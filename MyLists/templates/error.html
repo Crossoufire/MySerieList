@@ -1,0 +1,26 @@
+{% extends "layout_without_modals.html" %}
+{% block content %}
+    <div class="page-wrap d-flex flex-row align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-12 text-center">
+                    <span class="display-1 d-block">{{ error_code }}</span>
+                    {% if error_code == 400 %}
+                        <div class="mb-4 lead">You made an invalid request.</div>
+                    {% elif error_code == 403 %}
+                        <div class="mb-4 lead">You do not have the necessary permissions.</div>
+                    {% elif error_code == 404 %}
+                        <div class="mb-4 lead">The requested resource could not be found.</div>
+                    {% elif error_code == 410 %}
+                        <div class="mb-4 lead">The requested resource is no longer available.</div>
+                    {% elif error_code == 500 %}
+                        <div class="mb-4 lead">There was an internal server error.</div>
+                    {% else %}
+                        <div class="mb-4 lead">RIP</div>
+                    {% endif %}
+                    <img class="card-img-top" src="{{ image_error }}" alt="Error Image">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

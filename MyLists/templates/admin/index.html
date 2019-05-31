@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <a href="{{ url_for('user.index_view') }}">User</a>
+    <br>
+    <a href="{{ url_for('serie.index_view') }}">Serie</a>
+    <br>
+    <a href="{{ url_for('list.index_view') }}">List</a>
+    <br>
+    <a href="{{ url_for('episodesperseason.index_view') }}">Episodes per season</a>
+    <br>
+    <a href="{{ url_for('genre.index_view') }}">Genre</a>
+    <br>
+    <a href="{{ url_for('network.index_view') }}">Network</a>
+    <br>
+    <a href="{{ url_for('friend.index_view') }}">Friend</a>
+    <br>
+    <a href="{{ url_for('episodetimestamp.index_view') }}">Episode timestamp</a>
+    <br>
+{% endblock %}

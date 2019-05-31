@@ -1,0 +1,584 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.9)
+}
+
+.scrollable-menu {
+    text-align-last: center;
+}
+
+.form-control:focus {
+    height: 2rem;
+    padding: 5px;
+    background-color: #131418;
+    color: #fff;
+}
+
+.form-control:disabled {
+    background-color: #131418;
+}
+
+.modal-content {
+    background: #131418;
+}
+
+.card {
+    border-radius: 5px;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+#serie {
+    padding: 0px;
+}
+
+/* On screens that are 599px or more */
+@media screen and (min-width: 599px) {
+    .card-img-top {
+        border-style: solid;
+        border-width: 1px;
+        border-color: black;
+        border-radius: 3px;
+    }
+
+    .card {
+        width: 200px;
+    }
+
+    .dropdown-item {
+        background-color: #272525;
+        color: #fff;
+        font-weight: 300;
+        font-size: 11pt;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .form-control {
+        height: 2rem;
+        padding: 5px;
+        background-color: #131418;
+        color: #fff;
+        border-radius: 1px;
+        font-size: 11pt;
+        outline: none;
+        box-shadow:none !important;
+    }
+
+    .dropdown-menu {
+        background-color: #272525;
+        min-width: 9rem;
+    }
+}
+
+/* On screens that are 599px or less */
+@media screen and (max-width: 599px) {
+    .card-img-top {
+        border-style: solid;
+        border-width: 1px;
+        border-color: black;
+        border-radius: 3px;
+    }
+
+    .card {
+        width: 135px;
+        padding-right: 0px;
+        margin-left: 5px !important;
+        margin-right: 5px !important;
+        margin-bottom: 20px;
+    }
+
+    .dropdown-item {
+        background-color: #272525;
+        max-width: 120px;
+        padding-left: 10px;
+        padding-right: 10px;
+        color: #fff;
+        font-weight: 300;
+        font-size: 10pt;
+    }
+
+    .form-control {
+        height: 2rem;
+        background-color: #131418;
+        color: #fff;
+        border-radius: 1px;
+        font-size: 11pt;
+        outline: none;
+        box-shadow:none !important;
+        align-items: left;
+        padding: 5px;
+    }
+
+    .dropdown-menu {
+        background-color: #272525;
+        max-width: 120px !important;
+    }
+
+    .dropdown-divider {
+        max-width: 120px;
+    }
+}
+
+#test2 {
+    align-items: center;
+    justify-content: center;
+}
+
+.episodes {
+    border-style: 1px;
+    border-color: black;
+    border-radius: 2px;
+    -moz-appearance:none;
+    -webkit-appearance:none;
+    appearance:none;
+}
+
+.seasons {
+    border-style: 1px;
+    border-color: black;
+    border-radius: 2px;
+    -moz-appearance:none;
+    -webkit-appearance:none;
+    appearance:none;
+}
+</style>
+
+<h1 class="font-weight-light text-center mt-4 mb-0">WATCHING</h1>
+<hr class="mt-2 mb-4">
+
+<div class="d-flex flex-wrap" id="test2">
+{% for data in all_data[0] %}
+    <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
+        <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
+        <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
+            <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
+        </div>
+
+        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
+            <div class="container p-0">
+                <div class="row p-0 m-0">
+                    <div class="col p-0">
+                         <select disabled="disabled" class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
+                             {% for i in range(data["season_data"]|length) %}
+                                {% if i+1 == data["current_season"] %}
+                                    <option selected="selected">Season {{ i+1 }}</option>
+                                {% else %}
+                                    <option>Season {{ i+1 }}</option>
+                                {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col p-0">
+                        <select disabled="disabled" class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
+                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
+                                {% if i+1 == data["last_episode_watched"] %}
+                                    <option selected="selected">Episode {{ i+1 }}</option>
+                                {% else %}
+                                    <option>Episode {{ i+1 }}</option>
+                                {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{ data['serie_name'] }}</h4>
+                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
+                        <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
+                        <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
+                        <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
+                        <p><b>In production</b> : {{ data['in_production'] }}</p>
+                        <p><b>Created by</b> : {{ data['created_by'] }}</p>
+                        <p><b>Episode duration</b> : {{ data['episode_duration'] }} min</p>
+                        <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
+                        <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
+                        <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
+                        <p><b>Status</b> : {{ data['status'] }}</p>
+                        <p class="text-justify"><b>Synopsis</b> : {{ data['synopsis'] }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<h1 class="font-weight-light text-center mt-4 mb-0">COMPLETED</h1>
+<hr class="mt-2 mb-4">
+
+<div class="d-flex flex-wrap" id="test2">
+{% for data in all_data[1] %}
+    <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
+        <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
+        <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
+            <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
+        </div>
+
+        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
+            <div class="container p-0">
+                <div class="row p-0 m-0">
+                    <div class="col p-0">
+                         <select disabled="disabled" class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
+                             {% for i in range(data["season_data"]|length) %}
+                                {% if i+1 == data["current_season"] %}
+                                    <option selected="selected">Season {{ i+1 }}</option>
+                                {% else %}
+                                    <option>Season {{ i+1 }}</option>
+                                {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col p-0">
+                        <select disabled="disabled" class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
+                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
+                                {% if i+1 == data["last_episode_watched"] %}
+                                    <option selected="selected">Episode {{ i+1 }}</option>
+                                {% else %}
+                                    <option>Episode {{ i+1 }}</option>
+                                {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{ data['serie_name'] }}</h4>
+                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
+                        <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
+                        <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
+                        <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
+                        <p><b>In production</b> : {{ data['in_production'] }}</p>
+                        <p><b>Created by</b> : {{ data['created_by'] }}</p>
+                        <p><b>Episode duration</b> : {{ data['episode_duration'] }}</p>
+                        <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
+                        <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
+                        <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
+                        <p><b>Status</b> : {{ data['status'] }}</p>
+                        <p><b>Synopsis</b> : {{ data['synopsis'] }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<h1 class="font-weight-light text-center mt-4 mb-0">ON HOLD</h1>
+<hr class="mt-2 mb-4">
+
+<div class="d-flex flex-wrap" id="test2">
+{% for data in all_data[2] %}
+    <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
+        <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
+        <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
+            <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
+        </div>
+
+        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
+            <div class="container p-0">
+                <div class="row p-0 m-0">
+                    <div class="col p-0">
+                         <select disabled="disabled" class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
+                             {% for i in range(data["season_data"]|length) %}
+                                {% if i+1 == data["current_season"] %}
+                                    <option selected="selected">Season {{ i+1 }}</option>
+                                {% else %}
+                                    <option>Season {{ i+1 }}</option>
+                                {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col p-0">
+                        <select disabled="disabled" class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
+                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
+                                {% if i+1 == data["last_episode_watched"] %}
+                                    <option selected="selected">Episode {{ i+1 }}</option>
+                                {% else %}
+                                    <option>Episode {{ i+1 }}</option>
+                                {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{ data['serie_name'] }}</h4>
+                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
+                        <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
+                        <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
+                        <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
+                        <p><b>In production</b> : {{ data['in_production'] }}</p>
+                        <p><b>Created by</b> : {{ data['created_by'] }}</p>
+                        <p><b>Episode duration</b> : {{ data['episode_duration'] }}</p>
+                        <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
+                        <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
+                        <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
+                        <p><b>Status</b> : {{ data['status'] }}</p>
+                        <p><b>Synopsis</b> : {{ data['synopsis'] }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<h1 class="font-weight-light text-center mt-4 mb-0">RANDOM</h1>
+<hr class="mt-2 mb-4">
+
+<div class="d-flex flex-wrap" id="test2">
+{% for data in all_data[3] %}
+    <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
+        <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
+        <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
+            <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
+        </div>
+
+        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
+            <div class="container p-0">
+                <div class="row p-0 m-0">
+                    <div class="col p-0">
+                         <select disabled="disabled" class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
+                             {% for i in range(data["season_data"]|length) %}
+                                {% if i+1 == data["current_season"] %}
+                                    <option selected="selected">Season {{ i+1 }}</option>
+                                {% else %}
+                                    <option>Season {{ i+1 }}</option>
+                                {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col p-0">
+                        <select disabled="disabled" class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
+                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
+                                {% if i+1 == data["last_episode_watched"] %}
+                                    <option selected="selected">Episode {{ i+1 }}</option>
+                                {% else %}
+                                    <option>Episode {{ i+1 }}</option>
+                                {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{ data['serie_name'] }}</h4>
+                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
+                        <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
+                        <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
+                        <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
+                        <p><b>In production</b> : {{ data['in_production'] }}</p>
+                        <p><b>Created by</b> : {{ data['created_by'] }}</p>
+                        <p><b>Episode duration</b> : {{ data['episode_duration'] }}</p>
+                        <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
+                        <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
+                        <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
+                        <p><b>Status</b> : {{ data['status'] }}</p>
+                        <p><b>Synopsis</b> : {{ data['synopsis'] }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<h1 class="font-weight-light text-center mt-4 mb-0">DROPPED</h1>
+<hr class="mt-2 mb-4">
+
+<div class="d-flex flex-wrap" id="test2">
+{% for data in all_data[4] %}
+    <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
+        <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
+        <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
+            <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
+        </div>
+
+        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
+            <div class="container p-0">
+                <div class="row p-0 m-0">
+                    <div class="col p-0">
+                         <select disabled="disabled" class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
+                             {% for i in range(data["season_data"]|length) %}
+                                {% if i+1 == data["current_season"] %}
+                                    <option selected="selected">Season {{ i+1 }}</option>
+                                {% else %}
+                                    <option>Season {{ i+1 }}</option>
+                                {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col p-0">
+                        <select disabled="disabled" class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
+                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
+                                {% if i+1 == data["last_episode_watched"] %}
+                                    <option selected="selected">Episode {{ i+1 }}</option>
+                                {% else %}
+                                    <option>Episode {{ i+1 }}</option>
+                                {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{ data['serie_name'] }}</h4>
+                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
+                        <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
+                        <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
+                        <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
+                        <p><b>In production</b> : {{ data['in_production'] }}</p>
+                        <p><b>Created by</b> : {{ data['created_by'] }}</p>
+                        <p><b>Episode duration</b> : {{ data['episode_duration'] }}</p>
+                        <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
+                        <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
+                        <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
+                        <p><b>Status</b> : {{ data['status'] }}</p>
+                        <p><b>Synopsis</b> : {{ data['synopsis'] }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<h1 class="font-weight-light text-center mt-4 mb-0">PLAN TO WATCH</h1>
+<hr class="mt-2 mb-4">
+
+<div class="d-flex flex-wrap" id="test2">
+{% for data in all_data[5] %}
+    <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
+        <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
+        <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
+            <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
+        </div>
+
+        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
+            <div class="container p-0">
+                <div class="row p-0 m-0">
+                    <div class="col p-0">
+                         <select disabled="disabled" class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
+                             {% for i in range(data["season_data"]|length) %}
+                                {% if i+1 == data["current_season"] %}
+                                    <option selected="selected">Season {{ i+1 }}</option>
+                                {% else %}
+                                    <option>Season {{ i+1 }}</option>
+                                {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col p-0">
+                        <select disabled="disabled" class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
+                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
+                                {% if i+1 == data["last_episode_watched"] %}
+                                    <option selected="selected">Episode {{ i+1 }}</option>
+                                {% else %}
+                                    <option>Episode {{ i+1 }}</option>
+                                {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{ data['serie_name'] }}</h4>
+                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
+                        <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
+                        <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
+                        <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
+                        <p><b>In production</b> : {{ data['in_production'] }}</p>
+                        <p><b>Created by</b> : {{ data['created_by'] }}</p>
+                        <p><b>Episode duration</b> : {{ data['episode_duration'] }}</p>
+                        <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
+                        <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
+                        <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
+                        <p><b>Status</b> : {{ data['status'] }}</p>
+                        <p><b>Synopsis</b> : {{ data['synopsis'] }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock content %}

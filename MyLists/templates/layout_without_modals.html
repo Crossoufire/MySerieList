@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.2/css/mdb.min.css" rel="stylesheet">
+
+	<link href="{{ url_for('static', filename='css/mylists.css') }}" rel="stylesheet">
+	<link href="{{ url_for('static', filename='css/util.css') }}" rel="stylesheet">
+
+    {% block css %}
+    {% endblock %}
+
+	{% if title %}
+    <title>MyLists - {{ title }}</title>
+    {% else %}
+    <title>MyLists</title>
+    {% endif %}
+
+    <link rel='icon' href="{{ url_for('static', filename='img/favicon.ico') }}" type='image/gif'>
+</head>
+
+<body>
+    <header class="site-header">
+        <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
+            <div class="container">
+                <a class="navbar-brand mr-3" href="/">MyLists</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                                {{message}}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+
+    {% block home_header %}
+    {% endblock %}
+
+    <main role="main" class="container">
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.2/js/mdb.min.js"></script>
+
+    {% block script %}
+    {% endblock %}
+
+<footer class="page-footer font-small">
+    <div class="footer-copyright text-center py-3">© 2019 Copyright:
+        MySeriesList
+    </div>
+</footer>
+</body>
+</html>

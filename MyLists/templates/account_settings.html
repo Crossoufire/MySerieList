@@ -1,0 +1,134 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.4.0/css/bootstrap4-toggle.min.css" rel="stylesheet">
+{% endblock css %}
+
+{% block content %}
+<style>
+.account-img {
+    height: 200px;
+    width: 200px;
+    margin-bottom: 15px;
+    border-style: solid;
+    border-width: 1px;
+}
+
+hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.form-control {
+    background: transparent;
+    border-radius: 0px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    color: #fff;
+}
+
+.form-control:focus {
+    background: transparent;
+    border-radius: 0px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    box-shadow: 0 0 0 0rem;
+    color: #fff;
+}
+
+.form-check-label {
+    margin-bottom: 30px;
+}
+
+.form_account {
+    max-width: 800px;
+}
+</style>
+
+<div class="container form_account">
+    <div class="d-flex flex-wrap-reverse">
+        <div class="p-r-10 bd-highlight">
+            <img class="rounded border-light account-img" src="{{ image_file }}">
+        </div>
+        <div class="bd-highlight">
+            <h2 class="mt-0 account-heading">{{ current_user.username }}</h2>
+            <h5 class="text">{{ current_user.email }}</h5>
+        </div>
+        <div class="ml-auto bd-highlight">
+            <label>
+                Private Mode
+                <input id="private-toggle" type="checkbox" {{ value_privacy }} data-toggle="toggle"  data-onstyle="light" data-offstyle="dark" data-style="border" data-size="sm">
+            </label>
+        </div>
+    </div>
+
+    <form method="POST" action="" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group mt-4">
+            <legend class="border-bottom mb-4">Account Info</legend>
+            <div class="form-group">
+                {{ form.username.label(class="form-control-label") }}
+                {% if form.username.errors %}
+                    {{ form.username(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.username.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.username(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.email.label(class="form-control-label") }}
+                {% if form.email.errors %}
+                    {{ form.email(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.email.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.email(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.picture.label() }}
+                {{ form.picture(class="form-control-file") }}
+                {% if form.picture.errors %}
+                    {% for error in form.picture.errors %}
+                        <span class="text-danger">{{ error }}</span><br>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="text-left">
+            {{ form.submit(class="btn btn-outline-info") }}
+            <a class="btn btn-outline-info" href="{{ url_for('change_password') }}" role="button">Change password?</a>
+        </div>
+    </form>
+</div>
+
+
+<script>
+let private = document.getElementById("private-toggle");
+
+private.onchange = function () {
+
+    $.ajax ({
+        type: "POST",
+        url: "/private_mode",
+        contentType: "application/json",
+        data: JSON.stringify({private: "triggered"}),
+        dataType: "json",
+        success: function(response) {
+            console.log(response); }
+    });
+};
+</script>
+{% endblock content %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.4.0/js/bootstrap4-toggle.min.js"></script>
+{% endblock script %}

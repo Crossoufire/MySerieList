@@ -1,0 +1,347 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<style type="text/css">
+
+/* On screens that are 730px or less, set the title font size to 30pt */
+@media screen and (max-width: 730px) {
+    #title {
+        font-size: 35pt;
+    }
+}
+
+/* On screens that are 730px or more, set the title font size to 70pt */
+@media screen and (min-width: 730px) {
+    #title {
+        font-size: 70pt;
+    }
+}
+
+.background_white {
+    border-color: #e2e2e2;
+}
+
+/****** LOGIN & REGISTER MODAL ******/
+.modal-content {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  max-width:  343px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #131418;
+  border-radius: 2px !important;
+  border-style: solid !important;
+  border-color: white !important;
+  border-width: 1px !important;
+}
+
+.modal-content a {
+    color:  #f0efee;
+    font-weight: 400;
+    text-align: center;
+    display: inline-block;
+    opacity: 0.6;
+    transition: opacity ease 0.5s;
+}
+
+</style>
+{% endblock %}
+
+{% block home_header %}
+
+    <div id="myCarousel" class="carousel text-center" data-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="view">
+                    <img class="first-slide" src="{{ image_header }}" alt="First slide">
+
+                    <div class="mask d-flex justify-content-center align-items-center">
+                        <div class="text-center white-text mx-5 wow fadeIn">
+                            <h1 class="mb-4" id="title">
+                                <strong>Welcome to MyLists</strong>
+                            </h1>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block content %}
+    <!--Login modal-->
+    <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Login</h4>
+                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form  method="POST" action="">
+                            <fieldset>
+                                {{ login_form.hidden_tag() }}
+                                <div class="md-form">
+                                    {% if login_form.login_username.errors %}
+                                    {{ login_form.login_username(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in login_form.login_username.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    {{ login_form.login_username(class="form-control text-light", placeholder="Username") }}
+                                    {% endif %}
+                                </div>
+                                <div class="md-form">
+                                    {% if login_form.login_password.errors %}
+                                    {{ login_form.login_password(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in login_form.login_password.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    {{ login_form.login_password(class="form-control text-light", placeholder="Password") }}
+                                    {% endif %}
+                                </div>
+                                <div class="form-check m-l-20 m-r-20 m-b-10">
+                                    {{ login_form.login_remember(class="form-check-input") }}
+                                    {{ login_form.login_remember.label(class="form-check-label") }}
+                                </div>
+                                <div class="text-center m-b-10">
+                                    {{ login_form.login_submit(class="btn btn-outline-info") }}
+                                </div>
+                            </fieldset>
+                        </form>
+                        <div class="login-help text-center">
+                            <a type="text" href="{{url_for('reset_password')}}" >Forgot Password?</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Register modal-->
+    <div class="modal fade" id="modalRegisterForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Register</h4>
+                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" action="">
+                            {{ register_form.hidden_tag() }}
+                            <fieldset>
+                                <div class="md-form m-l-10 m-r-10">
+                                    {% if register_form.register_username.errors %}
+                                    {{ register_form.register_username(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in register_form.register_username.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    {{ register_form.register_username(class="form-control text-light", placeholder="Username") }}
+                                    {% endif %}
+                                </div>
+
+                                <div class="md-form m-l-10 m-r-10">
+                                    {% if register_form.register_email.errors %}
+                                    {{ register_form.register_email(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in register_form.register_email.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    {{ register_form.register_email(class="form-control text-light", placeholder="E-mail") }}
+                                    {% endif %}
+                                </div>
+
+                                <div class="md-form m-l-10 m-r-10">
+                                    {% if register_form.register_password.errors %}
+                                    {{ register_form.register_password(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in register_form.register_password.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    {{ register_form.register_password(class="form-control text-light", placeholder="Password") }}
+                                    {% endif %}
+                                </div>
+
+                                <div class="md-form m-l-10 m-r-10">
+                                    {% if register_form.register_confirm_password.errors %}
+                                    {{ register_form.register_confirm_password(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in register_form.register_confirm_password.errors %}
+                                        {% if error == "Field must be equal to new_password." %}
+                                        <span>New password and confirm new password are different.</span>
+                                        {% else %}
+                                        <span>{{ error }}</span>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    {{ register_form.register_confirm_password(class="form-control text-light", placeholder="Confirm Password") }}
+                                    {% endif %}
+                                </div>
+                            </fieldset>
+                            <div class="text-center m-b-10">
+                                {{ register_form.register_submit(class="btn btn-outline-info") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section>
+        <h1 class="my-5 h3 text-center" style="margin-bottom: 2rem !important; margin-top: 2rem !important">TRACK YOUR TV SHOWS AND NEVER GET LOST</h1>
+        <h5 class="my-5 text-center" style="margin-bottom: 2rem !important; margin-top: 2rem !important">MyLists has a beautiful and clear interface which allows you to track all your TV shows without remembering what was your last watched episode. It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see you friends' list and compare it to yours.</h5>
+
+        <div class="row wow fadeIn">
+            <div class="col-md-12 flex-center">
+                <img src="{{ img1 }}" class="img-fluid z-depth-1-half" alt="">
+            </div>
+        </div>
+    </section>
+
+    <hr class="my-5 background_white">
+
+    <section>
+        <h1 class="my-5 h3 text-center" style="margin-bottom: 2rem !important; margin-top: 2rem !important">COMPARE YOUR LIST WITH OTHER USERS</h1>
+        <h5 class="my-5 text-center" style="margin-bottom: 2rem !important; margin-top: 2rem !important">MyLists includes a Hall of Fame of all registered users. By default, all users can see the List of everyone. You can also set your profil to private, so only your friends can see your List.</h5>
+
+        <div class="row wow fadeIn">
+            <div class="col-md-12 flex-center">
+                <img src="{{ img2 }}" class="img-fluid z-depth-1-half" alt="">
+            </div>
+        </div>
+    </section>
+
+    <hr class="my-5 background_white">
+
+    <section>
+        <h2 class="my-5 h3 text-center">AND EVEN MORE</h2>
+        <div class="row features-small mt-5 wow fadeIn">
+
+            <div class="col-xl-3 col-lg-6">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fab fa-firefox fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2 pl-3">
+                        <h5 class="feature-title font-bold mb-1">Responsive</h5>
+                        <p class="grey-text mt-2">Fully responsive created with <a href="https://mdbootstrap.com/">MDB</a>. Supports PC, tablets, mobile, TV.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-6">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fab fa-osi fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">Open Source</h5>
+                        <p class="grey-text mt-2">Totally open source, made with <a href="http://flask.pocoo.org/">Flask</a>. You can find the source code on <a href="https://www.github.com/Crossoufire/MyLists">Github.</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-6">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fas fa-ad fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">No ads</h5>
+                        <p class="grey-text mt-2">You will not find any ads here, we don't do that here, and we want to keep it that way as long as possible.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-6">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fab fa-google fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">No analytics</h5>
+                        <p class="grey-text mt-2">No Google analysis or such things. Don't worry, we don't sell your privacy.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-6">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fas fa-dollar-sign fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">100% free</h5>
+                        <p class="grey-text mt-2">You only need to create an account to access all the content.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-6">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fas fa-comments fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">Found a bug ?</h5>
+                        <p class="grey-text mt-2">You can contact us by e-mail at: <a href="mailto:contact@mylists.info">contact@mylists.info</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-6">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="far fa-smile fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">Made by random people with ❤</h5>
+                        <p class="grey-text mt-2">Built and kept alive by only 2 people, on their spare time.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-6">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fas fa-code fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">New features incoming</h5>
+                        <p class="grey-text mt-2">We have a ton of ideas, just not enough time. Stay tuned !</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+{% endblock content %}
+
+{% block script %}
+    <script type="text/javascript">
+        // Animations initialization
+        new WOW().init();
+    </script>
+{% endblock script %}

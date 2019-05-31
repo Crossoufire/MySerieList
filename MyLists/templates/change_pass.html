@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block css %}
+    <style>
+        .change_pass_account {
+            max-width: 800px;
+        }
+
+        .form-control {
+            background: transparent;
+            border-radius: 0px;
+            border-top: 0px;
+            border-left: 0px;
+            border-right: 0px;
+            color: #fff;
+        }
+
+        .form-control:focus {
+            background: transparent;
+            border-radius: 0px;
+            border-top: 0px;
+            border-left: 0px;
+            border-right: 0px;
+            box-shadow: 0 0 0 0rem;
+            color: #fff;
+        }
+
+        .form-check-label {
+            margin-bottom: 30px;
+        }
+
+        .form-check {
+            padding: 0px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container change_pass_account">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Change Your Password</legend>
+                <div class="form-group">
+                    {% if form.actual_password.errors %}
+                        {{ form.actual_password(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.actual_password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.actual_password(class="form-control", placeholder="Actual Password") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {% if form.new_password.errors %}
+                        {{ form.new_password(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.new_password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.new_password(class="form-control", placeholder="New Password") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {% if form.confirm_new_password.errors %}
+                        {{ form.confirm_new_password(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.confirm_new_password.errors %}
+                                {% if error == "Field must be equal to new_password." %}
+                                    <span>New password and confirm new password are different.</span>
+                                {% else %}
+                                    <span>{{ error }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.confirm_new_password(class="form-control", placeholder="Confirm New Password") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                <div class="text-right">
+                    {{ form.submit(class="btn btn-outline-info") }}
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

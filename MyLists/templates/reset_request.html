@@ -1,0 +1,72 @@
+{% extends "layout_without_modals.html" %}
+{% block css %}
+    <style>
+        .form_account {
+            max-width: 700px;
+        }
+
+        .form-control {
+            background: transparent;
+            border-radius: 0px;
+            border-top: 0px;
+            border-left: 0px;
+            border-right: 0px;
+            color: #fff;
+        }
+
+        .form-control:focus {
+            background: transparent;
+            border-radius: 0px;
+            border-top: 0px;
+            border-left: 0px;
+            border-right: 0px;
+            box-shadow: 0 0 0 0rem;
+            color: #fff;
+        }
+
+        .form-check-label {
+            margin-bottom: 30px;
+        }
+
+        .form-check {
+            padding: 0px;
+        }
+
+        .g-recaptcha {
+            margin: 0 auto;
+            width: 304px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container form_account">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Reset Password</legend>
+                <div class="form-check m-l-30 m-r-30 m-b-30">
+                    {% if form.email.errors %}
+                        {{ form.email(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="form-control", placeholder="E-mail") }}
+                    {% endif %}
+                </div>
+                <div class="form-check m-l-30 m-r-30">
+                    {{ form.recaptcha }}
+                    {% for error in form.recaptcha.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </fieldset>
+            <div class="form-check m-l-30 m-r-30 text-center">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+{% endblock content %}

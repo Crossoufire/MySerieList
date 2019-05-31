@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<!-- MDBootstrap Datatables  -->
+<link href="{{ url_for('static', filename='css/addons/datatables.min.css') }}" rel="stylesheet">
+{% endblock css %}
+
+{% block content %}
+
+<style>
+    table.dataTable thead .sorting:after,
+    table.dataTable thead .sorting:before,
+    table.dataTable thead .sorting_asc:after,
+    table.dataTable thead .sorting_asc:before,
+    table.dataTable thead .sorting_asc_disabled:after,
+    table.dataTable thead .sorting_asc_disabled:before,
+    table.dataTable thead .sorting_desc:after,
+    table.dataTable thead .sorting_desc:before,
+    table.dataTable thead .sorting_desc_disabled:after,
+    table.dataTable thead .sorting_desc_disabled:before {
+        bottom: .5em;
+    }
+
+    .table {
+      color: #fff
+    }
+
+    table.table a {
+        color: #359aff;
+    }
+
+    .table td {
+        text-align: center;
+    }
+
+    .table tr {
+        text-align: center;
+    }
+
+    .current_user {
+        background-color: #2c3946;
+    }
+
+    a.page-link {
+        color: #ffffff !important;
+    }
+</style>
+
+<table id="hall_of_fame" class="table table-striped table-sm table-responsive-lg" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th class="th-sm">Username</th>
+            <th class="th-sm">Watching</th>
+            <th class="th-sm">Completed</th>
+            <th class="th-sm">On Hold</th>
+            <th class="th-sm">Random</th>
+            <th class="th-sm">Dropped</th>
+            <th class="th-sm">Plan to Watch</th>
+            <th class="th-sm">Total</th>
+            <th class="th-sm">Days spent</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for user in all_user_data %}
+        <tr>
+        {% if current_user.get_id() == '1' %}
+            <td><b><a href="/user/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
+            <td>{{ user["watching"] }}</td>
+            <td>{{ user["completed"] }}</td>
+            <td>{{ user["onhold"] }}</td>
+            <td>{{ user["random"] }}</td>
+            <td>{{ user["dropped"] }}</td>
+            <td>{{ user["plantowatch"] }}</td>
+            <td>{{ user["total"] }}</td>
+            <td>{{ user["days"] }}</td>
+
+            {% elif user["iscurrentuser"] %}
+            <td class="current_user"><b><a href="/user/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
+            <td class="current_user">{{ user["watching"] }}</td>
+            <td class="current_user">{{ user["completed"] }}</td>
+            <td class="current_user">{{ user["onhold"] }}</td>
+            <td class="current_user">{{ user["random"] }}</td>
+            <td class="current_user">{{ user["dropped"] }}</td>
+            <td class="current_user">{{ user["plantowatch"] }}</td>
+            <td class="current_user">{{ user["total"] }}</td>
+            <td class="current_user">{{ user["days"] }}</td>
+
+            {% elif user["isprivate"] and not user["isfriend"] %}
+            <td><b>Anonymous</b></td>
+            <td>{{ user["watching"] }}</td>
+            <td>{{ user["completed"] }}</td>
+            <td>{{ user["onhold"] }}</td>
+            <td>{{ user["random"] }}</td>
+            <td>{{ user["dropped"] }}</td>
+            <td>{{ user["plantowatch"] }}</td>
+            <td>{{ user["total"] }}</td>
+            <td>{{ user["days"] }}</td>
+
+            {% else %}
+            <td><b><a href="/user/{{ user['username'] }}">{{ user['username'] }}</a></b></td>
+            <td>{{ user["watching"] }}</td>
+            <td>{{ user["completed"] }}</td>
+            <td>{{ user["onhold"] }}</td>
+            <td>{{ user["random"] }}</td>
+            <td>{{ user["dropped"] }}</td>
+            <td>{{ user["plantowatch"] }}</td>
+            <td>{{ user["total"] }}</td>
+            <td>{{ user["days"] }}</td>
+        {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock content %}
+
+{% block script %}
+<!-- MDBootstrap Datatables  -->
+<script type="text/javascript" src="{{ url_for('static', filename='js/addons/datatables.min.js') }}"></script>
+
+<script>
+    $(document).ready(function () {
+    $('#hall_of_fame').DataTable({
+    "order": [[ 8, "desc" ], [ 0, "asc" ]]
+    });
+    $('.dataTables_length').addClass('bs-select');
+    });
+</script>
+{% endblock script %}
+
