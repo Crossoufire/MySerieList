@@ -819,12 +819,14 @@ function refresh_all_series() {
     let close_{{ data['serie_id'] }} = document.getElementById("C_{{ data['cover_id'] }}");
 
     function changeSerieCategory_{{ data['cover_id'] }}(new_category) {
+        $body = $("body");
         $.ajax ({
             type: "POST",
             url: "/change_serie_category",
             contentType: "application/json",
             data: JSON.stringify({status: new_category, serie_id: {{ data['serie_id'] }} }),
             dataType: "json",
+            beforeSend: function() { $body.addClass("loading"); },
             success: function(response) {
                 window.location.replace('/mylist'); }
         });
@@ -886,13 +888,14 @@ function refresh_all_series() {
     }
 
     close_{{ data['serie_id'] }}.onclick = function () {
-
+        $body = $("body");
         $.ajax ({
             type: "POST",
             url: "/delete_serie",
             contentType: "application/json",
             data: JSON.stringify({delete: {{ data['serie_id'] }} }),
             dataType: "json",
+            beforeSend: function() { $body.addClass("loading"); },
             success: function(response) {
                 window.location.replace('/mylist'); }
         });
