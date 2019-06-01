@@ -934,6 +934,7 @@ def get_list_data(serie_list):
             current_serie["last_episode_watched"] = serie.last_episode_watched
 
             category_serie_data.append(current_serie)
+        category_serie_data = sorted(category_serie_data, key=lambda i: (i['serie_name']))
         all_serie_data.append(category_serie_data)
     return all_serie_data
 
