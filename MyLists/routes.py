@@ -148,7 +148,7 @@ def register_token(token):
     db.session.commit()
     app.logger.info('[{}] Account activated'.format(user.id))
     flash('Your account has been activated.', 'success')
-    return redirect(url_for('mylist'))
+    return redirect(url_for('home'))
 
 
 @app.route("/test")
@@ -789,7 +789,9 @@ def user_list(user_name):
     friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
 
     if user.private:
-        if friend is None or friend.status != "accepted":
+        if current_user.get_id() == "1":
+            pass
+        elif friend is None or friend.status != "accepted":
             return redirect(url_for('anonymous'))
 
     if user.id == 1:
@@ -945,14 +947,20 @@ def add_friend(friend_username):
 
 def send_reset_email(user):
     token = user.get_reset_token()
-    msg = Message('Password Reset Request', sender=app.config['MAIL_USERNAME'], recipients=[user.email])
-    msg.html = "Dear {0} <br><br>" \
-               "To reset your password, visit the following link:<br><br>" \
-               "{1}<br><br>" \
-               "This link is valid 30 minutes only.<br><br>" \
-               "If you did not make this request then simply ignore this email and no changes will be made.<br><br>" \
-               "Sincerely<br><br>" \
-               "The MyLists staff".format(user.username, url_for('reset_token', token=token, _external=True))
+    msg = Message(subject='Password Reset Request',
+                  sender=app.config['MAIL_USERNAME'],
+                  recipients=[user.email])
+
+    if platform.system() == "Windows":
+        path = os.path.join(app.root_path, "static\emails\\password_reset.html")
+    else:  # Linux & macOS
+        path = os.path.join(app.root_path, "static/emails/password_reset.html")
+
+    email_template = open(path, 'r').read().replace("{1}", user.username)
+    email_template = email_template.replace("{2}", url_for('reset_token', token=token, _external=True))
+
+    msg.html = email_template
+
     try:
         mail.send(msg)
         return True
@@ -987,13 +995,20 @@ def send_register_email(user):
 
 def send_email_update_email(user):
     token = user.get_email_update_token()
-    msg = Message('MySerieList Email Update Request', sender=app.config['MAIL_USERNAME'], recipients=[user.email])
-    msg.html = "Dear {} <br><br>" \
-               "To update your email address, visit the following link:<br><br>" \
-               "{}<br><br>" \
-               "If you did not make this request then simply ignore this email.<br><br>" \
-               "Sincerely<br><br>" \
-               "The MySerieList staff".format(user.username, url_for('email_update_token', token=token, _external=True))
+    msg = Message(subject='MySerieList Email Update Request',
+                  sender=app.config['MAIL_USERNAME'],
+                  recipients=[user.email])
+
+    if platform.system() == "Windows":
+        path = os.path.join(app.root_path, "static\emails\\email_update.html")
+    else:  # Linux & macOS
+        path = os.path.join(app.root_path, "static/emails/email_update.html")
+
+    email_template = open(path, 'r').read().replace("{1}", user.username)
+    email_template = email_template.replace("{2}", url_for('email_update_token', token=token, _external=True))
+
+    msg.html = email_template
+
     try:
         mail.send(msg)
         return True
