@@ -109,7 +109,7 @@ venv.bak/
 # macOS
 *.DS_Store
 
-#MyLists
+# MyLists
 config.ini
 site.db
 site.db-journal
@@ -117,3 +117,4 @@ MyLists/static/profile_pics/*
 !MyLists/static/profile_pics/default.jpg
 MyLists/static/serie_covers/*
 !MyLists/static/serie_covers/.gitkeep
+start.sh
