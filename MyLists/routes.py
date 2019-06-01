@@ -30,7 +30,7 @@ except:
 @app.before_first_request
 def create_user():
     db.create_all()
-    if User.query.filter_by(username='admin').first() is None:
+    if User.query.filter_by(id='1').first() is None:
         admin = User(username='admin',
                      email='admin@admin.com',
                      password=bcrypt.generate_password_hash("password").decode('utf-8'),
@@ -721,6 +721,24 @@ def change_serie_status():
         serie.status = 'WATCHING'
     elif serie_new_category == 'Completed':
         serie.status = 'COMPLETED'
+        # Set Season / Episode to max
+        number_season = Episodesperseason.query.filter_by(serie_id=serie_id).count()
+        for i in range(number_season):
+            number_episode = Episodesperseason.query.filter_by(serie_id=serie_id, season=i+1).first().episodes
+            for j in range(number_episode):
+                if Episodetimestamp.query.filter_by(user_id=current_user.get_id(),
+                                                    serie_id=serie_id,
+                                                    season=i+1,
+                                                    episode=j+1).first() is None:
+                    ep = Episodetimestamp(user_id=current_user.get_id(),
+                                          serie_id=serie_id,
+                                          season=i+1,
+                                          episode=j+1,
+                                          timestamp=datetime.utcnow())
+                    db.session.add(ep)
+        serie.current_season = number_season
+        serie.last_episode_watched = number_episode
+        db.session.commit()
     elif serie_new_category == 'On Hold':
         serie.status = 'ON_HOLD'
     elif serie_new_category == 'Random':
