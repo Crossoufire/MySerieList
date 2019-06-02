@@ -42,6 +42,18 @@ def create_user():
         db.session.add(admin)
         db.session.commit()
 
+    if User.query.filter_by(id='2').first() is None:
+        admin = User(username='test',
+                     email='test@test.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+        db.session.commit()
+
 
 ################################################### Anonymous pages ###################################################
 
