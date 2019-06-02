@@ -14,6 +14,8 @@ try:
     flask_secret = config['Flask']['secret']
     email = config['Mail']['email']
     password = config['Mail']['password']
+    server = config['Mail']['server']
+    port = config['Mail']['port']
     captcha_public = config['Captcha']['public_key']
     captcha_private = config['Captcha']['private_key']
 except:
@@ -23,7 +25,7 @@ except:
 app = Flask(__name__)
 app.config["SECRET_KEY"] = flask_secret
 
-app.config["SESSION_COOKIE_SECURE"] = False
+app.config["SESSION_COOKIE_SECURE"] = True
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -32,10 +34,10 @@ app.config['RECAPTCHA_PUBLIC_KEY'] = captcha_public
 app.config['RECAPTCHA_PRIVATE_KEY'] = captcha_private
 app.config['RECAPTCHA_DATA_ATTRS'] = {'theme': 'dark', 'size': 'small'}
 
-app.config['TESTING'] = True
+app.config['TESTING'] = False
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
+app.config['MAIL_SERVER'] = server
+app.config['MAIL_PORT'] = int(port)
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = email

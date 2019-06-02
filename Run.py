@@ -7,4 +7,4 @@ if __name__ == "__main__":
         print("Config file not found. Exit.")
         sys.exit()
 
-app.run(debug=True)
+app.run(debug=False)

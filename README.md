@@ -35,6 +35,8 @@ secret = <random_value>
 [Mail]
 email = <mail used for sending registration / reset password / email update email>
 password = <password of the email>
+server = <server to connect to>
+port = <port to connect to>
 
 [Captcha]
 public_key = <public key of Google reCAPTCHA>
@@ -44,7 +46,7 @@ private_key = <private key of Google reCAPTCHA>
 api_key = <API key of TheMovieDB. You need to register on their website to get one>
 ```
 
-The default configuration used for the mails uses Gmail. Feel free to adapt it as you want (file `Mylists/__init__.py`, parameters `app.config['MAIL_X]`).
+For example if you want to use Gmail, set `server = smtp.gmail.com` and `port = 465` . If you need more settings, feel free to adapt it as you want (file `Mylists/__init__.py`, parameters `app.config['MAIL_X]`).
 
 If you want to first test the project locally, you should change the values of `app.config['TESTING']` to `True` and `app.config["SESSION_COOKIE_SECURE"]` to `False` in the `Mylists/__init__.py` file.
 
