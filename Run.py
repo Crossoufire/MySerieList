@@ -2,9 +2,6 @@ from MyLists import app
 import os
 import sys
 
-import logging
-from logging.handlers import RotatingFileHandler
-
 if __name__ == "__main__":
     if not os.path.isfile('./config.ini'):
         print("Config file not found. Exit.")

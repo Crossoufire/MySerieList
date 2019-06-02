@@ -6,6 +6,7 @@ import sys
 import urllib
 import time
 import requests
+import logging
 
 from datetime import datetime
 from PIL import Image
@@ -26,6 +27,9 @@ except:
     print("Config file error. Exit.")
     sys.exit()
 
+logging.basicConfig(format='[%(asctime)s] %(levelname)s - %(message)s', level=logging.INFO, filename="MyLists/log/mylists.log")
+log = logging.getLogger('werkzeug')
+log.disabled = True
 
 @app.before_first_request
 def create_user():
@@ -65,12 +69,12 @@ def home():
     if login_form.validate_on_submit():
         user = User.query.filter_by(username=login_form.login_username.data).first()
         if user and not user.active:
-            app.logger.info('[{}] Connexion attempt while account not activated'.format(user.id))
+            logging.info('[{}] Connexion attempt while account not activated'.format(user.id))
             flash('Your Account is not activated', 'danger')
         elif user and bcrypt.check_password_hash(user.password, login_form.login_password.data):
             login_user(user, remember=login_form.login_remember.data)
             next_page = request.args.get('next')
-            app.logger.info('[{}] Logged in'.format(user.id))
+            logging.info('[{}] Logged in'.format(user.id))
             flash("You're now logged in. Welcome {0}".format(login_form.login_username.data), "success")
             return redirect(next_page) if next_page else redirect(url_for('mylist'))
         else:
@@ -86,7 +90,7 @@ def home():
                     registered_on=datetime.utcnow())
         db.session.add(user)
         db.session.commit()
-        app.logger.info('[{}] New account registration : username = {}, email = {}'.format(user.id,
+        logging.info('[{}] New account registration : username = {}, email = {}'.format(user.id,
                                                                                            register_form.register_username.data,
                                                                                            register_form.register_email.data))
 
@@ -94,7 +98,7 @@ def home():
             flash('Your account has been created. Check your e-mail address to activate your account!', 'info')
             return redirect(url_for('home'))
         else:
-            app.logger.error('[SYSTEM] Error while sending the registration email to {}'.format(user.email))
+            logging.error('[SYSTEM] Error while sending the registration email to {}'.format(user.email))
             image_error = url_for('static', filename='img/error.jpg')
             return render_template('error.html', error_code=500, title='Error', image_error=image_error), 500
 
@@ -116,11 +120,11 @@ def reset_password():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if send_reset_email(user):
-            app.logger.info('[{}] Reset password email sent'.format(user.id))
+            logging.info('[{}] Reset password email sent'.format(user.id))
             flash('An email has been sent with instructions to reset your password.', 'info')
             return redirect(url_for('home'))
         else:
-            app.logger.error('[SYSTEM] Error while sending the reset password email to {}'.format(user.email))
+            logging.error('[SYSTEM] Error while sending the reset password email to {}'.format(user.email))
             flash("There was an error while sending the reset password email. Please try again later.")
             return redirect(url_for('home'))
     return render_template('reset_request.html', title='Reset Password', form=form)
@@ -139,7 +143,7 @@ def reset_token(token):
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user.password = hashed_password
         db.session.commit()
-        app.logger.info('[{}] Password reset via reset password email'.format(user.id))
+        logging.info('[{}] Password reset via reset password email'.format(user.id))
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('home'))
     return render_template('reset_token.html', title='Reset Password', form=form)
@@ -158,7 +162,7 @@ def register_token(token):
     user.active = True
     user.activated_on = datetime.utcnow()
     db.session.commit()
-    app.logger.info('[{}] Account activated'.format(user.id))
+    logging.info('[{}] Account activated'.format(user.id))
     flash('Your account has been activated.', 'success')
     return redirect(url_for('home'))
 
@@ -181,7 +185,7 @@ def admin():
 def logout():
     user = User.query.filter_by(id=current_user.get_id()).first()
     logout_user()
-    app.logger.info('[{}] Logged out'.format(user.id))
+    logging.info('[{}] Logged out'.format(user.id))
     return redirect(url_for('home'))
 
 
@@ -347,7 +351,7 @@ def account_settings():
             old_picture_file = user.image_file
             user.image_file = picture_file
             db.session.commit()
-            app.logger.info(
+            logging.info(
                 '[{}] Settings updated : old picture file = {}, new picture file = {}'.format(user.id, old_picture_file,
                                                                                               user.image_file))
 
@@ -355,7 +359,7 @@ def account_settings():
             old_username = user.username
             user.username = form.username.data
             db.session.commit()
-            app.logger.info('[{}] Settings updated : old username = {}, new username = {}'.format(user.id, old_username,
+            logging.info('[{}] Settings updated : old username = {}, new username = {}'.format(user.id, old_username,
                                                                                                   user.username))
 
         email_changed = False
@@ -363,14 +367,14 @@ def account_settings():
             old_email = user.email
             user.transition_email = form.email.data
             db.session.commit()
-            app.logger.info('[{}] Settings updated : old email = {}, new email = {}'.format(user.id, old_email,
+            logging.info('[{}] Settings updated : old email = {}, new email = {}'.format(user.id, old_email,
                                                                                             user.transition_email))
             email_changed = True
             if send_email_update_email(user):
                 success = True
             else:
                 success = False
-                app.logger.error('[SYSTEM] Error while sending the email update email to {}'.format(user.email))
+                logging.error('[SYSTEM] Error while sending the email update email to {}'.format(user.email))
 
         if not email_changed:
             flash("Your account have been updated ! ", 'success')
@@ -408,7 +412,7 @@ def email_update_token(token):
     user.email = user.transition_email
     user.transition_email = None
     db.session.commit()
-    app.logger.info('[{}] Email successfully changed from {} to {}'.format(user.id, old_email, user.email))
+    logging.info('[{}] Email successfully changed from {} to {}'.format(user.id, old_email, user.email))
     flash('Email successfully updated !', 'success')
     return redirect(url_for('mylist'))
 
@@ -431,7 +435,7 @@ def private_data():
     else:
         user.private = True
     db.session.commit()
-    app.logger.info('[{}] Private mode updated'.format(user.id))
+    logging.info('[{}] Private mode updated'.format(user.id))
     return '', 204
 
 
@@ -445,7 +449,7 @@ def change_password():
             hashed_password = bcrypt.generate_password_hash(form.confirm_new_password.data).decode('utf-8')
             current_user.password = hashed_password
             db.session.commit()
-            app.logger.info('[{}] Password updated'.format(user.id))
+            logging.info('[{}] Password updated'.format(user.id))
             flash('Your password has been successfully updated!', 'success')
             return redirect(url_for('account'))
         else:
@@ -479,7 +483,7 @@ def accept_friend_request():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
     user2.status = 'accepted'
     db.session.commit()
-    app.logger.info('[{}] Friend request accepted from user with ID {}'.format(current_user.get_id(), friend_id))
+    logging.info('[{}] Friend request accepted from user with ID {}'.format(current_user.get_id(), friend_id))
     return '', 204
 
 
@@ -506,7 +510,7 @@ def decline_friend_request():
     if not Friend.query.filter_by(user_id=decline_friend, friend_id=current_user.get_id(), status="request").delete():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
     db.session.commit()
-    app.logger.info('[{}] Friend request declined from user with ID {}'.format(current_user.get_id(), decline_friend))
+    logging.info('[{}] Friend request declined from user with ID {}'.format(current_user.get_id(), decline_friend))
     return '', 204
 
 
@@ -531,7 +535,7 @@ def delete_friend():
     Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id).delete()
     Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id()).delete()
     db.session.commit()
-    app.logger.info('[{}] Friend with ID {} deleted'.format(current_user.get_id(), friend_id))
+    logging.info('[{}] Friend with ID {} deleted'.format(current_user.get_id(), friend_id))
     return '', 204
 
 
@@ -620,7 +624,7 @@ def update_season():
     update.current_season = season + 1
     update.last_episode_watched = 1
     db.session.commit()
-    app.logger.info(
+    logging.info(
         '[{}] Season of the serie with ID {} updated to {}'.format(current_user.get_id(), serie_id, season + 1))
     return '', 204
 
@@ -676,7 +680,7 @@ def update_episode():
     update.last_episode_watched = episode + 1
     db.session.commit()
 
-    app.logger.info(
+    logging.info(
         '[{}] Episode of the serie with ID {} updated to {}'.format(current_user.get_id(), serie_id, episode + 1))
     return '', 204
 
@@ -709,7 +713,7 @@ def delete_serie():
     Episodetimestamp.query.filter_by(user_id=current_user.get_id(), serie_id=serie_id).delete()
     db.session.commit()
 
-    app.logger.info('[{}] Serie with ID {} deleted'.format(current_user.get_id(), serie_id))
+    logging.info('[{}] Serie with ID {} deleted'.format(current_user.get_id(), serie_id))
     return '', 204
 
 
@@ -760,7 +764,7 @@ def change_serie_status():
     elif serie_new_category == 'Plan to Watch':
         serie.status = 'PLAN_TO_WATCH'
     db.session.commit()
-    app.logger.info('[{}] Category of the serie with ID {} changed to {}'.format(current_user.get_id(), serie_id,
+    logging.info('[{}] Category of the serie with ID {} changed to {}'.format(current_user.get_id(), serie_id,
                                                                                  serie_new_category))
     return '', 204
 
@@ -954,7 +958,7 @@ def get_list_data(serie_list):
 def add_friend(friend_username):
     friend_to_add = User.query.filter_by(username=friend_username).first()
     if friend_to_add is None or friend_to_add.id == 1:
-        app.logger.info('[{}] Attempt of adding user {} as friend'.format(current_user.get_id(), friend_username))
+        logging.info('[{}] Attempt of adding user {} as friend'.format(current_user.get_id(), friend_username))
         return flash('Sorry, no user with this username', 'info')
 
     else:
@@ -972,7 +976,7 @@ def add_friend(friend_username):
         db.session.add(add_user_2)
         db.session.commit()
 
-        app.logger.info('[{}] Friend request sent to user with ID {}'.format(current_user.get_id(), friend_to_add.id))
+        logging.info('[{}] Friend request sent to user with ID {}'.format(current_user.get_id(), friend_to_add.id))
         flash("Your friend request was sent", 'success')
 
 
@@ -996,7 +1000,7 @@ def send_reset_email(user):
         mail.send(msg)
         return True
     except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised when sending reset email to user with the ID {} : {}'.format(user.id, e))
+        logging.error('[SYSTEM] Exception raised when sending reset email to user with the ID {} : {}'.format(user.id, e))
         return False
 
 
@@ -1020,7 +1024,7 @@ def send_register_email(user):
         mail.send(msg)
         return True
     except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised when sending register email to user with the ID {} : {}'.format(user.id, e))
+        logging.error('[SYSTEM] Exception raised when sending register email to user with the ID {} : {}'.format(user.id, e))
         return False
 
 
@@ -1044,7 +1048,7 @@ def send_email_update_email(user):
         mail.send(msg)
         return True
     except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'.format(user.id, e))
+        logging.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'.format(user.id, e))
         return False
 
 
@@ -1073,7 +1077,7 @@ def add_serie(serie_name):
                              status=Status.WATCHING)
             db.session.add(user_list)
             db.session.commit()
-            app.logger.info('[{}] Added serie with the ID {} (already in base)'.format(current_user.get_id(), serie.id))
+            logging.info('[{}] Added serie with the ID {} (already in base)'.format(current_user.get_id(), serie.id))
 
             # Add the serie in the Episodetimestamp table
             data = Episodetimestamp(user_id=int(current_user.get_id()),
@@ -1102,7 +1106,7 @@ def add_serie(serie_name):
 
         add_serie_to_user(serie_id, int(current_user.get_id()))
 
-        app.logger.info('[{}] Added serie with the ID {} (new serie)'.format(current_user.get_id(), serie_id))
+        logging.info('[{}] Added serie with the ID {} (new serie)'.format(current_user.get_id(), serie_id))
 
         return redirect(url_for('mylist'))
 
@@ -1116,13 +1120,13 @@ def search_serie(serie_name):
             return None
 
         if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            logging.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
             return None
 
-        app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+        logging.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
 
         if response.headers["X-RateLimit-Remaining"] == "0":
-            app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+            logging.info('[SYSTEM] themoviedb maximum rate limit reached')
             time.sleep(3)
             continue
         else:
@@ -1143,13 +1147,13 @@ def get_serie_data_from_api(themoviedb_id):
             return None
 
         if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            logging.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
             return None
 
-        app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+        logging.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
 
         if response.headers["X-RateLimit-Remaining"] == "0":
-            app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+            logging.info('[SYSTEM] themoviedb maximum rate limit reached')
             time.sleep(3)
             continue
         else:
@@ -1513,4 +1517,4 @@ def refresh_serie_data(serie_id):
             season.episodes = season_data["episode_count"]
     # TODO : refresh Networks and Genres
     db.session.commit()
-    app.logger.info("[{}] Refreshed the serie with the ID {}".format(current_user.get_id(), serie_id))
+    logging.info("[{}] Refreshed the serie with the ID {}".format(current_user.get_id(), serie_id))
