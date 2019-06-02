@@ -17,4 +17,4 @@ if __name__ == "__main__":
     app.logger.addHandler(handler)
     app.logger.setLevel(logging.DEBUG)
 
-    app.run(debug=False)
+    app.run(debug=True)
