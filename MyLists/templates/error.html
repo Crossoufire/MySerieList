@@ -13,6 +13,8 @@
                         <div class="mb-4 lead">The requested resource could not be found.</div>
                     {% elif error_code == 410 %}
                         <div class="mb-4 lead">The requested resource is no longer available.</div>
+                    {% elif error_code == 413 %}
+                        <div class="mb-4 lead">The data value transmitted exceeds the capacity limit.</div>
                     {% elif error_code == 500 %}
                         <div class="mb-4 lead">There was an internal server error.</div>
                     {% else %}
