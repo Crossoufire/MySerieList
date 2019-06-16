@@ -53,7 +53,7 @@ def home():
         user = User.query.filter_by(username=login_form.login_username.data).first()
         if user and not user.active:
             app.logger.info('[{}] Connexion attempt while account not activated'.format(user.id))
-            flash('Your Account is not activated', 'danger')
+            flash('Your account is not activated. You need to verify your email first.', 'danger')
         elif user and bcrypt.check_password_hash(user.password, login_form.login_password.data):
             login_user(user, remember=login_form.login_remember.data)
             next_page = request.args.get('next')
@@ -967,7 +967,9 @@ def send_reset_email(user):
     token = user.get_reset_token()
     msg = Message(subject='Password Reset Request',
                   sender=app.config['MAIL_USERNAME'],
-                  recipients=[user.email])
+                  recipients=[user.email],
+                  bcc=[app.config['MAIL_USERNAME']],
+                  reply_to=app.config['MAIL_USERNAME'])
 
     if platform.system() == "Windows":
         path = os.path.join(app.root_path, "static\emails\\password_reset.html")
@@ -991,7 +993,9 @@ def send_register_email(user):
     token = user.get_register_token()
     msg = Message(subject='MyLists Register Request',
                   sender=app.config['MAIL_USERNAME'],
-                  recipients=[user.email])
+                  recipients=[user.email],
+                  bcc=[app.config['MAIL_USERNAME']],
+                  reply_to=app.config['MAIL_USERNAME'])
 
     if platform.system() == "Windows":
         path = os.path.join(app.root_path, "static\emails\\register.html")
@@ -1015,7 +1019,9 @@ def send_email_update_email(user):
     token = user.get_email_update_token()
     msg = Message(subject='MySerieList Email Update Request',
                   sender=app.config['MAIL_USERNAME'],
-                  recipients=[user.email])
+                  recipients=[user.email],
+                  bcc=[app.config['MAIL_USERNAME']],
+                  reply_to=app.config['MAIL_USERNAME'])
 
     if platform.system() == "Windows":
         path = os.path.join(app.root_path, "static\emails\\email_update.html")
