@@ -117,4 +117,6 @@ MyLists/static/profile_pics/*
 !MyLists/static/profile_pics/default.jpg
 MyLists/static/serie_covers/*
 !MyLists/static/serie_covers/.gitkeep
+MyLists/static/game_covers/*
+!MyLists/static/game_covers/.gitkeep
 start.sh
