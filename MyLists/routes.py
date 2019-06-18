@@ -53,7 +53,7 @@ def home():
         user = User.query.filter_by(username=login_form.login_username.data).first()
         if user and not user.active:
             app.logger.info('[{}] Connexion attempt while account not activated'.format(user.id))
-            flash('Your account is not activated. You need to verify your email first.', 'danger')
+            flash('Your Account is not activated. Please check your e-mail address to activate your account.', 'danger')
         elif user and bcrypt.check_password_hash(user.password, login_form.login_password.data):
             login_user(user, remember=login_form.login_remember.data)
             next_page = request.args.get('next')
@@ -152,6 +152,7 @@ def register_token(token):
 
 @app.route("/test")
 def test():
+    crawl_tmdb()
     return render_template('test.html')
 
 ################################################# Authenticated pages #################################################
@@ -1218,6 +1219,9 @@ def add_serie_in_base(serie_data, serie_cover_id):
     # Check if there is a special season
     # We do not want to take it into account
     seasons_data = []
+    if len(serie_data["seasons"]) == 0:
+        return None
+
     if serie_data["seasons"][0]["season_number"] == 0:  # Special season
         for i in range(len(serie_data["seasons"])):
             try:
@@ -1507,3 +1511,29 @@ def refresh_serie_data(serie_id):
     # TODO : refresh Networks and Genres
     db.session.commit()
     app.logger.info("[{}] Refreshed the serie with the ID {}".format(current_user.get_id(), serie_id))
+
+
+def crawl_tmdb():
+    import time
+    start_time = time.time()
+
+    for i in range(1, 101):
+
+        response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}".format(i, themoviedb_api_key))
+
+        print(response.headers["X-RateLimit-Remaining"])
+
+        if response.status_code == 200:
+            serie_data = json.loads(response.text)
+            print("Serie ID {} : OK".format(i))
+        else:
+            print("Serie ID {} : NON OK".format(i))
+            continue
+
+        if serie_data["poster_path"] is not None:
+            cover_id = save_themoviedb_serie_cover(serie_data["poster_path"])
+            add_serie_in_base(serie_data, cover_id)
+        else:
+            add_serie_in_base(serie_data, "default.jpg")
+
+    print("--- %s seconds ---" % (time.time() - start_time))

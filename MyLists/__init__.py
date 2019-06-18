@@ -25,7 +25,7 @@ except:
 app = Flask(__name__)
 app.config["SECRET_KEY"] = flask_secret
 
-app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SECURE"] = False
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
