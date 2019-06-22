@@ -52,6 +52,16 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test)
+    if User.query.filter_by(id='3').first() is None:
+        test2 = User(username='test2',
+                     email='test2@test2.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(test2)
     db.session.commit()
 
 
@@ -211,9 +221,13 @@ def account():
         friend_data["status"] = friend.status
         friends_list_data.append(friend_data)
 
-    # Statistics
+    # Series Statistics
     nb_of_series = get_series_stats()
     total_time = get_total_time_spent(current_user.get_id())
+
+    # Animes Statistics
+    nb_of_animes = get_animes_stats()
+    total_time_animes = get_total_time_spent_anime(current_user.get_id())
 
     get_graphic_data = Episodetimestamp.query.filter_by(user_id=current_user.get_id()).all()
 
@@ -322,8 +336,13 @@ def account():
                             round(november_time / 60, 2),
                             round(december_time / 60, 2)]
 
-    return render_template('account.html', title='Account', image_file=image_file, nb_of_series=nb_of_series,
+    return render_template('account.html',
+                           title='Account',
+                           image_file=image_file,
+                           nb_of_series=nb_of_series,
                            time_spend_total=total_time,
+                           nb_of_animes=nb_of_animes,
+                           total_time_animes=total_time_animes,
                            friends_list_data=friends_list_data,
                            form=form,
                            values_nb=nb_episodes_watched,
