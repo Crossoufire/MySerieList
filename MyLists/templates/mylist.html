@@ -265,22 +265,32 @@
 {% for category in all_data %}
 
     {% if loop.index == 1 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">WATCHING</h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0">WATCHING <a class="fas fa-chevron-down float-right" id="WATCHING_arrow" onclick="hide('WATCHING', 'WATCHING_arrow')"></a></h1>
+    <hr class="mt-2 mb-4">
+    <div class="d-flex flex-wrap" id="WATCHING">
     {% elif loop.index == 2 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">COMPLETED</h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0">COMPLETED <a class="fas fa-chevron-down float-right" id="COMPLETED_arrow" onclick="hide('COMPLETED', 'COMPLETED_arrow')"></a></h1>
+    <hr class="mt-2 mb-4">
+    <div class="d-flex flex-wrap" id="COMPLETED">
     {% elif loop.index == 3 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">ON HOLD</h1>
-    {% elif loop.index == 4 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">RANDOM</h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0">ON HOLD <a class="fas fa-chevron-down float-right" id="ON_HOLD_arrow" onclick="hide('ON_HOLD', 'ON_HOLD_arrow')"></a></h1>
+    <hr class="mt-2 mb-4">
+    <div class="d-flex flex-wrap" id="ON_HOLD">
+     {% elif loop.index == 4 %}
+    <h1 class="font-weight-light text-center mt-4 mb-0">RANDOM <a class="fas fa-chevron-down float-right" id="RANDOM_arrow" onclick="hide('RANDOM', 'RANDOM_arrow')"></a></h1>
+     <hr class="mt-2 mb-4">
+    <div class="d-flex flex-wrap" id="RANDOM">
     {% elif loop.index == 5 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">DROPPED</h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0">DROPPED <a class="fas fa-chevron-down float-right" id="DROPPED_arrow" onclick="hide('DROPPED', 'DROPPED_arrow')"></a></h1>
+    <hr class="mt-2 mb-4">
+    <div class="d-flex flex-wrap" id="DROPPED">
     {% elif loop.index == 6%}
-    <h1 class="font-weight-light text-center mt-4 mb-0">PLAN TO WATCH</h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0">PLAN TO WATCH <a class="fas fa-chevron-down float-right" id="PLAN_TO_WATCH_arrow" onclick="hide('PLAN_TO_WATCH', 'PLAN_TO_WATCH_arrow')"></a></h1>
+    <hr class="mt-2 mb-4">
+    <div class="d-flex flex-wrap" id="PLAN_TO_WATCH">
     {% endif %}
     {% set outer_loop = loop %}
 
-    <hr class="mt-2 mb-4">
-    <div class="d-flex flex-wrap" id="test2">
 
     {% for data in category %}
         <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
@@ -444,6 +454,7 @@ function changeSerieCategory(serie_id, new_category) {
     });
 }
 
+
 function deleteSerie(serie_id) {
     $body = $("body");
     $.ajax ({
@@ -457,6 +468,7 @@ function deleteSerie(serie_id) {
             window.location.replace('/mylist'); }
     });
 }
+
 
 function updateEpisode(serie_id, episode){
     let selected_episode = episode.selectedIndex
@@ -473,6 +485,21 @@ function updateEpisode(serie_id, episode){
             $body.removeClass("loading"); }
     });
 }
+
+
+function hide(category, arrow) {
+  var category = document.getElementById(category);
+  var arrow = document.getElementById(arrow);
+
+  if (category.className === "d-flex flex-wrap"){
+        category.className = "d-none";
+        arrow.className = "fas fa-chevron-right float-right";
+  } else {
+        category.className = "d-flex flex-wrap";
+        arrow.className = "fas fa-chevron-down float-right";
+  }
+}
+
 
 {% for i in range (6) %}
     {% for data in all_data[i] %}
