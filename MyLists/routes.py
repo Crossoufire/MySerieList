@@ -42,7 +42,17 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(admin)
-        db.session.commit()
+    if User.query.filter_by(id='2').first() is None:
+        test = User(username='test',
+                     email='test@test.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=True,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(test)
+    db.session.commit()
 
 
 ################################################### Anonymous pages ###################################################
@@ -870,7 +880,7 @@ def hall_of_fame():
     for friend in friends_of_current_user:
         friends_list.append(friend.friend_id)
 
-    all_user_data = []
+    all_user_data_series = []
     for user in users:
         watching = List.query.filter_by(user_id=user.id, status='WATCHING').count()
         completed = List.query.filter_by(user_id=user.id, status='COMPLETED').count()
@@ -905,8 +915,49 @@ def hall_of_fame():
             user_data["isprivate"] = user.private
             user_data["iscurrentuser"] = False
 
-        all_user_data.append(user_data)
-    return render_template("hall_of_fame.html", title='Hall of Fame', all_user_data=all_user_data)
+        all_user_data_series.append(user_data)
+
+    all_user_data_animes = []
+    for user in users:
+        watching = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').count()
+        completed = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').count()
+        onhold = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').count()
+        random = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').count()
+        dropped = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').count()
+        plantowatch = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').count()
+
+        total = watching + completed + onhold + random + dropped + plantowatch
+        print(total)
+        spent = get_total_time_spent_anime(user.id)
+
+        user_data = {"username": user.username,
+                     "watching": watching,
+                     "completed": completed,
+                     "onhold": onhold,
+                     "random": random,
+                     "dropped": dropped,
+                     "plantowatch": plantowatch,
+                     "total": total,
+                     "days": spent[0],
+                     "episodes": spent[2]}
+
+        if user.id in friends_list:
+            user_data["isfriend"] = True
+        else:
+            user_data["isfriend"] = False
+
+        if str(user.id) == current_user.get_id():
+            user_data["isprivate"] = False
+            user_data["iscurrentuser"] = True
+        else:
+            user_data["isprivate"] = user.private
+            user_data["iscurrentuser"] = False
+
+        all_user_data_animes.append(user_data)
+
+    return render_template("hall_of_fame.html", title='Hall of Fame',
+                           all_user_data_series=all_user_data_series,
+                           all_user_data_animes=all_user_data_animes)
 
 
 @app.route("/anonymous")
@@ -1843,6 +1894,41 @@ def refresh_all_animes():
     return '', 204
 
 
+@app.route("/user_anime/<user_name>")
+@login_required
+def user_anime(user_name):
+    image_error = url_for('static', filename='img/error.jpg')
+    user = User.query.filter_by(username=user_name).first()
+
+    if user is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
+    if user and str(user.id) == current_user.get_id():
+        return redirect(url_for('myanimelist'))
+
+    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+
+    if user.private:
+        if current_user.get_id() == "1":
+            pass
+        elif friend is None or friend.status != "accepted":
+            return redirect(url_for('anonymous'))
+
+    if user.id == 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    watching_list = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
+    completed_list = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    random_list = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').all()
+    dropped_list = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantowatch_list = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
+
+    anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    anime_data = get_anime_list_data(anime_list)
+    return render_template('user_anime_list.html', title='{}\'s list'.format(user.username), all_data=anime_data)
+
+
 def get_anime_list_data(anime_list):
     all_anime_data = []
     for category in anime_list:
@@ -2293,6 +2379,55 @@ def refresh_anime_data(anime_id):
     # TODO : refresh Networks and Genres
     db.session.commit()
     app.logger.info("[{}] Refreshed the anime with the ID {}".format(current_user.get_id(), anime_id))
+
+
+def get_total_time_spent_anime(user_id):
+    animes_id_request = db.engine.execute("SELECT anime_id, current_season, last_episode_watched, status FROM anime_list WHERE user_id = {0} AND status != 'PLAN_TO_WATCH'".format(user_id))
+    animes_id = animes_id_request.fetchall()
+
+    animes_duration = []
+    for i in range(0, len(animes_id)):
+        tmp = animes_id[i][0]
+        animes_duration_request = db.engine.execute("SELECT episode_duration FROM anime WHERE id = {}".format(tmp))
+        animes_duration.append(animes_duration_request.first())
+
+    animes_episodes = []
+    for i in range(0, len(animes_duration)):
+        tmp = animes_id[i][0]
+        animes_episodes_request = db.engine.execute("SELECT episodes FROM anime_episodesperseason WHERE anime_id = {} order by season".format(tmp))
+        animes_episodes.append(animes_episodes_request.fetchall())
+
+    time_spend_per_anime = []
+    episodes_watched_per_anime = []
+    for i in range(0, len(animes_id)):
+        a = 0
+        tmp = int(animes_id[i][1])
+        if tmp == 1:
+            episodes_watched_per_anime.append(int(animes_id[i][2]))
+            a = (int(animes_id[i][2]) * int(animes_duration[i][0]))
+            time_spend_per_anime.append(a)
+        else:
+            tmp = tmp - 1
+            for j in range(0, tmp):
+                a = a + int(animes_episodes[i][j][0])
+            episodes_watched_per_anime.append(a + int(animes_id[i][2]))
+            a = a * int(animes_duration[i][0])
+            a = a + int((animes_id[i][2]) * int(animes_duration[i][0]))
+            time_spend_per_anime.append(a)
+
+    episodes_watched_total = 0
+    for l in range(len(episodes_watched_per_anime)):
+        episodes_watched_total = episodes_watched_total + episodes_watched_per_anime[l]
+
+    time_spend_total = 0
+    for k in range(len(time_spend_per_anime)):
+        time_spend_total = time_spend_total + time_spend_per_anime[k]
+
+    time_correction = episodes_watched_total * 4
+    time_spend_total_days = round((time_spend_total - time_correction)/(60*24), 1)
+    time_spend_total_hours = round((time_spend_total - time_correction)/60, 1)
+
+    return [time_spend_total_days, episodes_watched_total, time_spend_total_hours]
 
 
 ###################################################### CRAWL TEST #####################################################

@@ -1,12 +1,13 @@
 {% extends "layout.html" %}
 
+
 {% block css %}
 <!-- MDBootstrap Datatables  -->
 <link href="{{ url_for('static', filename='css/addons/datatables.min.css') }}" rel="stylesheet">
 {% endblock css %}
 
-{% block content %}
 
+{% block content %}
 <style>
     table.dataTable thead .sorting:after,
     table.dataTable thead .sorting:before,
@@ -44,9 +45,16 @@
     a.page-link {
         color: #ffffff !important;
     }
+
+    hr {
+        border-top: 1px solid rgba(255, 255, 255, 0.9)
+    }
 </style>
 
-<table id="hall_of_fame" class="table table-striped table-sm table-responsive-lg" cellspacing="0" width="100%">
+<h1 class="font-weight-light text-center mt-4 mb-0">SERIES</h1>
+<hr class="mt-2 mb-4">
+
+<table id="hall_of_fame_series" class="table table-striped table-sm table-responsive-lg" cellspacing="0" width="100%">
     <thead>
         <tr>
             <th class="th-sm">Username</th>
@@ -62,7 +70,7 @@
     </thead>
 
     <tbody>
-    {% for user in all_user_data %}
+    {% for user in all_user_data_series %}
         <tr>
         {% if current_user.get_id() == '1' %}
             <td><b><a href="/user/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
@@ -112,7 +120,79 @@
     {% endfor %}
     </tbody>
 </table>
+
+<h1 class="font-weight-light text-center m-t-150 mb-0">ANIMES</h1>
+<hr class="mt-2 mb-4">
+
+<table id="hall_of_fame_animes" class="table table-striped table-sm table-responsive-lg" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th class="th-sm">Username</th>
+            <th class="th-sm">Watching</th>
+            <th class="th-sm">Completed</th>
+            <th class="th-sm">On Hold</th>
+            <th class="th-sm">Random</th>
+            <th class="th-sm">Dropped</th>
+            <th class="th-sm">Plan to Watch</th>
+            <th class="th-sm">Total</th>
+            <th class="th-sm">Days spent</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for user in all_user_data_animes %}
+        <tr>
+        {% if current_user.get_id() == '1' %}
+            <td><b><a href="/user_anime/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
+            <td>{{ user["watching"] }}</td>
+            <td>{{ user["completed"] }}</td>
+            <td>{{ user["onhold"] }}</td>
+            <td>{{ user["random"] }}</td>
+            <td>{{ user["dropped"] }}</td>
+            <td>{{ user["plantowatch"] }}</td>
+            <td>{{ user["total"] }}</td>
+            <td>{{ user["days"] }}</td>
+
+            {% elif user["iscurrentuser"] %}
+            <td class="current_user"><b><a href="/user_anime/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
+            <td class="current_user">{{ user["watching"] }}</td>
+            <td class="current_user">{{ user["completed"] }}</td>
+            <td class="current_user">{{ user["onhold"] }}</td>
+            <td class="current_user">{{ user["random"] }}</td>
+            <td class="current_user">{{ user["dropped"] }}</td>
+            <td class="current_user">{{ user["plantowatch"] }}</td>
+            <td class="current_user">{{ user["total"] }}</td>
+            <td class="current_user">{{ user["days"] }}</td>
+
+            {% elif user["isprivate"] and not user["isfriend"] %}
+            <td><b>Anonymous</b></td>
+            <td>{{ user["watching"] }}</td>
+            <td>{{ user["completed"] }}</td>
+            <td>{{ user["onhold"] }}</td>
+            <td>{{ user["random"] }}</td>
+            <td>{{ user["dropped"] }}</td>
+            <td>{{ user["plantowatch"] }}</td>
+            <td>{{ user["total"] }}</td>
+            <td>{{ user["days"] }}</td>
+
+            {% else %}
+            <td><b><a href="/user_anime/{{ user['username'] }}">{{ user['username'] }}</a></b></td>
+            <td>{{ user["watching"] }}</td>
+            <td>{{ user["completed"] }}</td>
+            <td>{{ user["onhold"] }}</td>
+            <td>{{ user["random"] }}</td>
+            <td>{{ user["dropped"] }}</td>
+            <td>{{ user["plantowatch"] }}</td>
+            <td>{{ user["total"] }}</td>
+            <td>{{ user["days"] }}</td>
+        {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock content %}
+
+
 
 {% block script %}
 <!-- MDBootstrap Datatables  -->
