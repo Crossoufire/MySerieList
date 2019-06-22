@@ -1,4 +1,9 @@
 {% extends "layout.html" %}
+
+{% block css %}
+<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet"></link>
+{% endblock css %}
+
 {% block content %}
 
 <style>
@@ -248,13 +253,14 @@
         -webkit-appearance:none;
         appearance:none;
     }
+
 </style>
 
 <div class="d-flex flex-wrap">
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         <div class="ml-auto m-t-20 m-b-10">
-            {{ form.serie(class="form-control add_serie text-light", id="add_serie", placeholder="Add a serie", onfocus="this.value=''") }}
+            {{ form.serie(class="form-control add_serie text-light", id="add_serie", placeholder="Add a serie", type="text", id="autocomplete", onfocus="this.value=''") }}
         </div>
     </form>
     <div class="ml-auto m-t-20 m-b-10">
@@ -538,3 +544,28 @@ function hide(category, arrow) {
 <div class="modal_loading"></div>
 
 {% endblock content %}
+
+{% block script %}
+
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" ></script>
+
+<script type="text/javascript">
+$(function() {
+    $("#autocomplete").autocomplete({
+        source:function(request, response) {
+            $.getJSON("{{url_for('autocomplete_serie')}}",{
+                q: request.term,
+            }, function(data) {
+                response(data.matching_results);
+            });
+        },
+        minLength: 1,
+        select: function(event, ui) {
+            console.log(ui.item.value);
+        }
+    });
+})
+
+</script>
+
+{% endblock script %}

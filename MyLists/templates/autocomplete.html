@@ -1,13 +1,13 @@
 <head>
-<link href="//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet"></link>
-<script src="//code.jquery.com/jquery-2.2.0.min.js"></script>
-<script src="//code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+<link href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet"></link>
+<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
 
 <script type="text/javascript">
 $(function() {
     $("#autocomplete").autocomplete({
         source:function(request, response) {
-            $.getJSON("{{url_for('autocomplete1')}}",{
+            $.getJSON("{{url_for('autocomplete_serie')}}",{
                 q: request.term, // in flask, "q" will be the argument to look for using request.args
             }, function(data) {
                 response(data.matching_results); // matching_results from jsonify
