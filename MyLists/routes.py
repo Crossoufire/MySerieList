@@ -15,9 +15,11 @@ from flask_mail import Message
 
 from MyLists import app, db, bcrypt, mail, config
 from MyLists.admin_views import User
-from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, SearchForm, ChangePasswordForm, \
+from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, SearchForm, SearchFormAnime, ChangePasswordForm, \
     Add_FriendForm, ResetPasswordForm, RequestResetForm
-from MyLists.models import Serie, List, Episodesperseason, Status, Genre, Network, Friend, Episodetimestamp
+from MyLists.models import Serie, List, Episodesperseason, Status, Genre, Network, Friend, Episodetimestamp ,Anime, \
+    AnimeList, AnimeEpisodesperseason, AnimeGenre, AnimeNetwork, AnimeEpisodetimestamp
+
 
 config.read('config.ini')
 try:
@@ -25,6 +27,7 @@ try:
 except:
     print("Config file error. Exit.")
     sys.exit()
+
 
 @app.before_first_request
 def create_user():
@@ -154,6 +157,7 @@ def register_token(token):
 def test():
     crawl_tmdb()
     return render_template('test.html')
+
 
 ################################################# Authenticated pages #################################################
 
@@ -546,7 +550,7 @@ def mylist():
     serie_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     serie_data = get_list_data(serie_list)
     serie_category = ["WATCHING", "COMPLETED", "ON HOLD", "RANDOM", "DROPPED", "PLAN TO WATCH"]
-    return render_template('mylist.html', title='MyList', form=form, all_data=serie_data, categories=serie_category)
+    return render_template('mylist.html', title='MySeriesList', form=form, all_data=serie_data, categories=serie_category)
 
 
 @app.route('/update_season', methods=['POST'])
@@ -1540,6 +1544,755 @@ def refresh_serie_data(serie_id):
     # TODO : refresh Networks and Genres
     db.session.commit()
     app.logger.info("[{}] Refreshed the serie with the ID {}".format(current_user.get_id(), serie_id))
+
+
+###################################################### ANIME TEST #####################################################
+
+
+@app.route("/myanimelist", methods=['GET', 'POST'])
+@login_required
+def myanimelist():
+    form = SearchFormAnime()
+    if form.validate_on_submit():
+        add_anime(form.anime.data.strip())
+
+    watching_list = AnimeList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').all()
+    completed_list = AnimeList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
+    onhold_list = AnimeList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
+    random_list = AnimeList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').all()
+    dropped_list = AnimeList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').all()
+    plantowatch_list = AnimeList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').all()
+
+    anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    anime_data = get_anime_list_data(anime_list)
+    anime_category = ["WATCHING", "COMPLETED", "ON HOLD", "RANDOM", "DROPPED", "PLAN TO WATCH"]
+    return render_template('myanimelist.html', title='MyAnimeList', form=form, all_data=anime_data, categories=anime_category)
+
+
+@app.route('/update_season_anime', methods=['POST'])
+@login_required
+def update_season_anime():
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        json_data = request.get_json()
+        season = json_data['season']
+        anime_id = json_data['anime_id']
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the inputs are digits
+    try:
+        season = int(season)
+        anime_id = int(anime_id)
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the anime exists
+    if Anime.query.filter_by(id=anime_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the anime is in the current user's list
+    if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=anime_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the season number is between 1 and <last_season>
+    last_season = AnimeEpisodesperseason.query.filter_by(anime_id=anime_id).order_by(
+        AnimeEpisodesperseason.season.desc()).first().season
+    if season + 1 < 1 or season + 1 > last_season:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    update = AnimeList.query.filter_by(anime_id=anime_id, user_id=current_user.get_id()).first()
+
+    old_season = update.current_season
+
+    if old_season < season + 1:
+        for i in range(old_season, season + 1):
+            for j in range(1, AnimeEpisodesperseason.query.filter_by(anime_id=anime_id,
+                                                                     season=i).first().episodes + 1):
+                if AnimeEpisodetimestamp.query.filter_by(user_id=current_user.get_id(),
+                                                         anime_id=anime_id,
+                                                         season=i,
+                                                         episode=j).first() is None:
+                    ep = AnimeEpisodetimestamp(user_id=current_user.get_id(),
+                                               anime_id=anime_id,
+                                               season=i,
+                                               episode=j,
+                                               timestamp=datetime.utcnow())
+                    db.session.add(ep)
+        ep = AnimeEpisodetimestamp(user_id=current_user.get_id(),
+                                   anime_id=anime_id,
+                                   season=season + 1,
+                                   episode=1,
+                                   timestamp=datetime.utcnow())
+        db.session.add(ep)
+        db.session.commit()
+
+    elif old_season > season + 1:
+        for i in range(season + 1, old_season + 1):
+            AnimeEpisodetimestamp.query.filter_by(user_id=current_user.get_id(), anime_id=anime_id, season=i).delete()
+        ep = AnimeEpisodetimestamp(user_id=current_user.get_id(),
+                                   anime_id=anime_id,
+                                   season=season + 1,
+                                   episode=1,
+                                   timestamp=datetime.utcnow())
+        db.session.add(ep)
+        db.session.commit()
+
+    update.current_season = season + 1
+    update.last_episode_watched = 1
+    db.session.commit()
+    app.logger.info('[{}] Season of the anime with ID {} updated to {}'.format(current_user.get_id(), anime_id, season + 1))
+    return '', 204
+
+
+@app.route('/update_episode_anime', methods=['POST'])
+@login_required
+def update_episode_anime():
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        json_data = request.get_json()
+        episode = json_data['episode']
+        anime_id = json_data['anime_id']
+    except:
+        print("A")
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the inputs are digits
+    try:
+        episode = int(episode)
+        anime_id = int(anime_id)
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the anime exists
+    if Anime.query.filter_by(id=anime_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the anime is in the current user's list
+    if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=anime_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the episode number is between 1 and <last_episode>
+    current_season = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=anime_id).first().current_season
+    last_episode = AnimeEpisodesperseason.query.filter_by(anime_id=anime_id, season=current_season).first().episodes
+    if episode + 1 < 1 or episode + 1 > last_episode:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    update = AnimeList.query.filter_by(anime_id=anime_id, user_id=current_user.get_id()).first()
+    old_last_episode_watched = update.last_episode_watched
+    current_season = update.current_season
+
+    if episode + 1 > old_last_episode_watched:
+        for i in range(old_last_episode_watched + 1, episode + 2):
+            ep = AnimeEpisodetimestamp(user_id=current_user.get_id(),
+                                       anime_id=anime_id,
+                                       season=current_season,
+                                       episode=i,
+                                       timestamp=datetime.utcnow())
+            db.session.add(ep)
+        db.session.commit()
+    elif episode + 1 < old_last_episode_watched:
+        for i in range(episode + 2, old_last_episode_watched + 1):
+            AnimeEpisodetimestamp.query.filter_by(user_id=current_user.get_id(),
+                                                  anime_id=anime_id,
+                                                  season=current_season,
+                                                  episode=i).delete()
+        db.session.commit()
+
+    update.last_episode_watched = episode + 1
+    db.session.commit()
+
+    app.logger.info(
+        '[{}] Episode of the anime with ID {} updated to {}'.format(current_user.get_id(), anime_id, episode + 1))
+    return '', 204
+
+
+@app.route('/delete_anime', methods=['POST'])
+@login_required
+def delete_anime():
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        json_data = request.get_json()
+        anime_id = json_data['delete']
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the inputs are digits
+    try:
+        anime_id = int(anime_id)
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the serie exists
+    if Anime.query.filter_by(id=anime_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the serie is in the current user's list
+    if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=anime_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    AnimeList.query.filter_by(anime_id=anime_id, user_id=current_user.get_id()).delete()
+    db.session.commit()
+
+    AnimeEpisodetimestamp.query.filter_by(user_id=current_user.get_id(), anime_id=anime_id).delete()
+    db.session.commit()
+
+    app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.get_id(), anime_id))
+    return '', 204
+
+
+@app.route('/change_anime_category', methods=['POST'])
+@login_required
+def change_anime_category():
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        json_data = request.get_json()
+        anime_new_category = json_data['status']
+        anime_id = json_data['anime_id']
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
+    if anime_new_category not in category_list:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the inputs are digits
+    try:
+        anime_id = int(anime_id)
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    anime = AnimeList.query.filter_by(anime_id=anime_id, user_id=current_user.get_id()).first()
+    if anime_new_category == 'Watching':
+        anime.status = 'WATCHING'
+    elif anime_new_category == 'Completed':
+        anime.status = 'COMPLETED'
+        # Set Season / Episode to max
+        number_season = AnimeEpisodesperseason.query.filter_by(anime_id=anime_id).count()
+        for i in range(number_season):
+            number_episode = AnimeEpisodesperseason.query.filter_by(anime_id=anime_id, season=i+1).first().episodes
+            for j in range(number_episode):
+                if AnimeEpisodetimestamp.query.filter_by(user_id=current_user.get_id(),
+                                                          anime_id=anime_id,
+                                                          season=i+1,
+                                                          episode=j+1).first() is None:
+                    ep = AnimeEpisodesperseason(user_id=current_user.get_id(),
+                                                anime_id=anime_id,
+                                                season=i+1,
+                                                episode=j+1,
+                                                timestamp=datetime.utcnow())
+                    db.session.add(ep)
+        anime.current_season = number_season
+        anime.last_episode_watched = number_episode
+        db.session.commit()
+    elif anime_new_category == 'On Hold':
+        anime.status = 'ON_HOLD'
+    elif anime_new_category == 'Random':
+        anime.status = 'RANDOM'
+    elif anime_new_category == 'Dropped':
+        anime.status = 'DROPPED'
+    elif anime_new_category == 'Plan to Watch':
+        anime.status = 'PLAN_TO_WATCH'
+    db.session.commit()
+    app.logger.info('[{}] Category of the anime with ID {} changed to {}'.format(current_user.get_id(), anime_id,
+                                                                                 anime_new_category))
+    return '', 204
+
+
+@app.route('/refresh_single_anime', methods=['POST'])
+@login_required
+def refresh_single_anime():
+    image_error = url_for('static', filename='img/error.jpg')
+
+    try:
+        json_data = request.get_json()
+        anime_id = json_data['anime_id']
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the inputs are digits
+    try:
+        anime_id = int(anime_id)
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the anime is currently in the user's list
+    if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=anime_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if there is more than 30 min since the last update
+    last_update = Anime.query.filter_by(id=anime_id).first().last_update
+    time_delta = datetime.utcnow() - last_update
+    if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
+        refresh_anime_data(anime_id)
+    return '', 204
+
+
+@app.route('/refresh_all_animes', methods=['POST'])
+@login_required
+def refresh_all_animes():
+    animes = AnimeList.query.filter_by(user_id=current_user.get_id()).all()
+    for anime in animes:
+        # Check if there is more than 30 min since the last update
+        last_update = Anime.query.filter_by(id=anime.anime_id).first().last_update
+        time_delta = datetime.utcnow() - last_update
+        if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
+            refresh_anime_data(anime.anime_id)
+        else:
+            pass
+    return '', 204
+
+
+def get_anime_list_data(anime_list):
+    all_anime_data = []
+    for category in anime_list:
+        category_anime_data = []
+        for anime in category:
+            current_anime = {}
+            # Cover of the anime and its name
+            anime_data = Anime.query.filter_by(id=anime.anime_id).first()
+            cover_url = url_for('static', filename="anime_covers/{}".format(anime_data.image_cover))
+            current_anime["cover_url"] = cover_url
+            current_anime["cover_id"] = current_anime["cover_url"][
+                                        21:-4]  # /static/anime_covers/377d305d73a2689b.jpg -> 377d305d73a2689b
+
+            # Serie meta data
+            current_anime["anime_name"] = anime_data.name
+            current_anime["anime_original_name"] = anime_data.original_name
+            current_anime["anime_id"] = anime_data.id
+            current_anime["first_air_date"] = anime_data.first_air_date
+            current_anime["last_air_date"] = anime_data.last_air_date
+            current_anime["homepage"] = anime_data.homepage
+            current_anime["in_production"] = anime_data.in_production
+            current_anime["created_by"] = anime_data.created_by
+            current_anime["episode_duration"] = anime_data.episode_duration
+            current_anime["total_seasons"] = anime_data.total_seasons
+            current_anime["total_episodes"] = anime_data.total_episodes
+            current_anime["origin_country"] = anime_data.origin_country
+            current_anime["status"] = anime_data.status
+            current_anime["synopsis"] = anime_data.synopsis
+
+            # Can update
+            time_delta = datetime.utcnow() - anime_data.last_update
+            if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
+                current_anime["can_update"] = True
+            else:
+                current_anime["can_update"] = False
+
+            # Number of season and the number of ep of each season
+            episodesperseason = AnimeEpisodesperseason.query.filter_by(anime_id=anime_data.id).order_by(
+                AnimeEpisodesperseason.season.asc()).all()
+            tmp = []
+            for season in episodesperseason:
+                tmp.append(season.episodes)
+            current_anime["season_data"] = tmp
+
+            current_anime["current_season"] = anime.current_season
+            current_anime["last_episode_watched"] = anime.last_episode_watched
+
+            category_anime_data.append(current_anime)
+        all_anime_data.append(category_anime_data)
+    return all_anime_data
+
+
+def add_anime(anime_name):
+    if anime_name == "":
+        return redirect(url_for('myanimelist'))
+    anime = Anime.query.filter(Anime.name.like("%{}%".format(anime_name))).first()
+    if anime:  # Anime already in base
+        # Check if the anime is already in the current's user list
+        if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=anime.id).first() is not None:
+            return flash("The anime is already in your list", "warning")
+        else:
+            # Check if there is more than 30 min since the last update
+            last_update = anime.last_update
+            time_delta = datetime.utcnow() - last_update
+            if time_delta.days > 0 or (time_delta.seconds/1800> 1):  # 30 min
+                refresh_anime_data(anime.id)
+            else:
+                pass
+
+            # Create a link between the user and the anime
+            user_list = AnimeList(user_id=int(current_user.get_id()),
+                                  anime_id=anime.id,
+                                  current_season=1,
+                                  last_episode_watched=1,
+                                  status=Status.WATCHING)
+            db.session.add(user_list)
+            db.session.commit()
+            app.logger.info('[{}] Added anime with the ID {} (already in base)'.format(current_user.get_id(), anime.id))
+
+            # Add the anime in the Episodetimestamp table
+            data = AnimeEpisodetimestamp(user_id=int(current_user.get_id()),
+                                         anime_id=anime.id,
+                                         season=1,
+                                         episode=1,
+                                         timestamp=datetime.utcnow())
+            db.session.add(data)
+            db.session.commit()
+            return redirect(url_for('myanimelist'))
+    else:
+        themoviedb_id = search_anime(anime_name)
+        if themoviedb_id is None:
+            return flash("Anime not found", "warning")
+
+        anime_data = get_anime_data_from_api(themoviedb_id)
+        if anime_data is None:
+            return flash("There was a problem while getting anime's info. Please try again later.", "warning")
+
+        cover_id = save_themoviedb_anime_cover(anime_data["poster_path"])
+        if cover_id is None:
+            return flash("There was a problem while getting anime's poster. Please try again later.", "warning")
+
+        anime_id = add_anime_in_base(anime_data, cover_id)
+
+        add_anime_to_user(anime_id, int(current_user.get_id()))
+
+        app.logger.info('[{}] Added anime with the ID {} (new anime)'.format(current_user.get_id(), anime_id))
+
+        return redirect(url_for('myanimelist'))
+
+
+def search_anime(anime_name):
+    while True:
+        try:
+            response = requests.get(
+                "https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}".format(themoviedb_api_key, anime_name))
+        except:
+            return None
+
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            return None
+
+        app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+
+        if response.headers["X-RateLimit-Remaining"] == "0":
+            app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+            time.sleep(3)
+            continue
+        else:
+            break
+
+    data = json.loads(response.text)
+    if data["total_results"] == 0:
+        return None
+    return data["results"][0]["id"]
+
+
+def get_anime_data_from_api(themoviedb_id):
+    while True:
+        try:
+            response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}".format(themoviedb_id, themoviedb_api_key))
+        except:
+            return None
+
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            return None
+
+        app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+
+        if response.headers["X-RateLimit-Remaining"] == "0":
+            app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+            time.sleep(3)
+            continue
+        else:
+            break
+    return json.loads(response.text)
+
+
+def save_themoviedb_anime_cover(anime_cover_path):
+    anime_cover_id = "{}.jpg".format(secrets.token_hex(8))
+    if platform.system() == "Windows":
+        local_covers_path = os.path.join(app.root_path, "static\\anime_covers\\")
+    else:  # Linux & macOS
+        local_covers_path = os.path.join(app.root_path, "static/anime_covers/")
+    try:
+        urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(anime_cover_path),
+                                   "{}{}".format(local_covers_path, anime_cover_id))
+    except:
+        return None
+
+    img = Image.open("{}{}".format(local_covers_path, anime_cover_id))
+    img = img.resize((300, 450), Image.ANTIALIAS)
+    img.save("{}{}".format(local_covers_path, anime_cover_id), quality=90)
+    return anime_cover_id
+
+
+def add_anime_in_base(anime_data, anime_cover_id):
+    anime = Anime.query.filter_by(themoviedb_id=anime_data["id"]).first()
+    if anime is not None:
+        return anime.id
+
+    name = anime_data["name"]
+    original_name = anime_data["original_name"]
+    first_air_date = anime_data["first_air_date"]
+    last_air_date = anime_data["last_air_date"]
+    homepage = anime_data["homepage"]
+    in_production = anime_data["in_production"]
+    total_seasons = anime_data["number_of_seasons"]
+    total_episodes = anime_data["number_of_episodes"]
+    status = anime_data["status"]
+    vote_average = anime_data["vote_average"]
+    vote_count = anime_data["vote_count"]
+    synopsis = anime_data["overview"]
+    popularity = anime_data["popularity"]
+    themoviedb_id = anime_data["id"]
+
+    try:
+        created_by = ""
+        for person in anime_data["created_by"]:
+            created_by = created_by + person["name"] + ", "
+        if len(anime_data["created_by"]) > 0:
+            created_by = created_by[:-2]
+        else:
+            created_by = None
+    except:
+        created_by = None
+
+    try:
+        episode_duration = anime_data["episode_run_time"][0]
+    except:
+        episode_duration = None
+
+    try:
+        origin_country = ""
+        for country in anime_data["origin_country"]:
+            origin_country = origin_country + country + ", "
+        if len(anime_data["origin_country"]) > 0:
+            origin_country = origin_country[:-2]
+        else:
+            origin_country = None
+    except:
+        origin_country = None
+
+    # Check if there is a special season
+    # We do not want to take it into account
+    seasons_data = []
+    if anime_data["seasons"][0]["season_number"] == 0:  # Special season
+        for i in range(len(anime_data["seasons"])):
+            try:
+                seasons_data.append(anime_data["seasons"][i + 1])
+            except:
+                pass
+    else:
+        for i in range(len(anime_data["seasons"])):
+            try:
+                seasons_data.append(anime_data["seasons"][i])
+            except:
+                pass
+
+    genres_data = []
+    for i in range(len(anime_data["genres"])):
+        try:
+            genres_data.append(anime_data["genres"][i]["name"])
+        except:
+            pass
+
+    networks_data = []
+    for i in range(len(anime_data["networks"])):
+        try:
+            networks_data.append(anime_data["networks"][i]["name"])
+        except:
+            pass
+
+    # Add the anime into the Anime table
+    anime = Anime(name=name,
+                  original_name=original_name,
+                  image_cover=anime_cover_id,
+                  first_air_date=first_air_date,
+                  last_air_date=last_air_date,
+                  homepage=homepage,
+                  in_production=in_production,
+                  created_by=created_by,
+                  total_seasons=total_seasons,
+                  total_episodes=total_episodes,
+                  episode_duration=episode_duration,
+                  origin_country=origin_country,
+                  status=status,
+                  vote_average=vote_average,
+                  vote_count=vote_count,
+                  synopsis=synopsis,
+                  popularity=popularity,
+                  themoviedb_id=themoviedb_id,
+                  last_update=datetime.utcnow())
+    db.session.add(anime)
+    db.session.commit()
+
+    # Add the genres for each anime
+    for genre_data in genres_data:
+        genre = AnimeGenre(anime_id=anime.id,
+                      genre=genre_data)
+        db.session.add(genre)
+
+    # Add the different networks for each anime
+    for network_data in networks_data:
+        networks = AnimeNetwork(anime_id=anime.id,
+                           network=network_data)
+        db.session.add(networks)
+
+    # Add number of episodes for each season
+    for season_data in seasons_data:
+        season = AnimeEpisodesperseason(anime_id=anime.id,
+                                        season=season_data["season_number"],
+                                        episodes=season_data["episode_count"])
+        db.session.add(season)
+    db.session.commit()
+    return anime.id
+
+
+def add_anime_to_user(anime_id, user_id):
+    user_list = AnimeList(user_id=user_id,
+                          anime_id=anime_id,
+                          current_season=1,
+                          last_episode_watched=1,
+                          status=Status.WATCHING)
+    db.session.add(user_list)
+    db.session.commit()
+
+    data = AnimeEpisodetimestamp(user_id=user_id,
+                                 anime_id=anime_id,
+                                 season=1,
+                                 episode=1,
+                                 timestamp=datetime.utcnow())
+    db.session.add(data)
+    db.session.commit()
+
+
+def get_animes_stats():
+    watching = AnimeList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').count()
+    completed = AnimeList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').count()
+    onhold = AnimeList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').count()
+    random = AnimeList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').count()
+    dropped = AnimeList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').count()
+    plantowatch = AnimeList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').count()
+
+    statistics = [watching, completed, onhold, random, dropped, plantowatch]
+    return statistics
+
+
+def refresh_anime_data(anime_id):
+    anime = Anime.query.filter_by(id=anime_id).first()
+    anime_data = get_anime_data_from_api(anime.themoviedb_id)
+
+    if anime_data is None:
+        return flash("There was an error while refreshing the anime. Please try again later.")
+
+    name = anime_data["name"]
+    original_name = anime_data["original_name"]
+    first_air_date = anime_data["first_air_date"]
+    last_air_date = anime_data["last_air_date"]
+    homepage = anime_data["homepage"]
+    in_production = anime_data["in_production"]
+    total_seasons = anime_data["number_of_seasons"]
+    total_episodes = anime_data["number_of_episodes"]
+    status = anime_data["status"]
+    vote_average = anime_data["vote_average"]
+    vote_count = anime_data["vote_count"]
+    synopsis = anime_data["overview"]
+    popularity = anime_data["popularity"]
+    serie_poster = anime_data["poster_path"]
+
+    if platform.system() == "Windows":
+        local_covers_path = os.path.join(app.root_path, "static\\anime_covers\\")
+    else:  # Linux & macOS
+        local_covers_path = os.path.join(app.root_path, "static/anime_covers/")
+    try:
+        urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(anime_poster),
+                                   "{}{}".format(local_covers_path, anime.image_cover))
+    except:
+        return flash("There was an error while refreshing the anime. Please try again later.")
+
+    img = Image.open(local_covers_path + anime.image_cover)
+    img = img.resize((300, 450), Image.ANTIALIAS)
+    img.save(local_covers_path + anime.image_cover, quality=90)
+
+    try:
+        created_by = ""
+        for person in anime_data["created_by"]:
+            created_by = created_by + person["name"] + ", "
+        if len(anime_data["created_by"]) > 0:
+            created_by = created_by[:-2]
+        else:
+            created_by = None
+    except:
+        created_by = None
+
+    try:
+        episode_duration = anime_data["episode_run_time"][0]
+    except:
+        episode_duration = None
+
+    try:
+        origin_country = ""
+        for country in anime_data["origin_country"]:
+            origin_country = origin_country + country + ", "
+        if len(anime_data["origin_country"]) > 0:
+            origin_country = origin_country[:-2]
+        else:
+            origin_country = None
+    except:
+        origin_country = None
+
+    # Check if there is a special season
+    # We do not want to take it into account
+    seasons_data = []
+    if anime_data["seasons"][0]["season_number"] == 0:  # Special season
+        for i in range(len(anime_data["seasons"])):
+            try:
+                seasons_data.append(anime_data["seasons"][i + 1])
+            except:
+                pass
+    else:
+        for i in range(len(anime_data["seasons"])):
+            try:
+                seasons_data.append(anime_data["seasons"][i])
+            except:
+                pass
+
+    # We get the genres from the API
+    genres_data = []
+    for i in range(len(anime_data["genres"])):
+        genres_data.append(anime_data["genres"][i])
+
+    # We get the networks from the API
+    networks_data = []
+    for i in range(len(anime_data["networks"])):
+        networks_data.append(anime_data["networks"][i])
+
+    # Update the anime
+    anime.name = name
+    anime.original_name = original_name
+    anime.first_air_date = first_air_date
+    anime.last_air_date = last_air_date
+    anime.homepage = homepage
+    anime.in_production = in_production
+    anime.created_by = created_by
+    anime.total_seasons = total_seasons
+    anime.total_episodes = total_episodes
+    anime.episode_duration = episode_duration
+    anime.origin_country = origin_country
+    anime.status = status
+    anime.vote_average = vote_average
+    anime.vote_count = vote_count
+    anime.synopsis = synopsis
+    anime.popularity = popularity
+    anime.last_update = datetime.utcnow()
+
+    # Update the number of seasons and episodes
+    for season_data in seasons_data:
+        season = AnimeEpisodesperseason.query.filter_by(serie_id=anime_id, season=season_data["season_number"]).first()
+        if season is None:
+            season = AnimeEpisodesperseason(anime_id=anime.id,
+                                            season=season_data["season_number"],
+                                            episodes=season_data["episode_count"])
+            db.session.add(season)
+        else:
+            season.episodes = season_data["episode_count"]
+    # TODO : refresh Networks and Genres
+    db.session.commit()
+    app.logger.info("[{}] Refreshed the anime with the ID {}".format(current_user.get_id(), anime_id))
 
 
 ###################################################### CRAWL TEST #####################################################

@@ -120,3 +120,66 @@ class Episodetimestamp(db.Model):
     season = db.Column(db.Integer, nullable=False)
     episode = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
+
+
+########################### ANIME ########################################################
+
+
+class Anime(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    original_name = db.Column(db.String(50), nullable=False)
+    first_air_date = db.Column(db.String(30))
+    last_air_date = db.Column(db.String(30))
+    homepage = db.Column(db.String(200))
+    in_production = db.Column(db.Boolean)
+    created_by = db.Column(db.String(30))
+    episode_duration = db.Column(db.Integer)
+    total_seasons = db.Column(db.Integer, nullable=False)
+    total_episodes = db.Column(db.Integer)
+    origin_country = db.Column(db.String(20))
+    status = db.Column(db.String(50))
+    vote_average = db.Column(db.Float)
+    vote_count = db.Column(db.Float)
+    synopsis = db.Column(db.Text)
+    popularity = db.Column(db.Float)
+    image_cover = db.Column(db.String(100), nullable=False)
+    themoviedb_id = db.Column(db.Integer, nullable=False)
+    last_update = db.Column(db.DateTime, nullable=False)
+
+
+class AnimeList(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
+    current_season = db.Column(db.Integer, nullable=False)
+    last_episode_watched = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Enum(Status), nullable=False)
+
+
+class AnimeEpisodesperseason(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
+    season = db.Column(db.Integer, nullable=False)
+    episodes = db.Column(db.Integer, nullable=False)
+
+
+class AnimeGenre(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
+    genre = db.Column(db.String(100), nullable=False)
+
+
+class AnimeNetwork(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
+    network = db.Column(db.String(150), nullable=False)
+
+
+class AnimeEpisodetimestamp(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
+    season = db.Column(db.Integer, nullable=False)
+    episode = db.Column(db.Integer, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
