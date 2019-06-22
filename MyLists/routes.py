@@ -632,7 +632,6 @@ def update_episode():
         episode = json_data['episode']
         serie_id = json_data['serie_id']
     except:
-        print("A")
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the inputs are digits
@@ -1548,7 +1547,7 @@ def crawl_tmdb():
     import time
     start_time = time.time()
 
-    for i in range(1, 1001):
+    for i in range(1, 501):
 
         response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}".format(i, themoviedb_api_key))
 
@@ -1570,14 +1569,16 @@ def crawl_tmdb():
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
-@app.route('/autocomplete1', methods=['GET'])
-def autocomplete1():
+@app.route('/autocomplete_serie', methods=['GET'])
+def autocomplete_serie():
     search = request.args.get('q')
-    query = db.session.query(Serie.name).filter(Serie.name.like('%' + search + '%'))
+    query = db.session.query(Serie.name).filter(Serie.name.like(search + '%'))
     results = [mv[0] for mv in query.all()]
+    # Get only the first 5 matching results
+    results = results[:5]
     return jsonify(matching_results=results)    
 
 
-@app.route('/autocomplete')
-def autocomplete():
+@app.route('/autocomplete_sample')
+def autocomplete_sample():
     return render_template('autocomplete.html')
