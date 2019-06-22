@@ -2297,6 +2297,7 @@ def refresh_anime_data(anime_id):
 
 ###################################################### CRAWL TEST #####################################################
 
+
 def crawl_tmdb():
     import time
     start_time = time.time()
@@ -2304,7 +2305,6 @@ def crawl_tmdb():
     for i in range(1, 1001):
 
         response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}".format(i, themoviedb_api_key))
-
         print(response.headers["X-RateLimit-Remaining"])
 
         if response.status_code == 200:
