@@ -1,9 +1,4 @@
 {% extends "layout.html" %}
-
-{% block css %}
-<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet"></link>
-{% endblock css %}
-
 {% block content %}
 
 <style>
@@ -39,7 +34,7 @@
         background-color: #375a7d;
     }
 
-    #add_serie {
+    #add_anime {
         width: 220px;
     }
 
@@ -93,7 +88,7 @@
         outline: none;
     }
 
-    .add_serie {
+    .add_anime {
         background: transparent;
         border-radius: 0px;
         border-top: 0px;
@@ -253,18 +248,17 @@
         -webkit-appearance:none;
         appearance:none;
     }
-
 </style>
 
 <div class="d-flex flex-wrap">
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         <div class="ml-auto m-t-20 m-b-10">
-            {{ form.serie(class="form-control add_serie text-light", id="add_serie", placeholder="Add a serie", type="text", id="autocomplete", onfocus="this.value=''") }}
+            {{ form.anime(class="form-control add_anime text-light", id="add_anime", placeholder="Add an Anime", onfocus="this.value=''") }}
         </div>
     </form>
     <div class="ml-auto m-t-20 m-b-10">
-        <button class="btn btn-refresh-all" onclick="refresh_all_series()">Refresh All</button>
+        <button class="btn btn-refresh-all" onclick="refresh_all_animes()">Refresh All</button>
     </div>
 </div>
 
@@ -300,65 +294,65 @@
 
     {% for data in category %}
         <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
-            <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
+            <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['anime_name'] }}">
             <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
-                <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
+                <p class="text-light"><div class="text-center"><h3>{{ data['anime_name'] }}</h3></div>
             </div>
             <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
             <div class="dropdown-menu">
                 {% if outer_loop.index == 1 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Dropped')">Dropped</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Plan to Watch')">Plan to Watch</button>
                 {% elif outer_loop.index == 2 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Dropped')">Dropped</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Plan to Watch')">Plan to Watch</button>
                 {% elif outer_loop.index == 3 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Dropped')">Dropped</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Plan to Watch')">Plan to Watch</button>
                 {% elif outer_loop.index == 4 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Dropped')">Dropped</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Plan to Watch')">Plan to Watch</button>
                 {% elif outer_loop.index == 5 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Plan to Watch')">Plan to Watch</button>
                 {% elif outer_loop.index == 6 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['anime_id'] }}', 'Dropped')">Dropped</button>
                 {% endif %}
                 <div class="dropdown-divider"></div>
                 {% if data['can_update'] %}
-                    <button class="dropdown-item" onclick="refresh('{{ data['serie_id'] }}')">Refresh metadata</button>
+                    <button class="dropdown-item" onclick="refresh('{{ data['anime_id'] }}')">Refresh metadata</button>
                 {% else %}
                     <span class="d-inline-block disable" tabindex="0" data-toggle="tooltip" data-placement="right" title="A user refreshed this serie less than 30 min ago">
                         <button class="dropdown-item" style="pointer-events: none;" type="button" disabled>Refresh metadata</button>
                     </span>
                 {% endif %}
             </div>
-            <button class="btn btn_right" onclick="deleteSerie('{{ data['serie_id'] }}')"><b>x</b></button>
+            <button class="btn btn_right" onclick="deleteSerie('{{ data['anime_id'] }}')"><b>x</b></button>
 
             <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
                 <div class="container p-0">
                     <div class="row p-0 m-0">
                         <div class="col p-0">
-                             <select class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['serie_id'] }}">
+                             <select class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['anime_id'] }}">
                                  {% for i in range(data["season_data"]|length) %}
                                     {% if i+1 == data["current_season"] %}
                                         <option selected="selected">Season {{ i+1 }}</option>
@@ -369,7 +363,7 @@
                             </select>
                         </div>
                         <div class="col p-0">
-                            <select class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['serie_id'] }}" onchange="updateEpisode('{{ data['serie_id'] }}', this)">
+                            <select class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['anime_id'] }}" onchange="updateEpisode('{{ data['anime_id'] }}', this)">
                                 {% for i in range(data["season_data"][(data['current_season'])-1]) %}
                                     {% if i+1 == data["last_episode_watched"] %}
                                         <option selected="selected">Episode {{ i+1 }}</option>
@@ -395,7 +389,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
+                            <p><b>Original Name</b> : {{ data['anime_original_name'] }}</p>
                             <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
                             <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
                             <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
@@ -419,72 +413,72 @@
 
 <script>
 
-function refresh_all_series() {
+function refresh_all_animes() {
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/refresh_all_series",
+        url: "/refresh_all_animes",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            window.location.replace('/mylist'); }
+            window.location.replace('/myanimelist'); }
     });
 }
 
 
-function refresh(serie_id) {
+function refresh(anime_id) {
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/refresh_single_serie",
+        url: "/refresh_single_anime",
         contentType: "application/json",
-        data: JSON.stringify({serie_id: serie_id }),
+        data: JSON.stringify({anime_id: anime_id }),
         dataType: "json",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            window.location.replace('/mylist'); }
+            window.location.replace('/myanimelist'); }
     });
 }
 
 
-function changeSerieCategory(serie_id, new_category) {
+function changeSerieCategory(anime_id, new_category) {
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/change_serie_category",
+        url: "/change_anime_category",
         contentType: "application/json",
-        data: JSON.stringify({status: new_category, serie_id: serie_id}),
+        data: JSON.stringify({status: new_category, anime_id: anime_id}),
         dataType: "json",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            window.location.replace('/mylist'); }
+            window.location.replace('/myanimelist'); }
     });
 }
 
 
-function deleteSerie(serie_id) {
+function deleteSerie(anime_id) {
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/delete_serie",
+        url: "/delete_anime",
         contentType: "application/json",
-        data: JSON.stringify({delete: serie_id}),
+        data: JSON.stringify({delete: anime_id}),
         dataType: "json",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            window.location.replace('/mylist'); }
+            window.location.replace('/myanimelist'); }
     });
 }
 
 
-function updateEpisode(serie_id, episode){
+function updateEpisode(anime_id, episode){
     let selected_episode = episode.selectedIndex
 
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/update_episode",
+        url: "/update_episode_anime",
         contentType: "application/json",
-        data: JSON.stringify({episode: selected_episode, serie_id: serie_id}),
+        data: JSON.stringify({episode: selected_episode, anime_id: anime_id}),
         dataType: "json",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
@@ -509,26 +503,26 @@ function hide(category, arrow) {
 
 {% for i in range (6) %}
     {% for data in all_data[i] %}
-        let episodes_{{ data['serie_id'] }} = {{ data['season_data'] }};
-        let S_combobox_{{ data['serie_id'] }} = document.getElementById("S_{{ data['serie_id'] }}");
-        let E_combobox_{{ data['serie_id'] }} = document.getElementById("E_{{ data['serie_id'] }}");
+        let episodes_{{ data['anime_id'] }} = {{ data['season_data'] }};
+        let S_combobox_{{ data['anime_id'] }} = document.getElementById("S_{{ data['anime_id'] }}");
+        let E_combobox_{{ data['anime_id'] }} = document.getElementById("E_{{ data['anime_id'] }}");
 
-        S_combobox_{{ data['serie_id'] }}.onchange = function () {
-            let S_selected_{{ data['serie_id'] }} = S_combobox_{{ data['serie_id'] }}.selectedIndex
-            E_combobox_{{ data['serie_id'] }}.length = 1;
+        S_combobox_{{ data['anime_id'] }}.onchange = function () {
+            let S_selected_{{ data['anime_id'] }} = S_combobox_{{ data['anime_id'] }}.selectedIndex
+            E_combobox_{{ data['anime_id'] }}.length = 1;
 
-            for (i = 2; i <= episodes_{{ data['serie_id'] }}[S_selected_{{ data['serie_id'] }}]; i++) {
+            for (i = 2; i <= episodes_{{ data['anime_id'] }}[S_selected_{{ data['anime_id'] }}]; i++) {
                 let opt = document.createElement("option");
                 opt.text = "Episode " + i;
-                E_combobox_{{ data['serie_id'] }}.appendChild(opt);
+                E_combobox_{{ data['anime_id'] }}.appendChild(opt);
             }
 
             $body = $("body");
             $.ajax ({
                 type: "POST",
-                url: "/update_season",
+                url: "/update_season_anime",
                 contentType: "application/json",
-                data: JSON.stringify({season: S_selected_{{ data['serie_id'] }}, serie_id: {{ data['serie_id'] }} }),
+                data: JSON.stringify({season: S_selected_{{ data['anime_id'] }}, anime_id: {{ data['anime_id'] }} }),
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
@@ -544,28 +538,3 @@ function hide(category, arrow) {
 <div class="modal_loading"></div>
 
 {% endblock content %}
-
-{% block script %}
-
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" ></script>
-
-<script type="text/javascript">
-$(function() {
-    $("#autocomplete").autocomplete({
-        source:function(request, response) {
-            $.getJSON("{{url_for('autocomplete_serie')}}",{
-                q: request.term,
-            }, function(data) {
-                response(data.matching_results);
-            });
-        },
-        minLength: 1,
-        select: function(event, ui) {
-            console.log(ui.item.value);
-        }
-    });
-})
-
-</script>
-
-{% endblock script %}

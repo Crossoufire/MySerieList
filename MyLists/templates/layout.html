@@ -30,7 +30,8 @@
         <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
             <div class="container">
                 {% if current_user.is_authenticated %}
-                <a class="navbar-brand mr-3" href="{{ url_for('mylist') }}">MyLists</a>
+                <a class="navbar-brand mr-3" href="{{ url_for('mylist') }}">MySeriesList</a>
+                <a class="navbar-brand mr-3" href="{{ url_for('myanimelist') }}">MyAnimesList</a>
                 {% else %}
                 <a class="navbar-brand mr-3" href="{{ url_for('home') }}">MyLists</a>
                 {% endif %}
