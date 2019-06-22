@@ -9,7 +9,7 @@ import requests
 
 from datetime import datetime
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 
@@ -452,7 +452,9 @@ def accept_friend_request():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the inputs are digits
-    if type(friend_id) is not int:
+    try:
+        friend_id = int(friend_id)
+    except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if there is an actual pending request
@@ -482,7 +484,9 @@ def decline_friend_request():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the inputs are digits
-    if type(decline_friend) is not int:
+    try:
+        decline_friend = int(decline_friend)
+    except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if there is an actual pending request
@@ -509,7 +513,9 @@ def delete_friend():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the inputs are digits
-    if type(friend_id) is not int:
+    try:
+        friend_id = int(friend_id)
+    except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the friend to delete is in the friend list
@@ -539,7 +545,8 @@ def mylist():
 
     serie_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     serie_data = get_list_data(serie_list)
-    return render_template('mylist.html', title='MyList', form=form, all_data=serie_data)
+    serie_category = ["WATCHING", "COMPLETED", "ON HOLD", "RANDOM", "DROPPED", "PLAN TO WATCH"]
+    return render_template('mylist.html', title='MyList', form=form, all_data=serie_data, categories=serie_category)
 
 
 @app.route('/update_season', methods=['POST'])
@@ -554,7 +561,10 @@ def update_season():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the inputs are digits
-    if not (type(season) is int and type(serie_id) is int):
+    try:
+        season = int(season)
+        serie_id = int(serie_id)
+    except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the serie exists
@@ -622,10 +632,14 @@ def update_episode():
         episode = json_data['episode']
         serie_id = json_data['serie_id']
     except:
+        print("A")
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the inputs are digits
-    if not (type(episode) is int and type(serie_id) is int):
+    try:
+        episode = int(episode)
+        serie_id = int(serie_id)
+    except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the serie exists
@@ -680,7 +694,9 @@ def delete_serie():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the inputs are digits
-    if type(serie_id) is not int:
+    try:
+        serie_id = int(serie_id)
+    except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the serie exists
@@ -714,6 +730,12 @@ def change_serie_status():
 
     category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
     if serie_new_category not in category_list:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the inputs are digits
+    try:
+        serie_id = int(serie_id)
+    except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     serie = List.query.filter_by(serie_id=serie_id, user_id=current_user.get_id()).first()
@@ -761,6 +783,13 @@ def refresh_single_serie():
     try:
         json_data = request.get_json()
         serie_id = json_data['serie_id']
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+
+    # Check if the inputs are digits
+    try:
+        serie_id = int(serie_id)
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1513,11 +1542,13 @@ def refresh_serie_data(serie_id):
     app.logger.info("[{}] Refreshed the serie with the ID {}".format(current_user.get_id(), serie_id))
 
 
+###################################################### CRAWL TEST #####################################################
+
 def crawl_tmdb():
     import time
     start_time = time.time()
 
-    for i in range(1, 101):
+    for i in range(1, 1001):
 
         response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}".format(i, themoviedb_api_key))
 
@@ -1537,3 +1568,16 @@ def crawl_tmdb():
             add_serie_in_base(serie_data, "default.jpg")
 
     print("--- %s seconds ---" % (time.time() - start_time))
+
+
+@app.route('/autocomplete1', methods=['GET'])
+def autocomplete1():
+    search = request.args.get('q')
+    query = db.session.query(Serie.name).filter(Serie.name.like('%' + search + '%'))
+    results = [mv[0] for mv in query.all()]
+    return jsonify(matching_results=results)    
+
+
+@app.route('/autocomplete')
+def autocomplete():
+    return render_template('autocomplete.html')
