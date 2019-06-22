@@ -2,252 +2,252 @@
 {% block content %}
 
 <style>
-hr {
-    border-top: 1px solid rgba(255, 255, 255, 0.9)
-}
-
-.scrollable-menu {
-    text-align-last: center;
-}
-
-.form-control:focus {
-    height: 2rem;
-    padding: 5px;
-    background-color: #131418;
-    color: #fff;
-}
-
-.modal-content {
-    background: #131418;
-}
-
-.card {
-    border-radius: 5px;
-}
-
-.btn {
-    padding: 5px !important;
-    margin: 2px !important;
-}
-
-.btn-refresh-all {
-    background-color: #375a7d;
-}
-
-#add_serie {
-    width: 220px;
-}
-
-.btn_left{
-    position: absolute;
-    left: 0px;
-    opacity: 0;
-}
-
-.btn_right {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    background-color: #fff0;
-    border-color: #fff0;
-    color: white;
-    font-size: 12px;
-    border: none;
-    cursor: pointer;
-    border-radius: 2px;
-    text-align: center;
-    opacity: 0;
-}
-
-.btn_right:hover {
-    opacity: 1;
-}
-
-.btn_left:hover {
-    opacity: 1;
-}
-
-.mask:hover~.btn_right {
-    opacity: 1;
-}
-
-.mask:hover~.btn_left {
-    opacity: 1;
-}
-
-.btn {
-    color: #fff
-}
-
-.btn:hover {
-    color: #fff
-}
-
-.btn:focus {
-    color: #fff
-    outline: none;
-}
-
-.add_serie {
-    background: transparent;
-    border-radius: 0px;
-    border-top: 0px;
-    border-left: 0px;
-    border-right: 0px;
-    font-size: 12pt;
-}
-
-.add_serie:focus {
-    background: transparent;
-    border-radius: 0px;
-    border-top: 0px;
-    border-left: 0px;
-    border-right: 0px;
-    color: #fff;
-}
-
-/* ######### pacman loading ########## */
-.modal_loading {
-    display:    none;
-    position:   fixed;
-    z-index:    1000;
-    top:        0;
-    left:       0;
-    height:     100%;
-    width:      100%;
-    background: rgba(0, 0, 0, .6)
-                url('{{ url_for("static", filename="img/pacman_loader.gif") }}')
-                50% 50%
-                no-repeat;
-}
-
-body.loading .modal_loading {
-    overflow: hidden;
-}
-
-body.loading .modal_loading {
-    display: block;
-}
-/* ################################# */
-
-.pointer {
-    cursor: pointer;
-}
-
-#serie {
-    padding: 0px;
-}
-
-/* On screens that are 599px or more */
-@media screen and (min-width: 599px) {
-    .card-img-top {
-        border-style: solid;
-        border-width: 1px;
-        border-color: black;
-        border-radius: 3px;
+    hr {
+        border-top: 1px solid rgba(255, 255, 255, 0.9)
     }
 
-    .card {
-        width: 200px;
+    .scrollable-menu {
+        text-align-last: center;
     }
 
-    .dropdown-item {
-        background-color: #272525;
-        color: #fff;
-        font-weight: 300;
-        font-size: 11pt;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    .form-control {
+    .form-control:focus {
         height: 2rem;
         padding: 5px;
         background-color: #131418;
         color: #fff;
-        border-radius: 1px;
-        font-size: 11pt;
-        outline: none;
-        box-shadow:none !important;
     }
 
-    .dropdown-menu {
-        background-color: #272525;
-        min-width: 9rem;
-    }
-}
-
-/* On screens that are 599px or less */
-@media screen and (max-width: 599px) {
-    .card-img-top {
-        border-style: solid;
-        border-width: 1px;
-        border-color: black;
-        border-radius: 3px;
+    .modal-content {
+        background: #131418;
     }
 
     .card {
-        width: 135px;
-        padding-right: 0px;
-        margin-left: 5px !important;
-        margin-right: 5px !important;
-        margin-bottom: 20px;
+        border-radius: 5px;
     }
 
-    .dropdown-item {
-        background-color: #272525;
-        max-width: 120px;
-        padding-left: 10px;
-        padding-right: 10px;
-        color: #fff;
-        font-weight: 300;
-        font-size: 9pt;
+    .btn {
+        padding: 5px !important;
+        margin: 2px !important;
     }
 
-    .form-control {
-        height: 2rem;
-        background-color: #131418;
-        color: #fff;
-        border-radius: 1px;
-        font-size: 9pt;
+    .btn-refresh-all {
+        background-color: #375a7d;
+    }
+
+    #add_serie {
+        width: 220px;
+    }
+
+    .btn_left{
+        position: absolute;
+        left: 0px;
+        opacity: 0;
+    }
+
+    .btn_right {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        background-color: #fff0;
+        border-color: #fff0;
+        color: white;
+        font-size: 12px;
+        border: none;
+        cursor: pointer;
+        border-radius: 2px;
+        text-align: center;
+        opacity: 0;
+    }
+
+    .btn_right:hover {
+        opacity: 1;
+    }
+
+    .btn_left:hover {
+        opacity: 1;
+    }
+
+    .mask:hover~.btn_right {
+        opacity: 1;
+    }
+
+    .mask:hover~.btn_left {
+        opacity: 1;
+    }
+
+    .btn {
+        color: #fff
+    }
+
+    .btn:hover {
+        color: #fff
+    }
+
+    .btn:focus {
+        color: #fff
         outline: none;
-        box-shadow:none !important;
-        align-items: left;
-        padding: 5px;
     }
 
-    .dropdown-menu {
-        background-color: #272525;
-        max-width: 120px !important;
+    .add_serie {
+        background: transparent;
+        border-radius: 0px;
+        border-top: 0px;
+        border-left: 0px;
+        border-right: 0px;
+        font-size: 12pt;
     }
 
-    .dropdown-divider {
-        max-width: 120px;
+    .add_serie:focus {
+        background: transparent;
+        border-radius: 0px;
+        border-top: 0px;
+        border-left: 0px;
+        border-right: 0px;
+        color: #fff;
     }
-}
 
-#test2 {
-    align-items: center;
-    justify-content: center;
-}
+    /* ######### pacman loading ########## */
+    .modal_loading {
+        display:    none;
+        position:   fixed;
+        z-index:    1000;
+        top:        0;
+        left:       0;
+        height:     100%;
+        width:      100%;
+        background: rgba(0, 0, 0, .6)
+                    url('{{ url_for("static", filename="img/pacman_loader.gif") }}')
+                    50% 50%
+                    no-repeat;
+    }
 
-.episodes {
-    border-style: 1px;
-    border-color: black;
-    border-radius: 2px;
-    -moz-appearance:none;
-    -webkit-appearance:none;
-    appearance:none;
-}
+    body.loading .modal_loading {
+        overflow: hidden;
+    }
 
-.seasons {
-    border-style: 1px;
-    border-color: black;
-    border-radius: 2px;
-    -moz-appearance:none;
-    -webkit-appearance:none;
-    appearance:none;
-}
+    body.loading .modal_loading {
+        display: block;
+    }
+    /* ################################# */
+
+    .pointer {
+        cursor: pointer;
+    }
+
+    #serie {
+        padding: 0px;
+    }
+
+    /* On screens that are 599px or more */
+    @media screen and (min-width: 599px) {
+        .card-img-top {
+            border-style: solid;
+            border-width: 1px;
+            border-color: black;
+            border-radius: 3px;
+        }
+
+        .card {
+            width: 200px;
+        }
+
+        .dropdown-item {
+            background-color: #272525;
+            color: #fff;
+            font-weight: 300;
+            font-size: 11pt;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .form-control {
+            height: 2rem;
+            padding: 5px;
+            background-color: #131418;
+            color: #fff;
+            border-radius: 1px;
+            font-size: 11pt;
+            outline: none;
+            box-shadow:none !important;
+        }
+
+        .dropdown-menu {
+            background-color: #272525;
+            min-width: 9rem;
+        }
+    }
+
+    /* On screens that are 599px or less */
+    @media screen and (max-width: 599px) {
+        .card-img-top {
+            border-style: solid;
+            border-width: 1px;
+            border-color: black;
+            border-radius: 3px;
+        }
+
+        .card {
+            width: 135px;
+            padding-right: 0px;
+            margin-left: 5px !important;
+            margin-right: 5px !important;
+            margin-bottom: 20px;
+        }
+
+        .dropdown-item {
+            background-color: #272525;
+            max-width: 120px;
+            padding-left: 10px;
+            padding-right: 10px;
+            color: #fff;
+            font-weight: 300;
+            font-size: 9pt;
+        }
+
+        .form-control {
+            height: 2rem;
+            background-color: #131418;
+            color: #fff;
+            border-radius: 1px;
+            font-size: 9pt;
+            outline: none;
+            box-shadow:none !important;
+            align-items: left;
+            padding: 5px;
+        }
+
+        .dropdown-menu {
+            background-color: #272525;
+            max-width: 120px !important;
+        }
+
+        .dropdown-divider {
+            max-width: 120px;
+        }
+    }
+
+    #test2 {
+        align-items: center;
+        justify-content: center;
+    }
+
+    .episodes {
+        border-style: 1px;
+        border-color: black;
+        border-radius: 2px;
+        -moz-appearance:none;
+        -webkit-appearance:none;
+        appearance:none;
+    }
+
+    .seasons {
+        border-style: 1px;
+        border-color: black;
+        border-radius: 2px;
+        -moz-appearance:none;
+        -webkit-appearance:none;
+        appearance:none;
+    }
 </style>
 
 <div class="d-flex flex-wrap">
@@ -262,541 +262,144 @@ body.loading .modal_loading {
     </div>
 </div>
 
-<h1 class="font-weight-light text-center mt-4 mb-0">WATCHING</h1>
-<hr class="mt-2 mb-4">
+{% for category in all_data %}
 
-<div class="d-flex flex-wrap" id="test2">
-{% for data in all_data[0] %}
-    <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
-        <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
-        <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
-            <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
-        </div>
-        <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-        <div class="dropdown-menu">
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Completed')">Completed</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('On Hold')">On Hold</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Random')">Random</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Dropped')">Dropped</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Plan to Watch')">Plan to Watch</button>
-            <div class="dropdown-divider"></div>
-            {% if data['can_update'] %}
-                <button class="dropdown-item" onclick="refresh_{{ data['cover_id'] }}()">Refresh metadata</button>
-            {% else %}
-                <span class="d-inline-block disable" tabindex="0" data-toggle="tooltip" data-placement="right" title="A user refreshed this serie less than 30 min ago">
-                    <button class="dropdown-item" style="pointer-events: none;" type="button" disabled>Refresh metadata</button>
-                </span>
-            {% endif %}
-        </div>
-        <button class="btn btn_right" id="C_{{ data['cover_id'] }}"><b>x</b></button>
+    {% if loop.index == 1 %}
+    <h1 class="font-weight-light text-center mt-4 mb-0">WATCHING</h1>
+    {% elif loop.index == 2 %}
+    <h1 class="font-weight-light text-center mt-4 mb-0">COMPLETED</h1>
+    {% elif loop.index == 3 %}
+    <h1 class="font-weight-light text-center mt-4 mb-0">ON HOLD</h1>
+    {% elif loop.index == 4 %}
+    <h1 class="font-weight-light text-center mt-4 mb-0">RANDOM</h1>
+    {% elif loop.index == 5 %}
+    <h1 class="font-weight-light text-center mt-4 mb-0">DROPPED</h1>
+    {% elif loop.index == 6%}
+    <h1 class="font-weight-light text-center mt-4 mb-0">PLAN TO WATCH</h1>
+    {% endif %}
+    {% set outer_loop = loop %}
 
-        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
-            <div class="container p-0">
-                <div class="row p-0 m-0">
-                    <div class="col p-0">
-                         <select class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
-                             {% for i in range(data["season_data"]|length) %}
-                                {% if i+1 == data["current_season"] %}
-                                    <option selected="selected">Season {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Season {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col p-0">
-                        <select class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
-                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
-                                {% if i+1 == data["last_episode_watched"] %}
-                                    <option selected="selected">Episode {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Episode {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
+    <hr class="mt-2 mb-4">
+    <div class="d-flex flex-wrap" id="test2">
+
+    {% for data in category %}
+        <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
+            <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
+            <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
+                <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
+            </div>
+            <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+            <div class="dropdown-menu">
+                {% if outer_loop.index == 1 %}
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                {% elif outer_loop.index == 2 %}
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                {% elif outer_loop.index == 3 %}
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                {% elif outer_loop.index == 4 %}
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                {% elif outer_loop.index == 5 %}
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                {% elif outer_loop.index == 6 %}
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['serie_id'] }}', 'Dropped')">Dropped</button>
+                {% endif %}
+                <div class="dropdown-divider"></div>
+                {% if data['can_update'] %}
+                    <button class="dropdown-item" onclick="refresh('{{ data['serie_id'] }}')">Refresh metadata</button>
+                {% else %}
+                    <span class="d-inline-block disable" tabindex="0" data-toggle="tooltip" data-placement="right" title="A user refreshed this serie less than 30 min ago">
+                        <button class="dropdown-item" style="pointer-events: none;" type="button" disabled>Refresh metadata</button>
+                    </span>
+                {% endif %}
+            </div>
+            <button class="btn btn_right" onclick="deleteSerie('{{ data['serie_id'] }}')"><b>x</b></button>
+
+            <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
+                <div class="container p-0">
+                    <div class="row p-0 m-0">
+                        <div class="col p-0">
+                             <select class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['serie_id'] }}">
+                                 {% for i in range(data["season_data"]|length) %}
+                                    {% if i+1 == data["current_season"] %}
+                                        <option selected="selected">Season {{ i+1 }}</option>
+                                    {% else %}
+                                        <option>Season {{ i+1 }}</option>
+                                    {% endif %}
+                                 {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col p-0">
+                            <select class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['serie_id'] }}" onchange="updateEpisode('{{ data['serie_id'] }}', this)">
+                                {% for i in range(data["season_data"][(data['current_season'])-1]) %}
+                                    {% if i+1 == data["last_episode_watched"] %}
+                                        <option selected="selected">Episode {{ i+1 }}</option>
+                                    {% else %}
+                                        <option>Episode {{ i+1 }}</option>
+                                    {% endif %}
+                                 {% endfor %}
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
-                <div class="modal-body">
-                    <div class="modal-header">
-                        <h4 class="modal-title">{{ data['serie_name'] }}</h4>
-                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
+        <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
                     <div class="modal-body">
-                        <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
-                        <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
-                        <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
-                        <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
-                        <p><b>In production</b> : {{ data['in_production'] }}</p>
-                        <p><b>Created by</b> : {{ data['created_by'] }}</p>
-                        <p><b>Episode duration</b> : {{ data['episode_duration'] }} min</p>
-                        <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
-                        <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
-                        <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
-                        <p><b>Status</b> : {{ data['status'] }}</p>
-                        <p class="text-justify"><b>Synopsis</b> : {{ data['synopsis'] }}</p>
+                        <div class="modal-header">
+                            <h4 class="modal-title">{{ data['serie_name'] }}</h4>
+                            <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
+                            <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
+                            <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
+                            <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
+                            <p><b>In production</b> : {{ data['in_production'] }}</p>
+                            <p><b>Created by</b> : {{ data['created_by'] }}</p>
+                            <p><b>Episode duration</b> : {{ data['episode_duration'] }} min</p>
+                            <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
+                            <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
+                            <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
+                            <p><b>Status</b> : {{ data['status'] }}</p>
+                            <p class="text-justify"><b>Synopsis</b> : {{ data['synopsis'] }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     {% endfor %}
-</div>
-
-<h1 class="font-weight-light text-center mt-4 mb-0">COMPLETED</h1>
-<hr class="mt-2 mb-4">
-
-<div class="d-flex flex-wrap" id="test2">
-{% for data in all_data[1] %}
-    <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
-        <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
-        <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
-            <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
-        </div>
-        <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-        <div class="dropdown-menu">
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Watching')">Watching</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('On Hold')">On Hold</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Random')">Random</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Dropped')">Dropped</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Plan to Watch')">Plan to Watch</button>
-            <div class="dropdown-divider"></div>
-            {% if data['can_update'] %}
-                <button class="dropdown-item" onclick="refresh_{{ data['cover_id'] }}()">Refresh metadata</button>
-            {% else %}
-                <span class="d-inline-block disable" tabindex="0" data-toggle="tooltip" data-placement="right" title="A user refreshed this serie less than 30 min ago">
-                    <button class="dropdown-item" style="pointer-events: none;" type="button" disabled>Refresh metadata</button>
-                </span>
-            {% endif %}
-        </div>
-        <button class="btn btn_right" id="C_{{ data['cover_id'] }}"><b>x</b></button>
-
-        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
-            <div class="container p-0">
-                <div class="row p-0 m-0">
-                    <div class="col p-0">
-                         <select class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
-                             {% for i in range(data["season_data"]|length) %}
-                                {% if i+1 == data["current_season"] %}
-                                    <option selected="selected">Season {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Season {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col p-0">
-                        <select class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
-                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
-                                {% if i+1 == data["last_episode_watched"] %}
-                                    <option selected="selected">Episode {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Episode {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="modal-header">
-                        <h4 class="modal-title">{{ data['serie_name'] }}</h4>
-                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
-                        <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
-                        <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
-                        <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
-                        <p><b>In production</b> : {{ data['in_production'] }}</p>
-                        <p><b>Created by</b> : {{ data['created_by'] }}</p>
-                        <p><b>Episode duration</b> : {{ data['episode_duration'] }}</p>
-                        <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
-                        <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
-                        <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
-                        <p><b>Status</b> : {{ data['status'] }}</p>
-                        <p><b>Synopsis</b> : {{ data['synopsis'] }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-<h1 class="font-weight-light text-center mt-4 mb-0">ON HOLD</h1>
-<hr class="mt-2 mb-4">
-
-<div class="d-flex flex-wrap" id="test2">
-{% for data in all_data[2] %}
-    <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
-        <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
-        <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
-            <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
-        </div>
-        <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-        <div class="dropdown-menu">
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Watching')">Watching</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Completed')">Completed</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Random')">Random</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Dropped')">Dropped</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Plan to Watch')">Plan to Watch</button>
-            <div class="dropdown-divider"></div>
-            {% if data['can_update'] %}
-                <button class="dropdown-item" onclick="refresh_{{ data['cover_id'] }}()">Refresh metadata</button>
-            {% else %}
-                <span class="d-inline-block disable" tabindex="0" data-toggle="tooltip" data-placement="right" title="A user refreshed this serie less than 30 min ago">
-                    <button class="dropdown-item" style="pointer-events: none;" type="button" disabled>Refresh metadata</button>
-                </span>
-            {% endif %}
-        </div>
-        <button class="btn btn_right" id="C_{{ data['cover_id'] }}"><b>x</b></button>
-
-        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
-            <div class="container p-0">
-                <div class="row p-0 m-0">
-                    <div class="col p-0">
-                         <select class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
-                             {% for i in range(data["season_data"]|length) %}
-                                {% if i+1 == data["current_season"] %}
-                                    <option selected="selected">Season {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Season {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col p-0">
-                        <select class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
-                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
-                                {% if i+1 == data["last_episode_watched"] %}
-                                    <option selected="selected">Episode {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Episode {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="modal-header">
-                        <h4 class="modal-title">{{ data['serie_name'] }}</h4>
-                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
-                        <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
-                        <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
-                        <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
-                        <p><b>In production</b> : {{ data['in_production'] }}</p>
-                        <p><b>Created by</b> : {{ data['created_by'] }}</p>
-                        <p><b>Episode duration</b> : {{ data['episode_duration'] }}</p>
-                        <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
-                        <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
-                        <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
-                        <p><b>Status</b> : {{ data['status'] }}</p>
-                        <p><b>Synopsis</b> : {{ data['synopsis'] }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-<h1 class="font-weight-light text-center mt-4 mb-0">RANDOM</h1>
-<hr class="mt-2 mb-4">
-
-<div class="d-flex flex-wrap" id="test2">
-{% for data in all_data[3] %}
-    <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
-        <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
-        <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
-            <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
-        </div>
-        <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-        <div class="dropdown-menu">
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Watching')">Watching</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Completed')">Completed</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('On Hold')">On Hold</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Dropped')">Dropped</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Plan to Watch')">Plan to Watch</button>
-            <div class="dropdown-divider"></div>
-            {% if data['can_update'] %}
-                <button class="dropdown-item" onclick="refresh_{{ data['cover_id'] }}()">Refresh metadata</button>
-            {% else %}
-                <span class="d-inline-block disable" tabindex="0" data-toggle="tooltip" data-placement="right" title="A user refreshed this serie less than 30 min ago">
-                    <button class="dropdown-item" style="pointer-events: none;" type="button" disabled>Refresh metadata</button>
-                </span>
-            {% endif %}
-        </div>
-        <button class="btn btn_right" id="C_{{ data['cover_id'] }}"><b>x</b></button>
-
-        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
-            <div class="container p-0">
-                <div class="row p-0 m-0">
-                    <div class="col p-0">
-                         <select class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
-                             {% for i in range(data["season_data"]|length) %}
-                                {% if i+1 == data["current_season"] %}
-                                    <option selected="selected">Season {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Season {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col p-0">
-                        <select class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
-                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
-                                {% if i+1 == data["last_episode_watched"] %}
-                                    <option selected="selected">Episode {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Episode {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="modal-header">
-                        <h4 class="modal-title">{{ data['serie_name'] }}</h4>
-                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
-                        <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
-                        <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
-                        <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
-                        <p><b>In production</b> : {{ data['in_production'] }}</p>
-                        <p><b>Created by</b> : {{ data['created_by'] }}</p>
-                        <p><b>Episode duration</b> : {{ data['episode_duration'] }}</p>
-                        <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
-                        <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
-                        <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
-                        <p><b>Status</b> : {{ data['status'] }}</p>
-                        <p><b>Synopsis</b> : {{ data['synopsis'] }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-<h1 class="font-weight-light text-center mt-4 mb-0">DROPPED</h1>
-<hr class="mt-2 mb-4">
-
-<div class="d-flex flex-wrap" id="test2">
-{% for data in all_data[4] %}
-    <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
-        <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
-        <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
-            <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
-        </div>
-        <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-        <div class="dropdown-menu">
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Watching')">Watching</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Completed')">Completed</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('On Hold')">On Hold</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Random')">Random</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Plan to Watch')">Plan to Watch</button>
-            <div class="dropdown-divider"></div>
-            {% if data['can_update'] %}
-                <button class="dropdown-item" onclick="refresh_{{ data['cover_id'] }}()">Refresh metadata</button>
-            {% else %}
-                <span class="d-inline-block disable" tabindex="0" data-toggle="tooltip" data-placement="right" title="A user refreshed this serie less than 30 min ago">
-                    <button class="dropdown-item" style="pointer-events: none;" type="button" disabled>Refresh metadata</button>
-                </span>
-            {% endif %}
-        </div>
-        <button class="btn btn_right" id="C_{{ data['cover_id'] }}"><b>x</b></button>
-
-        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
-            <div class="container p-0">
-                <div class="row p-0 m-0">
-                    <div class="col p-0">
-                         <select class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
-                             {% for i in range(data["season_data"]|length) %}
-                                {% if i+1 == data["current_season"] %}
-                                    <option selected="selected">Season {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Season {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col p-0">
-                        <select class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
-                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
-                                {% if i+1 == data["last_episode_watched"] %}
-                                    <option selected="selected">Episode {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Episode {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="modal-header">
-                        <h4 class="modal-title">{{ data['serie_name'] }}</h4>
-                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
-                        <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
-                        <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
-                        <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
-                        <p><b>In production</b> : {{ data['in_production'] }}</p>
-                        <p><b>Created by</b> : {{ data['created_by'] }}</p>
-                        <p><b>Episode duration</b> : {{ data['episode_duration'] }}</p>
-                        <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
-                        <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
-                        <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
-                        <p><b>Status</b> : {{ data['status'] }}</p>
-                        <p><b>Synopsis</b> : {{ data['synopsis'] }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-<h1 class="font-weight-light text-center mt-4 mb-0">PLAN TO WATCH</h1>
-<hr class="mt-2 mb-4">
-
-<div class="d-flex flex-wrap" id="test2">
-{% for data in all_data[5] %}
-    <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
-        <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
-        <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
-            <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
-        </div>
-        <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-        <div class="dropdown-menu">
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Watching')">Watching</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Completed')">Completed</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('On Hold')">On Hold</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Random')">Random</button>
-            <button class="dropdown-item" onclick="changeSerieCategory_{{ data['cover_id'] }}('Dropped')">Dropped</button>
-            <div class="dropdown-divider"></div>
-            {% if data['can_update'] %}
-                <button class="dropdown-item" onclick="refresh_{{ data['cover_id'] }}()">Refresh metadata</button>
-            {% else %}
-                <span class="d-inline-block disable" tabindex="0" data-toggle="tooltip" data-placement="right" title="A user refreshed this serie less than 30 min ago">
-                    <button class="dropdown-item" style="pointer-events: none;" type="button" disabled>Refresh metadata</button>
-                </span>
-            {% endif %}
-        </div>
-        <button class="btn btn_right" id="C_{{ data['cover_id'] }}"><b>x</b></button>
-
-        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
-            <div class="container p-0">
-                <div class="row p-0 m-0">
-                    <div class="col p-0">
-                         <select class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
-                             {% for i in range(data["season_data"]|length) %}
-                                {% if i+1 == data["current_season"] %}
-                                    <option selected="selected">Season {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Season {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col p-0">
-                        <select class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
-                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
-                                {% if i+1 == data["last_episode_watched"] %}
-                                    <option selected="selected">Episode {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Episode {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="modal-header">
-                        <h4 class="modal-title">{{ data['serie_name'] }}</h4>
-                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
-                        <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
-                        <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
-                        <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
-                        <p><b>In production</b> : {{ data['in_production'] }}</p>
-                        <p><b>Created by</b> : {{ data['created_by'] }}</p>
-                        <p><b>Episode duration</b> : {{ data['episode_duration'] }}</p>
-                        <p><b>Total seasons</b> : {{ data['total_seasons'] }}</p>
-                        <p><b>Total episodes</b> : {{ data['total_episodes'] }}</p>
-                        <p><b>Origin country</b> : {{ data['origin_country'] }}</p>
-                        <p><b>Status</b> : {{ data['status'] }}</p>
-                        <p><b>Synopsis</b> : {{ data['synopsis'] }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-
+{% endfor %}
 
 <script>
 
@@ -811,95 +414,95 @@ function refresh_all_series() {
     });
 }
 
+
+function refresh(serie_id) {
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/refresh_single_serie",
+        contentType: "application/json",
+        data: JSON.stringify({serie_id: serie_id }),
+        dataType: "json",
+        beforeSend: function() { $body.addClass("loading"); },
+        success: function(response) {
+            window.location.replace('/mylist'); }
+    });
+}
+
+
+function changeSerieCategory(serie_id, new_category) {
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/change_serie_category",
+        contentType: "application/json",
+        data: JSON.stringify({status: new_category, serie_id: serie_id}),
+        dataType: "json",
+        beforeSend: function() { $body.addClass("loading"); },
+        success: function(response) {
+            window.location.replace('/mylist'); }
+    });
+}
+
+function deleteSerie(serie_id) {
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/delete_serie",
+        contentType: "application/json",
+        data: JSON.stringify({delete: serie_id}),
+        dataType: "json",
+        beforeSend: function() { $body.addClass("loading"); },
+        success: function(response) {
+            window.location.replace('/mylist'); }
+    });
+}
+
+function updateEpisode(serie_id, episode){
+    let selected_episode = episode.selectedIndex
+
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/update_episode",
+        contentType: "application/json",
+        data: JSON.stringify({episode: selected_episode, serie_id: serie_id}),
+        dataType: "json",
+        beforeSend: function() { $body.addClass("loading"); },
+        success: function(response) {
+            $body.removeClass("loading"); }
+    });
+}
+
 {% for i in range (6) %}
     {% for data in all_data[i] %}
-    let episodes_{{ data['serie_id'] }} = {{ data['season_data'] }};
-    let S_combobox_{{ data['serie_id'] }} = document.getElementById("S_{{ data['cover_id'] }}");
-    let E_combobox_{{ data['serie_id'] }} = document.getElementById("E_{{ data['cover_id'] }}");
-    let close_{{ data['serie_id'] }} = document.getElementById("C_{{ data['cover_id'] }}");
+        let episodes_{{ data['serie_id'] }} = {{ data['season_data'] }};
+        let S_combobox_{{ data['serie_id'] }} = document.getElementById("S_{{ data['serie_id'] }}");
+        let E_combobox_{{ data['serie_id'] }} = document.getElementById("E_{{ data['serie_id'] }}");
 
-    function changeSerieCategory_{{ data['cover_id'] }}(new_category) {
-        $body = $("body");
-        $.ajax ({
-            type: "POST",
-            url: "/change_serie_category",
-            contentType: "application/json",
-            data: JSON.stringify({status: new_category, serie_id: {{ data['serie_id'] }} }),
-            dataType: "json",
-            beforeSend: function() { $body.addClass("loading"); },
-            success: function(response) {
-                window.location.replace('/mylist'); }
-        });
-    }
+        S_combobox_{{ data['serie_id'] }}.onchange = function () {
+            let S_selected_{{ data['serie_id'] }} = S_combobox_{{ data['serie_id'] }}.selectedIndex
+            E_combobox_{{ data['serie_id'] }}.length = 1;
 
-    function refresh_{{ data['cover_id'] }}() {
-        $body = $("body");
-        $.ajax ({
-            type: "POST",
-            url: "/refresh_single_serie",
-            contentType: "application/json",
-            data: JSON.stringify({serie_id: {{ data['serie_id'] }} }),
-            dataType: "json",
-            beforeSend: function() { $body.addClass("loading"); },
-            success: function(response) {
-                window.location.replace('/mylist'); }
-        });
-    }
+            for (i = 2; i <= episodes_{{ data['serie_id'] }}[S_selected_{{ data['serie_id'] }}]; i++) {
+                let opt = document.createElement("option");
+                opt.text = "Episode " + i;
+                E_combobox_{{ data['serie_id'] }}.appendChild(opt);
+            }
 
-    S_combobox_{{ data['serie_id'] }}.onchange = function () {
-        let S_selected_{{ data['serie_id'] }} = S_combobox_{{ data['serie_id'] }}.selectedIndex
-        E_combobox_{{ data['serie_id'] }}.length = 1;
-
-        for (i = 2; i <= episodes_{{ data['serie_id'] }}[S_selected_{{ data['serie_id'] }}]; i++) {
-            let opt = document.createElement("option");
-            opt.text = "Episode " + i;
-            E_combobox_{{ data['serie_id'] }}.appendChild(opt);
+            $body = $("body");
+            $.ajax ({
+                type: "POST",
+                url: "/update_season",
+                contentType: "application/json",
+                data: JSON.stringify({season: S_selected_{{ data['serie_id'] }}, serie_id: {{ data['serie_id'] }} }),
+                dataType: "json",
+                beforeSend: function() { $body.addClass("loading"); },
+                success: function(response) {
+                    $body.removeClass("loading");
+                    console.log(response); }
+            });
         }
-
-        $body = $("body");
-        $.ajax ({
-            type: "POST",
-            url: "/update_season",
-            contentType: "application/json",
-            data: JSON.stringify({season: S_selected_{{ data['serie_id'] }}, serie_id: {{ data['serie_id'] }} }),
-            dataType: "json",
-            beforeSend: function() { $body.addClass("loading"); },
-            success: function(response) {
-                $body.removeClass("loading");
-                console.log(response); }
-        });
-    }
-
-    E_combobox_{{ data['serie_id'] }}.onchange = function () {
-        let E_selected_{{ data['serie_id'] }} = E_combobox_{{ data['serie_id'] }}.selectedIndex
-
-        $body = $("body");
-        $.ajax ({
-            type: "POST",
-            url: "/update_episode",
-            contentType: "application/json",
-            data: JSON.stringify({episode: E_selected_{{ data['serie_id'] }}, serie_id: {{ data['serie_id'] }} }),
-            dataType: "json",
-            beforeSend: function() { $body.addClass("loading"); },
-            success: function(response) {
-                $body.removeClass("loading")
-                console.log(response); }
-        });
-    }
-
-    close_{{ data['serie_id'] }}.onclick = function () {
-        $body = $("body");
-        $.ajax ({
-            type: "POST",
-            url: "/delete_serie",
-            contentType: "application/json",
-            data: JSON.stringify({delete: {{ data['serie_id'] }} }),
-            dataType: "json",
-            beforeSend: function() { $body.addClass("loading"); },
-            success: function(response) {
-                window.location.replace('/mylist'); }
-        });
-    }
     {% endfor %}
 {% endfor %}
 
