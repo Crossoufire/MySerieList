@@ -1,4 +1,9 @@
 {% extends "layout.html" %}
+
+{% block css %}
+<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet"></link>
+{% endblock css %}
+
 {% block content %}
 
 <style>
@@ -254,11 +259,11 @@
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         <div class="ml-auto m-t-20 m-b-10">
-            {{ form.anime(class="form-control add_anime text-light", id="add_anime", placeholder="Add an Anime", onfocus="this.value=''") }}
+            {{ form.anime(class="form-control add_anime text-light", id="add_anime", placeholder="Add an Anime", type="text", id="autocomplete", onfocus="this.value=''") }}
         </div>
     </form>
     <div class="ml-auto m-t-20 m-b-10">
-        <button class="btn btn-refresh-all" onclick="refresh_all_animes()">Refresh All</button>
+        <button class="btn btn-refresh-all" onclick="refreshAll()">Refresh All</button>
     </div>
 </div>
 
@@ -295,7 +300,7 @@
     {% for data in category %}
         <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
             <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['anime_name'] }}">
-            <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
+            <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['anime_id'] }}">
                 <p class="text-light"><div class="text-center"><h3>{{ data['anime_name'] }}</h3></div>
             </div>
             <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
@@ -378,7 +383,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+        <div class="modal fade" id="modal_{{ data['anime_id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
                     <div class="modal-body">
@@ -413,7 +418,7 @@
 
 <script>
 
-function refresh_all_animes() {
+function refreshAll() {
     $body = $("body");
     $.ajax ({
         type: "POST",
@@ -538,3 +543,28 @@ function hide(category, arrow) {
 <div class="modal_loading"></div>
 
 {% endblock content %}
+
+{% block script %}
+
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" ></script>
+
+<script type="text/javascript">
+$(function() {
+    $("#autocomplete").autocomplete({
+        source:function(request, response) {
+            $.getJSON("{{url_for('autocomplete_anime')}}",{
+                q: request.term,
+            }, function(data) {
+                response(data.matching_results);
+            });
+        },
+        minLength: 1,
+        select: function(event, ui) {
+            console.log(ui.item.value);
+        }
+    });
+})
+
+</script>
+
+{% endblock script %}

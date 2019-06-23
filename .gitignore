@@ -115,8 +115,8 @@ site.db
 site.db-journal
 MyLists/static/profile_pics/*
 !MyLists/static/profile_pics/default.jpg
-MyLists/static/serie_covers/*
-!MyLists/static/serie_covers/.gitkeep
+MyLists/static/series_covers/*
+!MyLists/static/series_covers/.gitkeep
 MyLists/static/anime_covers/*
 !MyLists/static/anime_covers/.gitkeep
 start.sh

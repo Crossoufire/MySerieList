@@ -17,6 +17,13 @@ class Status(enum.Enum):
     PLAN_TO_WATCH = "Plan to Watch"
 
 
+class ListType(enum.Enum):
+    SERIES = "Series"
+    ANIME = "Anime"
+    MOVIE = "Movie"
+    GAME = "Game"
+
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)
@@ -28,6 +35,7 @@ class User(db.Model, UserMixin):
     registered_on = db.Column(db.DateTime, nullable=False)
     activated_on = db.Column(db.DateTime)
     transition_email = db.Column(db.String(120))
+    default_list = db.Column(db.Enum(ListType), nullable=False, default=ListType.SERIES)
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
@@ -55,7 +63,17 @@ class User(db.Model, UserMixin):
             return user
 
 
-class Serie(db.Model):
+class Friend(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    friend_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    status = db.Column(db.String(50))
+
+
+######################################################## SERIES ########################################################
+
+
+class Series(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     original_name = db.Column(db.String(50), nullable=False)
@@ -78,51 +96,44 @@ class Serie(db.Model):
     last_update = db.Column(db.DateTime, nullable=False)
 
 
-class List(db.Model):
+class SeriesList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    serie_id = db.Column(db.Integer, db.ForeignKey('serie.id'), nullable=False)
+    series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     current_season = db.Column(db.Integer, nullable=False)
     last_episode_watched = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
 
 
-class Episodesperseason(db.Model):
+class SeriesEpisodesPerSeason(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    serie_id = db.Column(db.Integer, db.ForeignKey('serie.id'), nullable=False)
+    series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     season = db.Column(db.Integer, nullable=False)
     episodes = db.Column(db.Integer, nullable=False)
 
 
-class Genre(db.Model):
+class SeriesGenre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    serie_id = db.Column(db.Integer, db.ForeignKey('serie.id'), nullable=False)
+    series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
 
 
-class Network(db.Model):
+class SeriesNetwork(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    serie_id = db.Column(db.Integer, db.ForeignKey('serie.id'), nullable=False)
+    series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     network = db.Column(db.String(150), nullable=False)
 
 
-class Friend(db.Model):
+class SeriesEpisodeTimestamp(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    friend_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    status = db.Column(db.String(50))
-
-
-class Episodetimestamp(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    serie_id = db.Column(db.Integer, db.ForeignKey('serie.id'), nullable=False)
+    series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     season = db.Column(db.Integer, nullable=False)
     episode = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
 
 
-########################### ANIME ########################################################
+######################################################## ANIME #########################################################
 
 
 class Anime(db.Model):
@@ -157,7 +168,7 @@ class AnimeList(db.Model):
     status = db.Column(db.Enum(Status), nullable=False)
 
 
-class AnimeEpisodesperseason(db.Model):
+class AnimeEpisodesPerSeason(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     season = db.Column(db.Integer, nullable=False)
@@ -176,7 +187,7 @@ class AnimeNetwork(db.Model):
     network = db.Column(db.String(150), nullable=False)
 
 
-class AnimeEpisodetimestamp(db.Model):
+class AnimeEpisodeTimestamp(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)

@@ -30,12 +30,12 @@
         <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
             <div class="container">
                 {% if current_user.is_authenticated %}
-                <a class="navbar-brand" href="#">MyLists</a>
+                <a class="navbar-brand" href="{{ url_for('home') }}">MyLists</a>
                 <div class="nav-item dropdown m-l-30 m-r-30">
                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" style="color: #ffffffe6;" href="#">Lists<span class="caret"></span></a>
                     <div class="dropdown-menu bg-dark p-r-0 m-r-0">
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mylist') }}"><i class="fas fa-angle-right"></i> MySeriesList</a>
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('myanimelist') }}"><i class="fas fa-angle-right"></i> MyAnimesList</a>
+                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('myserieslist') }}"><i class="fas fa-angle-right"></i>MySeriesList</a>
+                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('myanimelist') }}"><i class="fas fa-angle-right"></i>MyAnimesList</a>
                     </div>
                 </div>
                 {% else %}

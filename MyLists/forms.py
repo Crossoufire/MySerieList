@@ -57,20 +57,20 @@ class ChangePasswordForm(FlaskForm):
     submit = SubmitField('Update Password')
 
 
-class SearchForm(FlaskForm):
-    serie = StringField('Select a Serie to Add:')
+class SearchSeriesForm(FlaskForm):
+    serie = StringField('Select a Serie to add:')
 
 
-class SearchFormAnime(FlaskForm):
-    anime = StringField('Select an Anime to Add:')
+class SearchAnimeForm(FlaskForm):
+    anime = StringField('Select an Anime to add:')
 
 
-class Add_FriendForm(FlaskForm):
+class AddFriendForm(FlaskForm):
     add_friend = StringField('Type a Username')
     submit = SubmitField('Send Request')
 
 
-class RequestResetForm(FlaskForm):
+class ResetPasswordRequestForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     recaptcha = RecaptchaField()
     submit = SubmitField('Request Password Reset')

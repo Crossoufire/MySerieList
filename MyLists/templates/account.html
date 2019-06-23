@@ -303,7 +303,7 @@ hr {
 
             $.ajax ({
                 type: "POST",
-                url: "/accept",
+                url: "/accept_friend_request",
                 contentType: "application/json",
                 data: JSON.stringify({reponse: {{ friend['user_id'] }} }),
                 dataType: "json",
@@ -316,7 +316,7 @@ hr {
 
             $.ajax ({
                 type: "POST",
-                url: "/decline",
+                url: "/decline_friend_request",
                 contentType: "application/json",
                 data: JSON.stringify({reponse: {{ friend['user_id'] }} }),
                 dataType: "json",
