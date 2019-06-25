@@ -1,332 +1,202 @@
 {% extends "layout.html" %}
+
 {% block content %}
 
 <style>
-hr {
-    border-top: 1px solid rgba(255, 255, 255, 0.9)
-}
-
-.scrollable-menu {
-    text-align-last: center;
-}
-
-.form-control:focus {
-    height: 2rem;
-    padding: 5px;
-    background-color: #131418;
-    color: #fff;
-}
-
-.modal-content {
-    background: #131418;
-}
-
-.card {
-    border-radius: 5px;
-}
-
-.btn {
-    padding: 5px !important;
-    margin: 2px !important;
-}
-
-.btn-refresh-all {
-    background-color: #375a7d;
-}
-
-#add_serie {
-    width: 220px;
-}
-
-.btn_left{
-    position: absolute;
-    left: 0px;
-    opacity: 0;
-}
-
-.btn_right {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    background-color: #fff0;
-    border-color: #fff0;
-    color: white;
-    font-size: 12px;
-    border: none;
-    cursor: pointer;
-    border-radius: 2px;
-    text-align: center;
-    opacity: 0;
-}
-
-.btn_right:hover {
-    opacity: 1;
-}
-
-.btn_left:hover {
-    opacity: 1;
-}
-
-.mask:hover~.btn_right {
-    opacity: 1;
-}
-
-.mask:hover~.btn_left {
-    opacity: 1;
-}
-
-.btn {
-    color: #fff
-}
-
-.btn:hover {
-    color: #fff
-}
-
-.btn:focus {
-    color: #fff
-    outline: none;
-}
-
-.add_serie {
-    background: transparent;
-    border-radius: 0px;
-    border-top: 0px;
-    border-left: 0px;
-    border-right: 0px;
-    font-size: 12pt;
-}
-
-.add_serie:focus {
-    background: transparent;
-    border-radius: 0px;
-    border-top: 0px;
-    border-left: 0px;
-    border-right: 0px;
-    color: #fff;
-}
-
-/* ######### pacman loading ########## */
-.modal_loading {
-    display:    none;
-    position:   fixed;
-    z-index:    1000;
-    top:        0;
-    left:       0;
-    height:     100%;
-    width:      100%;
-    background: rgba(0, 0, 0, .6)
-                url('{{ url_for("static", filename="img/pacman_loader.gif") }}')
-                50% 50%
-                no-repeat;
-}
-
-body.loading .modal_loading {
-    overflow: hidden;
-}
-
-body.loading .modal_loading {
-    display: block;
-}
-/* ################################# */
-
-.pointer {
-    cursor: pointer;
-}
-
-#serie {
-    padding: 0px;
-}
-
-/* On screens that are 599px or more */
-@media screen and (min-width: 599px) {
-    .card-img-top {
-        border-style: solid;
-        border-width: 1px;
-        border-color: black;
-        border-radius: 3px;
+    hr {
+        border-top: 1px solid rgba(255, 255, 255, 0.9)
     }
 
-    .card {
-        width: 200px;
+    .scrollable-menu {
+        text-align-last: center;
     }
 
-    .dropdown-item {
-        background-color: #272525;
-        color: #fff;
-        font-weight: 300;
-        font-size: 11pt;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    .form-control {
+    .form-control:focus {
         height: 2rem;
         padding: 5px;
         background-color: #131418;
         color: #fff;
-        border-radius: 1px;
-        font-size: 11pt;
-        outline: none;
-        box-shadow:none !important;
     }
 
-    .dropdown-menu {
-        background-color: #272525;
-        min-width: 9rem;
+    .form-control:disabled {
+        background-color: #131418;
     }
-}
 
-/* On screens that are 599px or less */
-@media screen and (max-width: 599px) {
-    .card-img-top {
-        border-style: solid;
-        border-width: 1px;
-        border-color: black;
-        border-radius: 3px;
+    .modal-content {
+        background: #131418;
     }
 
     .card {
-        width: 135px;
-        padding-right: 0px;
-        margin-left: 5px !important;
-        margin-right: 5px !important;
-        margin-bottom: 20px;
+        border-radius: 5px;
     }
 
-    .dropdown-item {
-        background-color: #272525;
-        max-width: 120px;
-        padding-left: 10px;
-        padding-right: 10px;
-        color: #fff;
-        font-weight: 300;
-        font-size: 9pt;
+    .btn {
+        padding: 5px !important;
+        margin: 2px !important;
     }
 
-    .form-control {
-        height: 2rem;
-        background-color: #131418;
-        color: #fff;
-        border-radius: 1px;
-        font-size: 9pt;
-        outline: none;
-        box-shadow:none !important;
-        align-items: left;
-        padding: 5px;
+    .pointer {
+        cursor: pointer;
     }
 
-    .dropdown-menu {
-        background-color: #272525;
-        max-width: 120px !important;
+    /* On screens that are 599px or more */
+    @media screen and (min-width: 599px) {
+        .card-img-top {
+            border-style: solid;
+            border-width: 1px;
+            border-color: black;
+            border-radius: 3px;
+        }
+
+        .card {
+            width: 200px;
+        }
+
+        .form-control {
+            height: 2rem;
+            padding: 5px;
+            background-color: #131418;
+            color: #fff;
+            border-radius: 1px;
+            font-size: 11pt;
+            outline: none;
+            box-shadow:none !important;
+        }
     }
 
-    .dropdown-divider {
-        max-width: 120px;
+    /* On screens that are 599px or less */
+    @media screen and (max-width: 599px) {
+        .card-img-top {
+            border-style: solid;
+            border-width: 1px;
+            border-color: black;
+            border-radius: 3px;
+        }
+
+        .card {
+            width: 135px;
+            padding-right: 0px;
+            margin-left: 5px !important;
+            margin-right: 5px !important;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            height: 2rem;
+            background-color: #131418;
+            color: #fff;
+            border-radius: 1px;
+            font-size: 9pt;
+            outline: none;
+            box-shadow:none !important;
+            align-items: left;
+            padding: 5px;
+        }
+
+        .category-title {
+            font-size: 2rem;
+        }
     }
-}
 
-#test2 {
-    align-items: center;
-    justify-content: center;
-}
+    .episodes {
+        border-style: 1px;
+        border-color: black;
+        border-radius: 2px;
+        -moz-appearance:none;
+        -webkit-appearance:none;
+        appearance:none;
+    }
 
-.episodes {
-    border-style: 1px;
-    border-color: black;
-    border-radius: 2px;
-    -moz-appearance:none;
-    -webkit-appearance:none;
-    appearance:none;
-}
+    .seasons {
+        border-style: 1px;
+        border-color: black;
+        border-radius: 2px;
+        -moz-appearance:none;
+        -webkit-appearance:none;
+        appearance:none;
+    }
 
-.seasons {
-    border-style: 1px;
-    border-color: black;
-    border-radius: 2px;
-    -moz-appearance:none;
-    -webkit-appearance:none;
-    appearance:none;
-}
 </style>
 
 {% for category in all_data %}
 
     {% if loop.index == 1 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">WATCHING <a class="fas fa-chevron-down float-right" id="WATCHING_arrow" onclick="hide('WATCHING', 'WATCHING_arrow')"></a></h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">WATCHING<a class="fas fa-chevron-down float-right" id="WATCHING_arrow" onclick="hide('WATCHING', 'WATCHING_arrow')"></a></h1>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="WATCHING">
     {% elif loop.index == 2 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">COMPLETED <a class="fas fa-chevron-down float-right" id="COMPLETED_arrow" onclick="hide('COMPLETED', 'COMPLETED_arrow')"></a></h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">COMPLETED<a class="fas fa-chevron-down float-right" id="COMPLETED_arrow" onclick="hide('COMPLETED', 'COMPLETED_arrow')"></a></h1>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="COMPLETED">
     {% elif loop.index == 3 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">ON HOLD <a class="fas fa-chevron-down float-right" id="ON_HOLD_arrow" onclick="hide('ON_HOLD', 'ON_HOLD_arrow')"></a></h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">ON HOLD<a class="fas fa-chevron-down float-right" id="ON_HOLD_arrow" onclick="hide('ON_HOLD', 'ON_HOLD_arrow')"></a></h1>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="ON_HOLD">
      {% elif loop.index == 4 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">RANDOM <a class="fas fa-chevron-down float-right" id="RANDOM_arrow" onclick="hide('RANDOM', 'RANDOM_arrow')"></a></h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">RANDOM<a class="fas fa-chevron-down float-right" id="RANDOM_arrow" onclick="hide('RANDOM', 'RANDOM_arrow')"></a></h1>
      <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="RANDOM">
     {% elif loop.index == 5 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">DROPPED <a class="fas fa-chevron-down float-right" id="DROPPED_arrow" onclick="hide('DROPPED', 'DROPPED_arrow')"></a></h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">DROPPED<a class="fas fa-chevron-down float-right" id="DROPPED_arrow" onclick="hide('DROPPED', 'DROPPED_arrow')"></a></h1>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="DROPPED">
     {% elif loop.index == 6%}
-    <h1 class="font-weight-light text-center mt-4 mb-0">PLAN TO WATCH <a class="fas fa-chevron-down float-right" id="PLAN_TO_WATCH_arrow" onclick="hide('PLAN_TO_WATCH', 'PLAN_TO_WATCH_arrow')"></a></h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">PLAN TO WATCH<a class="fas fa-chevron-down float-right" id="PLAN_TO_WATCH_arrow" onclick="hide('PLAN_TO_WATCH', 'PLAN_TO_WATCH_arrow')"></a></h1>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="PLAN_TO_WATCH">
     {% endif %}
     {% set outer_loop = loop %}
 
+
     {% for data in category %}
         <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
-            <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['serie_name'] }}">
-            <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['cover_id'] }}">
-                <p class="text-light"><div class="text-center"><h3>{{ data['serie_name'] }}</h3></div>
+            <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['name'] }}">
+            <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['id'] }}">
+                <p class="text-light"><div class="text-center"><h3>{{ data['name'] }}</h3></div>
             </div>
+
             <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
                 <div class="container p-0">
                     <div class="row p-0 m-0">
                         <div class="col p-0">
-                             <select disabled="disabled" style="background-color: #131418;" class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['cover_id'] }}">
-                             {% for i in range(data["season_data"]|length) %}
-                                {% if i+1 == data["current_season"] %}
-                                    <option selected="selected">Season {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Season {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col p-0">
-                        <select disabled="disabled" style="background-color: #131418;" class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['cover_id'] }}">
-                            {% for i in range(data["season_data"][(data['current_season'])-1]) %}
-                                {% if i+1 == data["last_episode_watched"] %}
-                                    <option selected="selected">Episode {{ i+1 }}</option>
-                                {% else %}
-                                    <option>Episode {{ i+1 }}</option>
-                                {% endif %}
-                             {% endfor %}
-                        </select>
+                             <select disabled="disabled" class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['id'] }}">
+                                 {% for i in range(data["season_data"]|length) %}
+                                    {% if i+1 == data["current_season"] %}
+                                        <option selected="selected">Season {{ i+1 }}</option>
+                                    {% else %}
+                                        <option>Season {{ i+1 }}</option>
+                                    {% endif %}
+                                 {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col p-0">
+                            <select disabled="disabled" class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['id'] }}" onchange="updateEpisode('{{ data['id'] }}', this)">
+                                {% for i in range(data["season_data"][(data['current_season'])-1]) %}
+                                    {% if i+1 == data["last_episode_watched"] %}
+                                        <option selected="selected">Episode {{ i+1 }}</option>
+                                    {% else %}
+                                        <option>Episode {{ i+1 }}</option>
+                                    {% endif %}
+                                 {% endfor %}
+                            </select>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="modal fade" id="modal_{{ data['cover_id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+        <div class="modal fade" id="modal_{{ data['id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
                     <div class="modal-body">
                         <div class="modal-header">
-                            <h4 class="modal-title">{{ data['serie_name'] }}</h4>
+                            <h4 class="modal-title">{{ data['name'] }}</h4>
                             <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
-                            <p><b>Original Name</b> : {{ data['serie_original_name'] }}</p>
+                            <p><b>Original Name</b> : {{ data['original_name'] }}</p>
                             <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
                             <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
                             <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
@@ -345,22 +215,22 @@ body.loading .modal_loading {
         </div>
     {% endfor %}
     </div>
+
 {% endfor %}
 
 <script>
-function hide(category, arrow) {
-  var category = document.getElementById(category);
-  var arrow = document.getElementById(arrow);
+    function hide(category, arrow) {
+      var category = document.getElementById(category);
+      var arrow = document.getElementById(arrow);
 
-  if (category.className === "d-flex flex-wrap"){
-        category.className = "d-none";
-        arrow.className = "fas fa-chevron-right float-right";
-  } else {
-        category.className = "d-flex flex-wrap";
-        arrow.className = "fas fa-chevron-down float-right";
-  }
-}
+      if (category.className === "d-flex flex-wrap"){
+            category.className = "d-none";
+            arrow.className = "fas fa-chevron-right float-right";
+      } else {
+            category.className = "d-flex flex-wrap";
+            arrow.className = "fas fa-chevron-down float-right";
+      }
+    }
 </script>
 
-<div class="modal_loading"></div>
 {% endblock content %}

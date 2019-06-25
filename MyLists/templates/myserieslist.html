@@ -229,6 +229,10 @@
         .dropdown-divider {
             max-width: 120px;
         }
+
+        .category-title {
+            font-size: 2rem;
+        }
     }
 
     #test2 {
@@ -271,27 +275,27 @@
 {% for category in all_data %}
 
     {% if loop.index == 1 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">WATCHING<a class="fas fa-chevron-down float-right" id="WATCHING_arrow" onclick="hide('WATCHING', 'WATCHING_arrow')"></a></h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">WATCHING<a class="fas fa-chevron-down float-right" id="WATCHING_arrow" onclick="hide('WATCHING', 'WATCHING_arrow')"></a></h1>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="WATCHING">
     {% elif loop.index == 2 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">COMPLETED<a class="fas fa-chevron-down float-right" id="COMPLETED_arrow" onclick="hide('COMPLETED', 'COMPLETED_arrow')"></a></h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">COMPLETED<a class="fas fa-chevron-down float-right" id="COMPLETED_arrow" onclick="hide('COMPLETED', 'COMPLETED_arrow')"></a></h1>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="COMPLETED">
     {% elif loop.index == 3 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">ON HOLD<a class="fas fa-chevron-down float-right" id="ON_HOLD_arrow" onclick="hide('ON_HOLD', 'ON_HOLD_arrow')"></a></h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">ON HOLD<a class="fas fa-chevron-down float-right" id="ON_HOLD_arrow" onclick="hide('ON_HOLD', 'ON_HOLD_arrow')"></a></h1>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="ON_HOLD">
      {% elif loop.index == 4 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">RANDOM<a class="fas fa-chevron-down float-right" id="RANDOM_arrow" onclick="hide('RANDOM', 'RANDOM_arrow')"></a></h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">RANDOM<a class="fas fa-chevron-down float-right" id="RANDOM_arrow" onclick="hide('RANDOM', 'RANDOM_arrow')"></a></h1>
      <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="RANDOM">
     {% elif loop.index == 5 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0">DROPPED<a class="fas fa-chevron-down float-right" id="DROPPED_arrow" onclick="hide('DROPPED', 'DROPPED_arrow')"></a></h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">DROPPED<a class="fas fa-chevron-down float-right" id="DROPPED_arrow" onclick="hide('DROPPED', 'DROPPED_arrow')"></a></h1>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="DROPPED">
     {% elif loop.index == 6%}
-    <h1 class="font-weight-light text-center mt-4 mb-0">PLAN TO WATCH<a class="fas fa-chevron-down float-right" id="PLAN_TO_WATCH_arrow" onclick="hide('PLAN_TO_WATCH', 'PLAN_TO_WATCH_arrow')"></a></h1>
+    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">PLAN TO WATCH<a class="fas fa-chevron-down float-right" id="PLAN_TO_WATCH_arrow" onclick="hide('PLAN_TO_WATCH', 'PLAN_TO_WATCH_arrow')"></a></h1>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="PLAN_TO_WATCH">
     {% endif %}
@@ -300,65 +304,65 @@
 
     {% for data in category %}
         <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
-            <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['series_name'] }}">
-            <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['series_id'] }}">
-                <p class="text-light"><div class="text-center"><h3>{{ data['series_name'] }}</h3></div>
+            <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['name'] }}">
+            <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['id'] }}">
+                <p class="text-light"><div class="text-center"><h3>{{ data['name'] }}</h3></div>
             </div>
             <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
             <div class="dropdown-menu">
                 {% if outer_loop.index == 1 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Dropped')">Dropped</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch')">Plan to Watch</button>
                 {% elif outer_loop.index == 2 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Dropped')">Dropped</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch')">Plan to Watch</button>
                 {% elif outer_loop.index == 3 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Dropped')">Dropped</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch')">Plan to Watch</button>
                 {% elif outer_loop.index == 4 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Dropped')">Dropped</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch')">Plan to Watch</button>
                 {% elif outer_loop.index == 5 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch')">Plan to Watch</button>
                 {% elif outer_loop.index == 6 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['series_id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
                 {% endif %}
                 <div class="dropdown-divider"></div>
                 {% if data['can_update'] %}
-                    <button class="dropdown-item" onclick="refresh('{{ data['series_id'] }}')">Refresh metadata</button>
+                    <button class="dropdown-item" onclick="refresh('{{ data['id'] }}')">Refresh metadata</button>
                 {% else %}
                     <span class="d-inline-block disable" tabindex="0" data-toggle="tooltip" data-placement="right" title="A user refreshed this serie less than 30 min ago">
                         <button class="dropdown-item" style="pointer-events: none;" type="button" disabled>Refresh metadata</button>
                     </span>
                 {% endif %}
             </div>
-            <button class="btn btn_right" onclick="deleteSerie('{{ data['series_id'] }}')"><b>x</b></button>
+            <button class="btn btn_right" onclick="deleteSerie('{{ data['id'] }}')"><b>x</b></button>
 
             <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
                 <div class="container p-0">
                     <div class="row p-0 m-0">
                         <div class="col p-0">
-                             <select class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['series_id'] }}">
+                             <select class="scrollable-menu text-center form-control p-0 seasons" id="S_{{ data['id'] }}">
                                  {% for i in range(data["season_data"]|length) %}
                                     {% if i+1 == data["current_season"] %}
                                         <option selected="selected">Season {{ i+1 }}</option>
@@ -369,7 +373,7 @@
                             </select>
                         </div>
                         <div class="col p-0">
-                            <select class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['series_id'] }}" onchange="updateEpisode('{{ data['series_id'] }}', this)">
+                            <select class="scrollable-menu text-center form-control p-0 episodes" id="E_{{ data['id'] }}" onchange="updateEpisode('{{ data['id'] }}', this)">
                                 {% for i in range(data["season_data"][(data['current_season'])-1]) %}
                                     {% if i+1 == data["last_episode_watched"] %}
                                         <option selected="selected">Episode {{ i+1 }}</option>
@@ -384,18 +388,18 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modal_{{ data['series_id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+        <div class="modal fade" id="modal_{{ data['id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
                     <div class="modal-body">
                         <div class="modal-header">
-                            <h4 class="modal-title">{{ data['series_name'] }}</h4>
+                            <h4 class="modal-title">{{ data['name'] }}</h4>
                             <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
-                            <p><b>Original Name</b> : {{ data['series_original_name'] }}</p>
+                            <p><b>Original Name</b> : {{ data['original_name'] }}</p>
                             <p><b>First air date</b> : {{ data['first_air_date'] }}</p>
                             <p><b>Last air date</b> : {{ data['last_air_date'] }}</p>
                             <p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a></p>
@@ -509,18 +513,18 @@ function hide(category, arrow) {
 
 {% for i in range (6) %}
     {% for data in all_data[i] %}
-        let episodes_{{ data['series_id'] }} = {{ data['season_data'] }};
-        let S_combobox_{{ data['series_id'] }} = document.getElementById("S_{{ data['series_id'] }}");
-        let E_combobox_{{ data['series_id'] }} = document.getElementById("E_{{ data['series_id'] }}");
+        let episodes_{{ data['id'] }} = {{ data['season_data'] }};
+        let S_combobox_{{ data['id'] }} = document.getElementById("S_{{ data['id'] }}");
+        let E_combobox_{{ data['id'] }} = document.getElementById("E_{{ data['id'] }}");
 
-        S_combobox_{{ data['series_id'] }}.onchange = function () {
-            let S_selected_{{ data['series_id'] }} = S_combobox_{{ data['series_id'] }}.selectedIndex
-            E_combobox_{{ data['series_id'] }}.length = 1;
+        S_combobox_{{ data['id'] }}.onchange = function () {
+            let S_selected_{{ data['id'] }} = S_combobox_{{ data['id'] }}.selectedIndex
+            E_combobox_{{ data['id'] }}.length = 1;
 
-            for (i = 2; i <= episodes_{{ data['series_id'] }}[S_selected_{{ data['series_id'] }}]; i++) {
+            for (i = 2; i <= episodes_{{ data['id'] }}[S_selected_{{ data['id'] }}]; i++) {
                 let opt = document.createElement("option");
                 opt.text = "Episode " + i;
-                E_combobox_{{ data['series_id'] }}.appendChild(opt);
+                E_combobox_{{ data['id'] }}.appendChild(opt);
             }
 
             $body = $("body");
@@ -528,7 +532,7 @@ function hide(category, arrow) {
                 type: "POST",
                 url: "/update_series_season",
                 contentType: "application/json",
-                data: JSON.stringify({season: S_selected_{{ data['series_id'] }}, series_id: {{ data['series_id'] }} }),
+                data: JSON.stringify({season: S_selected_{{ data['id'] }}, series_id: {{ data['id'] }} }),
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {

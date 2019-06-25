@@ -105,7 +105,7 @@ hr {
 
     <div class="d-flex flex-wrap-reverse">
         <div class="p-r-10 bd-highlight">
-            <img class="rounded border-light account-img" src="{{ image_file }}">
+            <img class="rounded border-light account-img" src="{{ profile_picture }}">
         </div>
         <div class="bd-highlight">
             <h2 class="mt-0 account-heading">{{ current_user.username }}</h2>
@@ -166,16 +166,16 @@ hr {
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Time Spend in Days</td>
-                        <td class="text-center">{{ time_spend_total[0] }}</td>
-                    </tr>
-                    <tr>
-                        <td>Time Spend in Hours</td>
-                        <td class="text-center">{{ time_spend_total[2] }}</td>
-                    </tr>
-                    <tr>
                         <td>Episodes Watched</td>
-                        <td class="text-center">{{ time_spend_total[1] }}</td>
+                        <td class="text-center">{{ total_time_series[0] }}</td>
+                    </tr>
+                    <tr>
+                        <td>Time Spent in Hours</td>
+                        <td class="text-center">{{ total_time_series[1] }}</td>
+                    </tr>
+                    <tr>
+                        <td>Time Spent in Days</td>
+                        <td class="text-center">{{ total_time_series[2] }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -269,16 +269,16 @@ hr {
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Time Spend in Days</td>
+                        <td>Episodes Watched</td>
                         <td class="text-center">{{ total_time_animes[0] }}</td>
                     </tr>
                     <tr>
-                        <td>Time Spend in Hours</td>
-                        <td class="text-center">{{ total_time_animes[2] }}</td>
+                        <td>Time Spent in Hours</td>
+                        <td class="text-center">{{ total_time_animes[1] }}</td>
                     </tr>
                     <tr>
-                        <td>Episodes Watched</td>
-                        <td class="text-center">{{ total_time_animes[1] }}</td>
+                        <td>Time Spent in Days</td>
+                        <td class="text-center">{{ total_time_animes[2] }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -353,7 +353,7 @@ var myChart = new Chart(ctx, {
         datasets: [{
             type: "bar",
             label: 'Episodes viewed per month this year',
-            data: {{ values_nb }},
+            data: {{ nb_episodes_watched }},
             backgroundColor: [
                 'rgba(185, 75, 100, 0.7)',
                 'rgba(185, 75, 100, 0.7)',
@@ -388,7 +388,7 @@ var myChart = new Chart(ctx, {
             type: "line",
             borderColor: 'rgba(255, 255, 255, 0.8)',
             label: 'Time per month in hours',
-            data: {{ values_time }},
+            data: {{ time_episodes_watched }},
             borderWidth: 2,
             yAxisID: 'y-axis-2',
         }]
@@ -406,7 +406,7 @@ var myChart = new Chart(ctx, {
                 ticks: {
                     beginAtZero: true,
                     fontColor: "#CCC",
-                    suggestedMax: {{ maxival }},
+                    suggestedMax: {{ max_value }},
                 },
                 gridLines: {
                     display: true,

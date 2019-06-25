@@ -58,7 +58,7 @@ class ChangePasswordForm(FlaskForm):
 
 
 class SearchSeriesForm(FlaskForm):
-    serie = StringField('Select a Serie to add:')
+    serie = StringField('Select a Series to add:')
 
 
 class SearchAnimeForm(FlaskForm):

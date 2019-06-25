@@ -116,7 +116,11 @@ site.db-journal
 MyLists/static/profile_pics/*
 !MyLists/static/profile_pics/default.jpg
 MyLists/static/series_covers/*
-!MyLists/static/series_covers/.gitkeep
+!MyLists/static/series_covers/default.jpg
 MyLists/static/anime_covers/*
-!MyLists/static/anime_covers/.gitkeep
+!MyLists/static/anime_covers/default.jpg
+MyLists/static/game_covers/*
+!MyLists/static/game_covers/default.jpg
+MyLists/static/movie_covers/*
+!MyLists/static/movie_covers/default.jpg
 start.sh
