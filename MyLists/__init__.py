@@ -34,7 +34,7 @@ app.config['RECAPTCHA_PUBLIC_KEY'] = captcha_public
 app.config['RECAPTCHA_PRIVATE_KEY'] = captcha_private
 app.config['RECAPTCHA_DATA_ATTRS'] = {'theme': 'dark', 'size': 'small'}
 
-app.config['TESTING'] = False
+app.config['TESTING'] = True
 
 app.config['MAIL_SERVER'] = server
 app.config['MAIL_PORT'] = int(port)

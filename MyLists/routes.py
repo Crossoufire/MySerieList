@@ -187,6 +187,11 @@ def register_token(token):
     return redirect(url_for('home'))
 
 
+@app.route("/test")
+def test():
+    crawl_tmdb()
+    return render_template('test.html')
+
 ################################################# Authenticated routes #################################################
 
 
@@ -238,113 +243,125 @@ def account():
     total_time_animes = get_total_time_spent(current_user.get_id(), ListType.ANIME)
 
     # Charts
-    get_graphic_data = SeriesEpisodeTimestamp.query.filter_by(user_id=current_user.get_id()).all()
-
-    datetime_user = []
-    series_ids = []
-    for i in range(0, len(get_graphic_data)):
-        tmp1 = get_graphic_data[i]
-        tmp2 = [str(tmp1.timestamp.date().year), str(tmp1.timestamp.date().month), int(tmp1.series_id)]
-        datetime_user.append(tmp2)
-        tmp3 = tmp1.series_id
-        if series_ids.count(int(tmp3)) == 0:
-            series_ids.append(int(tmp3))
-        else:
-            pass
-
-    for i in range(0, len(series_ids)):
-        duration_request = Series.query.filter_by(id=series_ids[i]).first()
-        duration = int(duration_request.episode_duration) - 4
-        for j in range(0, len(datetime_user)):
-            if series_ids[i] == datetime_user[j][2]:
-                datetime_user[j].append(int(duration))
-            else:
-                pass
-
-    year_now = str(datetime.now().year)
-
-    january = 0
-    february = 0
-    march = 0
-    april = 0
-    may = 0
-    june = 0
-    july = 0
-    august = 0
-    september = 0
-    october = 0
-    november = 0
-    december = 0
-    january_time = 0
-    february_time = 0
-    march_time = 0
-    april_time = 0
-    may_time = 0
-    june_time = 0
-    july_time = 0
-    august_time = 0
-    september_time = 0
-    october_time = 0
-    november_time = 0
-    december_time = 0
-    for i in range(0, len(datetime_user)):
-        if datetime_user[i][0] != year_now:
-            pass
-        else:
-            if datetime_user[i][1] == '1':
-                january += 1
-                january_time += int(datetime_user[i][3])
-            if datetime_user[i][1] == '2':
-                february += 1
-                february_time += int(datetime_user[i][3])
-            if datetime_user[i][1] == '3':
-                march += 1
-                march_time += int(datetime_user[i][3])
-            if datetime_user[i][1] == '4':
-                april += 1
-                april_time += int(datetime_user[i][3])
-            if datetime_user[i][1] == '5':
-                may += 1
-                may_time += int(datetime_user[i][3])
-            if datetime_user[i][1] == '6':
-                june += 1
-                june_time += int(datetime_user[i][3])
-            if datetime_user[i][1] == '7':
-                july += 1
-                july_time += int(datetime_user[i][3])
-            if datetime_user[i][1] == '8':
-                august += 1
-                august_time += int(datetime_user[i][3])
-            if datetime_user[i][1] == '9':
-                september += 1
-                september_time += int(datetime_user[i][3])
-            if datetime_user[i][1] == '10':
-                october += 1
-                october_time += int(datetime_user[i][3])
-            if datetime_user[i][1] == '11':
-                november += 1
-                november_time += int(datetime_user[i][3])
-            if datetime_user[i][1] == '12':
-                december += 1
-                december_time += int(datetime_user[i][3])
-
-    nb_episodes_watched = [january, february, march, april, may, june, july, august, september, october, november, december]
-    max_value = max(nb_episodes_watched) + 1
-
-    time_episodes_watched = [
-                            round(january_time / 60, 2),
-                            round(february_time / 60, 2),
-                            round(march_time / 60, 2),
-                            round(april_time / 60, 2),
-                            round(may_time / 60, 2),
-                            round(june_time / 60, 2),
-                            round(july_time / 60, 2),
-                            round(august_time / 60, 2),
-                            round(september_time / 60, 2),
-                            round(october_time / 60, 2),
-                            round(november_time / 60, 2),
-                            round(december_time / 60, 2)]
-
+    # get_graphic_data = SeriesEpisodeTimestamp.query.filter_by(user_id=current_user.get_id()).all()
+    #
+    # datetime_user = []
+    # series_ids = []
+    # for i in range(0, len(get_graphic_data)):
+    #     tmp1 = get_graphic_data[i]
+    #     tmp2 = [str(tmp1.timestamp.date().year), str(tmp1.timestamp.date().month), int(tmp1.series_id)]
+    #     datetime_user.append(tmp2)
+    #     tmp3 = tmp1.series_id
+    #     if series_ids.count(int(tmp3)) == 0:
+    #         series_ids.append(int(tmp3))
+    #     else:
+    #         pass
+    #
+    # for i in range(0, len(series_ids)):
+    #     duration_request = Series.query.filter_by(id=series_ids[i]).first()
+    #     duration = int(duration_request.episode_duration) - 4
+    #     for j in range(0, len(datetime_user)):
+    #         if series_ids[i] == datetime_user[j][2]:
+    #             datetime_user[j].append(int(duration))
+    #         else:
+    #             pass
+    #
+    # year_now = str(datetime.now().year)
+    #
+    # january = 0
+    # february = 0
+    # march = 0
+    # april = 0
+    # may = 0
+    # june = 0
+    # july = 0
+    # august = 0
+    # september = 0
+    # october = 0
+    # november = 0
+    # december = 0
+    # january_time = 0
+    # february_time = 0
+    # march_time = 0
+    # april_time = 0
+    # may_time = 0
+    # june_time = 0
+    # july_time = 0
+    # august_time = 0
+    # september_time = 0
+    # october_time = 0
+    # november_time = 0
+    # december_time = 0
+    # for i in range(0, len(datetime_user)):
+    #     if datetime_user[i][0] != year_now:
+    #         pass
+    #     else:
+    #         if datetime_user[i][1] == '1':
+    #             january += 1
+    #             january_time += int(datetime_user[i][3])
+    #         if datetime_user[i][1] == '2':
+    #             february += 1
+    #             february_time += int(datetime_user[i][3])
+    #         if datetime_user[i][1] == '3':
+    #             march += 1
+    #             march_time += int(datetime_user[i][3])
+    #         if datetime_user[i][1] == '4':
+    #             april += 1
+    #             april_time += int(datetime_user[i][3])
+    #         if datetime_user[i][1] == '5':
+    #             may += 1
+    #             may_time += int(datetime_user[i][3])
+    #         if datetime_user[i][1] == '6':
+    #             june += 1
+    #             june_time += int(datetime_user[i][3])
+    #         if datetime_user[i][1] == '7':
+    #             july += 1
+    #             july_time += int(datetime_user[i][3])
+    #         if datetime_user[i][1] == '8':
+    #             august += 1
+    #             august_time += int(datetime_user[i][3])
+    #         if datetime_user[i][1] == '9':
+    #             september += 1
+    #             september_time += int(datetime_user[i][3])
+    #         if datetime_user[i][1] == '10':
+    #             october += 1
+    #             october_time += int(datetime_user[i][3])
+    #         if datetime_user[i][1] == '11':
+    #             november += 1
+    #             november_time += int(datetime_user[i][3])
+    #         if datetime_user[i][1] == '12':
+    #             december += 1
+    #             december_time += int(datetime_user[i][3])
+    #
+    # nb_episodes_watched = [january, february, march, april, may, june, july, august, september, october, november, december]
+    # max_value = max(nb_episodes_watched) + 1
+    #
+    # time_episodes_watched = [
+    #                         round(january_time / 60, 2),
+    #                         round(february_time / 60, 2),
+    #                         round(march_time / 60, 2),
+    #                         round(april_time / 60, 2),
+    #                         round(may_time / 60, 2),
+    #                         round(june_time / 60, 2),
+    #                         round(july_time / 60, 2),
+    #                         round(august_time / 60, 2),
+    #                         round(september_time / 60, 2),
+    #                         round(october_time / 60, 2),
+    #                         round(november_time / 60, 2),
+    #                         round(december_time / 60, 2)]
+    #
+    # return render_template('account.html',
+    #                        title='Account',
+    #                        profile_picture=profile_picture,
+    #                        nb_of_series=nb_of_series,
+    #                        total_time_series=total_time_series,
+    #                        nb_of_animes=nb_of_animes,
+    #                        total_time_animes=total_time_animes,
+    #                        friends_list_data=friends_list_data,
+    #                        form=add_friend_form,
+    #                        nb_episodes_watched=nb_episodes_watched,
+    #                        time_episodes_watched=time_episodes_watched,
+    #                        max_value=max_value)
     return render_template('account.html',
                            title='Account',
                            profile_picture=profile_picture,
@@ -353,10 +370,7 @@ def account():
                            nb_of_animes=nb_of_animes,
                            total_time_animes=total_time_animes,
                            friends_list_data=friends_list_data,
-                           form=add_friend_form,
-                           nb_episodes_watched=nb_episodes_watched,
-                           time_episodes_watched=time_episodes_watched,
-                           max_value=max_value)
+                           form=add_friend_form)
 
 
 @app.route("/account_settings", methods=['GET', 'POST'])
@@ -1002,160 +1016,14 @@ def user_series_list(user_name):
 @login_required
 def autocomplete_series():
     search = request.args.get('q')
+    if "%" in search:
+        return jsonify([])
     query = db.session.query(Series.name).filter(Series.name.like(search + '%'))
     results = [mv[0] for mv in query.all()]
-    # Get only the first 5 matching results
-    results = results[:5]
+    results = sorted(results, key=str.lower)
+    # Get only the first 8 matching results
+    results = results[:8]
     return jsonify(matching_results=results)
-
-
-################################################### Series functions ###################################################
-
-
-def refresh_element_data(element_id, element_type):
-    if element_type == ListType.SERIES:
-        element = Series.query.filter_by(id=element_id).first()
-    elif element_type == ListType.ANIME:
-        element = Anime.query.filter_by(id=element_id).first()
-
-    element_data = get_element_data_from_api(element.themoviedb_id)
-
-    if element_data is None:
-        return flash("There was an error while refreshing. Please try again later.")
-
-    name            = element_data["name"]
-    original_name   = element_data["original_name"]
-    first_air_date  = element_data["first_air_date"]
-    last_air_date   = element_data["last_air_date"]
-    homepage        = element_data["homepage"]
-    in_production   = element_data["in_production"]
-    total_seasons   = element_data["number_of_seasons"]
-    total_episodes  = element_data["number_of_episodes"]
-    status          = element_data["status"]
-    vote_average    = element_data["vote_average"]
-    vote_count      = element_data["vote_count"]
-    synopsis        = element_data["overview"]
-    popularity      = element_data["popularity"]
-    element_poster  = element_data["poster_path"]
-
-    if element_type == ListType.SERIES:
-        if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\series_covers\\")
-        else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/series_covers/")
-    elif element_type == ListType.ANIME:
-        if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\\anime_covers\\")
-        else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/anime_covers/")
-
-    try:
-        urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(element_poster),
-                                   "{}{}".format(local_covers_path, element.image_cover))
-    except:
-        return flash("There was an error while refreshing. Please try again later.")
-
-    img = Image.open(local_covers_path + element.image_cover)
-    img = img.resize((300, 450), Image.ANTIALIAS)
-    img.save(local_covers_path + element.image_cover, quality=90)
-
-    try:
-        created_by = ""
-        for person in element_data["created_by"]:
-            created_by = created_by + person["name"] + ", "
-        if len(element_data["created_by"]) > 0:
-            created_by = created_by[:-2]
-        else:
-            created_by = None
-    except:
-        created_by = None
-
-    try:
-        episode_duration = element_data["episode_run_time"][0]
-    except:
-        episode_duration = None
-
-    try:
-        origin_country = ""
-        for country in element_data["origin_country"]:
-            origin_country = origin_country + country + ", "
-        if len(element_data["origin_country"]) > 0:
-            origin_country = origin_country[:-2]
-        else:
-            origin_country = None
-    except:
-        origin_country = None
-
-    # Check if there is a special season
-    # We do not want to take it into account
-    seasons_data = []
-    if element_data["seasons"][0]["season_number"] == 0:  # Special season
-        for i in range(len(element_data["seasons"])):
-            try:
-                seasons_data.append(element_data["seasons"][i + 1])
-            except:
-                pass
-    else:
-        for i in range(len(element_data["seasons"])):
-            try:
-                seasons_data.append(element_data["seasons"][i])
-            except:
-                pass
-
-    # Genres
-    genres_data = []
-    for i in range(len(element_data["genres"])):
-        genres_data.append(element_data["genres"][i])
-
-    # Networks
-    networks_data = []
-    for i in range(len(element_data["networks"])):
-        networks_data.append(element_data["networks"][i])
-
-    # Update the element
-    element.name                = name
-    element.original_name       = original_name
-    element.first_air_date      = first_air_date
-    element.last_air_date       = last_air_date
-    element.homepage            = homepage
-    element.in_production       = in_production
-    element.created_by          = created_by
-    element.total_seasons       = total_seasons
-    element.total_episodes      = total_episodes
-    element.episode_duration    = episode_duration
-    element.origin_country      = origin_country
-    element.status              = status
-    element.vote_average        = vote_average
-    element.vote_count          = vote_count
-    element.synopsis            = synopsis
-    element.popularity          = popularity
-    element.last_update         = datetime.utcnow()
-
-    # Update the number of seasons and episodes
-    for season_data in seasons_data:
-        if element_type == ListType.SERIES:
-            season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=season_data["season_number"]).first()
-            if season is None:
-                season = SeriesEpisodesPerSeason(series_id=element.id,
-                                                 season=season_data["season_number"],
-                                                 episodes=season_data["episode_count"])
-                db.session.add(season)
-            else:
-                season.episodes = season_data["episode_count"]
-        elif element_type == ListType.ANIME:
-            season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id,
-                                                            season=season_data["season_number"]).first()
-            if season is None:
-                season = AnimeEpisodesPerSeason(anime_id=element.id,
-                                                season=season_data["season_number"],
-                                                episodes=season_data["episode_count"])
-                db.session.add(season)
-            else:
-                season.episodes = season_data["episode_count"]
-
-    # TODO : refresh Networks and Genres
-    db.session.commit()
-    app.logger.info("[{}] Refreshed the element with the ID {}".format(current_user.get_id(), element_id))
 
 
 ##################################################### Anime routes  ####################################################
@@ -1494,10 +1362,13 @@ def user_anime(user_name):
 @login_required
 def autocomplete_anime():
     search = request.args.get('q')
+    if "%" in search:
+        return jsonify([])
     query = db.session.query(Anime.name).filter(Anime.name.like(search + '%'))
     results = [mv[0] for mv in query.all()]
-    # Get only the first 5 matching results
-    results = results[:5]
+    results = sorted(results, key=str.lower)
+    # Get only the first 8 matching results
+    results = results[:8]
     return jsonify(matching_results=results)
 
 
@@ -2098,6 +1969,152 @@ def add_friend(friend_username):
 
         app.logger.info('[{}] Friend request sent to user with ID {}'.format(current_user.get_id(), friend_to_add.id))
         flash("Your friend request was sent", 'success')
+
+
+def refresh_element_data(element_id, element_type):
+    if element_type == ListType.SERIES:
+        element = Series.query.filter_by(id=element_id).first()
+    elif element_type == ListType.ANIME:
+        element = Anime.query.filter_by(id=element_id).first()
+
+    element_data = get_element_data_from_api(element.themoviedb_id)
+
+    if element_data is None:
+        return flash("There was an error while refreshing. Please try again later.")
+
+    name            = element_data["name"]
+    original_name   = element_data["original_name"]
+    first_air_date  = element_data["first_air_date"]
+    last_air_date   = element_data["last_air_date"]
+    homepage        = element_data["homepage"]
+    in_production   = element_data["in_production"]
+    total_seasons   = element_data["number_of_seasons"]
+    total_episodes  = element_data["number_of_episodes"]
+    status          = element_data["status"]
+    vote_average    = element_data["vote_average"]
+    vote_count      = element_data["vote_count"]
+    synopsis        = element_data["overview"]
+    popularity      = element_data["popularity"]
+    element_poster  = element_data["poster_path"]
+
+    if element_type == ListType.SERIES:
+        if platform.system() == "Windows":
+            local_covers_path = os.path.join(app.root_path, "static\series_covers\\")
+        else:  # Linux & macOS
+            local_covers_path = os.path.join(app.root_path, "static/series_covers/")
+    elif element_type == ListType.ANIME:
+        if platform.system() == "Windows":
+            local_covers_path = os.path.join(app.root_path, "static\\anime_covers\\")
+        else:  # Linux & macOS
+            local_covers_path = os.path.join(app.root_path, "static/anime_covers/")
+
+    try:
+        urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(element_poster),
+                                   "{}{}".format(local_covers_path, element.image_cover))
+    except:
+        return flash("There was an error while refreshing. Please try again later.")
+
+    img = Image.open(local_covers_path + element.image_cover)
+    img = img.resize((300, 450), Image.ANTIALIAS)
+    img.save(local_covers_path + element.image_cover, quality=90)
+
+    try:
+        created_by = ""
+        for person in element_data["created_by"]:
+            created_by = created_by + person["name"] + ", "
+        if len(element_data["created_by"]) > 0:
+            created_by = created_by[:-2]
+        else:
+            created_by = None
+    except:
+        created_by = None
+
+    try:
+        episode_duration = element_data["episode_run_time"][0]
+    except:
+        episode_duration = None
+
+    try:
+        origin_country = ""
+        for country in element_data["origin_country"]:
+            origin_country = origin_country + country + ", "
+        if len(element_data["origin_country"]) > 0:
+            origin_country = origin_country[:-2]
+        else:
+            origin_country = None
+    except:
+        origin_country = None
+
+    # Check if there is a special season
+    # We do not want to take it into account
+    seasons_data = []
+    if element_data["seasons"][0]["season_number"] == 0:  # Special season
+        for i in range(len(element_data["seasons"])):
+            try:
+                seasons_data.append(element_data["seasons"][i + 1])
+            except:
+                pass
+    else:
+        for i in range(len(element_data["seasons"])):
+            try:
+                seasons_data.append(element_data["seasons"][i])
+            except:
+                pass
+
+    # Genres
+    genres_data = []
+    for i in range(len(element_data["genres"])):
+        genres_data.append(element_data["genres"][i])
+
+    # Networks
+    networks_data = []
+    for i in range(len(element_data["networks"])):
+        networks_data.append(element_data["networks"][i])
+
+    # Update the element
+    element.name                = name
+    element.original_name       = original_name
+    element.first_air_date      = first_air_date
+    element.last_air_date       = last_air_date
+    element.homepage            = homepage
+    element.in_production       = in_production
+    element.created_by          = created_by
+    element.total_seasons       = total_seasons
+    element.total_episodes      = total_episodes
+    element.episode_duration    = episode_duration
+    element.origin_country      = origin_country
+    element.status              = status
+    element.vote_average        = vote_average
+    element.vote_count          = vote_count
+    element.synopsis            = synopsis
+    element.popularity          = popularity
+    element.last_update         = datetime.utcnow()
+
+    # Update the number of seasons and episodes
+    for season_data in seasons_data:
+        if element_type == ListType.SERIES:
+            season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=season_data["season_number"]).first()
+            if season is None:
+                season = SeriesEpisodesPerSeason(series_id=element.id,
+                                                 season=season_data["season_number"],
+                                                 episodes=season_data["episode_count"])
+                db.session.add(season)
+            else:
+                season.episodes = season_data["episode_count"]
+        elif element_type == ListType.ANIME:
+            season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id,
+                                                            season=season_data["season_number"]).first()
+            if season is None:
+                season = AnimeEpisodesPerSeason(anime_id=element.id,
+                                                season=season_data["season_number"],
+                                                episodes=season_data["episode_count"])
+                db.session.add(season)
+            else:
+                season.episodes = season_data["episode_count"]
+
+    # TODO : refresh Networks and Genres
+    db.session.commit()
+    app.logger.info("[{}] Refreshed the element with the ID {}".format(current_user.get_id(), element_id))
 
 
 ###################################################### CRAWL TEST #####################################################
