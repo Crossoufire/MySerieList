@@ -6,6 +6,14 @@
 
 {% block content %}
 <style>
+.container-form {
+    max-width: 500px;
+}
+
+.container-scrollable {
+    max-width: 150px;
+}
+
 .account-img {
     height: 200px;
     width: 200px;
@@ -63,10 +71,66 @@ hr {
         </div>
     </div>
 
+    <div class="row">
+        <div class="col">
+            <div class="m-t-20 m-b-40">
+                <h5 class="m-b-10">Change your default page:</h5>
+                <div class="container-scrollable">
+                    <select id="default_page" class="text-center form-control p-0 default_page">
+                        {% if default_page == 'account' %}
+                            <option selected="selected">Account</option>
+                            <option>Hall of Fame</option>
+                            <option>MySeriesList</option>
+                            <option>MyAnimesList</option>
+                            <option>MyMoviesList</option>
+                        {% elif default_page == 'hall_of_fame' %}
+                            <option>Account</option>
+                            <option selected="selected">Hall of Fame</option>
+                            <option>MySeriesList</option>
+                            <option>MyAnimesList</option>
+                            <option>MyMoviesList</option>
+                        {% elif default_page == 'myserieslist' %}
+                            <option>Account</option>
+                            <option>Hall of Fame</option>
+                            <option selected="selected">MySeriesList</option>
+                            <option>MyAnimesList</option>
+                            <option>MyMoviesList</option>
+                        {% elif default_page == 'myanimelist' %}
+                            <option>Account</option>
+                            <option>Hall of Fame</option>
+                            <option>MySeriesList</option>
+                            <option selected="selected">MyAnimesList</option>
+                            <option>MyMoviesList</option>
+                        {% else %}
+                            <option>Account</option>
+                            <option>Hall of Fame</option>
+                            <option>MySeriesList</option>
+                            <option>MyAnimesList</option>
+                            <option selected="selected">MyMoviesList</option>
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="m-t-20 m-b-40">
+                <h5 class="m-b-10">Change the Hall of Fame default table:</h5>
+                <div class="container-scrollable">
+                    <select id="default_hof" class="text-center form-control p-0 default_page">
+                        <option selected="selected">MySeriesList</option>
+                        <option>MyAnimesList</option>
+                        <option>MyMoviesList</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <form method="POST" action="" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
-        <fieldset class="form-group mt-4">
-            <legend class="border-bottom mb-4">Account Info</legend>
+        <h3 class="border-bottom text-center m-t-10 m-b-30">Account Info</h3>
+        <div class="container-form">
             <div class="form-group">
                 {{ form.username.label(class="form-control-label") }}
                 {% if form.username.errors %}
@@ -102,7 +166,7 @@ hr {
                     {% endfor %}
                 {% endif %}
             </div>
-        </fieldset>
+        </div>
         <div class="text-left">
             {{ form.submit(class="btn btn-outline-info") }}
             <a class="btn btn-outline-info" href="{{ url_for('change_password') }}" role="button">Change password?</a>
@@ -113,9 +177,10 @@ hr {
 
 <script>
 let private = document.getElementById("private-toggle");
+let default_page = document.getElementById("default_page");
+let default_hof = document.getElementById("default_hof");
 
 private.onchange = function () {
-
     $.ajax ({
         type: "POST",
         url: "/private_mode",
@@ -126,6 +191,36 @@ private.onchange = function () {
             console.log(response); }
     });
 };
+
+default_page.onchange = function () {
+    let selected = default_page.selectedIndex;
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/default_page",
+        contentType: "application/json",
+        data: JSON.stringify({default_page: selected }),
+        dataType: "json",
+        beforeSend: function() { $body.addClass("loading"); },
+        success: function(response) {
+            $body.removeClass("loading"); }
+    });
+}
+
+default_hof.onchange = function () {
+    let selected = default_hof.selectedIndex;
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/default_hof",
+        contentType: "application/json",
+        data: JSON.stringify({default_hof: selected }),
+        dataType: "json",
+        beforeSend: function() { $body.addClass("loading"); },
+        success: function(response) {
+            $body.removeClass("loading"); }
+    });
+}
 </script>
 {% endblock content %}
 

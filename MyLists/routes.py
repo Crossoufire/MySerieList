@@ -86,7 +86,8 @@ def home():
             next_page = request.args.get('next')
             app.logger.info('[{}] Logged in'.format(user.id))
             flash("You're now logged in. Welcome {0}".format(login_form.login_username.data), "success")
-            return redirect(next_page) if next_page else redirect(url_for('myserieslist'))
+            default_page = str(user.default_page)
+            return redirect(next_page) if next_page else redirect(url_for(default_page))
         else:
             flash('Login Failed. Please check Username and Password', 'warning')
 
@@ -103,7 +104,6 @@ def home():
         app.logger.info('[{}] New account registration : username = {}, email = {}'.format(user.id,
                                                                                            register_form.register_username.data,
                                                                                            register_form.register_email.data))
-
         if send_register_email(user):
             flash('Your account has been created. Check your e-mail address to activate your account!', 'info')
             return redirect(url_for('home'))
@@ -385,6 +385,9 @@ def account_settings():
     else:
         is_private = "unchecked"
 
+    default_page = str(user.default_page)
+    print(default_page)
+
     if form.validate_on_submit():
         if form.picture.data:
             picture_file = save_profile_picture(form.picture.data)
@@ -394,14 +397,12 @@ def account_settings():
             app.logger.info(
                 '[{}] Settings updated : old picture file = {}, new picture file = {}'.format(user.id, old_picture_file,
                                                                                               user.image_file))
-
         if form.username.data != user.username:
             old_username = user.username
             user.username = form.username.data
             db.session.commit()
             app.logger.info('[{}] Settings updated : old username = {}, new username = {}'.format(user.id, old_username,
                                                                                                   user.username))
-
         email_changed = False
         if form.email.data != user.email:
             old_email = user.email
@@ -432,7 +433,34 @@ def account_settings():
         form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/{0}'.format(current_user.image_file))
     return render_template('account_settings.html', title='Settings', image_file=image_file, form=form,
-                           value_privacy=is_private)
+                           value_privacy=is_private, default_page=default_page)
+
+
+@app.route("/default_page", methods=['POST'])
+@login_required
+def default_page():
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        json_data = request.get_json()
+        default_page = int(json_data['default_page'])
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    user = User.query.filter_by(id=current_user.get_id()).first()
+
+    if default_page == 0:
+        user.default_page = "account"
+    elif default_page == 1:
+        user.default_page = "hall_of_fame"
+    elif default_page == 2:
+        user.default_page = "myserieslist"
+    elif default_page == 3:
+        user.default_page = "myanimelist"
+    else:
+        user.default_page = "mymovieslist"
+
+    db.session.commit()
+    return '', 204
 
 
 @app.route("/email_update/<token>", methods=['GET'])

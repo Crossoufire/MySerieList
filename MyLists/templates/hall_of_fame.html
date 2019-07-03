@@ -8,48 +8,48 @@
 
 {% block content %}
 <style>
-    table.dataTable thead .sorting:after,
-    table.dataTable thead .sorting:before,
-    table.dataTable thead .sorting_asc:after,
-    table.dataTable thead .sorting_asc:before,
-    table.dataTable thead .sorting_asc_disabled:after,
-    table.dataTable thead .sorting_asc_disabled:before,
-    table.dataTable thead .sorting_desc:after,
-    table.dataTable thead .sorting_desc:before,
-    table.dataTable thead .sorting_desc_disabled:after,
-    table.dataTable thead .sorting_desc_disabled:before {
-        bottom: .5em;
-    }
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+    bottom: .5em;
+}
 
-    .table {
-      color: #fff
-    }
+.table {
+  color: #fff
+}
 
-    table.table a {
-        color: #359aff;
-    }
+table.table a {
+    color: #359aff;
+}
 
-    .table td {
-        text-align: center;
-        vertical-align: middle;
-    }
+.table td {
+    text-align: center;
+    vertical-align: middle;
+}
 
-    .table tr {
-        text-align: center;
-        vertical-align: middle;
-    }
+.table tr {
+    text-align: center;
+    vertical-align: middle;
+}
 
-    .current_user {
-        background-color: #2c3946;
-    }
+.current_user {
+    background-color: #2c3946;
+}
 
-    a.page-link {
-        color: #ffffff !important;
-    }
+a.page-link {
+    color: #ffffff !important;
+}
 
-    hr {
-        border-top: 1px solid rgba(255, 255, 255, 0.9)
-    }
+hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.9)
+}
 </style>
 
 <h1 class="font-weight-light text-center mt-4 mb-0">SERIES</h1>
@@ -87,7 +87,7 @@
             <td>{{ user["plantowatch"] }}</td>
             <td>{{ user["total"] }}</td>
             <td>{{ user["days"] }}</td>
-            <td><a class="fas fa-user-friends" onclick="add_friend('{{ user['username'] }}')"></a></td>
+            <td><a class="fas fa-lg fa-user-friends" onclick="add_friend('{{ user['username'] }}')"></a></td>
 
             {% elif user["iscurrentuser"] %}
             <td class="current_user"><img src="{{ user['profile_picture'] }}" alt="profile_picture" style="width: 50px; height: 50px;"></img></td>
@@ -126,7 +126,7 @@
             <td>{{ user["plantowatch"] }}</td>
             <td>{{ user["total"] }}</td>
             <td>{{ user["days"] }}</td>
-            <td><a class="fas fa-user-friends" onclick="add_friend('{{ user['username'] }}')"></a></td>
+            <td><a class="fas fa-lg fa-user-friends" onclick="add_friend('{{ user['username'] }}')"></a></td>
 
         {% endif %}
         </tr>
@@ -168,7 +168,7 @@
             <td>{{ user["plantowatch"] }}</td>
             <td>{{ user["total"] }}</td>
             <td>{{ user["days"] }}</td>
-            <td><a class="fas fa-user-friends" onclick="add_friend('{{ user['username'] }}')"></a></td>
+            <td><a class="fas fa-lg fa-user-friends" onclick="add_friend('{{ user['username'] }}')"></a></td>
 
             {% elif user["iscurrentuser"] %}
             <td class="current_user"><img src="{{ user['profile_picture'] }}" alt="profile_picture" style="width: 50px; height: 50px;"></img></td>
@@ -207,7 +207,7 @@
             <td>{{ user["plantowatch"] }}</td>
             <td>{{ user["total"] }}</td>
             <td>{{ user["days"] }}</td>
-            <td><a class="fas fa-user-friends" onclick="add_friend('{{ user['username'] }}')"></a></td>
+            <td><a class="fas fa-lg fa-user-friends" onclick="add_friend('{{ user['username'] }}')"></a></td>
         {% endif %}
         </tr>
     {% endfor %}

@@ -36,6 +36,7 @@ class User(db.Model, UserMixin):
     activated_on = db.Column(db.DateTime)
     transition_email = db.Column(db.String(120))
     default_list = db.Column(db.Enum(ListType), nullable=False, default=ListType.SERIES)
+    default_page = db.Column(db.String(200), nullable=False, default="account")
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
