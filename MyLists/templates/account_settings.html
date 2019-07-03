@@ -77,36 +77,26 @@ hr {
                 <h5 class="m-b-10">Change your default page:</h5>
                 <div class="container-scrollable">
                     <select id="default_page" class="text-center form-control p-0 default_page">
-                        {% if default_page == 'account' %}
+                        {% if home_page == "account" %}
                             <option selected="selected">Account</option>
                             <option>Hall of Fame</option>
                             <option>MySeriesList</option>
                             <option>MyAnimesList</option>
-                            <option>MyMoviesList</option>
-                        {% elif default_page == 'hall_of_fame' %}
+                        {% elif home_page == "hall_of_fame" %}
                             <option>Account</option>
                             <option selected="selected">Hall of Fame</option>
                             <option>MySeriesList</option>
                             <option>MyAnimesList</option>
-                            <option>MyMoviesList</option>
-                        {% elif default_page == 'myserieslist' %}
+                        {% elif home_page == "myserieslist" %}
                             <option>Account</option>
                             <option>Hall of Fame</option>
                             <option selected="selected">MySeriesList</option>
                             <option>MyAnimesList</option>
-                            <option>MyMoviesList</option>
-                        {% elif default_page == 'myanimelist' %}
+                        {% elif home_page == "myanimelist" %}
                             <option>Account</option>
                             <option>Hall of Fame</option>
                             <option>MySeriesList</option>
                             <option selected="selected">MyAnimesList</option>
-                            <option>MyMoviesList</option>
-                        {% else %}
-                            <option>Account</option>
-                            <option>Hall of Fame</option>
-                            <option>MySeriesList</option>
-                            <option>MyAnimesList</option>
-                            <option selected="selected">MyMoviesList</option>
                         {% endif %}
                     </select>
                 </div>
@@ -115,12 +105,16 @@ hr {
 
         <div class="col">
             <div class="m-t-20 m-b-40">
-                <h5 class="m-b-10">Change the Hall of Fame default table:</h5>
+                <h5 class="m-b-10">Default Hall of Fame table:</h5>
                 <div class="container-scrollable">
-                    <select id="default_hof" class="text-center form-control p-0 default_page">
-                        <option selected="selected">MySeriesList</option>
-                        <option>MyAnimesList</option>
-                        <option>MyMoviesList</option>
+                    <select id="default_hof" class="text-center form-control p-0 default_hof">
+                        {% if default_hof == "myserieslist" %}
+                            <option selected="selected">MySeriesList</option>
+                            <option>MyAnimesList</option>
+                        {% elif default_hof == "myanimelist" %}
+                            <option>MySeriesList</option>
+                            <option selected="selected">MyAnimesList</option>
+                        {% endif %}
                     </select>
                 </div>
             </div>
@@ -193,13 +187,13 @@ private.onchange = function () {
 };
 
 default_page.onchange = function () {
-    let selected = default_page.selectedIndex;
+    let selected_index = default_page.selectedIndex;
     $body = $("body");
     $.ajax ({
         type: "POST",
         url: "/default_page",
         contentType: "application/json",
-        data: JSON.stringify({default_page: selected }),
+        data: JSON.stringify({home_page: selected_index }),
         dataType: "json",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
@@ -208,19 +202,20 @@ default_page.onchange = function () {
 }
 
 default_hof.onchange = function () {
-    let selected = default_hof.selectedIndex;
+    let selected_index = default_hof.selectedIndex;
     $body = $("body");
     $.ajax ({
         type: "POST",
         url: "/default_hof",
         contentType: "application/json",
-        data: JSON.stringify({default_hof: selected }),
+        data: JSON.stringify({default_hof: selected_index }),
         dataType: "json",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
             $body.removeClass("loading"); }
     });
 }
+
 </script>
 {% endblock content %}
 
