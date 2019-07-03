@@ -608,7 +608,11 @@ def hall_of_fame():
         total = watching + completed + onhold + random + dropped + plantowatch
         spent = get_total_time_spent(user.id, ListType.SERIES)
 
-        user_data = {"username": user.username,
+        # profile picture
+        profile_picture = url_for('static', filename='profile_pics/{0}'.format(current_user.image_file))
+
+        user_data = {"profile_picture": profile_picture,
+                     "username": user.username,
                      "watching": watching,
                      "completed": completed,
                      "onhold": onhold,
@@ -646,7 +650,11 @@ def hall_of_fame():
         total = watching + completed + onhold + random + dropped + plantowatch
         spent = get_total_time_spent(user.id, ListType.ANIME)
 
-        user_data = {"username": user.username,
+        # profile picture
+        profile_picture = url_for('static', filename='profile_pics/{0}'.format(current_user.image_file))
+
+        user_data = {"profile_picture": profile_picture,
+                     "username": user.username,
                      "watching": watching,
                      "completed": completed,
                      "onhold": onhold,
@@ -675,6 +683,20 @@ def hall_of_fame():
                            title='Hall of Fame',
                            series_data=all_user_data_series,
                            anime_data=all_user_data_animes)
+
+
+@app.route("/add_friend_hof", methods=['POST'])
+@login_required
+def add_friend_hof():
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        json_data = request.get_json()
+        user_name = json_data['user_name']
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    add_friend(user_name)
+
+    return '', 204
 
 
 @app.route("/anonymous")
