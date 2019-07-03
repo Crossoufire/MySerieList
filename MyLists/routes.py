@@ -668,7 +668,7 @@ def hall_of_fame():
         spent = get_total_time_spent(user.id, ListType.SERIES)
 
         # profile picture
-        profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
+		profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
 
         user_data = {"profile_picture": profile_picture,
                      "username": user.username,
