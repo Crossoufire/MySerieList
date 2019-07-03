@@ -18,7 +18,8 @@ from MyLists.admin_views import User
 from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, SearchSeriesForm, SearchAnimeForm, \
     ChangePasswordForm, AddFriendForm, ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
-    Friend, SeriesEpisodeTimestamp, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, AnimeEpisodeTimestamp
+    Friend, SeriesEpisodeTimestamp, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, AnimeEpisodeTimestamp, \
+    HomePage, HallOfFame
 
 
 config.read('config.ini')
@@ -43,27 +44,27 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
 
-        if User.query.filter_by(id='2').first() is None:
-            test = User(username='test',
-                        email='test@test.com',
-                        password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                        image_file='default.jpg',
-                        active=True,
-                        private=True,
-                        registered_on=datetime.utcnow(),
-                        activated_on=datetime.utcnow())
-            db.session.add(test)
+    if User.query.filter_by(id='2').first() is None:
+        test = User(username='test',
+                    email='test@test.com',
+                    password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                    image_file='default.jpg',
+                    active=True,
+                    private=True,
+                    registered_on=datetime.utcnow(),
+                    activated_on=datetime.utcnow())
+        db.session.add(test)
 
-        if User.query.filter_by(id='3').first() is None:
-            test2 = User(username='test2',
-                         email='test2@test2.com',
-                         password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                         image_file='default.jpg',
-                         active=True,
-                         private=False,
-                         registered_on=datetime.utcnow(),
-                         activated_on=datetime.utcnow())
-            db.session.add(test2)
+    if User.query.filter_by(id='3').first() is None:
+        test2 = User(username='test2',
+                     email='test2@test2.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(test2)
 
     db.session.commit()
 
@@ -114,9 +115,13 @@ def home():
 
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.get_id()).first()
-        if user.default_list == ListType.SERIES:
+        if user.home_page == HomePage.ACCOUNT:
+            return redirect(url_for('account'))
+        elif user.home_page == HomePage.HALL_OF_FAME:
+            return redirect(url_for('hall_of_fame'))
+        elif user.home_page == HomePage.MYSERIESLIST:
             return redirect(url_for('myserieslist'))
-        elif user.default_list == ListType.ANIME:
+        elif user.home_page == HomePage.MYANIMELIST:
             return redirect(url_for('myanimelist'))
 
     else:
@@ -191,6 +196,7 @@ def register_token(token):
 def test():
     crawl_tmdb()
     return render_template('test.html')
+
 
 ################################################# Authenticated routes #################################################
 
@@ -385,9 +391,6 @@ def account_settings():
     else:
         is_private = "unchecked"
 
-    default_page = str(user.default_page)
-    print(default_page)
-
     if form.validate_on_submit():
         if form.picture.data:
             picture_file = save_profile_picture(form.picture.data)
@@ -431,9 +434,10 @@ def account_settings():
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
+
     image_file = url_for('static', filename='profile_pics/{0}'.format(current_user.image_file))
     return render_template('account_settings.html', title='Settings', image_file=image_file, form=form,
-                           value_privacy=is_private, default_page=default_page)
+                           value_privacy=is_private, home_page=user.home_page.value, default_hof=user.default_hof.value)
 
 
 @app.route("/default_page", methods=['POST'])
@@ -442,26 +446,48 @@ def default_page():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        default_page = int(json_data['default_page'])
+        home_page = int(json_data['home_page'])
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     user = User.query.filter_by(id=current_user.get_id()).first()
 
-    if default_page == 0:
-        user.default_page = "account"
-    elif default_page == 1:
-        user.default_page = "hall_of_fame"
-    elif default_page == 2:
-        user.default_page = "myserieslist"
-    elif default_page == 3:
-        user.default_page = "myanimelist"
+    if home_page == 0:
+        user.home_page = HomePage.ACCOUNT
+    elif home_page == 1:
+        user.home_page = HomePage.HALL_OF_FAME
+    elif home_page == 2:
+        user.home_page = HomePage.MYSERIESLIST
+    elif home_page == 3:
+        user.home_page = HomePage.MYANIMELIST
     else:
-        user.default_page = "mymovieslist"
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     db.session.commit()
     return '', 204
 
+
+@app.route("/default_hof", methods=['POST'])
+@login_required
+def default_hof():
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        json_data = request.get_json()
+        default_hof = int(json_data['default_hof'])
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    user = User.query.filter_by(id=current_user.get_id()).first()
+
+    if default_hof == 0:
+        user.default_hof = HallOfFame.MYSERIESLIST
+    elif default_hof == 1:
+        user.default_hof = HallOfFame.MYANIMELIST
+    else:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    db.session.commit()
+    return '', 204
 
 @app.route("/email_update/<token>", methods=['GET'])
 @login_required
@@ -618,10 +644,15 @@ def hall_of_fame():
     # Get list of all users except admin
     users = User.query.filter(User.id >= "2").order_by(User.username.asc()).all()
 
-    current_user_friends = Friend.query.filter_by(user_id=current_user.get_id()).all()
+    current_user_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="accepted").all()
     friends_list = []
     for friend in current_user_friends:
         friends_list.append(friend.friend_id)
+
+    current_user_pending_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="request").all()
+    friends_pending_list = []
+    for friend in current_user_pending_friends:
+        friends_pending_list.append(friend.friend_id)
 
     # Series hall of fame
     all_user_data_series = []
@@ -637,7 +668,7 @@ def hall_of_fame():
         spent = get_total_time_spent(user.id, ListType.SERIES)
 
         # profile picture
-        profile_picture = url_for('static', filename='profile_pics/{0}'.format(current_user.image_file))
+        profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
 
         user_data = {"profile_picture": profile_picture,
                      "username": user.username,
@@ -653,7 +684,12 @@ def hall_of_fame():
 
         if user.id in friends_list:
             user_data["isfriend"] = True
+            user_data["ispendingfriend"] = False
         else:
+            if user.id in friends_pending_list:
+                user_data["ispendingfriend"] = True
+            else:
+                user_data["ispendingfriend"] = False
             user_data["isfriend"] = False
 
         if str(user.id) == current_user.get_id():
@@ -679,7 +715,7 @@ def hall_of_fame():
         spent = get_total_time_spent(user.id, ListType.ANIME)
 
         # profile picture
-        profile_picture = url_for('static', filename='profile_pics/{0}'.format(current_user.image_file))
+        profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
 
         user_data = {"profile_picture": profile_picture,
                      "username": user.username,
@@ -695,7 +731,12 @@ def hall_of_fame():
 
         if user.id in friends_list:
             user_data["isfriend"] = True
+            user_data["ispendingfriend"] = False
         else:
+            if user.id in friends_pending_list:
+                user_data["ispendingfriend"] = True
+            else:
+                user_data["ispendingfriend"] = False
             user_data["isfriend"] = False
 
         if str(user.id) == current_user.get_id():
@@ -2018,7 +2059,7 @@ def add_friend(friend_username):
         db.session.commit()
 
         app.logger.info('[{}] Friend request sent to user with ID {}'.format(current_user.get_id(), friend_to_add.id))
-        flash("Your friend request was sent", 'success')
+        flash("Your friend request has been sent.", 'success')
 
 
 def refresh_element_data(element_id, element_type):

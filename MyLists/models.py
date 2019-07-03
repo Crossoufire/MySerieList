@@ -24,6 +24,18 @@ class ListType(enum.Enum):
     GAME = "Game"
 
 
+class HomePage(enum.Enum):
+    ACCOUNT = "account"
+    HALL_OF_FAME = "hall_of_fame"
+    MYSERIESLIST = "myserieslist"
+    MYANIMELIST = "myanimelist"
+
+
+class HallOfFame(enum.Enum):
+    MYSERIESLIST = "myserieslist"
+    MYANIMELIST = "myanimelist"
+
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)
@@ -35,8 +47,8 @@ class User(db.Model, UserMixin):
     registered_on = db.Column(db.DateTime, nullable=False)
     activated_on = db.Column(db.DateTime)
     transition_email = db.Column(db.String(120))
-    default_list = db.Column(db.Enum(ListType), nullable=False, default=ListType.SERIES)
-    default_page = db.Column(db.String(200), nullable=False, default="account")
+    home_page = db.Column(db.Enum(HomePage), nullable=False, default=HomePage.MYSERIESLIST)
+    default_hof = db.Column(db.Enum(HallOfFame), nullable=False, default=HallOfFame.MYSERIESLIST)
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
