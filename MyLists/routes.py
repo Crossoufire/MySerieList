@@ -618,10 +618,15 @@ def hall_of_fame():
     # Get list of all users except admin
     users = User.query.filter(User.id >= "2").order_by(User.username.asc()).all()
 
-    current_user_friends = Friend.query.filter_by(user_id=current_user.get_id()).all()
+    current_user_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="accepted").all()
     friends_list = []
     for friend in current_user_friends:
         friends_list.append(friend.friend_id)
+
+    current_user_pending_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="request").all()
+    friends_pending_list = []
+    for friend in current_user_pending_friends:
+        friends_pending_list.append(friend.friend_id)
 
     # Series hall of fame
     all_user_data_series = []
@@ -636,8 +641,7 @@ def hall_of_fame():
         total = watching + completed + onhold + random + dropped + plantowatch
         spent = get_total_time_spent(user.id, ListType.SERIES)
 
-        # profile picture
-        profile_picture = url_for('static', filename='profile_pics/{0}'.format(current_user.image_file))
+        profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
 
         user_data = {"profile_picture": profile_picture,
                      "username": user.username,
@@ -653,7 +657,12 @@ def hall_of_fame():
 
         if user.id in friends_list:
             user_data["isfriend"] = True
+            user_data["ispendingfriend"] = False
         else:
+            if user.id in friends_pending_list:
+                user_data["ispendingfriend"] = True
+            else:
+                user_data["ispendingfriend"] = False
             user_data["isfriend"] = False
 
         if str(user.id) == current_user.get_id():
@@ -678,8 +687,7 @@ def hall_of_fame():
         total = watching + completed + onhold + random + dropped + plantowatch
         spent = get_total_time_spent(user.id, ListType.ANIME)
 
-        # profile picture
-        profile_picture = url_for('static', filename='profile_pics/{0}'.format(current_user.image_file))
+        profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
 
         user_data = {"profile_picture": profile_picture,
                      "username": user.username,
@@ -695,7 +703,12 @@ def hall_of_fame():
 
         if user.id in friends_list:
             user_data["isfriend"] = True
+            user_data["ispendingfriend"] = False
         else:
+            if user.id in friends_pending_list:
+                user_data["ispendingfriend"] = True
+            else:
+                user_data["ispendingfriend"] = False
             user_data["isfriend"] = False
 
         if str(user.id) == current_user.get_id():
@@ -2018,7 +2031,7 @@ def add_friend(friend_username):
         db.session.commit()
 
         app.logger.info('[{}] Friend request sent to user with ID {}'.format(current_user.get_id(), friend_to_add.id))
-        flash("Your friend request was sent", 'success')
+        flash("Your friend request has been sent.", 'success')
 
 
 def refresh_element_data(element_id, element_type):

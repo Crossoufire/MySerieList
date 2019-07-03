@@ -65,11 +65,10 @@ hr {
             <th class="th-sm">On Hold</th>
             <th class="th-sm">Random</th>
             <th class="th-sm">Dropped</th>
-            <th class="th-sm">Plan to Watch</th>
+            <th class="th-sm">PtW</th>
             <th class="th-sm">Total</th>
             <th class="th-sm">Days spent</th>
-            <th class="th-sm">Add friend</th>
-
+            <th></th>
         </tr>
     </thead>
 
@@ -77,7 +76,7 @@ hr {
     {% for user in series_data %}
         <tr>
         {% if current_user.get_id() == '1' %}
-            <td><img src="{{ user['profile_picture'] }}" alt="profile_picture" style="width: 50px; height: 50px;"></img></td>
+            <td><img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 30px; height: 30px;"></td>
             <td><b><a href="/user/series/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
             <td>{{ user["watching"] }}</td>
             <td>{{ user["completed"] }}</td>
@@ -87,10 +86,10 @@ hr {
             <td>{{ user["plantowatch"] }}</td>
             <td>{{ user["total"] }}</td>
             <td>{{ user["days"] }}</td>
-            <td><a class="fas fa-lg fa-user-friends" onclick="add_friend('{{ user['username'] }}')"></a></td>
+            <td></td>
 
             {% elif user["iscurrentuser"] %}
-            <td class="current_user"><img src="{{ user['profile_picture'] }}" alt="profile_picture" style="width: 50px; height: 50px;"></img></td>
+            <td class="current_user"><img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 30px; height: 30px;"></td>
             <td class="current_user"><b><a href="/user/series/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
             <td class="current_user">{{ user["watching"] }}</td>
             <td class="current_user">{{ user["completed"] }}</td>
@@ -103,7 +102,7 @@ hr {
             <td class="current_user"></td>
 
             {% elif user["isprivate"] and not user["isfriend"] %}
-            <td><i class="fas fa-times"></i></td>
+            <td><img src="{{ url_for("static", filename="profile_pics/anonymous.jpg") }}" alt="Anonymous" style="width: 30px; height: 30px;"></td>
             <td><b>Anonymous</b></td>
             <td>{{ user["watching"] }}</td>
             <td>{{ user["completed"] }}</td>
@@ -116,7 +115,7 @@ hr {
             <td></td>
 
             {% else %}
-            <td><img src="{{ user['profile_picture'] }}" alt="profile_picture" style="width: 50px; height: 50px;"></img></td>
+            <td><img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 30px; height: 30px;"></td>
             <td><b><a href="/user/series/{{ user['username'] }}">{{ user['username'] }}</a></b></td>
             <td>{{ user["watching"] }}</td>
             <td>{{ user["completed"] }}</td>
@@ -126,7 +125,13 @@ hr {
             <td>{{ user["plantowatch"] }}</td>
             <td>{{ user["total"] }}</td>
             <td>{{ user["days"] }}</td>
-            <td><a class="fas fa-lg fa-user-friends" onclick="add_friend('{{ user['username'] }}')"></a></td>
+            {% if user["isfriend"] %}
+            <td><i class="fas fa-user-friends"></i></td>
+            {% elif user["ispendingfriend"] %}
+            <td><i class="fas fa-user-friends" style="color: #2c3946;"></i></td>
+            {% else %}
+            <td><a class="fas fa-user-plus" onclick="add_friend('{{ user['username'] }}')"></a></td>
+            {% endif %}
 
         {% endif %}
         </tr>
@@ -150,7 +155,7 @@ hr {
             <th class="th-sm">Plan to Watch</th>
             <th class="th-sm">Total</th>
             <th class="th-sm">Days spent</th>
-            <th class="th-sm">Add friend</th>
+            <th></th>
         </tr>
     </thead>
 
@@ -158,8 +163,8 @@ hr {
     {% for user in anime_data %}
         <tr>
         {% if current_user.get_id() == '1' %}
-            <td><img src="{{ user['profile_picture'] }}" alt="profile_picture" style="width: 50px; height: 50px;"></img></td>
-            <td class="align-middle"><b><a href="/user/anime/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
+            <td><img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 30px; height: 30px;"></td>
+            <td><b><a href="/user/series/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
             <td>{{ user["watching"] }}</td>
             <td>{{ user["completed"] }}</td>
             <td>{{ user["onhold"] }}</td>
@@ -168,11 +173,11 @@ hr {
             <td>{{ user["plantowatch"] }}</td>
             <td>{{ user["total"] }}</td>
             <td>{{ user["days"] }}</td>
-            <td><a class="fas fa-lg fa-user-friends" onclick="add_friend('{{ user['username'] }}')"></a></td>
+            <td></td>
 
             {% elif user["iscurrentuser"] %}
-            <td class="current_user"><img src="{{ user['profile_picture'] }}" alt="profile_picture" style="width: 50px; height: 50px;"></img></td>
-            <td class="current_user"><b><a href="/user/anime/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
+            <td class="current_user"><img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 30px; height: 30px;"></td>
+            <td class="current_user"><b><a href="/user/series/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
             <td class="current_user">{{ user["watching"] }}</td>
             <td class="current_user">{{ user["completed"] }}</td>
             <td class="current_user">{{ user["onhold"] }}</td>
@@ -184,7 +189,7 @@ hr {
             <td class="current_user"></td>
 
             {% elif user["isprivate"] and not user["isfriend"] %}
-            <td><i class="fas fa-times"></i></td>
+            <td><img src="{{ url_for("static", filename="profile_pics/anonymous.jpg") }}" alt="Anonymous" style="width: 30px; height: 30px;"></td>
             <td><b>Anonymous</b></td>
             <td>{{ user["watching"] }}</td>
             <td>{{ user["completed"] }}</td>
@@ -197,8 +202,8 @@ hr {
             <td></td>
 
             {% else %}
-            <td><img src="{{ user['profile_picture'] }}" alt="profile_picture" style="width: 50px; height: 50px;"></img></td>
-            <td class="align-text-center"><b><a href="/user/anime/{{ user['username'] }}">{{ user['username'] }}</a></b></td>
+            <td><img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 30px; height: 30px;"></td>
+            <td><b><a href="/user/series/{{ user['username'] }}">{{ user['username'] }}</a></b></td>
             <td>{{ user["watching"] }}</td>
             <td>{{ user["completed"] }}</td>
             <td>{{ user["onhold"] }}</td>
@@ -207,12 +212,20 @@ hr {
             <td>{{ user["plantowatch"] }}</td>
             <td>{{ user["total"] }}</td>
             <td>{{ user["days"] }}</td>
-            <td><a class="fas fa-lg fa-user-friends" onclick="add_friend('{{ user['username'] }}')"></a></td>
+            {% if user["isfriend"] %}
+            <td><i class="fas fa-user-friends"></i></td>
+            {% elif user["ispendingfriend"] %}
+            <td><i class="fas fa-user-friends" style="color: #2c3946;"></i></td>
+            {% else %}
+            <td><a class="fas fa-user-plus" onclick="add_friend('{{ user['username'] }}')"></a></td>
+            {% endif %}
+
         {% endif %}
         </tr>
     {% endfor %}
     </tbody>
 </table>
+
 {% endblock content %}
 
 
@@ -237,17 +250,19 @@ function add_friend(username) {
 
 $(document).ready(function () {
 $('#hall_of_fame_series').DataTable({
-"order": [[ 8, "desc" ], [ 0, "asc" ]]
+"order": [[ 8, "desc" ], [ 1, "asc" ]]
 });
 $('.dataTables_length').addClass('bs-select');
 });
 
 $(document).ready(function () {
 $('#hall_of_fame_anime').DataTable({
-"order": [[ 8, "desc" ], [ 0, "asc" ]]
+"order": [[ 8, "desc" ], [ 1, "asc" ]]
 });
 $('.dataTables_length').addClass('bs-select');
 });
+
 </script>
+
 {% endblock script %}
 

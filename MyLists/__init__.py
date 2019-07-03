@@ -15,7 +15,7 @@ try:
     email = config['Mail']['email']
     password = config['Mail']['password']
     server = config['Mail']['server']
-    port = config['Mail']['port']
+    port = int(config['Mail']['port'])
     captcha_public = config['Captcha']['public_key']
     captcha_private = config['Captcha']['private_key']
 except:
@@ -37,7 +37,7 @@ app.config['RECAPTCHA_DATA_ATTRS'] = {'theme': 'dark', 'size': 'small'}
 app.config['TESTING'] = True
 
 app.config['MAIL_SERVER'] = server
-app.config['MAIL_PORT'] = int(port)
+app.config['MAIL_PORT'] = port
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = email
