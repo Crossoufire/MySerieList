@@ -37,26 +37,8 @@ hr {
     border-top: 1px solid rgba(255, 255, 255, 0.9);
 }
 
-.btn_settings {
-    border-style: solid !important;
-    border-width: 1px !important;
-    border-color: black !important;
-    border-radius: 1px !important;
-}
-
 .table {
   color: #fff
-}
-
-#add_friend {
-    padding-top: 5px !important;
-    padding-bottom: 5px !important;
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-}
-
-.btn_setting {
-    margin: 0px;
 }
 
 .form_account {
@@ -69,40 +51,58 @@ hr {
     padding-left: 10px !important;
     padding-right: 10px !important;
 }
+
+.border_account {
+    border-style: solid;
+    border-width: 2px;
+    border-color: grey;
+    border-radius: 10px;
+    padding-top: 30px;
+    padding-bottom: 20px;
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-bottom: 20px;
+}
+
+.arrow_div {
+    height: 21px;
+    width: 21px;
+}
 </style>
 {% endblock css %}
 
 {% block content %}
-<!-- Add friend modal -->
+<!--------- Add friend modal ---------->
 <div class="container form_account">
     <div class="modal fade" id="addFriendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; max-width: 300px; margin-left: auto; margin-right: auto;">
                 <form method="POST" action="">
                     {{ form.hidden_tag() }}
-                    <fieldset class="form-group">
-                        <h5 class="border-bottom p-t-10 p-b-10 text-center"><b>Add a Friend</b></h5>
-                        <div class="form-group m-l-20 m-r-20">
-                            {% if form.add_friend.errors %}
-                            {{ form.add_friend(class="form-control form-control is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.add_friend.errors %}
-                                <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                            {% else %}
-                            {{ form.add_friend(class="form-control", placeholder="Username", onfocus="this.value=''") }}
-                            {% endif %}
+                    <h5 class="border-bottom p-t-20 p-b-15 text-center"><b>Add a Friend</b></h5>
+                    <div class="form-group m-l-40 m-r-40 m-t-15">
+                        {% if form.add_friend.errors %}
+                        {{ form.add_friend(class="form-control form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.add_friend.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
                         </div>
-                    </fieldset>
+                        {% else %}
+                        {{ form.add_friend(class="form-control", placeholder="Username", onfocus="this.value=''") }}
+                        {% endif %}
+                    </div>
                     <div class="form-group m-l-20 m-r-20 text-center">
-                        {{ form.submit(class="btn btn-outline-info") }}
+                        {{ form.submit(class="btn btn-sm btn-outline-info") }}
                     </div>
                 </form>
             </div>
         </div>
     </div>
+    <!-------------------------------------------------->
 
+<div class="border_account">
+    <!----------------- Account picture/Username/email/account settings ------------------>
     <div class="d-flex flex-wrap-reverse">
         <div class="p-r-10 bd-highlight">
             <img class="rounded border-light account-img" src="{{ profile_picture }}">
@@ -112,16 +112,62 @@ hr {
             <h5 class="text">{{ current_user.email }}</h5>
         </div>
         <div class="ml-auto bd-highlight">
-            <a class="btn btn-sm bg-dark btn_setting" href="{{ url_for('account_settings') }}" role="button">
+            <a class="btn btn-sm bg-dark m-0" href="{{ url_for('account_settings') }}" role="button">
                 <i class="fa fa-cog fa-2x fa-fw"></i>
             </a>
         </div>
     </div>
+    <!------------------------------------------------>
 
-    <h2 class="font-weight-light text-center mt-4 mb-0">Series Statistics</h2>
+
+    <h4 class="font-weight-light text-center mt-4 mb-0">
+        <div class="arrow_div float-left">
+            <a class="fas fa-xs fa-user-plus" data-toggle="modal" data-target="#addFriendModal"></a>
+        </div>
+        Friends
+        <div class="arrow_div float-right">
+            <a class="fas fa-xs fa-chevron-down" id="FRIENDS_arrow" onclick="hide('FRIENDS', 'FRIENDS_arrow')"></a>
+        </div>
+    </h4>
     <hr class="mt-2 mb-3">
 
-    <div class="row">
+    <div id="FRIENDS" class="row">
+        {% for friend in friends_list_data %}
+            {% if friend['status'] == "pending" %}
+                <div class="col">
+                    <a class="text-light" href="#" id="{{ friend['user_id'] }}">{{ friend['username'] }}</a>
+                    <button class="btn btn-sm btn-mdb-color small" id="accept_{{ friend['user_id'] }}">Accept</button>
+                    <button class="btn btn-sm btn-danger small" id="decline_{{ friend['user_id'] }}">Decline</button>
+                </div>
+            {% elif friend['status'] == "request" %}
+                <div class="col">
+                    <a class="text-light" href="#">{{ friend['username'] }} (Pending request)</a>
+                    <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% elif friend['status'] == "declined" %}
+            {% else %}
+                <div class="col">
+                    <a class="text-light" href="/user/series/{{ friend['username'] }}">{{ friend['username'] }}</a>
+                    <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+
+    <h4 class="font-weight-light text-center mt-4 mb-0">
+        Series Statistics
+        <div class="arrow_div float-right">
+            <a class="fas fa-xs fa-chevron-down" id="SERIES_arrow" onclick="hide('SERIES', 'SERIES_arrow')"></a>
+        </div>
+    </h4>
+    <hr class="mt-2 mb-3">
+
+    <div id="SERIES" class="row">
         <div class="col-sm">
             <table class="table table-striped table-dark table-sm">
                 <thead>
@@ -180,51 +226,18 @@ hr {
                 </tbody>
             </table>
         </div>
-        <div class="col-sm">
-            <table class="table table-striped table-dark table-sm">
-                 <thead>
-                    <th scope="col" class="text-center">Friends
-                        <a id="add_friend" class="btn btn-sm btn-light text-dark float-right" data-toggle="modal" data-target="#addFriendModal">Add</a>
-                    </th>
-                </thead>
-                {% for friend in friends_list_data %}
-                    {% if friend['status'] == "pending" %}
-                        <tr>
-                            <td><a class="text-light" href="#" id="{{ friend['user_id'] }}">{{ friend['username'] }}</a>
-                                <button class="btn btn-sm btn-mdb-color small" id="accept_{{ friend['user_id'] }}">Accept</button>
-                                <button class="btn btn-sm btn-danger small" id="decline_{{ friend['user_id'] }}">Decline</button>
-                            </td>
-                        </tr>
-                    {% elif friend['status'] == "request" %}
-                        <tr>
-                            <td><a class="text-light" href="#">{{ friend['username'] }} (Pending request)</a>
-                                <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </td>
-                        </tr>
-
-                    {% elif friend['status'] == "declined" %}
-                    {% else %}
-                        <tr>
-                            <td>
-                                <a class="text-light" href="/user/{{ friend['username'] }}">{{ friend['username'] }}</a>
-                                <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-            </table>
-        </div>
     </div>
 
 
-    <h2 class="font-weight-light text-center mt-4 mb-0">Anime Statistics</h2>
+    <h4 class="font-weight-light text-center mt-4 mb-0">
+        Anime Statistics
+        <div class="arrow_div float-right">
+            <a class="fas fa-xs fa-chevron-down" id="ANIME_arrow" onclick="hide('ANIME', 'ANIME_arrow')"></a>
+        </div>
+    </h4>
     <hr class="mt-2 mb-3">
 
-    <div class="row">
+    <div id="ANIME" class="row">
         <div class="col-sm">
             <table class="table table-striped table-dark table-sm">
                 <thead>
@@ -284,15 +297,27 @@ hr {
             </table>
         </div>
     </div>
-
+</div>
 <!--    <h2 class="font-weight-light text-center mt-4 mb-0">Series Graphics</h2>
     <hr class="mt-2 mb-2">
 
     <canvas class="chart m-b-20 m-t-20" id="mixedChart"></canvas>-->
-
 </div>
 
 <script>
+function hide(category, arrow) {
+  var category = document.getElementById(category);
+  var arrow = document.getElementById(arrow);
+
+  if (category.className === "row"){
+        category.className = "d-none";
+        arrow.className = "fas fa-xs fa-chevron-right";
+  } else {
+        category.className = "row";
+        arrow.className = "fas fa-xs fa-chevron-down";
+  }
+}
+
 {% for friend in friends_list_data %}
     let close_{{ friend['user_id'] }} = document.getElementById("C_{{ friend['user_id'] }}");
     {% if friend['status'] == "pending" %}
@@ -300,7 +325,6 @@ hr {
         let decline_{{ friend['user_id'] }} = document.getElementById("decline_{{ friend['user_id'] }}");
 
         accept_{{ friend['user_id'] }}.onclick = function () {
-
             $.ajax ({
                 type: "POST",
                 url: "/accept_friend_request",
@@ -313,7 +337,6 @@ hr {
         }
 
         decline_{{ friend['user_id'] }}.onclick = function () {
-
             $.ajax ({
                 type: "POST",
                 url: "/decline_friend_request",
@@ -327,7 +350,6 @@ hr {
     {% else %}
 
     close_{{ friend['user_id'] }}.onclick = function () {
-
         $.ajax ({
             type: "POST",
             url: "/delete_friend",
