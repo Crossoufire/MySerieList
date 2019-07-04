@@ -66,6 +66,16 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(test2)
 
+    if User.query.filter_by(id='4').first() is None:
+        test3 = User(username='test3',
+                     email='test3@test3.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(test3)
     db.session.commit()
 
 
@@ -87,8 +97,8 @@ def home():
             next_page = request.args.get('next')
             app.logger.info('[{}] Logged in'.format(user.id))
             flash("You're now logged in. Welcome {0}".format(login_form.login_username.data), "success")
-            default_page = str(user.default_page)
-            return redirect(next_page) if next_page else redirect(url_for(default_page))
+            home_page = str(user.home_page.value)
+            return redirect(next_page) if next_page else redirect(url_for(home_page))
         else:
             flash('Login Failed. Please check Username and Password', 'warning')
 
@@ -437,7 +447,7 @@ def account_settings():
 
     image_file = url_for('static', filename='profile_pics/{0}'.format(current_user.image_file))
     return render_template('account_settings.html', title='Settings', image_file=image_file, form=form,
-                           value_privacy=is_private, home_page=user.home_page.value, default_hof=user.default_hof.value)
+                           value_privacy=is_private, home_page=str(user.home_page.value), default_hof=str(user.default_hof.value))
 
 
 @app.route("/default_page", methods=['POST'])
@@ -657,18 +667,18 @@ def hall_of_fame():
     # Series hall of fame
     all_user_data_series = []
     for user in users:
-        watching    = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').count()
-        completed   = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').count()
-        onhold      = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').count()
-        random      = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').count()
-        dropped     = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').count()
-        plantowatch = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').count()
+        watching     = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').count()
+        completed    = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').count()
+        onhold       = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').count()
+        random       = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').count()
+        dropped      = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').count()
+        plantowatch  = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').count()
 
         total = watching + completed + onhold + random + dropped + plantowatch
         spent = get_total_time_spent(user.id, ListType.SERIES)
 
         # profile picture
-		profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
+        profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
 
         user_data = {"profile_picture": profile_picture,
                      "username": user.username,

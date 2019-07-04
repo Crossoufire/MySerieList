@@ -67,7 +67,7 @@ class SearchAnimeForm(FlaskForm):
 
 class AddFriendForm(FlaskForm):
     add_friend = StringField('Type a Username')
-    submit = SubmitField('Send Request')
+    submit = SubmitField('Send')
 
 
 class ResetPasswordRequestForm(FlaskForm):
