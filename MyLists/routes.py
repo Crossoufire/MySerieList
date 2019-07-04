@@ -76,6 +76,18 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test3)
+
+
+    if User.query.filter_by(id='5').first() is None:
+        test4 = User(username='test4',
+                     email='test4@test4.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(test4)
     db.session.commit()
 
 

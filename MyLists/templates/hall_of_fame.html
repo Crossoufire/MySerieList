@@ -57,12 +57,12 @@ hr {
 }
 </style>
 
-<h4 class="font-weight-light text-center mt-4 mb-0">
+<h3 class="font-weight-light text-center mt-4 mb-0">
     SERIES
     <div class="arrow_div float-right">
         <a class="fas fa-xs fa-chevron-down" id="SERIES_arrow" onclick="hide('SERIES', 'SERIES_arrow')"></a>
     </div>
-</h4>
+</h3>
 <hr class="mt-2 mb-4">
 
 <div id="SERIES" class="container p-0">
@@ -152,12 +152,12 @@ hr {
 </div>
 
 
-<h4 class="font-weight-light text-center mt-4 mb-0">
+<h3 class="font-weight-light text-center mt-4 mb-0">
     ANIMES
     <div class="arrow_div float-right">
         <a class="fas fa-xs fa-chevron-down" id="ANIME_arrow" onclick="hide('ANIME', 'ANIME_arrow')"></a>
     </div>
-</h4>
+</h3>
 <hr class="mt-2 mb-4">
 
 <div id="ANIME" class="container p-0">
@@ -183,7 +183,7 @@ hr {
             <tr>
             {% if current_user.get_id() == '1' %}
                 <td><img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 30px; height: 30px;"></td>
-                <td><b><a href="/user/series/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
+                <td><b><a href="/user/anime/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
                 <td>{{ user["watching"] }}</td>
                 <td>{{ user["completed"] }}</td>
                 <td>{{ user["onhold"] }}</td>
@@ -196,7 +196,7 @@ hr {
 
                 {% elif user["iscurrentuser"] %}
                 <td class="current_user"><img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 30px; height: 30px;"></td>
-                <td class="current_user"><b><a href="/user/series/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
+                <td class="current_user"><b><a href="/user/anime/{{ user['username'] }}">{{ user["username"] }}</a></b></td>
                 <td class="current_user">{{ user["watching"] }}</td>
                 <td class="current_user">{{ user["completed"] }}</td>
                 <td class="current_user">{{ user["onhold"] }}</td>
@@ -222,7 +222,7 @@ hr {
 
                 {% else %}
                 <td><img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 30px; height: 30px;"></td>
-                <td><b><a href="/user/series/{{ user['username'] }}">{{ user['username'] }}</a></b></td>
+                <td><b><a href="/user/anime/{{ user['username'] }}">{{ user['username'] }}</a></b></td>
                 <td>{{ user["watching"] }}</td>
                 <td>{{ user["completed"] }}</td>
                 <td>{{ user["onhold"] }}</td>
