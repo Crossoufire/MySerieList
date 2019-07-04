@@ -115,6 +115,7 @@ site.db
 site.db-journal
 MyLists/static/profile_pics/*
 !MyLists/static/profile_pics/default.jpg
+!MyLists/static/profile_pics/anonymous.jpg
 MyLists/static/series_covers/*
 !MyLists/static/series_covers/default.jpg
 MyLists/static/anime_covers/*
