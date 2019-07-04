@@ -252,10 +252,32 @@ def account():
 
     # Series Statistics
     nb_of_series = get_list_count(ListType.SERIES)
+    total_series = sum(nb_of_series)
+    if total_series == 0:
+        pourcentage_series = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    else:
+        pourcentage_series = [(float(nb_of_series[0]/total_series))*100,
+                              (float(nb_of_series[1]/total_series))*100,
+                              (float(nb_of_series[2]/total_series))*100,
+                              (float(nb_of_series[3]/total_series))*100,
+                              (float(nb_of_series[4]/total_series))*100,
+                              (float(nb_of_series[5]/total_series))*100]
+
     total_time_series = get_total_time_spent(current_user.get_id(), ListType.SERIES)
 
     # Animes Statistics
     nb_of_animes = get_list_count(ListType.ANIME)
+    total_anime = sum(nb_of_animes)
+    if total_anime == 0:
+        pourcentage_anime = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    else:
+        pourcentage_anime = [(float(nb_of_animes[0]/total_anime))*100,
+                              (float(nb_of_animes[1]/total_anime))*100,
+                              (float(nb_of_animes[2]/total_anime))*100,
+                              (float(nb_of_animes[3]/total_anime))*100,
+                              (float(nb_of_animes[4]/total_anime))*100,
+                              (float(nb_of_animes[5]/total_anime))*100]
+
     total_time_animes = get_total_time_spent(current_user.get_id(), ListType.ANIME)
 
     # Charts
@@ -382,9 +404,11 @@ def account():
                            title='Account',
                            profile_picture=profile_picture,
                            nb_of_series=nb_of_series,
+                           pourcentage_series=pourcentage_series,
                            total_time_series=total_time_series,
                            nb_of_animes=nb_of_animes,
                            total_time_animes=total_time_animes,
+                           pourcentage_anime=pourcentage_anime,
                            friends_list_data=friends_list_data,
                            form=add_friend_form)
 
