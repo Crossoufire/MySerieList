@@ -12,6 +12,7 @@
 
 .container-scrollable {
     max-width: 150px;
+    min-width: 150px;
 }
 
 .account-img {
@@ -52,126 +53,138 @@ hr {
 .form_account {
     max-width: 800px;
 }
+
+.border_account {
+    border-style: solid;
+    border-width: 2px;
+    border-color: grey;
+    border-radius: 10px;
+    padding-top: 30px;
+    padding-bottom: 20px;
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-bottom: 20px;
+}
 </style>
 
+
 <div class="container form_account">
-    <div class="d-flex flex-wrap-reverse">
-        <div class="p-r-10 bd-highlight">
-            <img class="rounded border-light account-img" src="{{ image_file }}">
+    <div class="border_account">
+        <div class="d-flex flex-wrap-reverse">
+            <div class="p-r-10 bd-highlight">
+                <img class="rounded border-light account-img" src="{{ image_file }}">
+            </div>
+            <div class="bd-highlight">
+                <h2 class="mt-0 account-heading">{{ current_user.username }}</h2>
+                <h5 class="text">{{ current_user.email }}</h5>
+            </div>
+            <div class="ml-auto bd-highlight">
+                <label>
+                    Private Mode
+                    <input id="private-toggle" type="checkbox" {{ value_privacy }} data-toggle="toggle"  data-onstyle="light" data-offstyle="dark" data-style="border" data-size="sm">
+                </label>
+            </div>
         </div>
-        <div class="bd-highlight">
-            <h2 class="mt-0 account-heading">{{ current_user.username }}</h2>
-            <h5 class="text">{{ current_user.email }}</h5>
-        </div>
-        <div class="ml-auto bd-highlight">
-            <label>
-                Private Mode
-                <input id="private-toggle" type="checkbox" {{ value_privacy }} data-toggle="toggle"  data-onstyle="light" data-offstyle="dark" data-style="border" data-size="sm">
-            </label>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col">
-            <div class="m-t-20 m-b-40">
-                <h5 class="m-b-10">Change your default page:</h5>
-                <div class="container-scrollable">
-                    <select id="default_page" class="text-center form-control p-0 default_page">
-                        {% if home_page == "account" %}
-                            <option selected="selected">Account</option>
-                            <option>Hall of Fame</option>
-                            <option>MySeriesList</option>
-                            <option>MyAnimesList</option>
-                        {% elif home_page == "hall_of_fame" %}
-                            <option>Account</option>
-                            <option selected="selected">Hall of Fame</option>
-                            <option>MySeriesList</option>
-                            <option>MyAnimesList</option>
-                        {% elif home_page == "myserieslist" %}
-                            <option>Account</option>
-                            <option>Hall of Fame</option>
-                            <option selected="selected">MySeriesList</option>
-                            <option>MyAnimesList</option>
-                        {% elif home_page == "myanimelist" %}
-                            <option>Account</option>
-                            <option>Hall of Fame</option>
-                            <option>MySeriesList</option>
-                            <option selected="selected">MyAnimesList</option>
-                        {% endif %}
-                    </select>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col m-t-20 m-b-40">
+                    <h5 class="m-b-10">Change your home page:</h5>
+                    <div class="d-flex container-scrollable">
+                        <select id="home_page" class="text-center form-control p-0 default_page">
+                            {% if home_page == "account" %}
+                                <option selected="selected">Account</option>
+                                <option>Hall of Fame</option>
+                                <option>MySeriesList</option>
+                                <option>MyAnimesList</option>
+                            {% elif home_page == "hall_of_fame" %}
+                                <option>Account</option>
+                                <option selected="selected">Hall of Fame</option>
+                                <option>MySeriesList</option>
+                                <option>MyAnimesList</option>
+                            {% elif home_page == "myserieslist" %}
+                                <option>Account</option>
+                                <option>Hall of Fame</option>
+                                <option selected="selected">MySeriesList</option>
+                                <option>MyAnimesList</option>
+                            {% elif home_page == "myanimelist" %}
+                                <option>Account</option>
+                                <option>Hall of Fame</option>
+                                <option>MySeriesList</option>
+                                <option selected="selected">MyAnimesList</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col m-t-20 m-b-40">
+                    <h5 class="m-b-10">Default hall of fame table:</h5>
+                    <div class="d-flex container-scrollable">
+                        <select id="default_hof" class="text-center form-control p-0 default_hof">
+                            {% if default_hof == "myserieslist" %}
+                                <option selected="selected">MySeriesList</option>
+                                <option>MyAnimesList</option>
+                            {% elif default_hof == "myanimelist" %}
+                                <option>MySeriesList</option>
+                                <option selected="selected">MyAnimesList</option>
+                            {% endif %}
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col">
-            <div class="m-t-20 m-b-40">
-                <h5 class="m-b-10">Default Hall of Fame table:</h5>
-                <div class="container-scrollable">
-                    <select id="default_hof" class="text-center form-control p-0 default_hof">
-                        {% if default_hof == "myserieslist" %}
-                            <option selected="selected">MySeriesList</option>
-                            <option>MyAnimesList</option>
-                        {% elif default_hof == "myanimelist" %}
-                            <option>MySeriesList</option>
-                            <option selected="selected">MyAnimesList</option>
-                        {% endif %}
-                    </select>
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <h3 class="border-bottom text-center m-t-10 m-b-30">Account Info</h3>
+            <div class="container-form">
+                <div class="form-group">
+                    {{ form.username.label(class="form-control-label") }}
+                    {% if form.username.errors %}
+                        {{ form.username(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.username(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    {% if form.email.errors %}
+                        {{ form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.picture.label() }}
+                    {{ form.picture(class="form-control-file") }}
+                    {% if form.picture.errors %}
+                        {% for error in form.picture.errors %}
+                            <span class="text-danger">{{ error }}</span><br>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
-        </div>
+            <div class="text-left">
+                {{ form.submit(class="btn btn-outline-info") }}
+                <a class="btn btn-outline-info" href="{{ url_for('change_password') }}" role="button">Change password?</a>
+            </div>
+        </form>
     </div>
-
-    <form method="POST" action="" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <h3 class="border-bottom text-center m-t-10 m-b-30">Account Info</h3>
-        <div class="container-form">
-            <div class="form-group">
-                {{ form.username.label(class="form-control-label") }}
-                {% if form.username.errors %}
-                    {{ form.username(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.username.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.username(class="form-control form-control-lg") }}
-                {% endif %}
-            </div>
-            <div class="form-group">
-                {{ form.email.label(class="form-control-label") }}
-                {% if form.email.errors %}
-                    {{ form.email(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.email.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.email(class="form-control form-control-lg") }}
-                {% endif %}
-            </div>
-            <div class="form-group">
-                {{ form.picture.label() }}
-                {{ form.picture(class="form-control-file") }}
-                {% if form.picture.errors %}
-                    {% for error in form.picture.errors %}
-                        <span class="text-danger">{{ error }}</span><br>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        </div>
-        <div class="text-left">
-            {{ form.submit(class="btn btn-outline-info") }}
-            <a class="btn btn-outline-info" href="{{ url_for('change_password') }}" role="button">Change password?</a>
-        </div>
-    </form>
 </div>
-
 
 <script>
 let private = document.getElementById("private-toggle");
-let default_page = document.getElementById("default_page");
+let home_page = document.getElementById("home_page");
 let default_hof = document.getElementById("default_hof");
 
 private.onchange = function () {
@@ -186,8 +199,8 @@ private.onchange = function () {
     });
 };
 
-default_page.onchange = function () {
-    let selected_index = default_page.selectedIndex;
+home_page.onchange = function () {
+    let selected_index = home_page.selectedIndex;
     $body = $("body");
     $.ajax ({
         type: "POST",
