@@ -49,12 +49,7 @@ hr {
     width: 21px;
 }
 
-.block {
-	height: 30px;
-	color: #fff;
-	float: left;
-	background-color: #334D5C;
-}
+
 
 .block:nth-of-type(2) {
 	background-color: #45B29D;
@@ -84,9 +79,6 @@ hr {
     margin: 0 auto;
 }
 
-.mini {
-    min-width: 100px;
-
 /* On screens that are 599px or more */
 @media screen and (min-width: 599px) {
     .account-img {
@@ -107,6 +99,21 @@ hr {
         padding-left: 50px;
         padding-right: 50px;
         margin-bottom: 20px;
+    }
+
+    .stat_text {
+        font-size: 12pt;
+    }
+
+    .mini {
+        min-width: 105px;
+    }
+
+    .block {
+	    height: 30px;
+	    color: #fff;
+	    float: left;
+	    background-color: #334D5C;
     }
 }
 
@@ -140,13 +147,32 @@ hr {
     .username {
         font-size: 1.5rem;
     }
+
+    .stat_text {
+        font-size: 10pt;
+    }
+
+    .mini {
+        min-width: 100px;
+    }
+
+    .block {
+	    height: 25px;
+	    color: #fff;
+	    float: left;
+	    background-color: #334D5C;
+    }
+
+    .position {
+        text-align: right;
+    }
 }
 </style>
 {% endblock css %}
 
 {% block content %}
 <!--------- Add friend modal ---------->
-<div class="container form_account">
+<div class="container form_account p-0">
     <div class="modal fade" id="addFriendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; max-width: 300px; margin-left: auto; margin-right: auto;">
@@ -249,8 +275,8 @@ hr {
 
     <div id="SERIES" class="container-stats">
         <div class="m-b-10">
-            <span>Days: {{ total_time_series[2] }}</span>
-            <span class="float-right">Hours: {{ total_time_series[1] }}</span>
+            <span class="stat_text"><b>Days:</b> {{ total_time_series[2] }}</span>
+            <span class="stat_text float-right"><b>Hours:</b> {{ total_time_series[1] }}</span>
         </div>
 
         <figure class="d-flex">
@@ -276,68 +302,68 @@ hr {
 
         <div class="m-t-10">
             <div class="row">
-                <div class="col-sm mini">
-                    <span>Watching:</span>
+                <div class="col mini p-r-0">
+                    <span class="stat_text">Watching:</span>
                 </div>
-                <div class="col-sm">
-                    <span>{{ nb_of_series[0] }}</span>
+                <div class="col p-0 position">
+                    <span class="stat_text">{{ nb_of_series[0] }}</span>
                 </div>
-                <div class="col-sm mini">
-                    <span>Dropped:</span>
+                <div class="col mini p-r-0">
+                    <span class="stat_text">Dropped:</span>
                 </div>
-                <div class="col-sm">
-                     <span>{{ nb_of_series[4] }}</span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-sm mini">
-                    <span>Completed:</span>
-                </div>
-                <div class="col-sm">
-                    <span> {{ nb_of_series[1] }}</span>
-                </div>
-                <div class="col-sm mini">
-                    <span>Plan to Watch:</span>
-                </div>
-                <div class="col-sm">
-                    <span> {{ nb_of_series[5] }}</span>
+                <div class="col p-l-0 position">
+                     <span class="stat_text">{{ nb_of_series[4] }}</span>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-sm mini">
-                    <span>On Hold:</span>
+                <div class="col mini p-r-0">
+                    <span class="stat_text">Completed:</span>
                 </div>
-                 <div class="col-sm">
-                    <span> {{ nb_of_series[2] }}</span>
+                <div class="col p-0 position">
+                    <span class="stat_text">{{ nb_of_series[1] }}</span>
                 </div>
-                <div class="col-sm mini">
-                    <span></span>
+                <div class="col mini p-r-0">
+                    <span class="stat_text">Plan to Watch:</span>
                 </div>
-                 <div class="col-sm mini">
-                    <span></span>
+                <div class="col p-l-0 position">
+                    <span class="stat_text">{{ nb_of_series[5] }}</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col mini p-r-0">
+                    <span class="stat_text">On Hold:</span>
+                </div>
+                 <div class="col p-0 position">
+                    <span class="stat_text">{{ nb_of_series[2] }}</span>
+                </div>
+                <div class="col mini p-r-0">
+                    <span class="stat_text"></span>
+                </div>
+                 <div class="col p-l-0 position">
+                    <span class="stat_text"></span>
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm mini">
-                    <span>Random:</span>
+                <div class="col mini p-r-0">
+                    <span class="stat_text">Random:</span>
                 </div>
-                <div class="col-sm">
-                    <span> {{ nb_of_series[3] }}</span>
+                <div class="col p-0 position">
+                    <span class="stat_text">{{ nb_of_series[3] }}</span>
                 </div>
-                <div class="col-sm mini">
-                    <span>Total Episodes:</span>
+                <div class="col mini p-r-0">
+                    <span class="stat_text">Episodes:</span>
                 </div>
-                <div class="col-sm">
-                    <span>{{ total_time_series[0] }}</span>
+                <div class="col p-l-0 position">
+                    <span class="stat_text">{{ total_time_series[0] }}</span>
                 </div>
             </div>
         </div>
     </div>
 
 
-    <h3 class="font-weight-light text-center mt-4 mb-0">
+    <h3 class="font-weight-light text-center mt-5 mb-0">
         Anime Statistics
         <div class="arrow_div float-right">
             <a class="fas fa-xs fa-chevron-down" id="ANIME_arrow" onclick="hide('ANIME', 'ANIME_arrow')"></a>
@@ -347,8 +373,8 @@ hr {
 
     <div id="ANIME" class="container-stats">
         <div class="m-b-10">
-            <span>Days: {{ total_time_animes[2] }}</span>
-            <span class="float-right">Hours: {{ total_time_animes[1] }}</span>
+            <span class="stat_text"><b>Days:</b> {{ total_time_animes[2] }}</span>
+            <span class="stat_text float-right"><b>Hours:</b> {{ total_time_animes[1] }}</span>
         </div>
 
         <figure class="d-flex">
@@ -372,63 +398,63 @@ hr {
             </span>
         </figure>
 
+
         <div class="m-t-10">
             <div class="row">
-                <div class="col-sm mini">
-                    <span>Watching:</span>
+                <div class="col mini p-r-0">
+                    <span class="stat_text">Watching:</span>
                 </div>
-                <div class="col-sm">
-                    <span>{{ nb_of_animes[0] }}</span>
+                <div class="col p-0 position">
+                    <span class="stat_text">{{ nb_of_animes[0] }}</span>
                 </div>
-                <div class="col-sm mini">
-                    <span>Dropped:</span>
+                <div class="col mini p-r-0">
+                    <span class="stat_text">Dropped:</span>
                 </div>
-                <div class="col-sm">
-                     <span>{{ nb_of_animes[4] }}</span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-sm mini">
-                    <span>Completed:</span>
-                </div>
-                <div class="col-sm">
-                    <span> {{ nb_of_animes[1] }}</span>
-                </div>
-                <div class="col-sm mini">
-                    <span>Plan to Watch:</span>
-                </div>
-                <div class="col-sm">
-                    <span> {{ nb_of_animes[5] }}</span>
+                <div class="col p-l-0 position">
+                     <span class="stat_text">{{ nb_of_animes[4] }}</span>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-sm mini">
-                    <span>On Hold:</span>
+                <div class="col mini p-r-0">
+                    <span class="stat_text">Completed:</span>
                 </div>
-                 <div class="col-sm">
-                    <span> {{ nb_of_animes[2] }}</span>
+                <div class="col p-0 position">
+                    <span class="stat_text">{{ nb_of_animes[1] }}</span>
                 </div>
-                <div class="col-sm mini">
-                    <span></span>
+                <div class="col mini p-r-0">
+                    <span class="stat_text">Plan to Watch:</span>
                 </div>
-                 <div class="col-sm mini">
-                    <span></span>
+                <div class="col p-l-0 position">
+                    <span class="stat_text">{{ nb_of_animes[5] }}</span>
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm mini">
-                    <span>Random:</span>
+                <div class="col mini p-r-0">
+                    <span class="stat_text">On Hold:</span>
                 </div>
-                <div class="col-sm">
-                    <span> {{ nb_of_animes[3] }}</span>
+                 <div class="col p-0 position">
+                    <span class="stat_text">{{ nb_of_animes[2] }}</span>
                 </div>
-                <div class="col-sm mini">
-                    <span>Total Episodes:</span>
+                <div class="col mini p-r-0">
+                    <span class="stat_text"></span>
                 </div>
-                <div class="col-sm">
-                    <span>{{ total_time_animes[0] }}</span>
+                 <div class="col p-l-0 position">
+                    <span class="stat_text"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col mini p-r-0">
+                    <span class="stat_text">Random:</span>
+                </div>
+                <div class="col p-0 position">
+                    <span class="stat_text">{{ nb_of_animes[3] }}</span>
+                </div>
+                <div class="col mini p-r-0">
+                    <span class="stat_text">Episodes:</span>
+                </div>
+                <div class="col p-l-0 position">
+                    <span class="stat_text">{{ total_time_animes[0] }}</span>
                 </div>
             </div>
         </div>
