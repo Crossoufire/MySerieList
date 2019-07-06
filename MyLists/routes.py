@@ -266,9 +266,9 @@ def account():
     nb_of_series = get_list_count(ListType.SERIES)
     total_series = sum(nb_of_series)
     if total_series == 0:
-        pourcentage_series = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        series_rate = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     else:
-        pourcentage_series = [(float(nb_of_series[0]/total_series))*100,
+        series_rate = [(float(nb_of_series[0]/total_series))*100,
                               (float(nb_of_series[1]/total_series))*100,
                               (float(nb_of_series[2]/total_series))*100,
                               (float(nb_of_series[3]/total_series))*100,
@@ -281,9 +281,9 @@ def account():
     nb_of_animes = get_list_count(ListType.ANIME)
     total_anime = sum(nb_of_animes)
     if total_anime == 0:
-        pourcentage_anime = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        anime_rate = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     else:
-        pourcentage_anime = [(float(nb_of_animes[0]/total_anime))*100,
+        anime_rate = [(float(nb_of_animes[0]/total_anime))*100,
                               (float(nb_of_animes[1]/total_anime))*100,
                               (float(nb_of_animes[2]/total_anime))*100,
                               (float(nb_of_animes[3]/total_anime))*100,
@@ -292,135 +292,15 @@ def account():
 
     total_time_animes = get_total_time_spent(current_user.get_id(), ListType.ANIME)
 
-    # Charts
-    # get_graphic_data = SeriesEpisodeTimestamp.query.filter_by(user_id=current_user.get_id()).all()
-    #
-    # datetime_user = []
-    # series_ids = []
-    # for i in range(0, len(get_graphic_data)):
-    #     tmp1 = get_graphic_data[i]
-    #     tmp2 = [str(tmp1.timestamp.date().year), str(tmp1.timestamp.date().month), int(tmp1.series_id)]
-    #     datetime_user.append(tmp2)
-    #     tmp3 = tmp1.series_id
-    #     if series_ids.count(int(tmp3)) == 0:
-    #         series_ids.append(int(tmp3))
-    #     else:
-    #         pass
-    #
-    # for i in range(0, len(series_ids)):
-    #     duration_request = Series.query.filter_by(id=series_ids[i]).first()
-    #     duration = int(duration_request.episode_duration) - 4
-    #     for j in range(0, len(datetime_user)):
-    #         if series_ids[i] == datetime_user[j][2]:
-    #             datetime_user[j].append(int(duration))
-    #         else:
-    #             pass
-    #
-    # year_now = str(datetime.now().year)
-    #
-    # january = 0
-    # february = 0
-    # march = 0
-    # april = 0
-    # may = 0
-    # june = 0
-    # july = 0
-    # august = 0
-    # september = 0
-    # october = 0
-    # november = 0
-    # december = 0
-    # january_time = 0
-    # february_time = 0
-    # march_time = 0
-    # april_time = 0
-    # may_time = 0
-    # june_time = 0
-    # july_time = 0
-    # august_time = 0
-    # september_time = 0
-    # october_time = 0
-    # november_time = 0
-    # december_time = 0
-    # for i in range(0, len(datetime_user)):
-    #     if datetime_user[i][0] != year_now:
-    #         pass
-    #     else:
-    #         if datetime_user[i][1] == '1':
-    #             january += 1
-    #             january_time += int(datetime_user[i][3])
-    #         if datetime_user[i][1] == '2':
-    #             february += 1
-    #             february_time += int(datetime_user[i][3])
-    #         if datetime_user[i][1] == '3':
-    #             march += 1
-    #             march_time += int(datetime_user[i][3])
-    #         if datetime_user[i][1] == '4':
-    #             april += 1
-    #             april_time += int(datetime_user[i][3])
-    #         if datetime_user[i][1] == '5':
-    #             may += 1
-    #             may_time += int(datetime_user[i][3])
-    #         if datetime_user[i][1] == '6':
-    #             june += 1
-    #             june_time += int(datetime_user[i][3])
-    #         if datetime_user[i][1] == '7':
-    #             july += 1
-    #             july_time += int(datetime_user[i][3])
-    #         if datetime_user[i][1] == '8':
-    #             august += 1
-    #             august_time += int(datetime_user[i][3])
-    #         if datetime_user[i][1] == '9':
-    #             september += 1
-    #             september_time += int(datetime_user[i][3])
-    #         if datetime_user[i][1] == '10':
-    #             october += 1
-    #             october_time += int(datetime_user[i][3])
-    #         if datetime_user[i][1] == '11':
-    #             november += 1
-    #             november_time += int(datetime_user[i][3])
-    #         if datetime_user[i][1] == '12':
-    #             december += 1
-    #             december_time += int(datetime_user[i][3])
-    #
-    # nb_episodes_watched = [january, february, march, april, may, june, july, august, september, october, november, december]
-    # max_value = max(nb_episodes_watched) + 1
-    #
-    # time_episodes_watched = [
-    #                         round(january_time / 60, 2),
-    #                         round(february_time / 60, 2),
-    #                         round(march_time / 60, 2),
-    #                         round(april_time / 60, 2),
-    #                         round(may_time / 60, 2),
-    #                         round(june_time / 60, 2),
-    #                         round(july_time / 60, 2),
-    #                         round(august_time / 60, 2),
-    #                         round(september_time / 60, 2),
-    #                         round(october_time / 60, 2),
-    #                         round(november_time / 60, 2),
-    #                         round(december_time / 60, 2)]
-    #
-    # return render_template('account.html',
-    #                        title='Account',
-    #                        profile_picture=profile_picture,
-    #                        nb_of_series=nb_of_series,
-    #                        total_time_series=total_time_series,
-    #                        nb_of_animes=nb_of_animes,
-    #                        total_time_animes=total_time_animes,
-    #                        friends_list_data=friends_list_data,
-    #                        form=add_friend_form,
-    #                        nb_episodes_watched=nb_episodes_watched,
-    #                        time_episodes_watched=time_episodes_watched,
-    #                        max_value=max_value)
     return render_template('account.html',
                            title='Account',
                            profile_picture=profile_picture,
                            nb_of_series=nb_of_series,
-                           pourcentage_series=pourcentage_series,
+                           series_rate=series_rate,
                            total_time_series=total_time_series,
                            nb_of_animes=nb_of_animes,
                            total_time_animes=total_time_animes,
-                           pourcentage_anime=pourcentage_anime,
+                           anime_rate=anime_rate,
                            friends_list_data=friends_list_data,
                            form=add_friend_form)
 

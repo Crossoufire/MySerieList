@@ -3,145 +3,160 @@
 {% block content %}
 
 <style>
-    hr {
-        border-top: 1px solid rgba(255, 255, 255, 0.9)
+.form-control:disabled {
+    background-color: #131418;
+}
+
+hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.9)
+}
+
+.scrollable-menu {
+    text-align-last: center;
+}
+
+.form-control:focus {
+    height: 2rem;
+    padding: 5px;
+    background-color: #131418;
+    color: #fff;
+}
+
+.modal-content {
+    background: #131418;
+}
+
+.card {
+    border-radius: 5px;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+#anime {
+    padding: 0px;
+}
+
+.arrow_div {
+    height: 28px;
+    width: 28px;
+}
+
+/* On screens that are 599px or more */
+@media screen and (min-width: 599px) {
+    .card-img-top {
+        border-style: solid;
+        border-width: 1px;
+        border-color: black;
+        border-radius: 3px;
     }
 
-    .scrollable-menu {
-        text-align-last: center;
+    .card {
+        width: 200px;
     }
 
-    .form-control:focus {
+    .form-control {
         height: 2rem;
         padding: 5px;
         background-color: #131418;
         color: #fff;
+        border-radius: 1px;
+        font-size: 11pt;
+        outline: none;
+        box-shadow:none !important;
     }
+}
 
-    .form-control:disabled {
-        background-color: #131418;
-    }
-
-    .modal-content {
-        background: #131418;
+/* On screens that are 599px or less */
+@media screen and (max-width: 599px) {
+    .card-img-top {
+        border-style: solid;
+        border-width: 1px;
+        border-color: black;
+        border-radius: 3px;
     }
 
     .card {
-        border-radius: 5px;
+        width: 135px;
+        padding-right: 0px;
+        margin-left: 5px !important;
+        margin-right: 5px !important;
+        margin-bottom: 20px;
     }
 
-    .btn {
-        padding: 5px !important;
-        margin: 2px !important;
+    .form-control {
+        height: 2rem;
+        background-color: #131418;
+        color: #fff;
+        border-radius: 1px;
+        font-size: 9pt;
+        outline: none;
+        box-shadow:none !important;
+        align-items: left;
+        padding: 5px;
     }
 
-    .pointer {
-        cursor: pointer;
+    .category-title {
+        font-size: 2rem;
     }
+}
 
-    /* On screens that are 599px or more */
-    @media screen and (min-width: 599px) {
-        .card-img-top {
-            border-style: solid;
-            border-width: 1px;
-            border-color: black;
-            border-radius: 3px;
-        }
+.episodes {
+    border-style: 1px;
+    border-color: black;
+    border-radius: 2px;
+    -moz-appearance:none;
+    -webkit-appearance:none;
+    appearance:none;
+}
 
-        .card {
-            width: 200px;
-        }
-
-        .form-control {
-            height: 2rem;
-            padding: 5px;
-            background-color: #131418;
-            color: #fff;
-            border-radius: 1px;
-            font-size: 11pt;
-            outline: none;
-            box-shadow:none !important;
-        }
-    }
-
-    /* On screens that are 599px or less */
-    @media screen and (max-width: 599px) {
-        .card-img-top {
-            border-style: solid;
-            border-width: 1px;
-            border-color: black;
-            border-radius: 3px;
-        }
-
-        .card {
-            width: 135px;
-            padding-right: 0px;
-            margin-left: 5px !important;
-            margin-right: 5px !important;
-            margin-bottom: 20px;
-        }
-
-        .form-control {
-            height: 2rem;
-            background-color: #131418;
-            color: #fff;
-            border-radius: 1px;
-            font-size: 9pt;
-            outline: none;
-            box-shadow:none !important;
-            align-items: left;
-            padding: 5px;
-        }
-
-        .category-title {
-            font-size: 2rem;
-        }
-    }
-
-    .episodes {
-        border-style: 1px;
-        border-color: black;
-        border-radius: 2px;
-        -moz-appearance:none;
-        -webkit-appearance:none;
-        appearance:none;
-    }
-
-    .seasons {
-        border-style: 1px;
-        border-color: black;
-        border-radius: 2px;
-        -moz-appearance:none;
-        -webkit-appearance:none;
-        appearance:none;
-    }
-
+.seasons {
+    border-style: 1px;
+    border-color: black;
+    border-radius: 2px;
+    -moz-appearance:none;
+    -webkit-appearance:none;
+    appearance:none;
+}
 </style>
 
 {% for category in all_data %}
 
     {% if loop.index == 1 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">WATCHING<a class="fas fa-chevron-down float-right" id="WATCHING_arrow" onclick="hide('WATCHING', 'WATCHING_arrow')"></a></h1>
+    <h2 class="font-weight-light text-center pt-4 mb-0 category-title">WATCHING
+        <div class="arrow_div float-right"><a class="fas fa-sm fa-chevron-down" id="WATCHING_arrow" onclick="hide('WATCHING', 'WATCHING_arrow')"></a></div>
+    </h2>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="WATCHING">
     {% elif loop.index == 2 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">COMPLETED<a class="fas fa-chevron-down float-right" id="COMPLETED_arrow" onclick="hide('COMPLETED', 'COMPLETED_arrow')"></a></h1>
+    <h2 class="font-weight-light text-center pt-4 mb-0 category-title">COMPLETED
+        <div class="arrow_div float-right"><a class="fas fa-sm fa-chevron-down" id="COMPLETED_arrow" onclick="hide('COMPLETED', 'COMPLETED_arrow')"></a></div>
+    </h2>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="COMPLETED">
     {% elif loop.index == 3 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">ON HOLD<a class="fas fa-chevron-down float-right" id="ON_HOLD_arrow" onclick="hide('ON_HOLD', 'ON_HOLD_arrow')"></a></h1>
+    <h2 class="font-weight-light text-center pt-4 mb-0 category-title">ON HOLD
+        <div class="arrow_div float-right"><a class="fas fa-sm fa-chevron-down" id="ON_HOLD_arrow" onclick="hide('ON_HOLD', 'ON_HOLD_arrow')"></a></div>
+    </h2>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="ON_HOLD">
      {% elif loop.index == 4 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">RANDOM<a class="fas fa-chevron-down float-right" id="RANDOM_arrow" onclick="hide('RANDOM', 'RANDOM_arrow')"></a></h1>
+    <h2 class="font-weight-light text-center pt-4 mb-0 category-title">RANDOM
+        <div class="arrow_div float-right"><a class="fas fa-sm fa-chevron-down" id="RANDOM_arrow" onclick="hide('RANDOM', 'RANDOM_arrow')"></a></div>
+    </h2>
      <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="RANDOM">
     {% elif loop.index == 5 %}
-    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">DROPPED<a class="fas fa-chevron-down float-right" id="DROPPED_arrow" onclick="hide('DROPPED', 'DROPPED_arrow')"></a></h1>
+    <h2 class="font-weight-light text-center pt-4 mb-0 category-title">DROPPED
+        <div class="arrow_div float-right"><a class="fas fa-sm fa-chevron-down" id="DROPPED_arrow" onclick="hide('DROPPED', 'DROPPED_arrow')"></a></div>
+    </h2>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="DROPPED">
     {% elif loop.index == 6%}
-    <h1 class="font-weight-light text-center mt-4 mb-0 category-title">PLAN TO WATCH<a class="fas fa-chevron-down float-right" id="PLAN_TO_WATCH_arrow" onclick="hide('PLAN_TO_WATCH', 'PLAN_TO_WATCH_arrow')"></a></h1>
+    <h2 class="font-weight-light text-center pt-4 mb-0 category-title">PLAN TO WATCH
+        <div class="arrow_div float-right"><a class="fas fa-sm fa-chevron-down" id="PLAN_TO_WATCH_arrow" onclick="hide('PLAN_TO_WATCH', 'PLAN_TO_WATCH_arrow')"></a></div>
+    </h2>
     <hr class="mt-2 mb-4">
     <div class="d-flex flex-wrap" id="PLAN_TO_WATCH">
     {% endif %}
@@ -219,18 +234,18 @@
 {% endfor %}
 
 <script>
-    function hide(category, arrow) {
-      var category = document.getElementById(category);
-      var arrow = document.getElementById(arrow);
+function hide(category, arrow) {
+    var category = document.getElementById(category);
+    var arrow = document.getElementById(arrow);
 
-      if (category.className === "d-flex flex-wrap"){
-            category.className = "d-none";
-            arrow.className = "fas fa-chevron-right float-right";
-      } else {
-            category.className = "d-flex flex-wrap";
-            arrow.className = "fas fa-chevron-down float-right";
-      }
+    if (category.className === "d-flex flex-wrap"){
+        category.className = "d-none";
+        arrow.className = "fas fa-sm fa-chevron-right";
+    } else {
+        category.className = "d-flex flex-wrap";
+        arrow.className = "fas fa-sm fa-chevron-down";
     }
+}
 </script>
 
 {% endblock content %}

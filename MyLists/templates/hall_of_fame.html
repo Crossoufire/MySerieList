@@ -281,17 +281,23 @@ function add_friend(username) {
 }
 
 $(document).ready(function () {
-$('#hall_of_fame_series').DataTable({
-"order": [[ 8, "desc" ], [ 1, "asc" ]]
-});
-$('.dataTables_length').addClass('bs-select');
+    $('#hall_of_fame_series').DataTable({
+        "order": [[ 8, "desc" ], [ 1, "asc" ]],
+        columnDefs: [{orderable: false, targets: 0},
+                     {orderable: false, targets: 10}
+                    ]
+    });
+    $('.dataTables_length').addClass('bs-select');
 });
 
 $(document).ready(function () {
-$('#hall_of_fame_anime').DataTable({
-"order": [[ 8, "desc" ], [ 1, "asc" ]]
-});
-$('.dataTables_length').addClass('bs-select');
+    $('#hall_of_fame_anime').DataTable({
+        "order": [[ 8, "desc" ], [ 1, "asc" ]],
+        columnDefs: [{orderable: false, targets: 0},
+                     {orderable: false, targets: 10}
+                    ]
+    });
+    $('.dataTables_length').addClass('bs-select');
 });
 
 </script>

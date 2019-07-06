@@ -171,8 +171,8 @@ hr {
 {% endblock css %}
 
 {% block content %}
-<!--------- Add friend modal ---------->
 <div class="container form_account p-0">
+    <!--------- Add friend modal ---------->
     <div class="modal fade" id="addFriendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; max-width: 300px; margin-left: auto; margin-right: auto;">
@@ -181,14 +181,13 @@ hr {
                     <h5 class="border-bottom p-t-20 p-b-15 text-center"><b>Add a Friend</b></h5>
                     <div class="form-group m-l-40 m-r-40 m-t-15">
                         {% if form.add_friend.errors %}
-                        {{ form.add_friend(class="form-control form-control is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.add_friend.errors %}
-                            <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
+                            {{ form.add_friend(class="form-control form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.add_friend.errors %}
+                                    <span>{{ error }}</span> {% endfor %}
+                            </div>
                         {% else %}
-                        {{ form.add_friend(class="form-control", placeholder="Username", onfocus="this.value=''") }}
+                            {{ form.add_friend(class="form-control", placeholder="Username", onfocus="this.value=''") }}
                         {% endif %}
                     </div>
                     <div class="form-group m-l-20 m-r-20 text-center">
@@ -198,287 +197,284 @@ hr {
             </div>
         </div>
     </div>
-    <!-------------------------------------------------->
+    <!------------------------------------->
 
-<div class="border_account">
-    <!----------------- Account picture/Username/email/account settings ------------------>
-    <div class="d-flex flex-wrap-reverse">
-        <div class="p-r-10 bd-highlight">
-            <img class="rounded border-light account-img" src="{{ profile_picture }}">
+    <div class="border_account">
+        <!----------------- Account picture/Username/email/account settings ----------------->
+        <div class="d-flex flex-wrap">
+            <div class="p-r-10 bd-highlight">
+                <img class="rounded border-light account-img" src="{{ profile_picture }}">
+            </div>
+            <div class="bd-highlight">
+                <h2 class="mt-0 account-heading username">{{ current_user.username }}</h2>
+                <h5 class="text">{{ current_user.email }}</h5>
+            </div>
+            <div class="ml-auto bd-highlight">
+                <a class="btn btn-sm bg-dark m-0" href="{{ url_for('account_settings') }}" role="button">
+                    <i class="fa fa-cog fa-2x fa-fw"></i>
+                </a>
+            </div>
         </div>
-        <div class="bd-highlight">
-            <h2 class="mt-0 account-heading username">{{ current_user.username }}</h2>
-            <h5 class="text">{{ current_user.email }}</h5>
+        <!----------------------------------------------------------------------------------->
+
+        <h3 class="font-weight-light text-center mt-4 mb-0">
+            <div class="arrow_div float-left">
+                <a class="fas fa-xs fa-user-plus" data-toggle="modal" data-target="#addFriendModal"></a>
+            </div>
+            Friends
+            <div class="arrow_div float-right">
+                <a class="fas fa-xs fa-chevron-down" id="FRIENDS_arrow" onclick="hide('FRIENDS', 'FRIENDS_arrow')"></a>
+            </div>
+        </h3>
+
+        <hr class="mt-2 mb-3">
+
+        <div id="FRIENDS" class="row" style="margin-right: 0px; margin-left: 0px;">
+            <table class="table table-striped table-dark table-sm">
+                {% for friend in friends_list_data %}
+                    {% if friend['status'] == "pending" %}
+                        <tr>
+                            <td><a class="text-light" href="#" id="{{ friend['user_id'] }}">{{ friend['username'] }}</a>
+                                <button class="btn btn-sm btn-danger small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="decline_{{ friend['user_id'] }}">Decline</button>
+                                <button class="btn btn-sm btn-mdb-color small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="accept_{{ friend['user_id'] }}">Accept</button>
+                            </td>
+                        </tr>
+                    {% elif friend['status'] == "request" %}
+                        <tr>
+                            <td><a class="text-light" href="#">{{ friend['username'] }} (Pending request)</a>
+                                <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </td>
+                        </tr>
+
+                    {% elif friend['status'] == "declined" %}
+                    {% else %}
+                        <tr>
+                            <td>
+                                <a class="text-light" href="/user/myserieslist/{{ friend['username'] }}">{{ friend['username'] }}</a>
+                                <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
         </div>
-        <div class="ml-auto bd-highlight">
-            <a class="btn btn-sm bg-dark m-0" href="{{ url_for('account_settings') }}" role="button">
-                <i class="fa fa-cog fa-2x fa-fw"></i>
-            </a>
+
+        <h3 class="font-weight-light text-center mt-4 mb-0">
+            Series Statistics
+            <div class="arrow_div float-right">
+                <a class="fas fa-xs fa-chevron-down" id="SERIES_arrow" onclick="hide('SERIES', 'SERIES_arrow')"></a>
+            </div>
+        </h3>
+
+        <hr class="mt-2 mb-3">
+
+        <div id="SERIES" class="container-stats">
+            <div class="m-b-10">
+                <span class="stat_text"><b>Days:</b> {{ total_time_series[2] }}</span>
+                <span class="stat_text float-right"><b>Hours:</b> {{ total_time_series[1] }}</span>
+            </div>
+
+            <figure class="d-flex">
+                <span class="block" title="Watching">
+                    <span id="{{ series_rate[0] }}%" class="value"></span>
+                </span>
+                <span class="block" title="Completed">
+                    <span id="{{ series_rate[1] }}%" class="value"></span>
+                </span>
+                <span class="block" title="On Hold">
+                    <span id="{{ series_rate[2] }}%" class="value"></span>
+                </span>
+                <span class="block" title="Random">
+                    <span id="{{ series_rate[3] }}%" class="value"></span>
+                </span>
+                <span class="block" title="Dropped">
+                    <span id="{{ series_rate[4] }}%" class="value"></span>
+                </span>
+                <span class="block" title="Plan to Watch">
+                    <span id="{{ series_rate[5] }}%" class="value"></span>
+                </span>
+            </figure>
+
+            <div class="m-t-10">
+                <div class="row">
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Watching:</span>
+                    </div>
+                    <div class="col p-0 position">
+                        <span class="stat_text">{{ nb_of_series[0] }}</span>
+                    </div>
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Dropped:</span>
+                    </div>
+                    <div class="col p-l-0 position">
+                        <span class="stat_text">{{ nb_of_series[4] }}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Completed:</span>
+                    </div>
+                    <div class="col p-0 position">
+                        <span class="stat_text">{{ nb_of_series[1] }}</span>
+                    </div>
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Plan to Watch:</span>
+                    </div>
+                    <div class="col p-l-0 position">
+                        <span class="stat_text">{{ nb_of_series[5] }}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">On Hold:</span>
+                    </div>
+                    <div class="col p-0 position">
+                        <span class="stat_text">{{ nb_of_series[2] }}</span>
+                    </div>
+                    <div class="col mini p-r-0">
+                        <span class="stat_text"></span>
+                    </div>
+                    <div class="col p-l-0 position">
+                        <span class="stat_text"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Random:</span>
+                    </div>
+                    <div class="col p-0 position">
+                        <span class="stat_text">{{ nb_of_series[3] }}</span>
+                    </div>
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Episodes:</span>
+                    </div>
+                    <div class="col p-l-0 position">
+                        <span class="stat_text">{{ total_time_series[0] }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="font-weight-light text-center mt-5 mb-0">
+            Anime Statistics
+            <div class="arrow_div float-right">
+                <a class="fas fa-xs fa-chevron-down" id="ANIME_arrow" onclick="hide('ANIME', 'ANIME_arrow')"></a>
+            </div>
+        </h3>
+
+        <hr class="mt-2 mb-3">
+
+        <div id="ANIME" class="container-stats">
+            <div class="m-b-10">
+                <span class="stat_text"><b>Days:</b> {{ total_time_animes[2] }}</span>
+                <span class="stat_text float-right"><b>Hours:</b> {{ total_time_animes[1] }}</span>
+            </div>
+
+            <figure class="d-flex">
+                <span class="block" title="Watching">
+                    <span id="{{ anime_rate[0] }}%" class="value"></span>
+                </span>
+                <span class="block" title="Completed">
+                    <span id="{{ anime_rate[1] }}%" class="value"></span>
+                </span>
+                <span class="block" title="On Hold">
+                    <span id="{{ anime_rate[2] }}%" class="value"></span>
+                </span>
+                <span class="block" title="Random">
+                    <span id="{{ anime_rate[3] }}%" class="value"></span>
+                </span>
+                <span class="block" title="Dropped">
+                    <span id="{{ anime_rate[4] }}%" class="value"></span>
+                </span>
+                <span class="block" title="Plan to Watch">
+                    <span id="{{ anime_rate[5] }}%" class="value"></span>
+                </span>
+            </figure>
+
+            <div class="m-t-10">
+                <div class="row">
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Watching:</span>
+                    </div>
+                    <div class="col p-0 position">
+                        <span class="stat_text">{{ nb_of_animes[0] }}</span>
+                    </div>
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Dropped:</span>
+                    </div>
+                    <div class="col p-l-0 position">
+                        <span class="stat_text">{{ nb_of_animes[4] }}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Completed:</span>
+                    </div>
+                    <div class="col p-0 position">
+                        <span class="stat_text">{{ nb_of_animes[1] }}</span>
+                    </div>
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Plan to Watch:</span>
+                    </div>
+                    <div class="col p-l-0 position">
+                        <span class="stat_text">{{ nb_of_animes[5] }}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">On Hold:</span>
+                    </div>
+                    <div class="col p-0 position">
+                        <span class="stat_text">{{ nb_of_animes[2] }}</span>
+                    </div>
+                    <div class="col mini p-r-0">
+                        <span class="stat_text"></span>
+                    </div>
+                    <div class="col p-l-0 position">
+                        <span class="stat_text"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Random:</span>
+                    </div>
+                    <div class="col p-0 position">
+                        <span class="stat_text">{{ nb_of_animes[3] }}</span>
+                    </div>
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Episodes:</span>
+                    </div>
+                    <div class="col p-l-0 position">
+                        <span class="stat_text">{{ total_time_animes[0] }}</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <!------------------------------------------------>
-
-
-    <h3 class="font-weight-light text-center mt-4 mb-0">
-        <div class="arrow_div float-left">
-            <a class="fas fa-xs fa-user-plus" data-toggle="modal" data-target="#addFriendModal"></a>
-        </div>
-        Friends
-        <div class="arrow_div float-right">
-            <a class="fas fa-xs fa-chevron-down" id="FRIENDS_arrow" onclick="hide('FRIENDS', 'FRIENDS_arrow')"></a>
-        </div>
-    </h3>
-    <hr class="mt-2 mb-3">
-
-    <div id="FRIENDS" class="row" style="margin-right: 0px; margin-left: 0px;">
-    <table class="table table-striped table-dark table-sm">
-        {% for friend in friends_list_data %}
-            {% if friend['status'] == "pending" %}
-                <tr>
-                    <td><a class="text-light" href="#" id="{{ friend['user_id'] }}">{{ friend['username'] }}</a>
-                        <button class="btn btn-sm btn-danger small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="decline_{{ friend['user_id'] }}">Decline</button>
-                        <button class="btn btn-sm btn-mdb-color small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="accept_{{ friend['user_id'] }}">Accept</button>
-                    </td>
-                </tr>
-            {% elif friend['status'] == "request" %}
-                <tr>
-                    <td><a class="text-light" href="#">{{ friend['username'] }} (Pending request)</a>
-                        <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </td>
-                </tr>
-
-            {% elif friend['status'] == "declined" %}
-            {% else %}
-                <tr>
-                    <td>
-                        <a class="text-light" href="/user/myserieslist/{{ friend['username'] }}">{{ friend['username'] }}</a>
-                        <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </td>
-                </tr>
-            {% endif %}
-        {% endfor %}
-    </table>
-    </div>
-
-
-    <h3 class="font-weight-light text-center mt-4 mb-0">
-        Series Statistics
-        <div class="arrow_div float-right">
-            <a class="fas fa-xs fa-chevron-down" id="SERIES_arrow" onclick="hide('SERIES', 'SERIES_arrow')"></a>
-        </div>
-    </h3>
-    <hr class="mt-2 mb-3">
-
-    <div id="SERIES" class="container-stats">
-        <div class="m-b-10">
-            <span class="stat_text"><b>Days:</b> {{ total_time_series[2] }}</span>
-            <span class="stat_text float-right"><b>Hours:</b> {{ total_time_series[1] }}</span>
-        </div>
-
-        <figure class="d-flex">
-            <span class="block" title="Watching">
-                <span id="{{ pourcentage_series[0] }}%" class="value"></span>
-            </span>
-            <span class="block" title="Completed">
-                <span id="{{ pourcentage_series[1] }}%" class="value"></span>
-            </span>
-            <span class="block" title="On Hold">
-                <span id="{{ pourcentage_series[2] }}%" class="value"></span>
-            </span>
-            <span class="block" title="Random">
-                <span id="{{ pourcentage_series[3] }}%" class="value"></span>
-            </span>
-            <span class="block" title="Dropped">
-                <span id="{{ pourcentage_series[4] }}%" class="value"></span>
-            </span>
-            <span class="block" title="Plan to Watch">
-                <span id="{{ pourcentage_series[5] }}%" class="value"></span>
-            </span>
-        </figure>
-
-        <div class="m-t-10">
-            <div class="row">
-                <div class="col mini p-r-0">
-                    <span class="stat_text">Watching:</span>
-                </div>
-                <div class="col p-0 position">
-                    <span class="stat_text">{{ nb_of_series[0] }}</span>
-                </div>
-                <div class="col mini p-r-0">
-                    <span class="stat_text">Dropped:</span>
-                </div>
-                <div class="col p-l-0 position">
-                     <span class="stat_text">{{ nb_of_series[4] }}</span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col mini p-r-0">
-                    <span class="stat_text">Completed:</span>
-                </div>
-                <div class="col p-0 position">
-                    <span class="stat_text">{{ nb_of_series[1] }}</span>
-                </div>
-                <div class="col mini p-r-0">
-                    <span class="stat_text">Plan to Watch:</span>
-                </div>
-                <div class="col p-l-0 position">
-                    <span class="stat_text">{{ nb_of_series[5] }}</span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col mini p-r-0">
-                    <span class="stat_text">On Hold:</span>
-                </div>
-                 <div class="col p-0 position">
-                    <span class="stat_text">{{ nb_of_series[2] }}</span>
-                </div>
-                <div class="col mini p-r-0">
-                    <span class="stat_text"></span>
-                </div>
-                 <div class="col p-l-0 position">
-                    <span class="stat_text"></span>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col mini p-r-0">
-                    <span class="stat_text">Random:</span>
-                </div>
-                <div class="col p-0 position">
-                    <span class="stat_text">{{ nb_of_series[3] }}</span>
-                </div>
-                <div class="col mini p-r-0">
-                    <span class="stat_text">Episodes:</span>
-                </div>
-                <div class="col p-l-0 position">
-                    <span class="stat_text">{{ total_time_series[0] }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <h3 class="font-weight-light text-center mt-5 mb-0">
-        Anime Statistics
-        <div class="arrow_div float-right">
-            <a class="fas fa-xs fa-chevron-down" id="ANIME_arrow" onclick="hide('ANIME', 'ANIME_arrow')"></a>
-        </div>
-    </h3>
-    <hr class="mt-2 mb-3">
-
-    <div id="ANIME" class="container-stats">
-        <div class="m-b-10">
-            <span class="stat_text"><b>Days:</b> {{ total_time_animes[2] }}</span>
-            <span class="stat_text float-right"><b>Hours:</b> {{ total_time_animes[1] }}</span>
-        </div>
-
-        <figure class="d-flex">
-            <span class="block" title="Watching">
-                <span id="{{ pourcentage_anime[0] }}%" class="value"></span>
-            </span>
-            <span class="block" title="Completed">
-                <span id="{{ pourcentage_anime[1] }}%" class="value"></span>
-            </span>
-            <span class="block" title="On Hold">
-                <span id="{{ pourcentage_anime[2] }}%" class="value"></span>
-            </span>
-            <span class="block" title="Random">
-                <span id="{{ pourcentage_anime[3] }}%" class="value"></span>
-            </span>
-            <span class="block" title="Dropped">
-                <span id="{{ pourcentage_anime[4] }}%" class="value"></span>
-            </span>
-            <span class="block" title="Plan to Watch">
-                <span id="{{ pourcentage_anime[5] }}%" class="value"></span>
-            </span>
-        </figure>
-
-
-        <div class="m-t-10">
-            <div class="row">
-                <div class="col mini p-r-0">
-                    <span class="stat_text">Watching:</span>
-                </div>
-                <div class="col p-0 position">
-                    <span class="stat_text">{{ nb_of_animes[0] }}</span>
-                </div>
-                <div class="col mini p-r-0">
-                    <span class="stat_text">Dropped:</span>
-                </div>
-                <div class="col p-l-0 position">
-                     <span class="stat_text">{{ nb_of_animes[4] }}</span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col mini p-r-0">
-                    <span class="stat_text">Completed:</span>
-                </div>
-                <div class="col p-0 position">
-                    <span class="stat_text">{{ nb_of_animes[1] }}</span>
-                </div>
-                <div class="col mini p-r-0">
-                    <span class="stat_text">Plan to Watch:</span>
-                </div>
-                <div class="col p-l-0 position">
-                    <span class="stat_text">{{ nb_of_animes[5] }}</span>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col mini p-r-0">
-                    <span class="stat_text">On Hold:</span>
-                </div>
-                 <div class="col p-0 position">
-                    <span class="stat_text">{{ nb_of_animes[2] }}</span>
-                </div>
-                <div class="col mini p-r-0">
-                    <span class="stat_text"></span>
-                </div>
-                 <div class="col p-l-0 position">
-                    <span class="stat_text"></span>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col mini p-r-0">
-                    <span class="stat_text">Random:</span>
-                </div>
-                <div class="col p-0 position">
-                    <span class="stat_text">{{ nb_of_animes[3] }}</span>
-                </div>
-                <div class="col mini p-r-0">
-                    <span class="stat_text">Episodes:</span>
-                </div>
-                <div class="col p-l-0 position">
-                    <span class="stat_text">{{ total_time_animes[0] }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!--    <h2 class="font-weight-light text-center mt-4 mb-0">Series Graphics</h2>
-    <hr class="mt-2 mb-2">
-
-    <canvas class="chart m-b-20 m-t-20" id="mixedChart"></canvas>-->
 </div>
 
 <script>
 function hide(category, arrow) {
-  var category = document.getElementById(category);
-  var arrow = document.getElementById(arrow);
+    var category = document.getElementById(category);
+    var arrow = document.getElementById(arrow);
 
-  if (category.className === "container-stats"){
+    if (category.className === "container-stats"){
         category.className = "d-none";
         arrow.className = "fas fa-xs fa-chevron-right";
-  } else {
+    } else {
         category.className = "container-stats";
         arrow.className = "fas fa-xs fa-chevron-down";
-  }
+    }
 }
 
 {% for friend in friends_list_data %}
@@ -536,97 +532,5 @@ $('.value').each(function() {
 });
 
 $('.block').tooltip();
-
-/* var ctx = document.getElementById("mixedChart").getContext('2d');
-var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-        datasets: [{
-            type: "bar",
-            label: 'Episodes viewed per month this year',
-            data: {{ nb_episodes_watched }},
-            backgroundColor: [
-                'rgba(185, 75, 100, 0.7)',
-                'rgba(185, 75, 100, 0.7)',
-                'rgba(185, 75, 100, 0.7)',
-                'rgba(185, 75, 100, 0.7)',
-                'rgba(185, 75, 100, 0.7)',
-                'rgba(185, 75, 100, 0.7)',
-                'rgba(185, 75, 100, 0.7)',
-                'rgba(185, 75, 100, 0.7)',
-                'rgba(185, 75, 100, 0.7)',
-                'rgba(185, 75, 100, 0.7)',
-                'rgba(185, 75, 100, 0.7)',
-                'rgba(185, 75, 100, 0.7)',
-            ],
-            borderColor: [
-                'rgba(23, 23, 23, 0.8)',
-                'rgba(23, 23, 23, 0.8)',
-                'rgba(23, 23, 23, 0.8)',
-                'rgba(23, 23, 23, 0.8)',
-                'rgba(23, 23, 23, 0.8)',
-                'rgba(23, 23, 23, 0.8)',
-                'rgba(23, 23, 23, 0.8)',
-                'rgba(23, 23, 23, 0.8)',
-                'rgba(23, 23, 23, 0.8)',
-                'rgba(23, 23, 23, 0.8)',
-                'rgba(23, 23, 23, 0.8)',
-                'rgba(23, 23, 23, 0.8)'
-            ],
-            borderWidth: 2,
-            yAxisID: 'y-axis-1',
-        }, {
-            type: "line",
-            borderColor: 'rgba(255, 255, 255, 0.8)',
-            label: 'Time per month in hours',
-            data: {{ time_episodes_watched }},
-            borderWidth: 2,
-            yAxisID: 'y-axis-2',
-        }]
-    },
-    options: {
-        legend: {
-            labels: {
-                fontColor: "#CCC",
-            }
-        },
-        scales: {
-            yAxes: [{
-                position: 'left',
-				id: 'y-axis-1',
-                ticks: {
-                    beginAtZero: true,
-                    fontColor: "#CCC",
-                    suggestedMax: {{ max_value }},
-                },
-                gridLines: {
-                    display: true,
-					drawBorder: true,
-                    color: "rgba(255, 255, 255, 0.2)",
-                }
-            }, {
-                position: 'right',
-				id: 'y-axis-2',
-                ticks: {
-                    beginAtZero: true,
-                    fontColor: "#CCC",
-                },
-            }],
-            xAxes: [{
-                ticks: {
-                    fontColor: "#CCC",
-                },
-                gridLines: {
-                    display: true,
-					drawBorder: true,
-                    color: "rgba(255, 255, 255, 0.2)",
-                }
-            }],
-        }
-    }
-}); */
 </script>
 {% endblock %}
-
-<!---->

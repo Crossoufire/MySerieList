@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block css %}
-<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet"></link>
+<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet">
 {% endblock css %}
 
 {% block content %}
@@ -143,6 +143,11 @@ body.loading .modal_loading {
     padding: 0px;
 }
 
+.arrow_div {
+    height: 28px;
+    width: 28px;
+}
+
 /* On screens that are 599px or more */
 @media screen and (min-width: 599px) {
     .card-img-top {
@@ -179,11 +184,6 @@ body.loading .modal_loading {
     .dropdown-menu {
         background-color: #272525;
         min-width: 9rem;
-    }
-
-    .arrow_div {
-        height: 28px;
-        width: 28px;
     }
 }
 
@@ -238,16 +238,6 @@ body.loading .modal_loading {
     .category-title {
         font-size: 1.5rem;
     }
-
-    .arrow_div {
-        height: 28px;
-        width: 28px;
-    }
-}
-
-#test2 {
-    align-items: center;
-    justify-content: center;
 }
 
 .episodes {
@@ -567,7 +557,7 @@ function hide(category, arrow) {
 
 {% block script %}
 
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" ></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <script type="text/javascript">
 
