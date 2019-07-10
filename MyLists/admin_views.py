@@ -167,7 +167,7 @@ class AnimeNetworkAdminView(ModelView):
     column_searchable_list = ('anime_id', 'network')
     column_sortable_list = ('anime_id', 'network')
 
-    list_template = 'admin/Anime_network.html'
+    list_template = 'admin/anime_network.html'
 
 
 class AnimeEpisodeTimestampAdminView(ModelView):
@@ -210,5 +210,5 @@ admin.add_view(AnimeAdminView(model=Anime, session=db.session, name="Anime", end
 admin.add_view(AnimeListAdminView(model=AnimeList, session=db.session, name="Anime list", endpoint='anime_list'))
 admin.add_view(AnimeEpisodesPerSeasonAdminView(model=AnimeEpisodesPerSeason, session=db.session, name="Anime episodes per season", endpoint='anime_episodes_per_season'))
 admin.add_view(AnimeGenreAdminView(model=AnimeGenre, session=db.session, name="Anime genre", endpoint='anime_genre'))
-admin.add_view(AnimeNetworkAdminView(model=AnimeNetwork, session=db.session, name="Anime network", endpoint='Anime_network'))
-admin.add_view(AnimeEpisodeTimestampAdminView(model=AnimeEpisodeTimestamp, session=db.session, name="Anime episode timestamp", endpoint='Anime_episode_timestamp'))
+admin.add_view(AnimeNetworkAdminView(model=AnimeNetwork, session=db.session, name="Anime network", endpoint='anime_network'))
+admin.add_view(AnimeEpisodeTimestampAdminView(model=AnimeEpisodeTimestamp, session=db.session, name="Anime episode timestamp", endpoint='anime_episode_timestamp'))
