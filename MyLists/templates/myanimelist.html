@@ -7,6 +7,13 @@
 {% block content %}
 
 <style>
+
+#autocomplete.ui-autocomplete-loading {
+    background-image: url('{{ url_for("static", filename="img/add_loader.gif") }}');
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+
 hr {
     border-top: 1px solid rgba(255, 255, 255, 0.9)
 }
