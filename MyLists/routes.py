@@ -77,7 +77,6 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(test3)
 
-
     if User.query.filter_by(id='5').first() is None:
         test4 = User(username='test4',
                      email='test4@test4.com',
@@ -88,6 +87,86 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test4)
+
+    if User.query.filter_by(id='6').first() is None:
+        test5 = User(username='aaaa',
+                     email='test5@test5.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=True,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(test5)
+
+    if User.query.filter_by(id='7').first() is None:
+        test6 = User(username='Sudoer',
+                     email='test6@test6.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(test6)
+
+    if User.query.filter_by(id='8').first() is None:
+        test7 = User(username='aaa',
+                     email='test7@test7.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=True,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(test7)
+
+    if User.query.filter_by(id='9').first() is None:
+        test8 = User(username='I_Love_Anime',
+                     email='test8@test8.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(test8)
+
+
+    if User.query.filter_by(id='10').first() is None:
+        test9 = User(username='0010100011',
+                     email='test9@test9.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(test9)
+
+
+    if User.query.filter_by(id='11').first() is None:
+        test10 = User(username='Crossoufire',
+                     email='test10@test10.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(test10)
+
+
+    if User.query.filter_by(id='12').first() is None:
+        test11 = User(username='WynroZ',
+                     email='test11@test11.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(test11)
     db.session.commit()
 
 
@@ -149,7 +228,7 @@ def home():
     else:
         home_header = url_for('static', filename='img/home_header.jpg')
         img1 = url_for('static', filename='img/home_img1.jpg')
-        img2 = url_for('static', filename='img/home_img2_bis.jpg')
+        img2 = url_for('static', filename='img/home_img2.jpg')
         return render_template('home.html',
                                title='Home',
                                login_form=login_form,
