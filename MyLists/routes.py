@@ -132,7 +132,6 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(test8)
 
-
     if User.query.filter_by(id='10').first() is None:
         test9 = User(username='0010100011',
                      email='test9@test9.com',
@@ -144,7 +143,6 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(test9)
 
-
     if User.query.filter_by(id='11').first() is None:
         test10 = User(username='Crossoufire',
                      email='test10@test10.com',
@@ -155,7 +153,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test10)
-
 
     if User.query.filter_by(id='12').first() is None:
         test11 = User(username='WynroZ',

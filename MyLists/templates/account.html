@@ -49,8 +49,6 @@ hr {
     width: 21px;
 }
 
-
-
 .block:nth-of-type(2) {
 	background-color: #45B29D;
 }
@@ -167,6 +165,22 @@ hr {
         text-align: right;
     }
 }
+
+.table tr {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.container-friends {
+    max-width: 650px;
+    margin-right: auto;
+    margin-left: auto;
+}
 </style>
 {% endblock css %}
 
@@ -223,44 +237,61 @@ hr {
             </div>
             Friends
             <div class="arrow_div float-right">
-                <a class="fas fa-xs fa-chevron-down" id="FRIENDS_arrow" onclick="hide('FRIENDS', 'FRIENDS_arrow')"></a>
+                <a class="fas fa-xs fa-chevron-down" id="FRIENDS_arrow" onclick="hide_friends('FRIENDS', 'FRIENDS_arrow')"></a>
             </div>
         </h3>
 
         <hr class="mt-2 mb-3">
 
-        <div id="FRIENDS" class="row" style="margin-right: 0px; margin-left: 0px;">
-            <table class="table table-striped table-dark table-sm">
-                {% for friend in friends_list_data %}
-                    {% if friend['status'] == "pending" %}
+        <div class="container-friends">
+            <div id="FRIENDS" class="row" style="margin-right: 0px; margin-left: 0px;">
+                <table class="table table-striped table-sm table-responsive-lg" cellspacing="0" width="100%">
+                    <thead>
                         <tr>
-                            <td><a class="text-light" href="#" id="{{ friend['user_id'] }}">{{ friend['username'] }}</a>
-                                <button class="btn btn-sm btn-danger small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="decline_{{ friend['user_id'] }}">Decline</button>
-                                <button class="btn btn-sm btn-mdb-color small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="accept_{{ friend['user_id'] }}">Accept</button>
-                            </td>
+                            <th class="th-sm">Username</th>
+                            <th class="th-sm">Series List</th>
+                            <th class="th-sm">Anime List</th>
+                            <th></th>
                         </tr>
-                    {% elif friend['status'] == "request" %}
-                        <tr>
-                            <td><a class="text-light" href="#">{{ friend['username'] }} (Pending request)</a>
-                                <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </td>
-                        </tr>
-
-                    {% elif friend['status'] == "declined" %}
-                    {% else %}
-                        <tr>
-                            <td>
-                                <a class="text-light" href="/user/myserieslist/{{ friend['username'] }}">{{ friend['username'] }}</a>
-                                <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-            </table>
+                    </thead>
+                    {% for friend in friends_list_data %}
+                        {% if friend['status'] == "pending" %}
+                            <tr>
+                                <td><a class="text-light" href="#" id="{{ friend['user_id'] }}">{{ friend['username'] }}</a>
+                                    <button class="btn btn-sm btn-danger small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="decline_{{ friend['user_id'] }}">Decline</button>
+                                    <button class="btn btn-sm btn-mdb-color small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="accept_{{ friend['user_id'] }}">Accept</button>
+                                </td>
+                            </tr>
+                        {% elif friend['status'] == "request" %}
+                            <tr>
+                                <td><a class="text-light" href="#">{{ friend['username'] }} (Pending request)</a>
+                                    <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% elif friend['status'] == "declined" %}
+                        {% else %}
+                            <tr>
+                                <td>
+                                    <label class="text-light">{{ friend['username'] }}</label>
+                                </td>
+                                <td>
+                                    <a class="fas fa-external-link-alt text-light" href="/user/series/{{ friend['username'] }}"></a>
+                                </td>
+                                <td>
+                                    <a class="fas fa-external-link-alt text-light" href="/user/anime/{{ friend['username'] }}"></a>
+                                </td>
+                                <td>
+                                    <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </table>
+            </div>
         </div>
 
         <h3 class="font-weight-light text-center mt-4 mb-0">
@@ -477,6 +508,19 @@ function hide(category, arrow) {
     }
 }
 
+function hide_friends(category, arrow) {
+    var category = document.getElementById(category);
+    var arrow = document.getElementById(arrow);
+
+    if (category.className === "row"){
+        category.className = "d-none";
+        arrow.className = "fas fa-xs fa-chevron-right";
+    } else {
+        category.className = "row";
+        arrow.className = "fas fa-xs fa-chevron-down";
+    }
+}
+
 {% for friend in friends_list_data %}
     let close_{{ friend['user_id'] }} = document.getElementById("C_{{ friend['user_id'] }}");
     {% if friend['status'] == "pending" %}
@@ -528,9 +572,8 @@ function hide(category, arrow) {
 <script>
 $('.value').each(function() {
 	var text = $(this).attr('id');
-	$(this).parent().css('width', text);
+    $(this).parent().css('width', text);
 });
-
 $('.block').tooltip();
 </script>
 {% endblock %}
