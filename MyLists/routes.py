@@ -6,6 +6,7 @@ import sys
 import urllib
 import time
 import requests
+import pandas as pd
 
 from datetime import datetime
 from PIL import Image
@@ -1119,7 +1120,7 @@ def autocomplete_series():
     return jsonify(matching_results=results)
 
 
-##################################################### Anime routes  ####################################################
+##################################################### Anime routes #####################################################
 
 
 @app.route("/myanimelist", methods=['GET', 'POST'])
@@ -1465,7 +1466,16 @@ def autocomplete_anime():
     return jsonify(matching_results=results)
 
 
-###################################################### Functions  ######################################################
+###################################################### OwnList Routes ##################################################
+
+
+@app.route("/myownlist", methods=['GET', 'POST'])
+@login_required
+def myownlist():
+    return render_template('myownlist.html', title='MyOwnList')
+
+
+###################################################### Functions #######################################################
 
 
 def add_element(element_name, element_type):

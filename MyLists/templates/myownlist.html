@@ -1,0 +1,355 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet">
+<style>
+
+#autocomplete.ui-autocomplete-loading {
+    background-image: url('{{ url_for("static", filename="img/add_loader.gif") }}');
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+
+hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.9)
+}
+
+.scrollable-menu {
+    text-align-last: center;
+}
+
+.form-control:focus {
+    height: 2rem;
+    padding: 5px;
+    background-color: #131418;
+    color: #fff;
+}
+
+.modal-content {
+    background: #131418;
+}
+
+.card {
+    border-radius: 5px;
+}
+
+.btn {
+    padding: 5px !important;
+    margin: 2px !important;
+}
+
+.btn-add-category {
+    background-color: #375a7d;
+}
+
+#add_serie {
+    width: 220px;
+}
+
+.btn_left{
+    position: absolute;
+    left: 0px;
+    opacity: 0;
+}
+
+.btn_right {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background-color: #fff0;
+    border-color: #fff0;
+    color: white;
+    font-size: 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 2px;
+    text-align: center;
+    opacity: 0;
+}
+
+.btn_right:hover {
+    opacity: 1;
+}
+
+.btn_left:hover {
+    opacity: 1;
+}
+
+.mask:hover~.btn_right {
+    opacity: 1;
+}
+
+.mask:hover~.btn_left {
+    opacity: 1;
+}
+
+.btn {
+    color: #fff
+}
+
+.btn:hover {
+    color: #fff
+}
+
+.btn:focus {
+    color: #fff
+    outline: none;
+}
+
+.add_serie {
+    background: transparent;
+    border-radius: 0px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    font-size: 12pt;
+}
+
+.add_serie:focus {
+    background: transparent;
+    border-radius: 0px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    color: #fff;
+}
+
+/* ######### pacman loading ########## */
+.modal_loading {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba(0, 0, 0, .6)
+                url('{{ url_for("static", filename="img/pacman_loader.gif") }}')
+                50% 50%
+                no-repeat;
+}
+
+body.loading .modal_loading {
+    overflow: hidden;
+}
+
+body.loading .modal_loading {
+    display: block;
+}
+/* ################################# */
+
+.pointer {
+    cursor: pointer;
+}
+
+#serie {
+    padding: 0px;
+}
+
+.arrow_div {
+    height: 28px;
+    width: 28px;
+}
+
+/* On screens that are 599px or more */
+@media screen and (min-width: 599px) {
+    .card-img-top {
+        border-style: solid;
+        border-width: 1px;
+        border-color: black;
+        border-radius: 3px;
+    }
+
+    .card {
+        width: 200px;
+    }
+
+    .dropdown-item {
+        background-color: #272525;
+        color: #fff;
+        font-weight: 300;
+        font-size: 11pt;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .form-control {
+        height: 2rem;
+        padding: 5px;
+        background-color: #131418;
+        color: #fff;
+        border-radius: 1px;
+        font-size: 11pt;
+        outline: none;
+        box-shadow:none !important;
+    }
+
+    .dropdown-menu {
+        background-color: #272525;
+        min-width: 9rem;
+    }
+}
+
+/* On screens that are 599px or less */
+@media screen and (max-width: 599px) {
+    .card-img-top {
+        border-style: solid;
+        border-width: 1px;
+        border-color: black;
+        border-radius: 3px;
+    }
+
+    .card {
+        width: 135px;
+        padding-right: 0px;
+        margin-left: 5px !important;
+        margin-right: 5px !important;
+        margin-bottom: 20px;
+    }
+
+    .dropdown-item {
+        background-color: #272525;
+        max-width: 120px;
+        padding-left: 10px;
+        padding-right: 10px;
+        color: #fff;
+        font-weight: 300;
+        font-size: 9pt;
+    }
+
+    .form-control {
+        height: 2rem;
+        background-color: #131418;
+        color: #fff;
+        border-radius: 1px;
+        font-size: 9pt;
+        outline: none;
+        box-shadow:none !important;
+        align-items: left;
+        padding: 5px;
+    }
+
+    .dropdown-menu {
+        background-color: #272525;
+        max-width: 120px !important;
+    }
+
+    .dropdown-divider {
+        max-width: 120px;
+    }
+
+    .category-title {
+        font-size: 1.5rem;
+    }
+}
+
+.episodes {
+    border-style: 1px;
+    border-color: black;
+    border-radius: 2px;
+    -moz-appearance:none;
+    -webkit-appearance:none;
+    appearance:none;
+}
+
+.seasons {
+    border-style: 1px;
+    border-color: black;
+    border-radius: 2px;
+    -moz-appearance:none;
+    -webkit-appearance:none;
+    appearance:none;
+}
+</style>
+{% endblock css %}
+
+
+{% block content %}
+<div class="d-flex flex-wrap">
+    <div class="ml-auto m-t-20 m-b-10">
+        <input id="category_name" type="text"></input>
+        <button id="button_cat" class="btn btn-add-category" onclick="add_category()">Add Category</button>
+    </div>
+</div>
+
+<div id="adding_stuff">
+</div>
+{% endblock content %}
+
+
+{% block script %}
+<script>
+$(document).ready(function() {
+    $('#button_cat').attr('disabled', true);
+    $('#category_name').keyup(function(){
+        if($(this).val().length !=0)
+            $('#button_cat').attr('disabled', false);
+        else
+            $('#button_cat').attr('disabled', true);
+    })
+});
+
+
+function add_category() {
+    window.idnumber = Math.floor((Math.random() * 100000) + 1);
+    var text = $("#category_name").val();
+    var arrow = idnumber + "_arrow";
+    var hidding = idnumber + "_hidding";
+
+    $("#adding_stuff").append(
+        "<h2 class='font-weight-light text-center pt-4 mb-0 category-title'>" +
+            text +
+            "<div class='arrow_div float-right'><a class='fas fa-sm fa-chevron-down' id=" + arrow + " onclick='hide(\"" + hidding + "\",\"" + arrow + "\")'></a></div>" +
+        "</h2>" +
+        "<hr class='mt-2 mb-4'>" +
+        "<div id=" + hidding + " class='hide'>" +
+            "<a class='fas fa-plus float-right' onclick='add_row(\"" + idnumber + "\")'></a>" +
+            "<table class='table table-striped table-sm table-responsive-lg' cellspacing='0' width='100%'>" +
+            "<thead>" +
+                "<tr>" +
+                    "<th class='th-sm text-light'>Name</th>" +
+                    "<th class='th-sm text-light'>Plateform</th>" +
+                    "<th class='th-sm text-light'>Time Played</th>" +
+                    "<th class='th-sm text-light'>Achievements</th>" +
+                "</tr>" +
+            "</thead>" +
+            "<tbody id=" + idnumber + ">" +
+                "<tr>" +
+                    "<td class='text-light'>data1</td>" +
+                    "<td class='text-light'>data2</td>" +
+                    "<td class='text-light'>data3</td>" +
+                    "<td class='text-light'>data4</td>" +
+               "</tr>" +
+            "</tbody>" +
+            "</table>" +
+        "</div>"
+    );
+}
+
+
+function add_row(id_number) {
+    $("#"+id_number).append(
+        "<tr>" +
+            "<td class='text-light'>data1</td>" +
+            "<td class='text-light'>data2</td>" +
+            "<td class='text-light'>data3</td>" +
+            "<td class='text-light'>data4</td>" +
+       "</tr>"
+    );
+}
+
+function hide(category, arrow) {
+  var category = document.getElementById(category);
+  var arrow = document.getElementById(arrow);
+
+  if (category.className === "hide"){
+        category.className = "d-none";
+        arrow.className = "fas fa-sm fa-chevron-right";
+  } else {
+        category.className = "hide";
+        arrow.className = "fas fa-sm fa-chevron-down";
+  }
+}
+</script>
+{% endblock script %}
