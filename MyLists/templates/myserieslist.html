@@ -316,49 +316,49 @@ body.loading .modal_loading {
 
 
     {% for data in category %}
-        <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
+        <div id="card_{{ data['id'] }}" class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
             <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['name'] }}">
             <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['id'] }}">
                 <p class="text-light"><div class="text-center"><h3>{{ data['name'] }}</h3></div>
             </div>
             <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-            <div class="dropdown-menu">
+            <div id="drop_{{ data['id'] }}" class="dropdown-menu">
                 {% if outer_loop.index == 1 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Watch</button>
                 {% elif outer_loop.index == 2 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Watch</button>
                 {% elif outer_loop.index == 3 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Watch</button>
                 {% elif outer_loop.index == 4 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Watch</button>
                 {% elif outer_loop.index == 5 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch')">Plan to Watch</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Watch</button>
                 {% elif outer_loop.index == 6 %}
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching')">Watching</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed')">Completed</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random')">Random</button>
-                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Watching</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Random</button>
+                <button class="dropdown-item" onclick="changeSerieCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
                 {% endif %}
                 <div class="dropdown-divider"></div>
                 {% if data['can_update'] %}
@@ -369,7 +369,7 @@ body.loading .modal_loading {
                     </span>
                 {% endif %}
             </div>
-            <button class="btn btn_right" onclick="deleteSerie('{{ data['id'] }}')"><b>x</b></button>
+            <button class="btn btn_right" onclick="deleteSerie('{{ data['id'] }}', 'card_{{ data['id'] }}')"><b>x</b></button>
 
             <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
                 <div class="container p-0">
@@ -463,7 +463,151 @@ function refresh(series_id) {
 }
 
 
-function changeSerieCategory(series_id, new_category) {
+function changeSerieCategory(series_id, new_category, card_id, drop_id) {
+    if (new_category === 'Watching') {
+        var completed = 'Completed';
+        var on_hold = 'On Hold';
+        var random = 'Random';
+        var dropped = 'Dropped';
+        var plan_to_watch = 'Plan to Watch';
+
+        $("#"+drop_id+ " button").filter(":contains('Watching')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Completed')").remove()
+        $("#"+drop_id+ " button").filter(":contains('On Hold')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Random')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Dropped')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Plan to Watch')").remove()
+
+        $("#"+drop_id).prepend(
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Completed</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + drop_id + "\")'>On Hold</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Random</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Dropped</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Plan to Watch</button>"
+        );
+        $("#" + card_id).prependTo("#WATCHING");
+    }
+
+    if (new_category === 'Completed') {
+        var watching = 'Watching';
+        var on_hold = 'On Hold';
+        var random = 'Random';
+        var dropped = 'Dropped';
+        var plan_to_watch = 'Plan to Watch';
+
+        $("#"+drop_id+ " button").filter(":contains('Watching')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Completed')").remove()
+        $("#"+drop_id+ " button").filter(":contains('On Hold')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Random')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Dropped')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Plan to Watch')").remove()
+
+        $("#"+drop_id).prepend(
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Watching</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + drop_id + "\")'>On Hold</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Random</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Dropped</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Plan to Watch</button>"
+        );
+        $("#" + card_id).prependTo("#COMPLETED");
+    }
+
+    if (new_category === 'On Hold') {
+        var completed = 'Completed';
+        var watching = 'Watching';
+        var random = 'Random';
+        var dropped = 'Dropped';
+        var plan_to_watch = 'Plan to Watch';
+
+        $("#"+drop_id+ " button").filter(":contains('Watching')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Completed')").remove()
+        $("#"+drop_id+ " button").filter(":contains('On Hold')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Random')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Dropped')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Plan to Watch')").remove()
+
+        $("#"+drop_id).prepend(
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Watching</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Completed</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Random</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Dropped</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Plan to Watch</button>"
+        );
+        $("#" + card_id).prependTo("#ON_HOLD");
+    }
+
+    if (new_category === 'Random') {
+        var completed = 'Completed';
+        var on_hold = 'On Hold';
+        var watching = 'Watching';
+        var dropped = 'Dropped';
+        var plan_to_watch = 'Plan to Watch';
+
+        $("#"+drop_id+ " button").filter(":contains('Watching')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Completed')").remove()
+        $("#"+drop_id+ " button").filter(":contains('On Hold')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Random')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Dropped')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Plan to Watch')").remove()
+
+        $("#"+drop_id).prepend(
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Watching</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Completed</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + drop_id + "\")'>On Hold</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Dropped</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Plan to Watch</button>"
+        );
+        $("#" + card_id).prependTo("#RANDOM");
+    }
+
+    if (new_category === 'Dropped') {
+        var completed = 'Completed';
+        var on_hold = 'On Hold';
+        var random = 'Random';
+        var watching = 'Watching';
+        var plan_to_watch = 'Plan to Watch';
+
+        $("#"+drop_id+ " button").filter(":contains('Watching')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Completed')").remove()
+        $("#"+drop_id+ " button").filter(":contains('On Hold')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Random')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Dropped')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Plan to Watch')").remove()
+
+        $("#"+drop_id).prepend(
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Watching</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Completed</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + drop_id + "\")'>On Hold</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Random</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Plan to Watch</button>"
+        );
+        $("#" + card_id).prependTo("#DROPPED");
+    }
+
+    if (new_category === 'Plan to Watch') {
+        var completed = 'Completed';
+        var on_hold = 'On Hold';
+        var random = 'Random';
+        var dropped = 'Dropped';
+        var watching = 'Watching';
+
+        $("#"+drop_id+ " button").filter(":contains('Watching')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Completed')").remove()
+        $("#"+drop_id+ " button").filter(":contains('On Hold')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Random')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Dropped')").remove()
+        $("#"+drop_id+ " button").filter(":contains('Plan to Watch')").remove()
+
+        $("#"+drop_id).prepend(
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Watching</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Completed</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + drop_id + "\")'>On Hold</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Random</button>" +
+            "<button class='dropdown-item' onclick='changeSerieCategory(\"" + series_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + drop_id + "\")'>Dropped</button>"
+        );
+        $("#" + card_id).prependTo("#PLAN_TO_WATCH");
+    }
+
     $body = $("body");
     $.ajax ({
         type: "POST",
@@ -471,14 +615,15 @@ function changeSerieCategory(series_id, new_category) {
         contentType: "application/json",
         data: JSON.stringify({status: new_category, series_id: series_id}),
         dataType: "json",
-        beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            window.location.replace('/myserieslist'); }
+            console.log("ok"); }
     });
 }
 
 
-function deleteSerie(series_id) {
+function deleteSerie(series_id, card_id) {
+    $("#"+ card_id).remove();
+
     $body = $("body");
     $.ajax ({
         type: "POST",
@@ -486,9 +631,8 @@ function deleteSerie(series_id) {
         contentType: "application/json",
         data: JSON.stringify({delete: series_id}),
         dataType: "json",
-        beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            window.location.replace('/myserieslist'); }
+            console.log("ok"); }
     });
 }
 
