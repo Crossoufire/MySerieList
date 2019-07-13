@@ -273,6 +273,7 @@ body.loading .modal_loading {
 </div>
 
 <div id="adding_stuff">
+
 </div>
 {% endblock content %}
 
@@ -306,69 +307,92 @@ function add_category() {
                 "<div class='arrow_div float-right'><a class='fas fa-sm fa-chevron-down' id=" + arrow + " onclick='hide(\"" + hidding + "\",\"" + arrow + "\")'></a></div>" +
             "</h2>" +
             "<hr class='mt-2 mb-4'>" +
-            "<div id=" + hidding + " class='hide'>" +
-                "<a class='fas fa-plus float-right' onclick='add_row(\"" + idnumber + "\")'></a>" +
-                "<table class='table table-striped table-sm table-responsive-lg' cellspacing='0' width='100%'>" +
+            "<a id='btnAdd' class='fas fa-plus float-right'></a>" +
+            "<table id='tblData' class='table table-striped table-sm table-responsive-lg text-center align-middle' cellspacing='0' width='100%'>" +
                 "<thead>" +
                     "<tr>" +
-                        "<th class='th-sm text-light'>Name</th>" +
+                        "<th class='th-sm text-light'>Game Name</th>" +
                         "<th class='th-sm text-light'>Plateform</th>" +
                         "<th class='th-sm text-light'>Time Played</th>" +
                         "<th class='th-sm text-light'>Achievements</th>" +
-                        "<th></th>" +
-                    "</tr>" +
+                        "<th class='th-sm text-light'>Actions</th>" +
+                    "</tr>"+
                 "</thead>" +
-                "<tbody id=" + idnumber + ">" +
-                    "<tr id=" + idnumber_tr + ">" +
-                        "<td contenteditable='true' class='text-light'></td>" +
-                        "<td contenteditable='true' class='text-light'></td>" +
-                        "<td contenteditable='true' class='text-light'></td>" +
-                        "<td contenteditable='true' class='text-light'></td>" +
-                        "<td class='text-light'><a class='fas fa-minus-circle' onclick='delete_tr(\"" + idnumber_tr + "\")'></a></td>" +
-                   "</tr>" +
+                "<tbody>" +
                 "</tbody>" +
-                "</table>" +
-            "</div>" +
-        "</div>"
+            "</table>"
     );
+    $("#btnAdd").bind("click", Add);
 }
 
 
-function add_row(id_number) {
-    var idnumber_tr = Math.floor((Math.random() * 100000000) + 1);
-    $("#"+id_number).append(
-        "<tr id=" + idnumber_tr + ">" +
-            "<td contenteditable='true' class='text-light'></td>" +
-            "<td contenteditable='true' class='text-light'></td>" +
-            "<td contenteditable='true' class='text-light'></td>" +
-            "<td contenteditable='true' class='text-light'></td>" +
-            "<td class='text-light'><a class='fas fa-minus-circle' onclick='delete_tr(\"" + idnumber_tr + "\")'></a></td>" +
-       "</tr>"
-    );
-}
+
+function Add(){
+    console.log("test");
+    $("#tblData tbody").append(
+        "<tr>"+
+            "<td class='th-sm text-light'><input class='form-control' type='text'></input></td>"+
+            "<td class='th-sm text-light'><input class='form-control' type='text'></input></td>"+
+            "<td class='th-sm text-light'><input class='form-control' type='text'></input></td>"+
+            "<td class='th-sm text-light'><input class='form-control' type='text'></input></td>"+
+            "<td class='th-sm text-light'><a class='fas fa-save btnSave'></a><a class='fas fa-ban btnDelete'></a></td>"+
+        "</tr>");
+
+        $(".btnSave").bind("click", Save);
+        $(".btnDelete").bind("click", Delete);
+};
 
 
-function hide(category, arrow) {
-  var category = document.getElementById(category);
-  var arrow = document.getElementById(arrow);
+function Save(){
+    var par = $(this).parent().parent(); //tr
+    var tdGameName = par.children("td:nth-child(1)");
+    var tdPlateform = par.children("td:nth-child(2)");
+    var tdTimePlayed = par.children("td:nth-child(3)");
+    var tdAchievements = par.children("td:nth-child(4)");
+    var tdButtons = par.children("td:nth-child(5)");
 
-  if (category.className === "hide"){
-        category.className = "d-none";
-        arrow.className = "fas fa-sm fa-chevron-right";
-  } else {
-        category.className = "hide";
-        arrow.className = "fas fa-sm fa-chevron-down";
-  }
-}
+    tdGameName.html(tdGameName.children("input[type=text]").val());
+    tdPlateform.html(tdPlateform.children("input[type=text]").val());
+    tdTimePlayed.html(tdTimePlayed.children("input[type=text]").val());
+    tdAchievements.html(tdAchievements.children("input[type=text]").val());
+    tdButtons.html("<a class='fas fa-ban btnDelete'></a><a class='fas fa-edit btnEdit'></a>");
+
+    $(".btnEdit").bind("click", Edit);
+    $(".btnDelete").bind("click", Delete);
+};
 
 
-function delete_tr(tr_id) {
-    $("#"+ tr_id).remove();
-}
+function Edit(){
+    var par = $(this).parent().parent(); //tr
+    var tdGameName = par.children("td:nth-child(1)");
+    var tdPlateform = par.children("td:nth-child(2)");
+    var tdTimePlayed = par.children("td:nth-child(3)");
+    var tdAchievements = par.children("td:nth-child(4)");
+    var tdButtons = par.children("td:nth-child(5)");
 
-function delete_category(cat_id) {
-    $("#"+ cat_id).remove();
-}
+    tdGameName.html("<input class='form-control' type='text' id='txtGameName' value='"+tdGameName.html()+"'/>");
+    tdPlateform.html("<input class='form-control' type='text' id='txtPlateform' value='"+tdPlateform.html()+"'/>");
+    tdTimePlayed.html("<input class='form-control' type='text' id='txtTimePlayed' value='"+tdTimePlayed.html()+"'/>");
+    tdAchievements.html("<input class='form-control' type='text' id='txtAchievements' value='"+tdAchievements.html()+"'/>");
+    tdButtons.html("<a class='fas fa-save btnSave'></a>");
 
+    $(".btnSave").bind("click", Save);
+    $(".btnEdit").bind("click", Edit);
+    $(".btnDelete").bind("click", Delete);
+};
+
+
+function Delete(){
+    var par = $(this).parent().parent(); //tr
+    par.remove();
+};
+
+
+$(function(){
+    //Add, Save, Edit and Delete functions code
+    $(".btnEdit").bind("click", Edit);
+    $(".btnDelete").bind("click", Delete);
+    $("#btnAdd").bind("click", Add);
+});
 </script>
 {% endblock script %}
