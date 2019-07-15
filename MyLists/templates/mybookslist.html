@@ -322,6 +322,7 @@ body.loading .modal_loading {
     </div>
 </div>
 
+<div class="test">
 {% for category in all_data %}
 
     {% if loop.index == 1 %}
@@ -357,7 +358,7 @@ body.loading .modal_loading {
     {% endif %}
     {% set outer_loop = loop %}
 
-        <table id="book_table" class="table table-striped table-sm table-responsive-lg" cellspacing="0" width="100%">
+        <table id="book_table" class="table table-hover table-sm table-striped" cellspacing="0" width="100%">
             <thead>
                 <tr>
                     <th></th>
@@ -381,14 +382,147 @@ body.loading .modal_loading {
                     <td class="th-sm text-light">{{ data["categories"] }}</td>
                     <td class="th-sm text-light">{{ data["page_count"] }}</td>
                     <td class="th-sm text-light text-justify appadd">{{ data["description"] }}</td>
-                    <td class="th-sm text-light "><a class="fas fa-ban" onclick="deleteBook('{{ data['id'] }}')"></a></td>
+                    <td class="th-sm text-light ">
+                        <a class="fas fa-ellipsis-v" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                        <div id="drop_{{ data['id'] }}" class="dropdown-menu">
+                            {% if outer_loop.index == 1 %}
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Read</button>
+                            {% elif outer_loop.index == 2 %}
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Reading', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Reading</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Read</button>
+                            {% elif outer_loop.index == 3 %}
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Reading', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Reading</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Read</button>
+                            {% elif outer_loop.index == 4 %}
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Reading', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Reading</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Read</button>
+                            {% elif outer_loop.index == 5 %}
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Reading', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Reading</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                            <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
+                            {% endif %}
+                        </div>
+                        <a class="fas fa-ban float-right" onclick="deleteBook('{{ data['id'] }}')"></a>
+                    </td>
                 </tr>
     {% endfor %}
             </tbody>
         </table>
     </div>
 {% endfor %}
-<div class="modal_loading"></div>
+</div>
+
+<div class="d-none">
+{% for category in all_data %}
+
+    {% if loop.index == 1 %}
+    <h2 class="font-weight-light text-center pt-4 mb-0 category-title">READING
+        <div class="arrow_div float-right"><a class="fas fa-sm fa-chevron-down" id="WATCHING_arrow" onclick="hide('READING', 'READING_arrow')"></a></div>
+    </h2>
+    <hr class="mt-2 mb-4">
+    <div class="d-flex flex-wrap" id="READING">
+    {% elif loop.index == 2 %}
+    <h2 class="font-weight-light text-center pt-4 mb-0 category-title">COMPLETED
+        <div class="arrow_div float-right"><a class="fas fa-sm fa-chevron-down" id="COMPLETED_arrow" onclick="hide('COMPLETED', 'COMPLETED_arrow')"></a></div>
+    </h2>
+    <hr class="mt-2 mb-4">
+    <div class="d-flex flex-wrap" id="COMPLETED">
+    {% elif loop.index == 3 %}
+    <h2 class="font-weight-light text-center pt-4 mb-0 category-title">ON HOLD
+        <div class="arrow_div float-right"><a class="fas fa-sm fa-chevron-down" id="ON_HOLD_arrow" onclick="hide('ON_HOLD', 'ON_HOLD_arrow')"></a></div>
+    </h2>
+    <hr class="mt-2 mb-4">
+    <div class="d-flex flex-wrap" id="ON_HOLD">
+    {% elif loop.index == 4 %}
+    <h2 class="font-weight-light text-center pt-4 mb-0 category-title">DROPPED
+        <div class="arrow_div float-right"><a class="fas fa-sm fa-chevron-down" id="DROPPED_arrow" onclick="hide('DROPPED', 'DROPPED_arrow')"></a></div>
+    </h2>
+    <hr class="mt-2 mb-4">
+    <div class="d-flex flex-wrap" id="DROPPED">
+    {% elif loop.index == 5%}
+    <h2 class="font-weight-light text-center pt-4 mb-0 category-title">PLAN TO READ
+        <div class="arrow_div float-right"><a class="fas fa-sm fa-chevron-down" id="PLAN_TO_WATCH_arrow" onclick="hide('PLAN_TO_READ', 'PLAN_TO_READ_arrow')"></a></div>
+    </h2>
+    <hr class="mt-2 mb-4">
+    <div class="d-flex flex-wrap" id="PLAN_TO_READ">
+    {% endif %}
+    {% set outer_loop = loop %}
+
+
+    {% for data in category %}
+        <div id="card_{{ data['id'] }}" class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
+            <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['title'] }}">
+            <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['id'] }}">
+                <p class="text-light"><div class="text-center"><h3>{{ data['title'] }}</h3></div>
+            </div>
+            <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+            <div id="drop_{{ data['id'] }}" class="dropdown-menu">
+                {% if outer_loop.index == 1 %}
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Read</button>
+                {% elif outer_loop.index == 2 %}
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Reading', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Reading</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Read</button>
+                {% elif outer_loop.index == 3 %}
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Reading', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Reading</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Read</button>
+                {% elif outer_loop.index == 4 %}
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Reading', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Reading</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Plan to Read</button>
+                {% elif outer_loop.index == 5 %}
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Reading', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Reading</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Completed</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">On Hold</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'drop_{{ data['id'] }}')">Dropped</button>
+                {% endif %}
+            </div>
+            <button class="btn btn_right" onclick="deleteBook('{{ data['id'] }}', 'card_{{ data['id'] }}')"><b>x</b></button>
+        </div>
+
+        <div class="modal fade" id="modal_{{ data['id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
+                    <div class="modal-body">
+                        <div class="modal-header">
+                            <h4 class="modal-title">{{ data['title'] }}</h4>
+                            <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p><b>Title</b> : {{ data['title'] }}</p>
+                            <p><b>Author</b> : {{ data['authors'] }}</p>
+                            <p><b>Published Date</b> : {{ data['published_date'] }}</p>
+                            <p><b>N° Pages</b> : {{ data['page_count'] }}</p>
+                            <p><b>Genres</b> : {{ data['categories'] }}</p>
+                            <p class="text-justify"><b>Synopsis</b> : {{ data['description'] }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% endfor %}
+</div>
 {% endblock content %}
 
 
@@ -414,6 +548,10 @@ function changeBookCategory(book_id, new_category) {
 
 
 function deleteBook(book_id) {
+    if (!confirm("Do you want to delete")){
+      return false;
+    }
+
     $body = $("body");
     $.ajax ({
         type: "POST",
@@ -479,7 +617,7 @@ $(function() {
 	});
 
 	$( "#autocomplete" ).catcomplete({
-		delay: 0,
+		delay: 200,
 		source: function(request, response) {
 				$.getJSON("{{url_for('autocomplete_book')}}",{
 					q: request.term,

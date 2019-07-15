@@ -268,6 +268,52 @@ body.loading .modal_loading {
     text-align: center;
 }
 </style>
+<style>
+/* The side navigation menu */
+.sidenav {
+  height: 60%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 100px;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  padding-top: 60px;
+  transition: 0.5s;
+}
+
+/* The navigation menu links */
+.sidenav a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 20px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+/* Position and style the close button (top right corner) */
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 70px;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav
+(less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+</style>
 {% endblock css %}
 
 
@@ -280,6 +326,21 @@ body.loading .modal_loading {
     <div class="ml-auto m-t-20 m-b-10">
         <button class="btn btn-refresh-all" onclick="refreshAll()">Refresh All</button>
     </div>
+</div>
+<div class="d-flex flex-wrap">
+    <div class="ml-auto m-t-20 m-b-10">
+        <a class="fas fa-2x fa-bars" onclick="openNav()"></a>
+    </div>
+</div>
+
+
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <a href="#WATCHING">Watching</a>
+    <a href="#COMPLETED">Completed</a>
+    <a href="#ON_HOLD">On Hold</a>
+    <a href="#RANDOM">Random</a>
+    <a href="#PLAN_TO_WATCH">Plan to Watch</a>
 </div>
 
 {% for category in all_data %}
@@ -629,6 +690,10 @@ function changeSerieCategory(series_id, new_category, card_id, drop_id) {
 
 
 function deleteSerie(series_id, card_id) {
+    if (!confirm("Do you want to delete")){
+        return false;
+    }
+
     $("#"+ card_id).remove();
 
     $body = $("body");
@@ -735,7 +800,7 @@ $(function() {
 	});
 
 	$( "#autocomplete" ).catcomplete({
-		delay: 0,
+		delay: 300,
 		source: function(request, response) {
 				$.getJSON("{{url_for('autocomplete_series')}}",{
 					q: request.term,
@@ -764,5 +829,16 @@ $(function() {
         }
 	});
 });
+</script>
+<script>
+/* Set the width of the side navigation to 250px */
+function openNav() {
+    document.getElementById("mySidenav").style.width = "180px";
+}
+
+/* Set the width of the side navigation to 0 */
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+}
 </script>
 {% endblock script %}
