@@ -104,7 +104,6 @@ $("#"+drop_id).empty();
 
 
 
-
 <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
             <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['title'] }}">
             <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['id'] }}">
@@ -167,10 +166,11 @@ $("#"+drop_id).empty();
 
 
 
-$(function() {
+
+$(document).ready(function(){
     $("#autocomplete").autocomplete({
-        source:function(request, response) {
-            $.getJSON("{{url_for('autocomplete_book')}}",{
+        source: function(request, response) {
+            $.getJSON("{{url_for('autocomplete_series')}}",{
                 q: request.term,
             }, function(data) {
                 response(data.matching_results);
@@ -178,33 +178,26 @@ $(function() {
         },
         minLength: 2,
         select: function(event, ui) {
+            $body = $("body");
+            $("#autocomplete").val(ui.item.value);
+            $("#series_id").val(ui.item.id);
+
             $.ajax ({
                 type: "POST",
-                url: "/tata",
+                url: "/add_series",
                 contentType: "application/json",
-                data: JSON.stringify({test: ui.item.value}),
+                data: JSON.stringify({series_id: ui.item.id}),
                 dataType: "json",
+                beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
-                    window.location.replace('/mybookslist'); }
+                    window.location.replace('/myserieslist'); }
             });
+
         }
-    });
-})
-
-
-
-$(function() {
-    $("#autocomplete").autocomplete({
-        source:function(request, response) {
-            $.getJSON("{{url_for('autocomplete_anime')}}",{
-                q: request.term,
-            }, function(data) {
-                response(data.matching_results);
-            });
-        },
-        minLength: 3,
-        select: function(event, ui) {
-            console.log(ui.item.value);
-        }
-    });
-})
+    }).data("ui-autocomplete")._renderItem = function(ul, item) {
+    return $("<li class='list-group'></li>")
+        .data("item.autocomplete", item)
+        .append(item.label)
+        .appendTo(ul);
+    };
+});
