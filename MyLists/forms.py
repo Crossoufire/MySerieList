@@ -65,6 +65,10 @@ class SearchAnimeForm(FlaskForm):
     anime = StringField('Select an Anime to add:')
 
 
+class SearchBookForm(FlaskForm):
+    book = StringField('Select a Book to add:')
+
+
 class AddFriendForm(FlaskForm):
     add_friend = StringField('Type a Username')
     submit = SubmitField('Send')

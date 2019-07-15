@@ -5,7 +5,6 @@
 {% endblock css %}
 
 {% block content %}
-
 <style>
 
 #autocomplete.ui-autocomplete-loading {
@@ -271,6 +270,7 @@ body.loading .modal_loading {
         {{ form.hidden_tag() }}
         <div class="ml-auto m-t-20 m-b-10">
             {{ form.anime(class="form-control add_anime text-light", id="add_anime", placeholder="Add animes", type="text", id="autocomplete", onfocus="this.value=''") }}
+            <input type="hidden" id="anime_id" name="AnimeID" value=""/>
         </div>
     </form>
     <div class="ml-auto m-t-20 m-b-10">
@@ -440,7 +440,6 @@ body.loading .modal_loading {
 {% endfor %}
 
 <script>
-
 function refreshAll() {
     $body = $("body");
     $.ajax ({
@@ -559,34 +558,47 @@ function hide(category, arrow) {
         }
     {% endfor %}
 {% endfor %}
-
 </script>
-
 <div class="modal_loading"></div>
-
 {% endblock content %}
 
+
 {% block script %}
-
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
 <script type="text/javascript">
-$(function() {
+$(document).ready(function(){
     $("#autocomplete").autocomplete({
-        source:function(request, response) {
+        source: function(request, response) {
             $.getJSON("{{url_for('autocomplete_anime')}}",{
                 q: request.term,
             }, function(data) {
                 response(data.matching_results);
             });
         },
-        minLength: 1,
+        minLength: 2,
         select: function(event, ui) {
-            console.log(ui.item.value);
+            $body = $("body");
+            $("#add_anime").val(ui.item.value);
+            $("#anime_id").val(ui.item.id);
+
+            $.ajax ({
+                type: "POST",
+                url: "/testducul",
+                contentType: "application/json",
+                data: JSON.stringify({test: ui.item.id}),
+                dataType: "json",
+                beforeSend: function() { $body.addClass("loading"); },
+                success: function(response) {
+                    window.location.replace('/myanimelist'); }
+            });
+
         }
-    });
-})
-
+    }).data("ui-autocomplete")._renderItem = function(ul, item) {
+    return $("<li class='list-group'></li>")
+        .data("item.autocomplete", item)
+        .append(item.label)
+        .appendTo(ul);
+    };
+});
 </script>
-
 {% endblock script %}
