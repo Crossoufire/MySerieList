@@ -122,8 +122,6 @@ MyLists/static/anime_covers/*
 !MyLists/static/anime_covers/default.jpg
 MyLists/static/game_covers/*
 !MyLists/static/game_covers/default.jpg
-MyLists/static/movie_covers/*
-!MyLists/static/movie_covers/default.jpg
 MyLists/static/books_covers/*
 !MyLists/static/books_covers/default.jpg
 start.sh

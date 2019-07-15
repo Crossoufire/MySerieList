@@ -17,11 +17,20 @@ class Status(enum.Enum):
     PLAN_TO_WATCH = "Plan to Watch"
 
 
+class Status_book(enum.Enum):
+    READING = "Reading"
+    COMPLETED = "Completed"
+    ON_HOLD = "On Hold"
+    DROPPED = "Dropped"
+    PLAN_TO_READ = "Plan to Read"
+
+
 class ListType(enum.Enum):
     SERIES = "Series"
     ANIME = "Anime"
     MOVIE = "Movie"
     GAME = "Game"
+    BOOK = "Book"
 
 
 class HomePage(enum.Enum):
@@ -29,11 +38,13 @@ class HomePage(enum.Enum):
     HALL_OF_FAME = "hall_of_fame"
     MYSERIESLIST = "myserieslist"
     MYANIMELIST = "myanimelist"
+    MYBOOKLIST = "mybookslist"
 
 
 class HallOfFame(enum.Enum):
     MYSERIESLIST = "myserieslist"
     MYANIMELIST = "myanimelist"
+    MYBOOKLIST = "mybookslist"
 
 
 class User(db.Model, UserMixin):
@@ -207,3 +218,27 @@ class AnimeEpisodeTimestamp(db.Model):
     season = db.Column(db.Integer, nullable=False)
     episode = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
+
+
+######################################################## BOOKS #########################################################
+
+
+class Book(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(300), nullable=False)
+    image_cover = db.Column(db.String(100), nullable=False)
+    authors = db.Column(db.String(150), nullable=False)
+    published_date = db.Column(db.String(150), nullable=False)
+    description = db.Column(db.String(50), nullable=False)
+    page_count = db.Column(db.Integer, nullable=False)
+    categories = db.Column(db.String(150), nullable=False)
+    google_id = db.Column(db.String(150), nullable=False)
+
+
+class BookList(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
+    commentary = db.Column(db.String(5000))
+    read_year = db.Column(db.Integer)
+    status = db.Column(db.Enum(Status_book), nullable=False)

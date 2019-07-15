@@ -1,3 +1,203 @@
 {% extends "layout.html" %}
 {% block content %}
 {% endblock content %}
+
+<script>
+$(document).ready(function() {
+    $('#button_cat').attr('disabled', true);
+    $('#category_name').keyup(function(){
+        if($(this).val().length !=0)
+            $('#button_cat').attr('disabled', false);
+        else
+            $('#button_cat').attr('disabled', true);
+    })
+});
+
+
+function add_category() {
+    var idnumber = Math.floor((Math.random() * 100000) + 1);
+    var idnumber_tr = Math.floor((Math.random() * 100000000) + 1);
+    var idnumber_cat = Math.floor((Math.random() * 100000000) + 1);
+    var text = $("#category_name").val();
+    var arrow = idnumber + "_arrow";
+    var hidding = idnumber + "_hidding";
+
+    $("#adding_stuff").append(
+        "<div id=" + idnumber_cat + ">" +
+            "<h2 class='font-weight-light text-center pt-4 mb-0 category-title'>" +
+                "<div class='arrow_div float-left'><a class='fas fa-xs fa-trash' onclick='delete_category(\"" + idnumber_cat + "\")'></a></div>" +
+                text +
+                "<div class='arrow_div float-right'><a class='fas fa-sm fa-chevron-down' id=" + arrow + " onclick='hide(\"" + hidding + "\",\"" + arrow + "\")'></a></div>" +
+            "</h2>" +
+            "<hr class='mt-2 mb-4'>" +
+            "<div id=" + hidding + " class='hide'>" +
+                "<a class='fas fa-plus float-right' onclick='add_row(\"" + idnumber + "\")'></a>" +
+                "<table class='table table-striped table-sm table-responsive-lg' cellspacing='0' width='100%'>" +
+                "<thead>" +
+                    "<tr>" +
+                        "<th class='th-sm text-light'>Name</th>" +
+                        "<th class='th-sm text-light'>Plateform</th>" +
+                        "<th class='th-sm text-light'>Time Played</th>" +
+                        "<th class='th-sm text-light'>Achievements</th>" +
+                        "<th></th>" +
+                    "</tr>" +
+                "</thead>" +
+                "<tbody id=" + idnumber + ">" +
+                    "<tr id=" + idnumber_tr + ">" +
+                        "<td contenteditable='true' class='text-light'></td>" +
+                        "<td contenteditable='true' class='text-light'></td>" +
+                        "<td contenteditable='true' class='text-light'></td>" +
+                        "<td contenteditable='true' class='text-light'></td>" +
+                        "<td class='text-light'><a class='fas fa-minus-circle' onclick='delete_tr(\"" + idnumber_tr + "\")'></a></td>" +
+                   "</tr>" +
+                "</tbody>" +
+                "</table>" +
+            "</div>" +
+        "</div>"
+    );
+}
+
+
+function add_row(id_number) {
+    var idnumber_tr = Math.floor((Math.random() * 100000000) + 1);
+    $("#"+id_number).append(
+        "<tr id=" + idnumber_tr + ">" +
+            "<td contenteditable='true' class='text-light'></td>" +
+            "<td contenteditable='true' class='text-light'></td>" +
+            "<td contenteditable='true' class='text-light'></td>" +
+            "<td contenteditable='true' class='text-light'></td>" +
+            "<td class='text-light'><a class='fas fa-minus-circle' onclick='delete_tr(\"" + idnumber_tr + "\")'></a></td>" +
+       "</tr>"
+    );
+}
+
+
+function hide(category, arrow) {
+  var category = document.getElementById(category);
+  var arrow = document.getElementById(arrow);
+
+  if (category.className === "hide"){
+        category.className = "d-none";
+        arrow.className = "fas fa-sm fa-chevron-right";
+  } else {
+        category.className = "hide";
+        arrow.className = "fas fa-sm fa-chevron-down";
+  }
+}
+
+
+function delete_tr(tr_id) {
+    $("#"+ tr_id).remove();
+}
+
+function delete_category(cat_id) {
+    $("#"+ cat_id).remove();
+}
+
+</script>
+
+        beforeSend: function() { $body.addClass("loading"); },
+        success: function(response) {
+            window.location.replace('/myserieslist'); }
+
+$("#"+drop_id).empty();
+
+
+
+<div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
+            <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['title'] }}">
+            <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['id'] }}">
+                <p class="text-light"><div class="text-center"><h3>{{ data['title'] }}</h3></div>
+            </div>
+            <button type="button" class="btn btn-basic dropdown-toggle btn_left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+            <div class="dropdown-menu">
+                {% if outer_loop.index == 1 %}
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read')">Plan to Read</button>
+                {% elif outer_loop.index == 2 %}
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Reading')">Reading</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read')">Plan to Read</button>
+                {% elif outer_loop.index == 3 %}
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Reading')">Reading</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read')">Plan to Read</button>
+                {% elif outer_loop.index == 4 %}
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Reading')">Reading</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read')">Plan to Read</button>
+                {% elif outer_loop.index == 5 %}
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Reading')">Reading</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Completed')">Completed</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold')">On Hold</button>
+                <button class="dropdown-item" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped')">Dropped</button>
+                {% endif %}
+            </div>
+            <button class="btn btn_right" onclick="deleteBook('{{ data['id'] }}')"><b>x</b></button>
+        </div>
+
+        <div class="modal fade" id="modal_{{ data['id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
+                    <div class="modal-body">
+                        <div class="modal-header">
+                            <h4 class="modal-title">{{ data['title'] }}</h4>
+                            <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p><b>Title</b> : {{ data['title'] }}</p>
+                            <p><b>Author</b> : {{ data['authors'] }}</p>
+                            <p><b>Published Date</b> : {{ data['published_date'] }}</p>
+                            <p><b>Page Count</b> : {{ data['page_count'] }}</p>
+                            <p><b>Categories</b> : {{ data['categories'] }}</p>
+                            <p class="text-justify"><b>Description</b> : {{ data['description'] }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+$(document).ready(function(){
+    $("#autocomplete").autocomplete({
+        source: function(request, response) {
+            $.getJSON("{{url_for('autocomplete_series')}}",{
+                q: request.term,
+            }, function(data) {
+                response(data.matching_results);
+            });
+        },
+        minLength: 2,
+        select: function(event, ui) {
+            $body = $("body");
+            $("#autocomplete").val(ui.item.value);
+            $("#series_id").val(ui.item.id);
+
+            $.ajax ({
+                type: "POST",
+                url: "/add_series",
+                contentType: "application/json",
+                data: JSON.stringify({series_id: ui.item.id}),
+                dataType: "json",
+                beforeSend: function() { $body.addClass("loading"); },
+                success: function(response) {
+                    window.location.replace('/myserieslist'); }
+            });
+
+        }
+    }).data("ui-autocomplete")._renderItem = function(ul, item) {
+    return $("<li class='list-group'></li>")
+        .data("item.autocomplete", item)
+        .append(item.label)
+        .appendTo(ul);
+    };
+});

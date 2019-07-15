@@ -3,10 +3,6 @@
 {% block css %}
 <!-- MDBootstrap Datatables  -->
 <link href="{{ url_for('static', filename='css/addons/datatables.min.css') }}" rel="stylesheet">
-{% endblock css %}
-
-
-{% block content %}
 <style>
 table.dataTable thead .sorting:after,
 table.dataTable thead .sorting:before,
@@ -56,7 +52,10 @@ hr {
     width: 21px;
 }
 </style>
+{% endblock css %}
 
+
+{% block content %}
 <h3 class="font-weight-light text-center mt-4 mb-0">
     SERIES
     <div class="arrow_div float-right">
@@ -251,7 +250,6 @@ hr {
 {% block script %}
 <!-- MDBootstrap Datatables  -->
 <script type="text/javascript" src="{{ url_for('static', filename='js/addons/datatables.min.js') }}"></script>
-
 <script>
 function hide(category, arrow) {
   var category = document.getElementById(category);
@@ -265,6 +263,7 @@ function hide(category, arrow) {
         arrow.className = "fas fa-xs fa-chevron-down";
   }
 }
+
 
 function add_friend(username) {
     $body = $("body");
@@ -280,6 +279,7 @@ function add_friend(username) {
     });
 }
 
+
 $(document).ready(function () {
     $('#hall_of_fame_series').DataTable({
         "order": [[ 9, "desc" ], [ 1, "asc" ]],
@@ -290,6 +290,7 @@ $(document).ready(function () {
     $('.dataTables_length').addClass('bs-select');
 });
 
+
 $(document).ready(function () {
     $('#hall_of_fame_anime').DataTable({
         "order": [[ 9, "desc" ], [ 1, "asc" ]],
@@ -299,8 +300,6 @@ $(document).ready(function () {
     });
     $('.dataTables_length').addClass('bs-select');
 });
-
 </script>
-
 {% endblock script %}
 

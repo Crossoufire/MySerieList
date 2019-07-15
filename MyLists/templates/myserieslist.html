@@ -1,13 +1,10 @@
 {% extends "layout.html" %}
 
+
 {% block css %}
+<!------------ Jquery Autocomplete ---------->
 <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet">
-{% endblock css %}
-
-{% block content %}
-
 <style>
-
 #autocomplete.ui-autocomplete-loading {
     background-image: url('{{ url_for("static", filename="img/add_loader.gif") }}');
     background-position: right center;
@@ -44,10 +41,6 @@ hr {
 
 .btn-refresh-all {
     background-color: #375a7d;
-}
-
-#add_serie {
-    width: 220px;
 }
 
 .btn_left{
@@ -100,7 +93,8 @@ hr {
     outline: none;
 }
 
-.add_serie {
+.add_series {
+    width: 220px;
     background: transparent;
     border-radius: 0px;
     border-top: 0px;
@@ -109,7 +103,7 @@ hr {
     font-size: 12pt;
 }
 
-.add_serie:focus {
+.add_series:focus {
     background: transparent;
     border-radius: 0px;
     border-top: 0px;
@@ -264,15 +258,25 @@ body.loading .modal_loading {
     -webkit-appearance:none;
     appearance:none;
 }
-</style>
 
+.ui-autocomplete-category {
+    font-weight: bold;
+    background-color: #131418;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: white;
+    text-align: center;
+}
+</style>
+{% endblock css %}
+
+
+{% block content %}
 <div class="d-flex flex-wrap">
-    <form method="POST" action="">
-        {{ form.hidden_tag() }}
-        <div class="ml-auto m-t-20 m-b-10">
-            {{ form.serie(class="form-control add_serie text-light", id="add_serie", placeholder="Add series", type="text", id="autocomplete", onfocus="this.value=''") }}
-        </div>
-    </form>
+    <div class="m-t-20 m-b-10">
+        <input  class="form-control text-light add_series" placeholder="Add a series" type="text" id="autocomplete" onfocus="this.value=''"/>
+        <input type="hidden" id="series_id" name="SeriesID" value=""/>
+    </div>
     <div class="ml-auto m-t-20 m-b-10">
         <button class="btn btn-refresh-all" onclick="refreshAll()">Refresh All</button>
     </div>
@@ -313,7 +317,6 @@ body.loading .modal_loading {
     <div class="d-flex flex-wrap" id="PLAN_TO_WATCH">
     {% endif %}
     {% set outer_loop = loop %}
-
 
     {% for data in category %}
         <div id="card_{{ data['id'] }}" class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
@@ -431,11 +434,15 @@ body.loading .modal_loading {
         </div>
     {% endfor %}
     </div>
-
 {% endfor %}
+<div class="modal_loading"></div>
+{% endblock content %}
 
-<script>
 
+{% block script %}
+<!--------- Jquery Autocomplete ------------->
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript">
 function refreshAll() {
     $body = $("body");
     $.ajax ({
@@ -699,36 +706,63 @@ function hide(category, arrow) {
         }
     {% endfor %}
 {% endfor %}
-
 </script>
-
-<div class="modal_loading"></div>
-
-{% endblock content %}
-
-{% block script %}
-
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
 <script type="text/javascript">
-
 $(function() {
-    $("#autocomplete").autocomplete({
-        source:function(request, response) {
-            $.getJSON("{{url_for('autocomplete_series')}}",{
-                q: request.term,
-            }, function(data) {
-                response(data.matching_results);
-            });
+    $.widget("custom.catcomplete", $.ui.autocomplete, {
+        _create: function() {
+            this._super();
+            this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
         },
-        minLength: 1,
+        _renderMenu: function(ul, items) {
+            var that = this,
+            currentCategory = "";
+            $.each(items, function(index, item) {
+                var li;
+                if (item.category != currentCategory) {
+					ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+					currentCategory = item.category;
+				}
+                li = that._renderItemData(ul, item);
+				that._renderItem = function(ul, item) {
+			        return $("<li class='list-group'></li>")
+					.data("item.autocomplete", item)
+					.append(item.label)
+					.appendTo(ul);
+				};
+			});
+		}
+	});
+
+	$( "#autocomplete" ).catcomplete({
+		delay: 0,
+		source: function(request, response) {
+				$.getJSON("{{url_for('autocomplete_series')}}",{
+					q: request.term,
+				},
+					function(data) {
+						response(data.matching_results);
+					}
+				);
+		},
+		minLength: 1,
         select: function(event, ui) {
-            console.log(ui.item.value);
+            $body = $("body");
+            $("#autocomplete").val(ui.item.value);
+            $("#series_id").val(ui.item.id);
+
+            $.ajax ({
+                type: "POST",
+                url: "/add_series",
+                contentType: "application/json",
+                data: JSON.stringify({series_id: ui.item.id}),
+                dataType: "json",
+                beforeSend: function() { $body.addClass("loading"); },
+                success: function(response) {
+                    window.location.replace('/myserieslist'); }
+            });
         }
-    });
-})
-
-
+	});
+});
 </script>
-
 {% endblock script %}

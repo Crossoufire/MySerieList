@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
 
+
 {% block css %}
 <style type="text/css">
-
 /* On screens that are 730px or less, set the title font size to 30pt */
 @media screen and (max-width: 730px) {
     #title {
@@ -47,8 +47,8 @@
 </style>
 {% endblock %}
 
-{% block home_header %}
 
+{% block home_header %}
     <div id="myCarousel" class="carousel text-center" data-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active">
@@ -67,8 +67,8 @@
             </div>
         </div>
     </div>
-
 {% endblock %}
+
 
 {% block content %}
     <!--Login modal-->
@@ -345,9 +345,10 @@
     </section>
 {% endblock content %}
 
+
 {% block script %}
-    <script type="text/javascript">
-        // Animations initialization
-        new WOW().init();
-    </script>
+<script type="text/javascript">
+    // Animations initialization
+    new WOW().init();
+</script>
 {% endblock script %}

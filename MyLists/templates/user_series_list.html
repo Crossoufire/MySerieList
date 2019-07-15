@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
-{% block content %}
 
+{% block css %}
 <style>
 .form-control:disabled {
     background-color: #131418;
@@ -153,7 +153,10 @@ hr {
     appearance:none;
 }
 </style>
+{% endblock %}
 
+
+{% block content %}
 {% for category in all_data %}
 
     {% if loop.index == 1 %}
@@ -189,7 +192,6 @@ hr {
     <div class="d-flex flex-wrap" id="PLAN_TO_WATCH">
     {% endif %}
     {% set outer_loop = loop %}
-
 
     {% for data in category %}
         <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
@@ -258,9 +260,11 @@ hr {
         </div>
     {% endfor %}
     </div>
-
 {% endfor %}
+{% endblock content %}
 
+
+{% block script %}
 <script>
 function hide(category, arrow) {
     var category = document.getElementById(category);
@@ -275,5 +279,4 @@ function hide(category, arrow) {
     }
 }
 </script>
-
-{% endblock content %}
+{% endblock script %}
