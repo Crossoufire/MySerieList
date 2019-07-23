@@ -2,6 +2,7 @@
 
 
 {% block css %}
+<!-------------- Princiapl CSS ------------->
 <style>
 .modal-content {
     background: #131418;
@@ -81,8 +82,8 @@ hr {
 /* On screens that are 599px or more */
 @media screen and (min-width: 599px) {
     .account-img {
-        height: 200px;
-        width: 200px;
+        height: 120px;
+        width: 120px;
         margin-bottom: 15px;
         border-style: solid;
         border-width: 1px;
@@ -183,6 +184,163 @@ hr {
     margin-left: auto;
 }
 </style>
+<!------ level + badge + total level ------->
+<style>
+.account-bar-wrapper {
+    width: 350px;
+}
+
+.account-bar {
+    height: 100%;
+    margin: 0px auto;
+}
+
+.account-bar-name {
+    font-size: 12pt;
+    margin: 0px 0px 0px 5px;
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.account-bar-level {
+    font-size: 12pt;
+    margin: 0px 0px 0px;
+    display: inline-block;
+}
+
+#series_level {
+    margin-left: 20px;
+}
+
+#anime_level {
+    margin-left: 10px;
+}
+
+#book_level {
+    margin-left: 20px;
+}
+
+.account-bar-next-level {
+    display: inline-block;
+    font-size: 12pt;
+}
+
+.xp-bar {
+    height: 10px;
+    width: 250px;
+    background: #035;
+    margin: 0px 0px 0px 5px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#xp-bar-fill-series {
+    height: 100%;
+    width: 0.1%;
+    background: #4d0000;
+    font-size: 12px;
+    line-height: 10px;
+    text-align: right;
+}
+
+#xp-bar-fill-anime {
+    height: 100%;
+    width: 0.1%;
+    background: #0068b3;
+    font-size: 12px;
+    line-height: 10px;
+    text-align: right;
+}
+
+#xp-bar-fill-book {
+    height: 100%;
+    width: 0.1%;
+    background: #004d00;
+    font-size: 12px;
+    line-height: 10px;
+    text-align: right;
+}
+
+.xp-increase-fx {
+    position: relative;
+    display: none;
+    height: 100%;
+}
+
+.xp-increase-glow1 {
+    position: absolute;
+    margin: 0px 0px 0px -2px;
+    left: 0px;
+    top: 0px;
+    background: #fff;
+    width: 5px;
+    height: 100%;
+    border-radius: 0px;
+    -webkit-filter: blur(2px);
+}
+
+.xp-increase-glow2 {
+    position: absolute;
+    margin: -5px 0px 0px -2px;
+    left: 0px;
+    top: 0px;
+    background: #aaf;
+    width: 5px;
+    height: 200%;
+    border-radius: 0px;
+    -webkit-filter: blur(10px);
+}
+
+.xp-increase-glow3 {
+    position: absolute;
+    margin: 0px 0px 0px -5px;
+    left: 0px;
+    top: 0px;
+    background: #fff;
+    width: 10px;
+    height: 100%;
+    border-radius: 5px;
+    -webkit-filter: blur(5px);
+}
+
+.total_score {
+    border-radius: 50%;
+    border: solid red;
+    color: black;
+    display: inline-block;
+    font-weight: bold;
+    line-height: 2.5em;
+    padding-right: 2px;
+    text-align: center;
+    width: 2.8em;
+}
+</style>
+<!-- test -->
+<!--<style>-->
+<!--/* ############################# pacman loading ############################ */-->
+<!--.modal_loading {-->
+    <!--display: none;-->
+    <!--position: fixed;-->
+    <!--z-index: 9999;-->
+    <!--top: 0;-->
+    <!--left: 0;-->
+    <!--height: 100%;-->
+    <!--width: 100%;-->
+    <!--background: rgba(0, 0, 0, .6)-->
+                <!--url('../static/img/anime_achievements/{{ achievements[0][0] }}.png')-->
+                <!--50% 50%-->
+                <!--no-repeat;-->
+<!--}-->
+
+<!--body.loading .modal_loading {-->
+    <!--overflow: hidden;-->
+<!--}-->
+
+<!--body.loading .modal_loading {-->
+    <!--display: block;-->
+<!--}-->
+<!--/* ######################################################################### */-->
+<!--</style>-->
 {% endblock css %}
 
 
@@ -197,13 +355,13 @@ hr {
                     <h5 class="border-bottom p-t-20 p-b-15 text-center"><b>Add a Friend</b></h5>
                     <div class="form-group m-l-40 m-r-40 m-t-15">
                         {% if form.add_friend.errors %}
-                            {{ form.add_friend(class="form-control form-control is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.add_friend.errors %}
-                                    <span>{{ error }}</span> {% endfor %}
-                            </div>
+                        {{ form.add_friend(class="form-control form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.add_friend.errors %}
+                            <span>{{ error }}</span> {% endfor %}
+                        </div>
                         {% else %}
-                            {{ form.add_friend(class="form-control", placeholder="Username", onfocus="this.value=''") }}
+                        {{ form.add_friend(class="form-control", placeholder="Username", onfocus="this.value=''") }}
                         {% endif %}
                     </div>
                     <div class="form-group m-l-20 m-r-20 text-center">
@@ -213,17 +371,17 @@ hr {
             </div>
         </div>
     </div>
-    <!------------------------------------->
+    <!----------------------------------------------------------------------------------------->
 
     <div class="border_account">
-        <!----------------- Account picture/Username/email/account settings ----------------->
-        <div class="d-flex flex-wrap">
+        <!----------------- Account picture/Username/email/account settings ------------------->
+        <div class="d-flex flex-wrap-reverse">
             <div class="p-r-10 bd-highlight">
                 <img class="rounded border-light account-img" src="{{ profile_picture }}">
             </div>
             <div class="bd-highlight">
-                <h2 class="mt-0 account-heading username">{{ current_user.username }}</h2>
-                <h5 class="text">{{ current_user.email }}</h5>
+                <h4 class="mt-0 account-heading username">{{ current_user.username }}</h4>
+                <span style="font-size: 14pt;">Total:&nbsp&nbsp</span><span class="total_score text-light"> {{ total_level }}</span>
             </div>
             <div class="ml-auto bd-highlight">
                 <a class="btn btn-sm bg-dark m-0" href="{{ url_for('account_settings') }}" role="button">
@@ -231,7 +389,76 @@ hr {
                 </a>
             </div>
         </div>
-        <!----------------------------------------------------------------------------------->
+
+        <div class="row">
+            <div class="col">
+                <div class="d-flex">
+                    <div class='account-bar-wrapper'>
+                        <div class='account-bar'>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ series_stats[4] }}" src="../static/img/Ranks/{{ series_stats[4] }}.ico"/>
+                            <span class='account-bar-name'>Series</span>
+                            <div id="series_level" class='account-bar-level'>Level {{ series_stats[3][0] }}</div>
+                            <div class='xp-bar' data-toggle="tooltip" title="{{ series_stats[3][1] }}%">
+                                <div id='xp-bar-fill-series'>
+                                    <div class='xp-increase-fx'><div class='xp-increase-fx-flicker'><div class='xp-increase-glow1'></div><div class='xp-increase-glow2'></div><div class='xp-increase-glow3'></div></div><div class='xp-increase-glow2'></div></div>
+                                </div>
+                            </div>
+                            <div class='account-bar-next-level'>&nbsp{{ series_stats[3][0] | int + 1 }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class='account-bar-wrapper'>
+                        <div class='account-bar'>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ anime_stats[4] }}" src="../static/img/Ranks/{{ anime_stats[4] }}.ico"/>
+                            <div class='account-bar-name'>Animes</div>
+                            <div id="anime_level" class='account-bar-level'>Level {{ anime_stats[3][0] }}</div>
+                            <div class='xp-bar' data-toggle="tooltip" title="{{ anime_stats[3][1] }}%">
+                                <div id='xp-bar-fill-anime'>
+                                    <div class='xp-increase-fx'><div class='xp-increase-fx-flicker'><div class='xp-increase-glow1'></div><div class='xp-increase-glow2'></div><div class='xp-increase-glow3'></div></div><div class='xp-increase-glow2'></div></div>
+                                </div>
+                            </div>
+                            <div class='account-bar-next-level'>&nbsp{{ anime_stats[3][0] | int + 1 }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class='account-bar-wrapper'>
+                        <div class='account-bar'>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ book_stats[4] }}" src="../static/img/Ranks/{{ book_stats[4] }}.ico"/>
+                            <div class='account-bar-name'>Books</div>
+                            <div id="book_level" class='account-bar-level'>Level {{ book_stats[3][0] }}</div>
+                            <div class='xp-bar' data-toggle="tooltip" title="{{ book_stats[3][1] }}%">
+                                <div id='xp-bar-fill-book'>
+                                    <div class='xp-increase-fx'><div class='xp-increase-fx-flicker'><div class='xp-increase-glow1'></div><div class='xp-increase-glow2'></div><div class='xp-increase-glow3'></div></div><div class='xp-increase-glow2'></div></div>
+                                </div>
+                            </div>
+                            <div class='account-bar-next-level'>&nbsp{{ book_stats[3][0] | int + 1 }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <table class="table table-sm">
+                    <thead>
+                    <tr>
+                        <th style="font-size: 12pt;" colspan="2">
+                            All anime achievements &nbsp &nbsp
+                            <a class="text-light fas fa-external-link-square-alt" data-toggle="tooltip" title="All anime achievements" href="{{ url_for('anime_achievements') }}"></a>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            {# <img height="50" width="100" data-toggle="tooltip" title="{{ achievements[0][2] }}" src="../static/img/anime_achievements/{{ achievements[0][0] }}.png"/> #}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!------------------------------------------------------------------------------------->
 
         <h3 class="font-weight-light text-center mt-4 mb-0">
             <div class="arrow_div float-left">
@@ -249,44 +476,83 @@ hr {
             <div id="FRIENDS" class="row" style="margin-right: 0px; margin-left: 0px;">
                 <table class="table table-striped table-sm table-responsive-lg" cellspacing="0" width="100%">
                     {% for friend in friends_list_data %}
-                        {% if friend['status'] == "pending" %}
-                            <tr>
-                                <td><a class="text-light" href="#" id="{{ friend['user_id'] }}">{{ friend['username'] }}</a>
-                                    <button class="btn btn-sm btn-danger small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="decline_{{ friend['user_id'] }}">Decline</button>
-                                    <button class="btn btn-sm btn-mdb-color small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="accept_{{ friend['user_id'] }}">Accept</button>
-                                </td>
-                            </tr>
-                        {% elif friend['status'] == "request" %}
-                            <tr>
-                                <td><a class="text-light" href="#">{{ friend['username'] }} (Pending request)</a>
-                                    <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </td>
-                            </tr>
-                        {% elif friend['status'] == "declined" %}
-                        {% else %}
-                            <tr>
-                                <td>
-                                    <a class="disabled text-light">{{ friend['username'] }}</a>
-                                </td>
-                                <td>
-                                    <a class="text-light" href="/user/series/{{ friend['username'] }}">SeriesList</a>
-                                </td>
-                                <td>
-                                    <a class="text-light" href="/user/anime/{{ friend['username'] }}">AnimeList</a>
-                                </td>
-                                <td>
-                                    <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </td>
-                            </tr>
-                        {% endif %}
+                    {% if friend['status'] == "pending" %}
+                    <tr>
+                        <td><a class="text-light" href="#" id="{{ friend['user_id'] }}">{{ friend['username'] }}</a>
+                            <button class="btn btn-sm btn-danger small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="decline_{{ friend['user_id'] }}">Decline</button>
+                            <button class="btn btn-sm btn-mdb-color small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="accept_{{ friend['user_id'] }}">Accept</button>
+                        </td>
+                    </tr>
+                    {% elif friend['status'] == "request" %}
+                    <tr>
+                        <td><a class="text-light" href="#">{{ friend['username'] }} (Pending request)</a>
+                            <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </td>
+                    </tr>
+                    {% elif friend['status'] == "declined" %}
+                    {% else %}
+                    <tr>
+                        <td>
+                            <a class="disabled text-light">{{ friend['username'] }}</a>
+                        </td>
+                        <td>
+                            <a class="text-light" href="/user/series/{{ friend['username'] }}">SeriesList</a>
+                        </td>
+                        <td>
+                            <a class="text-light" href="/user/anime/{{ friend['username'] }}">AnimeList</a>
+                        </td>
+                        <td>
+                            <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endif %}
                     {% endfor %}
                 </table>
             </div>
         </div>
+
+
+        <h3 class="font-weight-light text-center mt-4 mb-0">
+            Anime Achievements
+            <div class="arrow_div float-right">
+                <a class="fas fa-xs fa-chevron-down" id="ACHIEVEMENTS_arrow" onclick="hide('ACHIEVEMENTS', 'ACHIEVEMENTS_arrow')"></a>
+            </div>
+        </h3>
+
+        <hr class="mt-2 mb-3">
+
+        <div id="ACHIEVEMENTS" class="container-stats">
+            <table>
+                <tbody>
+                {% for achievement in achievements %}
+                <tr>
+                    <td>
+                        <span>{{ achievement[1] }}</span><br>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <img class="m-t-5" height="50" width="100" src="../static/img/anime_achievements/{{ achievement[0] }}.png"/>
+                    </td>
+                    <td>
+                        <strong class="m-t-5 m-l-10">{{ achievement[2] }}</strong><br>
+                        <sub class="m-t-5 m-l-10">{{ achievement[3] }}</sub>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <hr class="mt-3 mb-3">
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
 
         <h3 class="font-weight-light text-center mt-4 mb-0">
             Series Statistics
@@ -298,29 +564,32 @@ hr {
         <hr class="mt-2 mb-3">
 
         <div id="SERIES" class="container-stats">
-            <div class="m-b-10">
-                <span class="stat_text"><b>Days:</b> {{ total_time_series[2] }}</span>
-                <span class="stat_text float-right"><b>Hours:</b> {{ total_time_series[1] }}</span>
+            <div class="m-b-5">
+                <span class="stat_text"><b>Days:</b> {{ series_stats[1][2] }}</span>
+                <span class="stat_text float-right"><b>Hours:</b> {{ series_stats[1][1] }}</span>
+            </div>
+            <div class="m-b-5">
+                <span class="stat_text"><b>Mean Score:</b> {{ series_stats[2] }}</span>
             </div>
 
             <figure class="d-flex">
                 <span class="block" title="Watching">
-                    <span id="{{ series_rate[0] }}%" class="value"></span>
+                    <span id="{{ series_stats[5][0] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Completed">
-                    <span id="{{ series_rate[1] }}%" class="value"></span>
+                    <span id="{{ series_stats[5][1] }}%" class="value"></span>
                 </span>
                 <span class="block" title="On Hold">
-                    <span id="{{ series_rate[2] }}%" class="value"></span>
+                    <span id="{{ series_stats[5][2] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Random">
-                    <span id="{{ series_rate[3] }}%" class="value"></span>
+                    <span id="{{ series_stats[5][3] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Dropped">
-                    <span id="{{ series_rate[4] }}%" class="value"></span>
+                    <span id="{{ series_stats[5][4] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Plan to Watch">
-                    <span id="{{ series_rate[5] }}%" class="value"></span>
+                    <span id="{{ series_stats[5][5] }}%" class="value"></span>
                 </span>
             </figure>
 
@@ -330,13 +599,13 @@ hr {
                         <span class="stat_text">Watching:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ nb_of_series[0] }}</span>
+                        <span class="stat_text">{{ series_stats[0][0] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Dropped:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ nb_of_series[4] }}</span>
+                        <span class="stat_text">{{ series_stats[0][4] }}</span>
                     </div>
                 </div>
 
@@ -345,13 +614,13 @@ hr {
                         <span class="stat_text">Completed:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ nb_of_series[1] }}</span>
+                        <span class="stat_text">{{ series_stats[0][1] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Plan to Watch:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ nb_of_series[5] }}</span>
+                        <span class="stat_text">{{ series_stats[0][5] }}</span>
                     </div>
                 </div>
 
@@ -360,7 +629,7 @@ hr {
                         <span class="stat_text">On Hold:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ nb_of_series[2] }}</span>
+                        <span class="stat_text">{{ series_stats[0][2] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text"></span>
@@ -375,13 +644,13 @@ hr {
                         <span class="stat_text">Random:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ nb_of_series[3] }}</span>
+                        <span class="stat_text">{{ series_stats[0][3] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Episodes:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ total_time_series[0] }}</span>
+                        <span class="stat_text">{{ series_stats[1][0] }}</span>
                     </div>
                 </div>
             </div>
@@ -397,29 +666,32 @@ hr {
         <hr class="mt-2 mb-3">
 
         <div id="ANIME" class="container-stats">
-            <div class="m-b-10">
-                <span class="stat_text"><b>Days:</b> {{ total_time_animes[2] }}</span>
-                <span class="stat_text float-right"><b>Hours:</b> {{ total_time_animes[1] }}</span>
+            <div class="m-b-5">
+                <span class="stat_text"><b>Days:</b> {{ anime_stats[1][2] }}</span>
+                <span class="stat_text float-right"><b>Hours:</b> {{ anime_stats[1][1] }}</span>
+            </div>
+            <div class="m-b-5">
+                <span class="stat_text"><b>Mean Score:</b> {{ anime_stats[2] }}</span>
             </div>
 
             <figure class="d-flex">
                 <span class="block" title="Watching">
-                    <span id="{{ anime_rate[0] }}%" class="value"></span>
+                    <span id="{{ anime_stats[5][0] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Completed">
-                    <span id="{{ anime_rate[1] }}%" class="value"></span>
+                    <span id="{{ anime_stats[5][1] }}%" class="value"></span>
                 </span>
                 <span class="block" title="On Hold">
-                    <span id="{{ anime_rate[2] }}%" class="value"></span>
+                    <span id="{{ anime_stats[5][2] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Random">
-                    <span id="{{ anime_rate[3] }}%" class="value"></span>
+                    <span id="{{ anime_stats[5][3] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Dropped">
-                    <span id="{{ anime_rate[4] }}%" class="value"></span>
+                    <span id="{{ anime_stats[5][4] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Plan to Watch">
-                    <span id="{{ anime_rate[5] }}%" class="value"></span>
+                    <span id="{{ anime_stats[5][5] }}%" class="value"></span>
                 </span>
             </figure>
 
@@ -429,13 +701,13 @@ hr {
                         <span class="stat_text">Watching:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ nb_of_animes[0] }}</span>
+                        <span class="stat_text">{{ anime_stats[0][0] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Dropped:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ nb_of_animes[4] }}</span>
+                        <span class="stat_text">{{ anime_stats[0][4] }}</span>
                     </div>
                 </div>
 
@@ -444,13 +716,13 @@ hr {
                         <span class="stat_text">Completed:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ nb_of_animes[1] }}</span>
+                        <span class="stat_text">{{ anime_stats[0][1] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Plan to Watch:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ nb_of_animes[5] }}</span>
+                        <span class="stat_text">{{ anime_stats[0][5] }}</span>
                     </div>
                 </div>
 
@@ -459,7 +731,7 @@ hr {
                         <span class="stat_text">On Hold:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ nb_of_animes[2] }}</span>
+                        <span class="stat_text">{{ anime_stats[0][2] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text"></span>
@@ -474,23 +746,119 @@ hr {
                         <span class="stat_text">Random:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ nb_of_animes[3] }}</span>
+                        <span class="stat_text">{{ anime_stats[0][3] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Episodes:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ total_time_animes[0] }}</span>
+                        <span class="stat_text">{{ anime_stats[1][0] }}</span>
                     </div>
                 </div>
             </div>
         </div>
+
+        <h3 class="font-weight-light text-center mt-4 mb-0">
+            Books Statistics
+            <div class="arrow_div float-right">
+                <a class="fas fa-xs fa-chevron-down" id="BOOK_arrow" onclick="hide('BOOK', 'BOOK_arrow')"></a>
+            </div>
+        </h3>
+
+        <hr class="mt-2 mb-3">
+
+        <div id="BOOK" class="container-stats">
+            <div class="m-b-5">
+                <span class="stat_text"><b>Days:</b> {{ book_stats[1][2] }}</span>
+                <span class="stat_text float-right"><b>Hours:</b> {{ book_stats[1][1] }}</span>
+            </div>
+            <div class="m-b-5">
+                <span class="stat_text"><b>Mean Score:</b> {{ book_stats[2] }}</span>
+            </div>
+
+            <figure class="d-flex">
+                <span class="block" title="Reading">
+                    <span id="{{ book_stats[5][0] }}%" class="value"></span>
+                </span>
+                <span class="block" title="Completed">
+                    <span id="{{ book_stats[5][1] }}%" class="value"></span>
+                </span>
+                <span class="block" title="On Hold">
+                    <span id="{{ book_stats[5][2] }}%" class="value"></span>
+                </span>
+                <span class="block" title="Dropped">
+                    <span id="{{ book_stats[5][3] }}%" class="value"></span>
+                </span>
+                <span class="block" title="Plan to Read">
+                    <span id="{{ book_stats[5][4] }}%" class="value"></span>
+                </span>
+            </figure>
+
+            <div class="m-t-10">
+                <div class="row">
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Reading:</span>
+                    </div>
+                    <div class="col p-0 position">
+                        <span class="stat_text">{{ book_stats[0][0] }}</span>
+                    </div>
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Dropped:</span>
+                    </div>
+                    <div class="col p-l-0 position">
+                        <span class="stat_text">{{ book_stats[0][3] }}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Completed:</span>
+                    </div>
+                    <div class="col p-0 position">
+                        <span class="stat_text">{{ book_stats[0][1] }}</span>
+                    </div>
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Plan to Read:</span>
+                    </div>
+                    <div class="col p-l-0 position">
+                        <span class="stat_text">{{ book_stats[0][4] }}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">On Hold:</span>
+                    </div>
+                    <div class="col p-0 position">
+                        <span class="stat_text">{{ book_stats[0][2] }}</span>
+                    </div>
+                    <div class="col mini p-r-0">
+                        <span class="stat_text"></span>
+                    </div>
+                    <div class="col p-l-0 position">
+                        <span class="stat_text"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col mini p-r-0">
+                        <span class="stat_text">Pages read:</span>
+                    </div>
+                    <div class="col p-l-0 position">
+                        <span class="stat_text">{{ book_stats[1][0] }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <canvas id="canvas"></canvas>
     </div>
 </div>
+<div class="modal_loading"></div>
 {% endblock content %}
 
 
 {% block script %}
+<!--------- Principal Javascript ---------->
 <script>
 function hide(category, arrow) {
     var category = document.getElementById(category);
@@ -563,11 +931,149 @@ function hide_friends(category, arrow) {
     {% endif %}
 {% endfor %}
 </script>
+<!--------- Tooltip Javascript ------------>
 <script>
 $('.value').each(function() {
 	var text = $(this).attr('id');
     $(this).parent().css('width', text);
 });
 $('.block').tooltip();
+// Tooltips Initialization
+$(function () {
+$('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+<!--------- Level XP Javascript ----------->
+<script>
+$(document).ready(function(){
+    $body = $("body");
+    $body.addClass("loading");
+    $(document).click(function() {
+        $body.removeClass("loading");
+    });
+});
+
+$(document).ready(function(){
+    $(".xp-increase-fx-flicker").css("opacity", "1");
+    $(".xp-increase-fx-flicker").animate({"opacity":Math.random()}, 100);
+    $(".xp-increase-fx").css("display", "inline-block");
+
+
+    $("#xp-bar-fill-series").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
+    setTimeout(function() {
+        $("#xp-bar-fill-series").css("-webkit-transition", "all 2s ease");
+        $("#xp-bar-fill-series").css("width", "{{ series_stats[3][1] }}%");
+    }, 100);
+    setTimeout(function(){
+        $(".xp-increase-fx").fadeOut(500);
+        $("#xp-bar-fill-series").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
+    }, 20*parseFloat({{ series_stats[3][1] }}));
+
+
+    $("#xp-bar-fill-anime").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
+    setTimeout(function() {
+        $("#xp-bar-fill-anime").css("-webkit-transition", "all 2s ease");
+        $("#xp-bar-fill-anime").css("width", "{{ anime_stats[3][1] }}%");
+    }, 100);
+    setTimeout(function() {
+        $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-anime").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
+    }, 20*parseFloat({{ anime_stats[3][1] }}));
+
+
+    $("#xp-bar-fill-book").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
+    setTimeout(function() {
+        $("#xp-bar-fill-book").css("-webkit-transition", "all 2s ease");
+        $("#xp-bar-fill-book").css("width", "{{ book_stats[3][1] }}%");
+    }, 100);
+    setTimeout(function() {
+        $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-book").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
+    }, 20*parseFloat({{ book_stats[3][1] }}));
+});
+</script>
+<!--------------- chart JS ---------------->
+<script>
+var barChartData = {
+    labels: ['0-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8', '8-9', '9-10'],
+    datasets: [{
+        label: 'N° Series',
+        borderWidth: 2,
+        data: {{ chart_data[1] }},
+        backgroundColor: [
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+        ],
+        borderColor: [
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)'
+        ],
+    }]
+};
+
+window.onload = function() {
+    var ctx = document.getElementById('canvas').getContext('2d');
+    var myBar = new Chart(ctx, {
+        type: 'bar',
+        data: barChartData,
+        options: {
+            legend: {
+                labels: {
+                    fontColor: "#ffffff",
+                }
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: "#ffffff",
+                    },
+                    gridLines: {
+                        display: true,
+                        drawBorder: true,
+                        color: "rgba(255, 255, 255, 0.2)",
+                    }
+                }],
+                xAxes: [{
+                    ticks: {
+                        fontColor: "#ffffff",
+                    },
+                    gridLines: {
+                        display: true,
+                        drawBorder: true,
+                        color: "rgba(255, 255, 255, 0.2)",
+                    }
+                }],
+            },
+            responsive: true,
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Series vs Score'
+            }
+        }
+    });
+
+};
 </script>
 {% endblock %}

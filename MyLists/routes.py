@@ -6,7 +6,8 @@ import sys
 import urllib
 import time
 import requests
-import pandas as pd
+import numpy as np
+import re
 
 from datetime import datetime
 from PIL import Image
@@ -20,7 +21,7 @@ from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, Change
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
     Friend, SeriesEpisodeTimestamp, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, \
-    AnimeEpisodeTimestamp, HomePage, HallOfFame, Status_book, Book, BookList
+    AnimeEpisodeTimestamp, HomePage, HallOfFame, Status_book, Book, BookList, AnimeAchievements
 
 
 config.read('config.ini')
@@ -293,7 +294,6 @@ def register_token(token):
 
 @app.route("/test")
 def test():
-    crawl_tmdb()
     return render_template('test.html')
 
 
@@ -318,6 +318,8 @@ def logout():
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
+    #add_achievements()
+    chart_data = test_stats_series()
     add_friend_form = AddFriendForm()
     if add_friend_form.validate_on_submit():
         if str(add_friend_form.add_friend.data) == str(current_user.username):
@@ -339,47 +341,34 @@ def account():
         friend_data["status"] = friend.status
         friends_list_data.append(friend_data)
 
-    # Series Statistics
-    nb_of_series = get_list_count(ListType.SERIES)
-    total_series = sum(nb_of_series)
-    if total_series == 0:
-        series_rate = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    else:
-        series_rate = [(float(nb_of_series[0]/total_series))*100,
-                              (float(nb_of_series[1]/total_series))*100,
-                              (float(nb_of_series[2]/total_series))*100,
-                              (float(nb_of_series[3]/total_series))*100,
-                              (float(nb_of_series[4]/total_series))*100,
-                              (float(nb_of_series[5]/total_series))*100]
+    # Series Statistics, scores and level
+    series_stats = get_all_account_stats(ListType.SERIES)
 
-    total_time_series = get_total_time_spent(current_user.get_id(), ListType.SERIES)
+    # Animes Statistics, scores, and level
+    anime_stats = get_all_account_stats(ListType.ANIME)
+    anime_achievements = get_anime_achievements()
 
-    # Animes Statistics
-    nb_of_animes = get_list_count(ListType.ANIME)
-    total_anime = sum(nb_of_animes)
-    if total_anime == 0:
-        anime_rate = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    else:
-        anime_rate = [(float(nb_of_animes[0]/total_anime))*100,
-                              (float(nb_of_animes[1]/total_anime))*100,
-                              (float(nb_of_animes[2]/total_anime))*100,
-                              (float(nb_of_animes[3]/total_anime))*100,
-                              (float(nb_of_animes[4]/total_anime))*100,
-                              (float(nb_of_animes[5]/total_anime))*100]
+    # Books Statistics, scores, and level
+    book_stats = get_all_account_stats(ListType.BOOK)
 
-    total_time_animes = get_total_time_spent(current_user.get_id(), ListType.ANIME)
-
+    total_level = int(series_stats[3][0]) + int(anime_stats[3][0]) + int(book_stats[3][0])
     return render_template('account.html',
                            title='Account',
                            profile_picture=profile_picture,
-                           nb_of_series=nb_of_series,
-                           series_rate=series_rate,
-                           total_time_series=total_time_series,
-                           nb_of_animes=nb_of_animes,
-                           total_time_animes=total_time_animes,
-                           anime_rate=anime_rate,
                            friends_list_data=friends_list_data,
-                           form=add_friend_form)
+                           form=add_friend_form,
+                           series_stats=series_stats,
+                           anime_stats=anime_stats,
+                           book_stats=book_stats,
+                           total_level=total_level,
+                           chart_data=chart_data,
+                           achievements=anime_achievements)
+
+
+@app.route("/anime_achievements")
+@login_required
+def anime_achievements():
+    return render_template('anime_achievements.html', title='Anime achievements')
 
 
 @app.route("/account_settings", methods=['GET', 'POST'])
@@ -439,8 +428,13 @@ def account_settings():
         form.email.data = current_user.email
 
     image_file = url_for('static', filename='profile_pics/{0}'.format(current_user.image_file))
-    return render_template('account_settings.html', title='Settings', image_file=image_file, form=form,
-                           value_privacy=is_private, home_page=str(user.home_page.value), default_hof=str(user.default_hof.value))
+    return render_template('account_settings.html',
+                           title='Settings',
+                           image_file=image_file,
+                           form=form,
+                           value_privacy=is_private,
+                           home_page=str(user.home_page.value),
+                           default_hof=str(user.default_hof.value))
 
 
 @app.route("/default_page", methods=['POST'])
@@ -496,7 +490,6 @@ def default_hof():
 @app.route("/email_update/<token>", methods=['GET'])
 @login_required
 def email_update_token(token):
-
     user = User.verify_reset_token(token)
     if user is None:
         flash('That is an invalid or expired token', 'warning')
@@ -1116,6 +1109,43 @@ def add_series():
     return '', 204
 
 
+@app.route('/add_score_series', methods=['POST'])
+@login_required
+def add_score_series():
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        json_data = request.get_json()
+        score_val = json_data['score_val']
+        series_id = json_data['series_id']
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the inputs are digits
+    try:
+        score_val = float(score_val)
+        series_id = int(series_id)
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the serie exists
+    if Series.query.filter_by(id=series_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the serie is in the current user's list
+    if SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=series_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the score is between 0 and 10:
+    if score_val > 10 or score_val < 0:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    add_score = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=series_id).first()
+    add_score.score = score_val
+    db.session.commit()
+    app.logger.info('[{}] Series with ID {} scored {}'.format(current_user.get_id(), series_id, score_val))
+    return '', 204
+
+
 @app.route('/autocomplete_series', methods=['GET'])
 @login_required
 def autocomplete_series():
@@ -1142,7 +1172,6 @@ def myanimelist():
 
     anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     anime_data = get_list_data(anime_list, ListType.ANIME)
-
     return render_template('myanimelist.html', title='MyAnimeList', all_data=anime_data)
 
 
@@ -1469,6 +1498,43 @@ def add_anime():
     return '', 204
 
 
+@app.route('/add_score_anime', methods=['POST'])
+@login_required
+def add_score_anime():
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        json_data = request.get_json()
+        score_val = json_data['score_val']
+        anime_id = json_data['anime_id']
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the inputs are digits
+    try:
+        score_val = float(score_val)
+        anime_id = int(anime_id)
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the anime exists
+    if Anime.query.filter_by(id=anime_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the anime is in the current user's list
+    if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=anime_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the score is between 0 and 10:
+    if score_val > 10 or score_val < 0:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    add_score = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=anime_id).first()
+    add_score.score = score_val
+    db.session.commit()
+    app.logger.info('[{}] Anime with ID {} scored {}'.format(current_user.get_id(), anime_id, score_val))
+    return '', 204
+
+
 @app.route('/autocomplete_anime', methods=['GET'])
 @login_required
 def autocomplete_anime():
@@ -1493,7 +1559,7 @@ def mybookslist():
     plantoread_list = BookList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_READ').all()
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
-    book_data = get_booklist_data(book_list)
+    book_data = get_list_data(book_list, ListType.BOOK)
     return render_template('mybookslist.html', title='MyBooksList', all_data=book_data)
 
 
@@ -1513,17 +1579,16 @@ def delete_book():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    # Check if the serie exists
+    # Check if the book exists
     if Book.query.filter_by(id=book_id).first() is None:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    # Check if the serie is in the current user's list
+    # Check if the book is in the current user's list
     if BookList.query.filter_by(user_id=current_user.get_id(), book_id=book_id).first() is None:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     BookList.query.filter_by(book_id=book_id, user_id=current_user.get_id()).delete()
     db.session.commit()
-
     app.logger.info('[{}] Book with ID {} deleted'.format(current_user.get_id(), book_id))
     return '', 204
 
@@ -1597,7 +1662,7 @@ def user_book(user_name):
     plantoread_list  = BookList.query.filter_by(user_id=user.id, status='PLAN_TO_READ').all()
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
-    book_data = get_booklist_data(book_list)
+    book_data = get_list_data(book_list, ListType.BOOK)
     return render_template('user_book_list.html', title='{}\'s list'.format(user.username), all_data=book_data)
 
 
@@ -1612,6 +1677,43 @@ def add_book():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     add_element(book_id, ListType.BOOK)
+    return '', 204
+
+
+@app.route('/add_score_book', methods=['POST'])
+@login_required
+def add_score_book():
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        json_data = request.get_json()
+        score_val = json_data['score_val']
+        book_id = json_data['book_id']
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the inputs are digits
+    try:
+        score_val = float(score_val)
+        book_id = int(book_id)
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the book exists
+    if Book.query.filter_by(id=book_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the book is in the current user's list
+    if BookList.query.filter_by(user_id=current_user.get_id(), book_id=book_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the score is between 0 and 10:
+    if score_val > 10 or score_val < 0:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    add_score = BookList.query.filter_by(user_id=current_user.get_id(), book_id=book_id).first()
+    add_score.score = score_val
+    db.session.commit()
+    app.logger.info('[{}] Book with ID {} scored {}'.format(current_user.get_id(), book_id, score_val))
     return '', 204
 
 
@@ -1638,18 +1740,138 @@ def myownlist():
 ###################################################### Functions #######################################################
 
 
-def autocomplete_search_element(element_name, element_type):
-    if element_type == ListType.SERIES:
+def get_all_account_stats(list_type):
+    nb_of_element = get_list_count(list_type)
+    total_element = sum(nb_of_element)
+    total_time_element = get_total_time_spent(current_user.get_id(), list_type)
+    mean_score_element = get_mean_score(list_type)
+    time_total_in_minutes_element = total_time_element[2]*3600
+
+    element_level_tmp = "{:.2f}".format(round((np.sqrt(2500+200*(time_total_in_minutes_element))-50)/100, 2))
+    element_level_tmp = str(element_level_tmp)
+    element_level = element_level_tmp.split('.')
+
+    list_rank_element = []
+    with open("{0}".format(os.path.join(app.root_path, "static\\img\\Ranks\\Ranks.txt")), "r") as fp:
+        for line in fp:
+            list_rank_element.append(line.split())
+
+    for i in range(0, len(list_rank_element)):
+        if str(list_rank_element[i][0]) == str(element_level[0]):
+            element_rank = str(list_rank_element[i][2])
+            break
+        else:
+            element_rank = "General_Grade_4"
+
+    if total_element == 0:
+        if list_type == ListType.SERIES or list_type == ListType.ANIME:
+            element_rate = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        elif list_type == ListType.BOOK:
+            element_rate = [0.0, 0.0, 0.0, 0.0, 0.0]
+    else:
+        if list_type == ListType.SERIES or list_type == ListType.ANIME:
+            element_rate = [(float(nb_of_element[0]/total_element))*100,
+                           (float(nb_of_element[1]/total_element))*100,
+                           (float(nb_of_element[2]/total_element))*100,
+                           (float(nb_of_element[3]/total_element))*100,
+                           (float(nb_of_element[4]/total_element))*100,
+                           (float(nb_of_element[5]/total_element))*100]
+        elif list_type == ListType.BOOK:
+            element_rate = [(float(nb_of_element[0]/total_element))*100,
+                            (float(nb_of_element[1]/total_element))*100,
+                            (float(nb_of_element[2]/total_element))*100,
+                            (float(nb_of_element[3]/total_element))*100,
+                            (float(nb_of_element[4]/total_element))*100]
+
+    return [nb_of_element, total_time_element, mean_score_element, element_level, element_rank, element_rate]
+
+
+def get_anime_achievements():
+    all_achievements = []
+    tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10 = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    animes = AnimeList.query.filter(AnimeList.status == "COMPLETED").filter_by(user_id=current_user.get_id()).all()
+    for anime in animes:
+        genres = AnimeGenre.query.filter_by(anime_id=anime.anime_id).all()
+        for genre in genres:
+            a = genre.genre_id
+            if a == 13:
+                tmp_1 += 1
+            elif a == 18:
+                tmp_2 += 1
+            elif a == 19:
+                tmp_3 += 1
+            elif a == 7:
+                tmp_4 += 1
+            elif a == 22:
+                tmp_5 += 1
+            elif a == 36:
+                tmp_6 += 1
+            elif a == 29:
+                tmp_7 += 1
+            elif a == 30:
+                tmp_8 += 1
+            elif a == 5 or a == 40:
+                tmp_9 += 1
+            elif a == 14 or a == 41:
+                tmp_10 += 1
+            else:
+                pass
+
+    ids = [13, 18, 19, 7, 22, 36, 29, 30, '5, 40', '14, 41']
+    values = [tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10]
+    for i in range(0, len(values)):
+        achievements = AnimeAchievements.query.filter_by(genre=str(ids[i])).all()
+        for achievement in achievements:
+            threshold = achievement.threshold
+            range_achiev = threshold.split("-")
+            if int(range_achiev[0]) <= int(values[i]) <= int(range_achiev[1]):
+                data_achiev = [achievement.image_id, achievement.level, achievement.title, achievement.description]
+                all_achievements.append(data_achiev)
+
+    return all_achievements
+
+
+def get_list_count(list_type):
+        if list_type is ListType.SERIES:
+            watching = SeriesList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').count()
+            completed = SeriesList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').count()
+            onhold = SeriesList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').count()
+            random = SeriesList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').count()
+            dropped = SeriesList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').count()
+            plantowatch = SeriesList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').count()
+        elif list_type is ListType.ANIME:
+            watching = AnimeList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').count()
+            completed = AnimeList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').count()
+            onhold = AnimeList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').count()
+            random = AnimeList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').count()
+            dropped = AnimeList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').count()
+            plantowatch = AnimeList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').count()
+        elif list_type is ListType.BOOK:
+            reading = BookList.query.filter_by(user_id=current_user.get_id(), status='READING').count()
+            completed = BookList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').count()
+            onhold = BookList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').count()
+            dropped = BookList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').count()
+            plantoread = BookList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_READ').count()
+
+        if list_type == ListType.SERIES or list_type == ListType.ANIME:
+            statistics = [watching, completed, onhold, random, dropped, plantowatch]
+        elif list_type == ListType.BOOK:
+            statistics = [reading, completed, onhold, dropped, plantoread]
+        return statistics
+
+
+def autocomplete_search_element(element_name, list_type):
+    if list_type == ListType.SERIES:
         element = Series.query.filter(Series.name.like("%{0}%".format(element_name))).all()
         cover_url = url_for('static', filename="series_covers/")
-    elif element_type == ListType.ANIME:
+    elif list_type == ListType.ANIME:
         element = Anime.query.filter(Anime.name.like("%{0}%".format(element_name))).all()
         cover_url = url_for('static', filename="anime_covers/")
-    elif element_type == ListType.BOOK:
+    elif list_type == ListType.BOOK:
         element = Book.query.filter(Book.title.like("%{0}%".format(element_name))).all()
         cover_url = url_for('static', filename="books_covers/")
 
-    if element_type == ListType.SERIES or element_type == ListType.ANIME:
+    if list_type == ListType.SERIES:
         i = 0
         local_results = []
         for i in range(5):
@@ -1657,12 +1879,7 @@ def autocomplete_search_element(element_name, element_type):
                 tmp = {"id": "{0}".format(element[i].id),
                        "value": "{0}".format(element[i].name),
                        "category": "Local Database",
-                       "label": "<a class='list-group-item bg-dark text-light'><img src='..{0}{1}' alt='{2}' "
-                                "style='width: 33px; height: 50px;'><span> {3}</span></a>"
-                            .format(cover_url,
-                                    element[i].image_cover,
-                                    element[i].name,
-                                    element[i].name)}
+                       "label": "..{0}{1}".format(cover_url, element[i].image_cover)}
                 local_results.append(tmp)
             except:
                 pass
@@ -1681,44 +1898,123 @@ def autocomplete_search_element(element_name, element_type):
                 app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
                 return None
             app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+
             if response.headers["X-RateLimit-Remaining"] == "0":
                 app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
                 time.sleep(3)
             else:
                 pass
+
             data = json.loads(response.text)
             if data["total_results"] == 0:
                 if len(local_results) == 0:
-                    return [{"category":"Sorry, No results found..."}]
+                    return [{"category":"False"}]
                 else:
                     return local_results
             else:
                 i = 0
                 tmdb_results = []
-                for i in range(5):
+                for i in range(8):
                     try:
-                        if data["results"][i]["poster_path"] is None:
-                            data["results"][i]["poster_path"] = url_for('static', filename="anime_covers/default.jpg")
-                            url = ".."
+                        genre_id = data["results"][i]["genre_ids"]
+                        country = data["results"][i]["origin_country"][0]
+                        if 16 in genre_id:
+                            if "JP" in country:
+                                pass
+                            else:
+                                if data["results"][i]["poster_path"] is None:
+                                    data["results"][i]["poster_path"] = url_for('static', filename="series_covers/default.jpg")
+                                    url = ".."
+                                else:
+                                    url = "http://image.tmdb.org/t/p/w300/"
+                                    tmp = {"id": "{0}".format(data['results'][i]['id']),
+                                           "value": "{0}".format(data["results"][i]["name"]),
+                                           "category": "Online API Database",
+                                           "label": "{0}{1}".format(url, data["results"][i]["poster_path"])}
+                                tmdb_results.append(tmp)
                         else:
-                            url = "http://image.tmdb.org/t/p/w300/"
-
-                        tmp = {"id": "{0}".format(data['results'][i]['id']),
-                               "value": "{0}".format(data["results"][i]["name"]),
-                               "category": "Online API Database",
-                               "label": "<a class='list-group-item bg-dark text-light'><img src='{0}{1}' alt='{2}' "
-                                        "style='width: 33px; height: 50px;'><span> {3}</span></a>"
-                                   .format(url,
-                                           data["results"][i]["poster_path"],
-                                           data["results"][i]["name"],
-                                           data["results"][i]["name"])}
-                        tmdb_results.append(tmp)
+                            if data["results"][i]["poster_path"] is None:
+                                data["results"][i]["poster_path"] = url_for('static', filename="anime_covers/default.jpg")
+                                url = ".."
+                            else:
+                                url = "http://image.tmdb.org/t/p/w300/"
+                                tmp = {"id": "{0}".format(data['results'][i]['id']),
+                                       "value": "{0}".format(data["results"][i]["name"]),
+                                       "category": "Online API Database",
+                                       "label": "{0}{1}".format(url, data["results"][i]["poster_path"])}
+                            tmdb_results.append(tmp)
                     except:
                         pass
                 all_results = local_results + tmdb_results
                 return all_results
+    elif list_type == ListType.ANIME:
+        i = 0
+        local_results = []
+        for i in range(5):
+            try:
+                tmp = {"id": "{0}".format(element[i].id),
+                       "value": "{0}".format(element[i].name),
+                       "category": "Local Database",
+                       "label": "..{0}{1}".format(cover_url, element[i].image_cover)}
+                local_results.append(tmp)
+            except:
+                pass
 
-    elif element_type == ListType.BOOK:
+        if len(local_results) >= 3:
+            return local_results
+
+        else:
+            try:
+                response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
+                                        .format(themoviedb_api_key, element_name))
+            except:
+                return None
+
+            if response.status_code == 401:
+                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+                return None
+            app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+
+            if response.headers["X-RateLimit-Remaining"] == "0":
+                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+                time.sleep(3)
+            else:
+                pass
+
+            data = json.loads(response.text)
+            if data["total_results"] == 0:
+                if len(local_results) == 0:
+                    return [{"category":"False"}]
+                else:
+                    return local_results
+            else:
+                i = 0
+                tmdb_results = []
+                for i in range(8):
+                    try:
+                        genre_id = data["results"][i]["genre_ids"]
+                        country = data["results"][i]["origin_country"][0]
+                        if 16 in genre_id:
+                            if "JP" in country:
+                                if data["results"][i]["poster_path"] is None:
+                                    data["results"][i]["poster_path"] = url_for('static', filename="anime_covers/default.jpg")
+                                    url = ".."
+                                else:
+                                    url = "http://image.tmdb.org/t/p/w300/"
+                                    tmp = {"id": "{0}".format(data['results'][i]['id']),
+                                           "value": "{0}".format(data["results"][i]["name"]),
+                                           "category": "Online API Database",
+                                           "label": "{0}{1}".format(url, data["results"][i]["poster_path"])}
+                                tmdb_results.append(tmp)
+                            else:
+                                pass
+                        else:
+                            pass
+                    except:
+                        pass
+                all_results = local_results + tmdb_results
+                return all_results
+    elif list_type == ListType.BOOK:
         i = 0
         local_results = []
         for i in range(5):
@@ -1726,12 +2022,7 @@ def autocomplete_search_element(element_name, element_type):
                 tmp = {"id": "{0}".format(element[i].id),
                        "value": "{0}".format(element[i].title),
                        "category": "Local Database",
-                       "label": "<a class='list-group-item bg-dark text-light'><img src='..{0}{1}' alt='{2}' "
-                                "style='width: 33px; height: 50px;'><span> {3}</span></a>"
-                           .format(cover_url,
-                                   element[i].image_cover,
-                                   element[i].title,
-                                   element[i].title)}
+                       "label": "..{0}{1}".format(cover_url, element[i].image_cover)}
                 local_results.append(tmp)
             except:
                 pass
@@ -1753,7 +2044,7 @@ def autocomplete_search_element(element_name, element_type):
             data = json.loads(response.text)
             if data["totalItems"] == 0:
                 if len(local_results) == 0:
-                    return [{"category": "Sorry, No results found..."}]
+                    return [{"category": "False"}]
                 else:
                     return local_results
             else:
@@ -1771,12 +2062,7 @@ def autocomplete_search_element(element_name, element_type):
                         tmp = {"id": "{0}".format(data["items"][i]["id"]),
                                "value": "{0}".format(data["items"][i]["volumeInfo"]["title"]),
                                "category": "Online API Database",
-                               "label": "<a class='list-group-item bg-dark text-light'><img src='{0}{1}' alt='{2}' "
-                                        "style='width: 33px; height: 50px;'><span> {3}</span></a>"
-                                   .format(url,
-                                           data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"],
-                                           data["items"][i]["volumeInfo"]["title"],
-                                           data["items"][i]["volumeInfo"]["title"])}
+                               "label": "{0}{1}".format(url, data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"])}
                         google_results.append(tmp)
                     except:
                         pass
@@ -1784,25 +2070,25 @@ def autocomplete_search_element(element_name, element_type):
         return all_results
 
 
-def add_element(element_id, element_type):
+def add_element(element_id, list_type):
     if element_id == "":
-        if element_type == ListType.SERIES:
+        if list_type == ListType.SERIES:
             return redirect(url_for('myserieslist'))
-        elif element_type == ListType.ANIME:
+        elif list_type == ListType.ANIME:
             return redirect(url_for('myanimelist'))
-        elif element_type == ListType.BOOK:
+        elif list_type == ListType.BOOK:
             return redirect(url_for('mybookslist'))
 
     # Check if the ID element exist in the database
-    if element_type == ListType.SERIES:
+    if list_type == ListType.SERIES:
         element = Series.query.filter_by(id=element_id).first()
         if element is None:
             element = Series.query.filter_by(themoviedb_id=element_id).first()
-    elif element_type == ListType.ANIME:
+    elif list_type == ListType.ANIME:
         element = Anime.query.filter_by(id=element_id).first()
         if element is None:
             element = Anime.query.filter_by(themoviedb_id=element_id).first()
-    elif element_type == ListType.BOOK:
+    elif list_type == ListType.BOOK:
         element = Book.query.filter_by(id=element_id).first()
         if element is None:
             element = Book.query.filter_by(google_id=element_id).first()
@@ -1810,116 +2096,114 @@ def add_element(element_id, element_type):
     # If ID is correct, we know which one to add in the user's list
     if element is not None:
         # Check if the element is already in the current's user list
-        if element_type == ListType.SERIES:
+        if list_type == ListType.SERIES:
             if SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element.id).first() is not None:
                 return flash("This series is already in your list", "warning")
-        elif element_type == ListType.ANIME:
+        elif list_type == ListType.ANIME:
             if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element.id).first() is not None:
                 return flash("This anime is already in your list", "warning")
-        elif element_type == ListType.BOOK:
+        elif list_type == ListType.BOOK:
             if BookList.query.filter_by(user_id=current_user.get_id(), book_id=element.id).first() is not None:
                 return flash("This book is already in your list", "warning")
 
-        if element_type == ListType.SERIES or element_type == ListType.ANIME:
+        if list_type == ListType.SERIES or list_type == ListType.ANIME:
             # Check if there is more than 30 min since the last update
             last_update = element.last_update
             time_delta = datetime.utcnow() - last_update
             if time_delta.days > 0 or (time_delta.seconds/1800 > 1):  # 30 min
-                refresh_element_data(element.id, element_type)
+                refresh_element_data(element.id, list_type)
             else:
                 pass
         else:
             pass
 
-        add_element_to_user(element.id, int(current_user.get_id()), element_type)
+        add_element_to_user(element.id, int(current_user.get_id()), list_type)
 
     # Otherwise we need to recover it from an online API
     else:
-        if element_type == ListType.SERIES:
-            series_data = get_element_data_from_api(element_id)
+        if list_type == ListType.SERIES:
+            series_data = get_element_data_from_api(element_id, ListType.SERIES)
             if series_data is None:
                 return flash("There was a problem while getting series' info. Please try again later.",
                              "warning")
 
-            cover_id = save_themoviedb_cover(series_data["poster_path"], ListType.SERIES)
+            cover_id = save_api_cover(series_data["poster_path"], ListType.SERIES)
             if cover_id is None:
                 return flash("There was a problem while getting series' poster. Please try again later.",
                              "warning")
 
             series_id = add_element_in_base(series_data, cover_id, ListType.SERIES)
-            add_element_to_user(series_id, int(current_user.get_id()), element_type)
+            add_element_to_user(series_id, int(current_user.get_id()), list_type)
             return redirect(url_for('myserieslist'))
-
-        elif element_type == ListType.ANIME:
-            anime_data = get_element_data_from_api(element_id)
+        elif list_type == ListType.ANIME:
+            anime_data = get_element_data_from_api(element_id, ListType.ANIME)
             if anime_data is None:
                 return flash("There was a problem while getting series' info. Please try again later.",
                              "warning")
 
-            cover_id = save_themoviedb_cover(anime_data["poster_path"], ListType.ANIME)
+            cover_id = save_api_cover(anime_data["poster_path"], ListType.ANIME)
             if cover_id is None:
                 return flash("There was a problem while getting series' poster. Please try again later.",
                              "warning")
 
-            anime_id = add_element_in_base(anime_data, cover_id, element_type)
-            add_element_to_user(anime_id, int(current_user.get_id()), element_type)
+            anime_id = add_element_in_base(anime_data, cover_id, list_type)
+            add_element_to_user(anime_id, int(current_user.get_id()), list_type)
             return redirect(url_for('myanimelist'))
-
-        elif element_type == ListType.BOOK:
-            book_data = get_element_data_from_google_api(element_id)
+        elif list_type == ListType.BOOK:
+            book_data = get_element_data_from_api(element_id, ListType.BOOK)
             if book_data is None:
-                return flash("There was a problem while getting book's info. Please try again later.",
-                             "warning")
+                return flash("There was a problem while getting book's info. Please try again later.", "warning")
 
-            cover_id = save_google_cover(book_data["volumeInfo"]["imageLinks"]["thumbnail"])
+            try:
+                cover_id = save_api_cover(book_data["volumeInfo"]["imageLinks"]["small"], ListType.BOOK)
+            except:
+                cover_id = save_api_cover(book_data["volumeInfo"]["imageLinks"]["thumbnail"], ListType.BOOK)
             if cover_id is None:
-                return flash("There was a problem while getting the book's cover. Please try again later.",
-                             "warning")
+                return flash("There was a problem while getting the book's cover. Please try again later.","warning")
 
-            book_id = add_book_in_base(book_data, cover_id)
-            add_element_to_user(book_id, int(current_user.get_id()), element_type)
+            book_id = add_element_in_base(book_data, cover_id, list_type)
+            add_element_to_user(book_id, int(current_user.get_id()), list_type)
             return redirect(url_for('mybookslist'))
 
 
-def get_element_data_from_api(themoviedb_id):
-    try:
-        response = requests.get(
-            "https://api.themoviedb.org/3/tv/{0}?api_key={1}".format(themoviedb_id, themoviedb_api_key))
-    except:
-        return None
+def get_element_data_from_api(api_id, list_type):
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
+        try:
+            response = requests.get(
+                "https://api.themoviedb.org/3/tv/{0}?api_key={1}".format(api_id, themoviedb_api_key))
+        except:
+            return None
 
-    if response.status_code == 401:
-        app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-        return None
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            return None
 
-    app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+        app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
 
-    if response.headers["X-RateLimit-Remaining"] == "0":
-        app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-        time.sleep(3)
-        get_element_data_from_api(themoviedb_id)
-    else:
-        pass
-    return json.loads(response.text)
+        if response.headers["X-RateLimit-Remaining"] == "0":
+            app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+            time.sleep(3)
+            get_element_data_from_api(api_id, list_type)
+        else:
+            pass
+    if list_type == ListType.BOOK:
+        try:
+            response = requests.get("https://www.googleapis.com/books/v1/volumes/{0}".format(api_id))
+        except:
+            return None
 
-
-def get_element_data_from_google_api(google_id):
-    try:
-        response = requests.get("https://www.googleapis.com/books/v1/volumes/{0}".format(google_id))
-    except:
-        return None
-
-    if response.status_code == 401:
-        app.logger.error('[SYSTEM] Error requesting google API :(')
-        return None
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting google API :(')
+            return None
 
     return json.loads(response.text)
 
 
-def save_themoviedb_cover(cover_path, list_type):
+def save_api_cover(cover_path, list_type):
     if cover_path is None:
         return "default.jpg"
     cover_id = "{}.jpg".format(secrets.token_hex(8))
+
     if list_type == ListType.SERIES:
         if platform.system() == "Windows":
             local_covers_path = os.path.join(app.root_path, "static\series_covers\\")
@@ -1930,245 +2214,250 @@ def save_themoviedb_cover(cover_path, list_type):
             local_covers_path = os.path.join(app.root_path, "static\\anime_covers\\")
         else:  # Linux & macOS
             local_covers_path = os.path.join(app.root_path, "static/anime_covers/")
-    else:
-        print("TODO")
-    try:
-        urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(cover_path),
-                                   "{}{}".format(local_covers_path, cover_id))
-    except:
-        return None
+    elif list_type == ListType.BOOK:
+        if platform.system() == "Windows":
+            local_covers_path = os.path.join(app.root_path, "static\\books_covers\\")
+        else:  # Linux & macOS
+            local_covers_path = os.path.join(app.root_path, "static/books_covers/")
+
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
+        try:
+            urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(cover_path),
+                                       "{}{}".format(local_covers_path, cover_id))
+        except:
+            return None
+    elif list_type == ListType.BOOK:
+        try:
+            urllib.request.urlretrieve("{0}".format(cover_path), "{0}{1}".format(local_covers_path, cover_id))
+        except:
+            return None
 
     img = Image.open("{}{}".format(local_covers_path, cover_id))
     img = img.resize((300, 450), Image.ANTIALIAS)
-    img.save("{}{}".format(local_covers_path, cover_id), quality=90)
-    return cover_id
-
-
-def save_google_cover(cover_link):
-    if cover_link is None:
-        return "default.jpg"
-    cover_id = "{}.jpg".format(secrets.token_hex(8))
-
-    if platform.system() == "Windows":
-        local_covers_path = os.path.join(app.root_path, "static\\books_covers\\")
-    else:  # Linux & macOS
-        local_covers_path = os.path.join(app.root_path, "static/books_covers/")
-
-    try:
-        urllib.request.urlretrieve("{0}".format(cover_link), "{0}{1}".format(local_covers_path, cover_id))
-    except:
-        return None
-
-    img = Image.open("{0}{1}".format(local_covers_path, cover_id))
-    img = img.resize((300, 450), Image.ANTIALIAS)
     img.save("{0}{1}".format(local_covers_path, cover_id), quality=90)
+
     return cover_id
 
 
-def add_element_in_base(element_data, element_cover_id, element_type):
-    if element_type == ListType.SERIES:
+def add_element_in_base(element_data, element_cover_id, list_type):
+    if list_type == ListType.SERIES:
         element = Series.query.filter_by(themoviedb_id=element_data["id"]).first()
-    elif element_type == ListType.ANIME:
+    elif list_type == ListType.ANIME:
         element = Anime.query.filter_by(themoviedb_id=element_data["id"]).first()
+    elif list_type == ListType.BOOK:
+        element = Book.query.filter_by(google_id=element_data["id"]).first()
 
     if element is not None:
         return element.id
 
-    name = element_data["name"]
-    original_name = element_data["original_name"]
-    first_air_date = element_data["first_air_date"]
-    last_air_date = element_data["last_air_date"]
-    homepage = element_data["homepage"]
-    in_production = element_data["in_production"]
-    total_seasons = element_data["number_of_seasons"]
-    total_episodes = element_data["number_of_episodes"]
-    status = element_data["status"]
-    vote_average = element_data["vote_average"]
-    vote_count = element_data["vote_count"]
-    synopsis = element_data["overview"]
-    popularity = element_data["popularity"]
-    themoviedb_id = element_data["id"]
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
+        name = element_data["name"]
+        original_name = element_data["original_name"]
+        first_air_date = element_data["first_air_date"]
+        last_air_date = element_data["last_air_date"]
+        homepage = element_data["homepage"]
+        in_production = element_data["in_production"]
+        total_seasons = element_data["number_of_seasons"]
+        total_episodes = element_data["number_of_episodes"]
+        status = element_data["status"]
+        vote_average = element_data["vote_average"]
+        vote_count = element_data["vote_count"]
+        synopsis = element_data["overview"]
+        popularity = element_data["popularity"]
+        themoviedb_id = element_data["id"]
 
-    try:
-        created_by = ""
-        for person in element_data["created_by"]:
-            created_by = created_by + person["name"] + ", "
-        if len(element_data["created_by"]) > 0:
-            created_by = created_by[:-2]
-        else:
+        try:
+            created_by = ""
+            for person in element_data["created_by"]:
+                created_by = created_by + person["name"] + ", "
+            if len(element_data["created_by"]) > 0:
+                created_by = created_by[:-2]
+            else:
+                created_by = None
+        except:
             created_by = None
-    except:
-        created_by = None
 
-    try:
-        episode_duration = element_data["episode_run_time"][0]
-    except:
-        episode_duration = None
+        try:
+            episode_duration = element_data["episode_run_time"][0]
+        except:
+            episode_duration = None
 
-    try:
-        origin_country = ""
-        for country in element_data["origin_country"]:
-            origin_country = origin_country + country + ", "
-        if len(element_data["origin_country"]) > 0:
-            origin_country = origin_country[:-2]
-        else:
+        try:
+            origin_country = ""
+            for country in element_data["origin_country"]:
+                origin_country = origin_country + country + ", "
+            if len(element_data["origin_country"]) > 0:
+                origin_country = origin_country[:-2]
+            else:
+                origin_country = None
+        except:
             origin_country = None
-    except:
-        origin_country = None
 
-    # Check if there is a special season
-    # We do not want to take it into account
-    seasons_data = []
-    if len(element_data["seasons"]) == 0:
-        return None
+        # Check if there is a special season
+        # We do not want to take it into account
+        seasons_data = []
+        if len(element_data["seasons"]) == 0:
+            return None
 
-    if element_data["seasons"][0]["season_number"] == 0:  # Special season
-        for i in range(len(element_data["seasons"])):
+        if element_data["seasons"][0]["season_number"] == 0:  # Special season
+            for i in range(len(element_data["seasons"])):
+                try:
+                    seasons_data.append(element_data["seasons"][i + 1])
+                except:
+                    pass
+        else:
+            for i in range(len(element_data["seasons"])):
+                try:
+                    seasons_data.append(element_data["seasons"][i])
+                except:
+                    pass
+
+        genres_data = []
+        for i in range(len(element_data["genres"])):
             try:
-                seasons_data.append(element_data["seasons"][i + 1])
+                genres_data.append(element_data["genres"][i]["name"])
             except:
                 pass
-    else:
-        for i in range(len(element_data["seasons"])):
+
+        networks_data = []
+        for i in range(len(element_data["networks"])):
             try:
-                seasons_data.append(element_data["seasons"][i])
+                networks_data.append(element_data["networks"][i]["name"])
             except:
                 pass
 
-    genres_data = []
-    for i in range(len(element_data["genres"])):
+        # Add the element into the table
+        if list_type == ListType.SERIES:
+            element = Series(name=name,
+                             original_name=original_name,
+                             image_cover=element_cover_id,
+                             first_air_date=first_air_date,
+                             last_air_date=last_air_date,
+                             homepage=homepage,
+                             in_production=in_production,
+                             created_by=created_by,
+                             total_seasons=total_seasons,
+                             total_episodes=total_episodes,
+                             episode_duration=episode_duration,
+                             origin_country=origin_country,
+                             status=status,
+                             vote_average=vote_average,
+                             vote_count=vote_count,
+                             synopsis=synopsis,
+                             popularity=popularity,
+                             themoviedb_id=themoviedb_id,
+                             last_update=datetime.utcnow())
+        elif list_type == ListType.ANIME:
+            element = Anime(name=name,
+                            original_name=original_name,
+                            image_cover=element_cover_id,
+                            first_air_date=first_air_date,
+                            last_air_date=last_air_date,
+                            homepage=homepage,
+                            in_production=in_production,
+                            created_by=created_by,
+                            total_seasons=total_seasons,
+                            total_episodes=total_episodes,
+                            episode_duration=episode_duration,
+                            origin_country=origin_country,
+                            status=status,
+                            vote_average=vote_average,
+                            vote_count=vote_count,
+                            synopsis=synopsis,
+                            popularity=popularity,
+                            themoviedb_id=themoviedb_id,
+                            last_update=datetime.utcnow())
+
+        db.session.add(element)
+        db.session.commit()
+
+        # Add genres
+        if list_type == ListType.SERIES:
+
+            for genre_data in genres_data:
+                genre = SeriesGenre(series_id=element.id,
+                                    genre=genre_data)
+                db.session.add(genre)
+
+        elif list_type == ListType.ANIME:
+            response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(element_data["name"]))
+            data_mal = json.loads(response.text)
+            mal_id = data_mal["results"][0]["mal_id"]
+
+            response = requests.get("https://api.jikan.moe/v3/anime/{}".format(mal_id))
+            data_mal = json.loads(response.text)
+            genres = data_mal["genres"]
+
+            for genre_data in genres:
+                genre = AnimeGenre(anime_id=element.id,
+                                   genre=genre_data["name"],
+                                   genre_id=int(genre_data["mal_id"]))
+                db.session.add(genre)
+
+        # Add the different networks for each serie
+        for network_data in networks_data:
+            if list_type == ListType.SERIES:
+                networks = SeriesNetwork(series_id=element.id,
+                                         network=network_data)
+            elif list_type == ListType.ANIME:
+                networks = AnimeNetwork(anime_id=element.id,
+                                        network=network_data)
+            db.session.add(networks)
+
+        # Add number of episodes for each season
+        for season_data in seasons_data:
+            if list_type == ListType.SERIES:
+                season = SeriesEpisodesPerSeason(series_id=element.id,
+                                                 season=season_data["season_number"],
+                                                 episodes=season_data["episode_count"])
+            elif list_type == ListType.ANIME:
+                season = AnimeEpisodesPerSeason(anime_id=element.id,
+                                                season=season_data["season_number"],
+                                                episodes=season_data["episode_count"])
+            db.session.add(season)
+        db.session.commit()
+
+    elif list_type == ListType.BOOK:
+        title = element_data["volumeInfo"]["title"]
+        authors = element_data["volumeInfo"]["authors"][0]
+        published_date = element_data["volumeInfo"]["publishedDate"]
         try:
-            genres_data.append(element_data["genres"][i]["name"])
+            published_date = published_date[0:4]
         except:
             pass
 
-    networks_data = []
-    for i in range(len(element_data["networks"])):
-        try:
-            networks_data.append(element_data["networks"][i]["name"])
-        except:
-            pass
+        def clean_html(raw_html):
+            cleaner = re.compile('<.*?>')
+            cleantext = re.sub(cleaner, '', raw_html)
+            return cleantext
 
-    # Add the element into the table
-    if element_type == ListType.SERIES:
-        element = Series(name=name,
-                         original_name=original_name,
-                         image_cover=element_cover_id,
-                         first_air_date=first_air_date,
-                         last_air_date=last_air_date,
-                         homepage=homepage,
-                         in_production=in_production,
-                         created_by=created_by,
-                         total_seasons=total_seasons,
-                         total_episodes=total_episodes,
-                         episode_duration=episode_duration,
-                         origin_country=origin_country,
-                         status=status,
-                         vote_average=vote_average,
-                         vote_count=vote_count,
-                         synopsis=synopsis,
-                         popularity=popularity,
-                         themoviedb_id=themoviedb_id,
-                         last_update=datetime.utcnow())
-    elif element_type == ListType.ANIME:
-        element = Anime(name=name,
-                        original_name=original_name,
-                        image_cover=element_cover_id,
-                        first_air_date=first_air_date,
-                        last_air_date=last_air_date,
-                        homepage=homepage,
-                        in_production=in_production,
-                        created_by=created_by,
-                        total_seasons=total_seasons,
-                        total_episodes=total_episodes,
-                        episode_duration=episode_duration,
-                        origin_country=origin_country,
-                        status=status,
-                        vote_average=vote_average,
-                        vote_count=vote_count,
-                        synopsis=synopsis,
-                        popularity=popularity,
-                        themoviedb_id=themoviedb_id,
-                        last_update=datetime.utcnow())
+        description = clean_html(element_data["volumeInfo"]["description"])
+        page_count = element_data["volumeInfo"]["pageCount"]
+        categories = element_data["volumeInfo"]["categories"][0]
+        google_id = element_data["id"]
 
-    db.session.add(element)
-    db.session.commit()
+        if "General" in categories:
+            new_categories = categories.replace("/ General", "")
+            categories = new_categories
 
-    # Add genres
-    for genre_data in genres_data:
-        if element_type == ListType.SERIES:
-            genre = SeriesGenre(series_id=element.id,
-                                genre=genre_data)
-        elif element_type == ListType.ANIME:
-            genre = AnimeGenre(anime_id=element.id,
-                               genre=genre_data)
-        db.session.add(genre)
+        # Add the element into the table
+        element = Book(title=title,
+                       authors=authors,
+                       image_cover=element_cover_id,
+                       published_date=published_date,
+                       description=description,
+                       page_count=page_count,
+                       categories=categories,
+                       google_id=google_id)
 
-    # Add the different networks for each serie
-    for network_data in networks_data:
-        if element_type == ListType.SERIES:
-            networks = SeriesNetwork(series_id=element.id,
-                                     network=network_data)
-        elif element_type == ListType.ANIME:
-            networks = AnimeNetwork(anime_id=element.id,
-                                    network=network_data)
-        db.session.add(networks)
+        db.session.add(element)
+        db.session.commit()
 
-    # Add number of episodes for each season
-    for season_data in seasons_data:
-        if element_type == ListType.SERIES:
-            season = SeriesEpisodesPerSeason(series_id=element.id,
-                                             season=season_data["season_number"],
-                                             episodes=season_data["episode_count"])
-        elif element_type == ListType.ANIME:
-            season = AnimeEpisodesPerSeason(anime_id=element.id,
-                                            season=season_data["season_number"],
-                                            episodes=season_data["episode_count"])
-        db.session.add(season)
-
-    db.session.commit()
     return element.id
 
 
-def add_book_in_base(book_data, cover_id):
-    book = Book.query.filter_by(google_id=book_data["id"]).first()
-
-    if book is not None:
-        return book.id
-
-    title = book_data["volumeInfo"]["title"]
-    authors = book_data["volumeInfo"]["authors"][0]
-    published_date = book_data["volumeInfo"]["publishedDate"]
-    try:
-        published_date = published_date[0:4]
-    except:
-        pass
-    description = book_data["volumeInfo"]["description"]
-    try:
-        description = description[0:120]
-    except:
-        pass
-    page_count = book_data["volumeInfo"]["pageCount"]
-    categories = book_data["volumeInfo"]["categories"][0]
-    google_id = book_data["id"]
-
-    # Add the element into the table
-    add_book = Book(title=title,
-                    authors=authors,
-                    image_cover=cover_id,
-                    published_date=published_date,
-                    description=description,
-                    page_count=page_count,
-                    categories=categories,
-                    google_id=google_id)
-
-    db.session.add(add_book)
-    db.session.commit()
-    return add_book.id
-
-
-def add_element_to_user(element_id, user_id, element_type):
-    if element_type == ListType.SERIES:
+def add_element_to_user(element_id, user_id, list_type):
+    if list_type == ListType.SERIES:
         user_list = SeriesList(user_id=user_id,
                                series_id=element_id,
                                current_season=1,
@@ -2185,8 +2474,7 @@ def add_element_to_user(element_id, user_id, element_type):
         db.session.add(user_list)
         db.session.add(data)
         db.session.commit()
-
-    elif element_type == ListType.ANIME:
+    elif list_type == ListType.ANIME:
         user_list = AnimeList(user_id=user_id,
                               anime_id=element_id,
                               current_season=1,
@@ -2203,8 +2491,7 @@ def add_element_to_user(element_id, user_id, element_type):
         db.session.add(user_list)
         db.session.add(data)
         db.session.commit()
-
-    elif element_type == ListType.BOOK:
+    elif list_type == ListType.BOOK:
         user_list = BookList(user_id=user_id,
                              book_id=element_id,
                              commentary= None,
@@ -2219,113 +2506,131 @@ def add_element_to_user(element_id, user_id, element_type):
 def get_list_data(list, list_type):
     all_list_data = []
     for category in list:
-        category_series_data = []
+        category_element_data = []
         for element in category:
             current_element = {}
-            # Cover of the element and its name
+            # Cover, name, genre and network of the element
             if list_type == ListType.SERIES:
                 element_data = Series.query.filter_by(id=element.series_id).first()
                 cover_url = url_for('static', filename="series_covers/{}".format(element_data.image_cover))
+                element_data_genres = SeriesGenre.query.filter_by(series_id=element.series_id).all()
+                element_data_networks = SeriesNetwork.query.filter_by(series_id=element.series_id).all()
             elif list_type == ListType.ANIME:
                 element_data = Anime.query.filter_by(id=element.anime_id).first()
                 cover_url = url_for('static', filename="anime_covers/{}".format(element_data.image_cover))
+                element_data_genres = AnimeGenre.query.filter_by(anime_id=element.anime_id).all()
+                element_data_networks = AnimeNetwork.query.filter_by(anime_id=element.anime_id).all()
+            elif list_type == ListType.BOOK:
+                element_data = Book.query.filter_by(id=element.book_id).first()
+                cover_url = url_for('static', filename="books_covers/{}".format(element_data.image_cover))
 
             current_element["cover_url"] = cover_url
 
-            # Element meta data
-            current_element["name"] = element_data.name
-            current_element["original_name"] = element_data.original_name
-            current_element["id"] = element_data.id
-            current_element["first_air_date"] = element_data.first_air_date
-            current_element["last_air_date"] = element_data.last_air_date
-            current_element["homepage"] = element_data.homepage
-            current_element["in_production"] = element_data.in_production
-            current_element["created_by"] = element_data.created_by
-            current_element["episode_duration"] = element_data.episode_duration
-            current_element["total_seasons"] = element_data.total_seasons
-            current_element["total_episodes"] = element_data.total_episodes
-            current_element["origin_country"] = element_data.origin_country
-            current_element["status"] = element_data.status
-            current_element["synopsis"] = element_data.synopsis
+            if list_type == ListType.SERIES or list_type == ListType.ANIME:
+                # Element meta data
+                current_element["id"] = element_data.id
+                current_element["name"] = element_data.name
+                current_element["original_name"] = element_data.original_name
 
-            # Can update
-            time_delta = datetime.utcnow() - element_data.last_update
-            if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
-                current_element["can_update"] = True
-            else:
-                current_element["can_update"] = False
+                tmp = []
+                for i in range(0, len(element_data_genres)):
+                    tmp.append(element_data_genres[i].genre)
+                current_element["genre"] = ', '.join(tmp)
 
-            # Number of season and the number of ep of each season
-            if list_type == ListType.SERIES:
-                episodesperseason = SeriesEpisodesPerSeason.query.filter_by(series_id=element_data.id).order_by(SeriesEpisodesPerSeason.season.asc()).all()
-            elif list_type == ListType.ANIME:
-                episodesperseason = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_data.id).order_by(AnimeEpisodesPerSeason.season.asc()).all()
-            tmp = []
-            for season in episodesperseason:
-                tmp.append(season.episodes)
-            current_element["season_data"] = tmp
+                tmp_fair_date = element_data.first_air_date.split('-')
+                tmp_fair_date_2 = [tmp_fair_date[2], tmp_fair_date[1], tmp_fair_date[0]]
+                fair_date = '-'.join(tmp_fair_date_2)
+                current_element["first_air_date"] = fair_date
 
-            current_element["current_season"] = element.current_season
-            current_element["last_episode_watched"] = element.last_episode_watched
+                tmp_lair_date = element_data.last_air_date.split('-')
+                tmp_lair_date_2 = [tmp_lair_date[2], tmp_lair_date[1], tmp_lair_date[0]]
+                lair_date = '-'.join(tmp_lair_date_2)
+                current_element["last_air_date"] = lair_date
 
-            category_series_data.append(current_element)
-        category_series_data = sorted(category_series_data, key=lambda i: (i['name']))
-        all_list_data.append(category_series_data)
+                current_element["homepage"] = element_data.homepage
+                current_element["in_production"] = element_data.in_production
+
+                tmp = []
+                for i in range(0, len(element_data_networks)):
+                    tmp.append(element_data_networks[i].network)
+                current_element["network"] = ', '.join(tmp)
+
+                current_element["created_by"] = element_data.created_by
+                current_element["episode_duration"] = element_data.episode_duration
+                current_element["total_seasons"] = element_data.total_seasons
+                current_element["total_episodes"] = element_data.total_episodes
+                current_element["origin_country"] = element_data.origin_country
+                current_element["status"] = element_data.status
+                current_element["synopsis"] = element_data.synopsis
+                current_element["score"] = element.score
+
+                # Can update
+                time_delta = datetime.utcnow() - element_data.last_update
+                if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
+                    current_element["can_update"] = True
+                else:
+                    current_element["can_update"] = False
+
+                # Number of season and the number of ep of each season
+                if list_type == ListType.SERIES:
+                    episodesperseason = SeriesEpisodesPerSeason.query.filter_by(series_id=element_data.id).order_by(SeriesEpisodesPerSeason.season.asc()).all()
+                elif list_type == ListType.ANIME:
+                    episodesperseason = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_data.id).order_by(AnimeEpisodesPerSeason.season.asc()).all()
+                tmp = []
+                for season in episodesperseason:
+                    tmp.append(season.episodes)
+                current_element["season_data"] = tmp
+
+                current_element["current_season"] = element.current_season
+                current_element["last_episode_watched"] = element.last_episode_watched
+                category_element_data.append(current_element)
+            elif list_type == ListType.BOOK:
+                # Element meta data
+                current_element["title"] = element_data.title
+                current_element["authors"] = element_data.authors
+                current_element["id"] = element_data.id
+                current_element["published_date"] = element_data.published_date
+                current_element["description"] = element_data.description
+                current_element["page_count"] = element_data.page_count
+                current_element["categories"] = element_data.categories
+                current_element["score"] = element.score
+                category_element_data.append(current_element)
+
+        if list_type == ListType.SERIES or list_type == ListType.ANIME:
+            category_element_data = sorted(category_element_data, key=lambda i: (i['name']))
+        elif list_type == ListType.BOOK:
+            category_element_data = sorted(category_element_data, key=lambda i: (i['title']))
+        all_list_data.append(category_element_data)
+
     return all_list_data
 
 
-def get_booklist_data(list):
-    all_list_data = []
-    for category in list:
-        category_books_data = []
-        for element in category:
-            current_element = {}
-            # Cover of the element and its name
-            element_data = Book.query.filter_by(id=element.book_id).first()
-            cover_url = url_for('static', filename="books_covers/{}".format(element_data.image_cover))
-
-            current_element["cover_url"] = cover_url
-
-            published_date = db.Column(db.String(150), nullable=False)
-            description = db.Column(db.String(5000), nullable=False)
-            page_count = db.Column(db.Integer, nullable=False)
-            categories = db.Column(db.String(150), nullable=False)
-
-            # Element meta data
-            current_element["title"] = element_data.title
-            current_element["authors"] = element_data.authors
-            current_element["id"] = element_data.id
-            current_element["published_date"] = element_data.published_date
-            current_element["description"] = element_data.description
-            current_element["page_count"] = element_data.page_count
-            current_element["categories"] = element_data.categories
-
-            category_books_data.append(current_element)
-        category_books_data = sorted(category_books_data, key=lambda i: (i['title']))
-        all_list_data.append(category_books_data)
-    return all_list_data
-
-
-def get_list_count(list_type):
+def get_mean_score(list_type):
     if list_type is ListType.SERIES:
-        watching    = SeriesList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').count()
-        completed   = SeriesList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').count()
-        onhold      = SeriesList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').count()
-        random      = SeriesList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').count()
-        dropped     = SeriesList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').count()
-        plantowatch = SeriesList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').count()
-    elif list_type is ListType.ANIME:
-        watching    = AnimeList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').count()
-        completed   = AnimeList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').count()
-        onhold      = AnimeList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').count()
-        random      = AnimeList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').count()
-        dropped     = AnimeList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').count()
-        plantowatch = AnimeList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').count()
-    else:
-        pass
+        all_scores  = SeriesList.query.filter_by(user_id=current_user.get_id()).all()
+    if list_type is ListType.ANIME:
+         all_scores = AnimeList.query.filter_by(user_id=current_user.get_id()).all()
+    if list_type is ListType.BOOK:
+        all_scores  = BookList.query.filter_by(user_id=current_user.get_id()).all()
 
-    statistics = [watching, completed, onhold, random, dropped, plantowatch]
-    return statistics
+    # If no element in the list mean score = 0
+    if len(all_scores) == 0:
+        mean_score = 0.00
+    else:
+        no_score = 0
+        score = 0
+        for i in range(0, len(all_scores)):
+            tmp = all_scores[i].score
+            if tmp is None:
+                no_score += 1
+            else:
+                score += float(all_scores[i].score)
+        if len(all_scores) == no_score:
+            mean_score = 0.00
+        else:
+            mean_score = round(score/(len(all_scores)-no_score), 2)
+
+    return mean_score
 
 
 def get_total_time_spent(user_id, list_type):
@@ -2333,160 +2638,53 @@ def get_total_time_spent(user_id, list_type):
         list = SeriesList.query.filter(SeriesList.status != "PLAN_TO_WATCH").filter_by(user_id=user_id).all()
     elif list_type == ListType.ANIME:
         list = AnimeList.query.filter(AnimeList.status != "PLAN_TO_WATCH").filter_by(user_id=user_id).all()
+    elif list_type == ListType.BOOK:
+        list = BookList.query.filter(BookList.status != "PLAN_TO_READ").filter_by(user_id=user_id).all()
 
-    episodes_counter = 0
-    time_spent_min = 0
-
-    for element in list:
-        if list_type == ListType.SERIES:
-            episode_duration = Series.query.filter_by(id=element.series_id).first().episode_duration
-        elif list_type == ListType.ANIME:
-            episode_duration = Anime.query.filter_by(id=element.anime_id).first().episode_duration
-
-        if episode_duration is None:
-            continue
-
-        current_season = element.current_season
-        current_ep = element.last_episode_watched
-
-        for i in range(1, current_season):
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
+        episodes_counter = 0
+        time_spent_min = 0
+        for element in list:
             if list_type == ListType.SERIES:
-                ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element.series_id, season=i).first().episodes
+                episode_duration = Series.query.filter_by(id=element.series_id).first().episode_duration
             elif list_type == ListType.ANIME:
-                ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element.anime_id, season=i).first().episodes
-            episodes_counter += ep
-            time_spent_min += ep*episode_duration
+                episode_duration = Anime.query.filter_by(id=element.anime_id).first().episode_duration
 
-        episodes_counter += current_ep
-        time_spent_min += current_ep*episode_duration
+            if episode_duration is None:
+                continue
 
-    time_spent_hours = round(time_spent_min/60, 2)
-    time_spent_days = round(time_spent_min/(60*24), 1)
+            current_season = element.current_season
+            current_ep = element.last_episode_watched
+            for i in range(1, current_season):
+                if list_type == ListType.SERIES:
+                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element.series_id, season=i).first().episodes
+                elif list_type == ListType.ANIME:
+                    ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element.anime_id, season=i).first().episodes
+                episodes_counter += ep
+                time_spent_min += ep*episode_duration
 
-    return [episodes_counter, time_spent_hours, time_spent_days]
+            episodes_counter += current_ep
+            time_spent_min += current_ep*episode_duration
 
+        time_spent_hours = int((time_spent_min/60))
+        time_spent_days = round(time_spent_min/(60*24), 1)
+        return [episodes_counter, time_spent_hours, time_spent_days]
 
-def save_profile_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
-    try:
-        i = Image.open(form_picture)
-    except:
-        return "default.jpg"
-    i = i.resize((300, 300), Image.ANTIALIAS)
-    i.save(picture_path, quality=90)
-    return picture_fn
+    elif list_type == ListType.BOOK:
+        total_pages = 0
+        for book in list:
+            pages_count = Book.query.filter_by(id=book.book_id).first().page_count
+            total_pages += pages_count
 
-
-def send_reset_email(user):
-    token = user.get_reset_token()
-    msg = Message(subject='Password Reset Request',
-                  sender=app.config['MAIL_USERNAME'],
-                  recipients=[user.email],
-                  bcc=[app.config['MAIL_USERNAME']],
-                  reply_to=app.config['MAIL_USERNAME'])
-
-    if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\emails\\password_reset.html")
-    else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/emails/password_reset.html")
-
-    email_template = open(path, 'r').read().replace("{1}", user.username)
-    email_template = email_template.replace("{2}", url_for('reset_token', token=token, _external=True))
-
-    msg.html = email_template
-
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised when sending reset email to user with the ID {} : {}'.format(user.id, e))
-        return False
+        time_spent_hours = int(((total_pages*2)/60))
+        time_spent_days = round((total_pages*2)/(60*24), 1)
+        return [total_pages, time_spent_hours, time_spent_days]
 
 
-def send_register_email(user):
-    token = user.get_register_token()
-    msg = Message(subject='MyLists Register Request',
-                  sender=app.config['MAIL_USERNAME'],
-                  recipients=[user.email],
-                  bcc=[app.config['MAIL_USERNAME']],
-                  reply_to=app.config['MAIL_USERNAME'])
-
-    if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\emails\\register.html")
-    else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/emails/register.html")
-
-    email_template = open(path, 'r').read().replace("{1}", user.username)
-    email_template = email_template.replace("{2}", url_for('register_token', token=token, _external=True))
-
-    msg.html = email_template
-
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised when sending register email to user with the ID {} : {}'.format(user.id, e))
-        return False
-
-
-def send_email_update_email(user):
-    token = user.get_email_update_token()
-    msg = Message(subject='MySerieList Email Update Request',
-                  sender=app.config['MAIL_USERNAME'],
-                  recipients=[user.email],
-                  bcc=[app.config['MAIL_USERNAME']],
-                  reply_to=app.config['MAIL_USERNAME'])
-
-    if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\emails\\email_update.html")
-    else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/emails/email_update.html")
-
-    email_template = open(path, 'r').read().replace("{1}", user.username)
-    email_template = email_template.replace("{2}", url_for('email_update_token', token=token, _external=True))
-
-    msg.html = email_template
-
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'.format(user.id, e))
-        return False
-
-
-def add_friend(friend_username):
-    friend_to_add = User.query.filter_by(username=friend_username).first()
-    if friend_to_add is None or friend_to_add.id == 1:
-        app.logger.info('[{}] Attempt of adding user {} as friend'.format(current_user.get_id(), friend_username))
-        return flash('Sorry, no user with this username', 'info')
-
-    else:
-        friends = Friend.query.filter_by(user_id=current_user.get_id()).all()
-
-        for friend in friends:
-            if friend_to_add.id == friend.friend_id:
-                return flash('Username already in your friend list', 'info')
-
-        add_user = Friend(user_id=current_user.get_id(), friend_id=friend_to_add.id, status="request")
-        db.session.add(add_user)
-        db.session.commit()
-
-        add_user_2 = Friend(user_id=friend_to_add.id, friend_id=current_user.get_id(), status="pending")
-        db.session.add(add_user_2)
-        db.session.commit()
-
-        app.logger.info('[{}] Friend request sent to user with ID {}'.format(current_user.get_id(), friend_to_add.id))
-        flash("Your friend request has been sent.", 'success')
-
-
-def refresh_element_data(element_id, element_type):
-    if element_type == ListType.SERIES:
+def refresh_element_data(element_id, list_type):
+    if list_type == ListType.SERIES:
         element = Series.query.filter_by(id=element_id).first()
-    elif element_type == ListType.ANIME:
+    elif list_type == ListType.ANIME:
         element = Anime.query.filter_by(id=element_id).first()
 
     element_data = get_element_data_from_api(element.themoviedb_id)
@@ -2509,12 +2707,12 @@ def refresh_element_data(element_id, element_type):
     popularity      = element_data["popularity"]
     element_poster  = element_data["poster_path"]
 
-    if element_type == ListType.SERIES:
+    if list_type == ListType.SERIES:
         if platform.system() == "Windows":
             local_covers_path = os.path.join(app.root_path, "static\series_covers\\")
         else:  # Linux & macOS
             local_covers_path = os.path.join(app.root_path, "static/series_covers/")
-    elif element_type == ListType.ANIME:
+    elif list_type == ListType.ANIME:
         if platform.system() == "Windows":
             local_covers_path = os.path.join(app.root_path, "static\\anime_covers\\")
         else:  # Linux & macOS
@@ -2604,7 +2802,7 @@ def refresh_element_data(element_id, element_type):
 
     # Update the number of seasons and episodes
     for season_data in seasons_data:
-        if element_type == ListType.SERIES:
+        if list_type == ListType.SERIES:
             season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=season_data["season_number"]).first()
             if season is None:
                 season = SeriesEpisodesPerSeason(series_id=element.id,
@@ -2613,7 +2811,7 @@ def refresh_element_data(element_id, element_type):
                 db.session.add(season)
             else:
                 season.episodes = season_data["episode_count"]
-        elif element_type == ListType.ANIME:
+        elif list_type == ListType.ANIME:
             season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id,
                                                             season=season_data["season_number"]).first()
             if season is None:
@@ -2627,6 +2825,123 @@ def refresh_element_data(element_id, element_type):
     # TODO : refresh Networks and Genres
     db.session.commit()
     app.logger.info("[{}] Refreshed the element with the ID {}".format(current_user.get_id(), element_id))
+
+
+def save_profile_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+    try:
+        i = Image.open(form_picture)
+    except:
+        return "default.jpg"
+    i = i.resize((300, 300), Image.ANTIALIAS)
+    i.save(picture_path, quality=90)
+    return picture_fn
+
+
+def add_friend(friend_username):
+    friend_to_add = User.query.filter_by(username=friend_username).first()
+    if friend_to_add is None or friend_to_add.id == 1:
+        app.logger.info('[{}] Attempt of adding user {} as friend'.format(current_user.get_id(), friend_username))
+        return flash('Sorry, no user with this username', 'info')
+
+    else:
+        friends = Friend.query.filter_by(user_id=current_user.get_id()).all()
+
+        for friend in friends:
+            if friend_to_add.id == friend.friend_id:
+                return flash('Username already in your friend list', 'info')
+
+        add_user = Friend(user_id=current_user.get_id(), friend_id=friend_to_add.id, status="request")
+        db.session.add(add_user)
+        db.session.commit()
+
+        add_user_2 = Friend(user_id=friend_to_add.id, friend_id=current_user.get_id(), status="pending")
+        db.session.add(add_user_2)
+        db.session.commit()
+
+        app.logger.info('[{}] Friend request sent to user with ID {}'.format(current_user.get_id(), friend_to_add.id))
+        flash("Your friend request has been sent.", 'success')
+
+
+def send_reset_email(user):
+    token = user.get_reset_token()
+    msg = Message(subject='Password Reset Request',
+                  sender=app.config['MAIL_USERNAME'],
+                  recipients=[user.email],
+                  bcc=[app.config['MAIL_USERNAME']],
+                  reply_to=app.config['MAIL_USERNAME'])
+
+    if platform.system() == "Windows":
+        path = os.path.join(app.root_path, "static\emails\\password_reset.html")
+    else:  # Linux & macOS
+        path = os.path.join(app.root_path, "static/emails/password_reset.html")
+
+    email_template = open(path, 'r').read().replace("{1}", user.username)
+    email_template = email_template.replace("{2}", url_for('reset_token', token=token, _external=True))
+
+    msg.html = email_template
+
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        app.logger.error('[SYSTEM] Exception raised when sending reset email to user with the ID {} : {}'.format(user.id, e))
+        return False
+
+
+def send_register_email(user):
+    token = user.get_register_token()
+    msg = Message(subject='MyLists Register Request',
+                  sender=app.config['MAIL_USERNAME'],
+                  recipients=[user.email],
+                  bcc=[app.config['MAIL_USERNAME']],
+                  reply_to=app.config['MAIL_USERNAME'])
+
+    if platform.system() == "Windows":
+        path = os.path.join(app.root_path, "static\emails\\register.html")
+    else:  # Linux & macOS
+        path = os.path.join(app.root_path, "static/emails/register.html")
+
+    email_template = open(path, 'r').read().replace("{1}", user.username)
+    email_template = email_template.replace("{2}", url_for('register_token', token=token, _external=True))
+
+    msg.html = email_template
+
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        app.logger.error('[SYSTEM] Exception raised when sending register email to user with the ID {} : {}'.format(user.id, e))
+        return False
+
+
+def send_email_update_email(user):
+    token = user.get_email_update_token()
+    msg = Message(subject='MySerieList Email Update Request',
+                  sender=app.config['MAIL_USERNAME'],
+                  recipients=[user.email],
+                  bcc=[app.config['MAIL_USERNAME']],
+                  reply_to=app.config['MAIL_USERNAME'])
+
+    if platform.system() == "Windows":
+        path = os.path.join(app.root_path, "static\emails\\email_update.html")
+    else:  # Linux & macOS
+        path = os.path.join(app.root_path, "static/emails/email_update.html")
+
+    email_template = open(path, 'r').read().replace("{1}", user.username)
+    email_template = email_template.replace("{2}", url_for('email_update_token', token=token, _external=True))
+
+    msg.html = email_template
+
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        app.logger.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'.format(user.id, e))
+        return False
 
 
 ###################################################### CRAWL TEST ######################################################
@@ -2649,7 +2964,7 @@ def crawl_tmdb():
             continue
 
         if series_data["poster_path"] is not None:
-            cover_id = save_themoviedb_cover(series_data["poster_path"], ListType.SERIES)
+            cover_id = save_api_cover(series_data["poster_path"], ListType.SERIES)
             add_element_in_base(series_data, cover_id, ListType.SERIES)
         else:
             add_element_in_base(series_data, "default.jpg", ListType.SERIES)
@@ -2657,8 +2972,365 @@ def crawl_tmdb():
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
+def test_stats_series():
+    get_scores = SeriesList.query.filter_by(user_id=current_user.get_id()).all()
+
+    ################################## Rating vs Count ###################################
+    tier_1 = 0
+    total_time_1 = 0
+    tier_2 = 0
+    total_time_2 = 0
+    tier_3 = 0
+    total_time_3 = 0
+    tier_4 = 0
+    total_time_4 = 0
+    tier_5 = 0
+    total_time_5 = 0
+    tier_6 = 0
+    total_time_6 = 0
+    tier_7 = 0
+    total_time_7 = 0
+    tier_8 = 0
+    total_time_8 = 0
+    tier_9 = 0
+    total_time_9 = 0
+    tier_10 = 0
+    total_time_10 = 0
+    for i in range(0, len(get_scores)):
+        if get_scores[i].score is None:
+            pass
+        else:
+            if 0 <= get_scores[i].score < 1:
+                tier_1 += 1
+
+                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
+
+                episodes_counter = 0
+                time_spent_min = 0
+
+                current_season = get_scores[i].current_season
+                current_ep = get_scores[i].last_episode_watched
+
+                for j in range(1, current_season):
+                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
+                    episodes_counter += ep
+                    time_spent_min += ep * duration
+
+                time_spent_hours = divmod(time_spent_min, 60)
+                total_time_1 += time_spent_hours[0]
+
+            elif 1 <= get_scores[i].score < 2:
+                tier_2 += 1
+
+                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
+
+                episodes_counter = 0
+                time_spent_min = 0
+
+                current_season = get_scores[i].current_season
+                current_ep = get_scores[i].last_episode_watched
+
+                for j in range(1, current_season):
+                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
+                    episodes_counter += ep
+                    time_spent_min += ep * duration
+
+                time_spent_hours = divmod(time_spent_min, 60)
+                total_time_2 += time_spent_hours[0]
+
+            elif 2 <= get_scores[i].score < 3:
+                tier_3 += 1
+
+                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
+
+                episodes_counter = 0
+                time_spent_min = 0
+
+                current_season = get_scores[i].current_season
+                current_ep = get_scores[i].last_episode_watched
+
+                for j in range(1, current_season):
+                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
+                    episodes_counter += ep
+                    time_spent_min += ep * duration
+
+                time_spent_hours = divmod(time_spent_min, 60)
+                total_time_3 += time_spent_hours[0]
+
+            elif 3 <= get_scores[i].score < 4:
+                tier_4 += 1
+
+                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
+
+                episodes_counter = 0
+                time_spent_min = 0
+
+                current_season = get_scores[i].current_season
+                current_ep = get_scores[i].last_episode_watched
+
+                for j in range(1, current_season):
+                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
+                    episodes_counter += ep
+                    time_spent_min += ep * duration
+
+                time_spent_hours = divmod(time_spent_min, 60)
+                total_time_4 += time_spent_hours[0]
+
+            elif 4 <= get_scores[i].score < 5:
+                tier_5 += 1
+
+                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
+
+                episodes_counter = 0
+                time_spent_min = 0
+
+                current_season = get_scores[i].current_season
+                current_ep = get_scores[i].last_episode_watched
+
+                for j in range(1, current_season):
+                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
+                    episodes_counter += ep
+                    time_spent_min += ep * duration
+
+                time_spent_hours = divmod(time_spent_min, 60)
+                total_time_5 += time_spent_hours[0]
+
+            elif 5 <= get_scores[i].score < 6:
+                tier_6 += 1
+
+                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
+
+                episodes_counter = 0
+                time_spent_min = 0
+
+                current_season = get_scores[i].current_season
+                current_ep = get_scores[i].last_episode_watched
+
+                for j in range(1, current_season):
+                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
+                    episodes_counter += ep
+                    time_spent_min += ep * duration
+
+                time_spent_hours = divmod(time_spent_min, 60)
+                total_time_6 += time_spent_hours[0]
+
+            elif 6 <= get_scores[i].score < 7:
+                tier_7 += 1
+
+                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
+
+                episodes_counter = 0
+                time_spent_min = 0
+
+                current_season = get_scores[i].current_season
+                current_ep = get_scores[i].last_episode_watched
+
+                for j in range(1, current_season):
+                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
+                    episodes_counter += ep
+                    time_spent_min += ep * duration
+
+                time_spent_hours = divmod(time_spent_min, 60)
+                total_time_7 += time_spent_hours[0]
+
+            elif 7 <= get_scores[i].score < 8:
+                tier_8 += 1
+
+                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
+
+                episodes_counter = 0
+                time_spent_min = 0
+
+                current_season = get_scores[i].current_season
+                current_ep = get_scores[i].last_episode_watched
+
+                for j in range(1, current_season):
+                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
+                    episodes_counter += ep
+                    time_spent_min += ep * duration
+
+                time_spent_hours = divmod(time_spent_min, 60)
+                total_time_8 += time_spent_hours[0]
+
+            elif 8 <= get_scores[i].score < 9:
+                tier_9 += 1
+
+                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
+
+                episodes_counter = 0
+                time_spent_min = 0
+
+                current_season = get_scores[i].current_season
+                current_ep = get_scores[i].last_episode_watched
+
+                for j in range(1, current_season):
+                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
+                    episodes_counter += ep
+                    time_spent_min += ep * duration
+
+                time_spent_hours = divmod(time_spent_min, 60)
+                total_time_9 += time_spent_hours[0]
+
+            elif 9 <= get_scores[i].score <= 10:
+                tier_10 += 1
+
+                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
+
+                episodes_counter = 0
+                time_spent_min = 0
+
+                current_season = get_scores[i].current_season
+                current_ep = get_scores[i].last_episode_watched
+
+                for j in range(1, current_season):
+                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
+                    episodes_counter += ep
+                    time_spent_min += ep * duration
+
+                time_spent_hours = divmod(time_spent_min, 60)
+                total_time_10 += time_spent_hours[0]
+
+    x = ['0-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8', '8-9', '9-10']
+    y = [tier_1, tier_2, tier_3, tier_4, tier_5, tier_6, tier_7, tier_8, tier_9, tier_10]
+
+    total_rated = tier_1+tier_2+tier_3+tier_4+tier_5+tier_6+tier_7+tier_8+tier_9+tier_10
+    total_series = len(get_scores)
+    try:
+        pourcentage_series_rated = round((total_rated/total_series)*100, 2)
+    except:
+        pourcentage_series_rated = 0
+
+    ################################ Rating vs time spent ##########################################
+
+    y_2 = [total_time_1, total_time_2, total_time_3, total_time_4, total_time_5,
+           total_time_6, total_time_7, total_time_8, total_time_9, total_time_10]
+
+    total_time = get_total_time_spent(int(current_user.get_id()), ListType.SERIES)
+
+    ################################ Rating vs Seasons count ##########################################
+
+    list_all_seasons = []
+    for i in range(0, len(get_scores)):
+        duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
+        score = get_scores[i].score
+        ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id).all()
+
+        season_per_series = []
+        for j in range(0, len(ep)):
+            season_per_series.append(ep[j].episodes)
 
 
+        list_all_seasons.append([len(season_per_series), score])
+
+    x_2 = ["1-2", "3-4", "5-6", "7-8", "9-10", "11+"]
+
+    tmp_1 = 0
+    tmp_mean_score_1 = 0
+    tmp_2 = 0
+    tmp_mean_score_2 = 0
+    tmp_3 = 0
+    tmp_mean_score_3 = 0
+    tmp_4 = 0
+    tmp_mean_score_4 = 0
+    tmp_5 = 0
+    tmp_mean_score_5 = 0
+    tmp_6 = 0
+    tmp_mean_score_6 = 0
+    for k in range(0, len(list_all_seasons)):
+        if 1 <= list_all_seasons[k][0] <= 2:
+            tmp_1 += 1
+            if list_all_seasons[k][1] is None:
+                pass
+            else:
+                tmp_mean_score_1 += list_all_seasons[k][1]
+        elif 3 <= list_all_seasons[k][0] <= 4:
+            tmp_2 += 1
+            if list_all_seasons[k][1] is None:
+                pass
+            else:
+                tmp_mean_score_2 += list_all_seasons[k][1]
+        elif 5 <= list_all_seasons[k][0] <= 6:
+            tmp_3 += 1
+            if list_all_seasons[k][1] is None:
+                pass
+            else:
+                tmp_mean_score_3 += list_all_seasons[k][1]
+        elif 7 <= list_all_seasons[k][0] <= 8:
+            tmp_4 += 1
+            if list_all_seasons[k][1] is None:
+                pass
+            else:
+                tmp_mean_score_4 += list_all_seasons[k][1]
+        elif 9 <= list_all_seasons[k][0] <= 10:
+            tmp_5 += 1
+            if list_all_seasons[k][1] is None:
+                pass
+            else:
+                tmp_mean_score_5 += list_all_seasons[k][1]
+        elif list_all_seasons[k][0] > 10:
+            tmp_6 += 1
+            if list_all_seasons[k][1] is None:
+                pass
+            else:
+                tmp_mean_score_6 += list_all_seasons[k][1]
+
+    y_3 = [tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6]
+
+    try:
+        mean_1 = tmp_mean_score_1/tmp_1
+    except:
+        mean_1 = 0
+    try:
+        mean_2 = tmp_mean_score_2/tmp_2
+    except:
+        mean_2 = 0
+    try:
+        mean_3 = tmp_mean_score_3/tmp_3
+    except:
+        mean_3 = 0
+    try:
+        mean_4 = tmp_mean_score_4/tmp_4
+    except:
+        mean_4 = 0
+    try:
+        mean_5 = tmp_mean_score_5/tmp_5
+    except:
+        mean_5 = 0
+    try:
+        mean_6 = tmp_mean_score_6/tmp_6
+    except:
+        mean_6 = 0
+
+    y_4 = [mean_1, mean_2, mean_3, mean_4, mean_5, mean_6]
+
+    # import matplotlib.pyplot as plt
+    #
+    # fig, ax1 = plt.subplots()
+    #
+    # ax1.bar(x_2, y_3)
+    # ax2 = ax1.twinx()
+    # ax2.plot(x_2, y_4)
+    #
+    # fig.tight_layout()
+    # plt.show()
+
+    return [x, y]
 
 
-
+def add_achievements():
+    mypath = "D:\Bureau\MyLists_Misc\Achievements\Anime\JSON_Achievements\genre"
+    from os import listdir
+    from os.path import isfile, join
+    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+    for file in onlyfiles:
+        with open("{}/{}".format(mypath, file), encoding='UTF-8', errors='ignore') as json_file:
+            data = json.load(json_file)
+            for i in range(0, len(data["achievements"])):
+                achiev = AnimeAchievements(genre=str(data["requirement"]["genre"]),
+                                           threshold=str(data["achievements"][i]["threshold"]),
+                                           image_id=str(data["achievements"][i]["id"]),
+                                           level=str(data["achievements"][i]["level"]),
+                                           title=str(data["achievements"][i]["title"]),
+                                           description=str(data["achievements"][i]["desc"]))
+                db.session.add(achiev)
+                db.session.commit()

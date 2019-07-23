@@ -112,7 +112,7 @@ hr {
                 <td class="current_user"></td>
 
                 {% elif user["isprivate"] and not user["isfriend"] %}
-                <td><img src="{{ url_for("static", filename="profile_pics/anonymous.jpg") }}" alt="Anonymous" style="width: 30px; height: 30px;"></td>
+                <td><img src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}" alt="Anonymous" style="width: 30px; height: 30px;"></td>
                 <td><b>Anonymous</b></td>
                 <td>{{ user["watching"] }}</td>
                 <td>{{ user["completed"] }}</td>
@@ -207,7 +207,7 @@ hr {
                 <td class="current_user"></td>
 
                 {% elif user["isprivate"] and not user["isfriend"] %}
-                <td><img src="{{ url_for("static", filename="profile_pics/anonymous.jpg") }}" alt="Anonymous" style="width: 30px; height: 30px;"></td>
+                <td><img src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}" alt="Anonymous" style="width: 30px; height: 30px;"></td>
                 <td><b>Anonymous</b></td>
                 <td>{{ user["watching"] }}</td>
                 <td>{{ user["completed"] }}</td>

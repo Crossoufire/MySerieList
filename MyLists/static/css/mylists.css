@@ -1,6 +1,6 @@
 
 /* --- General CSS ------------------------------------------------------------------------------------ */
-
+@import url(https://fonts.googleapis.com/css?family=Play);
 
 .bg-dark {
     background-color: #2c3946 !important;
@@ -16,6 +16,7 @@ body {
   background: #131418;
   margin-top: 5rem;
   color: #e2e2e2;
+  font-family: Play;
 }
 
 main {

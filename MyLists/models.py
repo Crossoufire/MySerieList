@@ -127,6 +127,7 @@ class SeriesList(db.Model):
     current_season = db.Column(db.Integer, nullable=False)
     last_episode_watched = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
+    score = db.Column(db.Float)
 
 
 class SeriesEpisodesPerSeason(db.Model):
@@ -190,6 +191,7 @@ class AnimeList(db.Model):
     current_season = db.Column(db.Integer, nullable=False)
     last_episode_watched = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
+    score = db.Column(db.Float)
 
 
 class AnimeEpisodesPerSeason(db.Model):
@@ -203,6 +205,7 @@ class AnimeGenre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
+    genre_id = db.Column(db.Integer, nullable=False)
 
 
 class AnimeNetwork(db.Model):
@@ -218,6 +221,16 @@ class AnimeEpisodeTimestamp(db.Model):
     season = db.Column(db.Integer, nullable=False)
     episode = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
+
+
+class AnimeAchievements(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    genre = db.Column(db.String(100))
+    threshold = db.Column(db.String(100), nullable=False)
+    image_id = db.Column(db.String(100), nullable=False)
+    level = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(100), nullable=False)
 
 
 ######################################################## BOOKS #########################################################
@@ -242,3 +255,4 @@ class BookList(db.Model):
     commentary = db.Column(db.String(5000))
     read_year = db.Column(db.Integer)
     status = db.Column(db.Enum(Status_book), nullable=False)
+    score = db.Column(db.Float)

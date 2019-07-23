@@ -7,3 +7,5 @@ flask-wtf
 flask-admin
 Pillow
 requests
+regex
+numpy

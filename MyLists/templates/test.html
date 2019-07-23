@@ -201,3 +201,109 @@ $(document).ready(function(){
         .appendTo(ul);
     };
 });
+
+
+
+$(function() {
+    $.widget("custom.catcomplete", $.ui.autocomplete, {
+        _create: function() {
+            this._super();
+            this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
+        },
+        _renderMenu: function(ul, items) {
+            var that = this,
+            currentCategory = "";
+            $.each(items, function(index, item) {
+                if (item.category != currentCategory) {
+					ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+					currentCategory = item.category;
+				}
+                that._renderItemData(ul, item);
+				that._renderItem = function(ul, item) {
+			        return $("<li class='list-group'></li>")
+					.data("item.autocomplete", item)
+					.append(item.label)
+					.appendTo(ul);
+				};
+			});
+		}
+	});
+
+	$( "#autocomplete" ).catcomplete({
+		delay: 300,
+		source: function(request, response) {
+				$.getJSON("{{url_for('autocomplete_series')}}",{
+					q: request.term,
+				},
+					function(data) {
+						response(data.matching_results);
+					}
+				);
+		},
+		minLength: 1,
+        select: function(event, ui) {
+            $body = $("body");
+            $("#autocomplete").val(ui.item.value);
+            $("#series_id").val(ui.item.id);
+
+            $.ajax ({
+                type: "POST",
+                url: "/add_series",
+                contentType: "application/json",
+                data: JSON.stringify({series_id: ui.item.id}),
+                dataType: "json",
+                beforeSend: function() { $body.addClass("loading"); },
+                success: function(response) {
+                    window.location.replace('/myserieslist'); }
+            });
+        }
+	});
+});
+
+
+_renderItem: function(ul, item) {
+		var $li = $('<li>'),
+			$img = $('<img>');
+
+		$img.attr({
+		  src: item.label,
+		  alt: item.value
+		});
+
+		$li.attr('data-value', item.value);
+		$li.append('<a href="#">');
+		$li.find('a').append($img).append(item.value);
+
+		return $li.appendTo(ul);
+	}
+
+        function show_all_score() {
+    var show = document.getElementById('show_all');
+    var hide = document.getElementById('hide_all');
+
+    $('div[id^="footer_"]').hide();
+
+    if (show.className === "fas fa-eye text-light m-r-5") {
+        $('.d-none.tata').attr('class', 'card-footer text-muted text-center p-0');
+        show.className = "d-none";
+        hide.className = "fas fa-eye-slash text-light m-r-5";
+    } else {
+        $('.card-footer.text-muted.text-center.p-0').attr('class', 'd-none tata');
+        show.className = "fas fa-eye text-light m-r-5";
+        hide.className = "d-none";
+    }
+}
+
+
+                if(content.length > showChar) {
+            var c = content.substr(0, showChar);
+            var h = content.substr(showChar, content.length - showChar);
+            var html = c +
+            '<span class="moreellipses">' + ellipsestext + '</span>' +
+            '<span class="morecontent">' +
+                '<span>' + h + '</span>' +
+                '<a href="" class="morelink">' + moretext + '</a>' +
+            '</span>';
+            $(this).html(html);
+        }
+    });
