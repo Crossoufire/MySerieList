@@ -498,41 +498,41 @@ body.loading .modal_loading {
                         </div>
                         <div id="mod_{{ data['id'] }}" class="modal-body">
                             {% if outer_loop.index == 1 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Random</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Watch</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
                             {% elif outer_loop.index == 2 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Watching</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Random</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Watch</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
                             {% elif outer_loop.index == 3 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Watching</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Random</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Watch</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
                             {% elif outer_loop.index == 4 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Watching</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Watch</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
                             {% elif outer_loop.index == 5 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Watching</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Random</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Watch</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Plan to Watch', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
                             {% elif outer_loop.index == 6 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Watching</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Random</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Watching', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Random', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeAnimeCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
                             {% endif %}
                             {% if data['can_update'] %}
                             <a style="background-color: #4d0000;" data-dismiss="modal" class="list-group-item modded" onclick="refresh('{{ data['id'] }}')">Refresh metadata</a>
@@ -668,8 +668,6 @@ $(function() {
 </script>
 <!------------ Principal scripts --------------->
 <script type="text/javascript">
-
-
 function refreshAll() {
     $body = $("body");
     $.ajax ({
@@ -697,7 +695,7 @@ function refresh(anime_id) {
 }
 
 
-function changeAnimeCategory(anime_id, new_category, card_id, mod_id, seas_drop_id, ep_drop_id) {
+function changeAnimeCategory(anime_id, new_category, card_id, mod_id, seas_drop_id, ep_drop_id, seas_data) {
     if (new_category === 'Watching') {
         var completed = 'Completed';
         var on_hold = 'On Hold';
@@ -713,11 +711,11 @@ function changeAnimeCategory(anime_id, new_category, card_id, mod_id, seas_drop_
         $("#"+mod_id+ " a").filter(":contains('Plan to Watch')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Random</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Dropped</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Plan to Watch</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
         );
         $("#" + card_id).prependTo("#collapse_WATCHING");
         $('.modal').modal("hide");
@@ -738,26 +736,32 @@ function changeAnimeCategory(anime_id, new_category, card_id, mod_id, seas_drop_
         $("#"+mod_id+ " a").filter(":contains('Plan to Watch')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Watching</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Random</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Dropped</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Plan to Watch</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
         );
         $("#" + card_id).prependTo("#collapse_COMPLETED");
         $('.modal').modal("hide");
 
-        //var seasons_length = $('#'+seas_drop_id).children('option').length;
-        //console.log(seasons_length);
-        //var seasons_index = (seasons_length - 1);
-        //console.log(seasons_index);
-        //$('#'+seas_drop_id).prop('selectedIndex', seasons_index);
+        var season_data = JSON.parse("[" + seas_data + "]");
+        var episode_drop = document.getElementById(ep_drop_id);
 
-        //var episodes_length = $('#'+ep_drop_id).children('option').length;
-        //console.log(episodes_length);
-        //var episode_index = (episodes_length - 1);
-        //$('#'+ep_drop_id).prop('selectedIndex', episode_index);
-        //console.log(episode_index);
+        var seasons_length = $('#'+seas_drop_id).children('option').length;
+        console.log(seasons_length);
+        var seasons_index = (seasons_length - 1);
+        console.log(seasons_index);
+        $('#'+seas_drop_id).prop('selectedIndex', seasons_index);
+
+        episode_drop.length = 1;
+
+        for (i = 2; i <= season_data[0][seasons_index]; i++) {
+            let opt = document.createElement("option");
+            opt.text = "Episode " + i;
+            episode_drop.appendChild(opt);
+        }
+        $('#'+ep_drop_id).prop('selectedIndex', season_data[0][seasons_index]-1);
     }
 
     if (new_category === 'On Hold') {
@@ -775,11 +779,11 @@ function changeAnimeCategory(anime_id, new_category, card_id, mod_id, seas_drop_
         $("#"+mod_id+ " a").filter(":contains('Plan to Watch')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Watching</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Random</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Dropped</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Plan to Watch</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
         );
         $("#" + card_id).prependTo("#collapse_ON_HOLD");
         $('.modal').modal("hide");
@@ -800,11 +804,11 @@ function changeAnimeCategory(anime_id, new_category, card_id, mod_id, seas_drop_
         $("#"+mod_id+ " a").filter(":contains('Plan to Watch')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Watching</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Dropped</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Plan to Watch</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
         );
         $("#" + card_id).prependTo("#collapse_RANDOM");
         $('.modal').modal("hide");
@@ -825,11 +829,11 @@ function changeAnimeCategory(anime_id, new_category, card_id, mod_id, seas_drop_
         $("#"+mod_id+ " a").filter(":contains('Plan to Watch')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Watching</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Random</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Plan to Watch</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
         );
         $("#" + card_id).prependTo("#collapse_DROPPED");
         $('.modal').modal("hide");
@@ -850,11 +854,11 @@ function changeAnimeCategory(anime_id, new_category, card_id, mod_id, seas_drop_
         $("#"+mod_id+ " a").filter(":contains('Plan to Watch')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Watching</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Random</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Dropped</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + watching + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + random + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeAnimeCategory(\"" + anime_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>"
         );
         $("#" + card_id).prependTo("#collapse_PLAN_TO_WATCH");
         $('.modal').modal("hide");
@@ -928,6 +932,7 @@ function updateSeason(anime_id, value, seas_data, ep_drop_id) {
     var selected_season = value.selectedIndex;
     var episode_drop = document.getElementById(ep_drop_id);
     var season_data = JSON.parse("[" + seas_data + "]");
+    console.log(season_data);
 
     episode_drop.length = 1;
 

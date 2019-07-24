@@ -27,6 +27,7 @@ from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, 
 config.read('config.ini')
 try:
     themoviedb_api_key = config['TheMovieDB']['api_key']
+    google_book_api_key = config['GoogleBook']['api_key']
 except:
     print("Config file error. Exit.")
     sys.exit()
@@ -352,6 +353,19 @@ def account():
     book_stats = get_all_account_stats(ListType.BOOK)
 
     total_level = int(series_stats[3][0]) + int(anime_stats[3][0]) + int(book_stats[3][0])
+    list_total_rank_element = []
+    with open("{0}".format(os.path.join(app.root_path, "static\\img\\Original\\Ranks_unity.csv")), "r") as fp:
+        for line in fp:
+            list_total_rank_element.append(line.split(";"))
+
+    total_rank_data = []
+    for i in range(0, len(list_total_rank_element)):
+        if str(list_total_rank_element[i][0]) == str(total_level):
+            total_rank_data.append([str(list_total_rank_element[i][1]), str(list_total_rank_element[i][2])])
+
+    if len(total_rank_data) == 0:
+        total_rank_data.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
+
     return render_template('account.html',
                            title='Account',
                            profile_picture=profile_picture,
@@ -360,7 +374,7 @@ def account():
                            series_stats=series_stats,
                            anime_stats=anime_stats,
                            book_stats=book_stats,
-                           total_level=total_level,
+                           total_rank_data=total_rank_data,
                            chart_data=chart_data,
                            achievements=anime_achievements)
 
@@ -1375,7 +1389,7 @@ def change_anime_category():
         # Set Season / Episode to max
         number_season = AnimeEpisodesPerSeason.query.filter_by(anime_id=anime_id).count()
         for i in range(number_season):
-            number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=anime_id, season=i + 1).first().episodes
+            number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=anime_id, season=i+1).first().episodes
             for j in range(number_episode):
                 if AnimeEpisodeTimestamp.query.filter_by(user_id=current_user.get_id(),
                                                          anime_id=anime_id,
@@ -1752,16 +1766,17 @@ def get_all_account_stats(list_type):
     element_level = element_level_tmp.split('.')
 
     list_rank_element = []
-    with open("{0}".format(os.path.join(app.root_path, "static\\img\\Ranks\\Ranks.txt")), "r") as fp:
+    with open("{0}".format(os.path.join(app.root_path, "static\\img\\Ranks\\Ranks.csv")), "r") as fp:
         for line in fp:
-            list_rank_element.append(line.split())
+            list_rank_element.append(line.split(";"))
 
+    element_rank_data = []
     for i in range(0, len(list_rank_element)):
         if str(list_rank_element[i][0]) == str(element_level[0]):
-            element_rank = str(list_rank_element[i][2])
-            break
-        else:
-            element_rank = "General_Grade_4"
+            element_rank_data.append([str(list_rank_element[i][2]), str(list_rank_element[i][3])])
+
+    if len(element_rank_data) == 0:
+        element_rank_data.append(["General_Grade_4", "General Grade 4"])
 
     if total_element == 0:
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
@@ -1783,7 +1798,7 @@ def get_all_account_stats(list_type):
                             (float(nb_of_element[3]/total_element))*100,
                             (float(nb_of_element[4]/total_element))*100]
 
-    return [nb_of_element, total_time_element, mean_score_element, element_level, element_rank, element_rate]
+    return [nb_of_element, total_time_element, mean_score_element, element_level, element_rank_data, element_rate]
 
 
 def get_anime_achievements():
@@ -2032,8 +2047,8 @@ def autocomplete_search_element(element_name, list_type):
 
         else:
             try:
-                response = requests.get("https://www.googleapis.com/books/v1/volumes?q={0}"
-                                        .format(element_name))
+                response = requests.get("https://www.googleapis.com/books/v1/volumes?q={0}&key={1}"
+                                        .format(element_name, google_book_api_key))
             except:
                 return None
 
@@ -2378,21 +2393,26 @@ def add_element_in_base(element_data, element_cover_id, list_type):
                 genre = SeriesGenre(series_id=element.id,
                                     genre=genre_data)
                 db.session.add(genre)
-
         elif list_type == ListType.ANIME:
-            response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(element_data["name"]))
-            data_mal = json.loads(response.text)
-            mal_id = data_mal["results"][0]["mal_id"]
+            try:
+                response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(element_data["name"]))
+                data_mal = json.loads(response.text)
+                mal_id = data_mal["results"][0]["mal_id"]
 
-            response = requests.get("https://api.jikan.moe/v3/anime/{}".format(mal_id))
-            data_mal = json.loads(response.text)
-            genres = data_mal["genres"]
+                response = requests.get("https://api.jikan.moe/v3/anime/{}".format(mal_id))
+                data_mal = json.loads(response.text)
+                genres = data_mal["genres"]
 
-            for genre_data in genres:
-                genre = AnimeGenre(anime_id=element.id,
-                                   genre=genre_data["name"],
-                                   genre_id=int(genre_data["mal_id"]))
-                db.session.add(genre)
+                for genre in genres:
+                    add_genre = AnimeGenre(anime_id=element.id,
+                                           genre=genre["name"],
+                                           genre_id=int(genre["mal_id"]))
+                    db.session.add(add_genre)
+            except:
+                for genre_data in genres_data:
+                    add_genre = AnimeGenre(anime_id=element.id,
+                                           genre=genre_data)
+                    db.session.add(add_genre)
 
         # Add the different networks for each serie
         for network_data in networks_data:
@@ -2687,7 +2707,7 @@ def refresh_element_data(element_id, list_type):
     elif list_type == ListType.ANIME:
         element = Anime.query.filter_by(id=element_id).first()
 
-    element_data = get_element_data_from_api(element.themoviedb_id)
+    element_data = get_element_data_from_api(element.themoviedb_id, list_type)
 
     if element_data is None:
         return flash("There was an error while refreshing. Please try again later.")

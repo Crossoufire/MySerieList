@@ -315,32 +315,6 @@ hr {
     width: 2.8em;
 }
 </style>
-<!-- test -->
-<!--<style>-->
-<!--/* ############################# pacman loading ############################ */-->
-<!--.modal_loading {-->
-    <!--display: none;-->
-    <!--position: fixed;-->
-    <!--z-index: 9999;-->
-    <!--top: 0;-->
-    <!--left: 0;-->
-    <!--height: 100%;-->
-    <!--width: 100%;-->
-    <!--background: rgba(0, 0, 0, .6)-->
-                <!--url('../static/img/anime_achievements/{{ achievements[0][0] }}.png')-->
-                <!--50% 50%-->
-                <!--no-repeat;-->
-<!--}-->
-
-<!--body.loading .modal_loading {-->
-    <!--overflow: hidden;-->
-<!--}-->
-
-<!--body.loading .modal_loading {-->
-    <!--display: block;-->
-<!--}-->
-<!--/* ######################################################################### */-->
-<!--</style>-->
 {% endblock css %}
 
 
@@ -381,7 +355,8 @@ hr {
             </div>
             <div class="bd-highlight">
                 <h4 class="mt-0 account-heading username">{{ current_user.username }}</h4>
-                <span style="font-size: 14pt;">Total:&nbsp&nbsp</span><span class="total_score text-light"> {{ total_level }}</span>
+                <span style="font-size: 14pt;">Total:&nbsp&nbsp</span><img height='66' width='66' data-toggle="tooltip" title="{{ total_rank_data[0][1] }}" src="../static/img/Original/{{ total_rank_data[0][0] }}.png"/>
+                <!--<span class="total_score text-light"></span>-->
             </div>
             <div class="ml-auto bd-highlight">
                 <a class="btn btn-sm bg-dark m-0" href="{{ url_for('account_settings') }}" role="button">
@@ -395,7 +370,7 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ series_stats[4] }}" src="../static/img/Ranks/{{ series_stats[4] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ series_stats[4][0][1] }}" src="../static/img/Ranks/{{ series_stats[4][0][0] }}.ico"/>
                             <span class='account-bar-name'>Series</span>
                             <div id="series_level" class='account-bar-level'>Level {{ series_stats[3][0] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ series_stats[3][1] }}%">
@@ -410,7 +385,7 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ anime_stats[4] }}" src="../static/img/Ranks/{{ anime_stats[4] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ anime_stats[4][0][1] }}" src="../static/img/Ranks/{{ anime_stats[4][0][0] }}.ico"/>
                             <div class='account-bar-name'>Animes</div>
                             <div id="anime_level" class='account-bar-level'>Level {{ anime_stats[3][0] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ anime_stats[3][1] }}%">
@@ -425,7 +400,7 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ book_stats[4] }}" src="../static/img/Ranks/{{ book_stats[4] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ book_stats[4][0][1] }}" src="../static/img/Ranks/{{ book_stats[4][0][0] }}.ico"/>
                             <div class='account-bar-name'>Books</div>
                             <div id="book_level" class='account-bar-level'>Level {{ book_stats[3][0] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ book_stats[3][1] }}%">
