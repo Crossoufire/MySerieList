@@ -361,12 +361,10 @@ body.loading .modal_loading {
         <a class="fas fa-bars text-light" onclick="openNav()"></a>
         <span class="m-r-5 text-light">Categories</span>
 
-        <!--<span class="m-l-5 m-r-5 text-light">||</span>-->
+        <span class="m-l-5 m-r-5 text-light">||</span>
 
-        <!--<div class="slidecontainer text-light float-right" style="vertical-align: middle;">-->
-            <!--<span class="m-r-5 text-light" style="vertical-align: middle;">ZOOM</span>-->
-            <!--<input id="card_size" type="range" step="25" min="100" max="200" value="200" class="slider" style="vertical-align: middle;">-->
-        <!--</div>-->
+        <a class="fas fa-bars text-light" href="{{ url_for('myanimelist_table') }}"></a>
+        <span class="m-r-5 text-light">Table View</span>
     </div>
 </div>
 {% endblock fixed %}
@@ -749,9 +747,7 @@ function changeAnimeCategory(anime_id, new_category, card_id, mod_id, seas_drop_
         var episode_drop = document.getElementById(ep_drop_id);
 
         var seasons_length = $('#'+seas_drop_id).children('option').length;
-        console.log(seasons_length);
         var seasons_index = (seasons_length - 1);
-        console.log(seasons_index);
         $('#'+seas_drop_id).prop('selectedIndex', seasons_index);
 
         episode_drop.length = 1;

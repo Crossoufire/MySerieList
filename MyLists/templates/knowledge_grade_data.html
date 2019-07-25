@@ -1,0 +1,345 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+<style>
+#hierarchical {
+    width: 100%;
+    height: 100%;
+}
+table {
+    margin: 0 auto;
+}
+table tr {
+    border-bottom: solid 1px grey;
+}
+table td {
+    text-align: center;
+}
+hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.9);
+}
+sub {
+    margin-left: 10px;
+}
+legend {
+    font-size: 12pt;
+}
+</style>
+{% endblock css %}
+
+
+{% block content %}
+<h3 class="font-weight-light text-center mb-4">Knowledge grade data</h3>
+
+<div class="d-flex flex-wrap p-l-10 p-t-10" style="border: black solid 2px; border-radius: 10px; background-color: #47476b;">
+    <p>
+        <i class="fas fa-dot-circle"></i>&nbsp &nbsp All these grades are taken from the unity assets store.<br>
+        <i class="fas fa-dot-circle"></i>&nbsp &nbsp There are 24 different grades.<br>
+        <i class="fas fa-dot-circle"></i>&nbsp &nbsp You gain a grade each 15 levels.<br>
+        <i class="fas fa-dot-circle"></i>&nbsp &nbsp The knowledge grades are based on the sum of the differents levels (Series, Anime, Books).<br>
+        <i class="fas fa-dot-circle"></i>&nbsp &nbsp We use the linear equation: grade = (lvl(Series)+lvl(Anime)+lvl(Books))/15.<br>
+    </p>
+</div>
+
+
+<legend class="font-weight-light text-center mt-4 mb-4">
+    Each grade in hierarchical order &nbsp &nbsp
+    <a class="fas fa-chevron-down" id="hierarchical_arrow" onclick="hide('hierarchical', 'hierarchical_arrow')"></a>
+    <hr class="mt-2 mb-3">
+</legend>
+<div id="hierarchical" class="container-stats">
+    <table>
+        <thead style="border-bottom: solid 2px grey;">
+            <th style="min-width: 100px;" class="text-center">Grade</th>
+            <th style="min-width: 200px;" class="text-center">Name</th>
+            <th style="min-width: 100px;" class="text-center">Levels</th>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Seeker.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Seeker</strong>
+            </td>
+            <td>
+                <strong>0 - 14</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Seeker_grade_2.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Seeker Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>15 - 29</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Seeker_grade_3.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Seeker Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>30 - 44</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Seeker_grade_4.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Seeker Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>45 - 59</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Initiate.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Initiate</strong><br>
+            </td>
+            <td>
+                <strong>60 - 74</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Initiate_grade_2.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Initiate Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>75 - 89</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Initiate_grade_3.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Initiate Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>90 - 104</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Initiate_grade_4.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Initiate Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>105 - 119</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Listener.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Listener</strong><br>
+            </td>
+            <td>
+                <strong>120 - 134</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Listener_grade_2.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Listener Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>135 - 149</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Listener_grade_3.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Listener Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>150 - 164</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Listener_grade_4.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Listener Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>165 - 179</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Guardian.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Guardian</strong><br>
+            </td>
+            <td>
+                <strong>180 - 194</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Guardian_grade_2.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Guardian Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>195 - 209</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Guardian_grade_3.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Guardian Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>210 - 224</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Guardian_grade_4.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Guardian Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>225 - 239</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Master.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Master</strong><br>
+            </td>
+            <td>
+                <strong>240 - 254</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Master_grade_2.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Master Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>255 - 269</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Master_grade_3.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Master Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>270 - 284</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Master_grade_4.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Master Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>285 - 299</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Emperor.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Emperor</strong><br>
+            </td>
+            <td>
+                <strong>300 - 314</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Emperor_grade_2.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Emperor Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>315 - 329</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Emperor_grade_3.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Emperor Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>330 - 344</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Original/Knowledge_Emperor_grade_4.png') }}" alt="">
+            </td>
+            <td>
+                <strong>Knowledge Emperor Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>345+</strong>
+            </td>
+        </tr>
+        </tbody>
+    </table>&nbsp;
+{% endblock content %}
+
+
+{% block script %}
+<script>
+function hide(category, arrow) {
+    var category = document.getElementById(category);
+    var arrow = document.getElementById(arrow);
+
+    if (category.className === "container-stats"){
+        category.className = "d-none";
+        arrow.className = "fas fa-chevron-right";
+    } else {
+        category.className = "container-stats";
+        arrow.className = "fas fa-chevron-down";
+    }
+}
+</script>
+{% endblock %}
+
+

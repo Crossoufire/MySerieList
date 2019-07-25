@@ -385,6 +385,18 @@ def anime_achievements():
     return render_template('anime_achievements.html', title='Anime achievements')
 
 
+@app.route("/level_grade_data")
+@login_required
+def level_grade_data():
+    return render_template('level_grade_data.html', title='Level Grade Data')
+
+
+@app.route("/knowledge_grade_data")
+@login_required
+def knowledge_grade_data():
+    return render_template('knowledge_grade_data.html', title='Knowledge Grade Data')
+
+
 @app.route("/account_settings", methods=['GET', 'POST'])
 @login_required
 def account_settings():
@@ -803,6 +815,21 @@ def myserieslist():
     return render_template('myserieslist.html', title='MySeriesList', all_data=series_data)
 
 
+@app.route("/myserieslist_table", methods=['GET', 'POST'])
+@login_required
+def myserieslist_table():
+    watching_list    = SeriesList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').all()
+    completed_list   = SeriesList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
+    onhold_list      = SeriesList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
+    random_list      = SeriesList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').all()
+    dropped_list     = SeriesList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').all()
+    plantowatch_list = SeriesList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').all()
+
+    series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    series_data = get_list_data(series_list, ListType.SERIES)
+    return render_template('myserieslist_table.html', title='MySeriesList', all_data=series_data)
+
+
 @app.route('/update_series_season', methods=['POST'])
 @login_required
 def update_series_season():
@@ -1187,6 +1214,21 @@ def myanimelist():
     anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     anime_data = get_list_data(anime_list, ListType.ANIME)
     return render_template('myanimelist.html', title='MyAnimeList', all_data=anime_data)
+
+
+@app.route("/myanimelist_table", methods=['GET', 'POST'])
+@login_required
+def myanimelist_table():
+    watching_list    = AnimeList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').all()
+    completed_list   = AnimeList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
+    onhold_list      = AnimeList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
+    random_list      = AnimeList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').all()
+    dropped_list     = AnimeList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').all()
+    plantowatch_list = AnimeList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').all()
+
+    anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    anime_data = get_list_data(anime_list, ListType.ANIME)
+    return render_template('myanimelist_table.html', title='MyAnimeList', all_data=anime_data)
 
 
 @app.route('/update_anime_season', methods=['POST'])
@@ -1575,6 +1617,20 @@ def mybookslist():
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
     return render_template('mybookslist.html', title='MyBooksList', all_data=book_data)
+
+
+@app.route("/mybookslist_table", methods=['GET', 'POST'])
+@login_required
+def mybookslist_table():
+    reading_list = BookList.query.filter_by(user_id=current_user.get_id(), status='READING').all()
+    completed_list = BookList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
+    onhold_list = BookList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
+    dropped_list = BookList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').all()
+    plantoread_list = BookList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_READ').all()
+
+    book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
+    book_data = get_list_data(book_list, ListType.BOOK)
+    return render_template('mybookslist_table.html', title='MyBooksList', all_data=book_data)
 
 
 @app.route('/delete_book', methods=['POST'])

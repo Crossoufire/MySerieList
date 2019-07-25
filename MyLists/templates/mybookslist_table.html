@@ -86,6 +86,7 @@ body.loading .modal_loading {
     padding-bottom: 5px;
 }
 
+
 .scrollable-menu {
     text-align-last: center;
 }
@@ -102,6 +103,7 @@ body.loading .modal_loading {
 }
 
 .episodes {
+    width: 100px;
     border-style: 1px;
     border-color: black;
     border-radius: 2px;
@@ -111,6 +113,7 @@ body.loading .modal_loading {
 }
 
 .seasons {
+    width: 100px;
     border-style: 1px;
     border-color: black;
     border-radius: 2px;
@@ -351,26 +354,13 @@ body.loading .modal_loading {
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
-        <a id="show_all" class="fas fa-eye text-light m-r-5" onclick="show_all_score()"></a>
-        <a id="hide_all" class="d-none" onclick="hide_all_score()"></a>
-        <span id="show_hide" class="m-r-5 text-light">Show scores</span>
-
-        <span class="m-l-5 m-r-5 text-light">||</span>
-
         <a class="fas fa-bars text-light" onclick="openNav()"></a>
         <span class="m-r-5 text-light">Categories</span>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
-        <a class="fas fa-th text-light" href="{{ url_for('mybookslist_table') }}"></a>
-        <span class="m-r-5 text-light">Table View</span>
-
-        <span class="m-l-5 m-r-5 text-light">||</span>
-
-        <div class="slidecontainer text-light float-right" style="vertical-align: middle;">
-            <span class="m-r-5 text-light" style="vertical-align: middle;">ZOOM</span>
-            <input id="card_size" type="range" step="25" min="100" max="200" value="200" class="slider" style="vertical-align: middle;">
-        </div>
+        <a class="fas fa-th text-light" href="{{ url_for('mybookslist') }}"></a>
+        <span class="m-r-5 text-light">Grid View</span>
     </div>
 </div>
 {% endblock fixed %}
@@ -387,17 +377,19 @@ body.loading .modal_loading {
     </div>
 </div>
 
+
 <div id="mySidenav" class="sidenav">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="#collapse_READING">Reading</a>
+    <a href="#collapse_READING">Watching</a>
     <a href="#collapse_COMPLETED">Completed</a>
     <a href="#collapse_ON_HOLD">On Hold</a>
+    <a href="#collapse_RANDOM">Random</a>
     <a href="#collapse_DROPPED">Dropped</a>
-    <a href="#collapse_PLAN_TO_READ">Plan to Read</a>
+    <a href="#collapse_PLAN_TO_READ">Plan to Watch</a>
 </div>
 
 
-<div class="grid_mode">
+<div class="table_mode">
     {% for category in all_data %}
 
         {% if loop.index == 1 %}
@@ -406,54 +398,106 @@ body.loading .modal_loading {
         </h2>
         <hr class="mt-2 mb-4">
         <div class="d-flex flex-wrap" id="collapse_READING">
+            <table class="table table-sm text-light">
+                <thead class="text-center">
+                    <th style="width: 50px;">#</th>
+                    <th>Books</th>
+                    <th style="width: 80px;">Score</th>
+                    <th style="width: 80px;">Actions</th>
+                </thead>
+                <tbody id="READING">
         {% elif loop.index == 2 %}
         <h2 class="font-weight-light text-center pt-4 mb-0 category-title">COMPLETED
             <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="COMPLETED_arrow" onclick="hide('collapse_COMPLETED', 'COMPLETED_arrow')"></a></div></h2>
         <hr class="mt-2 mb-4">
         <div class="d-flex flex-wrap" id="collapse_COMPLETED">
+            <table class="table table-sm text-light">
+                <thead class="text-center">
+                    <th style="width: 50px;">#</th>
+                    <th>Books</th>
+                    <th style="width: 80px;">Score</th>
+                    <th style="width: 80px;">Actions</th>
+                </thead>
+                <tbody id="COMPLETED">
         {% elif loop.index == 3 %}
         <h2 class="font-weight-light text-center pt-4 mb-0 category-title">ON HOLD
             <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="ON_HOLD_arrow" onclick="hide('collapse_ON_HOLD', 'ON_HOLD_arrow')"></a></div></h2>
         <hr class="mt-2 mb-4">
         <div class="d-flex flex-wrap" id="collapse_ON_HOLD">
-        {% elif loop.index == 4 %}
+            <table class="table table-sm text-light">
+                <thead class="text-center">
+                    <th style="width: 50px;">#</th>
+                    <th>Books</th>
+                    <th style="width: 80px;">Score</th>
+                    <th style="width: 80px;">Actions</th>
+                </thead>
+                <tbody id="ON_HOLD">
+         {% elif loop.index == 4 %}
+        <h2 class="font-weight-light text-center pt-4 mb-0 category-title">RANDOM
+            <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="RANDOM_arrow" onclick="hide('collapse_RANDOM', 'RANDOM_arrow')"></a></div></h2>
+         <hr class="mt-2 mb-4">
+        <div class="d-flex flex-wrap" id="collapse_RANDOM">
+            <table class="table table-sm text-light">
+                <thead class="text-center">
+                    <th style="width: 50px;">#</th>
+                    <th>Books</th>
+                    <th style="width: 80px;">Score</th>
+                    <th style="width: 80px;">Actions</th>
+                </thead>
+                <tbody id="RANDOM">
+        {% elif loop.index == 5 %}
         <h2 class="font-weight-light text-center pt-4 mb-0 category-title">DROPPED
             <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="DROPPED_arrow" onclick="hide('collapse_DROPPED', 'DROPPED_arrow')"></a></div></h2>
         <hr class="mt-2 mb-4">
         <div class="d-flex flex-wrap" id="collapse_DROPPED">
-        {% elif loop.index == 5 %}
-        <h2 class="font-weight-light text-center pt-4 mb-0 category-title">PLAN TO READ
+            <table class="table table-sm text-light">
+                <thead class="text-center">
+                    <th style="width: 50px;">#</th>
+                    <th>Books</th>
+                    <th style="width: 80px;">Score</th>
+                    <th style="width: 80px;">Actions</th>
+                </thead>
+                <tbody id="DROPPED">
+        {% elif loop.index == 6 %}
+        <h2 class="font-weight-light text-center pt-4 mb-0 category-title">PLAN TO WATCH
             <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="PLAN_TO_READ_arrow" onclick="hide('collapse_PLAN_TO_READ', 'PLAN_TO_READ_arrow')"></a></div></h2>
         <hr class="mt-2 mb-4">
         <div class="d-flex flex-wrap" id="collapse_PLAN_TO_READ">
+            <table class="table table-sm text-light">
+                <thead class="text-center">
+                    <th style="width: 80px;">#</th>
+                    <th>Books</th>
+                    <th style="width: 80px;">Score</th>
+                    <th style="width: 80px;">Actions</th>
+                </thead>
+                <tbody id="PLAN_TO_READ">
         {% endif %}
         {% set outer_loop = loop %}
 
+
         {% for data in category %}
-            <div id="card_{{ data['id'] }}" class="card bg-transparent m-l-10 m-r-10 m-b-40" style="border-radius: 5px;">
-
-                <div class="view overlay">
-                    <img class="card-img-top" width="200" height="300" src="{{ data['cover_url'] }}" alt="{{ data['title'] }}">
-                    <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_{{ data['id'] }}" style="cursor: pointer;">
-                        <span class="font-mask text-center text-light">{{ data['title'] }}</span>
-                    </div>
-                    <a class="btn_left fas fa-bars text-light" data-toggle="modal" data-target="#modal_cat{{ data['id'] }}"></a>
-                    <a class="btn_right fas fa-ban text-light" onclick="deleteBook('{{ data['id'] }}', 'card_{{ data['id'] }}')"></a>
-                    <a class="btn_bottom fas fa-caret-square-down" onclick="show_score('footer_{{ data['id'] }}', card_{{ data['id'] }})" style="z-index: 500;"></a>
-                </div>
-
-                <div id="footer_{{ data['id'] }}" class="d-none footer_score">
-                    <span class="score_size"> Score: </span><a class="score_size" id="new_{{ data['id'] }}" onclick="edit_score('edit_{{ data['id'] }}', 'new_{{ data['id'] }}')"> {{ data['score'] }}</a>
-                    <input id="edit_{{ data['id'] }}" class="d-none" type="text"
-                           style="max-width: 30px;
-                           max-height: 20px;
-                           background-color: black;
-                           color: white;
-                           border: solid;
-                           border-color: black;"
-                           onkeydown="add_score('new_{{ data['id'] }}', 'edit_{{ data['id'] }}', '{{ data['id'] }}')">
-                </div>
-            </div>
+            <tr id="tr_{{ data['id'] }}">
+                <td class="text-center">
+                    {{ data['id'] }}
+                </td>
+                <td class="text-left">
+                    <a data-toggle="modal" data-target="#modal_{{ data['id'] }}">{{ data['title'] }}</a>
+                </td>
+                <td class="text-center">
+                    <a class="score_size" id="new_{{ data['id'] }}" onclick="edit_score('edit_{{ data['id'] }}', 'new_{{ data['id'] }}')">{{ data['score'] }}</a>
+                    <input id="edit_{{ data['id'] }}" class="d-none" type="text" style="max-width: 30px;
+                   max-height: 20px;
+                   background-color: black;
+                   color: white;
+                   border: solid;
+                   border-color: black;" onkeydown="add_score('new_{{ data['id'] }}', 'edit_{{ data['id'] }}', '{{ data['id'] }}')">
+                </td>
+                <td class="text-center">
+                    <a class="fas fa-bars" data-toggle="modal" data-target="#modal_cat{{ data['id'] }}"></a>
+                    &nbsp &nbsp
+                    <a class="fas fa-ban" onclick="deletebook('{{ data['id'] }}', 'tr_{{ data['id'] }}')"></a>
+                </td>
+            </tr>
 
             <!----------- Categories Modal ---------------->
             <div style="max-width: 220px;" class="modal fade left" id="modal_cat{{ data['id'] }}" tabindex="-1" role="dialog" aria-labelledby="cat_mod" aria-hidden="true">
@@ -467,30 +511,31 @@ body.loading .modal_loading {
                         </div>
                         <div id="mod_{{ data['id'] }}" class="modal-body">
                             {% if outer_loop.index == 1 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Read</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Plan to Read', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Read</a>
                             {% elif outer_loop.index == 2 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Reading', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Reading</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Read</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Reading', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Reading</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Plan to Read', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Read</a>
                             {% elif outer_loop.index == 3 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Reading', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Reading</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Read</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Reading', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Reading</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Plan to Read', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Read</a>
                             {% elif outer_loop.index == 4 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Reading', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Reading</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Plan to Read', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Read</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Reading', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Reading</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Random', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Random</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Plan to Read', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Read</a>
                             {% elif outer_loop.index == 5 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Reading', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Reading</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Completed', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'On Hold', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeBookCategory('{{ data['id'] }}', 'Dropped', 'card_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Reading', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Reading</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
                             {% endif %}
                         </div>
                     </div>
@@ -521,6 +566,8 @@ body.loading .modal_loading {
                 </div>
             </div>
         {% endfor %}
+                </tbody>
+            </table>
         </div>
     {% endfor %}
 </div>
@@ -602,7 +649,7 @@ $(function() {
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
-                    window.location.replace('/mybookslist'); }
+                    window.location.replace('/mybookslist_table'); }
             });
         }
     });
@@ -610,19 +657,7 @@ $(function() {
 </script>
 <!------------ Principal scripts --------------->
 <script type="text/javascript">
-function refreshAll() {
-    $body = $("body");
-    $.ajax ({
-        type: "POST",
-        url: "/refresh_all_book",
-        beforeSend: function() { $body.addClass("loading"); },
-        success: function(response) {
-            window.location.replace('/mybookslist'); }
-    });
-}
-
-
-function changeBookCategory(book_id, new_category, card_id, mod_id) {
+function changebookCategory(book_id, new_category, tr_id, mod_id) {
     if (new_category === 'Reading') {
         var completed = 'Completed';
         var on_hold = 'On Hold';
@@ -636,12 +671,12 @@ function changeBookCategory(book_id, new_category, card_id, mod_id) {
         $("#"+mod_id+ " a").filter(":contains('Plan to Read')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Dropped</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + plan_to_read + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Plan to Read</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Dropped</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + plan_to_read + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Plan to Read</a>"
         );
-        $("#" + card_id).prependTo("#collapse_READING");
+        $("#" + tr_id).prependTo("#READING");
         $('.modal').modal("hide");
     }
 
@@ -658,12 +693,12 @@ function changeBookCategory(book_id, new_category, card_id, mod_id) {
         $("#"+mod_id+ " a").filter(":contains('Plan to Read')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + reading + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Reading</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Dropped</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + plan_to_read + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Plan to Read</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + reading + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Reading</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Dropped</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + plan_to_read + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Plan to Read</a>"
         );
-        $("#" + card_id).prependTo("#collapse_COMPLETED");
+        $("#" + tr_id).prependTo("#COMPLETED");
         $('.modal').modal("hide");
     }
 
@@ -680,15 +715,14 @@ function changeBookCategory(book_id, new_category, card_id, mod_id) {
         $("#"+mod_id+ " a").filter(":contains('Plan to Read')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + reading + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Reading</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Dropped</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + plan_to_read + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Plan to Read</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + reading + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Reading</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Dropped</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + plan_to_read + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Plan to Read</a>"
         );
-        $("#" + card_id).prependTo("#collapse_ON_HOLD");
+        $("#" + tr_id).prependTo("#ON_HOLD");
         $('.modal').modal("hide");
     }
-
 
     if (new_category === 'Dropped') {
         var completed = 'Completed';
@@ -703,19 +737,18 @@ function changeBookCategory(book_id, new_category, card_id, mod_id) {
         $("#"+mod_id+ " a").filter(":contains('Plan to Read')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + reading + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Reading</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + plan_to_read + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Plan to Read</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + reading + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Reading</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + plan_to_read + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Plan to Read</a>"
         );
-        $("#" + card_id).prependTo("#collapse_DROPPED");
+        $("#" + tr_id).prependTo("#DROPPED");
         $('.modal').modal("hide");
     }
 
     if (new_category === 'Plan to Read') {
         var completed = 'Completed';
         var on_hold = 'On Hold';
-        var random = 'Random';
         var dropped = 'Dropped';
         var reading = 'Reading';
 
@@ -726,12 +759,12 @@ function changeBookCategory(book_id, new_category, card_id, mod_id) {
         $("#"+mod_id+ " a").filter(":contains('Plan to Read')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + reading + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Reading</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + on_hold + "\", \"" + card_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeBookCategory(\"" + book_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\")'>Dropped</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + reading + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Reading</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changebookCategory(\"" + book_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\")'>Dropped</a>"
         );
-        $("#" + card_id).prependTo("#collapse_PLAN_TO_READ");
+        $("#" + tr_id).prependTo("#PLAN_TO_READ");
         $('.modal').modal("hide");
     }
 
@@ -748,12 +781,12 @@ function changeBookCategory(book_id, new_category, card_id, mod_id) {
 }
 
 
-function deleteBook(book_id, card_id) {
+function deletebook(book_id, tr_id) {
     if (!confirm("Do you want to delete")){
         return false;
     }
 
-    $("#"+card_id).remove();
+    $("#"+tr_id).remove();
 
     $body = $("body");
     $.ajax ({
@@ -781,7 +814,7 @@ function hide(category, arrow) {
     }
 }
 </script>
-<!------------ Description scripts ---------------->
+<!------------ Synopsis scripts ---------------->
 <script type="text/javascript">
 $(document).ready(function(){
 	var maxLength = 200;
@@ -804,18 +837,6 @@ $(document).ready(function(){
 </script>
 <!------------ Score scripts ------------------->
 <script type="text/javascript">
-function show_score(footer_id, card_id) {
-    var score = document.getElementById(footer_id);
-
-    if (score.className === "d-none footer_score"){
-        score.className = "card-footer text-muted text-center p-0";
-        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-15');
-    } else {
-        score.className = "d-none footer_score";
-        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-40');
-    }
-}
-
 function edit_score(edit_id, new_id) {
     var edit = document.getElementById(edit_id);
 
@@ -861,26 +882,6 @@ function add_score(new_score, edit_id, book_id) {
         return true;
     }
 }
-
-function show_all_score() {
-    var show = document.getElementById('show_all');
-    var hide = document.getElementById('hide_all');
-    $('div[id^="footer_"]').attr('class', 'card-footer text-muted text-center p-0');
-    hide.className = "fas fa-eye-slash text-light m-r-5";
-    show.className = "d-none";
-    $('#show_hide').text('Hide scores');
-    $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-15');
-}
-
-function hide_all_score() {
-    var hide = document.getElementById('hide_all');
-    var show = document.getElementById('show_all');
-    $('div[id^="footer_"]').attr('class', 'd-none footer_score');
-    hide.className = "d-none";
-    show.className = "fas fa-eye text-light m-r-5";
-    $('#show_hide').text('Show scores');
-    $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-40');
-}
 </script>
 <!---- Show/collapse all categories scripts ---->
 <script type="text/javascript">
@@ -913,22 +914,6 @@ function openNav() {
 
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
-}
-</script>
-<!--------- ZOOM slider/navbar scripts --------->
-<script type="text/javascript">
-var slider = document.getElementById("card_size");
-slider.value = 200;
-
-slider.oninput = function() {
-    var value = this.value;
-    $('.card-img-top').css('width', value);
-    $('.card-img-top').css('height', value*1.5);
-    $('.card').css('width', value);
-    $('.card').css('height', value*1.624);
-    $('.font-mask').css('font-size', value/10 + "pt");
-    $('.score_size').css('font-size', value/17 + "pt");
-    $('.card-footer').css('height', value/8.0645);
 }
 </script>
 {% endblock script %}

@@ -414,19 +414,37 @@ hr {
                 </div>
             </div>
             <div class="col">
-                <table class="table table-sm">
+                <table style="line-height: 1;" class="table table-sm">
                     <thead>
                     <tr>
-                        <th style="font-size: 12pt;" colspan="2">
-                            All anime achievements &nbsp &nbsp
-                            <a class="text-light fas fa-external-link-square-alt" data-toggle="tooltip" title="All anime achievements" href="{{ url_for('anime_achievements') }}"></a>
+                        <th class="text-center" style="font-size: 12pt;" colspan="2">
+                            Data Informations
                         </th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
-                        <td>
-                            {# <img height="50" width="100" data-toggle="tooltip" title="{{ achievements[0][2] }}" src="../static/img/anime_achievements/{{ achievements[0][0] }}.png"/> #}
+                        <td class="text-left">
+                            All anime achievements
+                        </td>
+                        <td class="text-center">
+                            <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('anime_achievements') }}" target="_blank"></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">
+                            Grade and level data
+                        </td>
+                        <td class="text-center">
+                            <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('level_grade_data') }}" target="_blank"></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">
+                            Knowledge level data
+                        </td>
+                        <td class="text-center">
+                            <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('knowledge_grade_data') }}" target="_blank"></a>
                         </td>
                     </tr>
                     </tbody>

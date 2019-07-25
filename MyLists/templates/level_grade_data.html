@@ -1,0 +1,672 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+<style>
+#hierarchical {
+    width: 100%;
+    height: 100%;
+}
+table {
+    margin: 0 auto;
+}
+table tr {
+    border-bottom: solid 1px grey;
+}
+table td {
+    text-align: center;
+}
+hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.9);
+}
+sub {
+    margin-left: 10px;
+}
+legend {
+    font-size: 12pt;
+}
+</style>
+{% endblock css %}
+
+
+{% block content %}
+<h3 class="font-weight-light text-center mb-4">Levels and grade data</h3>
+
+<div class="d-flex flex-wrap p-l-10 p-t-10" style="border: black solid 2px; border-radius: 10px; background-color: #47476b;">
+    <p>
+        <i class="fas fa-dot-circle"></i>&nbsp &nbsp All these grades are taken from the video game Halo 3.<br>
+        <i class="fas fa-dot-circle"></i>&nbsp &nbsp There are 42 different grades and 125 levels.<br>
+        <i class="fas fa-dot-circle"></i>&nbsp &nbsp You gain a grade each 3 levels.<br>
+        <i class="fas fa-dot-circle"></i>&nbsp &nbsp The levels are based on the time spent on each category (Series, Anime, Books).<br>
+        <i class="fas fa-dot-circle"></i>&nbsp &nbsp We use the quadratic equation: Level = 50*XP*(1+XP).<br>
+    </p>
+</div>
+
+
+<legend class="font-weight-light text-center mt-4 mb-4">
+    Each grade in hierarchical order &nbsp &nbsp
+    <a class="fas fa-chevron-down" id="hierarchical_arrow" onclick="hide('hierarchical', 'hierarchical_arrow')"></a>
+    <hr class="mt-2 mb-3">
+</legend>
+<div id="hierarchical" class="container-stats">
+    <table>
+        <thead style="border-bottom: solid 2px grey;">
+            <th style="min-width: 100px;" class="text-center">Grade</th>
+            <th style="min-width: 200px;" class="text-center">Name</th>
+            <th style="min-width: 100px;" class="text-center">Levels</th>
+            <th style="min-width: 200px;" class="text-center">Experiences</th>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/recruit.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Recruit</strong>
+            </td>
+            <td>
+                <strong>0 - 3</strong>
+            </td>
+            <td>
+                <strong>0 - 600</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/apprentice.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Apprentice</strong><br>
+            </td>
+            <td>
+                <strong>4 - 6</strong>
+            </td>
+            <td>
+                <strong>1000 - 2100</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Apprentice_Grade_2.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Apprentice Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>7 - 9</strong>
+            </td>
+            <td>
+                <strong>2800 - 4500</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/private.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Private</strong><br>
+            </td>
+            <td>
+                <strong>10 - 12</strong>
+            </td>
+            <td>
+                <strong>5500 - 7800</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/private_grade_2.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Private Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>13 - 15</strong>
+            </td>
+            <td>
+                <strong>9100 - 12000</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/corporal.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Corporal</strong><br>
+            </td>
+            <td>
+                <strong>16 - 18</strong>
+            </td>
+            <td>
+                <strong>13600 - 17100</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/corporal_grade_2.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Corporal Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>19 - 21</strong>
+            </td>
+            <td>
+                <strong>19000 - 23100</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/sergeant.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Sergeant</strong><br>
+            </td>
+            <td>
+                <strong>22 - 24</strong>
+            </td>
+            <td>
+                <strong>25300 - 30000</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/sergeant_grade_2.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Sergeant Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>25 - 27</strong>
+            </td>
+            <td>
+                <strong>32500 - 37800</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/sergeant_grade_3.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Sergeant Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>28 - 30</strong>
+            </td>
+            <td>
+                <strong>40600 - 46500</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/gunnery_sergeant.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Gunnery Sergeant</strong><br>
+            </td>
+            <td>
+                <strong>31 - 33</strong>
+            </td>
+            <td>
+                <strong>49600 - 56100</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/gunnery_sergeant_grade_2.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Gunnery Sergeant Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>34 - 36</strong>
+            </td>
+            <td>
+                <strong>59500 - 66600</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/gunnery_sergeant_grade_3.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Gunnery Sergeant Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>37 - 39</strong>
+            </td>
+            <td>
+                <strong>70300 - 78000</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/gunnery_sergeant_grade_4.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Gunnery Sergeant Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>40 - 42</strong>
+            </td>
+            <td>
+                <strong>82000 - 90300</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/lieutenant.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Lieutenant</strong><br>
+            </td>
+            <td>
+                <strong>43 - 45</strong>
+            </td>
+            <td>
+                <strong>94600 - 103500</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/lieutenant_grade_2.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Lieutenant Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>46 - 48</strong>
+            </td>
+            <td>
+                <strong>108100 - 117600</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/lieutenant_grade_3.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Lieutenant Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>49 - 51</strong>
+            </td>
+            <td>
+                <strong>122500 - 132600</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/lieutenant_grade_4.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Lieutenant Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>52 - 54</strong>
+            </td>
+            <td>
+                <strong>137800 - 148500</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/captain.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Captain</strong><br>
+            </td>
+            <td>
+                <strong>55 - 57</strong>
+            </td>
+            <td>
+                <strong>154000 - 165300</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/captain_grade_2.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Captain Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>58 - 60</strong>
+            </td>
+            <td>
+                <strong>171100 - 183000</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/captain_grade_3.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Captain Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>61 - 63</strong>
+            </td>
+            <td>
+                <strong>189100 - 201600</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/captain_grade_4.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Captain Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>64 - 66</strong>
+            </td>
+            <td>
+                <strong>208000 - 221100</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/major.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Major</strong><br>
+            </td>
+            <td>
+                <strong>67 - 69</strong>
+            </td>
+            <td>
+                <strong>227800 - 241500</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/major_grade_2.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Major Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>70 - 72</strong>
+            </td>
+            <td>
+                <strong>248500 - 262800</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/major_grade_3.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Major Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>73 - 75</strong>
+            </td>
+            <td>
+                <strong>270100 - 285000</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/major_grade_4.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Major Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>76 - 78</strong>
+            </td>
+            <td>
+                <strong>292600 - 308100</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/commander.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Commander</strong><br>
+            </td>
+            <td>
+                <strong>79 - 81</strong>
+            </td>
+            <td>
+                <strong>316000 - 332100</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/commander_grade_2.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Commander grade 2</strong><br>
+            </td>
+            <td>
+                <strong>82 - 84</strong>
+            </td>
+            <td>
+                <strong>340300 - 357000</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/commander_grade_3.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Commander grade 3</strong><br>
+            </td>
+            <td>
+                <strong>85 - 87</strong>
+            </td>
+            <td>
+                <strong>365500 - 382800</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/commander_grade_4.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Commander grade 4</strong><br>
+            </td>
+            <td>
+                <strong>88 - 90</strong>
+            </td>
+            <td>
+                <strong>391600 - 409500</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/colonel.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Colonel</strong><br>
+            </td>
+            <td>
+                <strong>91 - 93</strong>
+            </td>
+            <td>
+                <strong>418600 - 437100</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/colonel_grade_2.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Colonel Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>94 - 96</strong>
+            </td>
+            <td>
+                <strong>446500 - 465600</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/colonel_grade_3.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Colonel Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>97 - 99</strong>
+            </td>
+            <td>
+                <strong>475300 - 495000</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/colonel_grade_4.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Colonel Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>100 - 102</strong>
+            </td>
+            <td>
+                <strong>505000 - 525300</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/brigadier.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Brigadier</strong><br>
+            </td>
+            <td>
+                <strong>103 - 105</strong>
+            </td>
+            <td>
+                <strong>535600 - 556500</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/brigadier_grade_2.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Brigadier Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>106 - 108</strong>
+            </td>
+            <td>
+                <strong>567100 - 588600</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/brigadier_grade_3.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Brigadier Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>109 - 111</strong>
+            </td>
+            <td>
+                <strong>599500 - 599500</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/brigadier_grade_4.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>Brigadier Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>112 - 114</strong>
+            </td>
+            <td>
+                <strong>632800 - 655500</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/general.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>General</strong><br>
+            </td>
+            <td>
+                <strong>115 - 117</strong>
+            </td>
+            <td>
+                <strong>667000 - 690300</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/general_grade_2.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>General Grade 2</strong><br>
+            </td>
+            <td>
+                <strong>118 - 120</strong>
+            </td>
+            <td>
+                <strong>702100 - 726000</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/general_grade_3.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>General Grade 3</strong><br>
+            </td>
+            <td>
+                <strong>121 - 123</strong>
+            </td>
+            <td>
+                <strong>738100 - 762600</strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/general_grade_4.ico') }}" alt="">
+            </td>
+            <td>
+                <strong>General Grade 4</strong><br>
+            </td>
+            <td>
+                <strong>124 - 125+ </strong>
+            </td>
+            <td>
+                <strong>775000 - 787500+</strong>
+            </td>
+        </tr>
+
+
+        </tbody>
+    </table>&nbsp;
+{% endblock content %}
+
+
+{% block script %}
+<script>
+function hide(category, arrow) {
+    var category = document.getElementById(category);
+    var arrow = document.getElementById(arrow);
+
+    if (category.className === "container-stats"){
+        category.className = "d-none";
+        arrow.className = "fas fa-chevron-right";
+    } else {
+        category.className = "container-stats";
+        arrow.className = "fas fa-chevron-down";
+    }
+}
+</script>
+{% endblock %}
+
+
