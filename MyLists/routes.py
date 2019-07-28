@@ -21,7 +21,7 @@ from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, Change
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
     Friend, SeriesEpisodeTimestamp, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, \
-    AnimeEpisodeTimestamp, HomePage, HallOfFame, Status_book, Book, BookList, AnimeAchievements
+    AnimeEpisodeTimestamp, HomePage, HallOfFame, BookStatus, Book, BookList, AnimeAchievements
 
 
 config.read('config.ini')
@@ -1605,9 +1605,9 @@ def autocomplete_anime():
 ###################################################### Books Routes ####################################################
 
 
-@app.route("/mybookslist", methods=['GET', 'POST'])
+@app.route("/mybooklist", methods=['GET', 'POST'])
 @login_required
-def mybookslist():
+def mybooklist():
     reading_list = BookList.query.filter_by(user_id=current_user.get_id(), status='READING').all()
     completed_list = BookList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
     onhold_list = BookList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
@@ -1616,12 +1616,12 @@ def mybookslist():
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
-    return render_template('mybookslist.html', title='MyBooksList', all_data=book_data)
+    return render_template('mybooklist.html', title='MyBooksList', all_data=book_data)
 
 
-@app.route("/mybookslist_table", methods=['GET', 'POST'])
+@app.route("/mybooklist_table", methods=['GET', 'POST'])
 @login_required
-def mybookslist_table():
+def mybooklist_table():
     reading_list = BookList.query.filter_by(user_id=current_user.get_id(), status='READING').all()
     completed_list = BookList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
     onhold_list = BookList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
@@ -1630,7 +1630,7 @@ def mybookslist_table():
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
-    return render_template('mybookslist_table.html', title='MyBooksList', all_data=book_data)
+    return render_template('mybooklist_table.html', title='MyBooksList', all_data=book_data)
 
 
 @app.route('/delete_book', methods=['POST'])
@@ -2148,7 +2148,7 @@ def add_element(element_id, list_type):
         elif list_type == ListType.ANIME:
             return redirect(url_for('myanimelist'))
         elif list_type == ListType.BOOK:
-            return redirect(url_for('mybookslist'))
+            return redirect(url_for('mybooklist'))
 
     # Check if the ID element exist in the database
     if list_type == ListType.SERIES:
@@ -2234,7 +2234,7 @@ def add_element(element_id, list_type):
 
             book_id = add_element_in_base(book_data, cover_id, list_type)
             add_element_to_user(book_id, int(current_user.get_id()), list_type)
-            return redirect(url_for('mybookslist'))
+            return redirect(url_for('mybooklist'))
 
 
 def get_element_data_from_api(api_id, list_type):
@@ -2572,7 +2572,7 @@ def add_element_to_user(element_id, user_id, list_type):
                              book_id=element_id,
                              commentary= None,
                              read_year= None,
-                             status=Status_book.READING)
+                             status=BookStatus.READING)
 
         app.logger.info('[{}] Added book with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)

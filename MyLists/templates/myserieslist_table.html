@@ -721,7 +721,7 @@ function refreshAll() {
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/refresh_all_seriess",
+        url: "/refresh_all_series",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
             window.location.replace('/myserieslist_table'); }

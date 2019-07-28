@@ -17,7 +17,7 @@ class Status(enum.Enum):
     PLAN_TO_WATCH = "Plan to Watch"
 
 
-class Status_book(enum.Enum):
+class BookStatus(enum.Enum):
     READING = "Reading"
     COMPLETED = "Completed"
     ON_HOLD = "On Hold"
@@ -38,13 +38,13 @@ class HomePage(enum.Enum):
     HALL_OF_FAME = "hall_of_fame"
     MYSERIESLIST = "myserieslist"
     MYANIMELIST = "myanimelist"
-    MYBOOKLIST = "mybookslist"
+    MYBOOKLIST = "mybooklist"
 
 
 class HallOfFame(enum.Enum):
     MYSERIESLIST = "myserieslist"
     MYANIMELIST = "myanimelist"
-    MYBOOKLIST = "mybookslist"
+    MYBOOKLIST = "mybooklist"
 
 
 class User(db.Model, UserMixin):
@@ -254,5 +254,5 @@ class BookList(db.Model):
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
     commentary = db.Column(db.String(5000))
     read_year = db.Column(db.Integer)
-    status = db.Column(db.Enum(Status_book), nullable=False)
+    status = db.Column(db.Enum(BookStatus), nullable=False)
     score = db.Column(db.Float)

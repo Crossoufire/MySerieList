@@ -1,6 +1,6 @@
 # MyLists
 
-MyLists is a website with a beautiful and clear interface which allows you to track all your TV shows without remembering what was your last watched episode. It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see you friends' list and compare it to yours. You can see a live version here : [https://mylists.info](https://mylists.info).
+MyLists is a website with a beautiful and clear interface which allows you to track all your TV shows / Animes / Books. It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see you friends' list and compare it to yours. You can see a live version here : [https://mylists.info](https://mylists.info).
 
 ![MyLists](https://raw.githubusercontent.com/Crossoufire/MyLists/master/MyLists/static/img/home_img1.jpg)
 
@@ -8,7 +8,7 @@ MyLists uses [Flask](http://flask.pocoo.org/) and [Material Design for Bootstrap
 
 ## Features
 
-* Create a list of all your TV shows
+* Create a list of all your TV shows / Animes / Books
 * Compare your list with your friends
 * Get statistics about your list (time spent, number of episodes watched, etc)
 * More to come !
@@ -26,7 +26,7 @@ cd MyLists
 pip3 install -r requirements.txt
 ```
 
-Before starting the program, you MUST create a `config.ini` file respecting the following syntax :
+Before starting the program, you *MUST* create a `config.ini` file respecting the following syntax :
 
 ```
 [Flask]
@@ -44,6 +44,9 @@ private_key = <private key of Google reCAPTCHA>
 
 [TheMovieDB]
 api_key = <API key of TheMovieDB. You need to register on their website to get one>
+
+[GoogleBook]
+api_key = <API key of Google Books. You need to register on their website to get one>
 ```
 
 For example if you want to use Gmail, set `server = smtp.gmail.com` and `port = 465` . If you need more settings, feel free to adapt it as you want (file `Mylists/__init__.py`, parameters `app.config['MAIL_X]`).
