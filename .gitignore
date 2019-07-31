@@ -113,7 +113,6 @@ venv.bak/
 config.ini
 site.db
 site.db-journal
-MyLists/static/img/Original*
 MyLists/static/profile_pics/*
 !MyLists/static/profile_pics/default.jpg
 !MyLists/static/profile_pics/anonymous.jpg

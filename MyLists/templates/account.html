@@ -467,7 +467,7 @@ hr {
 
         <div class="container-friends">
             <div id="FRIENDS" class="row" style="margin-right: 0px; margin-left: 0px;">
-                <table class="table table-striped table-sm table-responsive-lg" cellspacing="0" width="100%">
+                <table class="table table-sm" cellspacing="0" width="100%">
                     {% for friend in friends_list_data %}
                     {% if friend['status'] == "pending" %}
                     <tr>
@@ -495,6 +495,9 @@ hr {
                         </td>
                         <td>
                             <a class="text-light" href="/user/anime/{{ friend['username'] }}">AnimeList</a>
+                        </td>
+                        <td>
+                            <a class="text-light" href="/user/book/{{ friend['username'] }}">BookList</a>
                         </td>
                         <td>
                             <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
