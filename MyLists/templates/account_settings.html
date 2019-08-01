@@ -91,7 +91,7 @@ hr {
         <div class="container-fluid">
             <div class="row">
                 <div class="col m-t-20 m-b-40">
-                    <h5 class="m-b-10">Change your home page:</h5>
+                    <h5 class="m-b-10">Default home page:</h5>
                     <div class="d-flex container-scrollable">
                         <select id="home_page" class="text-center form-control p-0 default_page">
                             {% if home_page == "account" %}
@@ -99,52 +99,52 @@ hr {
                                 <option>Hall of Fame</option>
                                 <option>MySeriesList</option>
                                 <option>MyAnimesList</option>
-                                <option>MyBookList</option>
+                                <option>MyBooksList</option>
                             {% elif home_page == "hall_of_fame" %}
                                 <option>Account</option>
                                 <option selected="selected">Hall of Fame</option>
                                 <option>MySeriesList</option>
                                 <option>MyAnimesList</option>
-                                <option>MyBookList</option>
+                                <option>MyBooksList</option>
                             {% elif home_page == "myserieslist" %}
                                 <option>Account</option>
                                 <option>Hall of Fame</option>
                                 <option selected="selected">MySeriesList</option>
                                 <option>MyAnimesList</option>
-                                <option>MyBookList</option>
-                            {% elif home_page == "myanimelist" %}
+                                <option>MyBooksList</option>
+                            {% elif home_page == "myanimeslist" %}
                                 <option>Account</option>
                                 <option>Hall of Fame</option>
                                 <option>MySeriesList</option>
                                 <option selected="selected">MyAnimesList</option>
-                                <option>MyBookList</option>
-                            {% elif home_page == "mybooklist" %}
+                                <option>MyBooksList</option>
+                            {% elif home_page == "mybookslist" %}
                                 <option>Account</option>
                                 <option>Hall of Fame</option>
                                 <option>MySeriesList</option>
                                 <option>MyAnimesList</option>
-                                <option selected="selected">MyBookList</option>
+                                <option selected="selected">MyBooksList</option>
                             {% endif %}
                         </select>
                     </div>
                 </div>
 
                 <div class="col m-t-20 m-b-40">
-                    <h5 class="m-b-10">Default hall of fame table:</h5>
+                    <h5 class="m-b-10">Default Hall of Fame table:</h5>
                     <div class="d-flex container-scrollable">
                         <select id="default_hof" class="text-center form-control p-0 default_hof">
                             {% if default_hof == "myserieslist" %}
                                 <option selected="selected">MySeriesList</option>
                                 <option>MyAnimesList</option>
-                                <option>MyBookList</option>
+                                <option>MyBooksList</option>
                             {% elif default_hof == "myanimelist" %}
                                 <option>MySeriesList</option>
                                 <option selected="selected">MyAnimesList</option>
-                                <option>MyBookList</option>
+                                <option>MyBooksList</option>
                             {% elif default_hof == "mybooklist" %}
                                 <option>MySeriesList</option>
                                 <option>MyAnimesList</option>
-                                <option selected="selected">MyBookList</option>
+                                <option selected="selected">MyBooksList</option>
                             {% endif %}
                         </select>
                     </div>

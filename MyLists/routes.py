@@ -810,9 +810,9 @@ def anonymous():
 ##################################################### Anime/Serie routes ###############################################
 
 
-@app.route("/myanimelist", methods=['GET', 'POST'])
+@app.route("/myanimeslist", methods=['GET', 'POST'])
 @login_required
-def myanimelist():
+def myanimeslist():
     watching_list     = AnimeList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').all()
     completed_list    = AnimeList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
     onhold_list       = AnimeList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
@@ -852,9 +852,9 @@ def myserieslist():
                            user_id=user_id)
 
 
-@app.route("/myanimelist_table", methods=['GET', 'POST'])
+@app.route("/myanimeslist_table", methods=['GET', 'POST'])
 @login_required
-def myanimelist_table():
+def myanimeslist_table():
     watching_list    = AnimeList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').all()
     completed_list   = AnimeList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
     onhold_list      = AnimeList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
@@ -864,7 +864,7 @@ def myanimelist_table():
 
     anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     anime_data = get_list_data(anime_list, ListType.ANIME)
-    return render_template('myanimelist_table.html', title='MyAnimeList', all_data=anime_data)
+    return render_template('myanimeslist_table.html', title='MyAnimeList', all_data=anime_data)
 
 
 @app.route("/myserieslist_table", methods=['GET', 'POST'])
@@ -1326,16 +1326,16 @@ def refresh_all_element():
     return '', 204
 
 
-@app.route("/user/anime/<user_name>")
+@app.route("/user/animes/<user_name>")
 @login_required
-def user_anime(user_name):
+def user_animes(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
     if user and str(user.id) == current_user.get_id():
-        return redirect(url_for('myanimelist'))
+        return redirect(url_for('myanimeslist'))
 
     friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
     if user.private:
@@ -1499,9 +1499,9 @@ def autocomplete_series():
 ###################################################### Books Routes ####################################################
 
 
-@app.route("/mybooklist", methods=['GET', 'POST'])
+@app.route("/mybookslist", methods=['GET', 'POST'])
 @login_required
-def mybooklist():
+def mybookslist():
     reading_list = BookList.query.filter_by(user_id=current_user.get_id(), status='READING').all()
     completed_list = BookList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
     onhold_list = BookList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
@@ -1513,9 +1513,9 @@ def mybooklist():
     return render_template('mybookslist.html', title='MyBooksList', all_data=book_data)
 
 
-@app.route("/mybooklist_table", methods=['GET', 'POST'])
+@app.route("/mybookslist_table", methods=['GET', 'POST'])
 @login_required
-def mybooklist_table():
+def mybookslist_table():
     reading_list = BookList.query.filter_by(user_id=current_user.get_id(), status='READING').all()
     completed_list = BookList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
     onhold_list = BookList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
@@ -1596,7 +1596,7 @@ def change_book_category():
     return '', 204
 
 
-@app.route("/user/book/<user_name>")
+@app.route("/user/books/<user_name>")
 @login_required
 def user_book(user_name):
     image_error = url_for('static', filename='img/error.jpg')
@@ -1627,7 +1627,7 @@ def user_book(user_name):
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
-    return render_template('user_book_list.html', title='{}\'s list'.format(user.username), all_data=book_data)
+    return render_template('user_books_list.html', title='{}\'s list'.format(user.username), all_data=book_data)
 
 
 @app.route('/add_book', methods=['POST'])
@@ -2124,7 +2124,7 @@ def add_element(element_id, list_type):
 
             book_id = add_element_in_base(book_data, cover_id, list_type)
             add_element_to_user(book_id, int(current_user.get_id()), list_type)
-            return redirect(url_for('mybooklist'))
+            return redirect(url_for('mybookslist'))
 
 
 def get_element_data_from_api(api_id, list_type):
