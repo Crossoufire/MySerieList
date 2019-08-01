@@ -118,8 +118,8 @@ MyLists/static/profile_pics/*
 !MyLists/static/profile_pics/anonymous.jpg
 MyLists/static/series_covers/*
 !MyLists/static/series_covers/default.jpg
-MyLists/static/anime_covers/*
-!MyLists/static/anime_covers/default.jpg
+MyLists/static/animes_covers/*
+!MyLists/static/animes_covers/default.jpg
 MyLists/static/books_covers/*
 !MyLists/static/books_covers/default.jpg
 start.sh
