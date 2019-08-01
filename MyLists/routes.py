@@ -223,7 +223,7 @@ def home():
         elif user.home_page == HomePage.MYSERIESLIST:
             return redirect(url_for('myserieslist'))
         elif user.home_page == HomePage.MYANIMESLIST:
-            return redirect(url_for('myanimelist'))
+            return redirect(url_for('myanimeslist'))
 
     else:
         home_header = url_for('static', filename='img/home_header.jpg')
@@ -1207,9 +1207,9 @@ def autocomplete_series():
 ##################################################### Anime routes #####################################################
 
 
-@app.route("/myanimelist", methods=['GET', 'POST'])
+@app.route("/myanimeslist", methods=['GET', 'POST'])
 @login_required
-def myanimelist():
+def myanimeslist():
     watching_list    = AnimeList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').all()
     completed_list   = AnimeList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
     onhold_list      = AnimeList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
@@ -1222,9 +1222,9 @@ def myanimelist():
     return render_template('myanimeslist.html', title='MyAnimesList', all_data=anime_data)
 
 
-@app.route("/myanimelist_table", methods=['GET', 'POST'])
+@app.route("/myanimeslist_table", methods=['GET', 'POST'])
 @login_required
-def myanimelist_table():
+def myanimeslist_table():
     watching_list    = AnimeList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').all()
     completed_list   = AnimeList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
     onhold_list      = AnimeList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
@@ -1521,7 +1521,7 @@ def user_anime(user_name):
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
     if user and str(user.id) == current_user.get_id():
-        return redirect(url_for('myanimelist'))
+        return redirect(url_for('myanimeslist'))
 
     friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
 
@@ -1718,7 +1718,7 @@ def user_book(user_name):
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
     if user and str(user.id) == current_user.get_id():
-        return redirect(url_for('myanimelist'))
+        return redirect(url_for('mybookslist'))
 
     friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
 
@@ -2157,9 +2157,9 @@ def add_element(element_id, list_type):
         if list_type == ListType.SERIES:
             return redirect(url_for('myserieslist'))
         elif list_type == ListType.ANIME:
-            return redirect(url_for('myanimelist'))
+            return redirect(url_for('myanimeslist'))
         elif list_type == ListType.BOOK:
-            return redirect(url_for('mybooklist'))
+            return redirect(url_for('mybookslist'))
 
     # Check if the ID element exist in the database
     if list_type == ListType.SERIES:
@@ -2230,7 +2230,7 @@ def add_element(element_id, list_type):
 
             anime_id = add_element_in_base(anime_data, cover_id, list_type)
             add_element_to_user(anime_id, int(current_user.get_id()), list_type)
-            return redirect(url_for('myanimelist'))
+            return redirect(url_for('myanimeslist'))
         elif list_type == ListType.BOOK:
             book_data = get_element_data_from_api(element_id, ListType.BOOK)
             if book_data is None:
