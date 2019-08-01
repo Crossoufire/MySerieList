@@ -19,7 +19,7 @@ try:
     captcha_public = config['Captcha']['public_key']
     captcha_private = config['Captcha']['private_key']
 except:
-    print("Config file error. Exit.")
+    print("Config file error. Please read the README to configure the config.ini file properly. Exit.")
     sys.exit()
 
 app = Flask(__name__)

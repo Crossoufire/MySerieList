@@ -37,14 +37,14 @@ class HomePage(enum.Enum):
     ACCOUNT = "account"
     HALL_OF_FAME = "hall_of_fame"
     MYSERIESLIST = "myserieslist"
-    MYANIMELIST = "myanimelist"
-    MYBOOKLIST = "mybooklist"
+    MYANIMESLIST = "myanimelist"
+    MYBOOKSLIST = "mybooklist"
 
 
 class HallOfFame(enum.Enum):
     MYSERIESLIST = "myserieslist"
-    MYANIMELIST = "myanimelist"
-    MYBOOKLIST = "mybooklist"
+    MYANIMESLIST = "myanimelist"
+    MYBOOKSLIST = "mybooklist"
 
 
 class User(db.Model, UserMixin):

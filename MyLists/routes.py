@@ -29,7 +29,7 @@ try:
     themoviedb_api_key = config['TheMovieDB']['api_key']
     google_book_api_key = config['GoogleBook']['api_key']
 except:
-    print("Config file error. Exit.")
+    print("Config file error. Please read the README to configure the config.ini file properly. Exit.")
     sys.exit()
 
 
@@ -222,7 +222,7 @@ def home():
             return redirect(url_for('hall_of_fame'))
         elif user.home_page == HomePage.MYSERIESLIST:
             return redirect(url_for('myserieslist'))
-        elif user.home_page == HomePage.MYANIMELIST:
+        elif user.home_page == HomePage.MYANIMESLIST:
             return redirect(url_for('myanimelist'))
 
     else:
@@ -354,9 +354,15 @@ def account():
 
     total_level = int(series_stats[3][0]) + int(anime_stats[3][0]) + int(book_stats[3][0])
     list_total_rank_element = []
-    with open("{0}".format(os.path.join(app.root_path, "static\\img\\Original\\Ranks_unity.csv")), "r") as fp:
-        for line in fp:
-            list_total_rank_element.append(line.split(";"))
+
+    if platform.system() == "Windows":
+        fp = open("{0}".format(os.path.join(app.root_path, "static\\img\\Original\\Ranks_unity.csv")), "r")
+    else:  # Linux & macOS
+        fp = open("{0}".format(os.path.join(app.root_path, "static/img/Original/Ranks_unity.csv")), "r")
+
+    for line in fp:
+        list_total_rank_element.append(line.split(";"))
+    fp.close()
 
     total_rank_data = []
     for i in range(0, len(list_total_rank_element)):
@@ -482,7 +488,7 @@ def default_page():
     elif home_page == 2:
         user.home_page = HomePage.MYSERIESLIST
     elif home_page == 3:
-        user.home_page = HomePage.MYANIMELIST
+        user.home_page = HomePage.MYANIMESLIST
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -505,7 +511,7 @@ def default_hof():
     if default_hof == 0:
         user.default_hof = HallOfFame.MYSERIESLIST
     elif default_hof == 1:
-        user.default_hof = HallOfFame.MYANIMELIST
+        user.default_hof = HallOfFame.MYANIMESLIST
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1213,7 +1219,7 @@ def myanimelist():
 
     anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     anime_data = get_list_data(anime_list, ListType.ANIME)
-    return render_template('myanimelist.html', title='MyAnimeList', all_data=anime_data)
+    return render_template('myanimeslist.html', title='MyAnimesList', all_data=anime_data)
 
 
 @app.route("/myanimelist_table", methods=['GET', 'POST'])
@@ -1228,7 +1234,7 @@ def myanimelist_table():
 
     anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     anime_data = get_list_data(anime_list, ListType.ANIME)
-    return render_template('myanimelist_table.html', title='MyAnimeList', all_data=anime_data)
+    return render_template('myanimeslist_table.html', title='MyAnimesList', all_data=anime_data)
 
 
 @app.route('/update_anime_season', methods=['POST'])
@@ -1537,7 +1543,7 @@ def user_anime(user_name):
 
     anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     anime_data = get_list_data(anime_list, ListType.ANIME)
-    return render_template('user_anime_list.html', title='{}\'s list'.format(user.username), all_data=anime_data)
+    return render_template('user_animes_list.html', title='{}\'s list'.format(user.username), all_data=anime_data)
 
 
 @app.route('/add_anime', methods=['POST'])
@@ -1616,7 +1622,7 @@ def mybooklist():
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
-    return render_template('mybooklist.html', title='MyBooksList', all_data=book_data)
+    return render_template('mybookslist.html', title='MyBooksList', all_data=book_data)
 
 
 @app.route("/mybooklist_table", methods=['GET', 'POST'])
@@ -1630,7 +1636,7 @@ def mybooklist_table():
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
-    return render_template('mybooklist_table.html', title='MyBooksList', all_data=book_data)
+    return render_template('mybookslist_table.html', title='MyBooksList', all_data=book_data)
 
 
 @app.route('/delete_book', methods=['POST'])
@@ -1822,9 +1828,14 @@ def get_all_account_stats(list_type):
     element_level = element_level_tmp.split('.')
 
     list_rank_element = []
-    with open("{0}".format(os.path.join(app.root_path, "static\\img\\Ranks\\Ranks.csv")), "r") as fp:
-        for line in fp:
-            list_rank_element.append(line.split(";"))
+
+    if platform.system() == "Windows":
+        fp = open("{0}".format(os.path.join(app.root_path, "static\\img\\Ranks\\Ranks.csv")), "r")
+    else:  # Linux & macOS
+        fp = open("{0}".format(os.path.join(app.root_path, "static/img/Ranks/Ranks.csv")), "r")
+    for line in fp:
+        list_rank_element.append(line.split(";"))
+    fp.close()
 
     element_rank_data = []
     for i in range(0, len(list_rank_element)):
@@ -1937,7 +1948,7 @@ def autocomplete_search_element(element_name, list_type):
         cover_url = url_for('static', filename="series_covers/")
     elif list_type == ListType.ANIME:
         element = Anime.query.filter(Anime.name.like("%{0}%".format(element_name))).all()
-        cover_url = url_for('static', filename="anime_covers/")
+        cover_url = url_for('static', filename="animes_covers/")
     elif list_type == ListType.BOOK:
         element = Book.query.filter(Book.title.like("%{0}%".format(element_name))).all()
         cover_url = url_for('static', filename="books_covers/")
@@ -2005,7 +2016,7 @@ def autocomplete_search_element(element_name, list_type):
                                 tmdb_results.append(tmp)
                         else:
                             if data["results"][i]["poster_path"] is None:
-                                data["results"][i]["poster_path"] = url_for('static', filename="anime_covers/default.jpg")
+                                data["results"][i]["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
                                 url = ".."
                             else:
                                 url = "http://image.tmdb.org/t/p/w300/"
@@ -2068,7 +2079,7 @@ def autocomplete_search_element(element_name, list_type):
                         if 16 in genre_id:
                             if "JP" in country:
                                 if data["results"][i]["poster_path"] is None:
-                                    data["results"][i]["poster_path"] = url_for('static', filename="anime_covers/default.jpg")
+                                    data["results"][i]["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
                                     url = ".."
                                 else:
                                     url = "http://image.tmdb.org/t/p/w300/"
@@ -2282,9 +2293,9 @@ def save_api_cover(cover_path, list_type):
             local_covers_path = os.path.join(app.root_path, "static/series_covers/")
     elif list_type == ListType.ANIME:
         if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\\anime_covers\\")
+            local_covers_path = os.path.join(app.root_path, "static\\animes_covers\\")
         else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/anime_covers/")
+            local_covers_path = os.path.join(app.root_path, "static/animes_covers/")
     elif list_type == ListType.BOOK:
         if platform.system() == "Windows":
             local_covers_path = os.path.join(app.root_path, "static\\books_covers\\")
@@ -2593,7 +2604,7 @@ def get_list_data(list, list_type):
                 element_data_networks = SeriesNetwork.query.filter_by(series_id=element.series_id).all()
             elif list_type == ListType.ANIME:
                 element_data = Anime.query.filter_by(id=element.anime_id).first()
-                cover_url = url_for('static', filename="anime_covers/{}".format(element_data.image_cover))
+                cover_url = url_for('static', filename="animes_covers/{}".format(element_data.image_cover))
                 element_data_genres = AnimeGenre.query.filter_by(anime_id=element.anime_id).all()
                 element_data_networks = AnimeNetwork.query.filter_by(anime_id=element.anime_id).all()
             elif list_type == ListType.BOOK:
@@ -2790,9 +2801,9 @@ def refresh_element_data(element_id, list_type):
             local_covers_path = os.path.join(app.root_path, "static/series_covers/")
     elif list_type == ListType.ANIME:
         if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\\anime_covers\\")
+            local_covers_path = os.path.join(app.root_path, "static\\animes_covers\\")
         else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/anime_covers/")
+            local_covers_path = os.path.join(app.root_path, "static/animes_covers/")
 
     try:
         urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(element_poster),

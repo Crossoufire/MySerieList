@@ -350,5 +350,13 @@
 <script type="text/javascript">
     // Animations initialization
     new WOW().init();
+
+    $('#modalLoginForm').on('shown.bs.modal', function() {
+        $('#login_username').focus();
+    })
+
+    $('#modalRegisterForm').on('shown.bs.modal', function() {
+        $('#register_username').focus();
+    })
 </script>
 {% endblock script %}

@@ -2,7 +2,7 @@
 
 
 {% block css %}
-<!-------------- Princiapl CSS ------------->
+<!-------------- Main CSS ------------->
 <style>
 .modal-content {
     background: #131418;
@@ -184,7 +184,7 @@ hr {
     margin-left: auto;
 }
 </style>
-<!------ level + badge + total level ------->
+<!---- level + badge + total level ---->
 <style>
 .account-bar-wrapper {
     width: 350px;
@@ -569,6 +569,11 @@ hr {
             </div>
 
             <figure class="d-flex">
+                {% if series_stats[5] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
+                <span class="block" title="Empty" style="background-color: black !important; border-width: 1px; border-style: solid; border-color: #717171">
+                    <span id="100%" class="value"></span>
+                </span>
+                {% else %}
                 <span class="block" title="Watching">
                     <span id="{{ series_stats[5][0] }}%" class="value"></span>
                 </span>
@@ -587,6 +592,7 @@ hr {
                 <span class="block" title="Plan to Watch">
                     <span id="{{ series_stats[5][5] }}%" class="value"></span>
                 </span>
+                {% endif %}
             </figure>
 
             <div class="m-t-10">
@@ -671,6 +677,11 @@ hr {
             </div>
 
             <figure class="d-flex">
+                {% if anime_stats[5] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
+                <span class="block" title="Empty" style="background-color: black !important; border-width: 1px; border-style: solid; border-color: #717171">
+                    <span id="100%" class="value"></span>
+                </span>
+                {% else %}
                 <span class="block" title="Watching">
                     <span id="{{ anime_stats[5][0] }}%" class="value"></span>
                 </span>
@@ -689,6 +700,7 @@ hr {
                 <span class="block" title="Plan to Watch">
                     <span id="{{ anime_stats[5][5] }}%" class="value"></span>
                 </span>
+                {% endif %}
             </figure>
 
             <div class="m-t-10">
@@ -773,6 +785,11 @@ hr {
             </div>
 
             <figure class="d-flex">
+                {% if book_stats[5] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
+                <span class="block" title="Empty" style="background-color: black !important; border-width: 1px; border-style: solid; border-color: #717171">
+                    <span id="100%" class="value"></span>
+                </span>
+                {% else %}
                 <span class="block" title="Reading">
                     <span id="{{ book_stats[5][0] }}%" class="value"></span>
                 </span>
@@ -788,6 +805,7 @@ hr {
                 <span class="block" title="Plan to Read">
                     <span id="{{ book_stats[5][4] }}%" class="value"></span>
                 </span>
+                {% endif %}
             </figure>
 
             <div class="m-t-10">
@@ -828,15 +846,6 @@ hr {
                     <div class="col p-0 position">
                         <span class="stat_text">{{ book_stats[0][2] }}</span>
                     </div>
-                    <div class="col mini p-r-0">
-                        <span class="stat_text"></span>
-                    </div>
-                    <div class="col p-l-0 position">
-                        <span class="stat_text"></span>
-                    </div>
-                </div>
-
-                <div class="row">
                     <div class="col mini p-r-0">
                         <span class="stat_text">Pages read:</span>
                     </div>
