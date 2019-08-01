@@ -864,7 +864,13 @@ def myanimeslist_table():
 
     anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     anime_data = get_list_data(anime_list, ListType.ANIME)
-    return render_template('myanimeslist_table.html', title='MyAnimeList', all_data=anime_data)
+    element_type = "ANIME"
+    user_id = current_user.get_id()
+    return render_template('mymedialist_table.html',
+                           title='MyAnimeList',
+                           all_data=anime_data,
+                           element_type=element_type,
+                           user_id=user_id)
 
 
 @app.route("/myserieslist_table", methods=['GET', 'POST'])
@@ -879,7 +885,13 @@ def myserieslist_table():
 
     series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     series_data = get_list_data(series_list, ListType.SERIES)
-    return render_template('myserieslist_table.html', title='MySeriesList', all_data=series_data)
+    element_type = "SERIES"
+    user_id = current_user.get_id()
+    return render_template('mymedialist_table.html',
+                           title='MySeriesList',
+                           all_data=series_data,
+                           element_type=element_type,
+                           user_id=user_id)
 
 
 @app.route('/update_element_season', methods=['POST'])
@@ -1326,9 +1338,9 @@ def refresh_all_element():
     return '', 204
 
 
-@app.route("/user/animes/<user_name>")
+@app.route("/user/anime/grid/<user_name>")
 @login_required
-def user_animes(user_name):
+def user_anime_grid(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
@@ -1364,9 +1376,9 @@ def user_animes(user_name):
                            element_type=element_type)
 
 
-@app.route("/user/series/<user_name>")
+@app.route("/user/series/grid/<user_name>")
 @login_required
-def user_series_list(user_name):
+def user_series_grid(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
@@ -1396,6 +1408,82 @@ def user_series_list(user_name):
     user_id = user.id
     element_type = "SERIES"
     return render_template('mymedialist.html',
+                           title='{}\'s list'.format(user.username),
+                           all_data=series_data,
+                           user_id=user_id,
+                           element_type=element_type)
+
+
+@app.route("/user/anime/table/<user_name>")
+@login_required
+def user_anime_table(user_name):
+    image_error = url_for('static', filename='img/error.jpg')
+    user = User.query.filter_by(username=user_name).first()
+
+    if user is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+    if user and str(user.id) == current_user.get_id():
+        return redirect(url_for('myanimelist_table'))
+
+    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+    if user.private:
+        if current_user.get_id() == "1":
+            pass
+        elif friend is None or friend.status != "accepted":
+            return redirect(url_for('anonymous'))
+    if user.id == 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    watching_list     = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
+    completed_list    = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list       = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    random_list       = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').all()
+    dropped_list      = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantowatch_list  = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
+
+    anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    anime_data = get_list_data(anime_list, ListType.ANIME)
+    user_id = user.id
+    element_type = "ANIME"
+    return render_template('mymedialist_table.html',
+                           title='{}\'s list'.format(user.username),
+                           all_data=anime_data,
+                           user_id=user_id,
+                           element_type=element_type)
+
+
+@app.route("/user/series/table/<user_name>")
+@login_required
+def user_series_table(user_name):
+    image_error = url_for('static', filename='img/error.jpg')
+    user = User.query.filter_by(username=user_name).first()
+
+    if user is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+    if user and str(user.id) == current_user.get_id():
+        return redirect(url_for('myserieslist_table'))
+
+    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+    if user.private:
+        if current_user.get_id() == "1":
+            pass
+        elif friend is None or friend.status != "accepted":
+            return redirect(url_for('anonymous'))
+    if user.id == 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    watching_list     = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
+    completed_list    = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list       = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    random_list       = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').all()
+    dropped_list      = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantowatch_list  = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
+
+    series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    series_data = get_list_data(series_list, ListType.SERIES)
+    user_id = user.id
+    element_type = "SERIES"
+    return render_template('mymedialist_table.html',
                            title='{}\'s list'.format(user.username),
                            all_data=series_data,
                            user_id=user_id,
