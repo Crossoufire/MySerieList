@@ -347,7 +347,7 @@ def account():
 
     # Animes Statistics, scores, and level
     anime_stats = get_all_account_stats(ListType.ANIME)
-    anime_achievements = get_anime_achievements()
+    anime_achievements = get_animes_achievements()
 
     # Books Statistics, scores, and level
     book_stats = get_all_account_stats(ListType.BOOK)
@@ -820,13 +820,13 @@ def myanimeslist():
     dropped_list      = AnimeList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').all()
     plantowatch_list  = AnimeList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').all()
 
-    anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-    anime_data = get_list_data(anime_list, ListType.ANIME)
+    animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    animes_data = get_list_data(animes_list, ListType.ANIME)
     element_type = "ANIME"
     user_id = current_user.get_id()
     return render_template('mymedialist.html',
                            title='MyAnimeList',
-                           all_data=anime_data,
+                           all_data=animes_data,
                            element_type=element_type,
                            user_id=user_id)
 
@@ -862,13 +862,13 @@ def myanimeslist_table():
     dropped_list     = AnimeList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').all()
     plantowatch_list = AnimeList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').all()
 
-    anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-    anime_data = get_list_data(anime_list, ListType.ANIME)
+    animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    animes_data = get_list_data(animes_list, ListType.ANIME)
     element_type = "ANIME"
     user_id = current_user.get_id()
     return render_template('mymedialist_table.html',
                            title='MyAnimeList',
-                           all_data=anime_data,
+                           all_data=animes_data,
                            element_type=element_type,
                            user_id=user_id)
 
@@ -1338,9 +1338,9 @@ def refresh_all_element():
     return '', 204
 
 
-@app.route("/user/anime/grid/<user_name>")
+@app.route("/user/animes/grid/<user_name>")
 @login_required
-def user_anime_grid(user_name):
+def user_animes_grid(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
@@ -1365,13 +1365,13 @@ def user_anime_grid(user_name):
     dropped_list      = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
     plantowatch_list  = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
 
-    anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-    anime_data = get_list_data(anime_list, ListType.ANIME)
+    animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    animes_data = get_list_data(animes_list, ListType.ANIME)
     user_id = user.id
     element_type = "ANIME"
     return render_template('mymedialist.html',
                            title='{}\'s list'.format(user.username),
-                           all_data=anime_data,
+                           all_data=animes_data,
                            user_id=user_id,
                            element_type=element_type)
 
@@ -1414,16 +1414,16 @@ def user_series_grid(user_name):
                            element_type=element_type)
 
 
-@app.route("/user/anime/table/<user_name>")
+@app.route("/user/animes/table/<user_name>")
 @login_required
-def user_anime_table(user_name):
+def user_animes_table(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
     if user and str(user.id) == current_user.get_id():
-        return redirect(url_for('myanimelist_table'))
+        return redirect(url_for('myanimeslist_table'))
 
     friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
     if user.private:
@@ -1441,13 +1441,13 @@ def user_anime_table(user_name):
     dropped_list      = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
     plantowatch_list  = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
 
-    anime_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-    anime_data = get_list_data(anime_list, ListType.ANIME)
+    animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    animes_data = get_list_data(animes_list, ListType.ANIME)
     user_id = user.id
     element_type = "ANIME"
     return render_template('mymedialist_table.html',
                            title='{}\'s list'.format(user.username),
-                           all_data=anime_data,
+                           all_data=animes_data,
                            user_id=user_id,
                            element_type=element_type)
 
@@ -1562,9 +1562,9 @@ def add_score_element():
     return '', 204
 
 
-@app.route('/autocomplete_anime', methods=['GET'])
+@app.route('/autocomplete_animes', methods=['GET'])
 @login_required
-def autocomplete_anime():
+def autocomplete_animes():
     search = request.args.get('q')
     if "%" in search:
         return jsonify([])
@@ -1835,7 +1835,7 @@ def get_all_account_stats(list_type):
     return [nb_of_element, total_time_element, mean_score_element, element_level, element_rank_data, element_rate]
 
 
-def get_anime_achievements():
+def get_animes_achievements():
     all_achievements = []
     tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10 = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     animes = AnimeList.query.filter(AnimeList.status == "COMPLETED").filter_by(user_id=current_user.get_id()).all()
@@ -1921,7 +1921,6 @@ def autocomplete_search_element(element_name, list_type):
         cover_url = url_for('static', filename="books_covers/")
 
     if list_type == ListType.SERIES:
-        i = 0
         local_results = []
         for i in range(5):
             try:
@@ -1961,7 +1960,6 @@ def autocomplete_search_element(element_name, list_type):
                 else:
                     return local_results
             else:
-                i = 0
                 tmdb_results = []
                 for i in range(8):
                     try:
@@ -1973,7 +1971,6 @@ def autocomplete_search_element(element_name, list_type):
                             else:
                                 if data["results"][i]["poster_path"] is None:
                                     data["results"][i]["poster_path"] = url_for('static', filename="series_covers/default.jpg")
-                                    url = ".."
                                 else:
                                     url = "http://image.tmdb.org/t/p/w300/"
                                     tmp = {"id": "{0}".format(data['results'][i]['id']),
@@ -1984,7 +1981,6 @@ def autocomplete_search_element(element_name, list_type):
                         else:
                             if data["results"][i]["poster_path"] is None:
                                 data["results"][i]["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
-                                url = ".."
                             else:
                                 url = "http://image.tmdb.org/t/p/w300/"
                                 tmp = {"id": "{0}".format(data['results'][i]['id']),
@@ -2047,7 +2043,6 @@ def autocomplete_search_element(element_name, list_type):
                             if "JP" in country:
                                 if data["results"][i]["poster_path"] is None:
                                     data["results"][i]["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
-                                    url = ".."
                                 else:
                                     url = "http://image.tmdb.org/t/p/w300/"
                                     tmp = {"id": "{0}".format(data['results'][i]['id']),

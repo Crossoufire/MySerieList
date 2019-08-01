@@ -660,7 +660,7 @@ $(function() {
       delay: 500,
       source: function(request, response) {
             {% if element_type == "ANIME" %}
-                $.getJSON("{{url_for('autocomplete_anime')}}",{
+                $.getJSON("{{url_for('autocomplete_animes')}}",{
                     q: request.term,
                 },
                     function(data) {
