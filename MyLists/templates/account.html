@@ -356,7 +356,6 @@ hr {
             <div class="bd-highlight">
                 <h4 class="mt-0 account-heading username">{{ current_user.username }}</h4>
                 <span style="font-size: 14pt;">Total:&nbsp&nbsp</span><img height='66' width='66' data-toggle="tooltip" title="{{ total_rank_data[0][1] }}" src="../static/img/Original/{{ total_rank_data[0][0] }}.png"/>
-                <!--<span class="total_score text-light"></span>-->
             </div>
             <div class="ml-auto bd-highlight">
                 <a class="btn btn-sm bg-dark m-0" href="{{ url_for('account_settings') }}" role="button">
@@ -855,7 +854,6 @@ hr {
                 </div>
             </div>
         </div>
-        <canvas id="canvas"></canvas>
     </div>
 </div>
 <div class="modal_loading"></div>
@@ -994,91 +992,5 @@ $(document).ready(function(){
         $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-book").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
     }, 20*parseFloat({{ book_stats[3][1] }}));
 });
-</script>
-<!--------------- chart JS ---------------->
-<script>
-var barChartData = {
-    labels: ['0-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8', '8-9', '9-10'],
-    datasets: [{
-        label: 'N° Series',
-        borderWidth: 2,
-        data: {{ chart_data[1] }},
-        backgroundColor: [
-            'rgba(185, 75, 100, 0.7)',
-            'rgba(185, 75, 100, 0.7)',
-            'rgba(185, 75, 100, 0.7)',
-            'rgba(185, 75, 100, 0.7)',
-            'rgba(185, 75, 100, 0.7)',
-            'rgba(185, 75, 100, 0.7)',
-            'rgba(185, 75, 100, 0.7)',
-            'rgba(185, 75, 100, 0.7)',
-            'rgba(185, 75, 100, 0.7)',
-            'rgba(185, 75, 100, 0.7)',
-            'rgba(185, 75, 100, 0.7)',
-            'rgba(185, 75, 100, 0.7)',
-        ],
-        borderColor: [
-            'rgba(23, 23, 23, 0.8)',
-            'rgba(23, 23, 23, 0.8)',
-            'rgba(23, 23, 23, 0.8)',
-            'rgba(23, 23, 23, 0.8)',
-            'rgba(23, 23, 23, 0.8)',
-            'rgba(23, 23, 23, 0.8)',
-            'rgba(23, 23, 23, 0.8)',
-            'rgba(23, 23, 23, 0.8)',
-            'rgba(23, 23, 23, 0.8)',
-            'rgba(23, 23, 23, 0.8)',
-            'rgba(23, 23, 23, 0.8)',
-            'rgba(23, 23, 23, 0.8)'
-        ],
-    }]
-};
-
-window.onload = function() {
-    var ctx = document.getElementById('canvas').getContext('2d');
-    var myBar = new Chart(ctx, {
-        type: 'bar',
-        data: barChartData,
-        options: {
-            legend: {
-                labels: {
-                    fontColor: "#ffffff",
-                }
-            },
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true,
-                        fontColor: "#ffffff",
-                    },
-                    gridLines: {
-                        display: true,
-                        drawBorder: true,
-                        color: "rgba(255, 255, 255, 0.2)",
-                    }
-                }],
-                xAxes: [{
-                    ticks: {
-                        fontColor: "#ffffff",
-                    },
-                    gridLines: {
-                        display: true,
-                        drawBorder: true,
-                        color: "rgba(255, 255, 255, 0.2)",
-                    }
-                }],
-            },
-            responsive: true,
-            legend: {
-                position: 'top',
-            },
-            title: {
-                display: true,
-                text: 'Series vs Score'
-            }
-        }
-    });
-
-};
 </script>
 {% endblock %}

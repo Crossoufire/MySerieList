@@ -328,3 +328,91 @@ _renderItem: function(ul, item) {
     <!--$('.score_size').css('font-size', value/17 + "pt");-->
     <!--$('.card-footer').css('height', value/8,0645);-->
 <!--</script>-->
+
+
+        <!--------------- chart JS ---------------->
+<script>
+var barChartData = {
+    labels: ['0-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8', '8-9', '9-10'],
+    datasets: [{
+        label: 'N° Series',
+        borderWidth: 2,
+        data: {{ chart_data[1] }},
+        backgroundColor: [
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+            'rgba(185, 75, 100, 0.7)',
+        ],
+        borderColor: [
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)',
+            'rgba(23, 23, 23, 0.8)'
+        ],
+    }]
+};
+
+window.onload = function() {
+    var ctx = document.getElementById('canvas').getContext('2d');
+    var myBar = new Chart(ctx, {
+        type: 'bar',
+        data: barChartData,
+        options: {
+            legend: {
+                labels: {
+                    fontColor: "#ffffff",
+                }
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: "#ffffff",
+                    },
+                    gridLines: {
+                        display: true,
+                        drawBorder: true,
+                        color: "rgba(255, 255, 255, 0.2)",
+                    }
+                }],
+                xAxes: [{
+                    ticks: {
+                        fontColor: "#ffffff",
+                    },
+                    gridLines: {
+                        display: true,
+                        drawBorder: true,
+                        color: "rgba(255, 255, 255, 0.2)",
+                    }
+                }],
+            },
+            responsive: true,
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Series vs Score'
+            }
+        }
+    });
+
+};
+</script>

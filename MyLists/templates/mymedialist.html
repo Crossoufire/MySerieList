@@ -692,7 +692,7 @@ $(function() {
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
                     {% if element_type == "ANIME" %}
-                        window.location.replace('/myanimelist');
+                        window.location.replace('/myanimeslist');
                     {% else %}
                         window.location.replace('/myserieslist');
                     {% endif %}

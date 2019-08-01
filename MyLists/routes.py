@@ -319,8 +319,6 @@ def logout():
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
-    #add_achievements()
-    chart_data = test_stats_series()
     add_friend_form = AddFriendForm()
     if add_friend_form.validate_on_submit():
         if str(add_friend_form.add_friend.data) == str(current_user.username):
@@ -343,15 +341,16 @@ def account():
         friends_list_data.append(friend_data)
 
     # Series Statistics, scores and level
-    series_stats = get_all_account_stats(ListType.SERIES)
+    series_stats = get_all_account_stats(current_user.get_id(), ListType.SERIES)
 
-    # Animes Statistics, scores, and level
-    anime_stats = get_all_account_stats(ListType.ANIME)
+    # Animes Statistics, scores, level, and achievements
+    anime_stats = get_all_account_stats(current_user.get_id(), ListType.ANIME)
     anime_achievements = get_animes_achievements()
 
     # Books Statistics, scores, and level
-    book_stats = get_all_account_stats(ListType.BOOK)
+    book_stats = get_all_account_stats(current_user.get_id(), ListType.BOOK)
 
+    # Total level calculation + grade
     total_level = int(series_stats[3][0]) + int(anime_stats[3][0]) + int(book_stats[3][0])
     list_total_rank_element = []
 
@@ -381,7 +380,6 @@ def account():
                            anime_stats=anime_stats,
                            book_stats=book_stats,
                            total_rank_data=total_rank_data,
-                           chart_data=chart_data,
                            achievements=anime_achievements)
 
 
@@ -686,33 +684,41 @@ def hall_of_fame():
     for friend in current_user_pending_friends:
         friends_pending_list.append(friend.friend_id)
 
-    # Series hall of fame
-    all_user_data_series = []
+    # hall of fame
+    all_user_data = []
     for user in users:
-        watching     = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').count()
-        completed    = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').count()
-        onhold       = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').count()
-        random       = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').count()
-        dropped      = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').count()
-        plantowatch  = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').count()
+        ranks_and_levels_series = get_all_account_stats(user.id, ListType.SERIES)
+        ranks_and_levels_animes = get_all_account_stats(user.id, ListType.ANIME)
+        ranks_and_levels_books = get_all_account_stats(user.id, ListType.BOOK)
 
-        total = watching + completed + onhold + random + dropped + plantowatch
-        spent = get_total_time_spent(user.id, ListType.SERIES)
+        total_level = int(ranks_and_levels_series[3][0]) + int(ranks_and_levels_animes[3][0]) + int(ranks_and_levels_books[3][0])
+        list_total_rank = []
+        if platform.system() == "Windows":
+            fp = open("{0}".format(os.path.join(app.root_path, "static\\img\\Original\\Ranks_unity.csv")), "r")
+        else:  # Linux & macOS
+            fp = open("{0}".format(os.path.join(app.root_path, "static/img/Original/Ranks_unity.csv")), "r")
+
+        for line in fp:
+            list_total_rank.append(line.split(";"))
+        fp.close()
+
+        total_rank_data = []
+        for i in range(0, len(list_total_rank)):
+            if str(list_total_rank[i][0]) == str(total_level):
+                total_rank_data.append([str(list_total_rank[i][1]), str(list_total_rank[i][2])])
+
+        if len(total_rank_data) == 0:
+            total_rank_data.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
 
         # profile picture
         profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
 
         user_data = {"profile_picture": profile_picture,
                      "username": user.username,
-                     "watching": watching,
-                     "completed": completed,
-                     "onhold": onhold,
-                     "random": random,
-                     "dropped": dropped,
-                     "plantowatch": plantowatch,
-                     "total": total,
-                     "days": spent[2],
-                     "episodes": spent[0]}
+                     "series": ranks_and_levels_series,
+                     "animes": ranks_and_levels_animes,
+                     "books": ranks_and_levels_books,
+                     "total": [total_level, total_rank_data]}
 
         if user.id in friends_list:
             user_data["isfriend"] = True
@@ -731,59 +737,11 @@ def hall_of_fame():
             user_data["isprivate"] = user.private
             user_data["iscurrentuser"] = False
 
-        all_user_data_series.append(user_data)
-
-    # Anime hall of fame
-    all_user_data_animes = []
-    for user in users:
-        watching    = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').count()
-        completed   = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').count()
-        onhold      = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').count()
-        random      = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').count()
-        dropped     = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').count()
-        plantowatch = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').count()
-
-        total = watching + completed + onhold + random + dropped + plantowatch
-        spent = get_total_time_spent(user.id, ListType.ANIME)
-
-        # profile picture
-        profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
-
-        user_data = {"profile_picture": profile_picture,
-                     "username": user.username,
-                     "watching": watching,
-                     "completed": completed,
-                     "onhold": onhold,
-                     "random": random,
-                     "dropped": dropped,
-                     "plantowatch": plantowatch,
-                     "total": total,
-                     "days": spent[2],
-                     "episodes": spent[0]}
-
-        if user.id in friends_list:
-            user_data["isfriend"] = True
-            user_data["ispendingfriend"] = False
-        else:
-            if user.id in friends_pending_list:
-                user_data["ispendingfriend"] = True
-            else:
-                user_data["ispendingfriend"] = False
-            user_data["isfriend"] = False
-
-        if str(user.id) == current_user.get_id():
-            user_data["isprivate"] = False
-            user_data["iscurrentuser"] = True
-        else:
-            user_data["isprivate"] = user.private
-            user_data["iscurrentuser"] = False
-
-        all_user_data_animes.append(user_data)
+        all_user_data.append(user_data)
 
     return render_template("hall_of_fame.html",
                            title='Hall of Fame',
-                           series_data=all_user_data_series,
-                           anime_data=all_user_data_animes)
+                           all_data=all_user_data)
 
 
 @app.route("/add_friend_hof", methods=['POST'])
@@ -1783,11 +1741,11 @@ def autocomplete_book():
 ###################################################### Functions #######################################################
 
 
-def get_all_account_stats(list_type):
-    nb_of_element = get_list_count(list_type)
+def get_all_account_stats(user_id, list_type):
+    nb_of_element = get_list_count(user_id, list_type)
     total_element = sum(nb_of_element)
-    total_time_element = get_total_time_spent(current_user.get_id(), list_type)
-    mean_score_element = get_mean_score(list_type)
+    total_time_element = get_total_time_spent(user_id, list_type)
+    mean_score_element = get_mean_score(user_id, list_type)
     time_total_in_minutes_element = total_time_element[2]*3600
 
     element_level_tmp = "{:.2f}".format(round((np.sqrt(2500+200*(time_total_in_minutes_element))-50)/100, 2))
@@ -1795,7 +1753,6 @@ def get_all_account_stats(list_type):
     element_level = element_level_tmp.split('.')
 
     list_rank_element = []
-
     if platform.system() == "Windows":
         fp = open("{0}".format(os.path.join(app.root_path, "static\\img\\Ranks\\Ranks.csv")), "r")
     else:  # Linux & macOS
@@ -1880,27 +1837,27 @@ def get_animes_achievements():
     return all_achievements
 
 
-def get_list_count(list_type):
+def get_list_count(user_id, list_type):
         if list_type is ListType.SERIES:
-            watching = SeriesList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').count()
-            completed = SeriesList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').count()
-            onhold = SeriesList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').count()
-            random = SeriesList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').count()
-            dropped = SeriesList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').count()
-            plantowatch = SeriesList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').count()
+            watching = SeriesList.query.filter_by(user_id=user_id, status='WATCHING').count()
+            completed = SeriesList.query.filter_by(user_id=user_id, status='COMPLETED').count()
+            onhold = SeriesList.query.filter_by(user_id=user_id, status='ON_HOLD').count()
+            random = SeriesList.query.filter_by(user_id=user_id, status='RANDOM').count()
+            dropped = SeriesList.query.filter_by(user_id=user_id, status='DROPPED').count()
+            plantowatch = SeriesList.query.filter_by(user_id=user_id, status='PLAN_TO_WATCH').count()
         elif list_type is ListType.ANIME:
-            watching = AnimeList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').count()
-            completed = AnimeList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').count()
-            onhold = AnimeList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').count()
-            random = AnimeList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').count()
-            dropped = AnimeList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').count()
-            plantowatch = AnimeList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').count()
+            watching = AnimeList.query.filter_by(user_id=user_id, status='WATCHING').count()
+            completed = AnimeList.query.filter_by(user_id=user_id, status='COMPLETED').count()
+            onhold = AnimeList.query.filter_by(user_id=user_id, status='ON_HOLD').count()
+            random = AnimeList.query.filter_by(user_id=user_id, status='RANDOM').count()
+            dropped = AnimeList.query.filter_by(user_id=user_id, status='DROPPED').count()
+            plantowatch = AnimeList.query.filter_by(user_id=user_id, status='PLAN_TO_WATCH').count()
         elif list_type is ListType.BOOK:
-            reading = BookList.query.filter_by(user_id=current_user.get_id(), status='READING').count()
-            completed = BookList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').count()
-            onhold = BookList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').count()
-            dropped = BookList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').count()
-            plantoread = BookList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_READ').count()
+            reading = BookList.query.filter_by(user_id=user_id, status='READING').count()
+            completed = BookList.query.filter_by(user_id=user_id, status='COMPLETED').count()
+            onhold = BookList.query.filter_by(user_id=user_id, status='ON_HOLD').count()
+            dropped = BookList.query.filter_by(user_id=user_id, status='DROPPED').count()
+            plantoread = BookList.query.filter_by(user_id=user_id, status='PLAN_TO_READ').count()
 
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
             statistics = [watching, completed, onhold, random, dropped, plantowatch]
@@ -2654,13 +2611,13 @@ def get_list_data(list, list_type):
     return all_list_data
 
 
-def get_mean_score(list_type):
+def get_mean_score(user_id, list_type):
     if list_type is ListType.SERIES:
-        all_scores  = SeriesList.query.filter_by(user_id=current_user.get_id()).all()
+        all_scores  = SeriesList.query.filter_by(user_id=user_id).all()
     if list_type is ListType.ANIME:
-         all_scores = AnimeList.query.filter_by(user_id=current_user.get_id()).all()
+         all_scores = AnimeList.query.filter_by(user_id=user_id).all()
     if list_type is ListType.BOOK:
-        all_scores  = BookList.query.filter_by(user_id=current_user.get_id()).all()
+        all_scores  = BookList.query.filter_by(user_id=user_id).all()
 
     # If no element in the list mean score = 0
     if len(all_scores) == 0:
