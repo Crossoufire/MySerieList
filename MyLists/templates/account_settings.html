@@ -99,21 +99,31 @@ hr {
                                 <option>Hall of Fame</option>
                                 <option>MySeriesList</option>
                                 <option>MyAnimesList</option>
+                                <option>MyBookList</option>
                             {% elif home_page == "hall_of_fame" %}
                                 <option>Account</option>
                                 <option selected="selected">Hall of Fame</option>
                                 <option>MySeriesList</option>
                                 <option>MyAnimesList</option>
+                                <option>MyBookList</option>
                             {% elif home_page == "myserieslist" %}
                                 <option>Account</option>
                                 <option>Hall of Fame</option>
                                 <option selected="selected">MySeriesList</option>
                                 <option>MyAnimesList</option>
+                                <option>MyBookList</option>
                             {% elif home_page == "myanimelist" %}
                                 <option>Account</option>
                                 <option>Hall of Fame</option>
                                 <option>MySeriesList</option>
                                 <option selected="selected">MyAnimesList</option>
+                                <option>MyBookList</option>
+                            {% elif home_page == "mybooklist" %}
+                                <option>Account</option>
+                                <option>Hall of Fame</option>
+                                <option>MySeriesList</option>
+                                <option>MyAnimesList</option>
+                                <option selected="selected">MyBookList</option>
                             {% endif %}
                         </select>
                     </div>
@@ -126,9 +136,15 @@ hr {
                             {% if default_hof == "myserieslist" %}
                                 <option selected="selected">MySeriesList</option>
                                 <option>MyAnimesList</option>
+                                <option>MyBookList</option>
                             {% elif default_hof == "myanimelist" %}
                                 <option>MySeriesList</option>
                                 <option selected="selected">MyAnimesList</option>
+                                <option>MyBookList</option>
+                            {% elif default_hof == "mybooklist" %}
+                                <option>MySeriesList</option>
+                                <option>MyAnimesList</option>
+                                <option selected="selected">MyBookList</option>
                             {% endif %}
                         </select>
                     </div>
