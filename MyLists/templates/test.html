@@ -416,3 +416,43 @@ window.onload = function() {
 
 };
 </script>
+
+
+         <table>
+                    {% for friend in friends_list_data %}
+                    {% if friend['status'] == "pending" %}
+                    <tr>
+                        <td>
+                            <a class="text-light" href="#" id="{{ friend['user_id'] }}">{{ friend['username'] }}</a>
+                            <button class="btn btn-sm btn-danger small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="decline_{{ friend['user_id'] }}">Decline</button>
+                            <button class="btn btn-sm btn-mdb-color small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="accept_{{ friend['user_id'] }}">Accept</button>
+                        </td>
+                    </tr>
+                    {% elif friend['status'] == "request" %}
+                    <tr>
+                        <td>
+                            <a class="text-light" href="#">{{ friend['username'] }} (Pending request)</a>
+                            <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </td>
+                    </tr>
+                    {% elif friend['status'] == "declined" %}
+                    {% else %}
+                    <tr>
+                        <td>
+                            {% if user_id == current_user.get_id() %}
+                            <a class="text-light" href="/user/account/{{ friend['username'] }}">{{ friend['username'] }}</a>
+                            {% else %}
+                            <a class="disabled text-light" href="#">{{ friend['username'] }}</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </table>

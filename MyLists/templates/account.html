@@ -320,7 +320,7 @@ hr {
 
 {% block content %}
 <div class="container form_account p-0">
-    <!--------- Add friend modal ---------->
+    <!--------------------------------------- Add friend modal -------------------------------->
     <div class="modal fade" id="addFriendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; max-width: 300px; margin-left: auto; margin-right: auto;">
@@ -348,19 +348,25 @@ hr {
     <!----------------------------------------------------------------------------------------->
 
     <div class="border_account">
-        <!----------------- Account picture/Username/email/account settings ------------------->
+        <!----------------- Account picture/Username/levels/grades/account settings ------------------->
         <div class="d-flex flex-wrap-reverse">
             <div class="p-r-10 bd-highlight">
                 <img class="rounded border-light account-img" src="{{ profile_picture }}">
             </div>
             <div class="bd-highlight">
-                <h4 class="mt-0 account-heading username">{{ current_user.username }}</h4>
-                <span style="font-size: 14pt;">Total:&nbsp&nbsp</span><img height='66' width='66' data-toggle="tooltip" title="{{ total_rank_data[0][1] }}" src="../static/img/Original/{{ total_rank_data[0][0] }}.png"/>
+                {% if user_id == current_user.get_id() %}
+                <h4 class="mt-0 account-heading username">{{ user_name }}</h4>
+                {% else %}
+                <h4 class="mt-0 account-heading username">{{ user_name }}'s account</h4>
+                {% endif %}
+                <span style="font-size: 14pt;">Total:&nbsp&nbsp</span><img height='66' width='66' data-toggle="tooltip" title="{{ total_rank_data[0][1] }}" src="/static/img/Original/{{ total_rank_data[0][0] }}.png"/>
             </div>
             <div class="ml-auto bd-highlight">
+                {% if user_id == current_user.get_id() %}
                 <a class="btn btn-sm bg-dark m-0" href="{{ url_for('account_settings') }}" role="button">
                     <i class="fa fa-cog fa-2x fa-fw"></i>
                 </a>
+                {% endif %}
             </div>
         </div>
 
@@ -369,7 +375,7 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ series_stats[4][0][1] }}" src="../static/img/Ranks/{{ series_stats[4][0][0] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ series_stats[4][0][1] }}" src="/static/img/Ranks/{{ series_stats[4][0][0] }}.ico"/>
                             <span class='account-bar-name'>Series</span>
                             <div id="series_level" class='account-bar-level'>Level {{ series_stats[3][0] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ series_stats[3][1] }}%">
@@ -384,7 +390,7 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ anime_stats[4][0][1] }}" src="../static/img/Ranks/{{ anime_stats[4][0][0] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ anime_stats[4][0][1] }}" src="/static/img/Ranks/{{ anime_stats[4][0][0] }}.ico"/>
                             <div class='account-bar-name'>Animes</div>
                             <div id="anime_level" class='account-bar-level'>Level {{ anime_stats[3][0] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ anime_stats[3][1] }}%">
@@ -399,7 +405,7 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ book_stats[4][0][1] }}" src="../static/img/Ranks/{{ book_stats[4][0][0] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ book_stats[4][0][1] }}" src="/static/img/Ranks/{{ book_stats[4][0][0] }}.ico"/>
                             <div class='account-bar-name'>Books</div>
                             <div id="book_level" class='account-bar-level'>Level {{ book_stats[3][0] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ book_stats[3][1] }}%">
@@ -450,66 +456,76 @@ hr {
                 </table>
             </div>
         </div>
-        <!------------------------------------------------------------------------------------->
+        <!--------------------------------------------------------------------------------------------->
+
+        {% if user_id != current_user.get_id() %}
+        <hr class="mt-2 mb-3">
+            <div class="row text-center">
+                <div class="col">
+                    <a class="btn btn-primary" href="/user/series/grid/{{ user_name }}">SeriesList</a>
+                </div>
+                <div class="col">
+                    <a class="btn btn-primary" href="/user/animes/grid/{{ user_name }}">AnimeList</a>
+                </div>
+                <div class="col">
+                    <a class="btn btn-primary" href="/user/books/grid/{{ user_name }}">BooksList</a>
+                </div>
+            </div>
+        {% endif %}
 
         <h3 class="font-weight-light text-center mt-4 mb-0">
             <div class="arrow_div float-left">
+                {% if user_id == current_user.get_id() %}
                 <a class="fas fa-xs fa-user-plus" data-toggle="modal" data-target="#addFriendModal"></a>
+                {% endif %}
             </div>
             Friends
             <div class="arrow_div float-right">
                 <a class="fas fa-xs fa-chevron-down" id="FRIENDS_arrow" onclick="hide_friends('FRIENDS', 'FRIENDS_arrow')"></a>
             </div>
         </h3>
-
         <hr class="mt-2 mb-3">
-
         <div class="container-friends">
             <div id="FRIENDS" class="row" style="margin-right: 0px; margin-left: 0px;">
-                <table class="table table-sm" cellspacing="0" width="100%">
+                <table>
+                    <tr>
                     {% for friend in friends_list_data %}
                     {% if friend['status'] == "pending" %}
-                    <tr>
-                        <td><a class="text-light" href="#" id="{{ friend['user_id'] }}">{{ friend['username'] }}</a>
-                            <button class="btn btn-sm btn-danger small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="decline_{{ friend['user_id'] }}">Decline</button>
-                            <button class="btn btn-sm btn-mdb-color small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="accept_{{ friend['user_id'] }}">Accept</button>
+                        {% if user_id == current_user.get_id() %}
+                        <td id="td_{{ friend['user_id'] }}" class="text-center">
+                            <span class="text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span>
+                            <br>
+                            <button class="btn btn-sm btn-danger small" id="decline_{{ friend['user_id'] }}">Decline</button>
+                            <button class="btn btn-sm btn-mdb-color small" id="accept_{{ friend['user_id'] }}">Accept</button>
                         </td>
-                    </tr>
+                        {% endif %}
                     {% elif friend['status'] == "request" %}
-                    <tr>
-                        <td><a class="text-light" href="#">{{ friend['username'] }} (Pending request)</a>
-                            <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                        {% if user_id == current_user.get_id() %}
+                        <td id="td_{{ friend['user_id'] }}" class="text-center p-r-15 p-l-15">
+                            <span class="text-light">{{ friend['username'] }}</span>
+                            <br>
+                            <span>(Pending)</span>
+                            <br>
+                            <a id="C_{{ friend['user_id'] }}" class="fas fa-ban"></a>
                         </td>
-                    </tr>
+                        {% endif %}
                     {% elif friend['status'] == "declined" %}
                     {% else %}
-                    <tr>
-                        <td>
-                            <a class="disabled text-light">{{ friend['username'] }}</a>
+                        <td id="td_{{ friend['user_id'] }}" class="text-center">
+                            {% if user_id == current_user.get_id() %}
+                            <a class="text-light" href="/user/account/{{ friend['username'] }}">{{ friend['username'] }}</a>
+                            <br>
+                            <a id="C_{{ friend['user_id'] }}" class="fas fa-ban" onclick="delete_friend('C_{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                            {% else %}
+                            <span class="text-light">{{ friend['username'] }}</span>
+                            {% endif %}
                         </td>
-                        <td>
-                            <a class="text-light" href="/user/series/grid/{{ friend['username'] }}">SeriesList</a>
-                        </td>
-                        <td>
-                            <a class="text-light" href="/user/anime/grid/{{ friend['username'] }}">AnimeList</a>
-                        </td>
-                        <td>
-                            <a class="text-light" href="/user/book/{{ friend['username'] }}">BookList</a>
-                        </td>
-                        <td>
-                            <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </td>
-                    </tr>
                     {% endif %}
                     {% endfor %}
+                    </tr>
                 </table>
             </div>
         </div>
-
 
         <h3 class="font-weight-light text-center mt-4 mb-0">
             Anime Achievements
@@ -517,9 +533,7 @@ hr {
                 <a class="fas fa-xs fa-chevron-down" id="ACHIEVEMENTS_arrow" onclick="hide('ACHIEVEMENTS', 'ACHIEVEMENTS_arrow')"></a>
             </div>
         </h3>
-
         <hr class="mt-2 mb-3">
-
         <div id="ACHIEVEMENTS" class="container-stats">
             <table>
                 <tbody>
@@ -548,16 +562,13 @@ hr {
             </table>
         </div>
 
-
         <h3 class="font-weight-light text-center mt-4 mb-0">
             Series Statistics
             <div class="arrow_div float-right">
                 <a class="fas fa-xs fa-chevron-down" id="SERIES_arrow" onclick="hide('SERIES', 'SERIES_arrow')"></a>
             </div>
         </h3>
-
         <hr class="mt-2 mb-3">
-
         <div id="SERIES" class="container-stats">
             <div class="m-b-5">
                 <span class="stat_text"><b>Days:</b> {{ series_stats[1][2] }}</span>
@@ -663,9 +674,7 @@ hr {
                 <a class="fas fa-xs fa-chevron-down" id="ANIME_arrow" onclick="hide('ANIME', 'ANIME_arrow')"></a>
             </div>
         </h3>
-
         <hr class="mt-2 mb-3">
-
         <div id="ANIME" class="container-stats">
             <div class="m-b-5">
                 <span class="stat_text"><b>Days:</b> {{ anime_stats[1][2] }}</span>
@@ -771,9 +780,7 @@ hr {
                 <a class="fas fa-xs fa-chevron-down" id="BOOK_arrow" onclick="hide('BOOK', 'BOOK_arrow')"></a>
             </div>
         </h3>
-
         <hr class="mt-2 mb-3">
-
         <div id="BOOK" class="container-stats">
             <div class="m-b-5">
                 <span class="stat_text"><b>Days:</b> {{ book_stats[1][2] }}</span>
@@ -921,6 +928,8 @@ function hide_friends(category, arrow) {
     {% else %}
 
     close_{{ friend['user_id'] }}.onclick = function () {
+        if (!confirm("Do you want to delete")){
+        return false;}
         $.ajax ({
             type: "POST",
             url: "/delete_friend",

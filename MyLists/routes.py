@@ -345,7 +345,7 @@ def account():
 
     # Animes Statistics, scores, level, and achievements
     anime_stats = get_all_account_stats(current_user.get_id(), ListType.ANIME)
-    anime_achievements = get_animes_achievements()
+    anime_achievements = get_animes_achievements(current_user.get_id())
 
     # Books Statistics, scores, and level
     book_stats = get_all_account_stats(current_user.get_id(), ListType.BOOK)
@@ -371,6 +371,8 @@ def account():
     if len(total_rank_data) == 0:
         total_rank_data.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
 
+    user_id = current_user.get_id()
+    user_name = current_user.username
     return render_template('account.html',
                            title='Account',
                            profile_picture=profile_picture,
@@ -380,7 +382,97 @@ def account():
                            anime_stats=anime_stats,
                            book_stats=book_stats,
                            total_rank_data=total_rank_data,
-                           achievements=anime_achievements)
+                           achievements=anime_achievements,
+                           user_id=user_id,
+                           user_name=user_name)
+
+
+@app.route("/user/account/<user_name>")
+@login_required
+def user_account(user_name):
+    add_friend_form = AddFriendForm()
+    if add_friend_form.validate_on_submit():
+        if str(add_friend_form.add_friend.data) == str(current_user.username):
+            flash("You cannot add yourself.", 'info')
+            return redirect(url_for('account'))
+        add_friend(add_friend_form.add_friend.data)
+
+    image_error = url_for('static', filename='img/error.jpg')
+    user = User.query.filter_by(username=user_name).first()
+
+    if user is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+    if user and str(user.id) == current_user.get_id():
+        return redirect(url_for('account'))
+
+    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+    if user.private:
+        if current_user.get_id() == "1":
+            pass
+        elif friend is None or friend.status != "accepted":
+            return redirect(url_for('anonymous'))
+    if user.id == 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    # Profile picture
+    profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
+
+    # Friends list
+    friends_list = Friend.query.filter_by(user_id=user.id).all()
+    friends_list_data = []
+    for friend in friends_list:
+        friend_data = {}
+        friend_username = User.query.filter_by(id=friend.friend_id).first().username
+        friend_data["username"] = friend_username
+        friend_data["user_id"] = friend.friend_id
+        friend_data["status"] = friend.status
+        friends_list_data.append(friend_data)
+
+    # Series Statistics, scores and level
+    series_stats = get_all_account_stats(user.id, ListType.SERIES)
+
+    # Animes Statistics, scores, level, and achievements
+    anime_stats = get_all_account_stats(user.id, ListType.ANIME)
+    anime_achievements = get_animes_achievements(user.id)
+
+    # Books Statistics, scores, and level
+    book_stats = get_all_account_stats(user.id, ListType.BOOK)
+
+    # Total level calculation + grade
+    total_level = int(series_stats[3][0]) + int(anime_stats[3][0]) + int(book_stats[3][0])
+    list_total_rank_element = []
+
+    if platform.system() == "Windows":
+        fp = open("{0}".format(os.path.join(app.root_path, "static\\img\\Original\\Ranks_unity.csv")), "r")
+    else:  # Linux & macOS
+        fp = open("{0}".format(os.path.join(app.root_path, "static/img/Original/Ranks_unity.csv")), "r")
+
+    for line in fp:
+        list_total_rank_element.append(line.split(";"))
+    fp.close()
+
+    total_rank_data = []
+    for i in range(0, len(list_total_rank_element)):
+        if str(list_total_rank_element[i][0]) == str(total_level):
+            total_rank_data.append([str(list_total_rank_element[i][1]), str(list_total_rank_element[i][2])])
+
+    if len(total_rank_data) == 0:
+        total_rank_data.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
+
+    user_id = user.id
+    user_name = user.username
+    return render_template('account.html',
+                           title='Account',
+                           profile_picture=profile_picture,
+                           form=add_friend_form,
+                           friends_list_data=friends_list_data,
+                           series_stats=series_stats,
+                           anime_stats=anime_stats,
+                           book_stats=book_stats,
+                           total_rank_data=total_rank_data,
+                           achievements=anime_achievements,
+                           user_id=user_id,
+                           user_name=user_name)
 
 
 @app.route("/anime_achievements")
@@ -1792,10 +1884,10 @@ def get_all_account_stats(user_id, list_type):
     return [nb_of_element, total_time_element, mean_score_element, element_level, element_rank_data, element_rate]
 
 
-def get_animes_achievements():
+def get_animes_achievements(user_id):
     all_achievements = []
     tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10 = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    animes = AnimeList.query.filter(AnimeList.status == "COMPLETED").filter_by(user_id=current_user.get_id()).all()
+    animes = AnimeList.query.filter(AnimeList.status == "COMPLETED").filter_by(user_id=user_id).all()
     for anime in animes:
         genres = AnimeGenre.query.filter_by(anime_id=anime.anime_id).all()
         for genre in genres:
