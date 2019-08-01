@@ -23,7 +23,7 @@
 </style>
 <!------------ Principal CSS -------------->
 <style>
-.add_series {
+.add_element {
     width: 220px;
     background: transparent;
     border-radius: 0px;
@@ -33,7 +33,7 @@
     font-size: 12pt;
 }
 
-.add_series:focus {
+.add_element:focus {
     background: transparent;
     border-radius: 0px;
     border-top: 0px;
@@ -359,8 +359,13 @@ body.loading .modal_loading {
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
+        {% if element_type == "ANIME" %}
+        <a class="fas fa-th text-light" href="{{ url_for('myanimelist') }}"></a>
+        <span class="m-r-5 text-light">Grid View</span>
+        {% elif element_type == "SERIES" %}
         <a class="fas fa-th text-light" href="{{ url_for('myserieslist') }}"></a>
         <span class="m-r-5 text-light">Grid View</span>
+        {% endif %}
     </div>
 </div>
 {% endblock fixed %}
@@ -368,13 +373,20 @@ body.loading .modal_loading {
 
 {% block content %}
 <div class="d-flex flex-wrap">
+    {% if user_id == current_user.get_id() %}
     <div class="m-t-20 m-b-10">
-        <input  class="form-control text-light add_series" placeholder="Add a series" type="text" id="autocomplete" onfocus="this.value=''"/>
-        <input type="hidden" id="series_id" value=""/>
+    {% if element_type == "ANIME" %}
+        <input  class="form-control text-light add_element" placeholder="Add an anime" type="text" id="autocomplete" onfocus="this.value=''"/>
+        <input type="hidden" id="element_id" value=""/>
+    {% elif element_type == "SERIES" %}
+        <input  class="form-control text-light add_element" placeholder="Add a Series" type="text" id="autocomplete" onfocus="this.value=''"/>
+        <input type="hidden" id="element_id" value=""/>
+    {% endif %}
     </div>
     <div class="ml-auto m-t-20 m-b-10">
         <button class="btn btn-sm btn-light text-dark p-2" onclick="refreshAll()"><a class="fas fa-sync m-r-5 text-dark"></a> REFRESH ALL</button>
     </div>
+    {% endif %}
 </div>
 
 
@@ -496,7 +508,11 @@ body.loading .modal_loading {
                     <a data-toggle="modal" data-target="#modal_{{ data['id'] }}">{{ data['name'] }}</a>
                 </td>
                 <td class="text-center">
+                    {% if user_id == current_user.get_id() %}
                     <select id="S_{{ data['id'] }}" class="scrollable-menu text-center form-control p-0 seasons" onchange="updateSeason('{{ data['id'] }}', this, '{{ data['season_data'] }}', 'E_{{ data['id'] }}')">
+                    {% else %}
+                    <select id="S_{{ data['id'] }}" class="disabled scrollable-menu text-center form-control p-0 seasons" onchange="updateSeason('{{ data['id'] }}', this, '{{ data['season_data'] }}', 'E_{{ data['id'] }}')">
+                     {% endif %}
                         {% for i in range(data["season_data"]|length) %}
                         {% if i+1 == data["current_season"] %}
                         <option selected="selected">Season {{ i+1 }}</option>
@@ -507,7 +523,11 @@ body.loading .modal_loading {
                     </select>
                 </td>
                 <td class="text-center">
+                    {% if user_id == current_user.get_id() %}
                     <select id="E_{{ data['id'] }}" class="scrollable-menu text-center form-control p-0 episodes" onchange="updateEpisode('{{ data['id'] }}', this)">
+                    {% else %}
+                    <select id="E_{{ data['id'] }}" class="disabled scrollable-menu text-center form-control p-0 episodes" onchange="updateEpisode('{{ data['id'] }}', this)">
+                    {% endif %}
                         {% for i in range(data["season_data"][(data['current_season'])-1]) %}
                         {% if i+1 == data["last_episode_watched"] %}
                         <option selected="selected">Episode {{ i+1 }}</option>
@@ -518,7 +538,11 @@ body.loading .modal_loading {
                     </select>
                 </td>
                 <td class="text-center">
+                    {% if user_id == current_user.get_id() %}
                     <a class="score_size" id="new_{{ data['id'] }}" onclick="edit_score('edit_{{ data['id'] }}', 'new_{{ data['id'] }}')">{{ data['score'] }}</a>
+                    {% else %}
+                    <a class="disabled score_size" id="new_{{ data['id'] }}" onclick="edit_score('edit_{{ data['id'] }}', 'new_{{ data['id'] }}')">{{ data['score'] }}</a>
+                    {% endif %}
                     <input id="edit_{{ data['id'] }}" class="d-none" type="text" style="max-width: 30px;
                    max-height: 20px;
                    background-color: black;
@@ -527,9 +551,11 @@ body.loading .modal_loading {
                    border-color: black;" onkeydown="add_score('new_{{ data['id'] }}', 'edit_{{ data['id'] }}', '{{ data['id'] }}')">
                 </td>
                 <td class="text-center">
+                    {% if user_id == current_user.get_id() %}
                     <a class="fas fa-bars" data-toggle="modal" data-target="#modal_cat{{ data['id'] }}"></a>
                     &nbsp &nbsp
-                    <a class="fas fa-ban" onclick="deleteseries('{{ data['id'] }}', 'tr_{{ data['id'] }}')"></a>
+                    <a class="fas fa-ban" onclick="delete_element('{{ data['id'] }}', 'tr_{{ data['id'] }}')"></a>
+                    {% endif %}
                 </td>
             </tr>
 
@@ -545,55 +571,53 @@ body.loading .modal_loading {
                         </div>
                         <div id="mod_{{ data['id'] }}" class="modal-body">
                             {% if outer_loop.index == 1 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Random', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Plan to Watch', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Random', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Plan to Watch', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
                             {% elif outer_loop.index == 2 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Watching', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Random', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Plan to Watch', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Watching', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Random', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Plan to Watch', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
                             {% elif outer_loop.index == 3 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Watching', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Random', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Plan to Watch', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Watching', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Random', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Plan to Watch', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
                             {% elif outer_loop.index == 4 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Watching', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Plan to Watch', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Watching', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Plan to Watch', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
                             {% elif outer_loop.index == 5 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Watching', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Random', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Plan to Watch', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Watching', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Random', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Plan to Watch', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Plan to Watch</a>
                             {% elif outer_loop.index == 6 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Watching', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Random', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeseriesCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Watching', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Watching</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Random', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Random</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['season_data'] }}')">Dropped</a>
                             {% endif %}
                             {% if data['can_update'] %}
                             <a style="background-color: #4d0000;" data-dismiss="modal" class="list-group-item modded" onclick="refresh('{{ data['id'] }}')">Refresh metadata</a>
                             {% else %}
                             <a style="background-color: grey;" data-dismiss="modal" class="disabled list-group-item modded" onclick="refresh('{{ data['id'] }}')">Refresh metadata</a>
-                            <!--<span class="d-inline-block disable" tabindex="0" data-toggle="tooltip" data-placement="right" title="A user refreshed this series less than 30 min ago">-->
-                            <!--</span>-->
                             {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!----------- series metadata Modal ----------->
+            <!----------- element metadata Modal ----------->
             <div class="modal fade" id="modal_{{ data['id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; background: #131418;">
@@ -687,29 +711,44 @@ $(function() {
     $("#autocomplete").catcomplete({
       delay: 500,
       source: function(request, response) {
-				$.getJSON("{{url_for('autocomplete_series')}}",{
-					q: request.term,
-				},
-					function(data) {
-						response(data.matching_results);
-					}
-				);
+            {% if element_type == "ANIME" %}
+                $.getJSON("{{url_for('autocomplete_anime')}}",{
+                    q: request.term,
+                },
+                    function(data) {
+                        response(data.matching_results);
+                    }
+                );
+            {% else %}
+                $.getJSON("{{url_for('autocomplete_series')}}",{
+                    q: request.term,
+                },
+                    function(data) {
+                        response(data.matching_results);
+                    }
+                );
+            {% endif %}
 		},
 		minLength: 1,
         select: function(event, ui) {
             $("#autocomplete").val(ui.item.value);
-            $("#series_id").val(ui.item.id);
+            $("#element_id").val(ui.item.id);
 
             $body = $("body");
             $.ajax ({
                 type: "POST",
-                url: "/add_series",
+                url: "/add_element",
                 contentType: "application/json",
-                data: JSON.stringify({series_id: ui.item.id}),
+                data: JSON.stringify({element_id: ui.item.id, element_type: '{{ element_type }}' }),
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
-                    window.location.replace('/myserieslist_table'); }
+                    {% if element_type == "ANIME" %}
+                        window.location.replace('/myanimelist_table');
+                    {% else %}
+                        window.location.replace('/myserieslist_table');
+                    {% endif %}
+                }
             });
         }
     });
@@ -721,30 +760,41 @@ function refreshAll() {
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/refresh_all_series",
+        url: "/refresh_all_element",
+        data: JSON.stringify({element_type: '{{ element_type }}' }),
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            window.location.replace('/myserieslist_table'); }
+            {% if element_type == "ANIME" %}
+                window.location.replace('/myanimelist_table');
+            {% else %}
+                window.location.replace('/myserieslist_table');
+            {% endif %}
+        }
     });
 }
 
 
-function refresh(series_id) {
+function refresh(element_id) {
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/refresh_single_series",
+        url: "/refresh_single_element",
         contentType: "application/json",
-        data: JSON.stringify({series_id: series_id }),
+        data: JSON.stringify({element_id: element_id, element_type: "{{ element_type }}" }),
         dataType: "json",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            window.location.replace('/myserieslist_table'); }
+            {% if element_type == "ANIME" %}
+                window.location.replace('/myanimelist_table');
+            {% else %}
+                window.location.replace('/myserieslist_table');
+            {% endif %}
+        }
     });
 }
 
 
-function changeseriesCategory(series_id, new_category, tr_id, mod_id, seas_drop_id, ep_drop_id, seas_data) {
+function changeCategory(element_id, new_category, tr_id, mod_id, seas_drop_id, ep_drop_id, seas_data) {
     if (new_category === 'Watching') {
         var completed = 'Completed';
         var on_hold = 'On Hold';
@@ -760,11 +810,11 @@ function changeseriesCategory(series_id, new_category, tr_id, mod_id, seas_drop_
         $("#"+mod_id+ " a").filter(":contains('Plan to Watch')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + random + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + plan_to_watch + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + random + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + plan_to_watch + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
         );
         $("#" + tr_id).prependTo("#WATCHING");
         $('.modal').modal("hide");
@@ -785,11 +835,11 @@ function changeseriesCategory(series_id, new_category, tr_id, mod_id, seas_drop_
         $("#"+mod_id+ " a").filter(":contains('Plan to Watch')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + watching + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + random + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + plan_to_watch + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + watching + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + random + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + plan_to_watch + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
         );
         $("#" + tr_id).prependTo("#COMPLETED");
         $('.modal').modal("hide");
@@ -828,11 +878,11 @@ function changeseriesCategory(series_id, new_category, tr_id, mod_id, seas_drop_
         $("#"+mod_id+ " a").filter(":contains('Plan to Watch')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + watching + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + random + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + plan_to_watch + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + watching + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + random + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + plan_to_watch + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
         );
         $("#" + tr_id).prependTo("#ON_HOLD");
         $('.modal').modal("hide");
@@ -853,11 +903,11 @@ function changeseriesCategory(series_id, new_category, tr_id, mod_id, seas_drop_
         $("#"+mod_id+ " a").filter(":contains('Plan to Watch')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + watching + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + plan_to_watch + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + watching + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + plan_to_watch + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
         );
         $("#" + tr_id).prependTo("#RANDOM");
         $('.modal').modal("hide");
@@ -878,11 +928,11 @@ function changeseriesCategory(series_id, new_category, tr_id, mod_id, seas_drop_
         $("#"+mod_id+ " a").filter(":contains('Plan to Watch')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + watching + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + random + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + plan_to_watch + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + watching + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + random + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + plan_to_watch + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Plan to Watch</a>"
         );
         $("#" + tr_id).prependTo("#DROPPED");
         $('.modal').modal("hide");
@@ -903,11 +953,11 @@ function changeseriesCategory(series_id, new_category, tr_id, mod_id, seas_drop_
         $("#"+mod_id+ " a").filter(":contains('Plan to Watch')").remove()
 
         $("#"+mod_id).prepend(
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + watching + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + random + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
-            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + series_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>"
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + watching + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Watching</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + completed + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Completed</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + on_hold + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>On Hold</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + random + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Random</a>" +
+            "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeseriesCategory(\"" + element_id + "\", \"" + dropped + "\", \"" + tr_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\")'>Dropped</a>"
         );
         $("#" + tr_id).prependTo("#PLAN_TO_WATCH");
         $('.modal').modal("hide");
@@ -916,9 +966,9 @@ function changeseriesCategory(series_id, new_category, tr_id, mod_id, seas_drop_
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/change_series_category",
+        url: "/change_element_category",
         contentType: "application/json",
-        data: JSON.stringify({status: new_category, series_id: series_id}),
+        data: JSON.stringify({status: new_category, element_id: element_id, element_type: "{{ element_type }}" }),
         dataType: "json",
         success: function(response) {
             console.log("ok"); }
@@ -926,19 +976,17 @@ function changeseriesCategory(series_id, new_category, tr_id, mod_id, seas_drop_
 }
 
 
-function deleteseries(series_id, tr_id) {
+function delete_element(element_id, tr_id) {
     if (!confirm("Do you want to delete")){
         return false;
     }
-
     $("#"+tr_id).remove();
-
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/delete_series",
+        url: "/delete_element",
         contentType: "application/json",
-        data: JSON.stringify({delete: series_id}),
+        data: JSON.stringify({delete: element_id, element_type: "{{ element_type }}" }),
         dataType: "json",
         success: function(response) {
             console.log("ok"); }
@@ -946,15 +994,15 @@ function deleteseries(series_id, tr_id) {
 }
 
 
-function updateEpisode(series_id, episode){
+function updateEpisode(element_id, episode){
     let selected_episode = episode.selectedIndex
 
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/update_series_episode",
+        url: "/update_element_episode",
         contentType: "application/json",
-        data: JSON.stringify({episode: selected_episode, series_id: series_id}),
+        data: JSON.stringify({episode: selected_episode, element_id: element_id, element_type: "{{ element_type }}" }),
         dataType: "json",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
@@ -977,7 +1025,7 @@ function hide(category, arrow) {
 }
 
 
-function updateSeason(series_id, value, seas_data, ep_drop_id) {
+function updateSeason(element_id, value, seas_data, ep_drop_id) {
     var selected_season = value.selectedIndex;
     var episode_drop = document.getElementById(ep_drop_id);
     var season_data = JSON.parse("[" + seas_data + "]");
@@ -994,9 +1042,9 @@ function updateSeason(series_id, value, seas_data, ep_drop_id) {
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/update_series_season",
+        url: "/update_element_season",
         contentType: "application/json",
-        data: JSON.stringify({season: selected_season, series_id: series_id }),
+        data: JSON.stringify({season: selected_season, element_id: element_id, element_type: "{{ element_type }}" }),
         dataType: "json",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
@@ -1041,7 +1089,7 @@ function edit_score(edit_id, new_id) {
     }
 }
 
-function add_score(new_score, edit_id, series_id) {
+function add_score(new_score, edit_id, element_id) {
     var new_sc = document.getElementById(new_score);
     var edit_score_value = document.getElementById(edit_id).value;
     var edit_score = document.getElementById(edit_id);
@@ -1061,9 +1109,9 @@ function add_score(new_score, edit_id, series_id) {
             $body = $("body");
             $.ajax ({
                 type: "POST",
-                url: "/add_score_series",
+                url: "/add_score_element",
                 contentType: "application/json",
-                data: JSON.stringify({score_val: edit_score_value, series_id: series_id }),
+                data: JSON.stringify({score_val: edit_score_value, element_id: element_id, element_type: '{{ element_type }}' }),
                 dataType: "json",
                 success: function(response) {
                     console.log('ok'); }
