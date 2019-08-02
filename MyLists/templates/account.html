@@ -4,8 +4,27 @@
 {% block css %}
 <!-------------- Main CSS ------------->
 <style>
+.form_account {
+    max-width: 800px;
+    margin-top: 40px;
+}
+
+hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.9);
+}
+
 .modal-content {
     background: #131418;
+}
+
+.table tr {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table td {
+    text-align: center;
+    vertical-align: middle;
 }
 
 .form-control {
@@ -27,25 +46,6 @@
     color: #fff;
 }
 
-hr {
-    border-top: 1px solid rgba(255, 255, 255, 0.9);
-}
-
-.table {
-  color: #fff
-}
-
-.form_account {
-    max-width: 800px;
-}
-
-.small {
-    padding-top: 5px !important;
-    padding-bottom: 5px !important;
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-}
-
 .arrow_div {
     height: 21px;
     width: 21px;
@@ -54,26 +54,21 @@ hr {
 .block:nth-of-type(2) {
 	background-color: #45B29D;
 }
-
 .block:nth-of-type(3) {
 	background-color: #EFC94C;
 }
-
 .block:nth-of-type(4) {
 	background-color: #E27A3F;
 }
 .block:nth-of-type(5) {
 	background-color: #DF5A49;
 }
-
 .block:nth-of-type(6) {
 	background-color: #962D3E;
 }
-
 .block:hover {
 	opacity: 0.75;
 }
-
 .col-centered{
     float: none;
     margin: 0 auto;
@@ -82,8 +77,8 @@ hr {
 /* On screens that are 599px or more */
 @media screen and (min-width: 599px) {
     .account-img {
-        height: 120px;
-        width: 120px;
+        height: 150px;
+        width: 150px;
         margin-bottom: 15px;
         border-style: solid;
         border-width: 1px;
@@ -166,22 +161,6 @@ hr {
     .position {
         text-align: right;
     }
-}
-
-.table tr {
-    text-align: center;
-    vertical-align: middle;
-}
-
-.table td {
-    text-align: center;
-    vertical-align: middle;
-}
-
-.container-friends {
-    max-width: 650px;
-    margin-right: auto;
-    margin-left: auto;
 }
 </style>
 <!---- level + badge + total level ---->
@@ -318,9 +297,22 @@ hr {
 {% endblock css %}
 
 
+{% block fixed %}
+<div class="d-flex flex-wrap">
+    <div class="ml-auto">
+        <a id="collapse_all" class="fas fa-eye-slash text-light m-r-5" onclick="hide_all_cat()"></a>
+        <a id="show_cat_all" class="d-none" onclick="show_all_cat()"></a>
+        <span id="collapse_show" class="m-r-5 text-light">Collapse all</span>
+
+        <span class="m-l-5 m-r-5 text-light">||</span>
+    </div>
+</div>
+{% endblock fixed %}
+
+
 {% block content %}
 <div class="container form_account p-0">
-    <!--------------------------------------- Add friend modal -------------------------------->
+    <!---------------------------------------- Add friend modal --------------------------------------->
     <div class="modal fade" id="addFriendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; max-width: 300px; margin-left: auto; margin-right: auto;">
@@ -345,31 +337,30 @@ hr {
             </div>
         </div>
     </div>
-    <!----------------------------------------------------------------------------------------->
 
     <div class="border_account">
-        <!----------------- Account picture/Username/levels/grades/account settings ------------------->
+        <!------------------------ Account picture/Username/account settings -------------------------->
         <div class="d-flex flex-wrap-reverse">
             <div class="p-r-10 bd-highlight">
                 <img class="rounded border-light account-img" src="{{ profile_picture }}">
             </div>
             <div class="bd-highlight">
                 {% if user_id == current_user.get_id() %}
-                <h4 class="mt-0 account-heading username">{{ user_name }}</h4>
+                <h2 class="mt-0 account-heading username">{{ user_name }}</h2>
                 {% else %}
-                <h4 class="mt-0 account-heading username">{{ user_name }}'s account</h4>
+                <h4 class="mt-0 account-heading username">{{ user_name }}'s profile</h4>
                 {% endif %}
-                <span style="font-size: 14pt;">Total:&nbsp&nbsp</span><img height='66' width='66' data-toggle="tooltip" title="{{ total_rank_data[0][1] }}" src="/static/img/Original/{{ total_rank_data[0][0] }}.png"/>
+                <span style="font-size: 14pt;">Knowledge level:&nbsp&nbsp</span>
+                <img height='64' width='64' data-toggle="tooltip" title="{{ total_rank_data[0][1] }}" src="/static/img/Original/{{ total_rank_data[0][0] }}.png"/>
             </div>
             <div class="ml-auto bd-highlight">
                 {% if user_id == current_user.get_id() %}
-                <a class="btn btn-sm bg-dark m-0" href="{{ url_for('account_settings') }}" role="button">
-                    <i class="fa fa-cog fa-2x fa-fw"></i>
-                </a>
+                <a class="fas fa-2x fa-user-cog text-light" data-toggle="tooltip" title="Settings" href="{{ url_for('account_settings') }}"></a>
                 {% endif %}
             </div>
         </div>
 
+        <!------------------------------- Levels/grades/informations data ----------------------------->
         <div class="row">
             <div class="col">
                 <div class="d-flex">
@@ -419,35 +410,27 @@ hr {
                 </div>
             </div>
             <div class="col">
-                <table style="line-height: 1;" class="table table-sm">
+                <table style="line-height: 1;" class="table table-sm text-light">
                     <thead>
                     <tr>
-                        <th class="text-center" style="font-size: 12pt;" colspan="2">
-                            Data Informations
-                        </th>
+                        <th class="text-center" style="font-size: 12pt;" colspan="2">Data Informations</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
-                        <td class="text-left">
-                            All anime achievements
-                        </td>
+                        <td class="text-left">All anime achievements</td>
                         <td class="text-center">
                             <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('anime_achievements') }}" target="_blank"></a>
                         </td>
                     </tr>
                     <tr>
-                        <td class="text-left">
-                            Grade and level data
-                        </td>
+                        <td class="text-left">Grade and level data</td>
                         <td class="text-center">
                             <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('level_grade_data') }}" target="_blank"></a>
                         </td>
                     </tr>
                     <tr>
-                        <td class="text-left">
-                            Knowledge level data
-                        </td>
+                        <td class="text-left">Knowledge level data</td>
                         <td class="text-center">
                             <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('knowledge_grade_data') }}" target="_blank"></a>
                         </td>
@@ -456,8 +439,8 @@ hr {
                 </table>
             </div>
         </div>
-        <!--------------------------------------------------------------------------------------------->
 
+        <!----------------------------- Lists when visiting other accounts ---------------------------->
         {% if user_id != current_user.get_id() %}
         <hr class="mt-2 mb-3">
             <div class="row text-center">
@@ -473,6 +456,7 @@ hr {
             </div>
         {% endif %}
 
+        <!------------------------------------------ Friends ------------------------------------------>
         <h3 class="font-weight-light text-center mt-4 mb-0">
             <div class="arrow_div float-left">
                 {% if user_id == current_user.get_id() %}
@@ -481,12 +465,12 @@ hr {
             </div>
             Friends
             <div class="arrow_div float-right">
-                <a class="fas fa-xs fa-chevron-down" id="FRIENDS_arrow" onclick="hide_friends('FRIENDS', 'FRIENDS_arrow')"></a>
+                <a class="collapse_all fas fa-xs fa-chevron-down" id="FRIENDS_arrow" onclick="hide('collapse_FRIENDS', 'FRIENDS_arrow')"></a>
             </div>
         </h3>
         <hr class="mt-2 mb-3">
-        <div class="container-friends">
-            <div id="FRIENDS" class="row" style="margin-right: 0px; margin-left: 0px;">
+        <div id="collapse_FRIENDS" class="container-stats">
+            <div class="row" style="margin-right: 0px; margin-left: 0px;">
                 <table>
                     <tr>
                     {% for friend in friends_list_data %}
@@ -495,8 +479,8 @@ hr {
                         <td id="td_{{ friend['user_id'] }}" class="text-center">
                             <span class="text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span>
                             <br>
-                            <button class="btn btn-sm btn-danger small" id="decline_{{ friend['user_id'] }}">Decline</button>
-                            <button class="btn btn-sm btn-mdb-color small" id="accept_{{ friend['user_id'] }}">Accept</button>
+                            <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
+                            <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
                         </td>
                         {% endif %}
                     {% elif friend['status'] == "request" %}
@@ -506,7 +490,7 @@ hr {
                             <br>
                             <span>(Pending)</span>
                             <br>
-                            <a id="C_{{ friend['user_id'] }}" class="fas fa-ban"></a>
+                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}','td_{{ friend['user_id'] }}')"></a>
                         </td>
                         {% endif %}
                     {% elif friend['status'] == "declined" %}
@@ -515,7 +499,7 @@ hr {
                             {% if user_id == current_user.get_id() %}
                             <a class="text-light" href="/user/account/{{ friend['username'] }}">{{ friend['username'] }}</a>
                             <br>
-                            <a id="C_{{ friend['user_id'] }}" class="fas fa-ban" onclick="delete_friend('C_{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
                             {% else %}
                             <span class="text-light">{{ friend['username'] }}</span>
                             {% endif %}
@@ -527,14 +511,15 @@ hr {
             </div>
         </div>
 
+        <!-------------------------------------- Achievements ----------------------------------------->
         <h3 class="font-weight-light text-center mt-4 mb-0">
             Anime Achievements
             <div class="arrow_div float-right">
-                <a class="fas fa-xs fa-chevron-down" id="ACHIEVEMENTS_arrow" onclick="hide('ACHIEVEMENTS', 'ACHIEVEMENTS_arrow')"></a>
+                <a class="collapse_all fas fa-xs fa-chevron-down" id="ACHIEVEMENTS_arrow" onclick="hide('collapse_ACHIEVEMENTS', 'ACHIEVEMENTS_arrow')"></a>
             </div>
         </h3>
         <hr class="mt-2 mb-3">
-        <div id="ACHIEVEMENTS" class="container-stats">
+        <div id="collapse_ACHIEVEMENTS" class="container-stats">
             <table>
                 <tbody>
                 {% for achievement in achievements %}
@@ -562,14 +547,15 @@ hr {
             </table>
         </div>
 
+        <!---------------------------------------- Statistics ----------------------------------------->
         <h3 class="font-weight-light text-center mt-4 mb-0">
             Series Statistics
             <div class="arrow_div float-right">
-                <a class="fas fa-xs fa-chevron-down" id="SERIES_arrow" onclick="hide('SERIES', 'SERIES_arrow')"></a>
+                <a class="collapse_all fas fa-xs fa-chevron-down" id="SERIES_arrow" onclick="hide('collapse_SERIES', 'SERIES_arrow')"></a>
             </div>
         </h3>
         <hr class="mt-2 mb-3">
-        <div id="SERIES" class="container-stats">
+        <div id="collapse_SERIES" class="container-stats">
             <div class="m-b-5">
                 <span class="stat_text"><b>Days:</b> {{ series_stats[1][2] }}</span>
                 <span class="stat_text float-right"><b>Hours:</b> {{ series_stats[1][1] }}</span>
@@ -580,7 +566,7 @@ hr {
 
             <figure class="d-flex">
                 {% if series_stats[5] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
-                <span class="block" title="Empty" style="background-color: black !important; border-width: 1px; border-style: solid; border-color: #717171">
+                <span class="block" title="No data" style="background-color: black; border-width: 1px; border-style: solid; border-color: #717171">
                     <span id="100%" class="value"></span>
                 </span>
                 {% else %}
@@ -668,14 +654,14 @@ hr {
             </div>
         </div>
 
-        <h3 class="font-weight-light text-center mt-5 mb-0">
+        <h3 class="font-weight-light text-center mt-4 mb-0">
             Anime Statistics
             <div class="arrow_div float-right">
-                <a class="fas fa-xs fa-chevron-down" id="ANIME_arrow" onclick="hide('ANIME', 'ANIME_arrow')"></a>
+                <a class="collapse_all fas fa-xs fa-chevron-down" id="ANIME_arrow" onclick="hide('collapse_ANIME', 'ANIME_arrow')"></a>
             </div>
         </h3>
         <hr class="mt-2 mb-3">
-        <div id="ANIME" class="container-stats">
+        <div id="collapse_ANIME" class="container-stats">
             <div class="m-b-5">
                 <span class="stat_text"><b>Days:</b> {{ anime_stats[1][2] }}</span>
                 <span class="stat_text float-right"><b>Hours:</b> {{ anime_stats[1][1] }}</span>
@@ -686,7 +672,7 @@ hr {
 
             <figure class="d-flex">
                 {% if anime_stats[5] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
-                <span class="block" title="Empty" style="background-color: black !important; border-width: 1px; border-style: solid; border-color: #717171">
+                <span class="block" title="No data" style="background-color: black !important; border-width: 1px; border-style: solid; border-color: #717171">
                     <span id="100%" class="value"></span>
                 </span>
                 {% else %}
@@ -777,11 +763,11 @@ hr {
         <h3 class="font-weight-light text-center mt-4 mb-0">
             Books Statistics
             <div class="arrow_div float-right">
-                <a class="fas fa-xs fa-chevron-down" id="BOOK_arrow" onclick="hide('BOOK', 'BOOK_arrow')"></a>
+                <a class="collapse_all fas fa-xs fa-chevron-down" id="BOOK_arrow" onclick="hide('collapse_BOOK', 'BOOK_arrow')"></a>
             </div>
         </h3>
         <hr class="mt-2 mb-3">
-        <div id="BOOK" class="container-stats">
+        <div id="collapse_BOOK" class="container-stats">
             <div class="m-b-5">
                 <span class="stat_text"><b>Days:</b> {{ book_stats[1][2] }}</span>
                 <span class="stat_text float-right"><b>Hours:</b> {{ book_stats[1][1] }}</span>
@@ -792,7 +778,7 @@ hr {
 
             <figure class="d-flex">
                 {% if book_stats[5] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
-                <span class="block" title="Empty" style="background-color: black !important; border-width: 1px; border-style: solid; border-color: #717171">
+                <span class="block" title="No data" style="background-color: black !important; border-width: 1px; border-style: solid; border-color: #717171">
                     <span id="100%" class="value"></span>
                 </span>
                 {% else %}
@@ -869,82 +855,53 @@ hr {
 
 {% block script %}
 <!--------- Principal Javascript ---------->
-<script>
+<script type="text/javascript">
 function hide(category, arrow) {
     var category = document.getElementById(category);
     var arrow = document.getElementById(arrow);
 
     if (category.className === "container-stats"){
         category.className = "d-none";
-        arrow.className = "fas fa-xs fa-chevron-right";
+        arrow.className = "collapse_all fas fa-xs fa-chevron-right";
     } else {
         category.className = "container-stats";
-        arrow.className = "fas fa-xs fa-chevron-down";
+        arrow.className = "collapse_all fas fa-xs fa-chevron-down";
     }
 }
 
-function hide_friends(category, arrow) {
-    var category = document.getElementById(category);
-    var arrow = document.getElementById(arrow);
 
-    if (category.className === "row"){
-        category.className = "d-none";
-        arrow.className = "fas fa-xs fa-chevron-right";
-    } else {
-        category.className = "row";
-        arrow.className = "fas fa-xs fa-chevron-down";
+function delete_friend(friend_id, td_id) {
+    if (!confirm("Do you want to delete")){
+        return false;
     }
+    $("#"+td_id).remove();
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/delete_friend",
+        contentType: "application/json",
+        data: JSON.stringify({delete: friend_id}),
+        dataType: "json",
+        success: function(response) {
+            console.log("ok"); }
+    });
 }
 
-{% for friend in friends_list_data %}
-    let close_{{ friend['user_id'] }} = document.getElementById("C_{{ friend['user_id'] }}");
-    {% if friend['status'] == "pending" %}
-        let accept_{{ friend['user_id'] }} = document.getElementById("accept_{{ friend['user_id'] }}");
-        let decline_{{ friend['user_id'] }} = document.getElementById("decline_{{ friend['user_id'] }}");
 
-        accept_{{ friend['user_id'] }}.onclick = function () {
-            $.ajax ({
-                type: "POST",
-                url: "/accept_friend_request",
-                contentType: "application/json",
-                data: JSON.stringify({reponse: {{ friend['user_id'] }} }),
-                dataType: "json",
-                success: function(response) {
-                    window.location.replace('/account'); }
-            });
-        }
-
-        decline_{{ friend['user_id'] }}.onclick = function () {
-            $.ajax ({
-                type: "POST",
-                url: "/decline_friend_request",
-                contentType: "application/json",
-                data: JSON.stringify({reponse: {{ friend['user_id'] }} }),
-                dataType: "json",
-                success: function(response) {
-                    window.location.replace('/account'); }
-            });
-        }
-    {% else %}
-
-    close_{{ friend['user_id'] }}.onclick = function () {
-        if (!confirm("Do you want to delete")){
-        return false;}
-        $.ajax ({
-            type: "POST",
-            url: "/delete_friend",
-            contentType: "application/json",
-            data: JSON.stringify({delete: {{ friend['user_id'] }} }),
-            dataType: "json",
-            success: function(response) {
-                window.location.replace('/account'); }
-        });
-    }
-    {% endif %}
-{% endfor %}
+function friend_request(friend_id, value) {
+    $.ajax ({
+        type: "POST",
+        url: "/friend_request",
+        contentType: "application/json",
+        data: JSON.stringify({response: friend_id, request: value }),
+        dataType: "json",
+        success: function(response) {
+            window.location.replace('/account'); }
+    });
+}
 </script>
 <!--------- Tooltip Javascript ------------>
-<script>
+<script type="text/javascript">
 $('.value').each(function() {
 	var text = $(this).attr('id');
     $(this).parent().css('width', text);
@@ -956,7 +913,7 @@ $('[data-toggle="tooltip"]').tooltip()
 })
 </script>
 <!--------- Level XP Javascript ----------->
-<script>
+<script type="text/javascript">
 $(document).ready(function(){
     $body = $("body");
     $body.addClass("loading");
@@ -1001,5 +958,27 @@ $(document).ready(function(){
         $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-book").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
     }, 20*parseFloat({{ book_stats[3][1] }}));
 });
+</script>
+<!---- Show/collapse all categories scripts ---->
+<script type="text/javascript">
+function hide_all_cat() {
+    var hide = document.getElementById('collapse_all');
+    var show = document.getElementById('show_cat_all');
+    $('div[id^="collapse"]').attr('class', 'd-none');
+    hide.className = "d-none";
+    show.className = "fas fa-eye text-light m-r-5";
+    $('#collapse_show').text('Expand All');
+    $('.collapse_all').attr('class', 'collapse_all fas fa-xs fa-chevron-right');
+}
+
+function show_all_cat() {
+    var show = document.getElementById('show_cat_all');
+    var hide = document.getElementById('collapse_all');
+    $('div[id^="collapse"]').attr('class', 'container-stats');
+    hide.className = "fas fa-eye-slash text-light m-r-5";
+    show.className = "d-none";
+    $('#collapse_show').text('Collapse All');
+    $('.collapse_all').attr('class', 'collapse_all fas fa-xs fa-chevron-down');
+}
 </script>
 {% endblock %}
