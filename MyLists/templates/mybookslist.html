@@ -592,7 +592,7 @@ $(function() {
     $("#autocomplete").catcomplete({
       delay: 500,
       source: function(request, response) {
-				$.getJSON("{{url_for('autocomplete_book')}}",{
+				$.getJSON("{{url_for('autocomplete_books')}}",{
 					q: request.term,
 				},
 					function(data) {

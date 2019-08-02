@@ -303,8 +303,6 @@ hr {
         <a id="collapse_all" class="fas fa-eye-slash text-light m-r-5" onclick="hide_all_cat()"></a>
         <a id="show_cat_all" class="d-none" onclick="show_all_cat()"></a>
         <span id="collapse_show" class="m-r-5 text-light">Collapse all</span>
-
-        <span class="m-l-5 m-r-5 text-light">||</span>
     </div>
 </div>
 {% endblock fixed %}
@@ -355,7 +353,7 @@ hr {
             </div>
             <div class="ml-auto bd-highlight">
                 {% if user_id == current_user.get_id() %}
-                <a class="fas fa-2x fa-user-cog text-light" data-toggle="tooltip" title="Settings" href="{{ url_for('account_settings') }}"></a>
+                <a class="fas fa-2x fa-cog text-light" data-toggle="tooltip" title="Settings" href="{{ url_for('account_settings') }}"></a>
                 {% endif %}
             </div>
         </div>

@@ -1877,9 +1877,9 @@ def add_score_book():
     return '', 204
 
 
-@app.route('/autocomplete_book', methods=['GET'])
+@app.route('/autocomplete_books', methods=['GET'])
 @login_required
-def autocomplete_book():
+def autocomplete_books():
     search = request.args.get('q')
     if "%" in search:
         return jsonify([])
@@ -2117,7 +2117,7 @@ def autocomplete_search_element(element_name, list_type):
 
         else:
             try:
-                response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
+                response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
                                         .format(themoviedb_api_key, element_name))
             except:
                 return None
@@ -2145,9 +2145,12 @@ def autocomplete_search_element(element_name, list_type):
                 for i in range(8):
                     try:
                         genre_id = data["results"][i]["genre_ids"]
-                        country = data["results"][i]["origin_country"][0]
+                        try:
+                            country = data["results"][i]["origin_country"][0]
+                        except:
+                            country = data["results"][i]["original_language"]
                         if 16 in genre_id:
-                            if "JP" in country:
+                            if "JP" in country :
                                 if data["results"][i]["poster_path"] is None:
                                     data["results"][i]["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
                                 else:
@@ -2157,6 +2160,16 @@ def autocomplete_search_element(element_name, list_type):
                                            "category": "Online API Database",
                                            "label": "{0}{1}".format(url, data["results"][i]["poster_path"])}
                                 tmdb_results.append(tmp)
+                            # elif "ja" in country:
+                            #     if data["results"][i]["poster_path"] is None:
+                            #         data["results"][i]["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
+                            #     else:
+                            #         url = "http://image.tmdb.org/t/p/w300/"
+                            #         tmp = {"id": "{0}".format(data['results'][i]['id']),
+                            #                "value": "{0}".format(data["results"][i]["title"]),
+                            #                "category": "Online API Database",
+                            #                "label": "{0}{1}".format(url, data["results"][i]["poster_path"])}
+                            #     tmdb_results.append(tmp)
                             else:
                                 pass
                         else:

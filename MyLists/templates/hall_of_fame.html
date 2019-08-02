@@ -224,6 +224,7 @@ function add_friend(username) {
 
 $(document).ready(function () {
     $('#hall_of_fame').DataTable({
+        "pageLength": 10,
         "order": [[ 5, "desc" ], [ 1, "asc" ]],
         columnDefs: [{orderable: false, targets: 0},
                      {orderable: false, targets: 6}
