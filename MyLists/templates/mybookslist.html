@@ -362,7 +362,11 @@ body.loading .modal_loading {
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
-        <a class="fas fa-th text-light" href="{{ url_for('mybookslist_table') }}"></a>
+        {% if user_id == current_user.get_id() %}
+        <a class="fas fa-bars text-light" href="{{ url_for('mybookslist_table') }}"></a>
+        {% else %}
+        <a class="fas fa-bars text-light" href="/user/books/table/{{ user_name }}"></a>
+        {% endif %}
         <span class="m-r-5 text-light">Table View</span>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
@@ -378,6 +382,7 @@ body.loading .modal_loading {
 
 {% block content %}
 <div class="d-flex flex-wrap">
+    {% if user_id == current_user.get_id() %}
     <div class="m-t-20 m-b-10">
         <input  class="form-control text-light add_book" placeholder="Add a book" type="text" id="autocomplete" onfocus="this.value=''"/>
         <input type="hidden" id="book_id" value=""/>
@@ -385,6 +390,7 @@ body.loading .modal_loading {
     <div class="ml-auto m-t-20 m-b-10">
         <button class="btn btn-sm btn-light text-dark p-2" onclick="refreshAll()"><a class="fas fa-sync m-r-5 text-dark"></a> REFRESH ALL</button>
     </div>
+    {% endif %}
 </div>
 
 <div id="mySidenav" class="sidenav">
@@ -437,13 +443,19 @@ body.loading .modal_loading {
                     <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_{{ data['id'] }}" style="cursor: pointer;">
                         <span class="font-mask text-center text-light">{{ data['title'] }}</span>
                     </div>
+                    {% if user_id == current_user.get_id() %}
                     <a class="btn_left fas fa-bars text-light" data-toggle="modal" data-target="#modal_cat{{ data['id'] }}"></a>
                     <a class="btn_right fas fa-ban text-light" onclick="deleteBook('{{ data['id'] }}', 'card_{{ data['id'] }}')"></a>
+                    {% endif %}
                     <a class="btn_bottom fas fa-caret-square-down" onclick="show_score('footer_{{ data['id'] }}', card_{{ data['id'] }})" style="z-index: 500;"></a>
                 </div>
 
                 <div id="footer_{{ data['id'] }}" class="d-none footer_score">
+                    {% if user_id == current_user.get_id() %}
                     <span class="score_size"> Score: </span><a class="score_size" id="new_{{ data['id'] }}" onclick="edit_score('edit_{{ data['id'] }}', 'new_{{ data['id'] }}')"> {{ data['score'] }}</a>
+                    {% else %}
+                    <span class="score_size"> Score: </span><a class="disabled score_size" id="new_{{ data['id'] }}" onclick="edit_score('edit_{{ data['id'] }}', 'new_{{ data['id'] }}')"> {{ data['score'] }}</a>
+                    {% endif %}
                     <input id="edit_{{ data['id'] }}" class="d-none" type="text"
                            style="max-width: 30px;
                            max-height: 20px;
