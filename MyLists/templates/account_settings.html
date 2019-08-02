@@ -2,19 +2,10 @@
 
 
 {% block css %}
-<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.4.0/css/bootstrap4-toggle.min.css" rel="stylesheet">
-{% endblock css %}
-
-
-{% block content %}
+<!-------- Principal CSS --------->
 <style>
 .container-form {
     max-width: 500px;
-}
-
-.container-scrollable {
-    max-width: 150px;
-    min-width: 150px;
 }
 
 .account-img {
@@ -68,154 +59,136 @@ hr {
     margin-bottom: 20px;
 }
 </style>
+{% endblock css %}
 
 
+{% block content %}
 <div class="container form_account">
     <div class="border_account">
+        <!------------------------ Account picture/Username/Privacy -------------------------->
         <div class="d-flex flex-wrap-reverse">
             <div class="p-r-10 bd-highlight">
                 <img class="rounded border-light account-img" src="{{ image_file }}">
             </div>
             <div class="bd-highlight">
                 <h2 class="mt-0 account-heading">{{ current_user.username }}</h2>
-                <h5 class="text">{{ current_user.email }}</h5>
+                <span style="font-size: 14pt;">{{ current_user.email }}</span>
             </div>
-            <div class="ml-auto bd-highlight">
-                <label>
-                    Private Mode
-                    <input id="private-toggle" type="checkbox" {{ value_privacy }} data-toggle="toggle"  data-onstyle="light" data-offstyle="dark" data-style="border" data-size="sm">
-                </label>
-            </div>
-        </div>
-
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col m-t-20 m-b-40">
-                    <h5 class="m-b-10">Default home page:</h5>
-                    <div class="d-flex container-scrollable">
-                        <select id="home_page" class="text-center form-control p-0 default_page">
-                            {% if home_page == "account" %}
-                                <option selected="selected">Account</option>
-                                <option>Hall of Fame</option>
-                                <option>MySeriesList</option>
-                                <option>MyAnimesList</option>
-                                <option>MyBooksList</option>
-                            {% elif home_page == "hall_of_fame" %}
-                                <option>Account</option>
-                                <option selected="selected">Hall of Fame</option>
-                                <option>MySeriesList</option>
-                                <option>MyAnimesList</option>
-                                <option>MyBooksList</option>
-                            {% elif home_page == "myserieslist" %}
-                                <option>Account</option>
-                                <option>Hall of Fame</option>
-                                <option selected="selected">MySeriesList</option>
-                                <option>MyAnimesList</option>
-                                <option>MyBooksList</option>
-                            {% elif home_page == "myanimeslist" %}
-                                <option>Account</option>
-                                <option>Hall of Fame</option>
-                                <option>MySeriesList</option>
-                                <option selected="selected">MyAnimesList</option>
-                                <option>MyBooksList</option>
-                            {% elif home_page == "mybookslist" %}
-                                <option>Account</option>
-                                <option>Hall of Fame</option>
-                                <option>MySeriesList</option>
-                                <option>MyAnimesList</option>
-                                <option selected="selected">MyBooksList</option>
-                            {% endif %}
-                        </select>
-                    </div>
-                </div>
-
-                <div class="col m-t-20 m-b-40">
-                    <h5 class="m-b-10">Default Hall of Fame table:</h5>
-                    <div class="d-flex container-scrollable">
-                        <select id="default_hof" class="text-center form-control p-0 default_hof">
-                            {% if default_hof == "myserieslist" %}
-                                <option selected="selected">MySeriesList</option>
-                                <option>MyAnimesList</option>
-                                <option>MyBooksList</option>
-                            {% elif default_hof == "myanimelist" %}
-                                <option>MySeriesList</option>
-                                <option selected="selected">MyAnimesList</option>
-                                <option>MyBooksList</option>
-                            {% elif default_hof == "mybooklist" %}
-                                <option>MySeriesList</option>
-                                <option>MyAnimesList</option>
-                                <option selected="selected">MyBooksList</option>
-                            {% endif %}
-                        </select>
-                    </div>
-                </div>
+            <div class="ml-auto bd-highlight text-center">
+                {% if value_privacy == "checked" %}
+                <a id="private_id" class="fas fa-2x fa-toggle-on" onclick="private_mode()"></a>
+                <br>
+                <span id="text_privacy">Private Mode On</span>
+                {% else %}
+                <a id="private_id" class="fas fa-2x fa-toggle-off" onclick="private_mode()"></a>
+                <br>
+                <span id="text_privacy">Private Mode Off</span>
+                {% endif %}
             </div>
         </div>
 
-        <form method="POST" action="" enctype="multipart/form-data">
-            {{ form.hidden_tag() }}
-            <h3 class="border-bottom text-center m-t-10 m-b-30">Account Info</h3>
-            <div class="container-form">
-                <div class="form-group">
-                    {{ form.username.label(class="form-control-label") }}
-                    {% if form.username.errors %}
-                        {{ form.username(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.username.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.username(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.email.label(class="form-control-label") }}
-                    {% if form.email.errors %}
-                        {{ form.email(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.email.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.email(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.picture.label() }}
-                    {{ form.picture(class="form-control-file") }}
-                    {% if form.picture.errors %}
-                        {% for error in form.picture.errors %}
-                            <span class="text-danger">{{ error }}</span><br>
-                        {% endfor %}
-                    {% endif %}
-                </div>
+        <!---------------------------- Account info/default page ----------------------------->
+        <h3 class="font-weight-light text-center mt-4 mb-0">
+            Account Info
+            <div class="arrow_div float-right">
+                <a class="fas fa-xs fa-chevron-down" id="INFO_arrow" onclick="hide('INFO', 'INFO_arrow')"></a>
             </div>
-            <div class="text-center">
-                {{ form.submit(class="btn btn-outline-info") }}
-                <a class="btn btn-outline-info" href="{{ url_for('change_password') }}" role="button">Change password?</a>
+        </h3>
+        <hr class="mt-2 mb-3">
+        <div id="INFO" class="d-flex flex-wrap">
+            <div class="col text-center">
+                <span>Default home page:</span>
+                <select id="home_page" class="ml-auto mr-auto m-t-10 m-b-20 scrollable-menu form-control text-center" style="max-width: 150px;">
+                {% if home_page == "account" %}
+                    <option selected="selected">Account</option>
+                    <option>Hall of Fame</option>
+                    <option>MySeriesList</option>
+                    <option>MyAnimesList</option>
+                    <option>MyBooksList</option>
+                {% elif home_page == "hall_of_fame" %}
+                    <option>Account</option>
+                    <option selected="selected">Hall of Fame</option>
+                    <option>MySeriesList</option>
+                    <option>MyAnimesList</option>
+                    <option>MyBooksList</option>
+                {% elif home_page == "myserieslist" %}
+                    <option>Account</option>
+                    <option>Hall of Fame</option>
+                    <option selected="selected">MySeriesList</option>
+                    <option>MyAnimesList</option>
+                    <option>MyBooksList</option>
+                {% elif home_page == "myanimeslist" %}
+                    <option>Account</option>
+                    <option>Hall of Fame</option>
+                    <option>MySeriesList</option>
+                    <option selected="selected">MyAnimesList</option>
+                    <option>MyBooksList</option>
+                {% elif home_page == "mybookslist" %}
+                    <option>Account</option>
+                    <option>Hall of Fame</option>
+                    <option>MySeriesList</option>
+                    <option>MyAnimesList</option>
+                    <option selected="selected">MyBooksList</option>
+                {% endif %}
+            </select>
             </div>
-        </form>
+            <div class="d-flex flex-wrap">
+                <form method="POST" action="" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="container-form">
+                        <div class="form-group">
+                            {{ form.username.label(class="form-control-label") }}
+                            {% if form.username.errors %}
+                                {{ form.username(class="form-control form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.username.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.username(class="form-control form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.email.label(class="form-control-label") }}
+                            {% if form.email.errors %}
+                                {{ form.email(class="form-control form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.email(class="form-control form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.picture.label() }}
+                            {{ form.picture(class="form-control-file") }}
+                            {% if form.picture.errors %}
+                                {% for error in form.picture.errors %}
+                                    <span class="text-danger">{{ error }}</span><br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        {{ form.submit(class="btn btn-outline-info") }}
+                        <a class="btn btn-outline-info" href="{{ url_for('change_password') }}" role="button">Change password?</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
+{% endblock content %}
 
+
+{% block script %}
+<!-------- Principal JS --------->
 <script>
-let private = document.getElementById("private-toggle");
 let home_page = document.getElementById("home_page");
-let default_hof = document.getElementById("default_hof");
 
-private.onchange = function () {
-    $.ajax ({
-        type: "POST",
-        url: "/private_mode",
-        contentType: "application/json",
-        data: JSON.stringify({private: "triggered"}),
-        dataType: "json",
-        success: function(response) {
-            console.log(response); }
-    });
-};
 
 home_page.onchange = function () {
     let selected_index = home_page.selectedIndex;
@@ -232,24 +205,50 @@ home_page.onchange = function () {
     });
 }
 
-default_hof.onchange = function () {
-    let selected_index = default_hof.selectedIndex;
-    $body = $("body");
-    $.ajax ({
-        type: "POST",
-        url: "/default_hof",
-        contentType: "application/json",
-        data: JSON.stringify({default_hof: selected_index }),
-        dataType: "json",
-        beforeSend: function() { $body.addClass("loading"); },
-        success: function(response) {
-            $body.removeClass("loading"); }
-    });
+
+function private_mode() {
+    var private = document.getElementById("private_id");
+
+    if (private.className === "fas fa-2x fa-toggle-on") {
+        private.className = "fas fa-2x fa-toggle-off";
+        $('#text_privacy').text('Private Mode Off');
+        $.ajax ({
+            type: "POST",
+            url: "/private_mode",
+            contentType: "application/json",
+            data: JSON.stringify({private: "off"}),
+            dataType: "json",
+            success: function(response) {
+                console.log("off"); }
+        });
+    } else {
+        private.className = "fas fa-2x fa-toggle-on";
+        $('#text_privacy').text('Private Mode On');
+        $.ajax ({
+            type: "POST",
+            url: "/private_mode",
+            contentType: "application/json",
+            data: JSON.stringify({private: "on"}),
+            dataType: "json",
+            success: function(response) {
+                console.log("on"); }
+        });
+    }
 }
 </script>
-{% endblock content %}
+<!------- Hide function --------->
+<script>
+function hide(category, arrow) {
+    var category = document.getElementById(category);
+    var arrow = document.getElementById(arrow);
 
-
-{% block script %}
-<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.4.0/js/bootstrap4-toggle.min.js"></script>
+    if (category.className === "d-flex flex-wrap"){
+        category.className = "d-none";
+        arrow.className = "fas fa-xs fa-chevron-right";
+    } else {
+        category.className = "d-flex flex-wrap";
+        arrow.className = "fas fa-xs fa-chevron-down";
+    }
+}
+</script>
 {% endblock script %}
