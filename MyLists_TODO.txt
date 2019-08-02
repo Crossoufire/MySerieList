@@ -8,10 +8,12 @@ TO DO / TO SEE
 	Add a "read less" for the synopsis
 	Check the style of the category selector modal
 	Check the style of the auto-complete selector
+	Remove duplicates of the auto-complete
+	Remove "Local" and "Online" categories of the autocomplete (merge in one)
 	Add ZOOM for the media lists (done on booklist but shady), but it is difficult to implement with cards style
-	Multi selection for the category changes
+	Multi selection when changing category
 	Separation of the code for routes!!
-	Add "more results" for javascript results
+	Add "more results" for auto-complete results
 	Add lots of statistics (already began the code part, need a page to display + chart.js)
 	Bug display season and episode when refresh due to the browser cache (don't know how to repair) but works great otherwise
 	Add Anime movies (Added multi search from the API)
