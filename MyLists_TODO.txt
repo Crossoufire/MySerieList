@@ -13,13 +13,13 @@ TO DO / TO SEE
 	Separation of the code for routes!!
 	Add "more results" for javascript results
 	Add lots of statistics (already began the code part, need a page to display + chart.js)
-	On login/register click focus on the modal
 	Bug display season and episode when refresh due to the browser cache (don't know how to repair) but works great otherwise
 	Add Anime movies (Added multi search from the API)
 	
 	
 DONE 
-	
+
+	On login/register click focus on the modal
 	Add fixed top bar
 	Add Books list
 	Add jQuery auto-complete with pictures from local + online databases :) !!!!!
