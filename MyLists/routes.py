@@ -335,9 +335,11 @@ def account():
     for friend in friends_list:
         friend_data = {}
         friend_username = User.query.filter_by(id=friend.friend_id).first().username
+        friend_picture = User.query.filter_by(id=friend.friend_id).first().image_file
         friend_data["username"] = friend_username
         friend_data["user_id"] = friend.friend_id
         friend_data["status"] = friend.status
+        friend_data["picture"] = friend_picture
         friends_list_data.append(friend_data)
 
     # Series Statistics, scores and level
@@ -423,9 +425,11 @@ def user_account(user_name):
     for friend in friends_list:
         friend_data = {}
         friend_username = User.query.filter_by(id=friend.friend_id).first().username
+        friend_picture = User.query.filter_by(id=friend.friend_id).first().image_file
         friend_data["username"] = friend_username
         friend_data["user_id"] = friend.friend_id
         friend_data["status"] = friend.status
+        friend_data["picture"] = friend_picture
         friends_list_data.append(friend_data)
 
     # Series Statistics, scores and level
@@ -1382,11 +1386,13 @@ def user_animes_grid(user_name):
     animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     animes_data = get_list_data(animes_list, ListType.ANIME)
     user_id = user.id
+    user_name = user.username
     element_type = "ANIME"
     return render_template('mymedialist.html',
                            title='{}\'s list'.format(user.username),
                            all_data=animes_data,
                            user_id=user_id,
+                           user_name=user_name,
                            element_type=element_type)
 
 
@@ -1420,11 +1426,13 @@ def user_series_grid(user_name):
     series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     series_data = get_list_data(series_list, ListType.SERIES)
     user_id = user.id
+    user_name = user.username
     element_type = "SERIES"
     return render_template('mymedialist.html',
                            title='{}\'s list'.format(user.username),
                            all_data=series_data,
                            user_id=user_id,
+                           user_name=user_name,
                            element_type=element_type)
 
 
@@ -1458,11 +1466,13 @@ def user_animes_table(user_name):
     animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     animes_data = get_list_data(animes_list, ListType.ANIME)
     user_id = user.id
+    user_name = user.username
     element_type = "ANIME"
     return render_template('mymedialist_table.html',
                            title='{}\'s list'.format(user.username),
                            all_data=animes_data,
                            user_id=user_id,
+                           user_name=user_name,
                            element_type=element_type)
 
 
@@ -1496,11 +1506,13 @@ def user_series_table(user_name):
     series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     series_data = get_list_data(series_list, ListType.SERIES)
     user_id = user.id
+    user_name = user.username
     element_type = "SERIES"
     return render_template('mymedialist_table.html',
                            title='{}\'s list'.format(user.username),
                            all_data=series_data,
                            user_id=user_id,
+                           user_name=user_name,
                            element_type=element_type)
 
 
@@ -1612,7 +1624,11 @@ def mybookslist():
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
-    return render_template('mybookslist.html', title='MyBooksList', all_data=book_data)
+    user_id = current_user.get_id()
+    return render_template('mybookslist.html',
+                           title='MyBooksList',
+                           user_id=user_id,
+                           all_data=book_data)
 
 
 @app.route("/mybookslist_table", methods=['GET', 'POST'])
@@ -1626,7 +1642,85 @@ def mybookslist_table():
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
-    return render_template('mybookslist_table.html', title='MyBooksList', all_data=book_data)
+    user_id = current_user.get_id()
+    return render_template('mybookslist_table.html',
+                           title='MyBooksList',
+                           user_id=user_id,
+                           all_data=book_data)
+
+
+@app.route("/user/books/grid/<user_name>", methods=['GET', 'POST'])
+@login_required
+def user_mybookslist_grid(user_name):
+    image_error = url_for('static', filename='img/error.jpg')
+    user = User.query.filter_by(username=user_name).first()
+
+    if user is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+    if user and str(user.id) == current_user.get_id():
+        return redirect(url_for('mybookslist'))
+
+    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+    if user.private:
+        if current_user.get_id() == "1":
+            pass
+        elif friend is None or friend.status != "accepted":
+            return redirect(url_for('anonymous'))
+    if user.id == 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    reading_list = BookList.query.filter_by(user_id=user.id, status='READING').all()
+    completed_list = BookList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list = BookList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    dropped_list = BookList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantoread_list = BookList.query.filter_by(user_id=user.id, status='PLAN_TO_READ').all()
+
+    book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
+    book_data = get_list_data(book_list, ListType.BOOK)
+    user_id = user.id
+    user_name = user.username
+    return render_template('mybookslist.html',
+                           title='MyBooksList',
+                           user_id=user_id,
+                           user_name=user_name,
+                           all_data=book_data)
+
+
+@app.route("/user/books/table/<user_name>", methods=['GET', 'POST'])
+@login_required
+def user_mybookslist_table(user_name):
+    image_error = url_for('static', filename='img/error.jpg')
+    user = User.query.filter_by(username=user_name).first()
+
+    if user is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+    if user and str(user.id) == current_user.get_id():
+        return redirect(url_for('mybookslist_table'))
+
+    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+    if user.private:
+        if current_user.get_id() == "1":
+            pass
+        elif friend is None or friend.status != "accepted":
+            return redirect(url_for('anonymous'))
+    if user.id == 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    reading_list = BookList.query.filter_by(user_id=user.id, status='READING').all()
+    completed_list = BookList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list = BookList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    dropped_list = BookList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantoread_list = BookList.query.filter_by(user_id=user.id, status='PLAN_TO_READ').all()
+
+    book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
+    book_data = get_list_data(book_list, ListType.BOOK)
+    user_id = user.id
+    user_name = user.username
+    return render_template('mybookslist_table.html',
+                           title='MyBooksList',
+                           user_id=user_id,
+                           user_name=user_name,
+                           all_data=book_data)
 
 
 @app.route('/delete_book', methods=['POST'])
@@ -2701,7 +2795,7 @@ def get_total_time_spent(user_id, list_type):
     elif list_type == ListType.ANIME:
         list = AnimeList.query.filter(AnimeList.status != "PLAN_TO_WATCH").filter_by(user_id=user_id).all()
     elif list_type == ListType.BOOK:
-        list = BookList.query.filter(BookList.status != "PLAN_TO_READ").filter_by(user_id=user_id).all()
+        list = BookList.query.filter(BookList.status == "COMPLETED").filter_by(user_id=user_id).all()
 
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
         episodes_counter = 0

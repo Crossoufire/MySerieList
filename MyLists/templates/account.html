@@ -448,7 +448,7 @@ hr {
                     <a class="btn btn-primary" href="/user/series/grid/{{ user_name }}">SeriesList</a>
                 </div>
                 <div class="col">
-                    <a class="btn btn-primary" href="/user/animes/grid/{{ user_name }}">AnimeList</a>
+                    <a class="btn btn-primary" href="/user/animes/grid/{{ user_name }}">AnimesList</a>
                 </div>
                 <div class="col">
                     <a class="btn btn-primary" href="/user/books/grid/{{ user_name }}">BooksList</a>
@@ -476,8 +476,8 @@ hr {
                     {% for friend in friends_list_data %}
                     {% if friend['status'] == "pending" %}
                         {% if user_id == current_user.get_id() %}
-                        <td id="td_{{ friend['user_id'] }}" class="text-center">
-                            <span class="text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span>
+                        <td id="td_{{ friend['user_id'] }}" class="text-center p-l-10 p-r-10">
+                            <span style="font-size: 12pt;" class="text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span>
                             <br>
                             <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
                             <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
@@ -485,8 +485,8 @@ hr {
                         {% endif %}
                     {% elif friend['status'] == "request" %}
                         {% if user_id == current_user.get_id() %}
-                        <td id="td_{{ friend['user_id'] }}" class="text-center p-r-15 p-l-15">
-                            <span class="text-light">{{ friend['username'] }}</span>
+                        <td id="td_{{ friend['user_id'] }}" class="text-center p-l-10 p-r-10">
+                            <span style="font-size: 12pt;" class="text-light">{{ friend['username'] }}</span>
                             <br>
                             <span>(Pending)</span>
                             <br>
@@ -495,13 +495,21 @@ hr {
                         {% endif %}
                     {% elif friend['status'] == "declined" %}
                     {% else %}
-                        <td id="td_{{ friend['user_id'] }}" class="text-center">
+                        <td id="td_{{ friend['user_id'] }}" class="text-center p-l-10 p-r-10">
                             {% if user_id == current_user.get_id() %}
-                            <a class="text-light" href="/user/account/{{ friend['username'] }}">{{ friend['username'] }}</a>
+                            <a href="/user/account/{{ friend['username'] }}">
+                                <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
+                            </a>
+                            <br>
+                            <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
                             <br>
                             <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
                             {% else %}
-                            <span class="text-light">{{ friend['username'] }}</span>
+                            <a class="disabled">
+                                <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
+                            </a>
+                            <br>
+                            <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
                             {% endif %}
                         </td>
                     {% endif %}
