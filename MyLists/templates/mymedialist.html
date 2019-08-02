@@ -363,10 +363,18 @@ body.loading .modal_loading {
 
         <span class="m-l-5 m-r-5 text-light">||</span>
         {% if element_type == "ANIME" %}
-        <a class="fas fa-th text-light" href="{{ url_for('myanimeslist_table') }}"></a>
+            {% if user_id == current_user.get_id() %}
+            <a class="fas fa-th text-light" href="{{ url_for('myanimeslist_table') }}"></a>
+            {% else %}
+            <a class="fas fa-th text-light" href="/user/animes/table/{{ user_name }}"></a>
+            {% endif %}
         <span class="m-r-5 text-light">Table View</span>
         {% elif element_type == "SERIES" %}
-        <a class="fas fa-th text-light" href="{{ url_for('myserieslist_table') }}"></a>
+            {% if user_id == current_user.get_id() %}
+            <a class="fas fa-th text-light" href="{{ url_for('myserieslist_table') }}"></a>
+            {% else %}
+            <a class="fas fa-th text-light" href="/user/series/table/{{ user_name }}"></a>
+            {% endif %}
         <span class="m-r-5 text-light">Table View</span>
         {% endif %}
     </div>
