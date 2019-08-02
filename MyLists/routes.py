@@ -588,28 +588,26 @@ def default_page():
     return '', 204
 
 
-@app.route("/default_hof", methods=['POST'])
+@app.route('/private_mode', methods=['POST'])
 @login_required
-def default_hof():
+def private_mode():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        default_hof = int(json_data['default_hof'])
+        triggered = json_data['private']
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     user = User.query.filter_by(id=current_user.get_id()).first()
-
-    if default_hof == 0:
-        user.default_hof = HallOfFame.MYSERIESLIST
-    elif default_hof == 1:
-        user.default_hof = HallOfFame.MYANIMESLIST
-    elif default_hof == 2:
-        user.default_hof = HallOfFame.MYBOOKSLIST
+    if triggered == "off":
+        user.private = False
+    elif triggered == "on":
+        user.private = True
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     db.session.commit()
+    app.logger.info('[{}] Private mode updated to {}'.format(user.id, triggered))
     return '', 204
 
 
@@ -633,27 +631,6 @@ def email_update_token(token):
     return redirect(url_for('myserieslist'))
 
 
-@app.route('/private_mode', methods=['POST'])
-@login_required
-def private_data():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data = request.get_json()
-        triggered = json_data['private']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    user = User.query.filter_by(id=current_user.get_id()).first()
-    is_private = user.private
-    if is_private:
-        user.private = False
-    else:
-        user.private = True
-    db.session.commit()
-    app.logger.info('[{}] Private mode updated'.format(user.id))
-    return '', 204
-
-
 @app.route('/change_pass', methods=['GET', 'POST'])
 @login_required
 def change_password():
@@ -672,13 +649,14 @@ def change_password():
     return render_template('change_pass.html', form=form)
 
 
-@app.route("/accept_friend_request", methods=['POST'])
+@app.route("/friend_request", methods=['POST'])
 @login_required
-def accept_friend_request():
+def friend_request():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        friend_id = json_data['reponse']
+        friend_id = json_data['response']
+        value = json_data['request']
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -688,48 +666,34 @@ def accept_friend_request():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    # Check if there is an actual pending request
-    user = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id, status="pending").first()
-    if user is None:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    user.status = 'accepted'
-    db.session.commit()
+    if value == "accept":
+        # Check if there is an actual pending request
+        user = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id, status="pending").first()
+        if user is None:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+        user.status = 'accepted'
+        db.session.commit()
 
-    user2 = Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id(), status="request").first()
-    if user2 is None:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    user2.status = 'accepted'
-    db.session.commit()
-    app.logger.info('[{}] Friend request accepted from user with ID {}'.format(current_user.get_id(), friend_id))
-    return '', 204
+        user2 = Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id(), status="request").first()
+        if user2 is None:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+        user2.status = 'accepted'
+        db.session.commit()
+        app.logger.info('[{}] Friend request accepted from user with ID {}'.format(current_user.get_id(), friend_id))
+    elif value == "decline":
+        # Check if there is an actual pending request
+        # Otherwise delete the pending request
+        if not Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id, status="pending").delete():
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+        db.session.commit()
 
-
-@app.route("/decline_friend_request", methods=['POST'])
-@login_required
-def decline_friend_request():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data = request.get_json()
-        decline_friend = json_data['reponse']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        decline_friend = int(decline_friend)
-    except:
+        if not Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id(), status="request").delete():
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+        db.session.commit()
+        app.logger.info('[{}] Friend request declined from user with ID {}'.format(current_user.get_id(), friend_id))
+    else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    # Check if there is an actual pending request
-    # Otherwise delete the pending request
-    if not Friend.query.filter_by(user_id=current_user.get_id(), friend_id=decline_friend, status="pending").delete():
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    db.session.commit()
-
-    if not Friend.query.filter_by(user_id=decline_friend, friend_id=current_user.get_id(), status="request").delete():
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    db.session.commit()
-    app.logger.info('[{}] Friend request declined from user with ID {}'.format(current_user.get_id(), decline_friend))
     return '', 204
 
 

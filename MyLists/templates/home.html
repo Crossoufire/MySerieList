@@ -2,6 +2,7 @@
 
 
 {% block css %}
+<!---------- Principal CSS ----------->
 <style type="text/css">
 /* On screens that are 730px or less, set the title font size to 30pt */
 @media screen and (max-width: 730px) {
@@ -21,7 +22,7 @@
     border-color: #e2e2e2;
 }
 
-/****** LOGIN & REGISTER MODAL ******/
+/**************** LOGIN & REGISTER MODAL ***************/
 .modal-content {
   padding-top: 10px;
   padding-bottom: 10px;
@@ -43,7 +44,6 @@
     opacity: 0.6;
     transition: opacity ease 0.5s;
 }
-
 </style>
 {% endblock %}
 
@@ -54,7 +54,6 @@
             <div class="carousel-item active">
                 <div class="view">
                     <img class="first-slide" src="{{ image_header }}" alt="First slide">
-
                     <div class="mask d-flex justify-content-center align-items-center">
                         <div class="text-center white-text mx-5 wow fadeIn">
                             <h1 class="mb-4" id="title">
@@ -62,7 +61,6 @@
                             </h1>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -71,7 +69,7 @@
 
 
 {% block content %}
-    <!--Login modal-->
+    <!----------------------- Login modal ------------------------------->
     <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
@@ -128,7 +126,7 @@
         </div>
     </div>
 
-    <!--Register modal-->
+    <!----------------------- Register modal ---------------------------->
     <div class="modal fade" id="modalRegisterForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
@@ -212,37 +210,32 @@
     <section>
         <h1 class="my-5 h3 text-center" style="margin-bottom: 2rem !important; margin-top: 2rem !important">TRACK YOUR TV SHOWS & ANIMES AND NEVER GET LOST</h1>
         <h5 class="my-5 text-center" style="margin-bottom: 2rem !important; margin-top: 2rem !important">MyLists has a beautiful and clear interface which allows you to track all your TV shows and animes without remembering what was your last watched episode. It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see your friends' list and compare it to yours.</h5>
-
         <div class="row wow fadeIn">
             <div class="col-md-12 flex-center">
                 <img src="{{ img1 }}" class="img-fluid z-depth-1-half" alt="">
             </div>
         </div>
     </section>
-
     <hr class="my-5 background_white">
 
     <section>
         <h1 class="my-5 h3 text-center" style="margin-bottom: 2rem !important; margin-top: 2rem !important">COMPARE YOUR LIST WITH OTHER USERS</h1>
         <h5 class="my-5 text-center" style="margin-bottom: 2rem !important; margin-top: 2rem !important">MyLists includes a Hall of Fame of all registered users. By default, all users can see the List of everyone. You can also set your profile to private, so only your friends can see your List.</h5>
-
         <div class="row wow fadeIn">
             <div class="col-md-12 flex-center">
                 <img src="{{ img2 }}" class="img-fluid z-depth-1-half" alt="">
             </div>
         </div>
     </section>
-
     <hr class="my-5 background_white">
 
     <section>
         <h2 class="my-5 h3 text-center">AND EVEN MORE</h2>
         <div class="row features-small mt-5 wow fadeIn">
-
             <div class="col-xl-3 col-lg-6">
                 <div class="row">
                     <div class="col-2">
-                        <i class="fab fa-firefox fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                        <i class="fab fa-bootstrap fa-2x mb-1 indigo-text" aria-hidden="true"></i>
                     </div>
                     <div class="col-10 mb-2 pl-3">
                         <h5 class="feature-title font-bold mb-1">Responsive</h5>
@@ -250,7 +243,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-xl-3 col-lg-6">
                 <div class="row">
                     <div class="col-2">
@@ -262,7 +254,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-xl-3 col-lg-6">
                 <div class="row">
                     <div class="col-2">
@@ -274,7 +265,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-xl-3 col-lg-6">
                 <div class="row">
                     <div class="col-2">
@@ -286,7 +276,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-xl-3 col-lg-6">
                 <div class="row">
                     <div class="col-2">
@@ -298,7 +287,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-xl-3 col-lg-6">
                 <div class="row">
                     <div class="col-2">
@@ -316,7 +304,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-xl-3 col-lg-6">
                 <div class="row">
                     <div class="col-2">
@@ -328,7 +315,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-xl-3 col-lg-6">
                 <div class="row">
                     <div class="col-2">
@@ -336,27 +322,27 @@
                     </div>
                     <div class="col-10 mb-2">
                         <h5 class="feature-title font-bold mb-1">New features incoming</h5>
-                        <p class="grey-text mt-2">We have a ton of ideas, just not enough time. Stay tuned !</p>
+                        <p class="grey-text mt-2">We have a ton of ideas, just not enough time. Stay tuned!</p>
                     </div>
                 </div>
             </div>
-
         </div>
     </section>
 {% endblock content %}
 
 
 {% block script %}
+<!-------------Principal JS -------------->
 <script type="text/javascript">
-    // Animations initialization
-    new WOW().init();
+// Animations initialization
+new WOW().init();
 
-    $('#modalLoginForm').on('shown.bs.modal', function() {
-        $('#login_username').focus();
-    })
+$('#modalLoginForm').on('shown.bs.modal', function() {
+    $('#login_username').focus();
+})
 
-    $('#modalRegisterForm').on('shown.bs.modal', function() {
-        $('#register_username').focus();
-    })
+$('#modalRegisterForm').on('shown.bs.modal', function() {
+    $('#register_username').focus();
+})
 </script>
 {% endblock script %}

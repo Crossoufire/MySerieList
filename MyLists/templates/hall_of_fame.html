@@ -1,8 +1,9 @@
 {% extends "layout.html" %}
 
 {% block css %}
-<!-- MDBootstrap Datatables  -->
+<!------ MDBootstrap Datatables ------->
 <link href="{{ url_for('static', filename='css/addons/datatables.min.css') }}" rel="stylesheet">
+<!----------- Principal CSS ----------->
 <style>
 table.dataTable thead .sorting:after,
 table.dataTable thead .sorting:before,
@@ -69,7 +70,6 @@ hr {
                 <th></th>
             </tr>
         </thead>
-
         <tbody>
         {% for user in all_data %}
             <tr>
@@ -203,8 +203,9 @@ hr {
 
 
 {% block script %}
-<!-- MDBootstrap Datatables  -->
+<!--------- MDBootstrap Datatables ----------->
 <script type="text/javascript" src="{{ url_for('static', filename='js/addons/datatables.min.js') }}"></script>
+<!-------------- Principal JS ---------------->
 <script>
 function add_friend(username) {
     $body = $("body");

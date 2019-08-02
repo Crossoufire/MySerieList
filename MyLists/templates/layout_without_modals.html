@@ -10,19 +10,20 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.2/css/mdb.min.css" rel="stylesheet">
 
+    <link rel='icon' href="{{ url_for('static', filename='img/favicon.ico') }}" type='image/gif'>
 	<link href="{{ url_for('static', filename='css/mylists.css') }}" rel="stylesheet">
 	<link href="{{ url_for('static', filename='css/util.css') }}" rel="stylesheet">
 
+
     {% block css %}
     {% endblock %}
+
 
 	{% if title %}
     <title>MyLists - {{ title }}</title>
     {% else %}
     <title>MyLists</title>
     {% endif %}
-
-    <link rel='icon' href="{{ url_for('static', filename='img/favicon.ico') }}" type='image/gif'>
 </head>
 
 <body>
@@ -70,9 +71,7 @@
     {% endblock %}
 
 <footer class="page-footer font-small">
-    <div class="footer-copyright text-center py-3">© 2019 Copyright:
-        MySeriesList
-    </div>
+    <div class="footer-copyright text-center py-3">© 2019 Copyright: MyLists</div>
 </footer>
 </body>
 </html>

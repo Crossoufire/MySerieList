@@ -43,7 +43,7 @@ app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = email
 app.config['MAIL_PASSWORD'] = password
 
-app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 8*1024*1024
 
 mail = Mail(app)
 db = SQLAlchemy(app)

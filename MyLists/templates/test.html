@@ -2,7 +2,9 @@
 {% block content %}
 {% endblock content %}
 
-<script>
+
+<!--------- JS MyOwnList(DONT DELETE) ---------->
+<script type="text/javascript">
 $(document).ready(function() {
     $('#button_cat').attr('disabled', true);
     $('#category_name').keyup(function(){
@@ -90,20 +92,14 @@ function delete_tr(tr_id) {
     $("#"+ tr_id).remove();
 }
 
+
 function delete_category(cat_id) {
     $("#"+ cat_id).remove();
 }
-
 </script>
 
-        beforeSend: function() { $body.addClass("loading"); },
-        success: function(response) {
-            window.location.replace('/myserieslist'); }
 
-$("#"+drop_id).empty();
-
-
-
+<!-------- HTML old category selector ---------->
 <div class="card bg-transparent view overlay m-l-10 m-r-10 m-b-40">
             <img class="card-img-top"  src="{{ data['cover_url'] }}" alt="{{ data['title'] }}">
             <div class="mask flex-center rgba-black-strong pointer" data-toggle="modal" data-target="#modal_{{ data['id'] }}">
@@ -140,8 +136,7 @@ $("#"+drop_id).empty();
             </div>
             <button class="btn btn_right" onclick="deleteBook('{{ data['id'] }}')"><b>x</b></button>
         </div>
-
-        <div class="modal fade" id="modal_{{ data['id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="modal_{{ data['id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
                     <div class="modal-body">
@@ -165,173 +160,29 @@ $("#"+drop_id).empty();
         </div>
 
 
+<!---------- JS ZOOM slider/navbar ------------->
+<script type="text/javascript">
+var slider = document.getElementById("card_size");
+slider.value = 200;
+
+slider.oninput = function() {
+    var value = this.value;
+    $('.card-img-top').css('width', value);
+    $('.card-img-top').css('height', value*1.5);
+    $('.card').css('width', value);
+    $('.card').css('height', value*1.814);
+    $('.font-mask').css('font-size', value/10 + "pt");
+    $('.seasons').css('font-size', value/17 + "pt");
+    $('.seasons').css('height', value/6.25);
+    $('.episodes').css('font-size', value/17 + "pt");
+    $('.episodes').css('height', value/6.25);
+    $('.score_size').css('font-size', value/17 + "pt");
+    $('.card-footer').css('height', value/8,0645);
+</script>
 
 
-$(document).ready(function(){
-    $("#autocomplete").autocomplete({
-        source: function(request, response) {
-            $.getJSON("{{url_for('autocomplete_series')}}",{
-                q: request.term,
-            }, function(data) {
-                response(data.matching_results);
-            });
-        },
-        minLength: 2,
-        select: function(event, ui) {
-            $body = $("body");
-            $("#autocomplete").val(ui.item.value);
-            $("#series_id").val(ui.item.id);
-
-            $.ajax ({
-                type: "POST",
-                url: "/add_series",
-                contentType: "application/json",
-                data: JSON.stringify({series_id: ui.item.id}),
-                dataType: "json",
-                beforeSend: function() { $body.addClass("loading"); },
-                success: function(response) {
-                    window.location.replace('/myserieslist'); }
-            });
-
-        }
-    }).data("ui-autocomplete")._renderItem = function(ul, item) {
-    return $("<li class='list-group'></li>")
-        .data("item.autocomplete", item)
-        .append(item.label)
-        .appendTo(ul);
-    };
-});
-
-
-
-$(function() {
-    $.widget("custom.catcomplete", $.ui.autocomplete, {
-        _create: function() {
-            this._super();
-            this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
-        },
-        _renderMenu: function(ul, items) {
-            var that = this,
-            currentCategory = "";
-            $.each(items, function(index, item) {
-                if (item.category != currentCategory) {
-					ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
-					currentCategory = item.category;
-				}
-                that._renderItemData(ul, item);
-				that._renderItem = function(ul, item) {
-			        return $("<li class='list-group'></li>")
-					.data("item.autocomplete", item)
-					.append(item.label)
-					.appendTo(ul);
-				};
-			});
-		}
-	});
-
-	$( "#autocomplete" ).catcomplete({
-		delay: 300,
-		source: function(request, response) {
-				$.getJSON("{{url_for('autocomplete_series')}}",{
-					q: request.term,
-				},
-					function(data) {
-						response(data.matching_results);
-					}
-				);
-		},
-		minLength: 1,
-        select: function(event, ui) {
-            $body = $("body");
-            $("#autocomplete").val(ui.item.value);
-            $("#series_id").val(ui.item.id);
-
-            $.ajax ({
-                type: "POST",
-                url: "/add_series",
-                contentType: "application/json",
-                data: JSON.stringify({series_id: ui.item.id}),
-                dataType: "json",
-                beforeSend: function() { $body.addClass("loading"); },
-                success: function(response) {
-                    window.location.replace('/myserieslist'); }
-            });
-        }
-	});
-});
-
-
-_renderItem: function(ul, item) {
-		var $li = $('<li>'),
-			$img = $('<img>');
-
-		$img.attr({
-		  src: item.label,
-		  alt: item.value
-		});
-
-		$li.attr('data-value', item.value);
-		$li.append('<a href="#">');
-		$li.find('a').append($img).append(item.value);
-
-		return $li.appendTo(ul);
-	}
-
-        function show_all_score() {
-    var show = document.getElementById('show_all');
-    var hide = document.getElementById('hide_all');
-
-    $('div[id^="footer_"]').hide();
-
-    if (show.className === "fas fa-eye text-light m-r-5") {
-        $('.d-none.tata').attr('class', 'card-footer text-muted text-center p-0');
-        show.className = "d-none";
-        hide.className = "fas fa-eye-slash text-light m-r-5";
-    } else {
-        $('.card-footer.text-muted.text-center.p-0').attr('class', 'd-none tata');
-        show.className = "fas fa-eye text-light m-r-5";
-        hide.className = "d-none";
-    }
-}
-
-
-                if(content.length > showChar) {
-            var c = content.substr(0, showChar);
-            var h = content.substr(showChar, content.length - showChar);
-            var html = c +
-            '<span class="moreellipses">' + ellipsestext + '</span>' +
-            '<span class="morecontent">' +
-                '<span>' + h + '</span>' +
-                '<a href="" class="morelink">' + moretext + '</a>' +
-            '</span>';
-            $(this).html(html);
-        }
-    });
-
-
-<!-------- ZOOM slider/navbar scripts ---------->
-<!--<script type="text/javascript">-->
-<!--var slider = document.getElementById("card_size");-->
-<!--slider.value = 200;-->
-
-<!--slider.oninput = function() {-->
-    <!--var value = this.value;-->
-    <!--$('.card-img-top').css('width', value);-->
-    <!--$('.card-img-top').css('height', value*1.5);-->
-    <!--$('.card').css('width', value);-->
-    <!--$('.card').css('height', value*1.814);-->
-    <!--$('.font-mask').css('font-size', value/10 + "pt");-->
-    <!--$('.seasons').css('font-size', value/17 + "pt");-->
-    <!--$('.seasons').css('height', value/6.25);-->
-    <!--$('.episodes').css('font-size', value/17 + "pt");-->
-    <!--$('.episodes').css('height', value/6.25);-->
-    <!--$('.score_size').css('font-size', value/17 + "pt");-->
-    <!--$('.card-footer').css('height', value/8,0645);-->
-<!--</script>-->
-
-
-        <!--------------- chart JS ---------------->
-<script>
+<!----------------- chart JS ------------------->
+<script type="text/javascript">
 var barChartData = {
     labels: ['0-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8', '8-9', '9-10'],
     datasets: [{
@@ -416,43 +267,3 @@ window.onload = function() {
 
 };
 </script>
-
-
-         <table>
-                    {% for friend in friends_list_data %}
-                    {% if friend['status'] == "pending" %}
-                    <tr>
-                        <td>
-                            <a class="text-light" href="#" id="{{ friend['user_id'] }}">{{ friend['username'] }}</a>
-                            <button class="btn btn-sm btn-danger small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="decline_{{ friend['user_id'] }}">Decline</button>
-                            <button class="btn btn-sm btn-mdb-color small" style="float: right; margin-top: 0px; margin-bottom: 0px;" id="accept_{{ friend['user_id'] }}">Accept</button>
-                        </td>
-                    </tr>
-                    {% elif friend['status'] == "request" %}
-                    <tr>
-                        <td>
-                            <a class="text-light" href="#">{{ friend['username'] }} (Pending request)</a>
-                            <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </td>
-                    </tr>
-                    {% elif friend['status'] == "declined" %}
-                    {% else %}
-                    <tr>
-                        <td>
-                            {% if user_id == current_user.get_id() %}
-                            <a class="text-light" href="/user/account/{{ friend['username'] }}">{{ friend['username'] }}</a>
-                            {% else %}
-                            <a class="disabled text-light" href="#">{{ friend['username'] }}</a>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <button type="button" id="C_{{ friend['user_id'] }}" class="close text-light" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </td>
-                    </tr>
-                    {% endif %}
-                    {% endfor %}
-                </table>

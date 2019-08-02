@@ -4,7 +4,7 @@
 {% block css %}
 <!------------ Jquery Autocomplete ---------->
 <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet">
-<!------------ Jquery autocomplete loading --------->
+<!------- Jquery autocomplete loading ------->
 <style>
 #autocomplete.ui-autocomplete-loading {
     background-image: url('{{ url_for("static", filename="img/add_loader.gif") }}');
@@ -21,7 +21,7 @@
     text-align: center;
 }
 </style>
-<!------------ Principal CSS -------------->
+<!------------- Principal CSS --------------->
 <style>
 .add_element {
     width: 220px;
@@ -754,7 +754,7 @@ $(function() {
     });
 });
 </script>
-<!------------ Principal scripts --------------->
+<!---------------- Principal ------------------->
 <script type="text/javascript">
 function refreshAll() {
     $body = $("body");
@@ -1053,7 +1053,7 @@ function updateSeason(element_id, value, seas_data, ep_drop_id) {
     });
 }
 </script>
-<!------------ Synopsis scripts ---------------->
+<!---------------- Synopsis -------------------->
 <script type="text/javascript">
 $(document).ready(function(){
 	var maxLength = 200;
@@ -1074,7 +1074,7 @@ $(document).ready(function(){
 	});
 });
 </script>
-<!------------ Score scripts ------------------->
+<!------------------ Score --------------------->
 <script type="text/javascript">
 function edit_score(edit_id, new_id) {
     var edit = document.getElementById(edit_id);
@@ -1122,7 +1122,7 @@ function add_score(new_score, edit_id, element_id) {
     }
 }
 </script>
-<!---- Show/collapse all categories scripts ---->
+<!-------- Show/collapse all categories -------->
 <script type="text/javascript">
 function hide_all_cat() {
     var hide = document.getElementById('collapse_all');
