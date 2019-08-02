@@ -1,0 +1,50 @@
+
+TO DO / TO SEE
+
+	Add the possibility to change the background color of the website
+	Add the possibility to have the score display by default or not in the grid lists
+	Add the possibility to select a default view (grid/table) for lists 
+	Change the account settings page (semi done)
+	Add a "read less" for the synopsis
+	Check the style of the category selector modal
+	Check the style of the auto-complete selector
+	Add ZOOM for the media lists (done on booklist but shady), but it is difficult to implement with cards style
+	Multi selection for the category changes
+	Separation of the code for routes!!
+	Add "more results" for javascript results
+	Add lots of statistics (already began the code part, need a page to display + chart.js)
+	On login/register click focus on the modal
+	Bug display season and episode when refresh due to the browser cache (don't know how to repair) but works great otherwise
+	Add Anime movies (Added multi search from the API)
+	
+	
+DONE 
+	
+	Add fixed top bar
+	Add Books list
+	Add jQuery auto-complete with pictures from local + online databases :) !!!!!
+	Show all/hide all categories
+	Show all/hide all scores
+	Add fast travel between categories
+	Add Networks in the modal
+	Add Genre in the modal
+	Change synopsis display
+	Add "read more" for synopsis
+	Change button refresh all
+	Change button to icons on card (replace button by <a> with font awesome)
+	Add <a> on card for scores
+	Change position mask only card top instead of all the card
+	Add/change lot of code/refactoring (javascript/jQuery functions, and css cleaning)
+	Change the categories selector with a modal (better for mobile and clearer)
+	Add a pop up window for the series deletion
+	Add mean score in the account
+	Add no transparency for the icons card in mobile display
+	Change the font-size of the score on mobile display
+	Add books simple statistics in account
+	Take the genre from MAL for Anime (useful for the achievements but longer query)
+	Add API key for Google book
+	Add two levels system //  Level X = 50*XP*(1+XP) // Linear levels "Knowledge"
+	Achievements (done for Genres achievements)
+	Add informations pages in account for the grades, levels, and Anime achievements
+	Add a table version for Anime and series lists
+	Find a way to display bars stats account even if no data
