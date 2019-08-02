@@ -75,7 +75,7 @@ hr {
             <tr>
             {% if current_user.get_id() == '1' %}
                 <td>
-                    <img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 30px; height: 30px;">
+                    <img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
                 </td>
                 <td>
                     <b><a href="/user/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
@@ -104,7 +104,7 @@ hr {
 
                 {% elif user["iscurrentuser"] %}
                 <td class="current_user">
-                    <img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 30px; height: 30px;">
+                    <img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
                 </td>
                 <td class="current_user">
                     <b><a href="/user/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
@@ -132,7 +132,7 @@ hr {
                 <td class="current_user"></td>
                 {% elif user["isprivate"] and not user["isfriend"] %}
                 <td>
-                    <img src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}" alt="Anonymous" style="width: 30px; height: 30px;">
+                    <img src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}" alt="Anonymous" style="width: 40px; height: 40px;">
                 </td>
                 <td>
                     <b>Anonymous</b>
@@ -161,7 +161,7 @@ hr {
 
                 {% else %}
                 <td>
-                    <img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 30px; height: 30px;">
+                    <img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
                 </td>
                 <td>
                     <b><a href="/user/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
