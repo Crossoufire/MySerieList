@@ -861,9 +861,9 @@ function add_score(new_score, edit_id, book_id) {
             $body = $("body");
             $.ajax ({
                 type: "POST",
-                url: "/add_score_book",
+                url: "/set_book_score",
                 contentType: "application/json",
-                data: JSON.stringify({score_val: edit_score_value, book_id: book_id }),
+                data: JSON.stringify({score_value: edit_score_value, book_id: book_id }),
                 dataType: "json",
                 success: function(response) {
                     console.log('ok'); }

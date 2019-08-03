@@ -1616,11 +1616,11 @@ def autocomplete_series():
 @app.route("/mybookslist", methods=['GET', 'POST'])
 @login_required
 def mybookslist():
-    reading_list = BookList.query.filter_by(user_id=current_user.get_id(), status='READING').all()
-    completed_list = BookList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
-    onhold_list = BookList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
-    dropped_list = BookList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').all()
-    plantoread_list = BookList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_READ').all()
+    reading_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.READING).all()
+    completed_list  = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.COMPLETED).all()
+    onhold_list     = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.ON_HOLD).all()
+    dropped_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.DROPPED).all()
+    plantoread_list = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.PLAN_TO_READ).all()
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
@@ -1634,11 +1634,11 @@ def mybookslist():
 @app.route("/mybookslist_table", methods=['GET', 'POST'])
 @login_required
 def mybookslist_table():
-    reading_list = BookList.query.filter_by(user_id=current_user.get_id(), status='READING').all()
-    completed_list = BookList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
-    onhold_list = BookList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
-    dropped_list = BookList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').all()
-    plantoread_list = BookList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_READ').all()
+    reading_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.READING).all()
+    completed_list  = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.COMPLETED).all()
+    onhold_list     = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.ON_HOLD).all()
+    dropped_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.DROPPED).all()
+    plantoread_list = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.PLAN_TO_READ).all()
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
@@ -1649,31 +1649,38 @@ def mybookslist_table():
                            all_data=book_data)
 
 
-@app.route("/user/books/grid/<user_name>", methods=['GET', 'POST'])
+@app.route("/user/books/grid/<user_name>", methods=['GET'])
 @login_required
-def user_mybookslist_grid(user_name):
+def user_bookslist_grid(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
+    # User not found
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-    if user and str(user.id) == current_user.get_id():
+
+    # User found == current user
+    if str(user.id) == current_user.get_id():
         return redirect(url_for('mybookslist'))
 
+    # User found == admin
+    if user.id == 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    # Check if user is in the current user's friends list
+    # Admin bypasses private option
     friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
     if user.private:
         if current_user.get_id() == "1":
             pass
         elif friend is None or friend.status != "accepted":
             return redirect(url_for('anonymous'))
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
-    reading_list = BookList.query.filter_by(user_id=user.id, status='READING').all()
-    completed_list = BookList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list = BookList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    dropped_list = BookList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantoread_list = BookList.query.filter_by(user_id=user.id, status='PLAN_TO_READ').all()
+    reading_list    = BookList.query.filter_by(user_id=user.id, status=BookStatus.READING).all()
+    completed_list  = BookList.query.filter_by(user_id=user.id, status=BookStatus.COMPLETED).all()
+    onhold_list     = BookList.query.filter_by(user_id=user.id, status=BookStatus.ON_HOLD).all()
+    dropped_list    = BookList.query.filter_by(user_id=user.id, status=BookStatus.DROPPED).all()
+    plantoread_list = BookList.query.filter_by(user_id=user.id, status=BookStatus.PLAN_TO_READ).all()
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
@@ -1686,31 +1693,38 @@ def user_mybookslist_grid(user_name):
                            all_data=book_data)
 
 
-@app.route("/user/books/table/<user_name>", methods=['GET', 'POST'])
+@app.route("/user/books/table/<user_name>", methods=['GET'])
 @login_required
-def user_mybookslist_table(user_name):
+def user_bookslist_table(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
+    # User not found
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-    if user and str(user.id) == current_user.get_id():
-        return redirect(url_for('mybookslist_table'))
 
+    # User found == current user
+    if str(user.id) == current_user.get_id():
+        return redirect(url_for('mybookslist'))
+
+    # User found == admin
+    if user.id == 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    # Check if user is in the current user's friends list
+    # Admin bypasses private option
     friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
     if user.private:
         if current_user.get_id() == "1":
             pass
         elif friend is None or friend.status != "accepted":
             return redirect(url_for('anonymous'))
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
-    reading_list = BookList.query.filter_by(user_id=user.id, status='READING').all()
-    completed_list = BookList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list = BookList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    dropped_list = BookList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantoread_list = BookList.query.filter_by(user_id=user.id, status='PLAN_TO_READ').all()
+    reading_list    = BookList.query.filter_by(user_id=user.id, status=BookStatus.READING).all()
+    completed_list  = BookList.query.filter_by(user_id=user.id, status=BookStatus.COMPLETED).all()
+    onhold_list     = BookList.query.filter_by(user_id=user.id, status=BookStatus.ON_HOLD).all()
+    dropped_list    = BookList.query.filter_by(user_id=user.id, status=BookStatus.DROPPED).all()
+    plantoread_list = BookList.query.filter_by(user_id=user.id, status=BookStatus.PLAN_TO_READ).all()
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
@@ -1776,54 +1790,20 @@ def change_book_category():
 
     book = BookList.query.filter_by(book_id=book_id, user_id=current_user.get_id()).first()
     if book_new_category == 'Reading':
-        book.status = 'READING'
+        book.status = BookStatus.READING
     elif book_new_category == 'Completed':
-        book.status = 'COMPLETED'
+        book.status = BookStatus.COMPLETED
     elif book_new_category == 'On Hold':
-        book.status = 'ON_HOLD'
+        book.status = BookStatus.ON_HOLD
     elif book_new_category == 'Dropped':
-        book.status = 'DROPPED'
+        book.status = BookStatus.DROPPED
     elif book_new_category == 'Plan to Read':
-        book.status = 'PLAN_TO_READ'
+        book.status = BookStatus.PLAN_TO_READ
     db.session.commit()
     app.logger.info('[{}] Category of the book with ID {} changed to {}'.format(current_user.get_id(),
                                                                                 book_id,
                                                                                 book_new_category))
     return '', 204
-
-
-@app.route("/user/books/<user_name>")
-@login_required
-def user_book(user_name):
-    image_error = url_for('static', filename='img/error.jpg')
-    user = User.query.filter_by(username=user_name).first()
-
-    if user is None:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-
-    if user and str(user.id) == current_user.get_id():
-        return redirect(url_for('mybookslist'))
-
-    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-
-    if user.private:
-        if current_user.get_id() == "1":
-            pass
-        elif friend is None or friend.status != "accepted":
-            return redirect(url_for('anonymous'))
-
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-
-    reading_list     = BookList.query.filter_by(user_id=user.id, status='READING').all()
-    completed_list   = BookList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list      = BookList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    dropped_list     = BookList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantoread_list  = BookList.query.filter_by(user_id=user.id, status='PLAN_TO_READ').all()
-
-    book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
-    book_data = get_list_data(book_list, ListType.BOOK)
-    return render_template('user_books_list.html', title='{}\'s list'.format(user.username), all_data=book_data)
 
 
 @app.route('/add_book', methods=['POST'])
@@ -1840,21 +1820,14 @@ def add_book():
     return '', 204
 
 
-@app.route('/add_score_book', methods=['POST'])
+@app.route('/set_book_score', methods=['POST'])
 @login_required
-def add_score_book():
+def set_book_score():
     image_error = url_for('static', filename='img/error.jpg')
     try:
-        json_data = request.get_json()
-        score_val = json_data['score_val']
-        book_id = json_data['book_id']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        score_val = float(score_val)
-        book_id = int(book_id)
+        json_data   = request.get_json()
+        score_value = round(float(json_data['score_value']), 2)
+        book_id     = int(json_data['book_id'])
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1867,13 +1840,13 @@ def add_score_book():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the score is between 0 and 10:
-    if score_val > 10 or score_val < 0:
+    if score_value > 10 or score_value < 0:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    add_score = BookList.query.filter_by(user_id=current_user.get_id(), book_id=book_id).first()
-    add_score.score = score_val
+    book = BookList.query.filter_by(user_id=current_user.get_id(), book_id=book_id).first()
+    book.score = score_value
     db.session.commit()
-    app.logger.info('[{}] Book with ID {} scored {}'.format(current_user.get_id(), book_id, score_val))
+    app.logger.info('[{}] Book with ID {} scored {}'.format(current_user.get_id(), book_id, score_value))
     return '', 204
 
 
@@ -2018,23 +1991,23 @@ def get_list_count(user_id, list_type):
 
 def autocomplete_search_element(element_name, list_type):
     if list_type == ListType.SERIES:
-        element = Series.query.filter(Series.name.like("%{0}%".format(element_name))).all()
+        autocomplete_local_results = Series.query.filter(Series.name.like("%{0}%".format(element_name))).all()
         cover_url = url_for('static', filename="series_covers/")
     elif list_type == ListType.ANIME:
-        element = Anime.query.filter(Anime.name.like("%{0}%".format(element_name))).all()
+        autocomplete_local_results = Anime.query.filter(Anime.name.like("%{0}%".format(element_name))).all()
         cover_url = url_for('static', filename="animes_covers/")
     elif list_type == ListType.BOOK:
-        element = Book.query.filter(Book.title.like("%{0}%".format(element_name))).all()
+        autocomplete_local_results = Book.query.filter(Book.title.like("%{0}%".format(element_name))).all()
         cover_url = url_for('static', filename="books_covers/")
 
     if list_type == ListType.SERIES:
         local_results = []
         for i in range(5):
             try:
-                tmp = {"id": "{0}".format(element[i].id),
-                       "value": "{0}".format(element[i].name),
+                tmp = {"id": "{0}".format(autocomplete_local_results[i].id),
+                       "value": "{0}".format(autocomplete_local_results[i].name),
                        "category": "Local Database",
-                       "label": "..{0}{1}".format(cover_url, element[i].image_cover)}
+                       "label": "..{0}{1}".format(cover_url, autocomplete_local_results[i].image_cover)}
                 local_results.append(tmp)
             except:
                 pass
@@ -2043,27 +2016,28 @@ def autocomplete_search_element(element_name, list_type):
             return local_results
 
         else:
-            try:
-                response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
-                                        .format(themoviedb_api_key, element_name))
-            except:
-                return None
+            while True:
+                try:
+                    response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
+                                            .format(themoviedb_api_key, element_name))
+                except:
+                    return None
 
-            if response.status_code == 401:
-                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-                return None
-            app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+                if response.status_code == 401:
+                    app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+                    return None
+                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
 
-            if response.headers["X-RateLimit-Remaining"] == "0":
-                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-                time.sleep(3)
-            else:
-                pass
+                if response.headers["X-RateLimit-Remaining"] == "0":
+                    app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+                    time.sleep(3)
+                else:
+                    break
 
             data = json.loads(response.text)
             if data["total_results"] == 0:
                 if len(local_results) == 0:
-                    return [{"category":"False"}]
+                    return [{"category": "False"}]
                 else:
                     return local_results
             else:
@@ -2072,6 +2046,7 @@ def autocomplete_search_element(element_name, list_type):
                     try:
                         genre_id = data["results"][i]["genre_ids"]
                         country = data["results"][i]["origin_country"][0]
+
                         if 16 in genre_id:
                             if "JP" in country:
                                 pass
@@ -2099,15 +2074,15 @@ def autocomplete_search_element(element_name, list_type):
                         pass
                 all_results = local_results + tmdb_results
                 return all_results
+
     elif list_type == ListType.ANIME:
-        i = 0
         local_results = []
         for i in range(5):
             try:
-                tmp = {"id": "{0}".format(element[i].id),
-                       "value": "{0}".format(element[i].name),
+                tmp = {"id": "{0}".format(autocomplete_local_results[i].id),
+                       "value": "{0}".format(autocomplete_local_results[i].name),
                        "category": "Local Database",
-                       "label": "..{0}{1}".format(cover_url, element[i].image_cover)}
+                       "label": "..{0}{1}".format(cover_url, autocomplete_local_results[i].image_cover)}
                 local_results.append(tmp)
             except:
                 pass
@@ -2116,22 +2091,23 @@ def autocomplete_search_element(element_name, list_type):
             return local_results
 
         else:
-            try:
-                response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
-                                        .format(themoviedb_api_key, element_name))
-            except:
-                return None
+            while True:
+                try:
+                    response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
+                                            .format(themoviedb_api_key, element_name))
+                except:
+                    return None
 
-            if response.status_code == 401:
-                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-                return None
-            app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+                if response.status_code == 401:
+                    app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+                    return None
+                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
 
-            if response.headers["X-RateLimit-Remaining"] == "0":
-                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-                time.sleep(3)
-            else:
-                pass
+                if response.headers["X-RateLimit-Remaining"] == "0":
+                    app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+                    time.sleep(3)
+                else:
+                    break
 
             data = json.loads(response.text)
             if data["total_results"] == 0:
@@ -2140,7 +2116,6 @@ def autocomplete_search_element(element_name, list_type):
                 else:
                     return local_results
             else:
-                i = 0
                 tmdb_results = []
                 for i in range(8):
                     try:
@@ -2149,8 +2124,9 @@ def autocomplete_search_element(element_name, list_type):
                             country = data["results"][i]["origin_country"][0]
                         except:
                             country = data["results"][i]["original_language"]
+
                         if 16 in genre_id:
-                            if "JP" in country :
+                            if "JP" in country:
                                 if data["results"][i]["poster_path"] is None:
                                     data["results"][i]["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
                                 else:
@@ -2176,17 +2152,18 @@ def autocomplete_search_element(element_name, list_type):
                             pass
                     except:
                         pass
+
                 all_results = local_results + tmdb_results
                 return all_results
+
     elif list_type == ListType.BOOK:
-        i = 0
         local_results = []
         for i in range(5):
             try:
-                tmp = {"id": "{0}".format(element[i].id),
-                       "value": "{0}".format(element[i].title),
+                tmp = {"id": "{0}".format(autocomplete_local_results[i].id),
+                       "value": "{0}".format(autocomplete_local_results[i].title),
                        "category": "Local Database",
-                       "label": "..{0}{1}".format(cover_url, element[i].image_cover)}
+                       "label": "..{0}{1}".format(cover_url, autocomplete_local_results[i].image_cover)}
                 local_results.append(tmp)
             except:
                 pass
@@ -2212,25 +2189,23 @@ def autocomplete_search_element(element_name, list_type):
                 else:
                     return local_results
             else:
-                i = 0
                 google_results = []
                 for i in range(5):
                     try:
                         if data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"] is None:
                             data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"] = \
                                 url_for('static', filename="books_covers/default.jpg")
-                            url = ".."
-                        else:
-                            url = ""
 
                         tmp = {"id": "{0}".format(data["items"][i]["id"]),
                                "value": "{0}".format(data["items"][i]["volumeInfo"]["title"]),
                                "category": "Online API Database",
-                               "label": "{0}{1}".format(url, data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"])}
+                               "label": "{0}".format(data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"])}
                         google_results.append(tmp)
                     except:
                         pass
+
                 all_results = local_results + google_results
+        print(all_results)
         return all_results
 
 
@@ -2323,7 +2298,7 @@ def add_element(element_id, list_type):
             except:
                 cover_id = save_api_cover(book_data["volumeInfo"]["imageLinks"]["thumbnail"], ListType.BOOK)
             if cover_id is None:
-                return flash("There was a problem while getting the book's cover. Please try again later.","warning")
+                return flash("There was a problem while getting the book's cover. Please try again later.", "warning")
 
             book_id = add_element_in_base(book_data, cover_id, list_type)
             add_element_to_user(book_id, int(current_user.get_id()), list_type)
