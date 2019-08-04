@@ -3,7 +3,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Selec
 from flask_wtf.file import FileField, FileAllowed
 from flask_wtf import FlaskForm, RecaptchaField
 from flask_login import current_user
-from MyLists.models import User
+from MyLists.models import User, HomePage
 
 
 class RegistrationForm(FlaskForm):
@@ -36,7 +36,7 @@ class UpdateAccountForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png'])])
     isprivate = BooleanField('Private mode')
-    homepage = SelectField('Default homepage', choices=[('msl', 'MySeriesList'), ('mal', 'MyAnimesList'), ('mbl', 'MyBooksList'), ('acc', 'Account'), ('hof', 'Hall of Fame')])
+    homepage = SelectField('Default homepage', choices=[('msl', 'MySeriesList'), ('mal', 'MyAnimesList'), ('mbl', 'MyBooksList')])
     submit = SubmitField('Update account')
 
     def validate_username(self, username):

@@ -132,7 +132,7 @@
                 <div class="form-group">
                     {{ form.username.label(class="form-control-label") }}
                     {% if form.username.errors %}
-                        {{ form.username(class="form-control is-invalid") }}
+                        {{ form.username(class="form-control is-invalid text-input") }}
                         <div class="invalid-feedback">
                             {% for error in form.username.errors %}
                                 <span>{{ error }}</span>
@@ -147,7 +147,7 @@
                 <div class="form-group">
                     {{ form.email.label(class="form-control-label") }}
                     {% if form.email.errors %}
-                        {{ form.email(class="form-control form-control is-invalid") }}
+                        {{ form.email(class="form-control form-control is-invalid text-input") }}
                         <div class="invalid-feedback">
                             {% for error in form.email.errors %}
                                 <span>{{ error }}</span>
@@ -162,7 +162,7 @@
                 <div class="form-group">
                     {{ form.homepage.label(class="form-control-label") }}
                     {% if form.homepage.errors %}
-                        {{ form.homepage(class="form-control is-invalid") }}
+                        {{ form.homepage(class="form-control is-invalid text-input") }}
                         <div class="invalid-feedback">
                             {% for error in form.homepage.errors %}
                                 <span>{{ error }}</span>
@@ -177,7 +177,7 @@
                 <div class="form-group">
                     {{ form.isprivate.label(class="form-control-label") }}
                     {% if form.isprivate.errors %}
-                        {{ form.isprivate(class="form-control is-invalid") }}
+                        {{ form.isprivate(class="form-control is-invalid text-input") }}
                         <div class="invalid-feedback">
                             {% for error in form.isprivate.errors %}
                                 <span>{{ error }}</span>
@@ -328,6 +328,7 @@
 {% block script %}
 <!-------- Principal JS --------->
 <script>
+/*
 let home_page = document.getElementById("home_page");
 
 
@@ -376,5 +377,6 @@ function private_mode() {
         });
     }
 }
+*/
 </script>
 {% endblock script %}

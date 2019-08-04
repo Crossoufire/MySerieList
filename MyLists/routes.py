@@ -21,7 +21,7 @@ from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, Change
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
     Friend, SeriesEpisodeTimestamp, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, \
-    AnimeEpisodeTimestamp, HomePage, HallOfFame, BookStatus, Book, BookList, AnimeAchievements
+    AnimeEpisodeTimestamp, HomePage, BookStatus, Book, BookList, AnimeAchievements
 
 
 config.read('config.ini')
@@ -216,14 +216,12 @@ def home():
 
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.get_id()).first()
-        if user.homepage == HomePage.ACCOUNT:
-            return redirect(url_for('account'))
-        elif user.homepage == HomePage.HALL_OF_FAME:
-            return redirect(url_for('hall_of_fame'))
-        elif user.homepage == HomePage.MYSERIESLIST:
+        if user.homepage == HomePage.MYSERIESLIST:
             return redirect(url_for('myserieslist'))
         elif user.homepage == HomePage.MYANIMESLIST:
             return redirect(url_for('myanimeslist'))
+        elif user.homepage == HomePage.MYBOOKSLIST:
+            return redirect(url_for('mybookslist'))
 
     else:
         home_header = url_for('static', filename='img/home_header.jpg')
@@ -519,6 +517,49 @@ def account_settings():
             db.session.commit()
             app.logger.info('[{}] Settings updated : old username = {}, new username = {}'.format(user.id, old_username,
                                                                                                   user.username))
+
+        if form.isprivate.data != user.private:
+            old_value = user.private
+            user.private = form.isprivate.data
+            db.session.commit()
+            app.logger.info('[{}] Settings updated : old private mode = {}, new private mode = {}'.format(user.id,
+                                                                                                          old_value,
+                                                                                                          form.isprivate.data))
+
+        if user.homepage == HomePage.MYSERIESLIST:
+            if form.homepage.data != "msl":
+                old_value = user.homepage
+                if form.homepage.data == "mal":
+                    user.homepage = HomePage.MYANIMESLIST
+                elif form.homepage.data == "mbl":
+                    user.homepage = HomePage.MYBOOKSLIST
+                db.session.commit()
+                app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
+                                                                                                      old_value,
+                                                                                                      form.homepage.data))
+        elif user.homepage == HomePage.MYANIMESLIST:
+            if form.homepage.data != "mal":
+                old_value = user.homepage
+                if form.homepage.data == "msl":
+                    user.homepage = HomePage.MYSERIESLIST
+                elif form.homepage.data == "mbl":
+                    user.homepage = HomePage.MYBOOKSLIST
+                db.session.commit()
+                app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
+                                                                                                      old_value,
+                                                                                                      form.homepage.data))
+        elif user.homepage == HomePage.MYBOOKSLIST:
+            if form.homepage.data != "mbl":
+                old_value = user.homepage
+                if form.homepage.data == "msl":
+                    user.homepage = HomePage.MYSERIESLIST
+                elif form.homepage.data == "mal":
+                    user.homepage = HomePage.MYANIMESLIST
+                db.session.commit()
+                app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
+                                                                                                      old_value,
+                                                                                                      form.homepage.data))
+
         email_changed = False
         if form.email.data != user.email:
             old_email = user.email
@@ -548,64 +589,17 @@ def account_settings():
         form.username.data = current_user.username
         form.email.data = current_user.email
         form.isprivate.data = current_user.private
-        form.homepage.data = current_user.homepage
 
+        if current_user.homepage == HomePage.MYSERIESLIST:
+            form.homepage.data = "msl"
+        elif current_user.homepage == HomePage.MYANIMESLIST:
+            form.homepage.data = "mal"
+        elif current_user.homepage == HomePage.MYBOOKSLIST:
+            form.homepage.data = "mbl"
 
     return render_template('account_settings.html',
                            title='Account Settings',
                            form=form)
-
-
-@app.route("/default_page", methods=['POST'])
-@login_required
-def default_page():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data = request.get_json()
-        home_page = int(json_data['home_page'])
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    user = User.query.filter_by(id=current_user.get_id()).first()
-
-    if home_page == 0:
-        user.homepage = HomePage.ACCOUNT
-    elif home_page == 1:
-        user.homepage = HomePage.HALL_OF_FAME
-    elif home_page == 2:
-        user.homepage = HomePage.MYSERIESLIST
-    elif home_page == 3:
-        user.homepage = HomePage.MYANIMESLIST
-    elif home_page == 4:
-        user.homepage = HomePage.MYBOOKSLIST
-    else:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    db.session.commit()
-    return '', 204
-
-
-@app.route('/private_mode', methods=['POST'])
-@login_required
-def private_mode():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data = request.get_json()
-        triggered = json_data['private']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    user = User.query.filter_by(id=current_user.get_id()).first()
-    if triggered == "off":
-        user.private = False
-    elif triggered == "on":
-        user.private = True
-    else:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    db.session.commit()
-    app.logger.info('[{}] Private mode updated to {}'.format(user.id, triggered))
-    return '', 204
 
 
 @app.route("/email_update/<token>", methods=['GET'])

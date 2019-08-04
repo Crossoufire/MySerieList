@@ -41,12 +41,6 @@ class HomePage(enum.Enum):
     MYBOOKSLIST = "mybookslist"
 
 
-class HallOfFame(enum.Enum):
-    MYSERIESLIST = "myserieslist"
-    MYANIMESLIST = "myanimeslist"
-    MYBOOKSLIST = "mybookslist"
-
-
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)
