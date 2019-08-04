@@ -1,5 +1,5 @@
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
 from flask_wtf.file import FileField, FileAllowed
 from flask_wtf import FlaskForm, RecaptchaField
 from flask_login import current_user
@@ -34,8 +34,10 @@ class LoginForm(FlaskForm):
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
-    submit = SubmitField('Update')
+    picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png'])])
+    isprivate = BooleanField('Private mode')
+    homepage = SelectField('Default homepage', choices=[('msl', 'MySeriesList'), ('mal', 'MyAnimesList'), ('mbl', 'MyBooksList'), ('acc', 'Account'), ('hof', 'Hall of Fame')])
+    submit = SubmitField('Update account')
 
     def validate_username(self, username):
         if username.data != current_user.username:

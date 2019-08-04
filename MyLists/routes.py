@@ -188,7 +188,7 @@ def home():
             next_page = request.args.get('next')
             app.logger.info('[{}] Logged in'.format(user.id))
             flash("You're now logged in. Welcome {0}".format(login_form.login_username.data), "success")
-            home_page = str(user.home_page.value)
+            home_page = str(user.homepage.value)
             return redirect(next_page) if next_page else redirect(url_for(home_page))
         else:
             flash('Login Failed. Please check Username and Password', 'warning')
@@ -216,13 +216,13 @@ def home():
 
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.get_id()).first()
-        if user.home_page == HomePage.ACCOUNT:
+        if user.homepage == HomePage.ACCOUNT:
             return redirect(url_for('account'))
-        elif user.home_page == HomePage.HALL_OF_FAME:
+        elif user.homepage == HomePage.HALL_OF_FAME:
             return redirect(url_for('hall_of_fame'))
-        elif user.home_page == HomePage.MYSERIESLIST:
+        elif user.homepage == HomePage.MYSERIESLIST:
             return redirect(url_for('myserieslist'))
-        elif user.home_page == HomePage.MYANIMESLIST:
+        elif user.homepage == HomePage.MYANIMESLIST:
             return redirect(url_for('myanimeslist'))
 
     else:
@@ -293,9 +293,9 @@ def register_token(token):
     return redirect(url_for('home'))
 
 
-@app.route("/test")
-def test():
-    return render_template('test.html')
+@app.route("/test2")
+def test2():
+    return render_template('test2.html')
 
 
 ################################################# Authenticated routes #################################################
@@ -503,11 +503,6 @@ def account_settings():
     form = UpdateAccountForm()
 
     user = User.query.filter_by(id=current_user.get_id()).first()
-    is_private = user.private
-    if is_private:
-        is_private = "checked"
-    else:
-        is_private = "unchecked"
 
     if form.validate_on_submit():
         if form.picture.data:
@@ -552,15 +547,13 @@ def account_settings():
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
+        form.isprivate.data = current_user.private
+        form.homepage.data = current_user.homepage
 
-    image_file = url_for('static', filename='profile_pics/{0}'.format(current_user.image_file))
+
     return render_template('account_settings.html',
-                           title='Settings',
-                           image_file=image_file,
-                           form=form,
-                           value_privacy=is_private,
-                           home_page=str(user.home_page.value),
-                           default_hof=str(user.default_hof.value))
+                           title='Account Settings',
+                           form=form)
 
 
 @app.route("/default_page", methods=['POST'])
@@ -576,15 +569,15 @@ def default_page():
     user = User.query.filter_by(id=current_user.get_id()).first()
 
     if home_page == 0:
-        user.home_page = HomePage.ACCOUNT
+        user.homepage = HomePage.ACCOUNT
     elif home_page == 1:
-        user.home_page = HomePage.HALL_OF_FAME
+        user.homepage = HomePage.HALL_OF_FAME
     elif home_page == 2:
-        user.home_page = HomePage.MYSERIESLIST
+        user.homepage = HomePage.MYSERIESLIST
     elif home_page == 3:
-        user.home_page = HomePage.MYANIMESLIST
+        user.homepage = HomePage.MYANIMESLIST
     elif home_page == 4:
-        user.home_page = HomePage.MYBOOKSLIST
+        user.homepage = HomePage.MYBOOKSLIST
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 

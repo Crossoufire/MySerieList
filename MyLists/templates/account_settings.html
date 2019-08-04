@@ -4,69 +4,210 @@
 {% block css %}
 <!-------- Principal CSS --------->
 <style>
-.container-form {
-    max-width: 500px;
-}
-
-.account-img {
-    height: 150px;
-    width: 150px;
-    margin-bottom: 15px;
-    border-style: solid;
-    border-width: 1px;
-}
-
-hr {
-    border-top: 1px solid rgba(255, 255, 255, 0.9);
-}
-
-.form-control {
-    background: transparent;
-    border-radius: 0px;
-    border-top: 0px;
-    border-left: 0px;
-    border-right: 0px;
-    color: #fff;
-}
-
-.form-control:focus {
-    background: transparent;
-    border-radius: 0px;
-    border-top: 0px;
-    border-left: 0px;
-    border-right: 0px;
-    box-shadow: 0 0 0 0rem;
-    color: #fff;
-}
-
-.form-check-label {
-    margin-bottom: 30px;
-}
-
 .form_account {
     max-width: 800px;
+    margin-top: 40px;
 }
 
-.border_account {
-    border-style: solid;
-    border-width: 2px;
-    border-color: grey;
-    border-radius: 10px;
-    padding-top: 30px;
-    padding-bottom: 20px;
-    padding-left: 50px;
-    padding-right: 50px;
-    margin-bottom: 20px;
+/* On screens that are 768px or more */
+@media screen and (min-width: 768px) {
+
+    .border_account {
+        border-style: solid;
+        border-width: 1px;
+        border-color: grey;
+        border-radius: 3px;
+        padding-top: 30px;
+        padding-bottom: 20px;
+        padding-left: 50px;
+        padding-right: 50px;
+        margin-bottom: 20px;
+    }
+
+    .block {
+	    height: 30px;
+	    color: #fff;
+	    float: left;
+	    background-color: #334D5C;
+    }
+
+    label {
+        color: white;
+        height: 20px;
+        width: 150px;
+        margin-left: 30px;
+        text-align: right;
+        margin-right:15px;
+        float:left;
+    }
+
+    .text-input {
+        width : 250px;
+        background: transparent;
+        color: white;
+        border-top: 0px;
+        border-left: 0px;
+        border-right: 0px;
+        border-bottom: 1px solid white;
+    }
+
+    .text-input:focus {
+        width : 250px;
+        background: transparent;
+        color: white;
+        border-top: 0px;
+        border-left: 0px;
+        border-right: 0px;
+        border-bottom: 1px solid white;
+    }
+}
+
+/* On screens that are 768px or less */
+@media screen and (max-width: 768px) {
+
+    .border_account {
+        border-style: solid;
+        border-width: 1px;
+        border-color: grey;
+        border-radius: 3px;
+        padding-top: 30px;
+        padding-bottom: 20px;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-bottom: 20px;
+    }
+
+    .block {
+	    height: 25px;
+	    color: #fff;
+	    float: left;
+	    background-color: #334D5C;
+    }
+
+    label {
+        color: white;
+        height: 20px;
+        margin-right:15px;
+        width: 130px;
+    }
+
+    .text-input {
+        width : 150px;
+        background: transparent;
+        color: white;
+        border-top: 0px;
+        border-left: 0px;
+        border-right: 0px;
+        border-bottom: 1px solid white;
+    }
+
+    .text-input:focus {
+        width : 150px;
+        background: transparent;
+        color: white;
+        border-top: 0px;
+        border-left: 0px;
+        border-right: 0px;
+        border-bottom: 1px solid white;
+    }
+
+    .custom-btn-size {
+        padding: 6px !important;
+    }
 }
 </style>
 {% endblock css %}
 
 
 {% block content %}
-<div class="container form_account">
+<div class="container form_account" style="padding-left: 0px; padding-right: 0px;">
     <div class="border_account">
+        <h3 class="m-b-30">Account Settings</h3>
+
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="container-form">
+
+                <!-- Username -->
+                <div class="form-group">
+                    {{ form.username.label(class="form-control-label") }}
+                    {% if form.username.errors %}
+                        {{ form.username(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.username(class="text-input") }}
+                    {% endif %}
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    {% if form.email.errors %}
+                        {{ form.email(class="form-control form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="text-input") }}
+                    {% endif %}
+                </div>
+
+                <!-- Default homepage -->
+                <div class="form-group">
+                    {{ form.homepage.label(class="form-control-label") }}
+                    {% if form.homepage.errors %}
+                        {{ form.homepage(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.homepage.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.homepage }}
+                    {% endif %}
+                </div>
+
+                <!-- Private -->
+                <div class="form-group">
+                    {{ form.isprivate.label(class="form-control-label") }}
+                    {% if form.isprivate.errors %}
+                        {{ form.isprivate(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.isprivate.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.isprivate }}
+                    {% endif %}
+                </div>
+
+                <!-- Profile picture  -->
+                <div class="form-group upload-btn-wrapper">
+                    {{ form.picture.label(class="form-control-label") }}
+                    {{ form.picture }}
+                    {% if form.picture.errors %}
+                        {% for error in form.picture.errors %}
+                            <span class="text-danger">{{ error }}</span><br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="text-center m-t-30">
+                {{ form.submit(class="btn btn-outline-info custom-btn-size") }}
+                <a class="btn btn-outline-info custom-btn-size" href="{{ url_for('change_password') }}" role="button">Change password?</a>
+            </div>
+        </form>
+
         <!------------------------ Account picture/Username/Privacy -------------------------->
-        <div class="d-flex flex-wrap-reverse">
+        <!--<div class="d-flex flex-wrap-reverse">
             <div class="p-r-10 bd-highlight">
                 <img class="rounded border-light account-img" src="{{ image_file }}">
             </div>
@@ -87,7 +228,7 @@ hr {
             </div>
         </div>
 
-        <!---------------------------- Account info/default page ----------------------------->
+        &lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; Account info/default page -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;
         <h3 class="font-weight-light text-center mt-4 mb-0">
             Account Info
             <div class="arrow_div float-right">
@@ -178,7 +319,7 @@ hr {
                     </div>
                 </form>
             </div>
-        </div>
+        </div>-->
     </div>
 </div>
 {% endblock content %}
@@ -233,21 +374,6 @@ function private_mode() {
             success: function(response) {
                 console.log("on"); }
         });
-    }
-}
-</script>
-<!------- Hide function --------->
-<script>
-function hide(category, arrow) {
-    var category = document.getElementById(category);
-    var arrow = document.getElementById(arrow);
-
-    if (category.className === "d-flex flex-wrap"){
-        category.className = "d-none";
-        arrow.className = "fas fa-xs fa-chevron-right";
-    } else {
-        category.className = "d-flex flex-wrap";
-        arrow.className = "fas fa-xs fa-chevron-down";
     }
 }
 </script>

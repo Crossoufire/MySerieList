@@ -58,8 +58,7 @@ class User(db.Model, UserMixin):
     registered_on = db.Column(db.DateTime, nullable=False)
     activated_on = db.Column(db.DateTime)
     transition_email = db.Column(db.String(120))
-    home_page = db.Column(db.Enum(HomePage), nullable=False, default=HomePage.MYSERIESLIST)
-    default_hof = db.Column(db.Enum(HallOfFame), nullable=False, default=HallOfFame.MYSERIESLIST)
+    homepage = db.Column(db.Enum(HomePage), nullable=False, default=HomePage.MYANIMESLIST)
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
