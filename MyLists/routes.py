@@ -627,16 +627,13 @@ def email_update_token(token):
 def change_password():
     form = ChangePasswordForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(id=current_user.get_id()).first()
-        if user and bcrypt.check_password_hash(user.password, form.actual_password.data):
-            hashed_password = bcrypt.generate_password_hash(form.confirm_new_password.data).decode('utf-8')
-            current_user.password = hashed_password
-            db.session.commit()
-            app.logger.info('[{}] Password updated'.format(user.id))
-            flash('Your password has been successfully updated!', 'success')
-            return redirect(url_for('account'))
-        else:
-            flash('Current password incorrect', 'danger')
+        hashed_password = bcrypt.generate_password_hash(form.confirm_new_password.data).decode('utf-8')
+        current_user.password = hashed_password
+        db.session.commit()
+        app.logger.info('[{}] Password updated'.format(current_user.id))
+        flash('Your password has been successfully updated!', 'success')
+        return redirect(url_for('account'))
+
     return render_template('change_pass.html', form=form)
 
 

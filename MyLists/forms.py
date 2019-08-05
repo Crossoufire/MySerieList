@@ -3,7 +3,9 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Selec
 from flask_wtf.file import FileField, FileAllowed
 from flask_wtf import FlaskForm, RecaptchaField
 from flask_login import current_user
-from MyLists.models import User, HomePage
+
+from MyLists import bcrypt
+from MyLists.models import User
 
 
 class RegistrationForm(FlaskForm):
@@ -16,12 +18,12 @@ class RegistrationForm(FlaskForm):
     def validate_register_username(form, field):
         user = User.query.filter_by(username=field.data).first()
         if user is not None:
-            raise ValidationError("That Username is already taken. Please choose another one.")
+            raise ValidationError("This username is already taken. Please choose another one.")
 
     def validate_register_email(form, field):
         user = User.query.filter_by(email=field.data).first()
         if user is not None:
-            raise ValidationError("That email already exist.")
+            raise ValidationError("This email already exist.")
 
 
 class LoginForm(FlaskForm):
@@ -53,10 +55,15 @@ class UpdateAccountForm(FlaskForm):
 
 
 class ChangePasswordForm(FlaskForm):
-    actual_password = PasswordField('Actual Password', validators=[DataRequired()])
-    new_password = PasswordField('Choose New Password', validators=[DataRequired(), Length(min=6)])
-    confirm_new_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password')])
+    current_password = PasswordField('Current password', validators=[DataRequired()])
+    new_password = PasswordField('Choose new password', validators=[DataRequired(), Length(min=6)])
+    confirm_new_password = PasswordField('Confirm new password', validators=[DataRequired(), EqualTo('new_password')])
     submit = SubmitField('Update Password')
+
+    def validate_current_password(self, current_password):
+        user = User.query.filter_by(id=current_user.get_id()).first()
+        if not bcrypt.check_password_hash(user.password, current_password.data):
+            raise ValidationError("Incorrect current password")
 
 
 class AddFriendForm(FlaskForm):
@@ -72,7 +79,7 @@ class ResetPasswordRequestForm(FlaskForm):
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is None:
-            raise ValidationError('There is no account with that email.')
+            raise ValidationError('There is no account with this email.')
 
 
 class ResetPasswordForm(FlaskForm):

@@ -44,15 +44,15 @@
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Change Your Password</legend>
                 <div class="form-group">
-                    {% if form.actual_password.errors %}
-                        {{ form.actual_password(class="form-control is-invalid") }}
+                    {% if form.current_password.errors %}
+                        {{ form.current_password(class="form-control is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.actual_password.errors %}
+                            {% for error in form.current_password.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.actual_password(class="form-control", placeholder="Actual Password") }}
+                        {{ form.current_password(class="form-control", placeholder="Current password") }}
                     {% endif %}
                 </div>
                 <div class="form-group">
@@ -64,7 +64,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.new_password(class="form-control", placeholder="New Password") }}
+                        {{ form.new_password(class="form-control", placeholder="New password") }}
                     {% endif %}
                 </div>
                 <div class="form-group">
@@ -80,7 +80,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.confirm_new_password(class="form-control", placeholder="Confirm New Password") }}
+                        {{ form.confirm_new_password(class="form-control", placeholder="Confirm new password") }}
                     {% endif %}
                 </div>
             </fieldset>

@@ -9,56 +9,53 @@
     margin-top: 40px;
 }
 
+.border_account {
+    border-style: solid;
+    border-width: 1px;
+    border-color: grey;
+    border-radius: 3px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+label {
+    color: white;
+    height: 20px;
+    padding-top: 3px;
+    float:left;
+    text-align: right;
+}
+
+.list_dropdown {
+    border-style: 1px;
+    border-color: black;
+    border-radius: 2px;
+    -moz-appearance:none;
+    -webkit-appearance:none;
+    appearance:none;
+}
+
 /* On screens that are 768px or more */
 @media screen and (min-width: 768px) {
 
     .border_account {
-        border-style: solid;
-        border-width: 1px;
-        border-color: grey;
-        border-radius: 3px;
         padding-top: 30px;
-        padding-bottom: 20px;
         padding-left: 50px;
         padding-right: 50px;
-        margin-bottom: 20px;
-    }
-
-    .block {
-	    height: 30px;
-	    color: #fff;
-	    float: left;
-	    background-color: #334D5C;
     }
 
     label {
-        color: white;
-        height: 20px;
-        width: 150px;
-        margin-left: 30px;
-        text-align: right;
-        margin-right:15px;
-        float:left;
+        width: 180px;
+        margin-right: 20px;
     }
 
     .text-input {
-        width : 250px;
-        background: transparent;
-        color: white;
-        border-top: 0px;
-        border-left: 0px;
-        border-right: 0px;
-        border-bottom: 1px solid white;
+        width : 280px;
+        padding: 0px !important;
     }
 
-    .text-input:focus {
-        width : 250px;
-        background: transparent;
-        color: white;
-        border-top: 0px;
-        border-left: 0px;
-        border-right: 0px;
-        border-bottom: 1px solid white;
+    .error-msg {
+        padding-left: 195px;
     }
 }
 
@@ -66,49 +63,24 @@
 @media screen and (max-width: 768px) {
 
     .border_account {
-        border-style: solid;
-        border-width: 1px;
-        border-color: grey;
-        border-radius: 3px;
-        padding-top: 30px;
-        padding-bottom: 20px;
-        padding-left: 20px;
-        padding-right: 20px;
-        margin-bottom: 20px;
+        padding-top: 20px;
+        padding-left: 15px;
+        padding-right: 15px;
     }
 
-    .block {
-	    height: 25px;
-	    color: #fff;
-	    float: left;
-	    background-color: #334D5C;
-    }
 
     label {
-        color: white;
-        height: 20px;
-        margin-right:15px;
         width: 130px;
+        margin-right: 10px;
     }
 
     .text-input {
-        width : 150px;
-        background: transparent;
-        color: white;
-        border-top: 0px;
-        border-left: 0px;
-        border-right: 0px;
-        border-bottom: 1px solid white;
+        width : 155px;
+        padding: 0px !important;
     }
 
-    .text-input:focus {
-        width : 150px;
-        background: transparent;
-        color: white;
-        border-top: 0px;
-        border-left: 0px;
-        border-right: 0px;
-        border-bottom: 1px solid white;
+    .error-msg {
+        padding-left: 145px;
     }
 
     .custom-btn-size {
@@ -132,14 +104,18 @@
                 <div class="form-group">
                     {{ form.username.label(class="form-control-label") }}
                     {% if form.username.errors %}
-                        {{ form.username(class="form-control is-invalid text-input") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.username.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
+                        <div class="md-form">
+                        {{ form.username(class="form-control is-invalid text-light text-input") }}
+                            <div class="invalid-feedback error-msg">
+                                {% for error in form.username.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
                         </div>
                     {% else %}
-                        {{ form.username(class="text-input") }}
+                        <div class="md-form">
+                        {{ form.username(class="form-control text-light text-input") }}
+                        </div>
                     {% endif %}
                 </div>
 
@@ -147,14 +123,18 @@
                 <div class="form-group">
                     {{ form.email.label(class="form-control-label") }}
                     {% if form.email.errors %}
-                        {{ form.email(class="form-control form-control is-invalid text-input") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.email.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
+                        <div class="md-form">
+                        {{ form.email(class="form-control is-invalid text-light text-input") }}
+                            <div class="invalid-feedback error-msg">
+                                {% for error in form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
                         </div>
                     {% else %}
-                        {{ form.email(class="text-input") }}
+                        <div class="md-form">
+                        {{ form.email(class="form-control text-light text-input") }}
+                        </div>
                     {% endif %}
                 </div>
 
@@ -184,7 +164,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.isprivate }}
+                        {{ form.isprivate(class="m-t-9") }}
                     {% endif %}
                 </div>
 
@@ -205,178 +185,6 @@
                 <a class="btn btn-outline-info custom-btn-size" href="{{ url_for('change_password') }}" role="button">Change password?</a>
             </div>
         </form>
-
-        <!------------------------ Account picture/Username/Privacy -------------------------->
-        <!--<div class="d-flex flex-wrap-reverse">
-            <div class="p-r-10 bd-highlight">
-                <img class="rounded border-light account-img" src="{{ image_file }}">
-            </div>
-            <div class="bd-highlight">
-                <h2 class="mt-0 account-heading">{{ current_user.username }}</h2>
-                <span style="font-size: 14pt;">{{ current_user.email }}</span>
-            </div>
-            <div class="ml-auto bd-highlight text-center">
-                {% if value_privacy == "checked" %}
-                <a id="private_id" class="fas fa-2x fa-toggle-on" onclick="private_mode()"></a>
-                <br>
-                <span id="text_privacy">Private Mode On</span>
-                {% else %}
-                <a id="private_id" class="fas fa-2x fa-toggle-off" onclick="private_mode()"></a>
-                <br>
-                <span id="text_privacy">Private Mode Off</span>
-                {% endif %}
-            </div>
-        </div>
-
-        &lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; Account info/default page -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;
-        <h3 class="font-weight-light text-center mt-4 mb-0">
-            Account Info
-            <div class="arrow_div float-right">
-                <a class="fas fa-xs fa-chevron-down" id="INFO_arrow" onclick="hide('INFO', 'INFO_arrow')"></a>
-            </div>
-        </h3>
-        <hr class="mt-2 mb-3">
-        <div id="INFO" class="d-flex flex-wrap">
-            <div class="col text-center">
-                <span>Default home page:</span>
-                <select id="home_page" class="ml-auto mr-auto m-t-10 m-b-20 scrollable-menu form-control text-center" style="max-width: 150px;">
-                {% if home_page == "account" %}
-                    <option selected="selected">Account</option>
-                    <option>Hall of Fame</option>
-                    <option>MySeriesList</option>
-                    <option>MyAnimesList</option>
-                    <option>MyBooksList</option>
-                {% elif home_page == "hall_of_fame" %}
-                    <option>Account</option>
-                    <option selected="selected">Hall of Fame</option>
-                    <option>MySeriesList</option>
-                    <option>MyAnimesList</option>
-                    <option>MyBooksList</option>
-                {% elif home_page == "myserieslist" %}
-                    <option>Account</option>
-                    <option>Hall of Fame</option>
-                    <option selected="selected">MySeriesList</option>
-                    <option>MyAnimesList</option>
-                    <option>MyBooksList</option>
-                {% elif home_page == "myanimeslist" %}
-                    <option>Account</option>
-                    <option>Hall of Fame</option>
-                    <option>MySeriesList</option>
-                    <option selected="selected">MyAnimesList</option>
-                    <option>MyBooksList</option>
-                {% elif home_page == "mybookslist" %}
-                    <option>Account</option>
-                    <option>Hall of Fame</option>
-                    <option>MySeriesList</option>
-                    <option>MyAnimesList</option>
-                    <option selected="selected">MyBooksList</option>
-                {% endif %}
-            </select>
-            </div>
-            <div class="d-flex flex-wrap">
-                <form method="POST" action="" enctype="multipart/form-data">
-                    {{ form.hidden_tag() }}
-                    <div class="container-form">
-                        <div class="form-group">
-                            {{ form.username.label(class="form-control-label") }}
-                            {% if form.username.errors %}
-                                {{ form.username(class="form-control form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.username.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.username(class="form-control form-control") }}
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            {{ form.email.label(class="form-control-label") }}
-                            {% if form.email.errors %}
-                                {{ form.email(class="form-control form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.email.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.email(class="form-control form-control") }}
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            {{ form.picture.label() }}
-                            {{ form.picture(class="form-control-file") }}
-                            {% if form.picture.errors %}
-                                {% for error in form.picture.errors %}
-                                    <span class="text-danger">{{ error }}</span><br>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        {{ form.submit(class="btn btn-outline-info") }}
-                        <a class="btn btn-outline-info" href="{{ url_for('change_password') }}" role="button">Change password?</a>
-                    </div>
-                </form>
-            </div>
-        </div>-->
     </div>
 </div>
 {% endblock content %}
-
-
-{% block script %}
-<!-------- Principal JS --------->
-<script>
-/*
-let home_page = document.getElementById("home_page");
-
-
-home_page.onchange = function () {
-    let selected_index = home_page.selectedIndex;
-    $body = $("body");
-    $.ajax ({
-        type: "POST",
-        url: "/default_page",
-        contentType: "application/json",
-        data: JSON.stringify({home_page: selected_index }),
-        dataType: "json",
-        beforeSend: function() { $body.addClass("loading"); },
-        success: function(response) {
-            $body.removeClass("loading"); }
-    });
-}
-
-
-function private_mode() {
-    var private = document.getElementById("private_id");
-
-    if (private.className === "fas fa-2x fa-toggle-on") {
-        private.className = "fas fa-2x fa-toggle-off";
-        $('#text_privacy').text('Private Mode Off');
-        $.ajax ({
-            type: "POST",
-            url: "/private_mode",
-            contentType: "application/json",
-            data: JSON.stringify({private: "off"}),
-            dataType: "json",
-            success: function(response) {
-                console.log("off"); }
-        });
-    } else {
-        private.className = "fas fa-2x fa-toggle-on";
-        $('#text_privacy').text('Private Mode On');
-        $.ajax ({
-            type: "POST",
-            url: "/private_mode",
-            contentType: "application/json",
-            data: JSON.stringify({private: "on"}),
-            dataType: "json",
-            success: function(response) {
-                console.log("on"); }
-        });
-    }
-}
-*/
-</script>
-{% endblock script %}
