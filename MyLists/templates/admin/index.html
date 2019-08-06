@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
+    <h2>Global</h2>
     <a href="{{ url_for('user.index_view') }}">User</a>
     <br>
     <a href="{{ url_for('friend.index_view') }}">Friend</a>
@@ -32,4 +33,10 @@
     <a href="{{ url_for('anime_network.index_view') }}">Anime network</a>
     <br>
     <a href="{{ url_for('anime_episode_timestamp.index_view') }}">Anime episode timestamp</a>
+    <br>
+    <br>
+    <h2>Book</h2>
+    <a href="{{ url_for('book.index_view') }}">Book</a>
+    <br>
+    <a href="{{ url_for('book_list.index_view') }}">Book list</a>
 {% endblock %}

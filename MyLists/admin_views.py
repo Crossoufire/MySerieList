@@ -1,7 +1,7 @@
 from flask_admin import expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from MyLists.models import User, Friend, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, SeriesNetwork, \
-    SeriesEpisodeTimestamp, Anime, AnimeEpisodesPerSeason, AnimeEpisodeTimestamp, AnimeGenre, AnimeList, AnimeNetwork
+    SeriesEpisodeTimestamp, Anime, AnimeEpisodesPerSeason, AnimeEpisodeTimestamp, AnimeGenre, AnimeList, AnimeNetwork, Book, BookList
 from MyLists import db, app
 from flask_login import current_user
 from flask_admin import Admin
@@ -51,7 +51,7 @@ class SeriesListAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
 
-    column_list = ('user_id', 'series_id', 'current_season', 'last_episode_watched', 'status')
+    column_list = ('user_id', 'series_id', 'current_season', 'last_episode_watched', 'status', 'score')
     column_searchable_list = ('user_id', 'series_id', 'status')
     column_sortable_list = ('id', 'user_id', 'series_id', 'status')
     list_template = 'admin/series_list.html'
@@ -123,7 +123,7 @@ class AnimeListAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
 
-    column_list = ('user_id', 'anime_id', 'current_season', 'last_episode_watched', 'status')
+    column_list = ('user_id', 'anime_id', 'current_season', 'last_episode_watched', 'status', 'score')
     column_searchable_list = ('user_id', 'anime_id', 'status')
     column_sortable_list = ('id', 'user_id', 'anime_id', 'status')
     list_template = 'admin/anime_list.html'
@@ -171,6 +171,31 @@ class AnimeEpisodeTimestampAdminView(ModelView):
     column_searchable_list = ('user_id', 'anime_id', 'timestamp')
     column_sortable_list = ('user_id', 'anime_id', 'timestamp')
     list_template = 'admin/anime_episode_timestamp.html'
+
+
+######################################################### BOOK #########################################################
+
+class BookAdminView(ModelView):
+
+    def is_accessible(self):
+        return current_user.get_id() == '1'
+
+    column_display_pk = True
+    column_exclude_list = ('image_cover', 'description', 'google_id')
+    column_searchable_list = ['title']
+    column_sortable_list = ('id', 'title', 'authors', 'published_date', 'page_count', 'categories')
+    list_template = 'admin/book.html'
+
+
+class BookListAdminView(ModelView):
+
+    def is_accessible(self):
+        return current_user.get_id() == '1'
+
+    column_list = ('user_id', 'book_id', 'commentary', 'read_year', 'status', 'score')
+    column_searchable_list = ('user_id', 'book_id')
+    column_sortable_list = ('user_id', 'book_id', 'status')
+    list_template = 'admin/book_list.html'
 
 
 # Override of the index flask-admin view:
@@ -256,3 +281,13 @@ admin.add_view(AnimeEpisodeTimestampAdminView(model=AnimeEpisodeTimestamp,
                                               session=db.session,
                                               name="Anime episode timestamp",
                                               endpoint='anime_episode_timestamp'))
+
+admin.add_view(BookAdminView(model=Book,
+                             session=db.session,
+                             name="Book",
+                             endpoint='book'))
+
+admin.add_view(BookListAdminView(model=BookList,
+                                 session=db.session,
+                                 name="Book list",
+                                 endpoint='book_list'))
