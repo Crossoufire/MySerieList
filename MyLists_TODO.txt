@@ -4,7 +4,7 @@ TO DO / TO SEE
 	Add the possibility to change the background color of the website
 	Add the possibility to have the score display by default or not in the grid lists
 	Add the possibility to select a default view (grid/table) for lists 
-	Change the account settings page (semi done)
+	Change the account settings page (80% done)
 	Add a "read less" for the synopsis
 	Check the style of the category selector modal
 	Check the style of the auto-complete selector
@@ -14,7 +14,7 @@ TO DO / TO SEE
 	Multi selection when changing category
 	Separation of the code for routes!!
 	Add "more results" for auto-complete results
-	Add lots of statistics (already began the code part, need a page to display + chart.js)
+	Add lots of statistics (already started the code part, need a page to display + chart.js)
 	Bug display season and episode when refresh due to the browser cache (don't know how to repair) but works great otherwise
 	Add Anime movies (Added multi search from the API)
 	
@@ -24,7 +24,7 @@ DONE
 	On login/register click focus on the modal
 	Add fixed top bar
 	Add Books list
-	Add jQuery auto-complete with pictures from local + online databases :) !!!!!
+	Add jQuery auto-complete with pictures from local + online databases
 	Show all/hide all categories
 	Show all/hide all scores
 	Add fast travel between categories
