@@ -81,7 +81,7 @@ hr {
                     <b><a href="/user/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
                 </td>
                 <td>
-                    <img src="../static/img/Ranks/{{user['series'][4][0][0] }}.ico" alt="{{ user['series'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="static/img/Ranks/{{user['series'][4][0][0] }}.ico" alt="{{ user['series'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
                     Level {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
                 </td>
@@ -102,7 +102,7 @@ hr {
                 </td>
                 <td></td>
 
-                {% elif user["iscurrentuser"] %}
+            {% elif user["iscurrentuser"] %}
                 <td class="current_user">
                     <img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
                 </td>
@@ -130,7 +130,8 @@ hr {
                     Level {{ user['total'][0] }}
                 </td>
                 <td class="current_user"></td>
-                {% elif user["isprivate"] and not user["isfriend"] %}
+
+            {% elif user["isprivate"] and not user["isfriend"] %}
                 <td>
                     <img src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}" alt="Anonymous" style="width: 40px; height: 40px;">
                 </td>
@@ -159,7 +160,7 @@ hr {
                 </td>
                 <td></td>
 
-                {% else %}
+            {% else %}
                 <td>
                     <img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
                 </td>
@@ -186,12 +187,13 @@ hr {
                     <br>
                     Level {{ user['total'][0] }}
                 </td>
+
                 {% if user["isfriend"] %}
-                <td><i class="fas fa-user-friends"></i></td>
+                    <td><i class="fas fa-user-friends"></i></td>
                 {% elif user["ispendingfriend"] %}
-                <td><i class="fas fa-user-friends" style="color: #2c3946;"></i></td>
+                    <td><i class="fas fa-user-friends" style="color: #2c3946;"></i></td>
                 {% else %}
-                <td><a class="fas fa-user-plus" onclick="add_friend('{{ user['username'] }}')"></a></td>
+                    <td><a class="fas fa-user-plus" onclick="add_friend('{{ user['username'] }}')"></a></td>
                 {% endif %}
             {% endif %}
             </tr>
@@ -213,7 +215,7 @@ function add_friend(username) {
         type: "POST",
         url: "/add_friend_hof",
         contentType: "application/json",
-        data: JSON.stringify({user_name: username }),
+        data: JSON.stringify({user_name: username}),
         dataType: "json",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {

@@ -384,14 +384,13 @@ body.loading .modal_loading {
 </div>
 
 
-<div id="mySidenav" class="sidenav">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="#collapse_READING">Watching</a>
+<div id="mySidenav" class="sidenav" style="height: 280px; padding-top: 30px;">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()" style="padding: 0px; margin-left: 135px;">&times;</a>
+    <a href="#collapse_READING">Reading</a>
     <a href="#collapse_COMPLETED">Completed</a>
     <a href="#collapse_ON_HOLD">On Hold</a>
-    <a href="#collapse_RANDOM">Random</a>
     <a href="#collapse_DROPPED">Dropped</a>
-    <a href="#collapse_PLAN_TO_READ">Plan to Watch</a>
+    <a href="#collapse_PLAN_TO_READ">Plan to Read</a>
 </div>
 
 
@@ -439,19 +438,6 @@ body.loading .modal_loading {
                 </thead>
                 <tbody id="ON_HOLD">
          {% elif loop.index == 4 %}
-        <h2 class="font-weight-light text-center pt-4 mb-0 category-title">RANDOM
-            <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="RANDOM_arrow" onclick="hide('collapse_RANDOM', 'RANDOM_arrow')"></a></div></h2>
-         <hr class="mt-2 mb-4">
-        <div class="d-flex flex-wrap" id="collapse_RANDOM">
-            <table class="table table-sm text-light">
-                <thead class="text-center">
-                    <th style="width: 50px;">#</th>
-                    <th>Books</th>
-                    <th style="width: 80px;">Score</th>
-                    <th style="width: 80px;">Actions</th>
-                </thead>
-                <tbody id="RANDOM">
-        {% elif loop.index == 5 %}
         <h2 class="font-weight-light text-center pt-4 mb-0 category-title">DROPPED
             <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="DROPPED_arrow" onclick="hide('collapse_DROPPED', 'DROPPED_arrow')"></a></div></h2>
         <hr class="mt-2 mb-4">
@@ -464,8 +450,8 @@ body.loading .modal_loading {
                     <th style="width: 80px;">Actions</th>
                 </thead>
                 <tbody id="DROPPED">
-        {% elif loop.index == 6 %}
-        <h2 class="font-weight-light text-center pt-4 mb-0 category-title">PLAN TO WATCH
+        {% elif loop.index == 5 %}
+        <h2 class="font-weight-light text-center pt-4 mb-0 category-title">PLAN TO READ
             <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="PLAN_TO_READ_arrow" onclick="hide('collapse_PLAN_TO_READ', 'PLAN_TO_READ_arrow')"></a></div></h2>
         <hr class="mt-2 mb-4">
         <div class="d-flex flex-wrap" id="collapse_PLAN_TO_READ">
@@ -479,7 +465,6 @@ body.loading .modal_loading {
                 <tbody id="PLAN_TO_READ">
         {% endif %}
         {% set outer_loop = loop %}
-
 
         {% for data in category %}
             <tr id="tr_{{ data['id'] }}">

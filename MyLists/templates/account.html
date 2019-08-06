@@ -349,7 +349,7 @@ hr {
                 <h4 class="mt-0 account-heading username">{{ user_name }}'s profile</h4>
                 {% endif %}
                 <span style="font-size: 14pt;">Knowledge level:&nbsp&nbsp</span>
-                <img height='64' width='64' data-toggle="tooltip" title="{{ total_rank_data[0][1] }}" src="/static/img/Original/{{ total_rank_data[0][0] }}.png"/>
+                <img height='64' width='64' data-toggle="tooltip" title="{{ total_rank_data[0][1] }}" src="static/img/Original/{{ total_rank_data[0][0] }}.png"/>
             </div>
             <div class="ml-auto bd-highlight">
                 {% if user_id == current_user.get_id() %}
@@ -468,32 +468,38 @@ hr {
         </h3>
         <hr class="mt-2 mb-3">
         <div id="collapse_FRIENDS" class="container-stats">
-            <div class="row" style="margin-right: 0px; margin-left: 0px;">
-                <table>
-                    <tr>
+            <div class="d-flex flex-wrap" style="margin-right: 0px; margin-left: 0px;">
                     {% for friend in friends_list_data %}
                     {% if friend['status'] == "pending" %}
                         {% if user_id == current_user.get_id() %}
-                        <td id="td_{{ friend['user_id'] }}" class="text-center p-l-10 p-r-10">
+                        <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
+                            <a href="/user/account/{{ friend['username'] }}">
+                                <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
+                            </a>
+                            <br>
                             <span style="font-size: 12pt;" class="text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span>
                             <br>
                             <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
                             <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
-                        </td>
+                        </div>
                         {% endif %}
                     {% elif friend['status'] == "request" %}
                         {% if user_id == current_user.get_id() %}
-                        <td id="td_{{ friend['user_id'] }}" class="text-center p-l-10 p-r-10">
+                        <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
+                            <a href="/user/account/{{ friend['username'] }}">
+                                <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
+                            </a>
+                            <br>
                             <span style="font-size: 12pt;" class="text-light">{{ friend['username'] }}</span>
                             <br>
                             <span>(Pending)</span>
                             <br>
-                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}','td_{{ friend['user_id'] }}')"></a>
-                        </td>
+                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}','td_{{ friend['user_id'] }}', '{{ friend['username'] }}')"></a>
+                        </div>
                         {% endif %}
                     {% elif friend['status'] == "declined" %}
                     {% else %}
-                        <td id="td_{{ friend['user_id'] }}" class="text-center p-l-10 p-r-10">
+                        <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
                             {% if user_id == current_user.get_id() %}
                             <a href="/user/account/{{ friend['username'] }}">
                                 <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
@@ -501,25 +507,23 @@ hr {
                             <br>
                             <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
                             <br>
-                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}', '{{ friend['username'] }}')"></a>
                             {% else %}
-                            <a class="disabled">
+                            <a href="/user/account/{{ friend['username'] }}">
                                 <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
                             </a>
                             <br>
                             <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
                             {% endif %}
-                        </td>
+                        </div>
                     {% endif %}
                     {% endfor %}
-                    </tr>
-                </table>
             </div>
         </div>
 
         <!-------------------------------------- Achievements ----------------------------------------->
         <h3 class="font-weight-light text-center p-t-4 p-b-0">
-            Anime Achievements
+            Animes Achievements
             <div class="arrow_div float-right">
                 <a class="collapse_all fas fa-xs fa-chevron-down" id="ACHIEVEMENTS_arrow" onclick="hide('collapse_ACHIEVEMENTS', 'ACHIEVEMENTS_arrow')"></a>
             </div>
@@ -876,8 +880,8 @@ function hide(category, arrow) {
 }
 
 
-function delete_friend(friend_id, td_id) {
-    if (!confirm("Do you want to delete")){
+function delete_friend(friend_id, td_id, friend_username) {
+    if (!confirm("Do you want to remove " + friend_username + " from your friends list ?")){
         return false;
     }
     $("#"+td_id).remove();

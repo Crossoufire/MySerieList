@@ -1346,26 +1346,33 @@ def user_animes_grid(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
+    # User not found
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-    if user and str(user.id) == current_user.get_id():
+
+    # User found == current user
+    if str(user.id) == current_user.get_id():
         return redirect(url_for('myanimeslist'))
 
+    # User found == admin
+    if user.id == 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    # Check if user is in the current user's friends list
+    # Admin bypasses private option
     friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
     if user.private:
         if current_user.get_id() == "1":
             pass
         elif friend is None or friend.status != "accepted":
             return redirect(url_for('anonymous'))
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
-    watching_list     = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
-    completed_list    = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list       = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    random_list       = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').all()
-    dropped_list      = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantowatch_list  = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
+    watching_list    = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
+    completed_list   = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list      = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    random_list      = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').all()
+    dropped_list     = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantowatch_list = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
 
     animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     animes_data = get_list_data(animes_list, ListType.ANIME)
@@ -1386,26 +1393,33 @@ def user_series_grid(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
+    # User not found
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-    if user and str(user.id) == current_user.get_id():
+
+    # User found == current user
+    if str(user.id) == current_user.get_id():
         return redirect(url_for('myserieslist'))
 
+    # User found == admin
+    if user.id == 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    # Check if user is in the current user's friends list
+    # Admin bypasses private option
     friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
     if user.private:
         if current_user.get_id() == "1":
             pass
         elif friend is None or friend.status != "accepted":
             return redirect(url_for('anonymous'))
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
-    watching_list     = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
-    completed_list    = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list       = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    random_list       = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').all()
-    dropped_list      = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantowatch_list  = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
+    watching_list    = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
+    completed_list   = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list      = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    random_list      = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').all()
+    dropped_list     = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantowatch_list = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
 
     series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     series_data = get_list_data(series_list, ListType.SERIES)
@@ -1426,26 +1440,33 @@ def user_animes_table(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
+    # User not found
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-    if user and str(user.id) == current_user.get_id():
+
+    # User found == current user
+    if str(user.id) == current_user.get_id():
         return redirect(url_for('myanimeslist_table'))
 
+    # User found == admin
+    if user.id == 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    # Check if user is in the current user's friends list
+    # Admin bypasses private option
     friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
     if user.private:
         if current_user.get_id() == "1":
             pass
         elif friend is None or friend.status != "accepted":
             return redirect(url_for('anonymous'))
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
-    watching_list     = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
-    completed_list    = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list       = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    random_list       = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').all()
-    dropped_list      = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantowatch_list  = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
+    watching_list    = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
+    completed_list   = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list      = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    random_list      = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').all()
+    dropped_list     = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantowatch_list = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
 
     animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     animes_data = get_list_data(animes_list, ListType.ANIME)
@@ -1466,26 +1487,33 @@ def user_series_table(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
+    # User not found
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
+    # User found == current user
     if user and str(user.id) == current_user.get_id():
         return redirect(url_for('myserieslist_table'))
 
+    # User found == admin
+    if user.id == 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    # Check if user is in the current user's friends list
+    # Admin bypasses private option
     friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
     if user.private:
         if current_user.get_id() == "1":
             pass
         elif friend is None or friend.status != "accepted":
             return redirect(url_for('anonymous'))
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
-    watching_list     = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
-    completed_list    = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list       = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    random_list       = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').all()
-    dropped_list      = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantowatch_list  = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
+    watching_list    = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
+    completed_list   = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list      = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    random_list      = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').all()
+    dropped_list     = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantowatch_list = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
 
     series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     series_data = get_list_data(series_list, ListType.SERIES)
@@ -3072,7 +3100,7 @@ def send_email_update_email(user):
         return False
 
 
-###################################################### CRAWL TEST ######################################################
+######################################################## TEST ##########################################################
 
 
 def crawl_tmdb():
