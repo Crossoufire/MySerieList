@@ -517,7 +517,6 @@ def account_settings():
             db.session.commit()
             app.logger.info('[{}] Settings updated : old username = {}, new username = {}'.format(user.id, old_username,
                                                                                                   user.username))
-
         if form.isprivate.data != user.private:
             old_value = user.private
             user.private = form.isprivate.data
@@ -525,7 +524,6 @@ def account_settings():
             app.logger.info('[{}] Settings updated : old private mode = {}, new private mode = {}'.format(user.id,
                                                                                                           old_value,
                                                                                                           form.isprivate.data))
-
         if user.homepage == HomePage.MYSERIESLIST:
             if form.homepage.data != "msl":
                 old_value = user.homepage

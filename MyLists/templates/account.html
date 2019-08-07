@@ -990,5 +990,9 @@ function show_all_cat() {
     $('#collapse_show').text('Collapse All');
     $('.collapse_all').attr('class', 'collapse_all fas fa-xs fa-chevron-down');
 }
+
+$('#addFriendModal').on('shown.bs.modal', function() {
+    $('#add_friend').focus();
+})
 </script>
 {% endblock %}

@@ -45,11 +45,10 @@ legend {
 
 
 <legend class="font-weight-light text-center mt-4 mb-4">
-    Each grade in hierarchical order &nbsp &nbsp
-    <a class="fas fa-chevron-down" id="hierarchical_arrow" onclick="hide('hierarchical', 'hierarchical_arrow')"></a>
+    Each grade in hierarchical order
     <hr class="mt-2 mb-3">
 </legend>
-<div id="hierarchical" class="container-stats">
+<div class="container-stats">
     <table>
         <thead style="border-bottom: solid 2px grey;">
             <th style="min-width: 100px;" class="text-center">Grade</th>
@@ -328,19 +327,4 @@ legend {
 
 
 {% block script %}
-<!------- Main JS -------->
-<script>
-function hide(category, arrow) {
-    var category = document.getElementById(category);
-    var arrow = document.getElementById(arrow);
-
-    if (category.className === "container-stats"){
-        category.className = "d-none";
-        arrow.className = "fas fa-chevron-right";
-    } else {
-        category.className = "container-stats";
-        arrow.className = "fas fa-chevron-down";
-    }
-}
-</script>
 {% endblock %}

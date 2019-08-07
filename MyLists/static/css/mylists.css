@@ -1,7 +1,5 @@
 
 /* --- General CSS ------------------------------------------------------------------------------ */
-@import url(https://fonts.googleapis.com/css?family=Play);
-
 .bg-dark {
     background-color: #2c3946 !important;
 }
@@ -21,8 +19,6 @@ body {
 main {
   flex: 1 0 auto;
 }
-
-
 /* --- Navigation bar CSS ----------------------------------------------------------------------- */
 
 .nav-item::after {
