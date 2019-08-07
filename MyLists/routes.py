@@ -1322,18 +1322,15 @@ def refresh_all_element():
             time_delta = datetime.utcnow() - last_update
             if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
                 refresh_element_data(anime.anime_id, ListType.ANIME)
-            else:
-                pass
+
     elif element_type == "SERIES":
         series = SeriesList.query.filter_by(user_id=current_user.get_id()).all()
-        for serie in series:
+        for single_serie in series:
             # Check if there is more than 30 min since the last update
-            last_update = Series.query.filter_by(id=series.series_id).first().last_update
+            last_update = Series.query.filter_by(id=single_serie.series_id).first().last_update
             time_delta = datetime.utcnow() - last_update
             if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
-                refresh_element_data(series.series_id, ListType.SERIES)
-            else:
-                pass
+                refresh_element_data(single_serie.series_id, ListType.SERIES)
 
     return '', 204
 
@@ -2031,23 +2028,30 @@ def autocomplete_search_element(element_name, list_type):
 
         # Take only the first 6 results for the autocomplete
         # If there is an anime in the 6 results, loop until the next one
+        # There are 20 results per page
         tmdb_results = []
         i = 0
-        while i < data["total_results"] and i < 6:
-            # genre_ids is a list of types ID
+        while i < data["total_results"] and i < 20 and len(tmdb_results) < 6:
+            # genre_ids : list
             if "genre_ids" in data["results"][i]:
                 genre_ids = data["results"][i]["genre_ids"]
             else:
                 genre_ids = None
 
-            # origin_country is a list of origin countries
+            # origin_country : list
             if "origin_country" in data["results"][i]:
                 origin_country = data["results"][i]["origin_country"]
             else:
                 origin_country = None
 
+            # original_language : string
+            if "original_language" in data["results"][i]:
+                original_language = data["results"][i]["original_language"]
+            else:
+                original_language = None
+
             # To not add animes in the series table, we need to check if it's an anime and it comes from Japan
-            if "JP" in origin_country and 16 in genre_ids:
+            if (16 in genre_ids and "JP" in origin_country) or (16 in genre_ids and original_language == "ja"):
                 i = i+1
                 continue
 
@@ -2069,7 +2073,6 @@ def autocomplete_search_element(element_name, list_type):
             tmdb_results.append(series_data)
             i = i+1
 
-        print(tmdb_results)
         return tmdb_results
 
     elif list_type == ListType.ANIME:
@@ -2099,23 +2102,30 @@ def autocomplete_search_element(element_name, list_type):
 
         # Take only the first 6 results for the autocomplete
         # If there is an series in the 6 results, loop until the next one
+        # There are 20 results per page
         tmdb_results = []
         i = 0
-        while i < data["total_results"] and i < 6:
-            # genre_ids is a list of types ID
+        while i < data["total_results"] and i < 20 and len(tmdb_results) < 6:
+            # genre_ids : list
             if "genre_ids" in data["results"][i]:
                 genre_ids = data["results"][i]["genre_ids"]
             else:
                 genre_ids = None
 
-            # origin_country is a list of origin countries
+            # origin_country : list
             if "origin_country" in data["results"][i]:
                 origin_country = data["results"][i]["origin_country"]
             else:
                 origin_country = None
 
+            # original_language : string
+            if "original_language" in data["results"][i]:
+                original_language = data["results"][i]["original_language"]
+            else:
+                original_language = None
+
             # To add only animes in the anime table, we need to check if it's an anime and it comes from Japan
-            if "JP" in origin_country and 16 in genre_ids:
+            if (16 in genre_ids and "JP" in origin_country) or (16 in genre_ids and original_language == "ja"):
                 anime_data = {
                     "tmdb_id": data["results"][i]["id"],
                     "name": data["results"][i]["name"]

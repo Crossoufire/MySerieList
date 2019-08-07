@@ -361,7 +361,7 @@ body.loading .modal_loading {
 
         {% if element_type == "ANIME" %}
             {% if user_id == current_user.get_id() %}
-            <a class="fas fa-th text-light" href="{{ url_for('myanimelist') }}"></a>
+            <a class="fas fa-th text-light" href="{{ url_for('myanimeslist') }}"></a>
             {% else %}
             <a class="fas fa-th text-light" href="/user/animes/grid/{{ user_name }}"></a>
             {% endif %}
@@ -752,7 +752,7 @@ $(function() {
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
                     {% if element_type == "ANIME" %}
-                        window.location.replace('/myanimelist_table');
+                        window.location.replace('/myanimeslist_table');
                     {% else %}
                         window.location.replace('/myserieslist_table');
                     {% endif %}
@@ -773,7 +773,7 @@ function refreshAll() {
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
             {% if element_type == "ANIME" %}
-                window.location.replace('/myanimelist_table');
+                window.location.replace('/myanimeslist_table');
             {% else %}
                 window.location.replace('/myserieslist_table');
             {% endif %}
@@ -793,7 +793,7 @@ function refresh(element_id) {
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
             {% if element_type == "ANIME" %}
-                window.location.replace('/myanimelist_table');
+                window.location.replace('/myanimeslist_table');
             {% else %}
                 window.location.replace('/myserieslist_table');
             {% endif %}
