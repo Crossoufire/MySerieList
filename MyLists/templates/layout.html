@@ -34,9 +34,9 @@
                 <div class="navbar-brand nav-item dropdown m-r-30">
                     <a class="dropdown-toggle" data-toggle="dropdown" style="color: #ffffffe6;" href="#">MyLists<span class="caret"></span></a>
                     <div class="dropdown-menu bg-dark p-r-0 m-r-0" style="z-index: 101; border: solid; border-color: black; border-width: 1px;">
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('myserieslist') }}"><i class="fas fa-angle-right"></i> MySeriesList</a>
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('myanimeslist') }}"><i class="fas fa-angle-right"></i> MyAnimesList</a>
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mybookslist') }}"><i class="fas fa-angle-right"></i> MyBooksList</a>
+                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('myserieslist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MySeriesList</a>
+                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('myanimeslist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyAnimesList</a>
+                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mybookslist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyBooksList</a>
                     </div>
                 </div>
                 {% else %}
@@ -54,11 +54,11 @@
                     <div class="navbar-nav">
                     {% if current_user.is_authenticated %}
                         {% if current_user.get_id() == '1' %}
-                        <a class="nav-item nav-link" href="{{ url_for('account') }}">{{ current_user.username }}</a>
+                        <a class="nav-item nav-link" href="{{ url_for('account', user_name=current_user.username) }}">{{ current_user.username }}</a>
                         <a class="nav-item nav-link" href="{{ url_for('admin') }}">Administration</a>
                         <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
                         {% else %}
-                        <a class="nav-item nav-link" href="{{ url_for('account') }}">{{ current_user.username }}</a>
+                        <a class="nav-item nav-link" href="{{ url_for('account', user_name=current_user.username) }}">{{ current_user.username }}</a>
                         <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
                         {% endif %}
                     {% else %}

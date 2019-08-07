@@ -217,11 +217,11 @@ def home():
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.get_id()).first()
         if user.homepage == HomePage.MYSERIESLIST:
-            return redirect(url_for('myserieslist'))
+            return redirect(url_for('myserieslist', user_name=current_user.username))
         elif user.homepage == HomePage.MYANIMESLIST:
-            return redirect(url_for('myanimeslist'))
+            return redirect(url_for('myanimeslist', user_name=current_user.username))
         elif user.homepage == HomePage.MYBOOKSLIST:
-            return redirect(url_for('mybookslist'))
+            return redirect(url_for('mybookslist', user_name=current_user.username))
 
     else:
         home_header = url_for('static', filename='img/home_header.jpg')
@@ -239,7 +239,7 @@ def home():
 @app.route("/reset_password", methods=['GET', 'POST'])
 def reset_password():
     if current_user.is_authenticated:
-        return redirect(url_for('myserieslist'))
+        return redirect(url_for('myserieslist', user_name=current_user.username))
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -257,7 +257,7 @@ def reset_password():
 @app.route("/reset_password/<token>", methods=['GET', 'POST'])
 def reset_token(token):
     if current_user.is_authenticated:
-        return redirect(url_for('myserieslist'))
+        return redirect(url_for('myserieslist', user_name=current_user.username))
     user = User.verify_reset_token(token)
     if user is None:
         flash('That is an invalid or expired token', 'warning')
@@ -276,7 +276,7 @@ def reset_token(token):
 @app.route("/register_account/<token>", methods=['GET', 'POST'])
 def register_token(token):
     if current_user.is_authenticated:
-        return redirect(url_for('myserieslist'))
+        return redirect(url_for('myserieslist', user_name=current_user.username))
 
     user = User.verify_reset_token(token)
     if user is None:
@@ -314,105 +314,33 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route("/account", methods=['GET', 'POST'])
+@app.route("/account/<user_name>", methods=['GET', 'POST'])
 @login_required
-def account():
+def account(user_name):
     add_friend_form = AddFriendForm()
     if add_friend_form.validate_on_submit():
-        if str(add_friend_form.add_friend.data) == str(current_user.username):
+        if str(add_friend_form.add_friend.data) == str(user_name):
             flash("You cannot add yourself.", 'info')
-            return redirect(url_for('account'))
-        add_friend(add_friend_form.add_friend.data)
-
-    # Profile picture
-    profile_picture = url_for('static', filename='profile_pics/{0}'.format(current_user.image_file))
-
-    # Friends list
-    friends_list = Friend.query.filter_by(user_id=current_user.get_id()).all()
-    friends_list_data = []
-    for friend in friends_list:
-        friend_data = {}
-        friend_username = User.query.filter_by(id=friend.friend_id).first().username
-        friend_picture = User.query.filter_by(id=friend.friend_id).first().image_file
-        friend_data["username"] = friend_username
-        friend_data["user_id"] = friend.friend_id
-        friend_data["status"] = friend.status
-        friend_data["picture"] = friend_picture
-        friends_list_data.append(friend_data)
-
-    # Series Statistics, scores and level
-    series_stats = get_all_account_stats(current_user.get_id(), ListType.SERIES)
-
-    # Animes Statistics, scores, level, and achievements
-    anime_stats = get_all_account_stats(current_user.get_id(), ListType.ANIME)
-    anime_achievements = get_animes_achievements(current_user.get_id())
-
-    # Books Statistics, scores, and level
-    book_stats = get_all_account_stats(current_user.get_id(), ListType.BOOK)
-
-    # Total level calculation + grade
-    total_level = int(series_stats[3][0]) + int(anime_stats[3][0]) + int(book_stats[3][0])
-    list_total_rank_element = []
-
-    if platform.system() == "Windows":
-        fp = open("{0}".format(os.path.join(app.root_path, "static\\img\\Original\\Ranks_unity.csv")), "r")
-    else:  # Linux & macOS
-        fp = open("{0}".format(os.path.join(app.root_path, "static/img/Original/Ranks_unity.csv")), "r")
-
-    for line in fp:
-        list_total_rank_element.append(line.split(";"))
-    fp.close()
-
-    total_rank_data = []
-    for i in range(0, len(list_total_rank_element)):
-        if str(list_total_rank_element[i][0]) == str(total_level):
-            total_rank_data.append([str(list_total_rank_element[i][1]), str(list_total_rank_element[i][2])])
-
-    if len(total_rank_data) == 0:
-        total_rank_data.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
-
-    user_id = current_user.get_id()
-    user_name = current_user.username
-    return render_template('account.html',
-                           title='Account',
-                           profile_picture=profile_picture,
-                           friends_list_data=friends_list_data,
-                           form=add_friend_form,
-                           series_stats=series_stats,
-                           anime_stats=anime_stats,
-                           book_stats=book_stats,
-                           total_rank_data=total_rank_data,
-                           achievements=anime_achievements,
-                           user_id=user_id,
-                           user_name=user_name)
-
-
-@app.route("/user/account/<user_name>")
-@login_required
-def user_account(user_name):
-    add_friend_form = AddFriendForm()
-    if add_friend_form.validate_on_submit():
-        if str(add_friend_form.add_friend.data) == str(current_user.username):
-            flash("You cannot add yourself.", 'info')
-            return redirect(url_for('account'))
-        add_friend(add_friend_form.add_friend.data)
+        else:
+            add_friend(add_friend_form.add_friend.data)
 
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-    if user and str(user.id) == current_user.get_id():
-        return redirect(url_for('account'))
 
-    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-    if user.private:
-        if current_user.get_id() == "1":
-            pass
-        elif friend is None or friend.status != "accepted":
-            return redirect(url_for('anonymous'))
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+    if str(current_user.get_id()) == str(user.id):
+        pass
+    else:
+        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        if user.id == 1:
+            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+        if user.private:
+            if current_user.get_id() == "1":
+                pass
+            elif friend is None or friend.status != "accepted":
+                return redirect(url_for('anonymous'))
 
     # Profile picture
     profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
@@ -461,13 +389,12 @@ def user_account(user_name):
     if len(total_rank_data) == 0:
         total_rank_data.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
 
-    user_id = user.id
-    user_name = user.username
+    user_id = str(user.id)
     return render_template('account.html',
-                           title='Account',
+                           title="{}'s account".format(user.username),
                            profile_picture=profile_picture,
-                           form=add_friend_form,
                            friends_list_data=friends_list_data,
+                           form=add_friend_form,
                            series_stats=series_stats,
                            anime_stats=anime_stats,
                            book_stats=book_stats,
@@ -609,7 +536,7 @@ def email_update_token(token):
         return redirect(url_for('home'))
 
     if str(user.id) != current_user.get_id():
-        return redirect(url_for('myserieslist'))
+        return redirect(url_for('myserieslist', user_name=current_user.username))
 
     old_email = user.email
     user.email = user.transition_email
@@ -617,7 +544,7 @@ def email_update_token(token):
     db.session.commit()
     app.logger.info('[{}] Email successfully changed from {} to {}'.format(user.id, old_email, user.email))
     flash('Email successfully updated !', 'success')
-    return redirect(url_for('myserieslist'))
+    return redirect(url_for('myserieslist', user_name=current_user.username))
 
 
 @app.route('/change_pass', methods=['GET', 'POST'])
@@ -633,81 +560,6 @@ def change_password():
         return redirect(url_for('account'))
 
     return render_template('change_pass.html', form=form)
-
-
-@app.route("/friend_request", methods=['POST'])
-@login_required
-def friend_request():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data = request.get_json()
-        friend_id = json_data['response']
-        value = json_data['request']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        friend_id = int(friend_id)
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    if value == "accept":
-        # Check if there is an actual pending request
-        user = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id, status="pending").first()
-        if user is None:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-        user.status = 'accepted'
-        db.session.commit()
-
-        user2 = Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id(), status="request").first()
-        if user2 is None:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-        user2.status = 'accepted'
-        db.session.commit()
-        app.logger.info('[{}] Friend request accepted from user with ID {}'.format(current_user.get_id(), friend_id))
-    elif value == "decline":
-        # Check if there is an actual pending request
-        # Otherwise delete the pending request
-        if not Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id, status="pending").delete():
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-        db.session.commit()
-
-        if not Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id(), status="request").delete():
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-        db.session.commit()
-        app.logger.info('[{}] Friend request declined from user with ID {}'.format(current_user.get_id(), friend_id))
-    else:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    return '', 204
-
-
-@app.route('/delete_friend', methods=['POST'])
-@login_required
-def delete_friend():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data = request.get_json()
-        friend_id = json_data['delete']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        friend_id = int(friend_id)
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the friend to delete is in the friend list
-    if Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id).first() is None:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id).delete()
-    Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id()).delete()
-    db.session.commit()
-    app.logger.info('[{}] Friend with ID {} deleted'.format(current_user.get_id(), friend_id))
-    return '', 204
 
 
 @app.route("/hall_of_fame")
@@ -786,6 +638,13 @@ def hall_of_fame():
                            all_data=all_user_data)
 
 
+@app.route("/anonymous")
+@login_required
+def anonymous():
+    image_anonymous = url_for('static', filename='img/anonymous.jpg')
+    return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
+
+
 @app.route("/add_friend_hof", methods=['POST'])
 @login_required
 def add_friend_hof():
@@ -800,98 +659,242 @@ def add_friend_hof():
     return '', 204
 
 
-@app.route("/anonymous")
+@app.route("/friend_request", methods=['POST'])
 @login_required
-def anonymous():
-    image_anonymous = url_for('static', filename='img/anonymous.jpg')
-    return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
+def friend_request():
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        json_data = request.get_json()
+        friend_id = json_data['response']
+        value = json_data['request']
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the inputs are digits
+    try:
+        friend_id = int(friend_id)
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    if value == "accept":
+        # Check if there is an actual pending request
+        user = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id, status="pending").first()
+        if user is None:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+        user.status = 'accepted'
+        db.session.commit()
+
+        user2 = Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id(), status="request").first()
+        if user2 is None:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+        user2.status = 'accepted'
+        db.session.commit()
+        app.logger.info('[{}] Friend request accepted from user with ID {}'.format(current_user.get_id(), friend_id))
+    elif value == "decline":
+        # Check if there is an actual pending request
+        # Otherwise delete the pending request
+        if not Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id, status="pending").delete():
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+        db.session.commit()
+
+        if not Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id(), status="request").delete():
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+        db.session.commit()
+        app.logger.info('[{}] Friend request declined from user with ID {}'.format(current_user.get_id(), friend_id))
+    else:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    return '', 204
+
+
+@app.route('/delete_friend', methods=['POST'])
+@login_required
+def delete_friend():
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        json_data = request.get_json()
+        friend_id = json_data['delete']
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the inputs are digits
+    try:
+        friend_id = int(friend_id)
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the friend to delete is in the friend list
+    if Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id).delete()
+    Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id()).delete()
+    db.session.commit()
+    app.logger.info('[{}] Friend with ID {} deleted'.format(current_user.get_id(), friend_id))
+    return '', 204
 
 
 ##################################################### Anime/Serie routes ###############################################
 
 
-@app.route("/myanimeslist", methods=['GET', 'POST'])
+@app.route("/animeslist/<user_name>", methods=['GET', 'POST'])
 @login_required
-def myanimeslist():
-    watching_list     = AnimeList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').all()
-    completed_list    = AnimeList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
-    onhold_list       = AnimeList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
-    random_list       = AnimeList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').all()
-    dropped_list      = AnimeList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').all()
-    plantowatch_list  = AnimeList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').all()
+def myanimeslist(user_name):
+    image_error = url_for('static', filename='img/error.jpg')
+    user = User.query.filter_by(username=user_name).first()
+
+    if user is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
+    if str(current_user.get_id()) == str(user.id):
+        pass
+    else:
+        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        if user.id == 1:
+            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+        if user.private:
+            if current_user.get_id() == "1":
+                pass
+            elif friend is None or friend.status != "accepted":
+                return redirect(url_for('anonymous'))
+
+    watching_list     = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
+    completed_list    = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list       = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    random_list       = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').all()
+    dropped_list      = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantowatch_list  = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
 
     animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     animes_data = get_list_data(animes_list, ListType.ANIME)
     element_type = "ANIME"
-    user_id = current_user.get_id()
+    user_id = str(user.id)
     return render_template('mymedialist.html',
-                           title='MyAnimeList',
+                           title="{}'s AnimesList".format(user_name),
                            all_data=animes_data,
                            element_type=element_type,
-                           user_id=user_id)
+                           user_id=user_id,
+                           user_name=user_name)
 
 
-@app.route("/myserieslist", methods=['GET', 'POST'])
+@app.route("/serieslist/<user_name>", methods=['GET', 'POST'])
 @login_required
-def myserieslist():
-    watching_list     = SeriesList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').all()
-    completed_list    = SeriesList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
-    onhold_list       = SeriesList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
-    random_list       = SeriesList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').all()
-    dropped_list      = SeriesList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').all()
-    plantowatch_list  = SeriesList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').all()
+def myserieslist(user_name):
+    image_error = url_for('static', filename='img/error.jpg')
+    user = User.query.filter_by(username=user_name).first()
+
+    if user is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
+    if str(current_user.get_id()) == str(user.id):
+        pass
+    else:
+        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        if user.id == 1:
+            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+        if user.private:
+            if current_user.get_id() == "1":
+                pass
+            elif friend is None or friend.status != "accepted":
+                return redirect(url_for('anonymous'))
+
+    watching_list     = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
+    completed_list    = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list       = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    random_list       = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').all()
+    dropped_list      = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantowatch_list  = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
 
     series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     series_data = get_list_data(series_list, ListType.SERIES)
     element_type = "SERIES"
-    user_id = current_user.get_id()
+    user_id = str(user.id)
     return render_template('mymedialist.html',
-                           title='MySeriesList',
+                           title="{}'s SeriesList".format(user_name),
                            all_data=series_data,
                            element_type=element_type,
-                           user_id=user_id)
+                           user_id=user_id,
+                           user_name=user_name)
 
 
-@app.route("/myanimeslist_table", methods=['GET', 'POST'])
+@app.route("/animeslist/table/<user_name>", methods=['GET', 'POST'])
 @login_required
-def myanimeslist_table():
-    watching_list    = AnimeList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').all()
-    completed_list   = AnimeList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
-    onhold_list      = AnimeList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
-    random_list      = AnimeList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').all()
-    dropped_list     = AnimeList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').all()
-    plantowatch_list = AnimeList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').all()
+def myanimeslist_table(user_name):
+    image_error = url_for('static', filename='img/error.jpg')
+    user = User.query.filter_by(username=user_name).first()
+
+    if user is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
+    if str(current_user.get_id()) == str(user.id):
+        pass
+    else:
+        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        if user.id == 1:
+            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+        if user.private:
+            if current_user.get_id() == "1":
+                pass
+            elif friend is None or friend.status != "accepted":
+                return redirect(url_for('anonymous'))
+
+    watching_list    = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
+    completed_list   = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list      = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    random_list      = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').all()
+    dropped_list     = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantowatch_list = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
 
     animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     animes_data = get_list_data(animes_list, ListType.ANIME)
     element_type = "ANIME"
-    user_id = current_user.get_id()
+    user_id = str(user.id)
     return render_template('mymedialist_table.html',
-                           title='MyAnimeList',
+                           title="{}'s AnimeList".format(user_name),
                            all_data=animes_data,
                            element_type=element_type,
-                           user_id=user_id)
+                           user_id=user_id,
+                           user_name=user_name)
 
 
-@app.route("/myserieslist_table", methods=['GET', 'POST'])
+@app.route("/serieslist/table/<user_name>", methods=['GET', 'POST'])
 @login_required
-def myserieslist_table():
-    watching_list    = SeriesList.query.filter_by(user_id=current_user.get_id(), status='WATCHING').all()
-    completed_list   = SeriesList.query.filter_by(user_id=current_user.get_id(), status='COMPLETED').all()
-    onhold_list      = SeriesList.query.filter_by(user_id=current_user.get_id(), status='ON_HOLD').all()
-    random_list      = SeriesList.query.filter_by(user_id=current_user.get_id(), status='RANDOM').all()
-    dropped_list     = SeriesList.query.filter_by(user_id=current_user.get_id(), status='DROPPED').all()
-    plantowatch_list = SeriesList.query.filter_by(user_id=current_user.get_id(), status='PLAN_TO_WATCH').all()
+def myserieslist_table(user_name):
+    image_error = url_for('static', filename='img/error.jpg')
+    user = User.query.filter_by(username=user_name).first()
+
+    if user is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
+    if str(current_user.get_id()) == str(user.id):
+        pass
+    else:
+        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        if user.id == 1:
+            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+        if user.private:
+            if current_user.get_id() == "1":
+                pass
+            elif friend is None or friend.status != "accepted":
+                return redirect(url_for('anonymous'))
+
+    watching_list    = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
+    completed_list   = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
+    onhold_list      = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
+    random_list      = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').all()
+    dropped_list     = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').all()
+    plantowatch_list = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
 
     series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     series_data = get_list_data(series_list, ListType.SERIES)
     element_type = "SERIES"
-    user_id = current_user.get_id()
+    user_id = str(user.id)
     return render_template('mymedialist_table.html',
-                           title='MySeriesList',
+                           title="{}'s SeriesList".format(user_name),
                            all_data=series_data,
                            element_type=element_type,
-                           user_id=user_id)
+                           user_id=user_id,
+                           user_name=user_name)
 
 
 @app.route('/update_element_season', methods=['POST'])
@@ -1335,194 +1338,6 @@ def refresh_all_element():
     return '', 204
 
 
-@app.route("/user/animes/grid/<user_name>")
-@login_required
-def user_animes_grid(user_name):
-    image_error = url_for('static', filename='img/error.jpg')
-    user = User.query.filter_by(username=user_name).first()
-
-    # User not found
-    if user is None:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-
-    # User found == current user
-    if str(user.id) == current_user.get_id():
-        return redirect(url_for('myanimeslist'))
-
-    # User found == admin
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-
-    # Check if user is in the current user's friends list
-    # Admin bypasses private option
-    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-    if user.private:
-        if current_user.get_id() == "1":
-            pass
-        elif friend is None or friend.status != "accepted":
-            return redirect(url_for('anonymous'))
-
-    watching_list    = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
-    completed_list   = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list      = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    random_list      = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').all()
-    dropped_list     = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantowatch_list = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
-
-    animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-    animes_data = get_list_data(animes_list, ListType.ANIME)
-    user_id = user.id
-    user_name = user.username
-    element_type = "ANIME"
-    return render_template('mymedialist.html',
-                           title='{}\'s list'.format(user.username),
-                           all_data=animes_data,
-                           user_id=user_id,
-                           user_name=user_name,
-                           element_type=element_type)
-
-
-@app.route("/user/series/grid/<user_name>")
-@login_required
-def user_series_grid(user_name):
-    image_error = url_for('static', filename='img/error.jpg')
-    user = User.query.filter_by(username=user_name).first()
-
-    # User not found
-    if user is None:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-
-    # User found == current user
-    if str(user.id) == current_user.get_id():
-        return redirect(url_for('myserieslist'))
-
-    # User found == admin
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-
-    # Check if user is in the current user's friends list
-    # Admin bypasses private option
-    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-    if user.private:
-        if current_user.get_id() == "1":
-            pass
-        elif friend is None or friend.status != "accepted":
-            return redirect(url_for('anonymous'))
-
-    watching_list    = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
-    completed_list   = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list      = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    random_list      = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').all()
-    dropped_list     = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantowatch_list = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
-
-    series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-    series_data = get_list_data(series_list, ListType.SERIES)
-    user_id = user.id
-    user_name = user.username
-    element_type = "SERIES"
-    return render_template('mymedialist.html',
-                           title='{}\'s list'.format(user.username),
-                           all_data=series_data,
-                           user_id=user_id,
-                           user_name=user_name,
-                           element_type=element_type)
-
-
-@app.route("/user/animes/table/<user_name>")
-@login_required
-def user_animes_table(user_name):
-    image_error = url_for('static', filename='img/error.jpg')
-    user = User.query.filter_by(username=user_name).first()
-
-    # User not found
-    if user is None:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-
-    # User found == current user
-    if str(user.id) == current_user.get_id():
-        return redirect(url_for('myanimeslist_table'))
-
-    # User found == admin
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-
-    # Check if user is in the current user's friends list
-    # Admin bypasses private option
-    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-    if user.private:
-        if current_user.get_id() == "1":
-            pass
-        elif friend is None or friend.status != "accepted":
-            return redirect(url_for('anonymous'))
-
-    watching_list    = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
-    completed_list   = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list      = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    random_list      = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').all()
-    dropped_list     = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantowatch_list = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
-
-    animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-    animes_data = get_list_data(animes_list, ListType.ANIME)
-    user_id = user.id
-    user_name = user.username
-    element_type = "ANIME"
-    return render_template('mymedialist_table.html',
-                           title='{}\'s list'.format(user.username),
-                           all_data=animes_data,
-                           user_id=user_id,
-                           user_name=user_name,
-                           element_type=element_type)
-
-
-@app.route("/user/series/table/<user_name>")
-@login_required
-def user_series_table(user_name):
-    image_error = url_for('static', filename='img/error.jpg')
-    user = User.query.filter_by(username=user_name).first()
-
-    # User not found
-    if user is None:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-
-    # User found == current user
-    if user and str(user.id) == current_user.get_id():
-        return redirect(url_for('myserieslist_table'))
-
-    # User found == admin
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-
-    # Check if user is in the current user's friends list
-    # Admin bypasses private option
-    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-    if user.private:
-        if current_user.get_id() == "1":
-            pass
-        elif friend is None or friend.status != "accepted":
-            return redirect(url_for('anonymous'))
-
-    watching_list    = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
-    completed_list   = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list      = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    random_list      = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').all()
-    dropped_list     = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantowatch_list = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
-
-    series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-    series_data = get_list_data(series_list, ListType.SERIES)
-    user_id = user.id
-    user_name = user.username
-    element_type = "SERIES"
-    return render_template('mymedialist_table.html',
-                           title='{}\'s list'.format(user.username),
-                           all_data=series_data,
-                           user_id=user_id,
-                           user_name=user_name,
-                           element_type=element_type)
-
-
 @app.route('/add_element', methods=['POST'])
 @login_required
 def add_element():
@@ -1624,68 +1439,26 @@ def autocomplete_series():
 ###################################################### Books Routes ####################################################
 
 
-@app.route("/mybookslist", methods=['GET', 'POST'])
+@app.route("/bookslist/<user_name>", methods=['GET', 'POST'])
 @login_required
-def mybookslist():
-    reading_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.READING).all()
-    completed_list  = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.COMPLETED).all()
-    onhold_list     = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.ON_HOLD).all()
-    dropped_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.DROPPED).all()
-    plantoread_list = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.PLAN_TO_READ).all()
-
-    book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
-    book_data = get_list_data(book_list, ListType.BOOK)
-    user_id = current_user.get_id()
-    return render_template('mybookslist.html',
-                           title='MyBooksList',
-                           user_id=user_id,
-                           all_data=book_data)
-
-
-@app.route("/mybookslist_table", methods=['GET', 'POST'])
-@login_required
-def mybookslist_table():
-    reading_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.READING).all()
-    completed_list  = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.COMPLETED).all()
-    onhold_list     = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.ON_HOLD).all()
-    dropped_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.DROPPED).all()
-    plantoread_list = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.PLAN_TO_READ).all()
-
-    book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
-    book_data = get_list_data(book_list, ListType.BOOK)
-    user_id = current_user.get_id()
-    return render_template('mybookslist_table.html',
-                           title='MyBooksList',
-                           user_id=user_id,
-                           all_data=book_data)
-
-
-@app.route("/user/books/grid/<user_name>", methods=['GET'])
-@login_required
-def user_bookslist_grid(user_name):
+def mybookslist(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
-    # User not found
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    # User found == current user
-    if str(user.id) == current_user.get_id():
-        return redirect(url_for('mybookslist'))
-
-    # User found == admin
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-
-    # Check if user is in the current user's friends list
-    # Admin bypasses private option
-    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-    if user.private:
-        if current_user.get_id() == "1":
-            pass
-        elif friend is None or friend.status != "accepted":
-            return redirect(url_for('anonymous'))
+    if str(current_user.get_id()) == str(user.id):
+        pass
+    else:
+        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        if user.id == 1:
+            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+        if user.private:
+            if current_user.get_id() == "1":
+                pass
+            elif friend is None or friend.status != "accepted":
+                return redirect(url_for('anonymous'))
 
     reading_list    = BookList.query.filter_by(user_id=user.id, status=BookStatus.READING).all()
     completed_list  = BookList.query.filter_by(user_id=user.id, status=BookStatus.COMPLETED).all()
@@ -1695,57 +1468,49 @@ def user_bookslist_grid(user_name):
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
-    user_id = user.id
-    user_name = user.username
+    user_id = str(user.id)
     return render_template('mybookslist.html',
-                           title='MyBooksList',
+                           title="{}'s BooksList".format(user_name),
                            user_id=user_id,
-                           user_name=user_name,
-                           all_data=book_data)
+                           all_data=book_data,
+                           user_name=user_name)
 
 
-@app.route("/user/books/table/<user_name>", methods=['GET'])
+@app.route("/bookslist/table/<user_name>", methods=['GET', 'POST'])
 @login_required
-def user_bookslist_table(user_name):
+def mybookslist_table(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
-    # User not found
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    # User found == current user
-    if str(user.id) == current_user.get_id():
-        return redirect(url_for('mybookslist'))
+    if str(current_user.get_id()) == str(user.id):
+        pass
+    else:
+        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        if user.id == 1:
+            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+        if user.private:
+            if current_user.get_id() == "1":
+                pass
+            elif friend is None or friend.status != "accepted":
+                return redirect(url_for('anonymous'))
 
-    # User found == admin
-    if user.id == 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-
-    # Check if user is in the current user's friends list
-    # Admin bypasses private option
-    friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-    if user.private:
-        if current_user.get_id() == "1":
-            pass
-        elif friend is None or friend.status != "accepted":
-            return redirect(url_for('anonymous'))
-
-    reading_list    = BookList.query.filter_by(user_id=user.id, status=BookStatus.READING).all()
-    completed_list  = BookList.query.filter_by(user_id=user.id, status=BookStatus.COMPLETED).all()
-    onhold_list     = BookList.query.filter_by(user_id=user.id, status=BookStatus.ON_HOLD).all()
-    dropped_list    = BookList.query.filter_by(user_id=user.id, status=BookStatus.DROPPED).all()
-    plantoread_list = BookList.query.filter_by(user_id=user.id, status=BookStatus.PLAN_TO_READ).all()
+    reading_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.READING).all()
+    completed_list  = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.COMPLETED).all()
+    onhold_list     = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.ON_HOLD).all()
+    dropped_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.DROPPED).all()
+    plantoread_list = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.PLAN_TO_READ).all()
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
-    user_id = user.id
-    user_name = user.username
+    user_id = str(user.id)
     return render_template('mybookslist_table.html',
-                           title='MyBooksList',
+                           title="{}'s BooksList".format(user_name),
                            user_id=user_id,
-                           user_name=user_name,
-                           all_data=book_data)
+                           all_data=book_data,
+                           user_name=user_name)
 
 
 @app.route('/delete_book', methods=['POST'])
@@ -2174,14 +1939,15 @@ def autocomplete_search_element(element_name, list_type):
 
         return google_results
 
+
 def add_element(element_id, list_type):
     if element_id == "":
         if list_type == ListType.SERIES:
-            return redirect(url_for('myserieslist'))
+            return redirect(url_for('myserieslist', user_name=current_user.username))
         elif list_type == ListType.ANIME:
-            return redirect(url_for('myanimeslist'))
+            return redirect(url_for('myanimeslist', user_name=current_user.username))
         elif list_type == ListType.BOOK:
-            return redirect(url_for('mybookslist'))
+            return redirect(url_for('mybookslist', user_name=current_user.username))
 
     # Check if the ID element exist in the database
     if list_type == ListType.SERIES:
@@ -2228,7 +1994,7 @@ def add_element(element_id, list_type):
 
             series_id = add_element_in_base(series_data, cover_id, ListType.SERIES)
             add_element_to_user(series_id, int(current_user.get_id()), list_type)
-            return redirect(url_for('myserieslist'))
+            return redirect(url_for('myserieslist', user_name=current_user.username))
 
         elif list_type == ListType.ANIME:
             anime_data = get_element_data_from_api(element_id, ListType.ANIME)
@@ -2243,7 +2009,7 @@ def add_element(element_id, list_type):
 
             anime_id = add_element_in_base(anime_data, cover_id, list_type)
             add_element_to_user(anime_id, int(current_user.get_id()), list_type)
-            return redirect(url_for('myanimeslist'))
+            return redirect(url_for('myanimeslist', user_name=current_user.username))
 
         elif list_type == ListType.BOOK:
             book_data = get_element_data_from_api(element_id, ListType.BOOK)
@@ -2259,7 +2025,7 @@ def add_element(element_id, list_type):
 
             book_id = add_element_in_base(book_data, cover_id, list_type)
             add_element_to_user(book_id, int(current_user.get_id()), list_type)
-            return redirect(url_for('mybookslist'))
+            return redirect(url_for('mybookslist', user_name=current_user.username))
 
 
 def get_element_data_from_api(api_id, list_type):

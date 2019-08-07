@@ -363,18 +363,10 @@ body.loading .modal_loading {
 
         <span class="m-l-5 m-r-5 text-light">||</span>
         {% if element_type == "ANIME" %}
-            {% if user_id == current_user.get_id() %}
-            <a class="fas fa-th text-light" href="{{ url_for('myanimeslist_table') }}"></a>
-            {% else %}
-            <a class="fas fa-th text-light" href="/user/animes/table/{{ user_name }}"></a>
-            {% endif %}
+            <a class="fas fa-bars text-light" href="{{ url_for('myanimeslist_table', user_name=user_name) }}"></a>
         <span class="m-r-5 text-light">Table View</span>
         {% elif element_type == "SERIES" %}
-            {% if user_id == current_user.get_id() %}
-            <a class="fas fa-th text-light" href="{{ url_for('myserieslist_table') }}"></a>
-            {% else %}
-            <a class="fas fa-th text-light" href="/user/series/table/{{ user_name }}"></a>
-            {% endif %}
+            <a class="fas fa-bars text-light" href="{{ url_for('myserieslist_table', user_name=user_name) }}"></a>
         <span class="m-r-5 text-light">Table View</span>
         {% endif %}
     </div>
@@ -693,9 +685,9 @@ $(function() {
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
                     {% if element_type == "ANIME" %}
-                        window.location.replace('/myanimeslist');
+                        window.location.replace('/animeslist/{{ current_user.username }}');
                     {% elif element_type == "SERIES" %}
-                        window.location.replace('/myserieslist');
+                        window.location.replace('/serieslist/{{ current_user.username }}');
                     {% endif %}
                 }
             });
@@ -715,9 +707,9 @@ function refreshAll() {
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
             {% if element_type == "ANIME" %}
-                window.location.replace('/myanimeslist');
+                window.location.replace('/animeslist/{{ current_user.username }}');
             {% elif element_type == "SERIES" %}
-                window.location.replace('/myserieslist');
+                window.location.replace('/serieslist/{{ current_user.username }}');
             {% endif %}
         }
     });
@@ -735,9 +727,9 @@ function refresh(element_id) {
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
             {% if element_type == "ANIME" %}
-                window.location.replace('/myanimeslist');
+                window.location.replace('/animeslist/{{ current_user.username }}');
             {% elif element_type == "SERIES" %}
-                window.location.replace('/myserieslist');
+                window.location.replace('/serieslist/{{ current_user.username }}');
             {% endif %}
         }
     });

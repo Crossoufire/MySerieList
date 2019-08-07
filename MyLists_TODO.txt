@@ -23,6 +23,7 @@ DONE
 	Remove duplicates of the auto-complete
 	Remove "Local" and "Online" categories of the autocomplete (merge in one)
 	On login/register click focus on the modal
+	On add friend (/account) click focus on the modal
 	Add fixed top bar
 	Add Books list
 	Add jQuery auto-complete with pictures from local + online databases

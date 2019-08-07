@@ -349,7 +349,7 @@ hr {
                 <h4 class="mt-0 account-heading username">{{ user_name }}'s profile</h4>
                 {% endif %}
                 <span style="font-size: 14pt;">Knowledge level:&nbsp&nbsp</span>
-                <img height='64' width='64' data-toggle="tooltip" title="{{ total_rank_data[0][1] }}" src="static/img/Original/{{ total_rank_data[0][0] }}.png"/>
+                <img height='64' width='64' data-toggle="tooltip" title="{{ total_rank_data[0][1] }}" src="/static/img/Original/{{ total_rank_data[0][0] }}.png"/>
             </div>
             <div class="ml-auto bd-highlight">
                 {% if user_id == current_user.get_id() %}
@@ -443,13 +443,13 @@ hr {
         <hr class="mt-2 mb-3">
             <div class="row text-center">
                 <div class="col">
-                    <a class="btn btn-primary" href="/user/series/grid/{{ user_name }}">SeriesList</a>
+                    <a class="btn btn-primary" href="/serieslist/{{ user_name }}">SeriesList</a>
                 </div>
                 <div class="col">
-                    <a class="btn btn-primary" href="/user/animes/grid/{{ user_name }}">AnimesList</a>
+                    <a class="btn btn-primary" href="/animeslist/{{ user_name }}">AnimesList</a>
                 </div>
                 <div class="col">
-                    <a class="btn btn-primary" href="/user/books/grid/{{ user_name }}">BooksList</a>
+                    <a class="btn btn-primary" href="/bookslist/{{ user_name }}">BooksList</a>
                 </div>
             </div>
         {% endif %}
@@ -473,7 +473,7 @@ hr {
                     {% if friend['status'] == "pending" %}
                         {% if user_id == current_user.get_id() %}
                         <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
-                            <a href="/user/account/{{ friend['username'] }}">
+                            <a href="/account/{{ friend['username'] }}">
                                 <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
                             </a>
                             <br>
@@ -486,7 +486,7 @@ hr {
                     {% elif friend['status'] == "request" %}
                         {% if user_id == current_user.get_id() %}
                         <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
-                            <a href="/user/account/{{ friend['username'] }}">
+                            <a href="/account/{{ friend['username'] }}">
                                 <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
                             </a>
                             <br>
@@ -501,7 +501,7 @@ hr {
                     {% else %}
                         <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
                             {% if user_id == current_user.get_id() %}
-                            <a href="/user/account/{{ friend['username'] }}">
+                            <a href="/account/{{ friend['username'] }}">
                                 <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
                             </a>
                             <br>
@@ -509,7 +509,7 @@ hr {
                             <br>
                             <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}', '{{ friend['username'] }}')"></a>
                             {% else %}
-                            <a href="/user/account/{{ friend['username'] }}">
+                            <a href="/account/{{ friend['username'] }}">
                                 <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
                             </a>
                             <br>
@@ -906,7 +906,7 @@ function friend_request(friend_id, value) {
         data: JSON.stringify({response: friend_id, request: value }),
         dataType: "json",
         success: function(response) {
-            window.location.replace('/account'); }
+            window.location.replace('/account/{{ current_user.username }}'); }
     });
 }
 </script>

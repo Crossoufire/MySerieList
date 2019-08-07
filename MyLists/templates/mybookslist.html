@@ -362,11 +362,7 @@ body.loading .modal_loading {
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
-        {% if user_id == current_user.get_id() %}
-        <a class="fas fa-bars text-light" href="{{ url_for('mybookslist_table') }}"></a>
-        {% else %}
-        <a class="fas fa-bars text-light" href="/user/books/table/{{ user_name }}"></a>
-        {% endif %}
+        <a class="fas fa-bars text-light" href="{{ url_for('mybookslist_table', user_name=user_name) }}"></a>
         <span class="m-r-5 text-light">Table View</span>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
@@ -614,7 +610,7 @@ $(function() {
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
-                    window.location.replace('/mybookslist'); }
+                    window.location.replace('/bookslist/{{ current_user.username }}'); }
             });
         }
     });
@@ -629,7 +625,7 @@ function refreshAll() {
         url: "/refresh_all_book",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            window.location.replace('/mybookslist'); }
+            window.location.replace('/bookslist/{{ current_user.username }}'); }
     });
 }
 
