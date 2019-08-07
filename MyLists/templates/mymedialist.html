@@ -459,7 +459,7 @@ body.loading .modal_loading {
                     </div>
                     {% if user_id == current_user.get_id() %}
                     <a class="btn_left fas fa-bars text-light" data-toggle="modal" data-target="#modal_cat{{ data['id'] }}"></a>
-                    <a class="btn_right fas fa-ban text-light" onclick="delete_element('{{ data['id'] }}', 'card_{{ data['id'] }}')"></a>
+                    <a class="btn_right fas fa-ban text-light" onclick="delete_element('{{ data['id'] }}', 'card_{{ data['id'] }}', '{{ data['name'] }}')"></a>
                     {% endif %}
                     <a class="btn_bottom fas fa-caret-square-down" onclick="show_score('footer_{{ data['id'] }}', card_{{ data['id'] }})" style="z-index: 500;"></a>
                 </div>
@@ -569,7 +569,7 @@ body.loading .modal_loading {
                             {% if data['can_update'] %}
                             <a style="background-color: #4d0000;" data-dismiss="modal" class="list-group-item modded" onclick="refresh('{{ data['id'] }}')">Refresh metadata</a>
                             {% else %}
-                            <a style="background-color: grey;" data-dismiss="modal" class="disabled list-group-item modded" onclick="refresh('{{ data['id'] }}')">Refresh metadata</a>
+                            <a style="background-color: grey;" data-dismiss="modal" class="disabled list-group-item modded" >Refresh metadata</a>
                             {% endif %}
                         </div>
                     </div>
@@ -631,18 +631,11 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
         $.each(items, function(index, item) {
             var li;
 
-            if (item.category === "False") {
-                var a = "Sorry, no results found..."
+            if (item.nb_results === 0) {
+                var a = "No results found"
                 ul.append("<li class='disabled'>" + a + "</li>");
             } else {
-                if (item.category != currentCategory) {
-                    ul.append("<li class='ui-autocomplete-category'>" + item.category + "</li>");
-                    currentCategory = item.category;
-                }
                 li = that._renderItemData(ul, item);
-                if (item.category) {
-                    li.attr("aria-label", item.category + " : " + item.value);
-                }
             }
         });
     },
@@ -651,13 +644,13 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
 			$img = $('<img>');
 
 		$img.attr({
-		  src: item.label,
-		  alt: item.value,
-		  style: "width: 34px; height: 51px;"
+		    src: item.poster_path,
+		    alt: item.name,
+		    style: "width: 34px; height: 51px;"
 		});
 
 		$li.append('<a class="list-group-item bg-dark text-light">');
-		$li.find('a').append($img).append(" "+item.value);
+		$li.find('a').append($img).append(" "+item.name);
 
 		return $li.appendTo(ul);
 	}
@@ -665,8 +658,8 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
 
 $(function() {
     $("#autocomplete").catcomplete({
-      delay: 500,
-      source: function(request, response) {
+        delay: 500,
+        source: function(request, response) {
             {% if element_type == "ANIME" %}
                 $.getJSON("{{url_for('autocomplete_animes')}}",{
                     q: request.term,
@@ -675,7 +668,7 @@ $(function() {
                         response(data.matching_results);
                     }
                 );
-            {% else %}
+            {% elif element_type == "SERIES" %}
                 $.getJSON("{{url_for('autocomplete_series')}}",{
                     q: request.term,
                 },
@@ -684,24 +677,24 @@ $(function() {
                     }
                 );
             {% endif %}
-		},
+	    },
 		minLength: 1,
         select: function(event, ui) {
-            $("#autocomplete").val(ui.item.value);
-            $("#element_id").val(ui.item.id);
+            $("#autocomplete").val(ui.item.name);
+            $("#element_id").val(ui.item.tmdb_id);
 
             $body = $("body");
             $.ajax ({
                 type: "POST",
                 url: "/add_element",
                 contentType: "application/json",
-                data: JSON.stringify({element_id: ui.item.id, element_type: '{{ element_type }}' }),
+                data: JSON.stringify({element_id: ui.item.tmdb_id, element_type: '{{ element_type }}' }),
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
                     {% if element_type == "ANIME" %}
                         window.location.replace('/myanimeslist');
-                    {% else %}
+                    {% elif element_type == "SERIES" %}
                         window.location.replace('/myserieslist');
                     {% endif %}
                 }
@@ -722,7 +715,7 @@ function refreshAll() {
         success: function(response) {
             {% if element_type == "ANIME" %}
                 window.location.replace('/myanimelist');
-            {% else %}
+            {% elif element_type == "SERIES" %}
                 window.location.replace('/myserieslist');
             {% endif %}
         }
@@ -742,7 +735,7 @@ function refresh(element_id) {
         success: function(response) {
             {% if element_type == "ANIME" %}
                 window.location.replace('/myanimelist');
-            {% else %}
+            {% elif element_type == "SERIES" %}
                 window.location.replace('/myserieslist');
             {% endif %}
         }
@@ -930,8 +923,8 @@ function changeCategory(element_id, new_category, card_id, mod_id, seas_drop_id,
 }
 
 
-function delete_element(element_id, card_id) {
-    if (!confirm("Do you want to delete")){
+function delete_element(element_id, card_id, element_name) {
+    if (!confirm("Do you want to delete " + element_name + " from your list ?")){
         return false;
     }
     $("#"+card_id).remove();

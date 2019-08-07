@@ -1539,6 +1539,10 @@ def add_element():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
+    list_type = ["SERIES", "ANIME"]
+    if element_type not in list_type:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
     if element_type == "ANIME":
         add_element(element_id, ListType.ANIME)
     elif element_type == "SERIES":
@@ -2002,224 +2006,165 @@ def get_list_count(user_id, list_type):
 
 
 def autocomplete_search_element(element_name, list_type):
-    if list_type == ListType.SERIES:
-        autocomplete_local_results = Series.query.filter(Series.name.like("%{0}%".format(element_name))).all()
-        cover_url = url_for('static', filename="series_covers/")
-    elif list_type == ListType.ANIME:
-        autocomplete_local_results = Anime.query.filter(Anime.name.like("%{0}%".format(element_name))).all()
-        cover_url = url_for('static', filename="animes_covers/")
-    elif list_type == ListType.BOOK:
-        autocomplete_local_results = Book.query.filter(Book.title.like("%{0}%".format(element_name))).all()
-        cover_url = url_for('static', filename="books_covers/")
 
     if list_type == ListType.SERIES:
-        local_results = []
-        for i in range(5):
+        while True:
             try:
-                tmp = {"id": "{0}".format(autocomplete_local_results[i].id),
-                       "value": "{0}".format(autocomplete_local_results[i].name),
-                       "category": "Local Database",
-                       "label": "..{0}{1}".format(cover_url, autocomplete_local_results[i].image_cover)}
-                local_results.append(tmp)
+                response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
+                                        .format(themoviedb_api_key, element_name))
             except:
-                pass
-
-        if len(local_results) >= 3:
-            return local_results
-
-        else:
-            while True:
-                try:
-                    response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
-                                            .format(themoviedb_api_key, element_name))
-                except:
-                    return None
-
-                if response.status_code == 401:
-                    app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-                    return None
-                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
-
-                if response.headers["X-RateLimit-Remaining"] == "0":
-                    app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-                    time.sleep(3)
-                else:
-                    break
-
-            data = json.loads(response.text)
-            if data["total_results"] == 0:
-                if len(local_results) == 0:
-                    return [{"category": "False"}]
-                else:
-                    return local_results
-            else:
-                tmdb_results = []
-                for i in range(8):
-                    try:
-                        genre_id = data["results"][i]["genre_ids"]
-                        country = data["results"][i]["origin_country"][0]
-
-                        if 16 in genre_id:
-                            if "JP" in country:
-                                pass
-                            else:
-                                if data["results"][i]["poster_path"] is None:
-                                    data["results"][i]["poster_path"] = url_for('static', filename="series_covers/default.jpg")
-                                else:
-                                    url = "http://image.tmdb.org/t/p/w300/"
-                                    tmp = {"id": "{0}".format(data['results'][i]['id']),
-                                           "value": "{0}".format(data["results"][i]["name"]),
-                                           "category": "Online API Database",
-                                           "label": "{0}{1}".format(url, data["results"][i]["poster_path"])}
-                                tmdb_results.append(tmp)
-                        else:
-                            if data["results"][i]["poster_path"] is None:
-                                data["results"][i]["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
-                            else:
-                                url = "http://image.tmdb.org/t/p/w300/"
-                                tmp = {"id": "{0}".format(data['results'][i]['id']),
-                                       "value": "{0}".format(data["results"][i]["name"]),
-                                       "category": "Online API Database",
-                                       "label": "{0}{1}".format(url, data["results"][i]["poster_path"])}
-                            tmdb_results.append(tmp)
-                    except:
-                        pass
-                all_results = local_results + tmdb_results
-                return all_results
-
-    elif list_type == ListType.ANIME:
-        local_results = []
-        for i in range(5):
-            try:
-                tmp = {"id": "{0}".format(autocomplete_local_results[i].id),
-                       "value": "{0}".format(autocomplete_local_results[i].name),
-                       "category": "Local Database",
-                       "label": "..{0}{1}".format(cover_url, autocomplete_local_results[i].image_cover)}
-                local_results.append(tmp)
-            except:
-                pass
-
-        if len(local_results) >= 3:
-            return local_results
-
-        else:
-            while True:
-                try:
-                    response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
-                                            .format(themoviedb_api_key, element_name))
-                except:
-                    return None
-
-                if response.status_code == 401:
-                    app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-                    return None
-                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
-
-                if response.headers["X-RateLimit-Remaining"] == "0":
-                    app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-                    time.sleep(3)
-                else:
-                    break
-
-            data = json.loads(response.text)
-            if data["total_results"] == 0:
-                if len(local_results) == 0:
-                    return [{"category":"False"}]
-                else:
-                    return local_results
-            else:
-                tmdb_results = []
-                for i in range(8):
-                    try:
-                        genre_id = data["results"][i]["genre_ids"]
-                        try:
-                            country = data["results"][i]["origin_country"][0]
-                        except:
-                            country = data["results"][i]["original_language"]
-
-                        if 16 in genre_id:
-                            if "JP" in country:
-                                if data["results"][i]["poster_path"] is None:
-                                    data["results"][i]["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
-                                else:
-                                    url = "http://image.tmdb.org/t/p/w300/"
-                                    tmp = {"id": "{0}".format(data['results'][i]['id']),
-                                           "value": "{0}".format(data["results"][i]["name"]),
-                                           "category": "Online API Database",
-                                           "label": "{0}{1}".format(url, data["results"][i]["poster_path"])}
-                                tmdb_results.append(tmp)
-                            # elif "ja" in country:
-                            #     if data["results"][i]["poster_path"] is None:
-                            #         data["results"][i]["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
-                            #     else:
-                            #         url = "http://image.tmdb.org/t/p/w300/"
-                            #         tmp = {"id": "{0}".format(data['results'][i]['id']),
-                            #                "value": "{0}".format(data["results"][i]["title"]),
-                            #                "category": "Online API Database",
-                            #                "label": "{0}{1}".format(url, data["results"][i]["poster_path"])}
-                            #     tmdb_results.append(tmp)
-                            else:
-                                pass
-                        else:
-                            pass
-                    except:
-                        pass
-
-                all_results = local_results + tmdb_results
-                return all_results
-
-    elif list_type == ListType.BOOK:
-        local_results = []
-        for i in range(5):
-            try:
-                tmp = {"id": "{0}".format(autocomplete_local_results[i].id),
-                       "value": "{0}".format(autocomplete_local_results[i].title),
-                       "category": "Local Database",
-                       "label": "..{0}{1}".format(cover_url, autocomplete_local_results[i].image_cover)}
-                local_results.append(tmp)
-            except:
-                pass
-
-        if len(local_results) >= 3:
-            return local_results
-
-        else:
-            try:
-                response = requests.get("https://www.googleapis.com/books/v1/volumes?q={0}&key={1}"
-                                        .format(element_name, google_book_api_key))
-            except:
-                return None
+                return [{"nb_results": 0}]
 
             if response.status_code == 401:
-                app.logger.error('[SYSTEM] Error requesting Google API :(')
-                return None
+                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+                return [{"nb_results": 0}]
+            app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
 
-            data = json.loads(response.text)
-            if data["totalItems"] == 0:
-                if len(local_results) == 0:
-                    return [{"category": "False"}]
-                else:
-                    return local_results
+            if response.headers["X-RateLimit-Remaining"] == "0":
+                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+                time.sleep(3)
             else:
-                google_results = []
-                for i in range(5):
-                    try:
-                        if data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"] is None:
-                            data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"] = \
-                                url_for('static', filename="books_covers/default.jpg")
+                break
 
-                        tmp = {"id": "{0}".format(data["items"][i]["id"]),
-                               "value": "{0}".format(data["items"][i]["volumeInfo"]["title"]),
-                               "category": "Online API Database",
-                               "label": "{0}".format(data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"])}
-                        google_results.append(tmp)
-                    except:
-                        pass
+        data = json.loads(response.text)
 
-                all_results = local_results + google_results
-        print(all_results)
-        return all_results
+        if data["total_results"] == 0:
+            return [{"nb_results": 0}]
 
+        # Take only the first 6 results for the autocomplete
+        # If there is an anime in the 6 results, loop until the next one
+        tmdb_results = []
+        i = 0
+        while i < data["total_results"] and i < 6:
+            # genre_ids is a list of types ID
+            if "genre_ids" in data["results"][i]:
+                genre_ids = data["results"][i]["genre_ids"]
+            else:
+                genre_ids = None
+
+            # origin_country is a list of origin countries
+            if "origin_country" in data["results"][i]:
+                origin_country = data["results"][i]["origin_country"]
+            else:
+                origin_country = None
+
+            # To not add animes in the series table, we need to check if it's an anime and it comes from Japan
+            if "JP" in origin_country and 16 in genre_ids:
+                i = i+1
+                continue
+
+            series_data = {
+                "tmdb_id":  data["results"][i]["id"],
+                "name":  data["results"][i]["name"]
+            }
+
+            if data["results"][i]["poster_path"] is not None:
+                series_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", data["results"][i]["poster_path"])
+            else:
+                series_data["poster_path"] = url_for('static', filename="series_covers/default.jpg")
+
+            if data["results"][i]["first_air_date"] is not None:
+                series_data["first_air_date"] = data["results"][i]["first_air_date"]
+            else:
+                series_data["first_air_date"] = "Unknown"
+
+            tmdb_results.append(series_data)
+            i = i+1
+
+        print(tmdb_results)
+        return tmdb_results
+
+    elif list_type == ListType.ANIME:
+        while True:
+            try:
+                response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
+                                        .format(themoviedb_api_key, element_name))
+            except:
+                return [{"nb_results": 0}]
+
+            if response.status_code == 401:
+                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+                return [{"nb_results": 0}]
+            app.logger.info(
+                '[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+
+            if response.headers["X-RateLimit-Remaining"] == "0":
+                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+                time.sleep(3)
+            else:
+                break
+
+        data = json.loads(response.text)
+
+        if data["total_results"] == 0:
+            return [{"nb_results": 0}]
+
+        # Take only the first 6 results for the autocomplete
+        # If there is an series in the 6 results, loop until the next one
+        tmdb_results = []
+        i = 0
+        while i < data["total_results"] and i < 6:
+            # genre_ids is a list of types ID
+            if "genre_ids" in data["results"][i]:
+                genre_ids = data["results"][i]["genre_ids"]
+            else:
+                genre_ids = None
+
+            # origin_country is a list of origin countries
+            if "origin_country" in data["results"][i]:
+                origin_country = data["results"][i]["origin_country"]
+            else:
+                origin_country = None
+
+            # To add only animes in the anime table, we need to check if it's an anime and it comes from Japan
+            if "JP" in origin_country and 16 in genre_ids:
+                anime_data = {
+                    "tmdb_id": data["results"][i]["id"],
+                    "name": data["results"][i]["name"]
+                }
+
+                if data["results"][i]["poster_path"] is not None:
+                    anime_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300",
+                                                               data["results"][i]["poster_path"])
+                else:
+                    anime_data["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
+
+                if data["results"][i]["first_air_date"] is not None:
+                    anime_data["first_air_date"] = data["results"][i]["first_air_date"]
+                else:
+                    anime_data["first_air_date"] = "Unknown"
+
+                tmdb_results.append(anime_data)
+
+            i = i+1
+
+        return tmdb_results
+
+    elif list_type == ListType.BOOK:
+        try:
+            response = requests.get("https://www.googleapis.com/books/v1/volumes?q={0}&key={1}"
+                                    .format(element_name, google_book_api_key))
+        except:
+            return [{"nb_results": 0}]
+
+        data = json.loads(response.text)
+        if data["totalItems"] == 0:
+            return [{"nb_results": 0}]
+
+        google_results = []
+        for i in range(6):
+            if data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"] is None:
+                data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"] = url_for('static', filename="books_covers/default.jpg")
+
+                book_data = {
+                    "google_id": "{0}".format(data["items"][i]["id"]),
+                    "name": "{0}".format(data["items"][i]["volumeInfo"]["title"]),
+                    "poster_path": "{0}".format(data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"])
+                }
+
+                google_results.append(book_data)
+
+        return google_results
 
 def add_element(element_id, list_type):
     if element_id == "":
@@ -2232,17 +2177,11 @@ def add_element(element_id, list_type):
 
     # Check if the ID element exist in the database
     if list_type == ListType.SERIES:
-        element = Series.query.filter_by(id=element_id).first()
-        if element is None:
-            element = Series.query.filter_by(themoviedb_id=element_id).first()
+        element = Series.query.filter_by(themoviedb_id=element_id).first()
     elif list_type == ListType.ANIME:
-        element = Anime.query.filter_by(id=element_id).first()
-        if element is None:
-            element = Anime.query.filter_by(themoviedb_id=element_id).first()
+        element = Anime.query.filter_by(themoviedb_id=element_id).first()
     elif list_type == ListType.BOOK:
-        element = Book.query.filter_by(id=element_id).first()
-        if element is None:
-            element = Book.query.filter_by(google_id=element_id).first()
+        element = Book.query.filter_by(google_id=element_id).first()
 
     # If ID is correct, we know which one to add in the user's list
     if element is not None:
@@ -2263,10 +2202,6 @@ def add_element(element_id, list_type):
             time_delta = datetime.utcnow() - last_update
             if time_delta.days > 0 or (time_delta.seconds/1800 > 1):  # 30 min
                 refresh_element_data(element.id, list_type)
-            else:
-                pass
-        else:
-            pass
 
         add_element_to_user(element.id, int(current_user.get_id()), list_type)
 
@@ -2286,6 +2221,7 @@ def add_element(element_id, list_type):
             series_id = add_element_in_base(series_data, cover_id, ListType.SERIES)
             add_element_to_user(series_id, int(current_user.get_id()), list_type)
             return redirect(url_for('myserieslist'))
+
         elif list_type == ListType.ANIME:
             anime_data = get_element_data_from_api(element_id, ListType.ANIME)
             if anime_data is None:
@@ -2300,6 +2236,7 @@ def add_element(element_id, list_type):
             anime_id = add_element_in_base(anime_data, cover_id, list_type)
             add_element_to_user(anime_id, int(current_user.get_id()), list_type)
             return redirect(url_for('myanimeslist'))
+
         elif list_type == ListType.BOOK:
             book_data = get_element_data_from_api(element_id, ListType.BOOK)
             if book_data is None:

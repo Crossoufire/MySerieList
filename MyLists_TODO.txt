@@ -8,8 +8,6 @@ TO DO / TO SEE
 	Add a "read less" for the synopsis
 	Check the style of the category selector modal
 	Check the style of the auto-complete selector
-	Remove duplicates of the auto-complete
-	Remove "Local" and "Online" categories of the autocomplete (merge in one)
 	Add ZOOM for the media lists (done on booklist but shady), but it is difficult to implement with cards style
 	Multi selection when changing category
 	Separation of the code for routes!!
@@ -17,10 +15,13 @@ TO DO / TO SEE
 	Add lots of statistics (already started the code part, need a page to display + chart.js)
 	Bug display season and episode when refresh due to the browser cache (don't know how to repair) but works great otherwise
 	Add Anime movies (Added multi search from the API)
+	Add year in autocomplete results
 	
 	
 DONE 
 
+	Remove duplicates of the auto-complete
+	Remove "Local" and "Online" categories of the autocomplete (merge in one)
 	On login/register click focus on the modal
 	Add fixed top bar
 	Add Books list
