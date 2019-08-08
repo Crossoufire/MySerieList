@@ -1117,6 +1117,21 @@ function add_score(new_score, edit_id, element_id) {
     }
 }
 </script>
+
+<script type="text/javascript">
+function edit_score(edit_id, new_id) {
+    var edit = document.getElementById(edit_id);
+
+    if (edit.className === "d-none"){
+        edit.className = "visible";
+        document.getElementById(new_id).innerHTML = "";
+        $(edit).val('');
+        $(edit).focus();
+    } else {
+        edit.className = "d-none";
+    }
+}
+</script>
 {% endif %}
 
 <!---------------- Expand/collaspe category -------------------->
@@ -1146,7 +1161,9 @@ function hide_all_cat() {
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-right');
 
 }
+</script>
 
+<script type="text/javascript">
 function show_all_cat() {
     var show = document.getElementById('show_cat_all');
     var hide = document.getElementById('collapse_all');
