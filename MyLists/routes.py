@@ -189,10 +189,9 @@ def home():
             app.logger.info('[{}] Logged in'.format(user.id))
             flash("You're now logged in. Welcome {0}".format(login_form.login_username.data), "success")
             home_page = str(user.homepage.value)
-            return redirect(next_page) if next_page else redirect(url_for(home_page))
+            return redirect(next_page) if next_page else redirect(url_for(home_page, user_name=user.username))
         else:
             flash('Login Failed. Please check Username and Password', 'warning')
-
     if register_form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(register_form.register_password.data).decode('utf-8')
         user = User(username=register_form.register_username.data,
@@ -213,7 +212,6 @@ def home():
             app.logger.error('[SYSTEM] Error while sending the registration email to {}'.format(user.email))
             image_error = url_for('static', filename='img/error.jpg')
             return render_template('error.html', error_code=500, title='Error', image_error=image_error), 500
-
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.get_id()).first()
         if user.homepage == HomePage.MYSERIESLIST:
@@ -222,7 +220,6 @@ def home():
             return redirect(url_for('myanimeslist', user_name=current_user.username))
         elif user.homepage == HomePage.MYBOOKSLIST:
             return redirect(url_for('mybookslist', user_name=current_user.username))
-
     else:
         home_header = url_for('static', filename='img/home_header.jpg')
         img1 = url_for('static', filename='img/home_img1.jpg')
@@ -277,12 +274,10 @@ def reset_token(token):
 def register_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('myserieslist', user_name=current_user.username))
-
     user = User.verify_reset_token(token)
     if user is None:
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('reset_password'))
-
     user.active = True
     user.activated_on = datetime.utcnow()
     db.session.commit()
@@ -404,10 +399,10 @@ def account(user_name):
                            user_name=user_name)
 
 
-@app.route("/anime_achievements")
+@app.route("/animes_achievements")
 @login_required
-def anime_achievements():
-    return render_template('anime_achievements.html', title='Anime achievements')
+def animes_achievements():
+    return render_template('animes_achievements.html', title='Animes achievements')
 
 
 @app.route("/level_grade_data")
@@ -547,7 +542,7 @@ def email_update_token(token):
     return redirect(url_for('myserieslist', user_name=current_user.username))
 
 
-@app.route('/change_pass', methods=['GET', 'POST'])
+@app.route('/change_password', methods=['GET', 'POST'])
 @login_required
 def change_password():
     form = ChangePasswordForm()
@@ -557,9 +552,9 @@ def change_password():
         db.session.commit()
         app.logger.info('[{}] Password updated'.format(current_user.id))
         flash('Your password has been successfully updated!', 'success')
-        return redirect(url_for('account'))
+        return redirect(url_for('account', user_name=current_user.username))
 
-    return render_template('change_pass.html', form=form)
+    return render_template('change_password.html', form=form)
 
 
 @app.route("/hall_of_fame")
@@ -1766,7 +1761,6 @@ def get_list_count(user_id, list_type):
 
 
 def autocomplete_search_element(element_name, list_type):
-
     if list_type == ListType.SERIES:
         while True:
             try:
@@ -1839,7 +1833,6 @@ def autocomplete_search_element(element_name, list_type):
             i = i+1
 
         return tmdb_results
-
     elif list_type == ListType.ANIME:
         while True:
             try:
@@ -1912,7 +1905,6 @@ def autocomplete_search_element(element_name, list_type):
             i = i+1
 
         return tmdb_results
-
     elif list_type == ListType.BOOK:
         try:
             response = requests.get("https://www.googleapis.com/books/v1/volumes?q={0}&key={1}"

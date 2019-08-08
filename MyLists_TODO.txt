@@ -18,7 +18,8 @@ TO DO LATER
 	Separation of the code for routes!!
 	Multi selection when changing category
 	Add Anime movies (Added multi search from the API)
-	
+	Add other achievements
+
 DONE
 	Remove duplicates of the auto-complete
 	Remove "Local" and "Online" categories of the autocomplete (merge in one)
