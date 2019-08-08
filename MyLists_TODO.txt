@@ -7,7 +7,6 @@ TO DO / FIX FIRST
 	Add "more results" for auto-complete results
 	Add year in auto-complete results
 	Add lots of statistics (already started the code part, need a page to display + chart.js)
-	Fix mobile view when displaying table view
 	Fix bug display season and episode when refresh due to the browser cache (don't know how to repair) but works great otherwise
 
 TO DO LATER
@@ -20,6 +19,7 @@ TO DO LATER
 	Add Anime movies (Added multi search from the API)
 	
 DONE
+	Fix mobile view when displaying table view
 	Remove duplicates of the auto-complete
 	Remove "Local" and "Online" categories of the autocomplete (merge in one)
 	On login/register click focus on the modal

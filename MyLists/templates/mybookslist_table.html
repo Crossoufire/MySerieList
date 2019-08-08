@@ -569,9 +569,10 @@ body.loading .modal_loading {
 
 
 {% block script %}
+{% if user_id == current_user.get_id() %}
 <!------------ Jquery Autocomplete ------------->
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<!------------ Jquery Autocomplete ------------->
+
 <script type="text/javascript">
 $.widget("custom.catcomplete", $.ui.autocomplete, {
     _create: function() {
@@ -584,18 +585,11 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
         $.each(items, function(index, item) {
             var li;
 
-            if (item.category === "False") {
-                var a = "Sorry, no results found..."
+            if (item.nb_results === 0) {
+                var a = "No results found"
                 ul.append("<li class='disabled'>" + a + "</li>");
             } else {
-                if (item.category != currentCategory) {
-                    ul.append("<li class='ui-autocomplete-category'>" + item.category + "</li>");
-                    currentCategory = item.category;
-                }
                 li = that._renderItemData(ul, item);
-                if (item.category) {
-                    li.attr("aria-label", item.category + " : " + item.value);
-                }
             }
         });
     },
@@ -604,18 +598,20 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
 			$img = $('<img>');
 
 		$img.attr({
-		  src: item.label,
-		  alt: item.value,
+		  src: item.poster_path,
+		  alt: item.name,
 		  style: "width: 34px; height: 51px;"
 		});
 
 		$li.append('<a class="list-group-item bg-dark text-light">');
-		$li.find('a').append($img).append(" "+item.value);
+		$li.find('a').append($img).append(" "+item.name);
 
 		return $li.appendTo(ul);
 	}
 });
+</script>
 
+<script type="text/javascript">
 $(function() {
     $("#autocomplete").catcomplete({
       delay: 500,
@@ -630,15 +626,15 @@ $(function() {
 		},
 		minLength: 1,
         select: function(event, ui) {
-            $("#autocomplete").val(ui.item.value);
-            $("#book_id").val(ui.item.id);
+            $("#autocomplete").val(ui.item.name);
+            $("#book_id").val(ui.item.google_id);
 
             $body = $("body");
             $.ajax ({
                 type: "POST",
                 url: "/add_book",
                 contentType: "application/json",
-                data: JSON.stringify({book_id: ui.item.id}),
+                data: JSON.stringify({book_id: ui.item.google_id}),
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
@@ -648,9 +644,25 @@ $(function() {
     });
 });
 </script>
-<!------------ Principal scripts --------------->
+
+<!------------ Refresh --------------->
 <script type="text/javascript">
-function changebookCategory(book_id, new_category, tr_id, mod_id) {
+function refreshAll() {
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/refresh_all_book",
+        beforeSend: function() { $body.addClass("loading"); },
+        success: function(response) {
+            window.location.replace('/bookslist/{{ current_user.username }}'); }
+    });
+}
+</script>
+
+
+<!---------------- Update/Change/Remove book ------------------->
+<script type="text/javascript">
+function changeBookCategory(book_id, new_category, card_id, mod_id) {
     if (new_category === 'Reading') {
         var completed = 'Completed';
         var on_hold = 'On Hold';
@@ -717,6 +729,7 @@ function changebookCategory(book_id, new_category, tr_id, mod_id) {
         $('.modal').modal("hide");
     }
 
+
     if (new_category === 'Dropped') {
         var completed = 'Completed';
         var on_hold = 'On Hold';
@@ -742,6 +755,7 @@ function changebookCategory(book_id, new_category, tr_id, mod_id) {
     if (new_category === 'Plan to Read') {
         var completed = 'Completed';
         var on_hold = 'On Hold';
+        var random = 'Random';
         var dropped = 'Dropped';
         var reading = 'Reading';
 
@@ -772,9 +786,10 @@ function changebookCategory(book_id, new_category, tr_id, mod_id) {
             console.log("ok"); }
     });
 }
+</script>
 
-
-function deletebook(book_id, tr_id) {
+<script type="text/javascript">
+function deleteBook(book_id, card_id) {
     if (!confirm("Do you want to delete")){
         return false;
     }
@@ -792,43 +807,11 @@ function deletebook(book_id, tr_id) {
             console.log("ok"); }
     });
 }
-
-
-function hide(category, arrow) {
-    var category = document.getElementById(category);
-    var arrow = document.getElementById(arrow);
-
-    if (category.className === "d-flex flex-wrap"){
-        category.className = "d-none";
-        arrow.className = "collapse_all fas fa-sm fa-chevron-right";
-    } else {
-        category.className = "d-flex flex-wrap";
-        arrow.className = "collapse_all fas fa-sm fa-chevron-down";
-    }
-}
 </script>
-<!------------ Synopsis scripts ---------------->
-<script type="text/javascript">
-$(document).ready(function(){
-	var maxLength = 200;
-	$(".show-read-more").each(function(){
-		var myStr = $(this).text();
-		if($.trim(myStr).length > maxLength){
-			var newStr = myStr.substring(0, maxLength);
-			var removedStr = myStr.substring(maxLength, $.trim(myStr).length);
-			$(this).empty().html(newStr);
-			$(this).append('<a href="javascript:void(0);" class="read-more"> read more...</a>');
-			$(this).append('<span class="more-text">' + removedStr + '</span>');
-		}
-	});
 
-	$(".read-more").click(function(){
-		$(this).siblings(".more-text").contents().unwrap();
-		$(this).remove();
-	});
-});
-</script>
-<!------------ Score scripts ------------------->
+
+<!------------ Score -------------->
+
 <script type="text/javascript">
 function edit_score(edit_id, new_id) {
     var edit = document.getElementById(edit_id);
@@ -842,7 +825,9 @@ function edit_score(edit_id, new_id) {
         edit.className = "d-none";
     }
 }
+</script>
 
+<script type="text/javascript">
 function add_score(new_score, edit_id, book_id) {
     var new_sc = document.getElementById(new_score);
     var edit_score_value = document.getElementById(edit_id).value;
@@ -863,9 +848,9 @@ function add_score(new_score, edit_id, book_id) {
             $body = $("body");
             $.ajax ({
                 type: "POST",
-                url: "/add_score_book",
+                url: "/set_book_score",
                 contentType: "application/json",
-                data: JSON.stringify({score_val: edit_score_value, book_id: book_id }),
+                data: JSON.stringify({score_value: edit_score_value, book_id: book_id }),
                 dataType: "json",
                 success: function(response) {
                     console.log('ok'); }
@@ -876,6 +861,30 @@ function add_score(new_score, edit_id, book_id) {
     }
 }
 </script>
+{% endif %}
+
+<!------------ Synopsis ---------------->
+<script type="text/javascript">
+$(document).ready(function(){
+	var maxLength = 200;
+	$(".show-read-more").each(function(){
+		var myStr = $(this).text();
+		if($.trim(myStr).length > maxLength){
+			var newStr = myStr.substring(0, maxLength);
+			var removedStr = myStr.substring(maxLength, $.trim(myStr).length);
+			$(this).empty().html(newStr);
+			$(this).append('<a href="javascript:void(0);" class="read-more"> read more...</a>');
+			$(this).append('<span class="more-text">' + removedStr + '</span>');
+		}
+	});
+
+	$(".read-more").click(function(){
+		$(this).siblings(".more-text").contents().unwrap();
+		$(this).remove();
+	});
+});
+</script>
+
 <!---- Show/collapse all categories scripts ---->
 <script type="text/javascript">
 function hide_all_cat() {
@@ -886,9 +895,10 @@ function hide_all_cat() {
     show.className = "fas fa-eye text-light m-r-5";
     $('#collapse_show').text('Expand All');
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-right');
-
 }
+</script>
 
+<script type="text/javascript">
 function show_all_cat() {
     var show = document.getElementById('show_cat_all');
     var hide = document.getElementById('collapse_all');
@@ -899,14 +909,33 @@ function show_all_cat() {
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-down');
 }
 </script>
+
+<script type="text/javascript">
+function hide(category, arrow) {
+    var category = document.getElementById(category);
+    var arrow = document.getElementById(arrow);
+
+    if (category.className === "d-flex flex-wrap"){
+        category.className = "d-none";
+        arrow.className = "collapse_all fas fa-sm fa-chevron-right";
+    } else {
+        category.className = "d-flex flex-wrap";
+        arrow.className = "collapse_all fas fa-sm fa-chevron-down";
+    }
+}
+</script>
+
 <!----------- Sidenav bar show/hide ------------>
 <script type="text/javascript">
 function openNav() {
     document.getElementById("mySidenav").style.width = "180px";
 }
+</script>
 
+<script type="text/javascript">
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 }
 </script>
+
 {% endblock script %}

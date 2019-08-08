@@ -189,7 +189,7 @@ def home():
             app.logger.info('[{}] Logged in'.format(user.id))
             flash("You're now logged in. Welcome {0}".format(login_form.login_username.data), "success")
             home_page = str(user.homepage.value)
-            return redirect(next_page) if next_page else redirect(url_for(home_page))
+            return redirect(next_page) if next_page else redirect(url_for(home_page, user_name=current_user.username))
         else:
             flash('Login Failed. Please check Username and Password', 'warning')
 
@@ -508,7 +508,6 @@ def account_settings():
             else:
                 flash("There was an error internal error. Please contact the administrator.", 'danger')
 
-        return redirect(url_for('account'))
 
     elif request.method == 'GET':
         form.username.data = current_user.username
@@ -1418,8 +1417,6 @@ def add_score_element():
 @login_required
 def autocomplete_animes():
     search = request.args.get('q')
-    if "%" in search:
-        return jsonify([])
 
     results = autocomplete_search_element(search, ListType.ANIME)
     return jsonify(matching_results=results)
@@ -1429,8 +1426,6 @@ def autocomplete_animes():
 @login_required
 def autocomplete_series():
     search = request.args.get('q')
-    if "%" in search:
-        return jsonify([])
 
     results = autocomplete_search_element(search, ListType.SERIES)
     return jsonify(matching_results=results)
@@ -1630,8 +1625,6 @@ def set_book_score():
 @login_required
 def autocomplete_books():
     search = request.args.get('q')
-    if "%" in search:
-        return jsonify([])
 
     results = autocomplete_search_element(search, ListType.BOOK)
     return jsonify(matching_results=results)
@@ -1925,17 +1918,19 @@ def autocomplete_search_element(element_name, list_type):
             return [{"nb_results": 0}]
 
         google_results = []
-        for i in range(6):
-            if data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"] is None:
-                data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"] = url_for('static', filename="books_covers/default.jpg")
+        i = 0
+        while i < 6 and i < data["totalItems"]:
+            book_data = {
+                "google_id": "{0}".format(data["items"][i]["id"]),
+                "name": "{0}".format(data["items"][i]["volumeInfo"]["title"])
+            }
+            try:
+                book_data["poster_path"] = data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"]
+            except:
+                book_data["poster_path"] = url_for('static', filename="books_covers/default.jpg")
 
-                book_data = {
-                    "google_id": "{0}".format(data["items"][i]["id"]),
-                    "name": "{0}".format(data["items"][i]["volumeInfo"]["title"]),
-                    "poster_path": "{0}".format(data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"])
-                }
-
-                google_results.append(book_data)
+            google_results.append(book_data)
+            i = i+1
 
         return google_results
 
@@ -2019,7 +2014,10 @@ def add_element(element_id, list_type):
             try:
                 cover_id = save_api_cover(book_data["volumeInfo"]["imageLinks"]["small"], ListType.BOOK)
             except:
-                cover_id = save_api_cover(book_data["volumeInfo"]["imageLinks"]["thumbnail"], ListType.BOOK)
+                try:
+                    cover_id = save_api_cover(book_data["volumeInfo"]["imageLinks"]["thumbnail"], ListType.BOOK)
+                except:
+                    cover_id = "default.jpg"
             if cover_id is None:
                 return flash("There was a problem while getting the book's cover. Please try again later.", "warning")
 
@@ -2300,12 +2298,15 @@ def add_element_in_base(element_data, element_cover_id, list_type):
 
         description = clean_html(element_data["volumeInfo"]["description"])
         page_count = element_data["volumeInfo"]["pageCount"]
-        categories = element_data["volumeInfo"]["categories"][0]
-        google_id = element_data["id"]
+        try:
+            categories = element_data["volumeInfo"]["categories"][0]
 
-        if "General" in categories:
-            new_categories = categories.replace("/ General", "")
-            categories = new_categories
+            if "General" in categories:
+                new_categories = categories.replace("/ General", "")
+                categories = new_categories
+        except:
+            categories = None
+        google_id = element_data["id"]
 
         # Add the element into the table
         element = Book(title=title,

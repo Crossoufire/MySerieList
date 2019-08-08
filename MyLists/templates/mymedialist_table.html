@@ -2,6 +2,7 @@
 
 
 {% block css %}
+{% if user_id == current_user.get_id() %}
 <!------------ Jquery Autocomplete ---------->
 <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet">
 <!------- Jquery autocomplete loading ------->
@@ -21,6 +22,7 @@
     text-align: center;
 }
 </style>
+{% endif %}
 <!------------- Main CSS --------------->
 <style>
 .add_element {
@@ -341,6 +343,27 @@ body.loading .modal_loading {
   .sidenav a {font-size: 18px;}
 }
 /* ######################################################################### */
+
+.table_number {
+    width: 50px;
+}
+
+.table_season {
+    width: 100px;
+}
+
+.table_episode {
+    width: 100px;
+}
+
+.table_score {
+    width: 80px;
+}
+
+.table_actions {
+    width: 80px;
+}
+
 </style>
 {% endblock css %}
 
@@ -374,18 +397,18 @@ body.loading .modal_loading {
 {% block content %}
 <div class="d-flex flex-wrap">
     {% if user_id == current_user.get_id() %}
-    <div class="m-t-20 m-b-10">
-    {% if element_type == "ANIME" %}
-        <input  class="form-control text-light add_element" placeholder="Add an anime" type="text" id="autocomplete" onfocus="this.value=''"/>
-        <input type="hidden" id="element_id" value=""/>
-    {% elif element_type == "SERIES" %}
-        <input  class="form-control text-light add_element" placeholder="Add a Series" type="text" id="autocomplete" onfocus="this.value=''"/>
-        <input type="hidden" id="element_id" value=""/>
-    {% endif %}
-    </div>
-    <div class="ml-auto m-t-20 m-b-10">
-        <button class="btn btn-sm btn-light text-dark p-2" onclick="refreshAll()"><a class="fas fa-sync m-r-5 text-dark"></a> REFRESH ALL</button>
-    </div>
+        <div class="m-t-20 m-b-10">
+        {% if element_type == "ANIME" %}
+            <input class="form-control text-light add_element" placeholder="Add an anime" type="text" id="autocomplete" onfocus="this.value=''"/>
+            <input type="hidden" id="element_id" value=""/>
+        {% elif element_type == "SERIES" %}
+            <input class="form-control text-light add_element" placeholder="Add a Series" type="text" id="autocomplete" onfocus="this.value=''"/>
+            <input type="hidden" id="element_id" value=""/>
+        {% endif %}
+        </div>
+        <div class="ml-auto m-t-20 m-b-10">
+            <button class="btn btn-sm btn-light text-dark p-2" onclick="refreshAll()"><a class="fas fa-sync m-r-5 text-dark"></a> REFRESH ALL</button>
+        </div>
     {% endif %}
 </div>
 
@@ -409,90 +432,102 @@ body.loading .modal_loading {
             <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="WATCHING_arrow" onclick="hide('collapse_WATCHING', 'WATCHING_arrow')"></a></div>
         </h2>
         <hr class="mt-2 mb-4">
-        <div class="d-flex flex-wrap" id="collapse_WATCHING">
+        <div class="d-flex flex-wrap table-responsive-sm" id="collapse_WATCHING">
             <table class="table table-sm text-light">
                 <thead class="text-center">
-                    <th style="width: 50px;">#</th>
-                    <th>series</th>
-                    <th style="width: 150px;">Seasons</th>
-                    <th style="width: 150px;">Episodes</th>
-                    <th style="width: 80px;">Score</th>
-                    <th style="width: 80px;">Actions</th>
+                    <th class="table_number">#</th>
+                    <th>Name</th>
+                    <th class="table_season">Season</th>
+                    <th class="table_episode">Episode</th>
+                    <th class="table_score">Score</th>
+                    {% if user_id == current_user.get_id() %}
+                    <th class="table_actions">Actions</th>
+                    {% endif %}
                 </thead>
                 <tbody id="WATCHING">
         {% elif loop.index == 2 %}
         <h2 class="font-weight-light text-center pt-4 mb-0 category-title">COMPLETED
             <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="COMPLETED_arrow" onclick="hide('collapse_COMPLETED', 'COMPLETED_arrow')"></a></div></h2>
         <hr class="mt-2 mb-4">
-        <div class="d-flex flex-wrap" id="collapse_COMPLETED">
+        <div class="d-flex flex-wrap table-responsive-sm" id="collapse_COMPLETED">
             <table class="table table-sm text-light">
                 <thead class="text-center">
-                    <th style="width: 50px;">#</th>
-                    <th>series</th>
-                    <th style="width: 150px;">Seasons</th>
-                    <th style="width: 150px;">Episodes</th>
-                    <th style="width: 80px;">Score</th>
-                    <th style="width: 80px;">Actions</th>
+                    <th class="table_number">#</th>
+                    <th>Name</th>
+                    <th class="table_season">Season</th>
+                    <th class="table_episode">Episode</th>
+                    <th class="table_score">Score</th>
+                    {% if user_id == current_user.get_id() %}
+                    <th class="table_actions">Actions</th>
+                    {% endif %}
                 </thead>
                 <tbody id="COMPLETED">
         {% elif loop.index == 3 %}
         <h2 class="font-weight-light text-center pt-4 mb-0 category-title">ON HOLD
             <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="ON_HOLD_arrow" onclick="hide('collapse_ON_HOLD', 'ON_HOLD_arrow')"></a></div></h2>
         <hr class="mt-2 mb-4">
-        <div class="d-flex flex-wrap" id="collapse_ON_HOLD">
+        <div class="d-flex flex-wrap table-responsive-sm" id="collapse_ON_HOLD">
             <table class="table table-sm text-light">
                 <thead class="text-center">
-                    <th style="width: 50px;">#</th>
-                    <th>series</th>
-                    <th style="width: 150px;">Seasons</th>
-                    <th style="width: 150px;">Episodes</th>
-                    <th style="width: 80px;">Score</th>
-                    <th style="width: 80px;">Actions</th>
+                    <th class="table_number">#</th>
+                    <th>Name</th>
+                    <th class="table_season">Season</th>
+                    <th class="table_episode">Episode</th>
+                    <th class="table_score">Score</th>
+                    {% if user_id == current_user.get_id() %}
+                    <th class="table_actions">Actions</th>
+                    {% endif %}
                 </thead>
                 <tbody id="ON_HOLD">
          {% elif loop.index == 4 %}
         <h2 class="font-weight-light text-center pt-4 mb-0 category-title">RANDOM
             <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="RANDOM_arrow" onclick="hide('collapse_RANDOM', 'RANDOM_arrow')"></a></div></h2>
          <hr class="mt-2 mb-4">
-        <div class="d-flex flex-wrap" id="collapse_RANDOM">
+        <div class="d-flex flex-wrap table-responsive-sm" id="collapse_RANDOM">
             <table class="table table-sm text-light">
                 <thead class="text-center">
-                    <th style="width: 50px;">#</th>
-                    <th>series</th>
-                    <th style="width: 150px;">Seasons</th>
-                    <th style="width: 150px;">Episodes</th>
-                    <th style="width: 80px;">Score</th>
-                    <th style="width: 80px;">Actions</th>
+                    <th class="table_number">#</th>
+                    <th>Name</th>
+                    <th class="table_season">Season</th>
+                    <th class="table_episode">Episode</th>
+                    <th class="table_score">Score</th>
+                    {% if user_id == current_user.get_id() %}
+                    <th class="table_actions">Actions</th>
+                    {% endif %}
                 </thead>
                 <tbody id="RANDOM">
         {% elif loop.index == 5 %}
         <h2 class="font-weight-light text-center pt-4 mb-0 category-title">DROPPED
             <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="DROPPED_arrow" onclick="hide('collapse_DROPPED', 'DROPPED_arrow')"></a></div></h2>
         <hr class="mt-2 mb-4">
-        <div class="d-flex flex-wrap" id="collapse_DROPPED">
+        <div class="d-flex flex-wrap table-responsive-sm" id="collapse_DROPPED">
             <table class="table table-sm text-light">
                 <thead class="text-center">
-                    <th style="width: 50px;">#</th>
-                    <th>series</th>
-                    <th style="width: 150px;">Seasons</th>
-                    <th style="width: 150px;">Episodes</th>
-                    <th style="width: 80px;">Score</th>
-                    <th style="width: 80px;">Actions</th>
+                    <th class="table_number">#</th>
+                    <th>Name</th>
+                    <th class="table_season">Season</th>
+                    <th class="table_episode">Episode</th>
+                    <th class="table_score">Score</th>
+                    {% if user_id == current_user.get_id() %}
+                    <th class="table_actions">Actions</th>
+                    {% endif %}
                 </thead>
                 <tbody id="DROPPED">
         {% elif loop.index == 6 %}
         <h2 class="font-weight-light text-center pt-4 mb-0 category-title">PLAN TO WATCH
             <div class="arrow_div float-right"><a class="collapse_all fas fa-sm fa-chevron-down" id="PLAN_TO_WATCH_arrow" onclick="hide('collapse_PLAN_TO_WATCH', 'PLAN_TO_WATCH_arrow')"></a></div></h2>
         <hr class="mt-2 mb-4">
-        <div class="d-flex flex-wrap" id="collapse_PLAN_TO_WATCH">
+        <div class="d-flex flex-wrap table-responsive-sm" id="collapse_PLAN_TO_WATCH">
             <table class="table table-sm text-light">
                 <thead class="text-center">
-                    <th style="width: 80px;">#</th>
-                    <th>series</th>
-                    <th style="width: 150px;">Seasons</th>
-                    <th style="width: 150px;">Episodes</th>
-                    <th style="width: 80px;">Score</th>
-                    <th style="width: 80px;">Actions</th>
+                    <th class="table_number">#</th>
+                    <th>Name</th>
+                    <th class="table_season">Season</th>
+                    <th class="table_episode">Episode</th>
+                    <th class="table_score">Score</th>
+                    {% if user_id == current_user.get_id() %}
+                    <th class="table_actions">Actions</th>
+                    {% endif %}
                 </thead>
                 <tbody id="PLAN_TO_WATCH">
         {% endif %}
@@ -502,7 +537,7 @@ body.loading .modal_loading {
         {% for data in category %}
             <tr id="tr_{{ data['id'] }}">
                 <td class="text-center">
-                    {{ data['id'] }}
+                    {{ loop.index }}
                 </td>
                 <td class="text-left">
                     <a data-toggle="modal" data-target="#modal_{{ data['id'] }}">{{ data['name'] }}</a>
@@ -550,13 +585,13 @@ body.loading .modal_loading {
                    border: solid;
                    border-color: black;" onkeydown="add_score('new_{{ data['id'] }}', 'edit_{{ data['id'] }}', '{{ data['id'] }}')">
                 </td>
+                {% if user_id == current_user.get_id() %}
                 <td class="text-center">
-                    {% if user_id == current_user.get_id() %}
                     <a class="fas fa-bars" data-toggle="modal" data-target="#modal_cat{{ data['id'] }}"></a>
                     &nbsp &nbsp
                     <a class="fas fa-ban" onclick="delete_element('{{ data['id'] }}', 'tr_{{ data['id'] }}')"></a>
-                    {% endif %}
                 </td>
+                {% endif %}
             </tr>
 
             <!----------- Categories Modal ---------------->
@@ -660,9 +695,10 @@ body.loading .modal_loading {
 
 
 {% block script %}
+{% if user_id == current_user.get_id() %}
 <!------------ Jquery Autocomplete ------------->
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<!------------ Jquery Autocomplete ------------->
+
 <script type="text/javascript">
 $.widget("custom.catcomplete", $.ui.autocomplete, {
     _create: function() {
@@ -675,18 +711,11 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
         $.each(items, function(index, item) {
             var li;
 
-            if (item.category === "False") {
-                var a = "Sorry, no results found..."
+            if (item.nb_results === 0) {
+                var a = "No results found"
                 ul.append("<li class='disabled'>" + a + "</li>");
             } else {
-                if (item.category != currentCategory) {
-                    ul.append("<li class='ui-autocomplete-category'>" + item.category + "</li>");
-                    currentCategory = item.category;
-                }
                 li = that._renderItemData(ul, item);
-                if (item.category) {
-                    li.attr("aria-label", item.category + " : " + item.value);
-                }
             }
         });
     },
@@ -695,22 +724,24 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
 			$img = $('<img>');
 
 		$img.attr({
-		  src: item.label,
-		  alt: item.value,
-		  style: "width: 34px; height: 51px;"
+		    src: item.poster_path,
+		    alt: item.name,
+		    style: "width: 34px; height: 51px;"
 		});
 
 		$li.append('<a class="list-group-item bg-dark text-light">');
-		$li.find('a').append($img).append(" "+item.value);
+		$li.find('a').append($img).append(" "+item.name);
 
 		return $li.appendTo(ul);
 	}
 });
+</script>
 
+<script type="text/javascript">
 $(function() {
     $("#autocomplete").catcomplete({
-      delay: 500,
-      source: function(request, response) {
+        delay: 500,
+        source: function(request, response) {
             {% if element_type == "ANIME" %}
                 $.getJSON("{{url_for('autocomplete_animes')}}",{
                     q: request.term,
@@ -719,7 +750,7 @@ $(function() {
                         response(data.matching_results);
                     }
                 );
-            {% else %}
+            {% elif element_type == "SERIES" %}
                 $.getJSON("{{url_for('autocomplete_series')}}",{
                     q: request.term,
                 },
@@ -728,24 +759,24 @@ $(function() {
                     }
                 );
             {% endif %}
-		},
+	    },
 		minLength: 1,
         select: function(event, ui) {
-            $("#autocomplete").val(ui.item.value);
-            $("#element_id").val(ui.item.id);
+            $("#autocomplete").val(ui.item.name);
+            $("#element_id").val(ui.item.tmdb_id);
 
             $body = $("body");
             $.ajax ({
                 type: "POST",
                 url: "/add_element",
                 contentType: "application/json",
-                data: JSON.stringify({element_id: ui.item.id, element_type: '{{ element_type }}' }),
+                data: JSON.stringify({element_id: ui.item.tmdb_id, element_type: '{{ element_type }}' }),
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
                     {% if element_type == "ANIME" %}
                         window.location.replace('/animeslist/table/{{ current_user.username }}');
-                    {% else %}
+                    {% elif element_type == "SERIES" %}
                         window.location.replace('/serieslist/table/{{ current_user.username }}');
                     {% endif %}
                 }
@@ -754,7 +785,8 @@ $(function() {
     });
 });
 </script>
-<!---------------- Principal ------------------->
+
+<!---------------- Refresh ------------------->
 <script type="text/javascript">
 function refreshAll() {
     $body = $("body");
@@ -772,8 +804,9 @@ function refreshAll() {
         }
     });
 }
+</script>
 
-
+<script type="text/javascript">
 function refresh(element_id) {
     $body = $("body");
     $.ajax ({
@@ -793,7 +826,10 @@ function refresh(element_id) {
     });
 }
 
+</script>
 
+<!---------------- Update/Change/Remove element ------------------->
+<script type="text/javascript">
 function changeCategory(element_id, new_category, tr_id, mod_id, seas_drop_id, ep_drop_id, seas_data) {
     if (new_category === 'Watching') {
         var completed = 'Completed';
@@ -975,7 +1011,9 @@ function changeCategory(element_id, new_category, tr_id, mod_id, seas_drop_id, e
     });
 }
 
+</script>
 
+<script type="text/javascript">
 function delete_element(element_id, tr_id) {
     if (!confirm("Do you want to delete")){
         return false;
@@ -993,7 +1031,9 @@ function delete_element(element_id, tr_id) {
     });
 }
 
+</script>
 
+<script type="text/javascript">
 function updateEpisode(element_id, episode){
     let selected_episode = episode.selectedIndex
 
@@ -1010,21 +1050,9 @@ function updateEpisode(element_id, episode){
     });
 }
 
+</script>
 
-function hide(category, arrow) {
-    var category = document.getElementById(category);
-    var arrow = document.getElementById(arrow);
-
-    if (category.className === "d-flex flex-wrap"){
-        category.className = "d-none";
-        arrow.className = "collapse_all fas fa-sm fa-chevron-right";
-    } else {
-        category.className = "d-flex flex-wrap";
-        arrow.className = "collapse_all fas fa-sm fa-chevron-down";
-    }
-}
-
-
+<script type="text/javascript">
 function updateSeason(element_id, value, seas_data, ep_drop_id) {
     var selected_season = value.selectedIndex;
     var episode_drop = document.getElementById(ep_drop_id);
@@ -1053,42 +1081,9 @@ function updateSeason(element_id, value, seas_data, ep_drop_id) {
     });
 }
 </script>
-<!---------------- Synopsis -------------------->
+
+<!------------------ Set score --------------------->
 <script type="text/javascript">
-$(document).ready(function(){
-	var maxLength = 200;
-	$(".show-read-more").each(function(){
-		var myStr = $(this).text();
-		if($.trim(myStr).length > maxLength){
-			var newStr = myStr.substring(0, maxLength);
-			var removedStr = myStr.substring(maxLength, $.trim(myStr).length);
-			$(this).empty().html(newStr);
-			$(this).append('<a href="javascript:void(0);" class="read-more"> read more...</a>');
-			$(this).append('<span class="more-text">' + removedStr + '</span>');
-		}
-	});
-
-	$(".read-more").click(function(){
-		$(this).siblings(".more-text").contents().unwrap();
-		$(this).remove();
-	});
-});
-</script>
-<!------------------ Score --------------------->
-<script type="text/javascript">
-function edit_score(edit_id, new_id) {
-    var edit = document.getElementById(edit_id);
-
-    if (edit.className === "d-none"){
-        edit.className = "visible";
-        document.getElementById(new_id).innerHTML = "";
-        $(edit).val('');
-        $(edit).focus();
-    } else {
-        edit.className = "d-none";
-    }
-}
-
 function add_score(new_score, edit_id, element_id) {
     var new_sc = document.getElementById(new_score);
     var edit_score_value = document.getElementById(edit_id).value;
@@ -1122,7 +1117,24 @@ function add_score(new_score, edit_id, element_id) {
     }
 }
 </script>
-<!-------- Show/collapse all categories -------->
+{% endif %}
+
+<!---------------- Expand/collaspe category -------------------->
+<script type="text/javascript">
+function hide(category, arrow) {
+    var category = document.getElementById(category);
+    var arrow = document.getElementById(arrow);
+
+    if (category.className === "d-flex flex-wrap"){
+        category.className = "d-none";
+        arrow.className = "collapse_all fas fa-sm fa-chevron-right";
+    } else {
+        category.className = "d-flex flex-wrap";
+        arrow.className = "collapse_all fas fa-sm fa-chevron-down";
+    }
+}
+</script>
+
 <script type="text/javascript">
 function hide_all_cat() {
     var hide = document.getElementById('collapse_all');
@@ -1145,7 +1157,30 @@ function show_all_cat() {
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-down');
 }
 </script>
-<!----------- Sidenav bar show/hide ------------>
+
+<!---------------- Synopsis -------------------->
+<script type="text/javascript">
+$(document).ready(function(){
+	var maxLength = 200;
+	$(".show-read-more").each(function(){
+		var myStr = $(this).text();
+		if($.trim(myStr).length > maxLength){
+			var newStr = myStr.substring(0, maxLength);
+			var removedStr = myStr.substring(maxLength, $.trim(myStr).length);
+			$(this).empty().html(newStr);
+			$(this).append('<a href="javascript:void(0);" class="read-more"> read more...</a>');
+			$(this).append('<span class="more-text">' + removedStr + '</span>');
+		}
+	});
+
+	$(".read-more").click(function(){
+		$(this).siblings(".more-text").contents().unwrap();
+		$(this).remove();
+	});
+});
+</script>
+
+<!----------- Show/hide sidenav bar ------------>
 <script type="text/javascript">
 function openNav() {
     document.getElementById("mySidenav").style.width = "180px";
@@ -1155,4 +1190,5 @@ function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 }
 </script>
+
 {% endblock script %}

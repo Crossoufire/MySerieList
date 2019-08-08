@@ -234,10 +234,10 @@ class Book(db.Model):
     title = db.Column(db.String(300), nullable=False)
     image_cover = db.Column(db.String(100), nullable=False)
     authors = db.Column(db.String(150), nullable=False)
-    published_date = db.Column(db.String(150), nullable=False)
-    description = db.Column(db.String(50), nullable=False)
-    page_count = db.Column(db.Integer, nullable=False)
-    categories = db.Column(db.String(150), nullable=False)
+    published_date = db.Column(db.String(150))
+    description = db.Column(db.String(50))
+    page_count = db.Column(db.Integer)
+    categories = db.Column(db.String(150))
     google_id = db.Column(db.String(150), nullable=False)
 
 
