@@ -8,6 +8,7 @@ TO DO / FIX FIRST
 	Add year in auto-complete results
 	Add lots of statistics (already started the code part, need a page to display + chart.js)
 	Fix bug display season and episode when refresh due to the browser cache (don't know how to repair) but works great otherwise
+	bug element_name for delete_element (JoJo's bizarre adventure for exemple)
 
 TO DO LATER
 	Add the possibility to change the background color of the website
