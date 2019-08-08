@@ -508,6 +508,7 @@ def account_settings():
             else:
                 flash("There was an error internal error. Please contact the administrator.", 'danger')
 
+        return redirect(url_for('account', user_name=current_user.username))
 
     elif request.method == 'GET':
         form.username.data = current_user.username
