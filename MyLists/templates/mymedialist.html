@@ -608,9 +608,10 @@ body.loading .modal_loading {
 
 
 {% block script %}
+{% if user_id == current_user.get_id() %}
 <!------------ Jquery Autocomplete ------------->
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<!------------ Jquery Autocomplete ------------->
+
 <script type="text/javascript">
 $.widget("custom.catcomplete", $.ui.autocomplete, {
     _create: function() {
@@ -647,7 +648,9 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
 		return $li.appendTo(ul);
 	}
 });
+</script>
 
+<script type="text/javascript">
 $(function() {
     $("#autocomplete").catcomplete({
         delay: 500,
@@ -695,7 +698,8 @@ $(function() {
     });
 });
 </script>
-<!-------------- Main JS ------------------>
+
+<!-------------- Refresh ------------------>
 <script type="text/javascript">
 function refreshAll() {
     $body = $("body");
@@ -714,8 +718,9 @@ function refreshAll() {
         }
     });
 }
+</script>
 
-
+<script type="text/javascript">
 function refresh(element_id) {
     $body = $("body");
     $.ajax ({
@@ -734,8 +739,10 @@ function refresh(element_id) {
         }
     });
 }
+</script>
 
-
+<!---------------- Update/Change/Remove element ------------------->
+<script type="text/javascript">
 function changeCategory(element_id, new_category, card_id, mod_id, seas_drop_id, ep_drop_id, seas_data) {
     if (new_category === 'Watching') {
         var completed = 'Completed';
@@ -914,8 +921,9 @@ function changeCategory(element_id, new_category, card_id, mod_id, seas_drop_id,
             console.log("ok"); }
     });
 }
+</script>
 
-
+<script type="text/javascript">
 function delete_element(element_id, card_id, element_name) {
     if (!confirm("Do you want to delete " + element_name + " from your list ?")){
         return false;
@@ -932,8 +940,9 @@ function delete_element(element_id, card_id, element_name) {
             console.log("ok"); }
     });
 }
+</script>
 
-
+<script type="text/javascript">
 function updateEpisode(element_id, episode){
     let selected_episode = episode.selectedIndex
 
@@ -949,22 +958,9 @@ function updateEpisode(element_id, episode){
             $body.removeClass("loading"); }
     });
 }
+</script>
 
-
-function hide(category, arrow) {
-    var category = document.getElementById(category);
-    var arrow = document.getElementById(arrow);
-
-    if (category.className === "d-flex flex-wrap"){
-        category.className = "d-none";
-        arrow.className = "collapse_all fas fa-sm fa-chevron-right";
-    } else {
-        category.className = "d-flex flex-wrap";
-        arrow.className = "collapse_all fas fa-sm fa-chevron-down";
-    }
-}
-
-
+<script type="text/javascript">
 function updateSeason(element_id, value, seas_data, ep_drop_id) {
     var selected_season = value.selectedIndex;
     var episode_drop = document.getElementById(ep_drop_id);
@@ -991,41 +987,10 @@ function updateSeason(element_id, value, seas_data, ep_drop_id) {
     });
 }
 </script>
-<!------------------ Synopsis ------------------>
+
+<!------------------ Score --------------------->
+
 <script type="text/javascript">
-$(document).ready(function() {
-	var maxLength = 200;
-	$(".show-read-more").each(function(){
-		var myStr = $(this).text();
-		if($.trim(myStr).length > maxLength){
-			var newStr = myStr.substring(0, maxLength);
-			var removedStr = myStr.substring(maxLength, $.trim(myStr).length);
-			$(this).empty().html(newStr);
-			$(this).append('<a href="javascript:void(0);" class="read-more"> read more...</a>');
-			$(this).append('<span class="more-text">' + removedStr + '</span>');
-		}
-	});
-
-	$(".read-more").click(function(){
-		$(this).siblings(".more-text").contents().unwrap();
-		$(this).remove();
-	});
-});
-</script>
-<!----------------- Score ---------------------->
-<script type="text/javascript">
-function show_score(footer_id, card_id) {
-    var score = document.getElementById(footer_id);
-
-    if (score.className === "d-none footer_score"){
-        score.className = "card-footer text-muted text-center p-0";
-        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-15');
-    } else {
-        score.className = "d-none footer_score";
-        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-40');
-    }
-}
-
 function edit_score(edit_id, new_id) {
     var edit = document.getElementById(edit_id);
 
@@ -1038,8 +1003,9 @@ function edit_score(edit_id, new_id) {
         edit.className = "d-none";
     }
 }
+</script>
 
-
+<script type="text/javascript">
 function add_score(new_score, edit_id, element_id) {
     var new_sc = document.getElementById(new_score);
     var edit_score_value = document.getElementById(edit_id).value;
@@ -1072,7 +1038,10 @@ function add_score(new_score, edit_id, element_id) {
         return true;
     }
 }
+</script>
+{% endif %}
 
+<script type="text/javascript">
 function show_all_score() {
     var show = document.getElementById('show_all');
     var hide = document.getElementById('hide_all');
@@ -1082,7 +1051,9 @@ function show_all_score() {
     $('#show_hide').text('Hide scores');
     $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-15');
 }
+</script>
 
+<script type="text/javascript">
 function hide_all_score() {
     var hide = document.getElementById('hide_all');
     var show = document.getElementById('show_all');
@@ -1093,6 +1064,43 @@ function hide_all_score() {
     $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-40');
 }
 </script>
+
+<script type="text/javascript">
+function show_score(footer_id, card_id) {
+    var score = document.getElementById(footer_id);
+
+    if (score.className === "d-none footer_score"){
+        score.className = "card-footer text-muted text-center p-0";
+        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-15');
+    } else {
+        score.className = "d-none footer_score";
+        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-40');
+    }
+}
+</script>
+
+<!------------------ Synopsis ------------------>
+<script type="text/javascript">
+$(document).ready(function() {
+	var maxLength = 200;
+	$(".show-read-more").each(function(){
+		var myStr = $(this).text();
+		if($.trim(myStr).length > maxLength){
+			var newStr = myStr.substring(0, maxLength);
+			var removedStr = myStr.substring(maxLength, $.trim(myStr).length);
+			$(this).empty().html(newStr);
+			$(this).append('<a href="javascript:void(0);" class="read-more"> read more...</a>');
+			$(this).append('<span class="more-text">' + removedStr + '</span>');
+		}
+	});
+
+	$(".read-more").click(function(){
+		$(this).siblings(".more-text").contents().unwrap();
+		$(this).remove();
+	});
+});
+</script>
+
 <!------- Show/collapse all categories --------->
 <script type="text/javascript">
 function hide_all_cat() {
@@ -1105,7 +1113,9 @@ function hide_all_cat() {
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-right');
 
 }
+</script>
 
+<script type="text/javascript">
 function show_all_cat() {
     var show = document.getElementById('show_cat_all');
     var hide = document.getElementById('collapse_all');
@@ -1116,12 +1126,30 @@ function show_all_cat() {
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-down');
 }
 </script>
+
+<script type="text/javascript">
+function hide(category, arrow) {
+    var category = document.getElementById(category);
+    var arrow = document.getElementById(arrow);
+
+    if (category.className === "d-flex flex-wrap"){
+        category.className = "d-none";
+        arrow.className = "collapse_all fas fa-sm fa-chevron-right";
+    } else {
+        category.className = "d-flex flex-wrap";
+        arrow.className = "collapse_all fas fa-sm fa-chevron-down";
+    }
+}
+</script>
+
 <!----------- Sidenav bar show/hide ------------>
 <script type="text/javascript">
 function openNav() {
     document.getElementById("mySidenav").style.width = "180px";
 }
+</script>
 
+<script type="text/javascript">
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 }
