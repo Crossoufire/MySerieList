@@ -19,7 +19,7 @@ from MyLists import app, db, bcrypt, mail, config
 from MyLists.admin_views import User
 from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, ChangePasswordForm, AddFriendForm, \
     ResetPasswordForm, ResetPasswordRequestForm
-from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
+from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, ElementStatus, ListType, SeriesGenre, SeriesNetwork, \
     Friend, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, BookStatus, Book, BookList, \
     Achievements
 
@@ -182,6 +182,7 @@ def home():
             return redirect(next_page) if next_page else redirect(url_for(home_page, user_name=current_user.username))
         else:
             flash('Login Failed. Please check Username and Password', 'warning')
+
     if register_form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(register_form.register_password.data).decode('utf-8')
         user = User(username=register_form.register_username.data,
@@ -202,6 +203,7 @@ def home():
             app.logger.error('[SYSTEM] Error while sending the registration email to {}'.format(user.email))
             image_error = url_for('static', filename='img/error.jpg')
             return render_template('error.html', error_code=500, title='Error', image_error=image_error), 500
+
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.get_id()).first()
         if user.homepage == HomePage.MYSERIESLIST:
@@ -210,12 +212,15 @@ def home():
             return redirect(url_for('myanimeslist', user_name=current_user.username))
         elif user.homepage == HomePage.MYBOOKSLIST:
             return redirect(url_for('mybookslist', user_name=current_user.username))
+        elif user.homepage == HomePage.ACCOUNT:
+            return redirect(url_for('account', user_name=current_user.username))
+        elif user.homepage == HomePage.HALL_OF_FAME:
+            return redirect(url_for('hall_of_fame', user_name=current_user.username))
     else:
         home_header = url_for('static', filename='img/home_header.jpg')
         img1 = url_for('static', filename='img/home_img1.jpg')
         img2 = url_for('static', filename='img/home_img2.jpg')
         return render_template('home.html',
-                               title='Home',
                                login_form=login_form,
                                register_form=register_form,
                                image_header=home_header,
@@ -226,7 +231,8 @@ def home():
 @app.route("/reset_password", methods=['GET', 'POST'])
 def reset_password():
     if current_user.is_authenticated:
-        return redirect(url_for('myserieslist', user_name=current_user.username))
+        return redirect(url_for('home'))
+
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -244,7 +250,8 @@ def reset_password():
 @app.route("/reset_password/<token>", methods=['GET', 'POST'])
 def reset_token(token):
     if current_user.is_authenticated:
-        return redirect(url_for('myserieslist', user_name=current_user.username))
+        return redirect(url_for('home'))
+
     user = User.verify_reset_token(token)
     if user is None:
         flash('That is an invalid or expired token', 'warning')
@@ -263,7 +270,8 @@ def reset_token(token):
 @app.route("/register_account/<token>", methods=['GET', 'POST'])
 def register_token(token):
     if current_user.is_authenticated:
-        return redirect(url_for('myserieslist', user_name=current_user.username))
+        return redirect(url_for('home'))
+
     user = User.verify_reset_token(token)
     if user is None:
         flash('That is an invalid or expired token', 'warning')
@@ -276,9 +284,9 @@ def register_token(token):
     return redirect(url_for('home'))
 
 
-@app.route("/test2")
-def test2():
-    return render_template('test2.html')
+@app.route("/test")
+def test():
+    pass
 
 
 ################################################# Authenticated routes #################################################
@@ -302,30 +310,30 @@ def logout():
 @app.route("/account/<user_name>", methods=['GET', 'POST'])
 @login_required
 def account(user_name):
-    add_friend_form = AddFriendForm()
-    if add_friend_form.validate_on_submit():
-        if str(add_friend_form.add_friend.data) == str(user_name):
-            flash("You cannot add yourself.", 'info')
-        else:
-            add_friend(add_friend_form.add_friend.data)
-
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
+    add_friend_form = AddFriendForm()
+    if add_friend_form.validate_on_submit():
+        add_friend(add_friend_form.add_friend.data)
+
+    # Protect admin account
+    if user.id == 1 and current_user.id != 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    # No account with this username
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    if str(current_user.get_id()) == str(user.id):
-        pass
-    else:
+    # Check if the account is private / in the friendslist
+    if current_user.id != user.id:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-        if user.id == 1:
-            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
         if user.private:
             if current_user.get_id() == "1":
                 pass
             elif friend is None or friend.status != "accepted":
-                return redirect(url_for('anonymous'))
+                image_anonymous = url_for('static', filename='img/anonymous.jpg')
+                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
     # Profile picture
     profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
@@ -509,7 +517,7 @@ def email_update_token(token):
         return redirect(url_for('home'))
 
     if str(user.id) != current_user.get_id():
-        return redirect(url_for('myserieslist', user_name=current_user.username))
+        return redirect(url_for('home'))
 
     old_email = user.email
     user.email = user.transition_email
@@ -517,7 +525,7 @@ def email_update_token(token):
     db.session.commit()
     app.logger.info('[{}] Email successfully changed from {} to {}'.format(user.id, old_email, user.email))
     flash('Email successfully updated !', 'success')
-    return redirect(url_for('myserieslist', user_name=current_user.username))
+    return redirect(url_for('home'))
 
 
 @app.route('/change_password', methods=['GET', 'POST'])
@@ -638,14 +646,8 @@ def friend_request():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        friend_id = json_data['response']
+        friend_id = int(json_data['response'])
         value = json_data['request']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        friend_id = int(friend_id)
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -686,13 +688,7 @@ def delete_friend():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        friend_id = json_data['delete']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        friend_id = int(friend_id)
+        friend_id = int(json_data['delete'])
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -719,9 +715,7 @@ def myanimeslist(user_name):
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    if str(current_user.get_id()) == str(user.id):
-        pass
-    else:
+    if current_user.id != user.id:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.id == 1:
             return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
@@ -729,7 +723,8 @@ def myanimeslist(user_name):
             if current_user.get_id() == "1":
                 pass
             elif friend is None or friend.status != "accepted":
-                return redirect(url_for('anonymous'))
+                image_anonymous = url_for('static', filename='img/anonymous.jpg')
+                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
     watching_list     = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
     completed_list    = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
@@ -759,9 +754,7 @@ def myserieslist(user_name):
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    if str(current_user.get_id()) == str(user.id):
-        pass
-    else:
+    if current_user.id != user.id:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.id == 1:
             return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
@@ -769,7 +762,8 @@ def myserieslist(user_name):
             if current_user.get_id() == "1":
                 pass
             elif friend is None or friend.status != "accepted":
-                return redirect(url_for('anonymous'))
+                image_anonymous = url_for('static', filename='img/anonymous.jpg')
+                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
     watching_list     = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
     completed_list    = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
@@ -799,9 +793,7 @@ def myanimeslist_table(user_name):
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    if str(current_user.get_id()) == str(user.id):
-        pass
-    else:
+    if current_user.id != user.id:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.id == 1:
             return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
@@ -809,7 +801,8 @@ def myanimeslist_table(user_name):
             if current_user.get_id() == "1":
                 pass
             elif friend is None or friend.status != "accepted":
-                return redirect(url_for('anonymous'))
+                image_anonymous = url_for('static', filename='img/anonymous.jpg')
+                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
     watching_list    = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
     completed_list   = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
@@ -839,9 +832,7 @@ def myserieslist_table(user_name):
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    if str(current_user.get_id()) == str(user.id):
-        pass
-    else:
+    if current_user.id != user.id:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.id == 1:
             return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
@@ -849,7 +840,8 @@ def myserieslist_table(user_name):
             if current_user.get_id() == "1":
                 pass
             elif friend is None or friend.status != "accepted":
-                return redirect(url_for('anonymous'))
+                image_anonymous = url_for('static', filename='img/anonymous.jpg')
+                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
     watching_list    = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
     completed_list   = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
@@ -876,16 +868,9 @@ def update_element_season():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        season = json_data['season']
-        element_id = json_data['element_id']
+        season = int(json_data['season'])
+        element_id = int(json_data['element_id'])
         element_type = json_data['element_type']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        season = int(season)
-        element_id = int(element_id)
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -943,21 +928,14 @@ def update_element_episode():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        episode = json_data['episode']
-        element_id = json_data['element_id']
+        episode = int(json_data['episode'])
+        element_id = int(json_data['element_id'])
         element_type = json_data['element_type']
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     valid_element_type = ["ANIME", "SERIES"]
     if element_type not in valid_element_type:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        episode = int(episode)
-        element_id = int(element_id)
-    except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element exists
@@ -1010,19 +988,13 @@ def delete_element():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        element_id = json_data['delete']
+        element_id = int(json_data['delete'])
         element_type = json_data['element_type']
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     valid_element_type = ["ANIME", "SERIES"]
     if element_type not in valid_element_type:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        element_id = int(element_id)
-    except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element exists
@@ -1060,7 +1032,7 @@ def change_element_category():
     try:
         json_data = request.get_json()
         element_new_category = json_data['status']
-        element_id = json_data['element_id']
+        element_id = int(json_data['element_id'])
         element_type = json_data['element_type']
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
@@ -1073,21 +1045,17 @@ def change_element_category():
     if element_type not in valid_element_type:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    # Check if the inputs are digits
-    try:
-        element_id = int(element_id)
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
     if element_type == "ANIME":
         element = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
     elif element_type == "SERIES":
         element = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
+    if element is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     if element_new_category == 'Watching':
-        element.status = 'WATCHING'
+        element.status = ElementStatus.WATCHING
     elif element_new_category == 'Completed':
-        element.status = 'COMPLETED'
+        element.status = ElementStatus.COMPLETED
         # Set Season / Episode to max
         if element_type == "ANIME":
             number_season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).count()
@@ -1102,13 +1070,13 @@ def change_element_category():
             element.last_episode_watched = number_episode
             db.session.commit()
     elif element_new_category == 'On Hold':
-        element.status = 'ON_HOLD'
+        element.status = ElementStatus.ON_HOLD
     elif element_new_category == 'Random':
-        element.status = 'RANDOM'
+        element.status = ElementStatus.RANDOM
     elif element_new_category == 'Dropped':
-        element.status = 'DROPPED'
+        element.status = ElementStatus.DROPPED
     elif element_new_category == 'Plan to Watch':
-        element.status = 'PLAN_TO_WATCH'
+        element.status = ElementStatus.PLAN_TO_WATCH
     db.session.commit()
     app.logger.info('[{}] Category of the element with ID {} changed to {}'.format(current_user.get_id(),
                                                                                    element_id,
@@ -1123,14 +1091,8 @@ def refresh_single_element():
 
     try:
         json_data = request.get_json()
-        element_id = json_data['element_id']
+        element_id = int(json_data['element_id'])
         element_type = json_data['element_type']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        element_id = int(element_id)
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1194,19 +1156,17 @@ def add_element():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        element_id = json_data['element_id']
+        element_id = int(json_data['element_id'])
         element_type = json_data['element_type']
     except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    list_type = ["SERIES", "ANIME"]
-    if element_type not in list_type:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     if element_type == "ANIME":
         add_element(element_id, ListType.ANIME)
     elif element_type == "SERIES":
         add_element(element_id, ListType.SERIES)
+    else:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     return '', 204
 
@@ -1217,16 +1177,9 @@ def add_score_element():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        score_value = json_data['score_val']
-        element_id = json_data['element_id']
+        score_value = round(float(json_data['score_val']), 2)
+        element_id = int(json_data['element_id'])
         element_type = json_data['element_type']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        score_value = float(score_value)
-        element_id = int(element_id)
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1251,13 +1204,13 @@ def add_score_element():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     if element_type == "ANIME":
-        add_score = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first()
-        add_score.score = score_value
+        anime = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first()
+        anime.score = score_value
         db.session.commit()
         app.logger.info('[{}] Anime with ID {} scored {}'.format(current_user.get_id(), element_id, score_value))
     elif element_type == "SERIES":
-        add_score = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first()
-        add_score.score = score_value
+        series = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first()
+        series.score = score_value
         db.session.commit()
         app.logger.info('[{}] Series with ID {} scored {}'.format(current_user.get_id(), element_id, score_value))
 
@@ -1294,9 +1247,7 @@ def mybookslist(user_name):
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    if str(current_user.get_id()) == str(user.id):
-        pass
-    else:
+    if current_user.id != user.id:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.id == 1:
             return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
@@ -1304,7 +1255,8 @@ def mybookslist(user_name):
             if current_user.get_id() == "1":
                 pass
             elif friend is None or friend.status != "accepted":
-                return redirect(url_for('anonymous'))
+                image_anonymous = url_for('static', filename='img/anonymous.jpg')
+                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
     reading_list    = BookList.query.filter_by(user_id=user.id, status=BookStatus.READING).all()
     completed_list  = BookList.query.filter_by(user_id=user.id, status=BookStatus.COMPLETED).all()
@@ -1331,9 +1283,7 @@ def mybookslist_table(user_name):
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    if str(current_user.get_id()) == str(user.id):
-        pass
-    else:
+    if current_user.id != user.id:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.id == 1:
             return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
@@ -1341,7 +1291,8 @@ def mybookslist_table(user_name):
             if current_user.get_id() == "1":
                 pass
             elif friend is None or friend.status != "accepted":
-                return redirect(url_for('anonymous'))
+                image_anonymous = url_for('static', filename='img/anonymous.jpg')
+                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
     reading_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.READING).all()
     completed_list  = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.COMPLETED).all()
@@ -1365,13 +1316,7 @@ def delete_book():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        book_id = json_data['delete']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        book_id = int(book_id)
+        book_id = int(json_data['delete'])
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1396,21 +1341,14 @@ def change_book_category():
     try:
         json_data = request.get_json()
         book_new_category = json_data['status']
-        book_id = json_data['book_id']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    category_list = ["Reading", "Completed", "On Hold", "Dropped", "Plan to Read"]
-    if book_new_category not in category_list:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the inputs are digits
-    try:
-        book_id = int(book_id)
+        book_id = int(json_data['book_id'])
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     book = BookList.query.filter_by(book_id=book_id, user_id=current_user.get_id()).first()
+    if book is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
     if book_new_category == 'Reading':
         book.status = BookStatus.READING
     elif book_new_category == 'Completed':
@@ -1421,6 +1359,9 @@ def change_book_category():
         book.status = BookStatus.DROPPED
     elif book_new_category == 'Plan to Read':
         book.status = BookStatus.PLAN_TO_READ
+    else:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
     db.session.commit()
     app.logger.info('[{}] Category of the book with ID {} changed to {}'.format(current_user.get_id(),
                                                                                 book_id,
@@ -1787,13 +1728,6 @@ def autocomplete_search_element(element_name, list_type):
 
 
 def add_element(element_id, list_type):
-    if element_id == "":
-        if list_type == ListType.SERIES:
-            return redirect(url_for('myserieslist', user_name=current_user.username))
-        elif list_type == ListType.ANIME:
-            return redirect(url_for('myanimeslist', user_name=current_user.username))
-        elif list_type == ListType.BOOK:
-            return redirect(url_for('mybookslist', user_name=current_user.username))
 
     # Check if the ID element exist in the database
     if list_type == ListType.SERIES:
@@ -1879,33 +1813,33 @@ def add_element(element_id, list_type):
 
 def get_element_data_from_api(api_id, list_type):
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        try:
-            response = requests.get(
-                "https://api.themoviedb.org/3/tv/{0}?api_key={1}".format(api_id, themoviedb_api_key))
-        except:
-            return None
+        while True:
+            try:
+                response = requests.get(
+                    "https://api.themoviedb.org/3/tv/{0}?api_key={1}".format(api_id, themoviedb_api_key))
+            except:
+                return None
 
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-            return None
+            if response.status_code == 401:
+                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+                return None
 
-        app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+            app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
 
-        if response.headers["X-RateLimit-Remaining"] == "0":
-            app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-            time.sleep(3)
-            get_element_data_from_api(api_id, list_type)
-        else:
-            pass
-    if list_type == ListType.BOOK:
+            if response.headers["X-RateLimit-Remaining"] == "0":
+                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+                time.sleep(3)
+            else:
+                break
+
+    elif list_type == ListType.BOOK:
         try:
             response = requests.get("https://www.googleapis.com/books/v1/volumes/{0}".format(api_id))
         except:
             return None
 
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting google API :(')
-            return None
+    else:
+        return None
 
     return json.loads(response.text)
 
@@ -1962,20 +1896,20 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         return element.id
 
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        name = element_data["name"]
-        original_name = element_data["original_name"]
-        first_air_date = element_data["first_air_date"]
-        last_air_date = element_data["last_air_date"]
-        homepage = element_data["homepage"]
-        in_production = element_data["in_production"]
-        total_seasons = element_data["number_of_seasons"]
-        total_episodes = element_data["number_of_episodes"]
-        status = element_data["status"]
-        vote_average = element_data["vote_average"]
-        vote_count = element_data["vote_count"]
-        synopsis = element_data["overview"]
-        popularity = element_data["popularity"]
-        themoviedb_id = element_data["id"]
+        name            = element_data["name"]
+        original_name   = element_data["original_name"]
+        first_air_date  = element_data["first_air_date"]
+        last_air_date   = element_data["last_air_date"]
+        homepage        = element_data["homepage"]
+        in_production   = element_data["in_production"]
+        total_seasons   = element_data["number_of_seasons"]
+        total_episodes  = element_data["number_of_episodes"]
+        status          = element_data["status"]
+        vote_average    = element_data["vote_average"]
+        vote_count      = element_data["vote_count"]
+        synopsis        = element_data["overview"]
+        popularity      = element_data["popularity"]
+        themoviedb_id   = element_data["id"]
 
         try:
             created_by = ""
@@ -2181,7 +2115,7 @@ def add_element_to_user(element_id, user_id, list_type):
                                series_id=element_id,
                                current_season=1,
                                last_episode_watched=1,
-                               status=Status.WATCHING)
+                               status=ElementStatus.WATCHING)
 
         app.logger.info('[{}] Added series with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
@@ -2191,7 +2125,7 @@ def add_element_to_user(element_id, user_id, list_type):
                               anime_id=element_id,
                               current_season=1,
                               last_episode_watched=1,
-                              status=Status.WATCHING)
+                              status=ElementStatus.WATCHING)
 
         app.logger.info('[{}] Added anime with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
@@ -2550,7 +2484,6 @@ def add_friend(friend_username):
     friend_to_add = User.query.filter_by(username=friend_username).first()
     if friend_to_add is None or friend_to_add.id == 1:
         app.logger.info('[{}] Attempt of adding user {} as friend'.format(current_user.get_id(), friend_username))
-        return flash('Sorry, no user with this username', 'info')
 
     else:
         friends = Friend.query.filter_by(user_id=current_user.get_id()).all()
@@ -2625,7 +2558,7 @@ def send_register_email(user):
 
 def send_email_update_email(user):
     token = user.get_email_update_token()
-    msg = Message(subject='MySerieList Email Update Request',
+    msg = Message(subject='MyList Email Update Request',
                   sender=app.config['MAIL_USERNAME'],
                   recipients=[user.email],
                   bcc=[app.config['MAIL_USERNAME']],
@@ -2647,401 +2580,3 @@ def send_email_update_email(user):
     except Exception as e:
         app.logger.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'.format(user.id, e))
         return False
-
-
-######################################################## TEST ##########################################################
-
-
-def crawl_tmdb():
-    import time
-    start_time = time.time()
-
-    for i in range(1, 501):
-
-        response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}".format(i, themoviedb_api_key))
-        print(response.headers["X-RateLimit-Remaining"])
-
-        if response.status_code == 200:
-            series_data = json.loads(response.text)
-            print("Serie ID {} : OK".format(i))
-        else:
-            print("Serie ID {} : NON OK".format(i))
-            continue
-
-        if series_data["poster_path"] is not None:
-            cover_id = save_api_cover(series_data["poster_path"], ListType.SERIES)
-            add_element_in_base(series_data, cover_id, ListType.SERIES)
-        else:
-            add_element_in_base(series_data, "default.jpg", ListType.SERIES)
-
-    print("--- %s seconds ---" % (time.time() - start_time))
-
-
-def test_stats_series():
-    get_scores = SeriesList.query.filter_by(user_id=current_user.get_id()).all()
-
-    ################################## Rating vs Count ###################################
-    tier_1 = 0
-    total_time_1 = 0
-    tier_2 = 0
-    total_time_2 = 0
-    tier_3 = 0
-    total_time_3 = 0
-    tier_4 = 0
-    total_time_4 = 0
-    tier_5 = 0
-    total_time_5 = 0
-    tier_6 = 0
-    total_time_6 = 0
-    tier_7 = 0
-    total_time_7 = 0
-    tier_8 = 0
-    total_time_8 = 0
-    tier_9 = 0
-    total_time_9 = 0
-    tier_10 = 0
-    total_time_10 = 0
-    for i in range(0, len(get_scores)):
-        if get_scores[i].score is None:
-            pass
-        else:
-            if 0 <= get_scores[i].score < 1:
-                tier_1 += 1
-
-                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
-
-                episodes_counter = 0
-                time_spent_min = 0
-
-                current_season = get_scores[i].current_season
-                current_ep = get_scores[i].last_episode_watched
-
-                for j in range(1, current_season):
-                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
-                    episodes_counter += ep
-                    time_spent_min += ep * duration
-
-                time_spent_hours = divmod(time_spent_min, 60)
-                total_time_1 += time_spent_hours[0]
-
-            elif 1 <= get_scores[i].score < 2:
-                tier_2 += 1
-
-                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
-
-                episodes_counter = 0
-                time_spent_min = 0
-
-                current_season = get_scores[i].current_season
-                current_ep = get_scores[i].last_episode_watched
-
-                for j in range(1, current_season):
-                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
-                    episodes_counter += ep
-                    time_spent_min += ep * duration
-
-                time_spent_hours = divmod(time_spent_min, 60)
-                total_time_2 += time_spent_hours[0]
-
-            elif 2 <= get_scores[i].score < 3:
-                tier_3 += 1
-
-                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
-
-                episodes_counter = 0
-                time_spent_min = 0
-
-                current_season = get_scores[i].current_season
-                current_ep = get_scores[i].last_episode_watched
-
-                for j in range(1, current_season):
-                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
-                    episodes_counter += ep
-                    time_spent_min += ep * duration
-
-                time_spent_hours = divmod(time_spent_min, 60)
-                total_time_3 += time_spent_hours[0]
-
-            elif 3 <= get_scores[i].score < 4:
-                tier_4 += 1
-
-                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
-
-                episodes_counter = 0
-                time_spent_min = 0
-
-                current_season = get_scores[i].current_season
-                current_ep = get_scores[i].last_episode_watched
-
-                for j in range(1, current_season):
-                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
-                    episodes_counter += ep
-                    time_spent_min += ep * duration
-
-                time_spent_hours = divmod(time_spent_min, 60)
-                total_time_4 += time_spent_hours[0]
-
-            elif 4 <= get_scores[i].score < 5:
-                tier_5 += 1
-
-                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
-
-                episodes_counter = 0
-                time_spent_min = 0
-
-                current_season = get_scores[i].current_season
-                current_ep = get_scores[i].last_episode_watched
-
-                for j in range(1, current_season):
-                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
-                    episodes_counter += ep
-                    time_spent_min += ep * duration
-
-                time_spent_hours = divmod(time_spent_min, 60)
-                total_time_5 += time_spent_hours[0]
-
-            elif 5 <= get_scores[i].score < 6:
-                tier_6 += 1
-
-                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
-
-                episodes_counter = 0
-                time_spent_min = 0
-
-                current_season = get_scores[i].current_season
-                current_ep = get_scores[i].last_episode_watched
-
-                for j in range(1, current_season):
-                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
-                    episodes_counter += ep
-                    time_spent_min += ep * duration
-
-                time_spent_hours = divmod(time_spent_min, 60)
-                total_time_6 += time_spent_hours[0]
-
-            elif 6 <= get_scores[i].score < 7:
-                tier_7 += 1
-
-                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
-
-                episodes_counter = 0
-                time_spent_min = 0
-
-                current_season = get_scores[i].current_season
-                current_ep = get_scores[i].last_episode_watched
-
-                for j in range(1, current_season):
-                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
-                    episodes_counter += ep
-                    time_spent_min += ep * duration
-
-                time_spent_hours = divmod(time_spent_min, 60)
-                total_time_7 += time_spent_hours[0]
-
-            elif 7 <= get_scores[i].score < 8:
-                tier_8 += 1
-
-                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
-
-                episodes_counter = 0
-                time_spent_min = 0
-
-                current_season = get_scores[i].current_season
-                current_ep = get_scores[i].last_episode_watched
-
-                for j in range(1, current_season):
-                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
-                    episodes_counter += ep
-                    time_spent_min += ep * duration
-
-                time_spent_hours = divmod(time_spent_min, 60)
-                total_time_8 += time_spent_hours[0]
-
-            elif 8 <= get_scores[i].score < 9:
-                tier_9 += 1
-
-                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
-
-                episodes_counter = 0
-                time_spent_min = 0
-
-                current_season = get_scores[i].current_season
-                current_ep = get_scores[i].last_episode_watched
-
-                for j in range(1, current_season):
-                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
-                    episodes_counter += ep
-                    time_spent_min += ep * duration
-
-                time_spent_hours = divmod(time_spent_min, 60)
-                total_time_9 += time_spent_hours[0]
-
-            elif 9 <= get_scores[i].score <= 10:
-                tier_10 += 1
-
-                duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
-
-                episodes_counter = 0
-                time_spent_min = 0
-
-                current_season = get_scores[i].current_season
-                current_ep = get_scores[i].last_episode_watched
-
-                for j in range(1, current_season):
-                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id, season=j).first().episodes
-                    episodes_counter += ep
-                    time_spent_min += ep * duration
-
-                time_spent_hours = divmod(time_spent_min, 60)
-                total_time_10 += time_spent_hours[0]
-
-    x = ['0-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8', '8-9', '9-10']
-    y = [tier_1, tier_2, tier_3, tier_4, tier_5, tier_6, tier_7, tier_8, tier_9, tier_10]
-
-    total_rated = tier_1+tier_2+tier_3+tier_4+tier_5+tier_6+tier_7+tier_8+tier_9+tier_10
-    total_series = len(get_scores)
-    try:
-        pourcentage_series_rated = round((total_rated/total_series)*100, 2)
-    except:
-        pourcentage_series_rated = 0
-
-    ################################ Rating vs time spent ##########################################
-
-    y_2 = [total_time_1, total_time_2, total_time_3, total_time_4, total_time_5,
-           total_time_6, total_time_7, total_time_8, total_time_9, total_time_10]
-
-    total_time = get_total_time_spent(int(current_user.get_id()), ListType.SERIES)
-
-    ################################ Rating vs Seasons count ##########################################
-
-    list_all_seasons = []
-    for i in range(0, len(get_scores)):
-        duration = Series.query.filter_by(id=get_scores[i].series_id).first().episode_duration
-        score = get_scores[i].score
-        ep = SeriesEpisodesPerSeason.query.filter_by(series_id=get_scores[i].series_id).all()
-
-        season_per_series = []
-        for j in range(0, len(ep)):
-            season_per_series.append(ep[j].episodes)
-
-
-        list_all_seasons.append([len(season_per_series), score])
-
-    x_2 = ["1-2", "3-4", "5-6", "7-8", "9-10", "11+"]
-
-    tmp_1 = 0
-    tmp_mean_score_1 = 0
-    tmp_2 = 0
-    tmp_mean_score_2 = 0
-    tmp_3 = 0
-    tmp_mean_score_3 = 0
-    tmp_4 = 0
-    tmp_mean_score_4 = 0
-    tmp_5 = 0
-    tmp_mean_score_5 = 0
-    tmp_6 = 0
-    tmp_mean_score_6 = 0
-    for k in range(0, len(list_all_seasons)):
-        if 1 <= list_all_seasons[k][0] <= 2:
-            tmp_1 += 1
-            if list_all_seasons[k][1] is None:
-                pass
-            else:
-                tmp_mean_score_1 += list_all_seasons[k][1]
-        elif 3 <= list_all_seasons[k][0] <= 4:
-            tmp_2 += 1
-            if list_all_seasons[k][1] is None:
-                pass
-            else:
-                tmp_mean_score_2 += list_all_seasons[k][1]
-        elif 5 <= list_all_seasons[k][0] <= 6:
-            tmp_3 += 1
-            if list_all_seasons[k][1] is None:
-                pass
-            else:
-                tmp_mean_score_3 += list_all_seasons[k][1]
-        elif 7 <= list_all_seasons[k][0] <= 8:
-            tmp_4 += 1
-            if list_all_seasons[k][1] is None:
-                pass
-            else:
-                tmp_mean_score_4 += list_all_seasons[k][1]
-        elif 9 <= list_all_seasons[k][0] <= 10:
-            tmp_5 += 1
-            if list_all_seasons[k][1] is None:
-                pass
-            else:
-                tmp_mean_score_5 += list_all_seasons[k][1]
-        elif list_all_seasons[k][0] > 10:
-            tmp_6 += 1
-            if list_all_seasons[k][1] is None:
-                pass
-            else:
-                tmp_mean_score_6 += list_all_seasons[k][1]
-
-    y_3 = [tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6]
-
-    try:
-        mean_1 = tmp_mean_score_1/tmp_1
-    except:
-        mean_1 = 0
-    try:
-        mean_2 = tmp_mean_score_2/tmp_2
-    except:
-        mean_2 = 0
-    try:
-        mean_3 = tmp_mean_score_3/tmp_3
-    except:
-        mean_3 = 0
-    try:
-        mean_4 = tmp_mean_score_4/tmp_4
-    except:
-        mean_4 = 0
-    try:
-        mean_5 = tmp_mean_score_5/tmp_5
-    except:
-        mean_5 = 0
-    try:
-        mean_6 = tmp_mean_score_6/tmp_6
-    except:
-        mean_6 = 0
-
-    y_4 = [mean_1, mean_2, mean_3, mean_4, mean_5, mean_6]
-
-    # import matplotlib.pyplot as plt
-    #
-    # fig, ax1 = plt.subplots()
-    #
-    # ax1.bar(x_2, y_3)
-    # ax2 = ax1.twinx()
-    # ax2.plot(x_2, y_4)
-    #
-    # fig.tight_layout()
-    # plt.show()
-
-    return [x, y]
-
-
-def add_achievements():
-    mypath = "D:/Bureau/MyLists/MyLists/static/achievements/anime_json/"
-    from os import listdir
-    from os.path import isfile, join
-    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-    for file in onlyfiles:
-        with open("{}/{}".format(mypath, file), encoding='UTF-8', errors='ignore') as json_file:
-            data = json.load(json_file)
-            for i in range(0, len(data["achievements"])):
-                try:
-                    genre = str(data["requirement"]["genre"])
-                except:
-                    genre = None
-                achievement = Achievements(media=str(data["media"]),
-                                           threshold=str(data["achievements"][i]["threshold"]),
-                                           image_id=str(data["achievements"][i]["id"]),
-                                           level=str(data["achievements"][i]["level"]),
-                                           title=str(data["achievements"][i]["title"]),
-                                           description=str(data["achievements"][i]["desc"]),
-                                           type=str(data["requirement"]["type"]),
-                                           genre=genre)
-                db.session.add(achievement)
-                db.session.commit()

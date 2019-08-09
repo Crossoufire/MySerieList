@@ -310,6 +310,7 @@ hr {
 
 {% block content %}
 <div class="container form_account p-0">
+    {% if user_id == current_user.get_id() %}
     <!---------------------------------------- Add friend modal --------------------------------------->
     <div class="modal fade" id="addFriendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -318,14 +319,14 @@ hr {
                     {{ form.hidden_tag() }}
                     <h5 class="border-bottom p-t-20 p-b-15 text-center"><b>Add a Friend</b></h5>
                     <div class="form-group m-l-40 m-r-40 m-t-15">
-                        {% if form.add_friend.errors %}
-                        {{ form.add_friend(class="form-control form-control is-invalid") }}
+                        {% if form.friend_to_add.errors %}
+                        {{ form.friend_to_add(class="form-control form-control is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.add_friend.errors %}
+                            {% for error in form.friend_to_add.errors %}
                             <span>{{ error }}</span> {% endfor %}
                         </div>
                         {% else %}
-                        {{ form.add_friend(class="form-control", placeholder="Username", onfocus="this.value=''") }}
+                        {{ form.friend_to_add(class="form-control", placeholder="Username", onfocus="this.value=''") }}
                         {% endif %}
                     </div>
                     <div class="form-group m-l-20 m-r-20 text-center">
@@ -335,6 +336,7 @@ hr {
             </div>
         </div>
     </div>
+    {% endif %}
 
     <div class="border_account">
         <!------------------------ Account picture/Username/account settings -------------------------->
@@ -346,7 +348,7 @@ hr {
                 {% if user_id == current_user.get_id() %}
                 <h2 class="mt-0 account-heading username">{{ user_name }}</h2>
                 {% else %}
-                <h4 class="mt-0 account-heading username">{{ user_name }}'s profile</h4>
+                <h2 class="mt-0 account-heading username">{{ user_name }}'s profile</h2>
                 {% endif %}
                 <span style="font-size: 14pt;">Knowledge level:&nbsp&nbsp</span>
                 <img height='64' width='64' data-toggle="tooltip" title="{{ total_rank_data[0][1] }}" src="/static/img/Original/{{ total_rank_data[0][0] }}.png"/>
@@ -990,9 +992,10 @@ function show_all_cat() {
     $('#collapse_show').text('Collapse All');
     $('.collapse_all').attr('class', 'collapse_all fas fa-xs fa-chevron-down');
 }
-
+{% if user_id == current_user.get_id() %}
 $('#addFriendModal').on('shown.bs.modal', function() {
-    $('#add_friend').focus();
+    $('#friend_to_add').focus();
 })
+{% endif %}
 </script>
 {% endblock %}

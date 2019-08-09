@@ -67,8 +67,15 @@ class ChangePasswordForm(FlaskForm):
 
 
 class AddFriendForm(FlaskForm):
-    add_friend = StringField('Type a Username')
-    submit = SubmitField('Send')
+    friend_to_add = StringField('Type a Username')
+    submit = SubmitField('Send friend request')
+
+    def validate_friend_to_add(self, friend_to_add):
+        if friend_to_add.data == current_user.username:
+            raise ValidationError("You cannot add yourself")
+        user = User.query.filter_by(username=friend_to_add.data).first()
+        if user is None or user.id == 1:
+            raise ValidationError("User not found")
 
 
 class ResetPasswordRequestForm(FlaskForm):

@@ -273,7 +273,6 @@ admin.add_view(AnimeNetworkAdminView(model=AnimeNetwork,
                                      name="Anime network",
                                      endpoint='anime_network'))
 
-
 admin.add_view(BookAdminView(model=Book,
                              session=db.session,
                              name="Book",
