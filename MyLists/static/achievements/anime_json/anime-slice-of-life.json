@@ -1,0 +1,39 @@
+{
+    "media": "A",
+    "achievements":
+    [
+        {
+            "threshold": "1-5",
+            "id": "anime-slice-of-life-1",
+            "level": "Slice of Life: level 1",
+            "title": "Normal High School Boy",
+            "desc": "Got started into the furious ride with slice-of-life anime."
+        },
+        {
+            "threshold": "6-10",
+            "id": "anime-slice-of-life-2",
+            "level": "Slice of Life: level 2",
+            "title": "Cute × ( Girls + Things )",
+            "desc": "Didn't get bored of watching cute girls doing cute things. As if that's possible."
+        },
+        {
+            "threshold": "11-20",
+            "id": "anime-slice-of-life-3",
+            "level": "Slice of Life: level 3",
+            "title": "Enjoying Life",
+            "desc": "Found the equilibrium between boring and interesting."
+        },
+        {
+            "threshold": "21-100000",
+            "id": "anime-slice-of-life-4",
+            "level": "Slice of Life: level MAX",
+            "title": "Prima Undine",
+            "desc": "Awarded Ph.D. degree in slice-of-life-ology. You can teach others how to stay calm and take it easy."
+        }
+    ],
+    "requirement":
+    {
+        "type": "genre",
+        "genre": 36
+    }
+}

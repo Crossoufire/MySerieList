@@ -1,0 +1,31 @@
+{
+    "media": "A",
+    "achievements":
+    [
+		{
+            "threshold": "0-2.99",
+            "id": "anime-score-very-low",
+            "level": "0/10. Play Next One",
+            "title": "Less Than Three",
+            "desc": "Mean anime score lower than 3. Is it hate, or is it love?"
+        },
+		{
+            "threshold": "3-5",
+            "id": "anime-score-low",
+            "level": "My Eyes! It Hurts!",
+            "title": "Watching Anime Is Suffering",
+            "desc": "Mean anime score lower than 5. Someone has to counterweight the fanboys, right?"
+        },
+        {
+            "threshold": "8.5-10",
+            "id": "anime-score-high",
+            "level": "10/10! EVERYTHING!",
+            "title": "I Love Chinese Cartoons",
+            "desc": "Mean anime score higher than 8.5. How about using the whole scale and re-rating stuff? That could make you look less like a fanboy..."
+        }
+    ],
+    "requirement":
+    {
+        "type": "score"
+    }
+}

@@ -21,7 +21,7 @@ from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, Change
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
     Friend, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, BookStatus, Book, BookList, \
-    AnimeAchievements
+    Achievements
 
 
 config.read('config.ini')
@@ -46,7 +46,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(admin)
-
     if User.query.filter_by(id='2').first() is None:
         test = User(username='test',
                     email='test@test.com',
@@ -57,7 +56,6 @@ def create_user():
                     registered_on=datetime.utcnow(),
                     activated_on=datetime.utcnow())
         db.session.add(test)
-
     if User.query.filter_by(id='3').first() is None:
         test2 = User(username='test2',
                      email='test2@test2.com',
@@ -68,7 +66,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test2)
-
     if User.query.filter_by(id='4').first() is None:
         test3 = User(username='test3',
                      email='test3@test3.com',
@@ -79,7 +76,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test3)
-
     if User.query.filter_by(id='5').first() is None:
         test4 = User(username='test4',
                      email='test4@test4.com',
@@ -90,7 +86,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test4)
-
     if User.query.filter_by(id='6').first() is None:
         test5 = User(username='aaaa',
                      email='test5@test5.com',
@@ -101,7 +96,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test5)
-
     if User.query.filter_by(id='7').first() is None:
         test6 = User(username='Sudoer',
                      email='test6@test6.com',
@@ -112,7 +106,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test6)
-
     if User.query.filter_by(id='8').first() is None:
         test7 = User(username='aaa',
                      email='test7@test7.com',
@@ -123,7 +116,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test7)
-
     if User.query.filter_by(id='9').first() is None:
         test8 = User(username='I_Love_Anime',
                      email='test8@test8.com',
@@ -134,7 +126,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test8)
-
     if User.query.filter_by(id='10').first() is None:
         test9 = User(username='0010100011',
                      email='test9@test9.com',
@@ -145,7 +136,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test9)
-
     if User.query.filter_by(id='11').first() is None:
         test10 = User(username='Crossoufire',
                      email='test10@test10.com',
@@ -156,7 +146,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test10)
-
     if User.query.filter_by(id='12').first() is None:
         test11 = User(username='WynroZ',
                      email='test11@test11.com',
@@ -167,6 +156,7 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test11)
+    add_achievements()
     db.session.commit()
 
 
@@ -358,7 +348,7 @@ def account(user_name):
 
     # Animes Statistics, scores, level, and achievements
     anime_stats = get_all_account_stats(user.id, ListType.ANIME)
-    anime_achievements = get_animes_achievements(user.id)
+    anime_achievements = get_achievements(user.id, ListType.ANIME)
 
     # Books Statistics, scores, and level
     book_stats = get_all_account_stats(user.id, ListType.BOOK)
@@ -1545,47 +1535,48 @@ def get_all_account_stats(user_id, list_type):
     return [nb_of_element, total_time_element, mean_score_element, element_level, element_rank_data, element_rate]
 
 
-def get_animes_achievements(user_id):
-    all_achievements = []
-    tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10 = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    animes = AnimeList.query.filter(AnimeList.status == "COMPLETED").filter_by(user_id=user_id).all()
-    for anime in animes:
-        genres = AnimeGenre.query.filter_by(anime_id=anime.anime_id).all()
-        for genre in genres:
-            a = genre.genre_id
-            if a == 13:
-                tmp_1 += 1
-            elif a == 18:
-                tmp_2 += 1
-            elif a == 19:
-                tmp_3 += 1
-            elif a == 7:
-                tmp_4 += 1
-            elif a == 22:
-                tmp_5 += 1
-            elif a == 36:
-                tmp_6 += 1
-            elif a == 29:
-                tmp_7 += 1
-            elif a == 30:
-                tmp_8 += 1
-            elif a == 5 or a == 40:
-                tmp_9 += 1
-            elif a == 14 or a == 41:
-                tmp_10 += 1
-            else:
-                pass
+def get_achievements(user_id, list_type):
+    if list_type == ListType.ANIME:
+        all_achievements = []
+        tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10 = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        animes = AnimeList.query.filter(AnimeList.status == "COMPLETED").filter_by(user_id=user_id).all()
+        for anime in animes:
+            genres = AnimeGenre.query.filter_by(anime_id=anime.anime_id).all()
+            for genre in genres:
+                a = genre.genre_id
+                if a == 13:
+                    tmp_1 += 1
+                elif a == 18:
+                    tmp_2 += 1
+                elif a == 19:
+                    tmp_3 += 1
+                elif a == 7:
+                    tmp_4 += 1
+                elif a == 22:
+                    tmp_5 += 1
+                elif a == 36:
+                    tmp_6 += 1
+                elif a == 29:
+                    tmp_7 += 1
+                elif a == 30:
+                    tmp_8 += 1
+                elif a == 40:
+                    tmp_9 += 1
+                elif a == 14:
+                    tmp_10 += 1
+                else:
+                    pass
 
-    ids = [13, 18, 19, 7, 22, 36, 29, 30, '5, 40', '14, 41']
-    values = [tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10]
-    for i in range(0, len(values)):
-        achievements = AnimeAchievements.query.filter_by(genre=str(ids[i])).all()
-        for achievement in achievements:
-            threshold = achievement.threshold
-            range_achiev = threshold.split("-")
-            if int(range_achiev[0]) <= int(values[i]) <= int(range_achiev[1]):
-                data_achiev = [achievement.image_id, achievement.level, achievement.title, achievement.description]
-                all_achievements.append(data_achiev)
+        ids = [13, 18, 19, 7, 22, 36, 29, 30, 40, 41]
+        values = [tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10]
+        for i in range(0, len(values)):
+            achievements = Achievements.query.filter_by(genre=str(ids[i])).all()
+            for achievement in achievements:
+                threshold = achievement.threshold
+                range_achievement = threshold.split("-")
+                if int(range_achievement[0]) <= int(values[i]) <= int(range_achievement[1]):
+                    data_achievements = [achievement.image_id, achievement.level, achievement.title, achievement.description]
+                    all_achievements.append(data_achievements)
 
     return all_achievements
 
@@ -3030,7 +3021,7 @@ def test_stats_series():
 
 
 def add_achievements():
-    mypath = "D:\Bureau\MyLists_Misc\Achievements\Anime\JSON_Achievements\genre"
+    mypath = "D:/Bureau/MyLists/MyLists/static/achievements/anime_json/"
     from os import listdir
     from os.path import isfile, join
     onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
@@ -3038,11 +3029,17 @@ def add_achievements():
         with open("{}/{}".format(mypath, file), encoding='UTF-8', errors='ignore') as json_file:
             data = json.load(json_file)
             for i in range(0, len(data["achievements"])):
-                achiev = AnimeAchievements(genre=str(data["requirement"]["genre"]),
+                try:
+                    genre = str(data["requirement"]["genre"])
+                except:
+                    genre = None
+                achievement = Achievements(media=str(data["media"]),
                                            threshold=str(data["achievements"][i]["threshold"]),
                                            image_id=str(data["achievements"][i]["id"]),
                                            level=str(data["achievements"][i]["level"]),
                                            title=str(data["achievements"][i]["title"]),
-                                           description=str(data["achievements"][i]["desc"]))
-                db.session.add(achiev)
+                                           description=str(data["achievements"][i]["desc"]),
+                                           type=str(data["requirement"]["type"]),
+                                           genre=genre)
+                db.session.add(achievement)
                 db.session.commit()

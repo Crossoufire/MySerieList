@@ -1,0 +1,38 @@
+{
+    "media": "A",
+    "achievements":
+    [
+        {
+            "threshold": "1-5",
+            "id": "anime-original-1",
+            "level": "Original: level 1",
+            "title": "Uncharted Waters",
+            "desc": "You have just stumbled across a wonderful, strange new world."
+        },
+        {
+            "threshold": "6-10",
+            "id": "anime-original-2",
+            "level": "Original: level 2",
+            "title": "Into the Jungle",
+            "desc": "The deeper you go, the less you want out."
+        },
+        {
+            "threshold": "11-20",
+            "id": "anime-original-3",
+            "level": "Original: level 3",
+            "title": "Center of the Earth",
+            "desc": "You have forgotten about the outside world; nature has assimilated you. An apple falls - not only have you flowered, you have produced fruit."
+        },
+        {
+            "threshold": "21-100000",
+            "id": "anime-original-4",
+            "level": "Original: level MAX",
+            "title": "Transcendence",
+            "desc": "You have been returned to the primordial ocean. From the highest point in the sky, you can peer into every universe, and lose yourself in an infinity of stories."
+        }
+    ],
+    "requirement":
+    {
+        "type": "source-original"
+    }
+}
