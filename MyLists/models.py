@@ -8,7 +8,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-class Status(enum.Enum):
+class ElementStatus(enum.Enum):
     WATCHING = "Watching"
     COMPLETED = "Completed"
     ON_HOLD = "On Hold"
@@ -28,8 +28,6 @@ class BookStatus(enum.Enum):
 class ListType(enum.Enum):
     SERIES = "Series"
     ANIME = "Anime"
-    MOVIE = "Movie"
-    GAME = "Game"
     BOOK = "Book"
 
 
@@ -119,7 +117,7 @@ class SeriesList(db.Model):
     series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     current_season = db.Column(db.Integer, nullable=False)
     last_episode_watched = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.Enum(Status), nullable=False)
+    status = db.Column(db.Enum(ElementStatus), nullable=False)
     score = db.Column(db.Float)
 
 
@@ -174,7 +172,7 @@ class AnimeList(db.Model):
     anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     current_season = db.Column(db.Integer, nullable=False)
     last_episode_watched = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.Enum(Status), nullable=False)
+    status = db.Column(db.Enum(ElementStatus), nullable=False)
     score = db.Column(db.Float)
 
 
@@ -228,6 +226,5 @@ class BookList(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
     commentary = db.Column(db.String(5000))
-    read_year = db.Column(db.Integer)
     status = db.Column(db.Enum(BookStatus), nullable=False)
     score = db.Column(db.Float)
