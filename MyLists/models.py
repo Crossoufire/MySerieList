@@ -196,16 +196,6 @@ class AnimeNetwork(db.Model):
     network = db.Column(db.String(150), nullable=False)
 
 
-class AnimeAchievements(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    genre = db.Column(db.String(100))
-    threshold = db.Column(db.String(100), nullable=False)
-    image_id = db.Column(db.String(100), nullable=False)
-    level = db.Column(db.String(100), nullable=False)
-    title = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(100), nullable=False)
-
-
 ######################################################## BOOKS #########################################################
 
 
@@ -228,3 +218,18 @@ class BookList(db.Model):
     commentary = db.Column(db.String(5000))
     status = db.Column(db.Enum(BookStatus), nullable=False)
     score = db.Column(db.Float)
+
+
+######################################################## ACHIEVEMENTS ##################################################
+
+
+class Achievements(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    media = db.Column(db.String(10), nullable=False)
+    threshold = db.Column(db.String(100), nullable=False)
+    image_id = db.Column(db.String(100), nullable=False)
+    level = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(200), nullable=False)
+    type = db.Column(db.String(100), nullable=False)
+    genre = db.Column(db.String(100))

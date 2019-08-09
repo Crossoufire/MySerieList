@@ -1,0 +1,38 @@
+{
+    "media": "A",
+    "achievements":
+    [
+        {
+            "threshold": "1-5",
+            "id": "anime-game-1",
+            "level": "Visual Novel: level 1",
+            "title": "Eternal Spring",
+            "desc": "It all started one fateful morning in April..."
+        },
+        {
+            "threshold": "6-10",
+            "id": "anime-game-2",
+            "level": "Visual Novel: level 2",
+            "title": "At the Gates of Eden",
+            "desc": "You're so close to heaven, you can almost feel it."
+        },
+        {
+            "threshold": "11-20",
+            "id": "anime-game-3",
+            "level": "Visual Novel: level 3",
+            "title": "Banquet of the Golden Witch",
+            "desc": "You've challenged her to a game. There is no turning back, now."
+        },
+        {
+            "threshold": "21-100000",
+            "id": "anime-game-4",
+            "level": "Immersion: level MAX",
+            "title": "Hacking to the Gate",
+            "desc": "All these games have made of you a wizard; you can crack any code without breaking a sweat."
+        }
+    ],
+    "requirement":
+    {
+        "type": "source-visual-novel"
+    }
+}

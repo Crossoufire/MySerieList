@@ -1,0 +1,39 @@
+{
+    "media": "A",
+    "achievements":
+    [
+        {
+            "threshold": "1-5",
+            "id": "anime-psychological-1",
+            "level": "Psychological: level 1",
+            "title": "What Exactly Did I Just Watch?",
+            "desc": "You discovered a whole new world of weird. Keep on watching."
+        },
+        {
+            "threshold": "6-10",
+            "id": "anime-psychological-2",
+            "level": "Psychological: level 2",
+            "title": "My Mind Is Full of Fu**",
+            "desc": "Your attempt to wrap your mind around this failed completely."
+        },
+        {
+            "threshold": "11-20",
+            "id": "anime-psychological-3",
+            "level": "Psychological: level 3",
+            "title": "Is This the Real Life?",
+            "desc": "It has become hard to distinguish between reality and fiction."
+        },
+        {
+            "threshold": "21-10000000",
+            "id": "anime-psychological-4",
+            "level": "Psychological: level MAX",
+            "title": "「 Ｗｉｒｅｄ Ｓｏｕｎｄ 」",
+            "desc": "You've seen too much. You've transcended humanity and operate on another level now."
+        }
+    ],
+    "requirement":
+    {
+        "type": "genre",
+        "genre": 40
+    }
+}

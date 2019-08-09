@@ -1,0 +1,39 @@
+{
+    "media": "A",
+    "achievements":
+    [
+        {
+            "threshold": "1-5",
+            "id": "anime-mecha-1",
+            "level": "Mecha: level 1",
+            "title": "Me? PILOT This Thing?!",
+            "desc": "A secret organization wants you to pilot a huge mecha. Can you do it?"
+        },
+        {
+            "threshold": "6-10",
+            "id": "anime-mecha-2",
+            "level": "Mecha: level 2",
+            "title": "Engineer",
+            "desc": "After watching over 59 mecha anime you should be able to build your own mobile suit. Remember not to kill the rest of us."
+        },
+        {
+            "threshold": "11-20",
+            "id": "anime-mecha-3",
+            "level": "Mecha: level 3",
+            "title": "Mechazawa",
+            "desc": "Having watched over 118 mecha anime, you've probably become a robot already. Nice job, hero."
+        },
+        {
+            "threshold": "21-1000000",
+            "id": "anime-mecha-4",
+            "level": "Mecha: level MAX",
+            "title": "Pierce the HEAVENS!",
+            "desc": "Do the impossible. See the invisible. ROW ROW FIGHT THE POWAH! You just sang that in your head, didn't you?"
+        }
+    ],
+    "requirement":
+    {
+        "type": "genre",
+        "genre": 18
+    }
+}
