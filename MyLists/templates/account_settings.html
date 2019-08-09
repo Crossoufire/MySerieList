@@ -55,7 +55,7 @@ label {
     }
 
     .error-msg {
-        padding-left: 195px;
+        padding-left: 200px;
     }
 }
 
@@ -80,7 +80,7 @@ label {
     }
 
     .error-msg {
-        padding-left: 145px;
+        padding-left: 140px;
     }
 
     .custom-btn-size {
@@ -143,7 +143,7 @@ label {
                     {{ form.homepage.label(class="form-control-label") }}
                     {% if form.homepage.errors %}
                         {{ form.homepage(class="form-control is-invalid text-input") }}
-                        <div class="invalid-feedback">
+                        <div class="invalid-feedback error-msg">
                             {% for error in form.homepage.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
@@ -158,7 +158,7 @@ label {
                     {{ form.isprivate.label(class="form-control-label") }}
                     {% if form.isprivate.errors %}
                         {{ form.isprivate(class="form-control is-invalid text-input") }}
-                        <div class="invalid-feedback">
+                        <div class="invalid-feedback error-msg">
                             {% for error in form.isprivate.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
@@ -174,7 +174,7 @@ label {
                     {{ form.picture }}
                     {% if form.picture.errors %}
                         {% for error in form.picture.errors %}
-                            <span class="text-danger">{{ error }}</span><br>
+                            <span class="text-danger error-msg">{{ error }}</span><br>
                         {% endfor %}
                     {% endif %}
                 </div>

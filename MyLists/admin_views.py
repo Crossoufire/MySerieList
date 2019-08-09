@@ -1,7 +1,7 @@
 from flask_admin import expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from MyLists.models import User, Friend, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, SeriesNetwork, \
-    SeriesEpisodeTimestamp, Anime, AnimeEpisodesPerSeason, AnimeEpisodeTimestamp, AnimeGenre, AnimeList, AnimeNetwork, Book, BookList
+    Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork, Book, BookList
 from MyLists import db, app
 from flask_login import current_user
 from flask_admin import Admin
@@ -248,10 +248,6 @@ admin.add_view(SeriesNetworkAdminView(model=SeriesNetwork,
                                       name="Series network",
                                       endpoint='series_network'))
 
-admin.add_view(SeriesEpisodeTimestampAdminView(model=SeriesEpisodeTimestamp,
-                                               session=db.session,
-                                               name="Series episode timestamp",
-                                               endpoint='series_episode_timestamp'))
 admin.add_view(AnimeAdminView(model=Anime,
                               session=db.session,
                               name="Anime",
@@ -277,10 +273,6 @@ admin.add_view(AnimeNetworkAdminView(model=AnimeNetwork,
                                      name="Anime network",
                                      endpoint='anime_network'))
 
-admin.add_view(AnimeEpisodeTimestampAdminView(model=AnimeEpisodeTimestamp,
-                                              session=db.session,
-                                              name="Anime episode timestamp",
-                                              endpoint='anime_episode_timestamp'))
 
 admin.add_view(BookAdminView(model=Book,
                              session=db.session,

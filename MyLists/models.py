@@ -142,15 +142,6 @@ class SeriesNetwork(db.Model):
     network = db.Column(db.String(150), nullable=False)
 
 
-class SeriesEpisodeTimestamp(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
-    season = db.Column(db.Integer, nullable=False)
-    episode = db.Column(db.Integer, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False)
-
-
 ######################################################## ANIME #########################################################
 
 
@@ -205,15 +196,6 @@ class AnimeNetwork(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     network = db.Column(db.String(150), nullable=False)
-
-
-class AnimeEpisodeTimestamp(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
-    season = db.Column(db.Integer, nullable=False)
-    episode = db.Column(db.Integer, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False)
 
 
 class AnimeAchievements(db.Model):

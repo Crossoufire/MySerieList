@@ -38,20 +38,20 @@ class UpdateAccountForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png'])])
     isprivate = BooleanField('Private mode')
-    homepage = SelectField('Default homepage', choices=[('msl', 'MySeriesList'), ('mal', 'MyAnimesList'), ('mbl', 'MyBooksList')])
+    homepage = SelectField('Default homepage', choices=[('msl', 'MySeriesList'), ('mal', 'MyAnimesList'), ('mbl', 'MyBooksList'), ('acc', 'Account'), ('hof', 'Hall of Fame')])
     submit = SubmitField('Update account')
 
     def validate_username(self, username):
         if username.data != current_user.username:
             user = User.query.filter_by(username=username.data).first()
             if user is not None:
-                raise ValidationError("That Username is already taken. Please choose another one.")
+                raise ValidationError("This username is already taken. Please choose another one.")
 
     def validate_email(self, email):
         if email.data != current_user.email:
             user = User.query.filter_by(email=email.data).first()
             if user is not None:
-                raise ValidationError("That email already exist.")
+                raise ValidationError("This email already exist.")
 
 
 class ChangePasswordForm(FlaskForm):

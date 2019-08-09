@@ -20,8 +20,8 @@ from MyLists.admin_views import User
 from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, ChangePasswordForm, AddFriendForm, \
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
-    Friend, SeriesEpisodeTimestamp, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, \
-    AnimeEpisodeTimestamp, HomePage, BookStatus, Book, BookList, AnimeAchievements
+    Friend, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, BookStatus, Book, BookList, \
+    AnimeAchievements
 
 
 config.read('config.ini')
@@ -439,6 +439,7 @@ def account_settings():
             db.session.commit()
             app.logger.info('[{}] Settings updated : old username = {}, new username = {}'.format(user.id, old_username,
                                                                                                   user.username))
+
         if form.isprivate.data != user.private:
             old_value = user.private
             user.private = form.isprivate.data
@@ -446,39 +447,22 @@ def account_settings():
             app.logger.info('[{}] Settings updated : old private mode = {}, new private mode = {}'.format(user.id,
                                                                                                           old_value,
                                                                                                           form.isprivate.data))
-        if user.homepage == HomePage.MYSERIESLIST:
-            if form.homepage.data != "msl":
-                old_value = user.homepage
-                if form.homepage.data == "mal":
-                    user.homepage = HomePage.MYANIMESLIST
-                elif form.homepage.data == "mbl":
-                    user.homepage = HomePage.MYBOOKSLIST
-                db.session.commit()
-                app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
-                                                                                                      old_value,
-                                                                                                      form.homepage.data))
-        elif user.homepage == HomePage.MYANIMESLIST:
-            if form.homepage.data != "mal":
-                old_value = user.homepage
-                if form.homepage.data == "msl":
-                    user.homepage = HomePage.MYSERIESLIST
-                elif form.homepage.data == "mbl":
-                    user.homepage = HomePage.MYBOOKSLIST
-                db.session.commit()
-                app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
-                                                                                                      old_value,
-                                                                                                      form.homepage.data))
-        elif user.homepage == HomePage.MYBOOKSLIST:
-            if form.homepage.data != "mbl":
-                old_value = user.homepage
-                if form.homepage.data == "msl":
-                    user.homepage = HomePage.MYSERIESLIST
-                elif form.homepage.data == "mal":
-                    user.homepage = HomePage.MYANIMESLIST
-                db.session.commit()
-                app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
-                                                                                                      old_value,
-                                                                                                      form.homepage.data))
+
+        old_value = user.homepage
+        if form.homepage.data == "msl":
+            user.homepage = HomePage.MYSERIESLIST
+        elif form.homepage.data == "mal":
+            user.homepage = HomePage.MYANIMESLIST
+        elif form.homepage.data == "mbl":
+            user.homepage = HomePage.MYBOOKSLIST
+        elif form.homepage.data == "acc":
+            user.homepage = HomePage.ACCOUNT
+        elif form.homepage.data == "hof":
+            user.homepage = HomePage.HALL_OF_FAME
+        db.session.commit()
+        app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
+                                                                                              old_value,
+                                                                                              form.homepage.data))
 
         email_changed = False
         if form.email.data != user.email:
@@ -516,6 +500,10 @@ def account_settings():
             form.homepage.data = "mal"
         elif current_user.homepage == HomePage.MYBOOKSLIST:
             form.homepage.data = "mbl"
+        elif current_user.homepage == HomePage.ACCOUNT:
+            form.homepage.data = "acc"
+        elif current_user.homepage == HomePage.HALL_OF_FAME:
+            form.homepage.data = "hof"
 
     return render_template('account_settings.html',
                            title='Account Settings',
@@ -912,6 +900,9 @@ def update_element_season():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element exists
+    valide_types = ["ANIME", "SERIES"]
+    if element_type not in valide_types:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
     if element_type == "ANIME":
         if Anime.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
@@ -935,42 +926,6 @@ def update_element_season():
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
         update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
-        old_season = update.current_season
-
-        if old_season < season + 1:
-            for i in range(old_season, season + 1):
-                for j in range(1, AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id,
-                                                                         season=i).first().episodes + 1):
-                    if AnimeEpisodeTimestamp.query.filter_by(user_id=current_user.get_id(),
-                                                             anime_id=element_id,
-                                                             season=i,
-                                                             episode=j).first() is None:
-                        ep = AnimeEpisodeTimestamp(user_id=current_user.get_id(),
-                                                   anime_id=element_id,
-                                                   season=i,
-                                                   episode=j,
-                                                   timestamp=datetime.utcnow())
-                        db.session.add(ep)
-            ep = AnimeEpisodeTimestamp(user_id=current_user.get_id(),
-                                       anime_id=element_id,
-                                       season=season + 1,
-                                       episode=1,
-                                       timestamp=datetime.utcnow())
-            db.session.add(ep)
-            db.session.commit()
-
-        elif old_season > season + 1:
-            for i in range(season + 1, old_season + 1):
-                AnimeEpisodeTimestamp.query.filter_by(user_id=current_user.get_id(),
-                                                      anime_id=element_id,
-                                                      season=i).delete()
-            ep = AnimeEpisodeTimestamp(user_id=current_user.get_id(),
-                                       anime_id=element_id,
-                                       season=season + 1,
-                                       episode=1,
-                                       timestamp=datetime.utcnow())
-            db.session.add(ep)
-            db.session.commit()
 
         update.current_season = season + 1
         update.last_episode_watched = 1
@@ -983,42 +938,6 @@ def update_element_season():
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
         update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
-        old_season = update.current_season
-
-        if old_season < season + 1:
-            for i in range(old_season, season + 1):
-                for j in range(1, SeriesEpisodesPerSeason.query.filter_by(series_id=element_id,
-                                                                          season=i).first().episodes + 1):
-                    if SeriesEpisodeTimestamp.query.filter_by(user_id=current_user.get_id(),
-                                                              series_id=element_id,
-                                                              season=i,
-                                                              episode=j).first() is None:
-                        ep = SeriesEpisodeTimestamp(user_id=current_user.get_id(),
-                                                    series_id=element_id,
-                                                    season=i,
-                                                    episode=j,
-                                                    timestamp=datetime.utcnow())
-                        db.session.add(ep)
-            ep = SeriesEpisodeTimestamp(user_id=current_user.get_id(),
-                                        series_id=element_id,
-                                        season=season + 1,
-                                        episode=1,
-                                        timestamp=datetime.utcnow())
-            db.session.add(ep)
-            db.session.commit()
-
-        elif old_season > season + 1:
-            for i in range(season + 1, old_season + 1):
-                SeriesEpisodeTimestamp.query.filter_by(user_id=current_user.get_id(),
-                                                       series_id=element_id,
-                                                       season=i).delete()
-            ep = SeriesEpisodeTimestamp(user_id=current_user.get_id(),
-                                        series_id=element_id,
-                                        season=season + 1,
-                                        episode=1,
-                                        timestamp=datetime.utcnow())
-            db.session.add(ep)
-            db.session.commit()
 
         update.current_season = season + 1
         update.last_episode_watched = 1
@@ -1038,6 +957,10 @@ def update_element_episode():
         element_id = json_data['element_id']
         element_type = json_data['element_type']
     except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    valid_element_type = ["ANIME", "SERIES"]
+    if element_type not in valid_element_type:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the inputs are digits
@@ -1071,25 +994,6 @@ def update_element_episode():
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
         update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
-        old_last_episode_watched = update.last_episode_watched
-        current_season = update.current_season
-
-        if episode + 1 > old_last_episode_watched:
-            for i in range(old_last_episode_watched + 1, episode + 2):
-                ep = AnimeEpisodeTimestamp(user_id=current_user.get_id(),
-                                           anime_id=element_id,
-                                           season=current_season,
-                                           episode=i,
-                                           timestamp=datetime.utcnow())
-                db.session.add(ep)
-            db.session.commit()
-        elif episode + 1 < old_last_episode_watched:
-            for i in range(episode + 2, old_last_episode_watched + 1):
-                AnimeEpisodeTimestamp.query.filter_by(user_id=current_user.get_id(),
-                                                      anime_id=element_id,
-                                                      season=current_season,
-                                                      episode=i).delete()
-            db.session.commit()
 
         update.last_episode_watched = episode + 1
         db.session.commit()
@@ -1102,25 +1006,6 @@ def update_element_episode():
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
         update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
-        old_last_episode_watched = update.last_episode_watched
-        current_season = update.current_season
-
-        if episode + 1 > old_last_episode_watched:
-            for i in range(old_last_episode_watched + 1, episode + 2):
-                ep = SeriesEpisodeTimestamp(user_id=current_user.get_id(),
-                                            series_id=element_id,
-                                            season=current_season,
-                                            episode=i,
-                                            timestamp=datetime.utcnow())
-                db.session.add(ep)
-            db.session.commit()
-        elif episode + 1 < old_last_episode_watched:
-            for i in range(episode + 2, old_last_episode_watched + 1):
-                SeriesEpisodeTimestamp.query.filter_by(user_id=current_user.get_id(),
-                                                       series_id=element_id,
-                                                       season=current_season,
-                                                       episode=i).delete()
-            db.session.commit()
 
         update.last_episode_watched = episode + 1
         db.session.commit()
@@ -1138,6 +1023,10 @@ def delete_element():
         element_id = json_data['delete']
         element_type = json_data['element_type']
     except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    valid_element_type = ["ANIME", "SERIES"]
+    if element_type not in valid_element_type:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the inputs are digits
@@ -1165,13 +1054,9 @@ def delete_element():
     if element_type == "ANIME":
         AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).delete()
         db.session.commit()
-        AnimeEpisodeTimestamp.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).delete()
-        db.session.commit()
         app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.get_id(), element_id))
     elif element_type == "SERIES":
         SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).delete()
-        db.session.commit()
-        SeriesEpisodeTimestamp.query.filter_by(user_id=current_user.get_id(), series_id=element_id).delete()
         db.session.commit()
         app.logger.info('[{}] Series with ID {} deleted'.format(current_user.get_id(), element_id))
 
@@ -1194,6 +1079,10 @@ def change_element_category():
     if element_new_category not in category_list:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
+    valid_element_type = ["ANIME", "SERIES"]
+    if element_type not in valid_element_type:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
     # Check if the inputs are digits
     try:
         element_id = int(element_id)
@@ -1212,37 +1101,13 @@ def change_element_category():
         # Set Season / Episode to max
         if element_type == "ANIME":
             number_season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).count()
-            for i in range(number_season):
-                number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=i+1).first().episodes
-                for j in range(number_episode):
-                    if AnimeEpisodeTimestamp.query.filter_by(user_id=current_user.get_id(),
-                                                             anime_id=element_id,
-                                                             season=i+1,
-                                                             episode=j+1).first() is None:
-                        ep = AnimeEpisodeTimestamp(user_id=current_user.get_id(),
-                                                    anime_id=element_id,
-                                                    season=i+1,
-                                                    episode=j+1,
-                                                    timestamp=datetime.utcnow())
-                        db.session.add(ep)
+            number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
             element.last_episode_watched = number_episode
             db.session.commit()
         elif element_type == "SERIES":
             number_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).count()
-            for i in range(number_season):
-                number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=i+1).first().episodes
-                for j in range(number_episode):
-                    if SeriesEpisodeTimestamp.query.filter_by(user_id=current_user.get_id(),
-                                                              series_id=element_id,
-                                                              season=i+1,
-                                                              episode=j+1).first() is None:
-                        ep = SeriesEpisodeTimestamp(user_id=current_user.get_id(),
-                                                    series_id=element_id,
-                                                    season=i+1,
-                                                    episode=j+1,
-                                                    timestamp=datetime.utcnow())
-                        db.session.add(ep)
+            number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
             element.last_episode_watched = number_episode
             db.session.commit()
@@ -2325,15 +2190,8 @@ def add_element_to_user(element_id, user_id, list_type):
                                last_episode_watched=1,
                                status=Status.WATCHING)
 
-        data = SeriesEpisodeTimestamp(user_id=user_id,
-                                      series_id=element_id,
-                                      season=1,
-                                      episode=1,
-                                      timestamp=datetime.utcnow())
-
         app.logger.info('[{}] Added series with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
-        db.session.add(data)
         db.session.commit()
     elif list_type == ListType.ANIME:
         user_list = AnimeList(user_id=user_id,
@@ -2342,15 +2200,8 @@ def add_element_to_user(element_id, user_id, list_type):
                               last_episode_watched=1,
                               status=Status.WATCHING)
 
-        data = AnimeEpisodeTimestamp(user_id=user_id,
-                                     anime_id=element_id,
-                                     season=1,
-                                     episode=1,
-                                     timestamp=datetime.utcnow())
-
         app.logger.info('[{}] Added anime with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
-        db.session.add(data)
         db.session.commit()
     elif list_type == ListType.BOOK:
         user_list = BookList(user_id=user_id,
