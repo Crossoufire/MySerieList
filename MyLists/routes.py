@@ -1538,7 +1538,7 @@ def get_all_account_stats(user_id, list_type):
 def get_achievements(user_id, list_type):
     if list_type == ListType.ANIME:
         all_achievements = []
-        tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10 = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10, tmp_11 = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
         animes = AnimeList.query.filter(AnimeList.status == "COMPLETED").filter_by(user_id=user_id).all()
         for anime in animes:
             genres = AnimeGenre.query.filter_by(anime_id=anime.anime_id).all()
@@ -1564,11 +1564,13 @@ def get_achievements(user_id, list_type):
                     tmp_9 += 1
                 elif a == 14:
                     tmp_10 += 1
+                elif a == 9 or a == 12:
+                    tmp_11 += 1
                 else:
                     pass
 
-        ids = [13, 18, 19, 7, 22, 36, 29, 30, 40, 41]
-        values = [tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10]
+        ids = [13, 18, 19, 7, 22, 36, 29, 30, 40, 41, [9, 12]]
+        values = [tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10, tmp_11]
         for i in range(0, len(values)):
             achievements = Achievements.query.filter_by(genre=str(ids[i])).all()
             for achievement in achievements:
