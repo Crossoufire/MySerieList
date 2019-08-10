@@ -500,7 +500,7 @@ hr {
                             <br>
                             <span>(Pending)</span>
                             <br>
-                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}','td_{{ friend['user_id'] }}', '{{ friend['username'] }}')"></a>
+                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}','td_{{ friend['user_id'] }}')"></a>
                         </div>
                         {% endif %}
                     {% elif friend['status'] == "declined" %}
@@ -513,7 +513,7 @@ hr {
                             <br>
                             <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
                             <br>
-                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}', '{{ friend['username'] }}')"></a>
+                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
                             {% else %}
                             <a href="/account/{{ friend['username'] }}">
                                 <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
@@ -882,8 +882,8 @@ function hide(category, arrow) {
 }
 
 
-function delete_friend(friend_id, td_id, friend_username) {
-    if (!confirm("Do you want to remove " + friend_username + " from your friends list ?")){
+function delete_friend(friend_id, td_id) {
+    if (!confirm("Are you sure you want to delete this friend from your list ?")){
         return false;
     }
     $("#"+td_id).remove();
