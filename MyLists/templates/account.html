@@ -13,6 +13,10 @@ hr {
     border-top: 1px solid rgba(255, 255, 255, 0.9);
 }
 
+.grey_hr {
+    border-top: 1px solid grey;
+}
+
 .modal-content {
     background: #131418;
 }
@@ -536,22 +540,18 @@ hr {
                 <tbody>
                 {% for achievement in achievements %}
                 <tr>
-                    <td>
+                    <td style="width: 150px;">
                         <span>{{ achievement[1] }}</span><br>
+                        <img class="p-t-5" height="50" width="100" src="../static/img/anime_achievements/{{ achievement[0] }}.png"/>
+                    </td>
+                    <td class="align-bottom">
+                        <span>{{ achievement[2] }}</span><br>
+                        <span>{{ achievement[3] }}</span>
                     </td>
                 </tr>
                 <tr>
-                    <td>
-                        <img class="m-t-5" height="50" width="100" src="../static/img/anime_achievements/{{ achievement[0] }}.png"/>
-                    </td>
-                    <td>
-                        <strong class="m-t-5 m-l-10">{{ achievement[2] }}</strong><br>
-                        <sub class="m-t-5 m-l-10">{{ achievement[3] }}</sub>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <hr class="mt-3 mb-3">
+                    <td colspan="2">
+                        <hr class="grey_hr mt-3 mb-3">
                     </td>
                 </tr>
                 {% endfor %}
