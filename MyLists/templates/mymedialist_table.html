@@ -1044,9 +1044,8 @@ function updateEpisode(element_id, episode){
         contentType: "application/json",
         data: JSON.stringify({episode: selected_episode, element_id: element_id, element_type: "{{ element_type }}" }),
         dataType: "json",
-        beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            $body.removeClass("loading"); }
+            console.log("ok"); }
     });
 }
 
@@ -1074,9 +1073,7 @@ function updateSeason(element_id, value, seas_data, ep_drop_id) {
         contentType: "application/json",
         data: JSON.stringify({season: selected_season, element_id: element_id, element_type: "{{ element_type }}" }),
         dataType: "json",
-        beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            $body.removeClass("loading");
             console.log("ok"); }
     });
 }

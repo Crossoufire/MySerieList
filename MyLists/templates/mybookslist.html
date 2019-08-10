@@ -383,9 +383,6 @@ body.loading .modal_loading {
         <input  class="form-control text-light add_book" placeholder="Add a book" type="text" id="autocomplete" onfocus="this.value=''"/>
         <input type="hidden" id="book_id" value=""/>
     </div>
-    <div class="ml-auto m-t-20 m-b-10">
-        <button class="btn btn-sm btn-light text-dark p-2" onclick="refreshAll()"><a class="fas fa-sync m-r-5 text-dark"></a> REFRESH ALL</button>
-    </div>
     {% endif %}
 </div>
 
@@ -613,19 +610,6 @@ $(function() {
 });
 </script>
 
-<!------------ Refresh --------------->
-<script type="text/javascript">
-function refreshAll() {
-    $body = $("body");
-    $.ajax ({
-        type: "POST",
-        url: "/refresh_all_book",
-        beforeSend: function() { $body.addClass("loading"); },
-        success: function(response) {
-            window.location.replace('/bookslist/{{ current_user.username }}'); }
-    });
-}
-</script>
 
 
 <!---------------- Update/Change/Remove book ------------------->
