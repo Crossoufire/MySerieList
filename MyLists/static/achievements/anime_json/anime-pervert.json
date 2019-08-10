@@ -5,28 +5,28 @@
 		{
             "threshold": "1-5",
             "id": "anime-pervert-0",
-            "level": "Saint",
+            "level": "Pervert: level 1",
             "title": "Innocent One",
             "desc": "Puritan, oblivious, or serial killer in the making? Either way, you made it through No Man's Land without glimpsing a single bra. Good job!"
         },
         {
             "threshold": "6-10",
             "id": "anime-pervert-1",
-            "level": "\"Plot\"",
-            "title": "I Watch Anime Only for the Plot...",
+            "level": "Pervert: level 2",
+            "title": "I Watch Anime Only for the \"Plot\"...",
             "desc": "It's not your fault that there is so much fan service... Right?"
         },
 		{
             "threshold": "11-20",
             "id": "anime-pervert-2",
-            "level": "Naughty",
+            "level": "Pervert: level 3",
             "title": "Only Accidents! I Swear!",
             "desc": "Physics in anime are incredible. When you trip, you always cop a feel."
         },
 		{
             "threshold": "21-100000",
             "id": "anime-pervert-3",
-            "level": "Pervert",
+            "level": "Pervert: level MAX",
             "title": "Hentai Overlord",
             "desc": "No use denying it! You know what you are..."
         }
@@ -34,6 +34,6 @@
     "requirement":
     {
         "type": "genre",
-		"genre": [9, 12]
+		"genre": 9
     }
 }

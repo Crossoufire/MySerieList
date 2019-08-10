@@ -46,6 +46,27 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(admin)
+
+        path = os.path.join(app.root_path, 'static/achievements/anime_json/')
+        anime_json = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+        for file in anime_json:
+            with open("{}/{}".format(path, file), encoding='UTF-8', errors='ignore') as json_file:
+                data = json.load(json_file)
+                for i in range(0, len(data["achievements"])):
+                    try:
+                        genre = str(data["requirement"]["genre"])
+                    except:
+                        genre = None
+                    achievement = Achievements(media=str(data["media"]),
+                                               threshold=str(data["achievements"][i]["threshold"]),
+                                               image_id=str(data["achievements"][i]["id"]),
+                                               level=str(data["achievements"][i]["level"]),
+                                               title=str(data["achievements"][i]["title"]),
+                                               description=str(data["achievements"][i]["desc"]),
+                                               type=str(data["requirement"]["type"]),
+                                               genre=genre)
+                    db.session.add(achievement)
+                    db.session.commit()
     if User.query.filter_by(id='2').first() is None:
         test = User(username='test',
                     email='test@test.com',
@@ -156,7 +177,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(test11)
-    add_achievements()
     db.session.commit()
 
 
@@ -1505,12 +1525,12 @@ def get_achievements(user_id, list_type):
                     tmp_9 += 1
                 elif a == 14:
                     tmp_10 += 1
-                elif a == 9 or a == 12:
+                elif a == 9:
                     tmp_11 += 1
                 else:
                     pass
 
-        ids = [13, 18, 19, 7, 22, 36, 29, 30, 40, 41, [9, 12]]
+        ids = [13, 18, 19, 7, 22, 36, 29, 30, 40, 41, 9]
         values = [tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10, tmp_11]
         for i in range(0, len(values)):
             achievements = Achievements.query.filter_by(genre=str(ids[i])).all()
