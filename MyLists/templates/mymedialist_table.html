@@ -793,12 +793,13 @@ function refreshAll() {
     $.ajax ({
         type: "POST",
         url: "/refresh_all_element",
+        contentType: "application/json",
         data: JSON.stringify({element_type: '{{ element_type }}' }),
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
             {% if element_type == "ANIME" %}
                 window.location.replace('/animeslist/table/{{ current_user.username }}');
-            {% else %}
+            {% elif element_type == "SERIES" %}
                 window.location.replace('/serieslist/table/{{ current_user.username }}');
             {% endif %}
         }

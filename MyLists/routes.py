@@ -19,8 +19,8 @@ from MyLists import app, db, bcrypt, mail, config
 from MyLists.admin_views import User
 from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, ChangePasswordForm, AddFriendForm, \
     ResetPasswordForm, ResetPasswordRequestForm
-from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, ElementStatus, ListType, SeriesGenre, SeriesNetwork, \
-    Friend, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, BookStatus, Book, BookList, \
+from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
+    Friend, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, Book, BookList, \
     Achievements
 
 
@@ -66,117 +66,6 @@ def create_user():
                                                type=str(data["requirement"]["type"]),
                                                genre=genre)
                     db.session.add(achievement)
-                    db.session.commit()
-    if User.query.filter_by(id='2').first() is None:
-        test = User(username='test',
-                    email='test@test.com',
-                    password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                    image_file='default.jpg',
-                    active=True,
-                    private=True,
-                    registered_on=datetime.utcnow(),
-                    activated_on=datetime.utcnow())
-        db.session.add(test)
-    if User.query.filter_by(id='3').first() is None:
-        test2 = User(username='test2',
-                     email='test2@test2.com',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(test2)
-    if User.query.filter_by(id='4').first() is None:
-        test3 = User(username='test3',
-                     email='test3@test3.com',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(test3)
-    if User.query.filter_by(id='5').first() is None:
-        test4 = User(username='test4',
-                     email='test4@test4.com',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(test4)
-    if User.query.filter_by(id='6').first() is None:
-        test5 = User(username='aaaa',
-                     email='test5@test5.com',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=True,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(test5)
-    if User.query.filter_by(id='7').first() is None:
-        test6 = User(username='Sudoer',
-                     email='test6@test6.com',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(test6)
-    if User.query.filter_by(id='8').first() is None:
-        test7 = User(username='aaa',
-                     email='test7@test7.com',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=True,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(test7)
-    if User.query.filter_by(id='9').first() is None:
-        test8 = User(username='I_Love_Anime',
-                     email='test8@test8.com',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(test8)
-    if User.query.filter_by(id='10').first() is None:
-        test9 = User(username='0010100011',
-                     email='test9@test9.com',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(test9)
-    if User.query.filter_by(id='11').first() is None:
-        test10 = User(username='Crossoufire',
-                     email='test10@test10.com',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(test10)
-    if User.query.filter_by(id='12').first() is None:
-        test11 = User(username='WynroZ',
-                     email='test11@test11.com',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(test11)
     db.session.commit()
 
 
@@ -746,12 +635,12 @@ def myanimeslist(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    watching_list     = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
-    completed_list    = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list       = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    random_list       = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').all()
-    dropped_list      = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantowatch_list  = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
+    watching_list     = AnimeList.query.filter_by(user_id=user.id, status=Status.WATCHING).all()
+    completed_list    = AnimeList.query.filter_by(user_id=user.id, status=Status.COMPLETED).all()
+    onhold_list       = AnimeList.query.filter_by(user_id=user.id, status=Status.ON_HOLD).all()
+    random_list       = AnimeList.query.filter_by(user_id=user.id, status=Status.RANDOM).all()
+    dropped_list      = AnimeList.query.filter_by(user_id=user.id, status=Status.DROPPED).all()
+    plantowatch_list  = AnimeList.query.filter_by(user_id=user.id, status=Status.PLAN_TO_WATCH).all()
 
     animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     animes_data = get_list_data(animes_list, ListType.ANIME)
@@ -785,12 +674,12 @@ def myserieslist(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    watching_list     = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
-    completed_list    = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list       = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    random_list       = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').all()
-    dropped_list      = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantowatch_list  = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
+    watching_list     = SeriesList.query.filter_by(user_id=user.id, status=Status.WATCHING).all()
+    completed_list    = SeriesList.query.filter_by(user_id=user.id, status=Status.COMPLETED).all()
+    onhold_list       = SeriesList.query.filter_by(user_id=user.id, status=Status.ON_HOLD).all()
+    random_list       = SeriesList.query.filter_by(user_id=user.id, status=Status.RANDOM).all()
+    dropped_list      = SeriesList.query.filter_by(user_id=user.id, status=Status.DROPPED).all()
+    plantowatch_list  = SeriesList.query.filter_by(user_id=user.id, status=Status.PLAN_TO_WATCH).all()
 
     series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     series_data = get_list_data(series_list, ListType.SERIES)
@@ -824,12 +713,12 @@ def myanimeslist_table(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    watching_list    = AnimeList.query.filter_by(user_id=user.id, status='WATCHING').all()
-    completed_list   = AnimeList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list      = AnimeList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    random_list      = AnimeList.query.filter_by(user_id=user.id, status='RANDOM').all()
-    dropped_list     = AnimeList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantowatch_list = AnimeList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
+    watching_list    = AnimeList.query.filter_by(user_id=user.id, status=Status.WATCHING).all()
+    completed_list   = AnimeList.query.filter_by(user_id=user.id, status=Status.COMPLETED).all()
+    onhold_list      = AnimeList.query.filter_by(user_id=user.id, status=Status.ON_HOLD).all()
+    random_list      = AnimeList.query.filter_by(user_id=user.id, status=Status.RANDOM).all()
+    dropped_list     = AnimeList.query.filter_by(user_id=user.id, status=Status.DROPPED).all()
+    plantowatch_list = AnimeList.query.filter_by(user_id=user.id, status=Status.PLAN_TO_WATCH).all()
 
     animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     animes_data = get_list_data(animes_list, ListType.ANIME)
@@ -863,12 +752,12 @@ def myserieslist_table(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    watching_list    = SeriesList.query.filter_by(user_id=user.id, status='WATCHING').all()
-    completed_list   = SeriesList.query.filter_by(user_id=user.id, status='COMPLETED').all()
-    onhold_list      = SeriesList.query.filter_by(user_id=user.id, status='ON_HOLD').all()
-    random_list      = SeriesList.query.filter_by(user_id=user.id, status='RANDOM').all()
-    dropped_list     = SeriesList.query.filter_by(user_id=user.id, status='DROPPED').all()
-    plantowatch_list = SeriesList.query.filter_by(user_id=user.id, status='PLAN_TO_WATCH').all()
+    watching_list    = SeriesList.query.filter_by(user_id=user.id, status=Status.WATCHING).all()
+    completed_list   = SeriesList.query.filter_by(user_id=user.id, status=Status.COMPLETED).all()
+    onhold_list      = SeriesList.query.filter_by(user_id=user.id, status=Status.ON_HOLD).all()
+    random_list      = SeriesList.query.filter_by(user_id=user.id, status=Status.RANDOM).all()
+    dropped_list     = SeriesList.query.filter_by(user_id=user.id, status=Status.DROPPED).all()
+    plantowatch_list = SeriesList.query.filter_by(user_id=user.id, status=Status.PLAN_TO_WATCH).all()
 
     series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
     series_data = get_list_data(series_list, ListType.SERIES)
@@ -1073,9 +962,9 @@ def change_element_category():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     if element_new_category == 'Watching':
-        element.status = ElementStatus.WATCHING
+        element.status = Status.WATCHING
     elif element_new_category == 'Completed':
-        element.status = ElementStatus.COMPLETED
+        element.status = Status.COMPLETED
         # Set Season / Episode to max
         if element_type == "ANIME":
             number_season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).count()
@@ -1090,13 +979,13 @@ def change_element_category():
             element.last_episode_watched = number_episode
             db.session.commit()
     elif element_new_category == 'On Hold':
-        element.status = ElementStatus.ON_HOLD
+        element.status = Status.ON_HOLD
     elif element_new_category == 'Random':
-        element.status = ElementStatus.RANDOM
+        element.status = Status.RANDOM
     elif element_new_category == 'Dropped':
-        element.status = ElementStatus.DROPPED
+        element.status = Status.DROPPED
     elif element_new_category == 'Plan to Watch':
-        element.status = ElementStatus.PLAN_TO_WATCH
+        element.status = Status.PLAN_TO_WATCH
     db.session.commit()
     app.logger.info('[{}] Category of the element with ID {} changed to {}'.format(current_user.get_id(),
                                                                                    element_id,
@@ -1278,11 +1167,11 @@ def mybookslist(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    reading_list    = BookList.query.filter_by(user_id=user.id, status=BookStatus.READING).all()
-    completed_list  = BookList.query.filter_by(user_id=user.id, status=BookStatus.COMPLETED).all()
-    onhold_list     = BookList.query.filter_by(user_id=user.id, status=BookStatus.ON_HOLD).all()
-    dropped_list    = BookList.query.filter_by(user_id=user.id, status=BookStatus.DROPPED).all()
-    plantoread_list = BookList.query.filter_by(user_id=user.id, status=BookStatus.PLAN_TO_READ).all()
+    reading_list    = BookList.query.filter_by(user_id=user.id, status=Status.READING).all()
+    completed_list  = BookList.query.filter_by(user_id=user.id, status=Status.COMPLETED).all()
+    onhold_list     = BookList.query.filter_by(user_id=user.id, status=Status.ON_HOLD).all()
+    dropped_list    = BookList.query.filter_by(user_id=user.id, status=Status.DROPPED).all()
+    plantoread_list = BookList.query.filter_by(user_id=user.id, status=Status.PLAN_TO_READ).all()
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
@@ -1314,11 +1203,11 @@ def mybookslist_table(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    reading_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.READING).all()
-    completed_list  = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.COMPLETED).all()
-    onhold_list     = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.ON_HOLD).all()
-    dropped_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.DROPPED).all()
-    plantoread_list = BookList.query.filter_by(user_id=current_user.get_id(), status=BookStatus.PLAN_TO_READ).all()
+    reading_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=Status.READING).all()
+    completed_list  = BookList.query.filter_by(user_id=current_user.get_id(), status=Status.COMPLETED).all()
+    onhold_list     = BookList.query.filter_by(user_id=current_user.get_id(), status=Status.ON_HOLD).all()
+    dropped_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=Status.DROPPED).all()
+    plantoread_list = BookList.query.filter_by(user_id=current_user.get_id(), status=Status.PLAN_TO_READ).all()
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
@@ -1370,15 +1259,15 @@ def change_book_category():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     if book_new_category == 'Reading':
-        book.status = BookStatus.READING
+        book.status = Status.READING
     elif book_new_category == 'Completed':
-        book.status = BookStatus.COMPLETED
+        book.status = Status.COMPLETED
     elif book_new_category == 'On Hold':
-        book.status = BookStatus.ON_HOLD
+        book.status = Status.ON_HOLD
     elif book_new_category == 'Dropped':
-        book.status = BookStatus.DROPPED
+        book.status = Status.DROPPED
     elif book_new_category == 'Plan to Read':
-        book.status = BookStatus.PLAN_TO_READ
+        book.status = Status.PLAN_TO_READ
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1546,25 +1435,25 @@ def get_achievements(user_id, list_type):
 
 def get_list_count(user_id, list_type):
         if list_type is ListType.SERIES:
-            watching = SeriesList.query.filter_by(user_id=user_id, status='WATCHING').count()
-            completed = SeriesList.query.filter_by(user_id=user_id, status='COMPLETED').count()
-            onhold = SeriesList.query.filter_by(user_id=user_id, status='ON_HOLD').count()
-            random = SeriesList.query.filter_by(user_id=user_id, status='RANDOM').count()
-            dropped = SeriesList.query.filter_by(user_id=user_id, status='DROPPED').count()
-            plantowatch = SeriesList.query.filter_by(user_id=user_id, status='PLAN_TO_WATCH').count()
+            watching    = SeriesList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
+            completed   = SeriesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+            onhold      = SeriesList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
+            random      = SeriesList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
+            dropped     = SeriesList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
+            plantowatch = SeriesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
         elif list_type is ListType.ANIME:
-            watching = AnimeList.query.filter_by(user_id=user_id, status='WATCHING').count()
-            completed = AnimeList.query.filter_by(user_id=user_id, status='COMPLETED').count()
-            onhold = AnimeList.query.filter_by(user_id=user_id, status='ON_HOLD').count()
-            random = AnimeList.query.filter_by(user_id=user_id, status='RANDOM').count()
-            dropped = AnimeList.query.filter_by(user_id=user_id, status='DROPPED').count()
-            plantowatch = AnimeList.query.filter_by(user_id=user_id, status='PLAN_TO_WATCH').count()
+            watching    = AnimeList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
+            completed   = AnimeList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+            onhold      = AnimeList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
+            random      = AnimeList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
+            dropped     = AnimeList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
+            plantowatch = AnimeList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
         elif list_type is ListType.BOOK:
-            reading = BookList.query.filter_by(user_id=user_id, status='READING').count()
-            completed = BookList.query.filter_by(user_id=user_id, status='COMPLETED').count()
-            onhold = BookList.query.filter_by(user_id=user_id, status='ON_HOLD').count()
-            dropped = BookList.query.filter_by(user_id=user_id, status='DROPPED').count()
-            plantoread = BookList.query.filter_by(user_id=user_id, status='PLAN_TO_READ').count()
+            reading     = BookList.query.filter_by(user_id=user_id, status=Status.READING).count()
+            completed   = BookList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+            onhold      = BookList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
+            dropped     = BookList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
+            plantoread  = BookList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_READ).count()
 
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
             statistics = [watching, completed, onhold, random, dropped, plantowatch]
@@ -1788,13 +1677,13 @@ def add_element(element_id, list_type):
                              "warning")
 
             cover_id = save_api_cover(series_data["poster_path"], ListType.SERIES)
+            print(cover_id)
             if cover_id is None:
-                return flash("There was a problem while getting series' poster. Please try again later.",
-                             "warning")
+                cover_id = "default.jpg"
+                flash("There was a problem while getting series' poster. Please try refreshing the series later.", "warning")
 
             series_id = add_element_in_base(series_data, cover_id, ListType.SERIES)
             add_element_to_user(series_id, int(current_user.get_id()), list_type)
-            return redirect(url_for('myserieslist', user_name=current_user.username))
 
         elif list_type == ListType.ANIME:
             anime_data = get_element_data_from_api(element_id, ListType.ANIME)
@@ -1804,12 +1693,11 @@ def add_element(element_id, list_type):
 
             cover_id = save_api_cover(anime_data["poster_path"], ListType.ANIME)
             if cover_id is None:
-                return flash("There was a problem while getting series' poster. Please try again later.",
-                             "warning")
+                cover_id = "default.jpg"
+                flash("There was a problem while getting series' poster. Please try refreshing the anime later.", "warning")
 
             anime_id = add_element_in_base(anime_data, cover_id, list_type)
             add_element_to_user(anime_id, int(current_user.get_id()), list_type)
-            return redirect(url_for('myanimeslist', user_name=current_user.username))
 
         elif list_type == ListType.BOOK:
             book_data = get_element_data_from_api(element_id, ListType.BOOK)
@@ -1823,12 +1711,12 @@ def add_element(element_id, list_type):
                     cover_id = save_api_cover(book_data["volumeInfo"]["imageLinks"]["thumbnail"], ListType.BOOK)
                 except:
                     cover_id = "default.jpg"
+
             if cover_id is None:
-                return flash("There was a problem while getting the book's cover. Please try again later.", "warning")
+                flash("There was a problem while getting the book's cover.", "warning")
 
             book_id = add_element_in_base(book_data, cover_id, list_type)
             add_element_to_user(book_id, int(current_user.get_id()), list_type)
-            return redirect(url_for('mybookslist', user_name=current_user.username))
 
 
 def get_element_data_from_api(api_id, list_type):
@@ -2101,8 +1989,16 @@ def add_element_in_base(element_data, element_cover_id, list_type):
             cleantext = re.sub(cleaner, '', raw_html)
             return cleantext
 
-        description = clean_html(element_data["volumeInfo"]["description"])
-        page_count = element_data["volumeInfo"]["pageCount"]
+        try:
+            description = clean_html(element_data["volumeInfo"]["description"])
+        except:
+            description = None
+
+        try:
+            page_count = element_data["volumeInfo"]["pageCount"]
+        except:
+            page_count = None
+
         try:
             categories = element_data["volumeInfo"]["categories"][0]
 
@@ -2111,6 +2007,7 @@ def add_element_in_base(element_data, element_cover_id, list_type):
                 categories = new_categories
         except:
             categories = None
+
         google_id = element_data["id"]
 
         # Add the element into the table
@@ -2135,7 +2032,7 @@ def add_element_to_user(element_id, user_id, list_type):
                                series_id=element_id,
                                current_season=1,
                                last_episode_watched=1,
-                               status=ElementStatus.WATCHING)
+                               status=Status.WATCHING)
 
         app.logger.info('[{}] Added series with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
@@ -2145,7 +2042,7 @@ def add_element_to_user(element_id, user_id, list_type):
                               anime_id=element_id,
                               current_season=1,
                               last_episode_watched=1,
-                              status=ElementStatus.WATCHING)
+                              status=Status.WATCHING)
 
         app.logger.info('[{}] Added anime with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
@@ -2153,9 +2050,7 @@ def add_element_to_user(element_id, user_id, list_type):
     elif list_type == ListType.BOOK:
         user_list = BookList(user_id=user_id,
                              book_id=element_id,
-                             commentary= None,
-                             read_year= None,
-                             status=BookStatus.READING)
+                             status=Status.READING)
 
         app.logger.info('[{}] Added book with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
@@ -2294,11 +2189,11 @@ def get_mean_score(user_id, list_type):
 
 def get_total_time_spent(user_id, list_type):
     if list_type == ListType.SERIES:
-        list = SeriesList.query.filter(SeriesList.status != "PLAN_TO_WATCH").filter_by(user_id=user_id).all()
+        list = SeriesList.query.filter(SeriesList.status != Status.PLAN_TO_READ).filter_by(user_id=user_id).all()
     elif list_type == ListType.ANIME:
-        list = AnimeList.query.filter(AnimeList.status != "PLAN_TO_WATCH").filter_by(user_id=user_id).all()
+        list = AnimeList.query.filter(AnimeList.status != Status.PLAN_TO_WATCH).filter_by(user_id=user_id).all()
     elif list_type == ListType.BOOK:
-        list = BookList.query.filter(BookList.status == "COMPLETED").filter_by(user_id=user_id).all()
+        list = BookList.query.filter(BookList.status == Status.COMPLETED).filter_by(user_id=user_id).all()
 
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
         episodes_counter = 0
@@ -2333,7 +2228,8 @@ def get_total_time_spent(user_id, list_type):
         total_pages = 0
         for book in list:
             pages_count = Book.query.filter_by(id=book.book_id).first().page_count
-            total_pages += pages_count
+            if pages_count is not None:
+                total_pages += pages_count
 
         time_spent_hours = int(((total_pages*2)/60))
         time_spent_days = round((total_pages*2)/(60*24), 1)
@@ -2380,12 +2276,13 @@ def refresh_element_data(element_id, list_type):
     try:
         urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(element_poster),
                                    "{}{}".format(local_covers_path, element.image_cover))
-    except:
-        return flash("There was an error while refreshing. Please try again later.")
 
-    img = Image.open(local_covers_path + element.image_cover)
-    img = img.resize((300, 450), Image.ANTIALIAS)
-    img.save(local_covers_path + element.image_cover, quality=90)
+        img = Image.open(local_covers_path + element.image_cover)
+        img = img.resize((300, 450), Image.ANTIALIAS)
+        img.save(local_covers_path + element.image_cover, quality=90)
+    except:
+        flash("There was an error while downloading the cover. Please try again later.")
+
 
     try:
         created_by = ""
