@@ -365,7 +365,7 @@ hr {
         </div>
 
         <!------------------------------- Levels/grades/informations data ----------------------------->
-        <div class="row">
+        <div class="row m-t-10">
             <div class="col">
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
@@ -422,19 +422,19 @@ hr {
                     </thead>
                     <tbody>
                     <tr>
-                        <td class="text-left">All anime achievements</td>
+                        <td class="text-left">All animes achievements</td>
                         <td class="text-center">
                             <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('animes_achievements') }}" target="_blank"></a>
                         </td>
                     </tr>
                     <tr>
-                        <td class="text-left">Grade and level data</td>
+                        <td class="text-left">Grades and levels data</td>
                         <td class="text-center">
                             <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('level_grade_data') }}" target="_blank"></a>
                         </td>
                     </tr>
                     <tr>
-                        <td class="text-left">Knowledge level data</td>
+                        <td class="text-left">Knowledge levels data</td>
                         <td class="text-center">
                             <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('knowledge_grade_data') }}" target="_blank"></a>
                         </td>
@@ -449,13 +449,13 @@ hr {
         <hr class="mt-2 mb-3">
             <div class="row text-center">
                 <div class="col">
-                    <a class="btn btn-primary" href="/serieslist/{{ user_name }}">SeriesList</a>
+                    <a class="btn btn-mdb-color" href="/serieslist/{{ user_name }}">SeriesList</a>
                 </div>
                 <div class="col">
-                    <a class="btn btn-primary" href="/animeslist/{{ user_name }}">AnimesList</a>
+                    <a class="btn btn-mdb-color" href="/animeslist/{{ user_name }}">AnimesList</a>
                 </div>
                 <div class="col">
-                    <a class="btn btn-primary" href="/bookslist/{{ user_name }}">BooksList</a>
+                    <a class="btn btn-mdb-color" href="/bookslist/{{ user_name }}">BooksList</a>
                 </div>
             </div>
         {% endif %}
@@ -528,7 +528,7 @@ hr {
         </div>
 
         <!-------------------------------------- Achievements ----------------------------------------->
-        <h3 class="font-weight-light text-center p-t-4 p-b-0">
+        <h3 class="font-weight-light text-center m-t-30 p-b-0">
             Animes Achievements
             <div class="arrow_div float-right">
                 <a class="collapse_all fas fa-xs fa-chevron-down" id="ACHIEVEMENTS_arrow" onclick="hide('collapse_ACHIEVEMENTS', 'ACHIEVEMENTS_arrow')"></a>
@@ -560,7 +560,7 @@ hr {
         </div>
 
         <!---------------------------------------- Statistics ----------------------------------------->
-        <h3 class="font-weight-light text-center p-t-4 p-b-0">
+        <h3 class="font-weight-light text-center m-t-30 p-b-0">
             Series Statistics
             <div class="arrow_div float-right">
                 <a class="collapse_all fas fa-xs fa-chevron-down" id="SERIES_arrow" onclick="hide('collapse_SERIES', 'SERIES_arrow')"></a>
@@ -666,8 +666,8 @@ hr {
             </div>
         </div>
 
-        <h3 class="font-weight-light text-center p-t-4 p-b-0">
-            Anime Statistics
+        <h3 class="font-weight-light text-center m-t-30 p-b-0">
+            Animes Statistics
             <div class="arrow_div float-right">
                 <a class="collapse_all fas fa-xs fa-chevron-down" id="ANIME_arrow" onclick="hide('collapse_ANIME', 'ANIME_arrow')"></a>
             </div>
@@ -772,7 +772,7 @@ hr {
             </div>
         </div>
 
-        <h3 class="font-weight-light text-center p-t-4 p-b-0">
+        <h3 class="font-weight-light text-center m-t-30 p-b-0">
             Books Statistics
             <div class="arrow_div float-right">
                 <a class="collapse_all fas fa-xs fa-chevron-down" id="BOOK_arrow" onclick="hide('collapse_BOOK', 'BOOK_arrow')"></a>
