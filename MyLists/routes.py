@@ -1066,12 +1066,28 @@ def change_element_category():
             number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
             element.last_episode_watched = number_episode
+            episodes_counter = 0
+            for i in range(1, number_season):
+                ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=i).first().episodes
+                episodes_counter += ep
+            total_episodes_watched = int(episodes_counter) + int(number_episode)
+            update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
+            update.number_of_episodes_watched = total_episodes_watched
+            app.logger.info('[{}] Total episode watched of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
             db.session.commit()
         elif element_type == "SERIES":
             number_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).count()
             number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
             element.last_episode_watched = number_episode
+            episodes_counter = 0
+            for i in range(1, number_season):
+                ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=i).first().episodes
+                episodes_counter += ep
+            total_episodes_watched = int(episodes_counter) + int(number_episode)
+            update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
+            update.number_of_episodes_watched = total_episodes_watched
+            app.logger.info('[{}] Total episode watched of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
             db.session.commit()
     elif element_new_category == 'On Hold':
         element.status = Status.ON_HOLD
@@ -2068,7 +2084,6 @@ def add_element_in_base(element_data, element_cover_id, list_type):
                                                 episodes=season_data["episode_count"])
             db.session.add(season)
         db.session.commit()
-
     elif list_type == ListType.BOOK:
         title = element_data["volumeInfo"]["title"]
         authors = element_data["volumeInfo"]["authors"][0]
@@ -2122,21 +2137,27 @@ def add_element_in_base(element_data, element_cover_id, list_type):
 
 def add_element_to_user(element_id, user_id, list_type):
     if list_type == ListType.SERIES:
+        episode_duration = Series.query.filter_by(id=element_id).first().episode_duration
         user_list = SeriesList(user_id=user_id,
                                series_id=element_id,
                                current_season=1,
                                last_episode_watched=1,
-                               status=Status.WATCHING)
+                               status=Status.WATCHING,
+                               episode_duration=episode_duration,
+                               number_of_episodes_watched=1)
 
         app.logger.info('[{}] Added series with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
         db.session.commit()
     elif list_type == ListType.ANIME:
+        episode_duration = Anime.query.filter_by(id=element_id).first().episode_duration
         user_list = AnimeList(user_id=user_id,
                               anime_id=element_id,
                               current_season=1,
                               last_episode_watched=1,
-                              status=Status.WATCHING)
+                              status=Status.WATCHING,
+                              episode_duration=episode_duration,
+                              number_of_episodes_watched=1)
 
         app.logger.info('[{}] Added anime with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)

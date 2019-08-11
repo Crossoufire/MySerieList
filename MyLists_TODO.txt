@@ -9,6 +9,19 @@ TO DO / FIX FIRST
 	Add lots of statistics (already started the code part, need a page to display + chart.js)
 	Fix bug display season and episode when refresh due to the browser cache (don't know how to repair) but works great otherwise
 	bug element_name for delete_element (JoJo's bizarre adventure for exemple)
+	grade image manquante
+	rajouter xp = 1min
+	tester hall of fame sans image pour tri
+	achievement dire pourquoi du comment
+	passer en heure/jour pour l'xp
+	ajout element sans refresh
+	cache hall of fame 
+	diminuer la taille navbar
+	augmenter taille conteneur
+	supprimer ami en haut a droite dans la carte
+	ajout onglet stats + achievement
+	dans la barre rouge : mettre le texte clickable
+debug false
 
 TO DO LATER
 	Add the possibility to change the background color of the website
