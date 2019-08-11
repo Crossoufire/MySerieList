@@ -1066,12 +1066,28 @@ def change_element_category():
             number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
             element.last_episode_watched = number_episode
+            episodes_counter = 0
+            for i in range(1, number_season):
+                ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=i).first().episodes
+                episodes_counter += ep
+            total_episodes_watched = int(episodes_counter) + int(number_episode)
+            update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
+            update.number_of_episodes_watched = total_episodes_watched
+            app.logger.info('[{}] Total episode watched of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
             db.session.commit()
         elif element_type == "SERIES":
             number_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).count()
             number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
             element.last_episode_watched = number_episode
+            episodes_counter = 0
+            for i in range(1, number_season):
+                ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=i).first().episodes
+                episodes_counter += ep
+            total_episodes_watched = int(episodes_counter) + int(number_episode)
+            update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
+            update.number_of_episodes_watched = total_episodes_watched
+            app.logger.info('[{}] Total episode watched of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
             db.session.commit()
     elif element_new_category == 'On Hold':
         element.status = Status.ON_HOLD
