@@ -12,7 +12,11 @@
 {% block content %}
 <div style="max-width: 1000px;" class="container">
     <h2 class="text-center mb-3">Anime Achievements</h2>
+    {% if current_user.get_id() == user_id %}
     <div style="font-size: 14pt;" class="text-center mb-5">You have unlocked {{ number_of_achievements }}/44 achievements.</div>
+    {% else %}
+    <div style="font-size: 14pt;" class="text-center mb-5">{{ user_name }} has unlocked {{ number_of_achievements }}/44 achievements.</div>
+    {% endif %}
     <div class="projects row p-0 text-center">
         {% for i in range(0, data|length) %}
         <div class="col col-sm text-center m-b-30 p-b-0 p-l-30">

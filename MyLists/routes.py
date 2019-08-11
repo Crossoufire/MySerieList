@@ -570,6 +570,7 @@ def achievements(user_name):
     return render_template("achievements.html",
                            title='Achievements',
                            user_id=user_id,
+                           user_name=user_name,
                            data=data,
                            number_of_achievements=number_of_achievements)
 
@@ -1772,7 +1773,6 @@ def add_element(element_id, list_type):
                              "warning")
 
             cover_id = save_api_cover(series_data["poster_path"], ListType.SERIES)
-            print(cover_id)
             if cover_id is None:
                 cover_id = "default.jpg"
                 flash("There was a problem while getting series' poster. Please try refreshing the series later.", "warning")
