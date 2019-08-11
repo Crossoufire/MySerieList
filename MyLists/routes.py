@@ -65,7 +65,6 @@ def create_user():
                                                type=str(data["requirement"]["type"]),
                                                genre=genre)
                     db.session.add(achievement)
-    add_values()
     db.session.commit()
 
 
@@ -2596,39 +2595,3 @@ def send_email_update_email(user):
     except Exception as e:
         app.logger.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'.format(user.id, e))
         return False
-
-
-
-
-
-
-def add_values():
-    all_users = User.query.order_by(User.id).all()
-    for user in all_users:
-        anime_list = AnimeList.query.filter_by(user_id=user.id).all()
-        for anime in anime_list:
-            episode_duration = Anime.query.filter_by(id=anime.anime_id).first().episode_duration
-            anime.episode_duration = episode_duration
-            last_episode_watched = anime.last_episode_watched
-            current_season = anime.current_season
-            episodes_counter = 0
-            for i in range(1, current_season):
-                ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=anime.anime_id, season=i).first().episodes
-                episodes_counter += ep
-            total_episodes_watched = int(episodes_counter) + int(last_episode_watched)
-            anime.number_of_episodes_watched = total_episodes_watched
-            db.session.commit()
-
-        series_list = SeriesList.query.filter_by(user_id=user.id).all()
-        for series in series_list:
-            episode_duration = Series.query.filter_by(id=series.series_id).first().episode_duration
-            series.episode_duration = episode_duration
-            last_episode_watched = series.last_episode_watched
-            current_season = series.current_season
-            episodes_counter = 0
-            for i in range(1, current_season):
-                ep = SeriesEpisodesPerSeason.query.filter_by(series_id=series.series_id, season=i).first().episodes
-                episodes_counter += ep
-            total_episodes_watched = int(episodes_counter) + int(last_episode_watched)
-            series.number_of_episodes_watched = total_episodes_watched
-            db.session.commit()
