@@ -113,6 +113,8 @@ class SeriesList(db.Model):
     last_episode_watched = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
     score = db.Column(db.Float)
+    episode_duration = db.Column(db.Integer)
+    number_of_episodes_watched = db.Column(db.Integer)
 
 
 class SeriesEpisodesPerSeason(db.Model):
@@ -168,6 +170,8 @@ class AnimeList(db.Model):
     last_episode_watched = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
     score = db.Column(db.Float)
+    episode_duration = db.Column(db.Integer)
+    number_of_episodes_watched = db.Column(db.Integer)
 
 
 class AnimeEpisodesPerSeason(db.Model):

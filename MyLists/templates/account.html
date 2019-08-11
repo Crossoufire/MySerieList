@@ -457,6 +457,9 @@ hr {
                 <div class="col">
                     <a class="btn btn-primary" href="/bookslist/{{ user_name }}">BooksList</a>
                 </div>
+                <div class="col">
+                    <a class="btn btn-primary" href="/achievements/{{ user_name }}">Achievements</a>
+                </div>
             </div>
         {% endif %}
 
@@ -525,38 +528,6 @@ hr {
                     {% endif %}
                     {% endfor %}
             </div>
-        </div>
-
-        <!-------------------------------------- Achievements ----------------------------------------->
-        <h3 class="font-weight-light text-center">
-            Animes Achievements
-            <div class="arrow_div float-right">
-                <a class="collapse_all fas fa-xs fa-chevron-down" id="ACHIEVEMENTS_arrow" onclick="hide('collapse_ACHIEVEMENTS', 'ACHIEVEMENTS_arrow')"></a>
-            </div>
-        </h3>
-        <hr class="mt-2 mb-3">
-        <div id="collapse_ACHIEVEMENTS" class="container-stats">
-            <table>
-                <tbody>
-                {% for achievement in achievements %}
-                <tr>
-                    <td style="width: 150px;">
-                        <span>{{ achievement[1] }}</span><br>
-                        <img class="p-t-5" height="50" width="100" src="../static/img/anime_achievements/{{ achievement[0] }}.png"/>
-                    </td>
-                    <td class="align-bottom">
-                        <span>{{ achievement[2] }}</span><br>
-                        <span>{{ achievement[3] }}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <hr class="grey_hr mt-3 mb-3">
-                    </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
         </div>
 
         <!---------------------------------------- Statistics ----------------------------------------->

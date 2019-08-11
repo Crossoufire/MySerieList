@@ -6,7 +6,6 @@ import sys
 import urllib
 import time
 import requests
-import numpy as np
 import re
 
 from datetime import datetime
@@ -66,6 +65,7 @@ def create_user():
                                                type=str(data["requirement"]["type"]),
                                                genre=genre)
                     db.session.add(achievement)
+    add_values()
     db.session.commit()
 
 
@@ -263,9 +263,8 @@ def account(user_name):
     # Series Statistics, scores and level
     series_stats = get_all_account_stats(user.id, ListType.SERIES)
 
-    # Animes Statistics, scores, level, and achievements
+    # Animes Statistics, scores and level
     anime_stats = get_all_account_stats(user.id, ListType.ANIME)
-    anime_achievements = get_achievements(user.id, ListType.ANIME)
 
     # Books Statistics, scores, and level
     book_stats = get_all_account_stats(user.id, ListType.BOOK)
@@ -301,7 +300,6 @@ def account(user_name):
                            anime_stats=anime_stats,
                            book_stats=book_stats,
                            total_rank_data=total_rank_data,
-                           achievements=anime_achievements,
                            user_id=user_id,
                            user_name=user_name)
 
@@ -526,6 +524,54 @@ def hall_of_fame():
     return render_template("hall_of_fame.html",
                            title='Hall of Fame',
                            all_data=all_user_data)
+
+
+@app.route("/achievements/<user_name>")
+@login_required
+def achievements(user_name):
+    image_error = url_for('static', filename='img/error.jpg')
+    user = User.query.filter_by(username=user_name).first()
+
+    # Protect admin account
+    if user.id == 1 and current_user.id != 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    # No account with this username
+    if user is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
+    # Check if the account is private / in the friendslist
+    if current_user.id != user.id:
+        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        if user.private:
+            if current_user.get_id() == "1":
+                pass
+            elif friend is None or friend.status != "accepted":
+                image_anonymous = url_for('static', filename='img/anonymous.jpg')
+                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
+
+    # Anime achievements
+    user_achievements = get_achievements(user.id, ListType.ANIME)
+    all_achievements = Achievements.query.filter_by(type="genre").order_by(Achievements.image_id.asc()).all()
+
+    data = []
+    for achievement in all_achievements :
+        data.append([achievement.image_id, achievement.level, achievement.title, achievement.description])
+
+    for i in range(0, len(user_achievements)):
+        for j in range(0, len(data)):
+            if str(user_achievements[i]) == str(data[j][1]):
+                data[j].append(1)
+                break
+
+    number_of_achievements =len(user_achievements)
+
+    user_id = str(user.id)
+    return render_template("achievements.html",
+                           title='Achievements',
+                           user_id=user_id,
+                           data=data,
+                           number_of_achievements=number_of_achievements)
 
 
 @app.route("/anonymous")
@@ -828,6 +874,32 @@ def update_element_season():
         db.session.commit()
         app.logger.info('[{}] Season of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, season + 1))
 
+    # Add/replace the total number of episodes watched by the user for this element
+    if element_type == "ANIME":
+        last_episode_watched = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().last_episode_watched
+        current_season = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().current_season
+        episodes_counter = 0
+        for i in range(1, current_season):
+            ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=i).first().episodes
+            episodes_counter += ep
+        total_episodes_watched = int(episodes_counter) + int(last_episode_watched)
+        update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
+        update.number_of_episodes_watched = total_episodes_watched
+        db.session.commit()
+        app.logger.info('[{}] Total episode watched of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
+    elif element_type == "SERIES":
+        last_episode_watched = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first().last_episode_watched
+        current_season = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().current_season
+        episodes_counter = 0
+        for i in range(1, current_season):
+            ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=i).first().episodes
+            episodes_counter += ep
+        total_episodes_watched = int(episodes_counter) + int(last_episode_watched)
+        update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
+        update.number_of_episodes_watched = total_episodes_watched
+        db.session.commit()
+        app.logger.info('[{}] Total episode watched of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
+
     return '', 204
 
 
@@ -888,6 +960,29 @@ def update_element_episode():
         db.session.commit()
         app.logger.info('[{}] Episode of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, episode + 1))
 
+    # Add/replace the total number of episodes watched by the user for this element
+    if element_type == "ANIME":
+        last_episode_watched = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().last_episode_watched
+        episodes_counter = 0
+        for i in range(1, current_season):
+            ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=i).first().episodes
+            episodes_counter += ep
+        total_episodes_watched = int(episodes_counter) + int(last_episode_watched)
+        update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
+        update.number_of_episodes_watched = total_episodes_watched
+        db.session.commit()
+        app.logger.info('[{}] Total episode watched of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
+    elif element_type == "SERIES":
+        last_episode_watched = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first().last_episode_watched
+        episodes_counter = 0
+        for i in range(1, current_season):
+            ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=i).first().episodes
+            episodes_counter += ep
+        total_episodes_watched = int(episodes_counter) + int(last_episode_watched)
+        update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
+        update.number_of_episodes_watched = total_episodes_watched
+        db.session.commit()
+        app.logger.info('[{}] Total episode watched of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
     return '', 204
 
 
@@ -1336,12 +1431,12 @@ def autocomplete_books():
 
 def get_all_account_stats(user_id, list_type):
     nb_of_element = get_list_count(user_id, list_type)
-    total_element = sum(nb_of_element)
     total_time_element = get_total_time_spent(user_id, list_type)
+    total_element = sum(nb_of_element)
     mean_score_element = get_mean_score(user_id, list_type)
     time_total_in_minutes_element = total_time_element[2]*3600
 
-    element_level_tmp = "{:.2f}".format(round((np.sqrt(2500+200*(time_total_in_minutes_element))-50)/100, 2))
+    element_level_tmp = "{:.2f}".format(round((((2500+200*(time_total_in_minutes_element))**(1/2))-50)/100, 2))
     element_level_tmp = str(element_level_tmp)
     element_level = element_level_tmp.split('.')
 
@@ -1426,8 +1521,8 @@ def get_achievements(user_id, list_type):
             for achievement in achievements:
                 threshold = achievement.threshold
                 range_achievement = threshold.split("-")
-                if int(range_achievement[0]) <= int(values[i]) <= int(range_achievement[1]):
-                    data_achievements = [achievement.image_id, achievement.level, achievement.title, achievement.description]
+                if int(range_achievement[0]) <= int(values[i]):
+                    data_achievements = str(achievement.level)
                     all_achievements.append(data_achievements)
 
     return all_achievements
@@ -2200,25 +2295,29 @@ def get_total_time_spent(user_id, list_type):
         time_spent_min = 0
         for element in list:
             if list_type == ListType.SERIES:
-                episode_duration = Series.query.filter_by(id=element.series_id).first().episode_duration
+                #episode_duration = Series.query.filter_by(id=element.series_id).first().episode_duration
+                episode_duration = element.episode_duration
             elif list_type == ListType.ANIME:
-                episode_duration = Anime.query.filter_by(id=element.anime_id).first().episode_duration
+                #episode_duration = Anime.query.filter_by(id=element.anime_id).first().episode_duration
+                episode_duration = element.episode_duration
 
             if episode_duration is None:
                 continue
 
-            current_season = element.current_season
-            current_ep = element.last_episode_watched
-            for i in range(1, current_season):
-                if list_type == ListType.SERIES:
-                    ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element.series_id, season=i).first().episodes
-                elif list_type == ListType.ANIME:
-                    ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element.anime_id, season=i).first().episodes
-                episodes_counter += ep
-                time_spent_min += ep*episode_duration
+            # current_season = element.current_season
+            # current_ep = element.last_episode_watched
+            # for i in range(1, current_season):
+            #     if list_type == ListType.SERIES:
+            #         ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element.series_id, season=i).first().episodes
+            #     elif list_type == ListType.ANIME:
+            #         ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element.anime_id, season=i).first().episodes
+            #     episodes_counter += ep
+            #     time_spent_min += ep*episode_duration
+            #
+            # episodes_counter += current_ep
 
-            episodes_counter += current_ep
-            time_spent_min += current_ep*episode_duration
+            total_episodes_watched = element.number_of_episodes_watched
+            time_spent_min += total_episodes_watched*episode_duration
 
         time_spent_hours = int((time_spent_min/60))
         time_spent_days = round(time_spent_min/(60*24), 1)
@@ -2497,3 +2596,39 @@ def send_email_update_email(user):
     except Exception as e:
         app.logger.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'.format(user.id, e))
         return False
+
+
+
+
+
+
+def add_values():
+    all_users = User.query.order_by(User.id).all()
+    for user in all_users:
+        anime_list = AnimeList.query.filter_by(user_id=user.id).all()
+        for anime in anime_list:
+            episode_duration = Anime.query.filter_by(id=anime.anime_id).first().episode_duration
+            anime.episode_duration = episode_duration
+            last_episode_watched = anime.last_episode_watched
+            current_season = anime.current_season
+            episodes_counter = 0
+            for i in range(1, current_season):
+                ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=anime.anime_id, season=i).first().episodes
+                episodes_counter += ep
+            total_episodes_watched = int(episodes_counter) + int(last_episode_watched)
+            anime.number_of_episodes_watched = total_episodes_watched
+            db.session.commit()
+
+        series_list = SeriesList.query.filter_by(user_id=user.id).all()
+        for series in series_list:
+            episode_duration = Series.query.filter_by(id=series.series_id).first().episode_duration
+            series.episode_duration = episode_duration
+            last_episode_watched = series.last_episode_watched
+            current_season = series.current_season
+            episodes_counter = 0
+            for i in range(1, current_season):
+                ep = SeriesEpisodesPerSeason.query.filter_by(series_id=series.series_id, season=i).first().episodes
+                episodes_counter += ep
+            total_episodes_watched = int(episodes_counter) + int(last_episode_watched)
+            series.number_of_episodes_watched = total_episodes_watched
+            db.session.commit()

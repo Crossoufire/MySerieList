@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<style>
+.details {
+    display: none;
+}
+</style>
+{% endblock css %}
+
+
+{% block content %}
+<div style="max-width: 1000px;" class="container">
+    <h2 class="text-center mb-3">Anime Achievements</h2>
+    <div style="font-size: 14pt;" class="text-center mb-5">You have unlocked {{ number_of_achievements }}/44 achievements.</div>
+    <div class="projects row p-0 text-center">
+        {% for i in range(0, data|length) %}
+        <div class="col col-sm text-center m-b-30 p-b-0 p-l-30">
+            <span class="text-center">{{ data[i][1] }}</span><br>
+            {% if data[i][4] == 1 %}
+            <a href="#"><img height="100" width="200" src="/static/img/anime_achievements/{{ data[i][0] }}.png" alt=""><br></a>
+            {% else %}
+            <a href="#"><img style="filter: grayscale(100%);" height="100" width="200" src="/static/img/anime_achievements/{{ data[i][0] }}.png" alt=""><br></a>
+            {% endif %}
+            <div class="details p-t-10">
+                <div class="text text-left">
+                    <span style="font-size: 14pt;">{{ data[i][2] }}</span>
+                    <p class="text-left p-b-30">{{ data[i][3] }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block script %}
+<script>
+$(".projects>div>a").on("click", function(e) {
+    console.log("ok");
+    e.preventDefault();
+    var div = $(this).parent(),
+    div_height = div.height(),
+    details = div.find(".details"),
+    details_height = details.height(),
+    new_height = details_height;
+    div.toggleClass("current").animate({
+        paddingBottom: '0', marginBottom: '0'}, {duration: 500, queue: false }).siblings().removeClass("current");
+    $(".projects div:not(.current)").animate({
+        paddingBottom: '0'}, {duration: 500, queue: false }).find(".details").slideUp(500);
+    $(".current").find(".details").slideDown(500);
+});
+</script>
+{% endblock script %}
+
