@@ -2,7 +2,7 @@
 
 {% block css %}
 <!------ MDBootstrap Datatables ------->
-<link href="{{ url_for('static', filename='css/datatables.min.css') }}" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.css"/>
 <!----------- Main CSS ----------->
 <style>
 table.dataTable thead .sorting:after,
@@ -57,14 +57,14 @@ hr {
 
 
 {% block content %}
-<div class="container p-0">
+<div class="container p-0 mt-4">
     <table id="hall_of_fame" class="table table-striped table-sm table-responsive-lg" cellspacing="0" width="100%">
         <thead>
             <tr>
                 <th></th>
                 <th class="th-sm">Username</th>
                 <th class="th-sm">Series</th>
-                <th class="th-sm">Animes</th>
+                <th class="th-sm">Anime</th>
                 <th class="th-sm">Books</th>
                 <th class="th-sm">Total</th>
                 <th></th>
@@ -81,24 +81,24 @@ hr {
                     <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
                 </td>
                 <td>
-                    <img src="static/img/Ranks/{{user['series'][4][0][0] }}.ico" alt="{{ user['series'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="static/img/levels_ranks/{{user['series'][4][0][0] }}.ico" alt="{{ user['series'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
+                    {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
                 </td>
                 <td>
-                    <img src="/static/img/Ranks/{{ user['animes'][4][0][0] }}.ico" alt="{{ user['animes'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/levels_ranks/{{ user['anime'][4][0][0] }}.ico" alt="{{ user['anime'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['animes'][3][0] }} ({{ user['animes'][3][1] }}%)
+                    {{ user['anime'][3][0] }} ({{ user['anime'][3][1] }}%)
                 </td>
                 <td>
-                    <img src="/static/img/Ranks/{{ user['books'][4][0][0] }}.ico" alt="{{ user['books'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/levels_ranks/{{ user['books'][4][0][0] }}.ico" alt="{{ user['books'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['books'][3][0] }} ({{ user['books'][3][1] }}%)
+                    {{ user['books'][3][0] }} ({{ user['books'][3][1] }}%)
                 </td>
                 <td>
-                    <img src="/static/img/Original/{{ user['total'][1][0][0] }}.png" alt="{{ user['total'][1][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/knowledge_ranks/{{ user['total'][1][0][0] }}.png" alt="{{ user['total'][1][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['total'][0] }}
+                    {{ user['total'][0] }}
                 </td>
                 <td></td>
 
@@ -110,24 +110,24 @@ hr {
                     <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
                 </td>
                 <td class="current_user">
-                    <img src="/static/img/Ranks/{{ user['series'][4][0][0] }}.ico" alt="{{ user['series'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/levels_ranks/{{ user['series'][4][0][0] }}.ico" alt="{{ user['series'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
+                    {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
                 </td>
                 <td class="current_user">
-                    <img src="/static/img/Ranks/{{ user['animes'][4][0][0] }}.ico" alt="{{ user['animes'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/levels_ranks/{{ user['anime'][4][0][0] }}.ico" alt="{{ user['anime'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['animes'][3][0] }} ({{ user['animes'][3][1] }}%)
+                    {{ user['anime'][3][0] }} ({{ user['anime'][3][1] }}%)
                 </td>
                 <td class="current_user">
-                    <img src="/static/img/Ranks/{{ user['books'][4][0][0] }}.ico" alt="{{ user['books'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/levels_ranks/{{ user['books'][4][0][0] }}.ico" alt="{{ user['books'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['books'][3][0] }} ({{ user['books'][3][1] }}%)
+                    {{ user['books'][3][0] }} ({{ user['books'][3][1] }}%)
                 </td >
                 <td class="current_user">
-                    <img src="/static/img/Original/{{ user['total'][1][0][0] }}.png" alt="{{ user['total'][1][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/knowledge_ranks/{{ user['total'][1][0][0] }}.png" alt="{{ user['total'][1][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['total'][0] }}
+                    {{ user['total'][0] }}
                 </td>
                 <td class="current_user"></td>
 
@@ -139,24 +139,24 @@ hr {
                     <b>Anonymous</b>
                 </td>
                 <td>
-                    <img src="/static/img/Ranks/{{ user['series'][4][0][0] }}.ico" alt="{{ user['series'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/levels_ranks/{{ user['series'][4][0][0] }}.ico" alt="{{ user['series'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
+                    {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
                 </td>
                 <td>
-                    <img src="/static/img/Ranks/{{ user['animes'][4][0][0] }}.ico" alt="{{ user['animes'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/levels_ranks/{{ user['anime'][4][0][0] }}.ico" alt="{{ user['anime'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['animes'][3][0] }} ({{ user['animes'][3][1] }}%)
+                    {{ user['anime'][3][0] }} ({{ user['anime'][3][1] }}%)
                 </td>
                 <td>
-                    <img src="/static/img/Ranks/{{ user['books'][4][0][0] }}.ico" alt="{{ user['books'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/levels_ranks/{{ user['books'][4][0][0] }}.ico" alt="{{ user['books'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['books'][3][0] }} ({{ user['books'][3][1] }}%)
+                    {{ user['books'][3][0] }} ({{ user['books'][3][1] }}%)
                 </td>
                 <td>
-                    <img src="/static/img/Original/{{ user['total'][1][0][0] }}.png" alt="{{ user['total'][1][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/knowledge_ranks/{{ user['total'][1][0][0] }}.png" alt="{{ user['total'][1][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['total'][0] }}
+                    {{ user['total'][0] }}
                 </td>
                 <td></td>
 
@@ -168,24 +168,24 @@ hr {
                     <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
                 </td>
                 <td>
-                    <img src="/static/img/Ranks/{{ user['series'][4][0][0] }}.ico" alt="{{ user['series'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/levels_ranks/{{ user['series'][4][0][0] }}.ico" alt="{{ user['series'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
+                    {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
                 </td>
                 <td>
-                    <img src="/static/img/Ranks/{{ user['animes'][4][0][0] }}.ico" alt="{{ user['animes'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/levels_ranks/{{ user['anime'][4][0][0] }}.ico" alt="{{ user['anime'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['animes'][3][0] }} ({{ user['animes'][3][1] }}%)
+                    {{ user['anime'][3][0] }} ({{ user['anime'][3][1] }}%)
                 </td>
                 <td>
-                    <img src="/static/img/Ranks/{{ user['books'][4][0][0] }}.ico" alt="{{ user['books'][4][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/levels_ranks/{{ user['books'][4][0][0] }}.ico" alt="{{ user['books'][4][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['books'][3][0] }} ({{ user['books'][3][1] }}%)
+                    {{ user['books'][3][0] }} ({{ user['books'][3][1] }}%)
                 </td>
                 <td>
-                    <img src="/static/img/Original/{{ user['total'][1][0][0] }}.png" alt="{{ user['total'][1][0][1] }}" style="width: 30px; height: 30px;">
+                    <img src="/static/img/knowledge_ranks/{{ user['total'][1][0][0] }}.png" alt="{{ user['total'][1][0][1] }}" style="width: 30px; height: 30px;">
                     <br>
-                    Level {{ user['total'][0] }}
+                    {{ user['total'][0] }}
                 </td>
 
                 {% if user["isfriend"] %}
@@ -206,7 +206,7 @@ hr {
 
 {% block script %}
 <!--------- MDBootstrap Datatables ----------->
-<script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>
 <!-------------- Main JS ---------------->
 <script>
 function add_friend(username) {
@@ -227,8 +227,7 @@ $(document).ready(function () {
     $('#hall_of_fame').DataTable({
         "order": [[ 5, "desc" ], [ 1, "asc" ]],
         columnDefs: [{orderable: false, targets: 0},
-                     {orderable: false, targets: 6}
-                    ]
+                     {orderable: false, targets: 6}],
     });
     $('.dataTables_length').addClass('bs-select');
 });

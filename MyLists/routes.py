@@ -250,46 +250,41 @@ def account(user_name):
     friends_list = Friend.query.filter_by(user_id=user.id).all()
     friends_list_data = []
     for friend in friends_list:
-        friend_data = {}
-        friend_username = User.query.filter_by(id=friend.friend_id).first().username
-        friend_picture = User.query.filter_by(id=friend.friend_id).first().image_file
-        friend_data["username"] = friend_username
-        friend_data["user_id"] = friend.friend_id
-        friend_data["status"] = friend.status
-        friend_data["picture"] = friend_picture
+        friend_data_2 = User.query.filter_by(id=friend.friend_id).first()
+        friend_data = {"username": friend_data_2.username,
+                       "user_id": friend.friend_id,
+                       "status": friend.status,
+                       "picture": friend_data_2.image_file}
         friends_list_data.append(friend_data)
 
     # Series Statistics, scores and level
     series_stats = get_all_account_stats(user.id, ListType.SERIES)
-
     # Animes Statistics, scores and level
     anime_stats = get_all_account_stats(user.id, ListType.ANIME)
-
     # Books Statistics, scores, and level
     book_stats = get_all_account_stats(user.id, ListType.BOOK)
 
-    # Total level calculation + grade
-    total_level = int(series_stats[3][0]) + int(anime_stats[3][0]) + int(book_stats[3][0])
-    list_total_rank_element = []
+    # Knowledge level calculation + Grade
+    knowledge_level = int(series_stats[3][0]) + int(anime_stats[3][0]) + int(book_stats[3][0])
 
+    list_all_knowledge_ranks = []
     if platform.system() == "Windows":
-        fp = open("{0}".format(os.path.join(app.root_path, "static\\img\\Original\\Ranks_unity.csv")), "r")
+        path = os.path.join(app.root_path, "static\\img\\knowledge_ranks\\knowledge_ranks.csv")
     else:  # Linux & macOS
-        fp = open("{0}".format(os.path.join(app.root_path, "static/img/Original/Ranks_unity.csv")), "r")
+        path = os.path.join(app.root_path, "static/img/knowledge_ranks/knowledge_ranks.csv")
+    with open(path, 'r') as fp:
+        for line in fp:
+            list_all_knowledge_ranks.append(line.split(";"))
 
-    for line in fp:
-        list_total_rank_element.append(line.split(";"))
-    fp.close()
+    user_knowledge_rank = []
+    # Check if the user has a level greater than 345
+    if int(knowledge_level) > 345:
+        user_knowledge_rank.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
+    else:
+        for rank in list_all_knowledge_ranks:
+            if str(rank[0]) == str(knowledge_level):
+                user_knowledge_rank.append([str(rank[1]), str(rank[2])])
 
-    total_rank_data = []
-    for i in range(0, len(list_total_rank_element)):
-        if str(list_total_rank_element[i][0]) == str(total_level):
-            total_rank_data.append([str(list_total_rank_element[i][1]), str(list_total_rank_element[i][2])])
-
-    if len(total_rank_data) == 0:
-        total_rank_data.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
-
-    user_id = str(user.id)
     return render_template('account.html',
                            title="{}'s account".format(user.username),
                            profile_picture=profile_picture,
@@ -298,27 +293,27 @@ def account(user_name):
                            series_stats=series_stats,
                            anime_stats=anime_stats,
                            book_stats=book_stats,
-                           total_rank_data=total_rank_data,
-                           user_id=user_id,
+                           user_knowledge_rank=user_knowledge_rank,
+                           user_id=str(user.id),
                            user_name=user_name)
 
 
-@app.route("/animes_achievements")
+@app.route("/anime_achievements")
 @login_required
-def animes_achievements():
-    return render_template('animes_achievements.html', title='Animes achievements')
+def anime_achievements():
+    return render_template('anime_achievements.html', title='Anime achievements')
 
 
 @app.route("/level_grade_data")
 @login_required
 def level_grade_data():
-    return render_template('level_grade_data.html', title='Level Grade Data')
+    return render_template('level_grade_data.html', title='Level grade data')
 
 
 @app.route("/knowledge_grade_data")
 @login_required
 def knowledge_grade_data():
-    return render_template('knowledge_grade_data.html', title='Knowledge Grade Data')
+    return render_template('knowledge_grade_data.html', title='Knowledge grade data')
 
 
 @app.route("/account_settings", methods=['GET', 'POST'])
@@ -343,7 +338,6 @@ def account_settings():
             db.session.commit()
             app.logger.info('[{}] Settings updated : old username = {}, new username = {}'.format(user.id, old_username,
                                                                                                   user.username))
-
         if form.isprivate.data != user.private:
             old_value = user.private
             user.private = form.isprivate.data
@@ -367,7 +361,6 @@ def account_settings():
         app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
                                                                                               old_value,
                                                                                               form.homepage.data))
-
         email_changed = False
         if form.email.data != user.email:
             old_email = user.email
@@ -381,7 +374,6 @@ def account_settings():
             else:
                 success = False
                 app.logger.error('[SYSTEM] Error while sending the email update email to {}'.format(user.email))
-
         if not email_changed:
             flash("Your account has been updated ! ", 'success')
         else:
@@ -390,9 +382,7 @@ def account_settings():
                       'success')
             else:
                 flash("There was an error internal error. Please contact the administrator.", 'danger')
-
         return redirect(url_for('account', user_name=current_user.username))
-
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
@@ -409,9 +399,7 @@ def account_settings():
         elif current_user.homepage == HomePage.HALL_OF_FAME:
             form.homepage.data = "hof"
 
-    return render_template('account_settings.html',
-                           title='Account Settings',
-                           form=form)
+    return render_template('account_settings.html', title='Account settings', form=form)
 
 
 @app.route("/email_update/<token>", methods=['GET'])
@@ -469,37 +457,38 @@ def hall_of_fame():
     all_user_data = []
     for user in users:
         ranks_and_levels_series = get_all_account_stats(user.id, ListType.SERIES)
-        ranks_and_levels_animes = get_all_account_stats(user.id, ListType.ANIME)
+        ranks_and_levels_anime = get_all_account_stats(user.id, ListType.ANIME)
         ranks_and_levels_books = get_all_account_stats(user.id, ListType.BOOK)
 
-        total_level = int(ranks_and_levels_series[3][0]) + int(ranks_and_levels_animes[3][0]) + int(ranks_and_levels_books[3][0])
-        list_total_rank = []
+        # Knowledge level calculation + Grade
+        knowledge_level = int(ranks_and_levels_series[3][0]) + int(ranks_and_levels_anime[3][0]) + int(ranks_and_levels_books[3][0])
+
+        list_all_knowledge_ranks = []
         if platform.system() == "Windows":
-            fp = open("{0}".format(os.path.join(app.root_path, "static\\img\\Original\\Ranks_unity.csv")), "r")
+            path = os.path.join(app.root_path, "static\\img\\knowledge_ranks\\knowledge_ranks.csv")
         else:  # Linux & macOS
-            fp = open("{0}".format(os.path.join(app.root_path, "static/img/Original/Ranks_unity.csv")), "r")
+            path = os.path.join(app.root_path, "static/img/knowledge_ranks/knowledge_ranks.csv")
+        with open(path, 'r') as fp:
+            for line in fp:
+                list_all_knowledge_ranks.append(line.split(";"))
 
-        for line in fp:
-            list_total_rank.append(line.split(";"))
-        fp.close()
-
-        total_rank_data = []
-        for i in range(0, len(list_total_rank)):
-            if str(list_total_rank[i][0]) == str(total_level):
-                total_rank_data.append([str(list_total_rank[i][1]), str(list_total_rank[i][2])])
-
-        if len(total_rank_data) == 0:
-            total_rank_data.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
+        user_knowledge_rank = []
+        # Check if the user has a level greater than 345
+        if int(knowledge_level) > 345:
+            user_knowledge_rank.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
+        else:
+            for rank in list_all_knowledge_ranks:
+                if str(rank[0]) == str(knowledge_level):
+                    user_knowledge_rank.append([str(rank[1]), str(rank[2])])
 
         # profile picture
         profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
-
         user_data = {"profile_picture": profile_picture,
                      "username": user.username,
                      "series": ranks_and_levels_series,
-                     "animes": ranks_and_levels_animes,
+                     "anime": ranks_and_levels_anime,
                      "books": ranks_and_levels_books,
-                     "total": [total_level, total_rank_data]}
+                     "total": [knowledge_level, user_knowledge_rank]}
 
         if user.id in friends_list:
             user_data["isfriend"] = True
@@ -510,7 +499,6 @@ def hall_of_fame():
             else:
                 user_data["ispendingfriend"] = False
             user_data["isfriend"] = False
-
         if str(user.id) == current_user.get_id():
             user_data["isprivate"] = False
             user_data["iscurrentuser"] = True
@@ -520,9 +508,7 @@ def hall_of_fame():
 
         all_user_data.append(user_data)
 
-    return render_template("hall_of_fame.html",
-                           title='Hall of Fame',
-                           all_data=all_user_data)
+    return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_user_data)
 
 
 @app.route("/achievements/<user_name>")
@@ -553,25 +539,22 @@ def achievements(user_name):
     user_achievements = get_achievements(user.id, ListType.ANIME)
     all_achievements = Achievements.query.filter_by(type="genre").order_by(Achievements.image_id.asc()).all()
 
-    data = []
+    achievements_data = []
     for achievement in all_achievements :
-        data.append([achievement.image_id, achievement.level, achievement.title, achievement.description])
+        achievements_data.append([achievement.image_id, achievement.level, achievement.title, achievement.description])
 
     for i in range(0, len(user_achievements)):
-        for j in range(0, len(data)):
-            if str(user_achievements[i]) == str(data[j][1]):
-                data[j].append(1)
+        for j in range(0, len(achievements_data)):
+            if str(user_achievements[i]) == str(achievements_data[j][1]):
+                achievements_data[j].append(1)
                 break
 
-    number_of_achievements =len(user_achievements)
-
-    user_id = str(user.id)
     return render_template("achievements.html",
                            title='Achievements',
-                           user_id=user_id,
+                           user_id=str(user.id),
                            user_name=user_name,
-                           data=data,
-                           number_of_achievements=number_of_achievements)
+                           achievements_data=achievements_data,
+                           number_of_achievements=len(user_achievements))
 
 
 @app.route("/anonymous")
@@ -651,6 +634,7 @@ def delete_friend():
     if Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id).first() is None:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
+    # Delete the friend
     Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id).delete()
     Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id()).delete()
     db.session.commit()
@@ -1108,7 +1092,6 @@ def change_element_category():
 @login_required
 def refresh_single_element():
     image_error = url_for('static', filename='img/error.jpg')
-
     try:
         json_data = request.get_json()
         element_id = int(json_data['element_id'])
@@ -1157,7 +1140,6 @@ def refresh_all_element():
             time_delta = datetime.utcnow() - last_update
             if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
                 refresh_element_data(anime.anime_id, ListType.ANIME)
-
     elif element_type == "SERIES":
         series = SeriesList.query.filter_by(user_id=current_user.get_id()).all()
         for single_serie in series:
@@ -1446,54 +1428,171 @@ def autocomplete_books():
 
 
 def get_all_account_stats(user_id, list_type):
-    nb_of_element = get_list_count(user_id, list_type)
+    # Recover the amount of time spent watching an element
     total_time_element = get_total_time_spent(user_id, list_type)
-    total_element = sum(nb_of_element)
-    mean_score_element = get_mean_score(user_id, list_type)
-    time_total_in_minutes_element = total_time_element[2]*3600
+    total_time_in_minutes_element = total_time_element[2]*3600
 
-    element_level_tmp = "{:.2f}".format(round((((2500+200*(time_total_in_minutes_element))**(1/2))-50)/100, 2))
+    # Calculation of the corresponding level using the quadratic equation
+    element_level_tmp = "{:.2f}".format(round((((2500+200*(total_time_in_minutes_element))**(1/2))-50)/100, 2))
     element_level_tmp = str(element_level_tmp)
     element_level = element_level_tmp.split('.')
+    element_level[0] = int(element_level[0])
 
-    list_rank_element = []
+    # Level and rang calculation + Grade
+    list_all_levels_ranks = []
     if platform.system() == "Windows":
-        fp = open("{0}".format(os.path.join(app.root_path, "static\\img\\Ranks\\Ranks.csv")), "r")
+        path = os.path.join(app.root_path, "static\\img\\levels_ranks\\levels_ranks.csv")
     else:  # Linux & macOS
-        fp = open("{0}".format(os.path.join(app.root_path, "static/img/Ranks/Ranks.csv")), "r")
-    for line in fp:
-        list_rank_element.append(line.split(";"))
-    fp.close()
+        path = os.path.join(app.root_path, "static/img/levels_ranks/levels_ranks.csv")
+    with open(path, 'r') as fp:
+        for line in fp:
+            list_all_levels_ranks.append(line.split(";"))
 
-    element_rank_data = []
-    for i in range(0, len(list_rank_element)):
-        if str(list_rank_element[i][0]) == str(element_level[0]):
-            element_rank_data.append([str(list_rank_element[i][2]), str(list_rank_element[i][3])])
+    user_level_rank = []
+    # Check if the user has a level greater than 125
+    if element_level[0] > 125:
+        user_level_rank.append(["General_Grade_4", "General Grade 4"])
+    else:
+        for rank in list_all_levels_ranks:
+            if int(rank[0]) == element_level[0]:
+                user_level_rank.append([str(rank[2]), str(rank[3])])
 
-    if len(element_rank_data) == 0:
-        element_rank_data.append(["General_Grade_4", "General Grade 4"])
+    # Recover the mean score for an element
+    mean_score_element = get_mean_score(user_id, list_type)
 
+    # Recover the pourcentage of each category
+    nb_of_element = get_list_count(user_id, list_type)
+    total_element = sum(nb_of_element)
     if total_element == 0:
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            element_rate = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            element_pourcentage = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         elif list_type == ListType.BOOK:
-            element_rate = [0.0, 0.0, 0.0, 0.0, 0.0]
+            element_pourcentage = [0.0, 0.0, 0.0, 0.0, 0.0]
     else:
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            element_rate = [(float(nb_of_element[0]/total_element))*100,
-                           (float(nb_of_element[1]/total_element))*100,
-                           (float(nb_of_element[2]/total_element))*100,
-                           (float(nb_of_element[3]/total_element))*100,
-                           (float(nb_of_element[4]/total_element))*100,
-                           (float(nb_of_element[5]/total_element))*100]
+            element_pourcentage = [(float(nb_of_element[0]/total_element))*100,
+                                   (float(nb_of_element[1]/total_element))*100,
+                                   (float(nb_of_element[2]/total_element))*100,
+                                   (float(nb_of_element[3]/total_element))*100,
+                                   (float(nb_of_element[4]/total_element))*100,
+                                   (float(nb_of_element[5]/total_element))*100]
         elif list_type == ListType.BOOK:
-            element_rate = [(float(nb_of_element[0]/total_element))*100,
-                            (float(nb_of_element[1]/total_element))*100,
-                            (float(nb_of_element[2]/total_element))*100,
-                            (float(nb_of_element[3]/total_element))*100,
-                            (float(nb_of_element[4]/total_element))*100]
+            element_pourcentage = [(float(nb_of_element[0]/total_element))*100,
+                                   (float(nb_of_element[1]/total_element))*100,
+                                   (float(nb_of_element[2]/total_element))*100,
+                                   (float(nb_of_element[3]/total_element))*100,
+                                   (float(nb_of_element[4]/total_element))*100]
 
-    return [nb_of_element, total_time_element, mean_score_element, element_level, element_rank_data, element_rate]
+    return [nb_of_element, total_time_element, mean_score_element, element_level, user_level_rank, element_pourcentage]
+
+
+def get_list_count(user_id, list_type):
+        if list_type is ListType.SERIES:
+            watching = SeriesList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
+            completed = SeriesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+            onhold = SeriesList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
+            random = SeriesList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
+            dropped = SeriesList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
+            plantowatch = SeriesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
+        elif list_type is ListType.ANIME:
+            watching = AnimeList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
+            completed = AnimeList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+            onhold = AnimeList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
+            random = AnimeList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
+            dropped = AnimeList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
+            plantowatch = AnimeList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
+        elif list_type is ListType.BOOK:
+            reading = BookList.query.filter_by(user_id=user_id, status=Status.READING).count()
+            completed = BookList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+            onhold = BookList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
+            dropped = BookList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
+            plantoread = BookList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_READ).count()
+
+        if list_type == ListType.SERIES or list_type == ListType.ANIME:
+            statistics = [watching, completed, onhold, random, dropped, plantowatch]
+        elif list_type == ListType.BOOK:
+            statistics = [reading, completed, onhold, dropped, plantoread]
+        return statistics
+
+
+def get_total_time_spent(user_id, list_type):
+    if list_type == ListType.SERIES:
+        list = SeriesList.query.filter(SeriesList.status != Status.PLAN_TO_READ).filter_by(user_id=user_id).all()
+    elif list_type == ListType.ANIME:
+        list = AnimeList.query.filter(AnimeList.status != Status.PLAN_TO_WATCH).filter_by(user_id=user_id).all()
+    elif list_type == ListType.BOOK:
+        list = BookList.query.filter(BookList.status == Status.COMPLETED).filter_by(user_id=user_id).all()
+
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
+        episodes_counter = 0
+        time_spent_min = 0
+        for element in list:
+            if list_type == ListType.SERIES:
+                #episode_duration = Series.query.filter_by(id=element.series_id).first().episode_duration
+                episode_duration = element.episode_duration
+            elif list_type == ListType.ANIME:
+                #episode_duration = Anime.query.filter_by(id=element.anime_id).first().episode_duration
+                episode_duration = element.episode_duration
+
+            if episode_duration is None:
+                continue
+
+            # current_season = element.current_season
+            # current_ep = element.last_episode_watched
+            # for i in range(1, current_season):
+            #     if list_type == ListType.SERIES:
+            #         ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element.series_id, season=i).first().episodes
+            #     elif list_type == ListType.ANIME:
+            #         ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element.anime_id, season=i).first().episodes
+            #     episodes_counter += ep
+            #     time_spent_min += ep*episode_duration
+            #
+            # episodes_counter += current_ep
+
+            total_episodes_watched = element.number_of_episodes_watched
+            time_spent_min += total_episodes_watched*episode_duration
+
+        time_spent_hours = int((time_spent_min/60))
+        time_spent_days = round(time_spent_min/(60*24), 1)
+        return [episodes_counter, time_spent_hours, time_spent_days]
+    elif list_type == ListType.BOOK:
+        total_pages = 0
+        for book in list:
+            pages_count = Book.query.filter_by(id=book.book_id).first().page_count
+            if pages_count is not None:
+                total_pages += pages_count
+
+        time_spent_hours = int(((total_pages*2)/60))
+        time_spent_days = round((total_pages*2)/(60*24), 1)
+        return [total_pages, time_spent_hours, time_spent_days]
+
+
+def get_mean_score(user_id, list_type):
+    if list_type is ListType.SERIES:
+        all_scores  = SeriesList.query.filter_by(user_id=user_id).all()
+    if list_type is ListType.ANIME:
+         all_scores = AnimeList.query.filter_by(user_id=user_id).all()
+    if list_type is ListType.BOOK:
+        all_scores  = BookList.query.filter_by(user_id=user_id).all()
+
+    # If no element in the list, mean score = 0
+    if len(all_scores) == 0:
+        mean_score = 0.00
+    else:
+        not_scored = 0
+        score = 0
+        for i in range(0, len(all_scores)):
+            tmp = all_scores[i].score
+            if tmp is None:
+                not_scored += 1
+            else:
+                score += float(all_scores[i].score)
+        if len(all_scores) == not_scored:
+            mean_score = 0.00
+        else:
+            mean_score = round(score/(len(all_scores)-not_scored), 2)
+
+    return mean_score
 
 
 def get_achievements(user_id, list_type):
@@ -1542,35 +1641,6 @@ def get_achievements(user_id, list_type):
                     all_achievements.append(data_achievements)
 
     return all_achievements
-
-
-def get_list_count(user_id, list_type):
-        if list_type is ListType.SERIES:
-            watching    = SeriesList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
-            completed   = SeriesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
-            onhold      = SeriesList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
-            random      = SeriesList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
-            dropped     = SeriesList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
-            plantowatch = SeriesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
-        elif list_type is ListType.ANIME:
-            watching    = AnimeList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
-            completed   = AnimeList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
-            onhold      = AnimeList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
-            random      = AnimeList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
-            dropped     = AnimeList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
-            plantowatch = AnimeList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
-        elif list_type is ListType.BOOK:
-            reading     = BookList.query.filter_by(user_id=user_id, status=Status.READING).count()
-            completed   = BookList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
-            onhold      = BookList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
-            dropped     = BookList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
-            plantoread  = BookList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_READ).count()
-
-        if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            statistics = [watching, completed, onhold, random, dropped, plantowatch]
-        elif list_type == ListType.BOOK:
-            statistics = [reading, completed, onhold, dropped, plantoread]
-        return statistics
 
 
 def autocomplete_search_element(element_name, list_type):
@@ -1748,7 +1818,6 @@ def autocomplete_search_element(element_name, list_type):
 
 
 def add_element(element_id, list_type):
-
     # Check if the ID element exist in the database
     if list_type == ListType.SERIES:
         element = Series.query.filter_by(themoviedb_id=element_id).first()
@@ -1778,7 +1847,6 @@ def add_element(element_id, list_type):
                 refresh_element_data(element.id, list_type)
 
         add_element_to_user(element.id, int(current_user.get_id()), list_type)
-
     # Otherwise we need to recover it from an online API
     else:
         if list_type == ListType.SERIES:
@@ -1849,13 +1917,11 @@ def get_element_data_from_api(api_id, list_type):
                 time.sleep(3)
             else:
                 break
-
     elif list_type == ListType.BOOK:
         try:
             response = requests.get("https://www.googleapis.com/books/v1/volumes/{0}".format(api_id))
         except:
             return None
-
     else:
         return None
 
@@ -2274,87 +2340,6 @@ def get_list_data(list, list_type):
     return all_list_data
 
 
-def get_mean_score(user_id, list_type):
-    if list_type is ListType.SERIES:
-        all_scores  = SeriesList.query.filter_by(user_id=user_id).all()
-    if list_type is ListType.ANIME:
-         all_scores = AnimeList.query.filter_by(user_id=user_id).all()
-    if list_type is ListType.BOOK:
-        all_scores  = BookList.query.filter_by(user_id=user_id).all()
-
-    # If no element in the list mean score = 0
-    if len(all_scores) == 0:
-        mean_score = 0.00
-    else:
-        no_score = 0
-        score = 0
-        for i in range(0, len(all_scores)):
-            tmp = all_scores[i].score
-            if tmp is None:
-                no_score += 1
-            else:
-                score += float(all_scores[i].score)
-        if len(all_scores) == no_score:
-            mean_score = 0.00
-        else:
-            mean_score = round(score/(len(all_scores)-no_score), 2)
-
-    return mean_score
-
-
-def get_total_time_spent(user_id, list_type):
-    if list_type == ListType.SERIES:
-        list = SeriesList.query.filter(SeriesList.status != Status.PLAN_TO_READ).filter_by(user_id=user_id).all()
-    elif list_type == ListType.ANIME:
-        list = AnimeList.query.filter(AnimeList.status != Status.PLAN_TO_WATCH).filter_by(user_id=user_id).all()
-    elif list_type == ListType.BOOK:
-        list = BookList.query.filter(BookList.status == Status.COMPLETED).filter_by(user_id=user_id).all()
-
-    if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        episodes_counter = 0
-        time_spent_min = 0
-        for element in list:
-            if list_type == ListType.SERIES:
-                #episode_duration = Series.query.filter_by(id=element.series_id).first().episode_duration
-                episode_duration = element.episode_duration
-            elif list_type == ListType.ANIME:
-                #episode_duration = Anime.query.filter_by(id=element.anime_id).first().episode_duration
-                episode_duration = element.episode_duration
-
-            if episode_duration is None:
-                continue
-
-            # current_season = element.current_season
-            # current_ep = element.last_episode_watched
-            # for i in range(1, current_season):
-            #     if list_type == ListType.SERIES:
-            #         ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element.series_id, season=i).first().episodes
-            #     elif list_type == ListType.ANIME:
-            #         ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element.anime_id, season=i).first().episodes
-            #     episodes_counter += ep
-            #     time_spent_min += ep*episode_duration
-            #
-            # episodes_counter += current_ep
-
-            total_episodes_watched = element.number_of_episodes_watched
-            time_spent_min += total_episodes_watched*episode_duration
-
-        time_spent_hours = int((time_spent_min/60))
-        time_spent_days = round(time_spent_min/(60*24), 1)
-        return [episodes_counter, time_spent_hours, time_spent_days]
-
-    elif list_type == ListType.BOOK:
-        total_pages = 0
-        for book in list:
-            pages_count = Book.query.filter_by(id=book.book_id).first().page_count
-            if pages_count is not None:
-                total_pages += pages_count
-
-        time_spent_hours = int(((total_pages*2)/60))
-        time_spent_days = round((total_pages*2)/(60*24), 1)
-        return [total_pages, time_spent_hours, time_spent_days]
-
-
 def refresh_element_data(element_id, list_type):
     if list_type == ListType.SERIES:
         element = Series.query.filter_by(id=element_id).first()
@@ -2401,7 +2386,6 @@ def refresh_element_data(element_id, list_type):
         img.save(local_covers_path + element.image_cover, quality=90)
     except:
         flash("There was an error while downloading the cover. Please try again later.")
-
 
     try:
         created_by = ""
@@ -2497,7 +2481,7 @@ def refresh_element_data(element_id, list_type):
             else:
                 season.episodes = season_data["episode_count"]
 
-    # TODO : refresh Networks and Genres
+    # TO DO: refresh Networks and Genres
     db.session.commit()
     app.logger.info("[{}] Refreshed the element with the ID {}".format(current_user.get_id(), element_id))
 
@@ -2513,6 +2497,7 @@ def save_profile_picture(form_picture):
         return "default.jpg"
     i = i.resize((300, 300), Image.ANTIALIAS)
     i.save(picture_path, quality=90)
+
     return picture_fn
 
 
@@ -2555,7 +2540,6 @@ def send_reset_email(user):
 
     email_template = open(path, 'r').read().replace("{1}", user.username)
     email_template = email_template.replace("{2}", url_for('reset_token', token=token, _external=True))
-
     msg.html = email_template
 
     try:
@@ -2581,7 +2565,6 @@ def send_register_email(user):
 
     email_template = open(path, 'r').read().replace("{1}", user.username)
     email_template = email_template.replace("{2}", url_for('register_token', token=token, _external=True))
-
     msg.html = email_template
 
     try:
@@ -2607,7 +2590,6 @@ def send_email_update_email(user):
 
     email_template = open(path, 'r').read().replace("{1}", user.username)
     email_template = email_template.replace("{2}", url_for('email_update_token', token=token, _external=True))
-
     msg.html = email_template
 
     try:

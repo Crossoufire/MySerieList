@@ -355,7 +355,7 @@ hr {
                 <h2 class="mt-0 account-heading username">{{ user_name }}'s profile</h2>
                 {% endif %}
                 <span style="font-size: 14pt;">Knowledge level:&nbsp&nbsp</span>
-                <img height='64' width='64' data-toggle="tooltip" title="{{ total_rank_data[0][1] }}" src="/static/img/Original/{{ total_rank_data[0][0] }}.png"/>
+                <img height='64' width='64' data-toggle="tooltip" title="{{ user_knowledge_rank[0][1] }}" src="/static/img/knowledge_ranks/{{ user_knowledge_rank[0][0] }}.png"/>
             </div>
             <div class="ml-auto bd-highlight">
                 {% if user_id == current_user.get_id() %}
@@ -370,7 +370,7 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ series_stats[4][0][1] }}" src="/static/img/Ranks/{{ series_stats[4][0][0] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ series_stats[4][0][1] }}" src="/static/img/levels_ranks/{{ series_stats[4][0][0] }}.ico"/>
                             <span class='account-bar-name'>Series</span>
                             <div id="series_level" class='account-bar-level'>Level {{ series_stats[3][0] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ series_stats[3][1] }}%">
@@ -385,8 +385,8 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ anime_stats[4][0][1] }}" src="/static/img/Ranks/{{ anime_stats[4][0][0] }}.ico"/>
-                            <div class='account-bar-name'>Animes</div>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ anime_stats[4][0][1] }}" src="/static/img/levels_ranks/{{ anime_stats[4][0][0] }}.ico"/>
+                            <div class='account-bar-name'>Anime</div>
                             <div id="anime_level" class='account-bar-level'>Level {{ anime_stats[3][0] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ anime_stats[3][1] }}%">
                                 <div id='xp-bar-fill-anime'>
@@ -400,7 +400,7 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ book_stats[4][0][1] }}" src="/static/img/Ranks/{{ book_stats[4][0][0] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ book_stats[4][0][1] }}" src="/static/img/levels_ranks/{{ book_stats[4][0][0] }}.ico"/>
                             <div class='account-bar-name'>Books</div>
                             <div id="book_level" class='account-bar-level'>Level {{ book_stats[3][0] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ book_stats[3][1] }}%">
@@ -422,9 +422,9 @@ hr {
                     </thead>
                     <tbody>
                     <tr>
-                        <td class="text-left">All animes achievements</td>
+                        <td class="text-left">All anime achievements</td>
                         <td class="text-center">
-                            <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('animes_achievements') }}" target="_blank"></a>
+                            <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('anime_achievements') }}" target="_blank"></a>
                         </td>
                     </tr>
                     <tr>
@@ -531,7 +531,7 @@ hr {
         </div>
 
         <!---------------------------------------- Statistics ----------------------------------------->
-        <h3 class="font-weight-light text-center">
+        <h3 class="font-weight-light text-center mt-4">
             Series Statistics
             <div class="arrow_div float-right">
                 <a class="collapse_all fas fa-xs fa-chevron-down" id="SERIES_arrow" onclick="hide('collapse_SERIES', 'SERIES_arrow')"></a>
@@ -637,8 +637,8 @@ hr {
             </div>
         </div>
 
-        <h3 class="font-weight-light text-center">
-            Animes Statistics
+        <h3 class="font-weight-light text-center mt-4">
+            Anime Statistics
             <div class="arrow_div float-right">
                 <a class="collapse_all fas fa-xs fa-chevron-down" id="ANIME_arrow" onclick="hide('collapse_ANIME', 'ANIME_arrow')"></a>
             </div>
@@ -743,7 +743,7 @@ hr {
             </div>
         </div>
 
-        <h3 class="font-weight-light text-center">
+        <h3 class="font-weight-light text-center mt-4">
             Books Statistics
             <div class="arrow_div float-right">
                 <a class="collapse_all fas fa-xs fa-chevron-down" id="BOOK_arrow" onclick="hide('collapse_BOOK', 'BOOK_arrow')"></a>
