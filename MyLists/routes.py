@@ -223,7 +223,7 @@ def account(user_name):
 
     add_friend_form = AddFriendForm()
     if add_friend_form.validate_on_submit():
-        add_friend(add_friend_form.add_friend.data)
+        add_friend(add_friend_form.friend_to_add.data)
 
     # Protect admin account
     if user.id == 1 and current_user.id != 1:
