@@ -639,11 +639,11 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
 		$img.attr({
 		    src: item.poster_path,
 		    alt: item.name,
-		    style: "width: 34px; height: 51px;"
+		    style: "width: 40px; height: 60px;"
 		});
 
 		$li.append('<a class="list-group-item bg-dark text-light">');
-		$li.find('a').append($img).append(" "+item.name);
+		$li.find('a').append($img).append(" "+item.name + " - " +item.first_air_date);
 
 		return $li.appendTo(ul);
 	}

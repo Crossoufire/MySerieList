@@ -866,7 +866,7 @@ def update_element_season():
         app.logger.info('[{}] Total episode watched of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
     elif element_type == "SERIES":
         last_episode_watched = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first().last_episode_watched
-        current_season = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().current_season
+        current_season = AnimeList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first().current_season
         episodes_counter = 0
         for i in range(1, current_season):
             ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=i).first().episodes
@@ -1594,17 +1594,8 @@ def get_achievements(user_id, list_type):
         tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10, tmp_11 = [0 for _ in range(11)]
         time_1, time_2, time_3, time_4, time_5, time_6, time_7, time_8, time_9, time_10, time_11 = [0 for _ in range(11)]
         animes = AnimeList.query.filter(AnimeList.status != "PLAN_TO_WATCH").filter_by(user_id=user_id).all()
-        anime_name_1 = []
-        anime_name_2 = []
-        anime_name_3 = []
-        anime_name_4 = []
-        anime_name_5 = []
-        anime_name_6 = []
-        anime_name_7 = []
-        anime_name_8 = []
-        anime_name_9 = []
-        anime_name_10 = []
-        anime_name_11 = []
+        anime_name_1, anime_name_2, anime_name_3, anime_name_4, anime_name_5, anime_name_6, anime_name_7, \
+        anime_name_8, anime_name_9, anime_name_10, anime_name_11 = [[] for _ in range(11)]
         for anime in animes:
             genres = AnimeGenre.query.filter_by(anime_id=anime.anime_id).all()
             for genre in genres:
@@ -1673,7 +1664,6 @@ def get_achievements(user_id, list_type):
                        anime_name_7, anime_name_8, anime_name_9, anime_name_10, anime_name_11]
         for i in range(0, len(ids)):
             achievements = Achievements.query.filter_by(genre=str(ids[i])).all()
-            print(len(achievements))
             for achievement in achievements:
                 data_achievements = {"threshold": achievement.threshold,
                                      "image_id":achievement.image_id,
@@ -1684,7 +1674,7 @@ def get_achievements(user_id, list_type):
                                      "anime_watched": values[i],
                                      "anime_name": anime_names[i]}
                 all_achievements.append(data_achievements)
-        print(len(all_achievements))
+
     return all_achievements
 
 
@@ -1737,7 +1727,7 @@ def autocomplete_search_element(element_name, list_type):
             else:
                 original_language = None
 
-            # To not add animes in the series table, we need to check if it's an anime and it comes from Japan
+            # To not add anime in the series table, we need to check if it's an anime and it comes from Japan
             if (16 in genre_ids and "JP" in origin_country) or (16 in genre_ids and original_language == "ja"):
                 i = i+1
                 continue
@@ -1753,7 +1743,8 @@ def autocomplete_search_element(element_name, list_type):
                 series_data["poster_path"] = url_for('static', filename="series_covers/default.jpg")
 
             if data["results"][i]["first_air_date"] is not None:
-                series_data["first_air_date"] = data["results"][i]["first_air_date"]
+                tmp = data["results"][i]["first_air_date"].split('-')
+                series_data["first_air_date"] = tmp[0]
             else:
                 series_data["first_air_date"] = "Unknown"
 
@@ -2147,7 +2138,6 @@ def add_element_in_base(element_data, element_cover_id, list_type):
 
         # Add genres
         if list_type == ListType.SERIES:
-
             for genre_data in genres_data:
                 genre = SeriesGenre(series_id=element.id,
                                     genre=genre_data)

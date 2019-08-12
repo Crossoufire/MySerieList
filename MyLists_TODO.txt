@@ -9,9 +9,7 @@ TO DO / FIX FIRST
 	Add lots of statistics (already started the code part, need a page to display + chart.js)
 	Fix bug display season and episode when refresh due to the browser cache (don't know how to repair) but works great otherwise
 	bug element_name for delete_element (JoJo's bizarre adventure for exemple)
-	[DONE] missing pictures grades
-	[DONE] add 1min and 1page = 1XP
-	tester hall of fame sans image pour tri
+	Hall of Fame "Total" works but not the other (even if we just let number + picture (without pourcentage))
 	achievement dire pourquoi du comment
 	passer en heure/jour pour l'xp
 	ajout element sans refresh
