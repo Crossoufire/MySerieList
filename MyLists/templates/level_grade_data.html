@@ -30,21 +30,23 @@ legend {
 
 
 {% block content %}
-<h3 class="font-weight-light text-center mb-4">Levels and grade data</h3>
+<h3 class="font-weight-light text-center mb-4">Levels and Grade data</h3>
 
 <div class="d-flex flex-wrap p-l-10 p-t-10" style="border: black solid 2px; border-radius: 10px; background-color: #47476b;">
     <p>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp All these grades are taken from the video game Halo 3.<br>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp There are 42 different grades and 125 levels.<br>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp You gain a grade each 3 levels.<br>
+        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp All these Grades are taken from the video game Halo 3.<br>
+        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp There are 42 different Grades and 125 levels.<br>
+        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp You gain a Grade each 3 levels.<br>
         <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp The levels are based on the time spent on each category (Series, Animes, Books).<br>
         <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp We use the quadratic equation: Level = 50*XP*(1+XP).<br>
+        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp 1min = 1XP taken from the episode duration for series and anime.<br>
+        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp 1page = 1XP for the books.<br>
     </p>
 </div>
 
 
 <legend class="font-weight-light text-center mt-4 mb-4">
-    Each grade in hierarchical order
+    Each Grade in hierarchical order
     <hr class="mt-2 mb-3">
 </legend>
 
@@ -59,7 +61,7 @@ legend {
         <tbody>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/recruit.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Recruit.ico') }}" alt="">
             </td>
             <td>
                 <strong>Recruit</strong>
@@ -73,7 +75,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/apprentice.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Apprentice.ico') }}" alt="">
             </td>
             <td>
                 <strong>Apprentice</strong><br>
@@ -101,7 +103,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/private.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Private.ico') }}" alt="">
             </td>
             <td>
                 <strong>Private</strong><br>
@@ -115,7 +117,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/private_grade_2.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Private_Grade_2.ico') }}" alt="">
             </td>
             <td>
                 <strong>Private Grade 2</strong><br>
@@ -129,7 +131,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/corporal.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Corporal.ico') }}" alt="">
             </td>
             <td>
                 <strong>Corporal</strong><br>
@@ -143,7 +145,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/corporal_grade_2.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Corporal_Grade_2.ico') }}" alt="">
             </td>
             <td>
                 <strong>Corporal Grade 2</strong><br>
@@ -157,7 +159,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/sergeant.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Sergeant.ico') }}" alt="">
             </td>
             <td>
                 <strong>Sergeant</strong><br>
@@ -171,7 +173,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/sergeant_grade_2.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Sergeant_Grade_2.ico') }}" alt="">
             </td>
             <td>
                 <strong>Sergeant Grade 2</strong><br>
@@ -185,7 +187,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/sergeant_grade_3.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Sergeant_Grade_3.ico') }}" alt="">
             </td>
             <td>
                 <strong>Sergeant Grade 3</strong><br>
@@ -199,7 +201,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/gunnery_sergeant.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Gunnery_Sergeant.ico') }}" alt="">
             </td>
             <td>
                 <strong>Gunnery Sergeant</strong><br>
@@ -213,7 +215,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/gunnery_sergeant_grade_2.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Gunnery_Sergeant_Grade_2.ico') }}" alt="">
             </td>
             <td>
                 <strong>Gunnery Sergeant Grade 2</strong><br>
@@ -227,7 +229,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/gunnery_sergeant_grade_3.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Gunnery_Sergeant_Grade_3.ico') }}" alt="">
             </td>
             <td>
                 <strong>Gunnery Sergeant Grade 3</strong><br>
@@ -241,7 +243,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/gunnery_sergeant_grade_4.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Gunnery_Sergeant_Grade_4.ico') }}" alt="">
             </td>
             <td>
                 <strong>Gunnery Sergeant Grade 4</strong><br>
@@ -255,7 +257,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/lieutenant.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Lieutenant.ico') }}" alt="">
             </td>
             <td>
                 <strong>Lieutenant</strong><br>
@@ -269,7 +271,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/lieutenant_grade_2.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Lieutenant_Grade_2.ico') }}" alt="">
             </td>
             <td>
                 <strong>Lieutenant Grade 2</strong><br>
@@ -283,7 +285,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/lieutenant_grade_3.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Lieutenant_Grade_3.ico') }}" alt="">
             </td>
             <td>
                 <strong>Lieutenant Grade 3</strong><br>
@@ -297,7 +299,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/lieutenant_grade_4.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Lieutenant_Grade_4.ico') }}" alt="">
             </td>
             <td>
                 <strong>Lieutenant Grade 4</strong><br>
@@ -311,7 +313,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/captain.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Captain.ico') }}" alt="">
             </td>
             <td>
                 <strong>Captain</strong><br>
@@ -325,7 +327,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/captain_grade_2.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Captain_Grade_2.ico') }}" alt="">
             </td>
             <td>
                 <strong>Captain Grade 2</strong><br>
@@ -339,7 +341,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/captain_grade_3.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Captain_Grade_3.ico') }}" alt="">
             </td>
             <td>
                 <strong>Captain Grade 3</strong><br>
@@ -353,7 +355,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/captain_grade_4.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Captain_Grade_4.ico') }}" alt="">
             </td>
             <td>
                 <strong>Captain Grade 4</strong><br>
@@ -367,7 +369,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/major.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Major.ico') }}" alt="">
             </td>
             <td>
                 <strong>Major</strong><br>
@@ -381,7 +383,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/major_grade_2.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Major_Grade_2.ico') }}" alt="">
             </td>
             <td>
                 <strong>Major Grade 2</strong><br>
@@ -395,7 +397,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/major_grade_3.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Major_Grade_3.ico') }}" alt="">
             </td>
             <td>
                 <strong>Major Grade 3</strong><br>
@@ -409,7 +411,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/major_grade_4.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Major_Grade_4.ico') }}" alt="">
             </td>
             <td>
                 <strong>Major Grade 4</strong><br>
@@ -423,7 +425,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/commander.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Commander.ico') }}" alt="">
             </td>
             <td>
                 <strong>Commander</strong><br>
@@ -437,10 +439,10 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/commander_grade_2.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Commander_Grade_2.ico') }}" alt="">
             </td>
             <td>
-                <strong>Commander grade 2</strong><br>
+                <strong>Commander Grade 2</strong><br>
             </td>
             <td>
                 <strong>82 - 84</strong>
@@ -451,10 +453,10 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/commander_grade_3.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Commander_Grade_3.ico') }}" alt="">
             </td>
             <td>
-                <strong>Commander grade 3</strong><br>
+                <strong>Commander Grade 3</strong><br>
             </td>
             <td>
                 <strong>85 - 87</strong>
@@ -465,10 +467,10 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/commander_grade_4.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Commander_Grade_4.ico') }}" alt="">
             </td>
             <td>
-                <strong>Commander grade 4</strong><br>
+                <strong>Commander Grade 4</strong><br>
             </td>
             <td>
                 <strong>88 - 90</strong>
@@ -479,7 +481,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/colonel.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Colonel.ico') }}" alt="">
             </td>
             <td>
                 <strong>Colonel</strong><br>
@@ -493,7 +495,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/colonel_grade_2.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Colonel_Grade_2.ico') }}" alt="">
             </td>
             <td>
                 <strong>Colonel Grade 2</strong><br>
@@ -507,7 +509,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/colonel_grade_3.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Colonel_Grade_3.ico') }}" alt="">
             </td>
             <td>
                 <strong>Colonel Grade 3</strong><br>
@@ -521,7 +523,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/colonel_grade_4.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Colonel_Grade_4.ico') }}" alt="">
             </td>
             <td>
                 <strong>Colonel Grade 4</strong><br>
@@ -535,7 +537,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/brigadier.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Brigadier.ico') }}" alt="">
             </td>
             <td>
                 <strong>Brigadier</strong><br>
@@ -549,7 +551,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/brigadier_grade_2.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Brigadier_Grade_2.ico') }}" alt="">
             </td>
             <td>
                 <strong>Brigadier Grade 2</strong><br>
@@ -563,7 +565,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/brigadier_grade_3.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Brigadier_Grade_3.ico') }}" alt="">
             </td>
             <td>
                 <strong>Brigadier Grade 3</strong><br>
@@ -577,7 +579,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/brigadier_grade_4.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/Brigadier_Grade_4.ico') }}" alt="">
             </td>
             <td>
                 <strong>Brigadier Grade 4</strong><br>
@@ -591,7 +593,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/general.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/General.ico') }}" alt="">
             </td>
             <td>
                 <strong>General</strong><br>
@@ -605,7 +607,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/general_grade_2.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/General_Grade_2.ico') }}" alt="">
             </td>
             <td>
                 <strong>General Grade 2</strong><br>
@@ -619,7 +621,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/general_grade_3.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/General_Grade_3.ico') }}" alt="">
             </td>
             <td>
                 <strong>General Grade 3</strong><br>
@@ -633,7 +635,7 @@ legend {
         </tr>
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/general_grade_4.ico') }}" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/Ranks/General_Grade_4.ico') }}" alt="">
             </td>
             <td>
                 <strong>General Grade 4</strong><br>
