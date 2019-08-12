@@ -1939,7 +1939,8 @@ def autocomplete_search_element(element_name, list_type):
                     anime_data["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
 
                 if data["results"][i]["first_air_date"] is not None:
-                    anime_data["first_air_date"] = data["results"][i]["first_air_date"]
+                    tmp = data["results"][i]["first_air_date"].split('-')
+                    anime_data["first_air_date"] = tmp[0]
                 else:
                     anime_data["first_air_date"] = "Unknown"
 
