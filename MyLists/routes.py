@@ -659,8 +659,9 @@ def myanimeslist(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    # Get series data
-    anime_data = db.session.query(Anime, AnimeList).join(AnimeList, AnimeList.anime_id == Anime.id).filter(AnimeList.user_id == user.id).all()
+    # Get anime data
+    anime_data = db.session.query(Anime, AnimeList).join(AnimeList, AnimeList.anime_id == Anime.id).filter(AnimeList.user_id == user.id).order_by(
+            Anime.name.asc()).all()
 
     watching_list    = []
     completed_list   = []
@@ -760,7 +761,8 @@ def myserieslist(user_name):
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
     # Get series data
-    series_data = db.session.query(Series, SeriesList).join(SeriesList, SeriesList.series_id == Series.id).filter(SeriesList.user_id == user.id).all()
+    series_data = db.session.query(Series, SeriesList).join(SeriesList, SeriesList.series_id == Series.id).filter(SeriesList.user_id == user.id).order_by(
+            Series.name.asc()).all()
 
     watching_list    = []
     completed_list   = []
