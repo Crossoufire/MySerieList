@@ -36,7 +36,11 @@ hr {
                 <div class="text text-left">
                     <span style="font-size: 14pt;">{{ user_achievements[i]['title'] }}</span>
                     <p class="text-left p-0">{{ user_achievements[i]['description'] }}</p>
-                    <p class="p-b-30">Anime watched: {{ user_achievements[i]['anime_watched'] }}</p>
+                    <p class="text-left p-0">N° Anime watched: {{ user_achievements[i]['anime_watched'] }}</p>
+                    {% for anime in user_achievements[i]['anime_name'] %}
+                    <li class="p-0">{{ anime }}</li>
+                    {% endfor %}
+                    <div class="m-b-30">----------------------------------------</div>
                 </div>
             </div>
         </div>
