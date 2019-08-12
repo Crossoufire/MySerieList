@@ -16,4 +16,4 @@ if not os.path.isfile('./config.ini'):
     sys.exit()
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)

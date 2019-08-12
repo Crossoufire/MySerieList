@@ -670,6 +670,7 @@ def myanimeslist(user_name):
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
+    # Check if the current user can see the target user's list
     if current_user.id != user.id:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.id == 1:
@@ -681,23 +682,83 @@ def myanimeslist(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    watching_list     = AnimeList.query.filter_by(user_id=user.id, status=Status.WATCHING).all()
-    completed_list    = AnimeList.query.filter_by(user_id=user.id, status=Status.COMPLETED).all()
-    onhold_list       = AnimeList.query.filter_by(user_id=user.id, status=Status.ON_HOLD).all()
-    random_list       = AnimeList.query.filter_by(user_id=user.id, status=Status.RANDOM).all()
-    dropped_list      = AnimeList.query.filter_by(user_id=user.id, status=Status.DROPPED).all()
-    plantowatch_list  = AnimeList.query.filter_by(user_id=user.id, status=Status.PLAN_TO_WATCH).all()
+    # Get series data
+    anime_data = db.session.query(Anime, AnimeList).join(AnimeList, AnimeList.anime_id == Anime.id).filter(AnimeList.user_id == user.id).all()
 
-    animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-    animes_data = get_list_data(animes_list, ListType.ANIME)
-    element_type = "ANIME"
-    user_id = str(user.id)
+    watching_list    = []
+    completed_list   = []
+    onhold_list      = []
+    random_list      = []
+    dropped_list     = []
+    plantowatch_list = []
+
+    eps = {}
+    genres = {}
+    networks = {}
+    can_update = {}
+
+    for anime in anime_data:
+        # Change cover path
+        anime[0].image_cover = "/static/animes_covers/{}".format(anime[0].image_cover)
+
+        if anime[1].status == Status.WATCHING:
+            watching_list.append(anime)
+        elif anime[1].status == Status.COMPLETED:
+            completed_list.append(anime)
+        elif anime[1].status == Status.ON_HOLD:
+            onhold_list.append(anime)
+        elif anime[1].status == Status.RANDOM:
+            random_list.append(anime)
+        elif anime[1].status == Status.DROPPED:
+            dropped_list.append(anime)
+        elif anime[1].status == Status.PLAN_TO_WATCH:
+            plantowatch_list.append(anime)
+
+        # Get episodes per season
+        episodesperseason = AnimeEpisodesPerSeason.query.filter_by(anime_id=anime[0].id).order_by(
+            AnimeEpisodesPerSeason.season.asc()).all()
+        tmp = []
+        for season in episodesperseason:
+            tmp.append(season.episodes)
+        eps["{}".format(anime[0].id)] = tmp
+
+        # Get genres
+        genres_data = AnimeGenre.query.filter_by(anime_id=anime[0].id).all()
+        genres_string = ""
+        for element in genres_data:
+            genres_string += element.genre
+            genres_string += ", "
+        genres_string = genres_string[:-2]
+        genres["{}".format(anime[0].id)] = genres_string
+
+        # Get networks
+        networks_data = AnimeNetwork.query.filter_by(anime_id=anime[0].id).all()
+        networks_string = ""
+        for element in networks_data:
+            networks_string += element.network
+            networks_string += ", "
+        networks_string = networks_string[:-2]
+        networks["{}".format(anime[0].id)] = networks_string
+
+        # Can update
+        time_delta = datetime.utcnow() - anime[0].last_update
+        if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
+            can_update["{}".format(anime[0].id)] = True
+        else:
+            can_update["{}".format(anime[0].id)] = False
+
+    anime_all_data = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+
     return render_template('mymedialist.html',
-                           title="{}'s AnimesList".format(user_name),
-                           all_data=animes_data,
-                           element_type=element_type,
-                           user_id=user_id,
-                           user_name=user_name)
+                           title="{}'s AnimeList".format(user_name),
+                           all_data=anime_all_data,
+                           eps=eps,
+                           genres=genres,
+                           networks=networks,
+                           can_update=can_update,
+                           element_type="ANIME",
+                           target_user_id=str(user.id),
+                           target_user_name=user_name)
 
 
 @app.route("/serieslist/<user_name>", methods=['GET', 'POST'])
@@ -709,6 +770,7 @@ def myserieslist(user_name):
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
+    # Check if the current user can see the target user's list
     if current_user.id != user.id:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.id == 1:
@@ -720,23 +782,83 @@ def myserieslist(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    watching_list     = SeriesList.query.filter_by(user_id=user.id, status=Status.WATCHING).all()
-    completed_list    = SeriesList.query.filter_by(user_id=user.id, status=Status.COMPLETED).all()
-    onhold_list       = SeriesList.query.filter_by(user_id=user.id, status=Status.ON_HOLD).all()
-    random_list       = SeriesList.query.filter_by(user_id=user.id, status=Status.RANDOM).all()
-    dropped_list      = SeriesList.query.filter_by(user_id=user.id, status=Status.DROPPED).all()
-    plantowatch_list  = SeriesList.query.filter_by(user_id=user.id, status=Status.PLAN_TO_WATCH).all()
+    # Get series data
+    series_data = db.session.query(Series, SeriesList).join(SeriesList, SeriesList.series_id == Series.id).filter(SeriesList.user_id == user.id).all()
 
-    series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-    series_data = get_list_data(series_list, ListType.SERIES)
-    element_type = "SERIES"
-    user_id = str(user.id)
+    watching_list    = []
+    completed_list   = []
+    onhold_list      = []
+    random_list      = []
+    dropped_list     = []
+    plantowatch_list = []
+
+    eps = {}
+    genres = {}
+    networks = {}
+    can_update = {}
+
+    for series in series_data:
+        # Change cover path
+        series[0].image_cover = "/static/series_covers/{}".format(series[0].image_cover)
+
+        if series[1].status == Status.WATCHING:
+            watching_list.append(series)
+        elif series[1].status == Status.COMPLETED:
+            completed_list.append(series)
+        elif series[1].status == Status.ON_HOLD:
+            onhold_list.append(series)
+        elif series[1].status == Status.RANDOM:
+            random_list.append(series)
+        elif series[1].status == Status.DROPPED:
+            dropped_list.append(series)
+        elif series[1].status == Status.PLAN_TO_WATCH:
+            plantowatch_list.append(series)
+
+        # Get episodes per season
+        episodesperseason = SeriesEpisodesPerSeason.query.filter_by(series_id=series[0].id).order_by(
+            SeriesEpisodesPerSeason.season.asc()).all()
+        tmp = []
+        for season in episodesperseason:
+            tmp.append(season.episodes)
+        eps["{}".format(series[0].id)] = tmp
+
+        # Get genres
+        genres_data = SeriesGenre.query.filter_by(series_id=series[0].id).all()
+        genres_string = ""
+        for element in genres_data:
+            genres_string += element.genre
+            genres_string += ", "
+        genres_string = genres_string[:-2]
+        genres["{}".format(series[0].id)] = genres_string
+
+        # Get networks
+        networks_data = SeriesNetwork.query.filter_by(series_id=series[0].id).all()
+        networks_string = ""
+        for element in networks_data:
+            networks_string += element.network
+            networks_string += ", "
+        networks_string = networks_string[:-2]
+        networks["{}".format(series[0].id)] = networks_string
+
+        # Can update
+        time_delta = datetime.utcnow() - series[0].last_update
+        if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
+            can_update["{}".format(series[0].id)] = True
+        else:
+            can_update["{}".format(series[0].id)] = False
+
+    series_all_data = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+
     return render_template('mymedialist.html',
                            title="{}'s SeriesList".format(user_name),
-                           all_data=series_data,
-                           element_type=element_type,
-                           user_id=user_id,
-                           user_name=user_name)
+                           all_data=series_all_data,
+                           eps=eps,
+                           genres=genres,
+                           networks=networks,
+                           can_update=can_update,
+                           element_type="SERIES",
+                           target_user_id=str(user.id),
+                           target_user_name=user_name)
 
 
 @app.route("/animeslist/table/<user_name>", methods=['GET', 'POST'])
@@ -889,7 +1011,7 @@ def update_element_season():
         app.logger.info('[{}] Total episode watched of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
     elif element_type == "SERIES":
         last_episode_watched = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first().last_episode_watched
-        current_season = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().current_season
+        current_season = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first().current_season
         episodes_counter = 0
         for i in range(1, current_season):
             ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=i).first().episodes
@@ -1097,6 +1219,15 @@ def change_element_category():
         element.status = Status.DROPPED
     elif element_new_category == 'Plan to Watch':
         element.status = Status.PLAN_TO_WATCH
+        # Set Season/Ep to 1/1
+        if element_type == "SERIES":
+            series = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
+            series.current_season = 1
+            series.last_episode_watched = 1
+        elif element_type == "ANIME":
+            anime = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
+            anime.current_season = 1
+            anime.last_episode_watched = 1
     db.session.commit()
     app.logger.info('[{}] Category of the element with ID {} changed to {}'.format(current_user.get_id(),
                                                                                    element_id,
