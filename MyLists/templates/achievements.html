@@ -5,31 +5,38 @@
 .details {
     display: none;
 }
+
+hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.9);
+}
 </style>
 {% endblock css %}
 
 
 {% block content %}
 <div style="max-width: 1000px;" class="container">
-    <h2 class="text-center mb-3">Anime Achievements</h2>
+    <h2 class="text-center mb-3 mt-4">Anime Achievements</h2>
+    <hr class="mt-2 mb-3">
     {% if current_user.get_id() == user_id %}
-    <div style="font-size: 14pt;" class="text-center mb-5">You have unlocked {{ number_of_achievements }}/44 achievements.</div>
+    <div style="font-size: 14pt;" class="text-center mb-5">You have unlocked {{ user_number_achievements }}/44 achievements.</div>
     {% else %}
-    <div style="font-size: 14pt;" class="text-center mb-5">{{ user_name }} has unlocked {{ number_of_achievements }}/44 achievements.</div>
+    <div style="font-size: 14pt;" class="text-center mb-5">{{ user_name }} has unlocked {{ user_number_achievements }}/44 achievements.</div>
     {% endif %}
     <div class="projects row p-0 text-center">
-        {% for i in range(0, achievements_data|length) %}
+        {% for i in range(0, user_achievements|length) %}
         <div class="col col-sm text-center m-b-30 p-b-0 p-l-30">
-            <span class="text-center">{{ achievements_data[i][1] }}</span><br>
-            {% if achievements_data[i][4] == 1 %}
-            <a href="#"><img height="100" width="200" src="/static/img/anime_achievements/{{ achievements_data[i][0] }}.png" alt=""><br></a>
+            <span>{{ user_achievements[i]["level"] }}</span><br>
+            <span>{{ user_achievements[i]["time_hours"] }}/{{ user_achievements[i]["threshold"] }} hours watched</span><br>
+            {% if user_achievements[i]["threshold"] < user_achievements[i]["time_hours"] %}
+            <a href="#"><img height="100" width="200" src="/static/img/anime_achievements/{{ user_achievements[i]['image_id'] }}.png" alt=""><br></a>
             {% else %}
-            <a href="#"><img style="filter: grayscale(100%);" height="100" width="200" src="/static/img/anime_achievements/{{ achievements_data[i][0] }}.png" alt=""><br></a>
+            <a href="#"><img style="filter: grayscale(100%);" height="100" width="200" src="/static/img/anime_achievements/{{ user_achievements[i]['image_id'] }}.png" alt=""><br></a>
             {% endif %}
             <div class="details p-t-10">
                 <div class="text text-left">
-                    <span style="font-size: 14pt;">{{ achievements_data[i][2] }}</span>
-                    <p class="text-left p-b-30">{{ achievements_data[i][3] }}</p>
+                    <span style="font-size: 14pt;">{{ user_achievements[i]['title'] }}</span>
+                    <p class="text-left p-0">{{ user_achievements[i]['description'] }}</p>
+                    <p class="p-b-30">Anime watched: {{ user_achievements[i]['anime_watched'] }}</p>
                 </div>
             </div>
         </div>

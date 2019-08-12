@@ -224,7 +224,7 @@ class BookList(db.Model):
 class Achievements(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media = db.Column(db.String(10), nullable=False)
-    threshold = db.Column(db.String(100), nullable=False)
+    threshold = db.Column(db.Integer, nullable=False)
     image_id = db.Column(db.String(100), nullable=False)
     level = db.Column(db.String(100), nullable=False)
     title = db.Column(db.String(100), nullable=False)
