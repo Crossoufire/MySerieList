@@ -1598,61 +1598,51 @@ def get_achievements(user_id, list_type):
         anime_name_8, anime_name_9, anime_name_10, anime_name_11 = [[] for _ in range(11)]
         for anime in animes:
             genres = AnimeGenre.query.filter_by(anime_id=anime.anime_id).all()
+            anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
             for genre in genres:
                 if genre.genre_id == 13:
                     tmp_1 += 1
                     time_1 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                    anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
                     anime_name_1.append(anime_name)
                 elif genre.genre_id == 18:
                     tmp_2 += 1
                     time_2 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                    anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
                     anime_name_2.append(anime_name)
                 elif genre.genre_id == 19:
                     tmp_3 += 1
                     time_3 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                    anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
                     anime_name_3.append(anime_name)
                 elif genre.genre_id == 7:
                     tmp_4 += 1
                     time_4 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                    anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
                     anime_name_4.append(anime_name)
                 elif genre.genre_id == 22:
                     tmp_5 += 1
                     time_5 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                    anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
                     anime_name_5.append(anime_name)
                 elif genre.genre_id == 36:
                     tmp_6 += 1
                     time_6 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                    anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
                     anime_name_6.append(anime_name)
                 elif genre.genre_id == 29:
                     tmp_7 += 1
                     time_7 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                    anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
                     anime_name_7.append(anime_name)
                 elif genre.genre_id == 30:
                     tmp_8 += 1
                     time_8 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                    anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
                     anime_name_8.append(anime_name)
                 elif genre.genre_id == 40:
                     tmp_9 += 1
                     time_9 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                    anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
                     anime_name_9.append(anime_name)
                 elif genre.genre_id == 14:
                     tmp_10 += 1
                     time_10 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                    anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
                     anime_name_10.append(anime_name)
                 elif genre.genre_id == 9:
                     tmp_11 += 1
                     time_11 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                    anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
                     anime_name_11.append(anime_name)
                 else:
                     pass
