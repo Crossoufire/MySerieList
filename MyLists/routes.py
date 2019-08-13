@@ -65,6 +65,29 @@ def create_user():
                                        type=list_all_achievements[i][6],
                                        genre=genre)
             db.session.add(achievement)
+
+    list_all_achievements = []
+    path = os.path.join(app.root_path, 'static/achievements/anime_achievements.csv')
+    with open(path, "r") as fp:
+        for line in fp:
+            list_all_achievements.append(line.split(";"))
+
+    achievements = Achievements.query.filter_by(media="A").all()
+    for i in range(1, len(list_all_achievements)):
+        try:
+            genre = int(list_all_achievements[i][7])
+        except:
+            genre = None
+
+        achievements[i-1].media       = list_all_achievements[i][0]
+        achievements[i-1].threshold   = int(list_all_achievements[i][1])
+        achievements[i-1].image_id    = list_all_achievements[i][2]
+        achievements[i-1].level       = list_all_achievements[i][3]
+        achievements[i-1].title       = list_all_achievements[i][4]
+        achievements[i-1].description = list_all_achievements[i][5]
+        achievements[i-1].type        = list_all_achievements[i][6]
+        achievements[i-1].genre       = genre
+
     db.session.commit()
 
 
@@ -307,13 +330,64 @@ def anime_achievements():
 @app.route("/level_grade_data")
 @login_required
 def level_grade_data():
-    return render_template('level_grade_data.html', title='Level grade data')
+    all_ranks_list = []
+    if platform.system() == "Windows":
+        path = os.path.join(app.root_path, "static\\img\\levels_ranks\\levels_ranks.csv")
+    else:  # Linux & macOS
+        path = os.path.join(app.root_path, "static/img/levels_ranks/levels_ranks.csv")
+    with open(path, "r") as fp:
+        for line in fp:
+            all_ranks_list.append(line.split(";"))
+
+    i, low, incr = [0, 0, 0]
+    data = []
+    while True:
+        rank = all_ranks_list[i][2]
+        if i == len(all_ranks_list)-2:
+            data.append(["General_Grade_4", "General Grade 4", [124, "+"], [(25*low)*(1+low), "+"], [int(((25*low)*(1+low))/60), "+"]])
+            break
+        for j in range(i, len(all_ranks_list)):
+            if str(rank) == all_ranks_list[j][2]:
+                incr += 1
+            else:
+                data.append([rank, all_ranks_list[j-1][3], [low, incr-1],
+                             [(25*low)*(1+low), ((25*incr)*(1+incr))-1], [int(((25*low)*(1+low))/60), int((((25*incr)*(1+incr))-1)/60)]])
+                i = j
+                low = incr
+                break
+
+    return render_template('level_grade_data.html', title='Level grade data', data=data)
 
 
 @app.route("/knowledge_grade_data")
 @login_required
 def knowledge_grade_data():
-    return render_template('knowledge_grade_data.html', title='Knowledge grade data')
+    all_knowledge_ranks_list = []
+    if platform.system() == "Windows":
+        path = os.path.join(app.root_path, "static\\img\\knowledge_ranks\\knowledge_ranks.csv")
+    else:  # Linux & macOS
+        path = os.path.join(app.root_path, "static/img/knowledge_ranks/knowledge_ranks.csv")
+    with open(path, "r") as fp:
+        for line in fp:
+            all_knowledge_ranks_list.append(line.split(";"))
+
+    i, low, incr = [1, 1, 1]
+    data = []
+    while True:
+        rank = all_knowledge_ranks_list[i][1]
+        if i == 346:
+            data.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4", [345, "+"]])
+            break
+        for j in range(i, len(all_knowledge_ranks_list)):
+            if str(rank) == all_knowledge_ranks_list[j][1]:
+                incr += 1
+            else:
+                data.append([rank, all_knowledge_ranks_list[j - 1][2], [low-1, incr-2]])
+                i = j
+                low = incr
+                break
+
+    return render_template('knowledge_grade_data.html', title='Knowledge grade data', data=data)
 
 
 @app.route("/account_settings", methods=['GET', 'POST'])
@@ -1556,10 +1630,10 @@ def autocomplete_books():
 def get_all_account_stats(user_id, list_type):
     # Recover the amount of time spent watching an element
     total_time_element = get_total_time_spent(user_id, list_type)
-    total_time_in_minutes_element = total_time_element[2]*3600
+    total_time_in_minutes_element = total_time_element[1]*60
 
     # Calculation of the corresponding level using the quadratic equation
-    element_level_tmp = "{:.2f}".format(round((((2500+200*(total_time_in_minutes_element))**(1/2))-50)/100, 2))
+    element_level_tmp = "{:.2f}".format(round((((625+100*(total_time_in_minutes_element))**(1/2))-25)/50, 2))
     element_level_tmp = str(element_level_tmp)
     element_level = element_level_tmp.split('.')
     element_level[0] = int(element_level[0])
