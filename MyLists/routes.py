@@ -13,6 +13,7 @@ from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
+from sqlalchemy import func
 
 from MyLists import app, db, bcrypt, mail, config
 from MyLists.admin_views import User
@@ -660,8 +661,18 @@ def myanimeslist(user_name):
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
     # Get anime data
-    anime_data = db.session.query(Anime, AnimeList).join(AnimeList, AnimeList.anime_id == Anime.id).filter(AnimeList.user_id == user.id).order_by(
-            Anime.name.asc()).all()
+    anime_data = db.session.query(Anime, AnimeList,
+                            func.group_concat(AnimeGenre.genre.distinct()),
+                            func.group_concat(AnimeNetwork.network.distinct()),
+                            func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
+                            func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                            join(AnimeList, AnimeList.anime_id == Anime.id). \
+                            join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
+                            join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
+                            join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
+                            filter(AnimeList.user_id == user.id). \
+                            group_by(Anime.id). \
+                            order_by(Anime.name.asc())
 
     watching_list    = []
     completed_list   = []
@@ -693,30 +704,16 @@ def myanimeslist(user_name):
             plantowatch_list.append(anime)
 
         # Get episodes per season
-        episodesperseason = AnimeEpisodesPerSeason.query.filter_by(anime_id=anime[0].id).order_by(
-            AnimeEpisodesPerSeason.season.asc()).all()
-        tmp = []
-        for season in episodesperseason:
-            tmp.append(season.episodes)
-        eps["{}".format(anime[0].id)] = tmp
+        nb_season = len(anime[4].split(","))
+        eps["{}".format(anime[0].id)] = anime[5].split(",")[:nb_season]
+        # Convert all element to int
+        eps["{}".format(anime[0].id)] = [int(x) for x in eps["{}".format(anime[0].id)]]
 
         # Get genres
-        genres_data = AnimeGenre.query.filter_by(anime_id=anime[0].id).all()
-        genres_string = ""
-        for element in genres_data:
-            genres_string += element.genre
-            genres_string += ", "
-        genres_string = genres_string[:-2]
-        genres["{}".format(anime[0].id)] = genres_string
+        genres["{}".format(anime[0].id)] = anime[2]
 
         # Get networks
-        networks_data = AnimeNetwork.query.filter_by(anime_id=anime[0].id).all()
-        networks_string = ""
-        for element in networks_data:
-            networks_string += element.network
-            networks_string += ", "
-        networks_string = networks_string[:-2]
-        networks["{}".format(anime[0].id)] = networks_string
+        networks["{}".format(anime[0].id)] = anime[3]
 
         # Can update
         time_delta = datetime.utcnow() - anime[0].last_update
@@ -761,8 +758,18 @@ def myserieslist(user_name):
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
     # Get series data
-    series_data = db.session.query(Series, SeriesList).join(SeriesList, SeriesList.series_id == Series.id).filter(SeriesList.user_id == user.id).order_by(
-            Series.name.asc()).all()
+    series_data = db.session.query(Series, SeriesList,
+                            func.group_concat(SeriesGenre.genre.distinct()),
+                            func.group_concat(SeriesNetwork.network.distinct()),
+                            func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
+                            func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                            join(SeriesList, SeriesList.series_id == Series.id). \
+                            join(SeriesGenre, SeriesGenre.series_id == Series.id). \
+                            join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
+                            join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
+                            filter(SeriesList.user_id == user.id). \
+                            group_by(Series.id). \
+                            order_by(Series.name.asc())
 
     watching_list    = []
     completed_list   = []
@@ -794,30 +801,16 @@ def myserieslist(user_name):
             plantowatch_list.append(series)
 
         # Get episodes per season
-        episodesperseason = SeriesEpisodesPerSeason.query.filter_by(series_id=series[0].id).order_by(
-            SeriesEpisodesPerSeason.season.asc()).all()
-        tmp = []
-        for season in episodesperseason:
-            tmp.append(season.episodes)
-        eps["{}".format(series[0].id)] = tmp
+        nb_season = len(series[4].split(","))
+        eps["{}".format(series[0].id)] = series[5].split(",")[:nb_season]
+        # Convert all element to int
+        eps["{}".format(series[0].id)] = [int(x) for x in eps["{}".format(series[0].id)]]
 
         # Get genres
-        genres_data = SeriesGenre.query.filter_by(series_id=series[0].id).all()
-        genres_string = ""
-        for element in genres_data:
-            genres_string += element.genre
-            genres_string += ", "
-        genres_string = genres_string[:-2]
-        genres["{}".format(series[0].id)] = genres_string
+        genres["{}".format(series[0].id)] = series[2]
 
         # Get networks
-        networks_data = SeriesNetwork.query.filter_by(series_id=series[0].id).all()
-        networks_string = ""
-        for element in networks_data:
-            networks_string += element.network
-            networks_string += ", "
-        networks_string = networks_string[:-2]
-        networks["{}".format(series[0].id)] = networks_string
+        networks["{}".format(series[0].id)] = series[3]
 
         # Can update
         time_delta = datetime.utcnow() - series[0].last_update
