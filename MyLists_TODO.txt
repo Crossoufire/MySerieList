@@ -7,12 +7,14 @@ TO DO / FIX FIRST
 	Check the style of the auto-complete selector
 	Add "more results" for auto-complete results
 	Add a statistics page with chart.js (already started the code part)
-	Jinja the ranks html data
 	Add an element without refreshing (ajax method)
 	Set the Line height of nav-bar to 1
 	Increase the container size
-	Put the delete friend in the img in account
 	Add stats in navbar (when page done)
+	Change style achievements
+	Add color for friends in hall of fame
+	Add friend without reload in account
+
 
 TO DO LATER
 	Add the possibility to change the background color of the website
