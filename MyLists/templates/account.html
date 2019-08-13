@@ -298,6 +298,23 @@ hr {
     width: 2.8em;
 }
 </style>
+<!-------- Friends CSS --------->
+<style>
+.btn_right {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    opacity: 0;
+}
+
+.btn_right:hover {
+    opacity: 1;
+}
+
+.hover:hover~.btn_right {
+    opacity: 0.7;
+}
+</style>
 {% endblock css %}
 
 
@@ -481,49 +498,52 @@ hr {
                     {% for friend in friends_list_data %}
                     {% if friend['status'] == "pending" %}
                         {% if user_id == current_user.get_id() %}
-                        <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
-                            <a href="/account/{{ friend['username'] }}">
-                                <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
-                            </a>
-                            <br>
-                            <span style="font-size: 12pt;" class="text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span>
-                            <br>
-                            <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
-                            <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
+                        <div id="td_{{ friend['user_id'] }}" class="card bg-transparent m-l-10 m-r-10 m-t-8" style="width: 70px; height: 120.5px;">
+                            <div class="view overlay">
+                                <img class="card-img-top" width="70" height="70" src="/static/profile_pics/{{ friend['picture'] }}" alt="{{ friend['username'] }}">
+                                <a class="hover" href="/account/{{ friend['username'] }}">
+                                    <div class="mask flex-center rgba-black-strong"></div>
+                                </a>
+                                <a class="btn_right fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                            </div>
+                            <div class="card-body bg-transparent p-0 text-center">
+                                <span class="text-light">{{ friend['username'] }}</span><br>
+                                <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
+                                <a class="fas fa-sm fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
+                            </div>
                         </div>
                         {% endif %}
                     {% elif friend['status'] == "request" %}
                         {% if user_id == current_user.get_id() %}
-                        <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
-                            <a href="/account/{{ friend['username'] }}">
-                                <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
-                            </a>
-                            <br>
-                            <span style="font-size: 12pt;" class="text-light">{{ friend['username'] }}</span>
-                            <br>
-                            <span>(Pending)</span>
-                            <br>
-                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}','td_{{ friend['user_id'] }}')"></a>
+                        <div id="td_{{ friend['user_id'] }}" class="card bg-transparent m-l-10 m-r-10 m-t-8" style="width: 70px; height: 114px;">
+                            <div class="view overlay">
+                                <img class="card-img-top" width="70" height="70" src="/static/profile_pics/{{ friend['picture'] }}" alt="{{ friend['username'] }}">
+                                <a class="hover" href="/account/{{ friend['username'] }}">
+                                    <div class="mask flex-center rgba-black-strong"></div>
+                                </a>
+                                <a class="btn_right fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                            </div>
+                            <div class="card-body bg-transparent p-0 text-center">
+                                <span class="text-light" >{{ friend['username'] }}</span>
+                                <span style="font-size: 10pt;">(Pending)</span>
+                            </div>
                         </div>
                         {% endif %}
                     {% elif friend['status'] == "declined" %}
                     {% else %}
-                        <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
-                            {% if user_id == current_user.get_id() %}
-                            <a href="/account/{{ friend['username'] }}">
-                                <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
-                            </a>
-                            <br>
-                            <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
-                            <br>
-                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
-                            {% else %}
-                            <a href="/account/{{ friend['username'] }}">
-                                <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
-                            </a>
-                            <br>
-                            <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
-                            {% endif %}
+                        <div id="td_{{ friend['user_id'] }}" class="card bg-transparent m-l-10 m-r-10 m-t-8" style="height: 90px; width: 70px;">
+                            <div class="view overlay">
+                                <img class="card-img-top" width="70" height="70" src="/static/profile_pics/{{ friend['picture'] }}" alt="{{ friend['username'] }}">
+                                <a class="hover" href="/account/{{ friend['username'] }}">
+                                    <div class="mask flex-center rgba-black-strong"></div>
+                                </a>
+                                {% if user_id == current_user.get_id() %}
+                                <a class="btn_right fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                                {% endif %}
+                            </div>
+                            <div class="card-body bg-transparent p-0 text-center">
+                                <span class="text-light" >{{ friend['username'] }}</span>
+                            </div>
                         </div>
                     {% endif %}
                     {% endfor %}

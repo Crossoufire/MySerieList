@@ -387,7 +387,7 @@ body.loading .modal_loading {
             <a class="m-r-5 text-light" href="{{ url_for('myanimeslist', user_name=user_name) }}">Grid View</a>
         {% elif element_type == "SERIES" %}
             <a class="fas fa-th text-light" href="{{ url_for('myserieslist', user_name=user_name) }}"></a>
-            <a class="m-r-5 text-light" href="{{ url_for('myanimeslist', user_name=user_name) }}">Grid View</a>
+            <a class="m-r-5 text-light" href="{{ url_for('myserieslist', user_name=user_name) }}">Grid View</a>
         {% endif %}
     </div>
 </div>
