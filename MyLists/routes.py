@@ -1816,8 +1816,8 @@ def autocomplete_search_element(element_name, list_type):
             if response.status_code == 401:
                 app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
                 return [{"nb_results": 0}]
-            app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
 
+            app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
             if response.headers["X-RateLimit-Remaining"] == "0":
                 app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
                 time.sleep(3)
@@ -1826,7 +1826,10 @@ def autocomplete_search_element(element_name, list_type):
 
         data = json.loads(response.text)
 
-        if data["total_results"] == 0:
+        try:
+            if data["total_results"] == 0:
+                return [{"nb_results": 0}]
+        except:
             return [{"nb_results": 0}]
 
         # Take only the first 6 results for the autocomplete
@@ -1900,7 +1903,10 @@ def autocomplete_search_element(element_name, list_type):
 
         data = json.loads(response.text)
 
-        if data["total_results"] == 0:
+        try:
+            if data["total_results"] == 0:
+                return [{"nb_results": 0}]
+        except:
             return [{"nb_results": 0}]
 
         # Take only the first 6 results for the autocomplete
@@ -1959,7 +1965,11 @@ def autocomplete_search_element(element_name, list_type):
             return [{"nb_results": 0}]
 
         data = json.loads(response.text)
-        if data["totalItems"] == 0:
+
+        try:
+            if data["totalItems"] == 0:
+                return [{"nb_results": 0}]
+        except:
             return [{"nb_results": 0}]
 
         google_results = []

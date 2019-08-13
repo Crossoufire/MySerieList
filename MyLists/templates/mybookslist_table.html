@@ -350,17 +350,17 @@ body.loading .modal_loading {
     <div class="ml-auto">
         <a id="collapse_all" class="fas fa-eye-slash text-light m-r-5" onclick="hide_all_cat()"></a>
         <a id="show_cat_all" class="d-none" onclick="show_all_cat()"></a>
-        <span id="collapse_show" class="m-r-5 text-light">Collapse all</span>
+        <a id="collapse_show" class="m-r-5 text-light" onclick="hide_all_cat()">Collapse all</a>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
         <a class="fas fa-bars text-light" onclick="openNav()"></a>
-        <span class="m-r-5 text-light">Categories</span>
+        <a class="m-r-5 text-light" onclick="openNav()">Categories</a>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
         <a class="fas fa-th text-light" href="{{ url_for('mybookslist', user_name=user_name) }}"></a>
-        <span class="m-r-5 text-light">Grid View</span>
+        <a class="m-r-5 text-light" href="{{ url_for('mybookslist', user_name=user_name) }}">Grid View</a>
     </div>
 </div>
 {% endblock fixed %}
@@ -601,7 +601,7 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
 		});
 
 		$li.append('<a class="list-group-item bg-dark text-light">');
-		$li.find('a').append($img).append(" "+item.name);
+		$li.find('a').append($img).append(" "+item.name + " (" + item.first_air_date + ")");
 
 		return $li.appendTo(ul);
 	}
@@ -877,6 +877,7 @@ function hide_all_cat() {
     hide.className = "d-none";
     show.className = "fas fa-eye text-light m-r-5";
     $('#collapse_show').text('Expand All');
+    $('#collapse_show').attr('onclick', 'show_all_cat()');
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-right');
 }
 </script>
@@ -889,6 +890,7 @@ function show_all_cat() {
     hide.className = "fas fa-eye-slash text-light m-r-5";
     show.className = "d-none";
     $('#collapse_show').text('Collapse All');
+    $('#collapse_show').attr('onclick', 'hide_all_cat()');
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-down');
 }
 </script>

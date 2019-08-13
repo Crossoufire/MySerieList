@@ -373,21 +373,21 @@ body.loading .modal_loading {
     <div class="ml-auto">
         <a id="collapse_all" class="fas fa-eye-slash text-light m-r-5" onclick="hide_all_cat()"></a>
         <a id="show_cat_all" class="d-none" onclick="show_all_cat()"></a>
-        <span id="collapse_show" class="m-r-5 text-light">Collapse all</span>
+        <a id="collapse_show" class="m-r-5 text-light" onclick="hide_all_cat()">Collapse all</a>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
         <a class="fas fa-bars text-light" onclick="openNav()"></a>
-        <span class="m-r-5 text-light">Categories</span>
+        <a class="m-r-5 text-light" onclick="openNav()">Categories</a>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
         {% if element_type == "ANIME" %}
             <a class="fas fa-th text-light" href="{{ url_for('myanimeslist', user_name=user_name) }}"></a>
-        <span class="m-r-5 text-light">Grid View</span>
+            <a class="m-r-5 text-light" href="{{ url_for('myanimeslist', user_name=user_name) }}">Grid View</a>
         {% elif element_type == "SERIES" %}
             <a class="fas fa-th text-light" href="{{ url_for('myserieslist', user_name=user_name) }}"></a>
-        <span class="m-r-5 text-light">Grid View</span>
+            <a class="m-r-5 text-light" href="{{ url_for('myanimeslist', user_name=user_name) }}">Grid View</a>
         {% endif %}
     </div>
 </div>
@@ -1156,6 +1156,7 @@ function hide_all_cat() {
     hide.className = "d-none";
     show.className = "fas fa-eye text-light m-r-5";
     $('#collapse_show').text('Expand All');
+    $('#collapse_show').attr('onclick', 'show_all_cat()');
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-right');
 
 }
@@ -1169,6 +1170,7 @@ function show_all_cat() {
     hide.className = "fas fa-eye-slash text-light m-r-5";
     show.className = "d-none";
     $('#collapse_show').text('Collapse All');
+    $('#collapse_show').attr('onclick', 'hide_all_cat()');
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-down');
 }
 </script>
