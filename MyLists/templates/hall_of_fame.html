@@ -1,9 +1,11 @@
 {% extends "layout.html" %}
 
 {% block css %}
-<!------ MDBootstrap Datatables ------->
+<!------ CDN Datatables ------->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.css"/>
-<!----------- Main CSS ----------->
+<!------ MDBootstrap Datatables ------->
+<!-- <link href="{{ url_for('static', filename='css/datatables.min.css') }}" rel="stylesheet"> -->
+
 <style>
 table.dataTable thead .sorting:after,
 table.dataTable thead .sorting:before,
@@ -205,9 +207,11 @@ hr {
 
 
 {% block script %}
-<!--------- MDBootstrap Datatables ----------->
+<!--------- CDN Datatables ----------->
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>
-<!-------------- Main JS ---------------->
+<!--------- MDBootstrap Datatables ----------->
+<!-- <script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script> -->
+
 <script>
 function add_friend(username) {
     $body = $("body");
@@ -222,7 +226,9 @@ function add_friend(username) {
             window.location.replace('/hall_of_fame'); }
     });
 }
+</script>
 
+<script>
 $(document).ready(function () {
     $('#hall_of_fame').DataTable({
         "order": [[ 5, "desc" ], [ 1, "asc" ]],
