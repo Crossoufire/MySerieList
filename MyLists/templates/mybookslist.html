@@ -347,28 +347,28 @@ body.loading .modal_loading {
     <div class="ml-auto">
         <a id="collapse_all" class="fas fa-eye-slash text-light m-r-5" onclick="hide_all_cat()"></a>
         <a id="show_cat_all" class="d-none" onclick="show_all_cat()"></a>
-        <a id="collapse_show" class="m-r-5 text-light" onclick="hide_all_cat()">Collapse all</a>
+        <a id="collapse_show" class="text-light" onclick="hide_all_cat()">Collapse all</a>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
         <a id="show_all" class="fas fa-eye text-light m-r-5" onclick="show_all_score()"></a>
         <a id="hide_all" class="d-none" onclick="hide_all_score()"></a>
-        <a id="show_hide" class="m-r-5 text-light" onclick="show_all_score()">Show scores</a>
+        <a id="show_hide" class="text-light" onclick="show_all_score()">Show scores</a>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
         <a class="fas fa-bars text-light" onclick="openNav()"></a>
-        <a class="m-r-5 text-light" onclick="openNav()">Categories</a>
+        <a class="text-light" onclick="openNav()">Categories</a>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
         <a class="fas fa-bars text-light" href="{{ url_for('mybookslist_table', user_name=user_name) }}"></a>
-        <a class="m-r-5 text-light" href="{{ url_for('mybookslist_table', user_name=user_name) }}">Table View</a>
+        <a class="text-light" href="{{ url_for('mybookslist_table', user_name=user_name) }}">Table View</a>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
         <div class="slidecontainer text-light float-right" style="vertical-align: middle;">
-            <span class="m-r-5 text-light" style="vertical-align: middle;">ZOOM</span>
+            <span class="m-l-1 text-light" style="vertical-align: middle;">ZOOM</span>
             <input id="card_size" type="range" step="25" min="100" max="200" value="200" class="slider" style="vertical-align: middle;">
         </div>
     </div>

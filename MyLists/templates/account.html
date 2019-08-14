@@ -372,7 +372,7 @@ hr {
                 <h2 class="mt-0 account-heading username">{{ user_name }}'s profile</h2>
                 {% endif %}
                 <span style="font-size: 14pt;">Knowledge level:&nbsp&nbsp</span>
-                <img height='64' width='64' data-toggle="tooltip" title="{{ user_knowledge_rank[0][1] }}" src="/static/img/knowledge_ranks/{{ user_knowledge_rank[0][0] }}.png"/>
+                <img height='64' width='64' data-toggle="tooltip" title="{{ user_knowledge_rank[0][1] }}" src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ user_knowledge_rank[0][0] }}.png"/>
             </div>
             <div class="ml-auto bd-highlight">
                 {% if user_id == current_user.get_id() %}
@@ -387,12 +387,19 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ series_stats[4][0][1] }}" src="/static/img/levels_ranks/{{ series_stats[4][0][0] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ series_stats[4][0][1] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ series_stats[4][0][0] }}.ico"/>
                             <span class='account-bar-name'>Series</span>
                             <div id="series_level" class='account-bar-level'>Level {{ series_stats[3][0] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ series_stats[3][1] }}%">
                                 <div id='xp-bar-fill-series'>
-                                    <div class='xp-increase-fx'><div class='xp-increase-fx-flicker'><div class='xp-increase-glow1'></div><div class='xp-increase-glow2'></div><div class='xp-increase-glow3'></div></div><div class='xp-increase-glow2'></div></div>
+                                    <div class='xp-increase-fx'>
+                                        <div class='xp-increase-fx-flicker'>
+                                            <div class='xp-increase-glow1'></div>
+                                            <div class='xp-increase-glow2'></div>
+                                            <div class='xp-increase-glow3'></div>
+                                        </div>
+                                        <div class='xp-increase-glow2'></div>
+                                    </div>
                                 </div>
                             </div>
                             <div class='account-bar-next-level'>&nbsp{{ series_stats[3][0] | int + 1 }}</div>
@@ -402,12 +409,19 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ anime_stats[4][0][1] }}" src="/static/img/levels_ranks/{{ anime_stats[4][0][0] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ anime_stats[4][0][1] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ anime_stats[4][0][0] }}.ico"/>
                             <div class='account-bar-name'>Anime</div>
                             <div id="anime_level" class='account-bar-level'>Level {{ anime_stats[3][0] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ anime_stats[3][1] }}%">
                                 <div id='xp-bar-fill-anime'>
-                                    <div class='xp-increase-fx'><div class='xp-increase-fx-flicker'><div class='xp-increase-glow1'></div><div class='xp-increase-glow2'></div><div class='xp-increase-glow3'></div></div><div class='xp-increase-glow2'></div></div>
+                                    <div class='xp-increase-fx'>
+                                        <div class='xp-increase-fx-flicker'>
+                                            <div class='xp-increase-glow1'></div>
+                                            <div class='xp-increase-glow2'></div>
+                                            <div class='xp-increase-glow3'></div>
+                                        </div>
+                                        <div class='xp-increase-glow2'></div>
+                                    </div>
                                 </div>
                             </div>
                             <div class='account-bar-next-level'>&nbsp{{ anime_stats[3][0] | int + 1 }}</div>
@@ -417,12 +431,19 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ book_stats[4][0][1] }}" src="/static/img/levels_ranks/{{ book_stats[4][0][0] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ book_stats[4][0][1] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ book_stats[4][0][0] }}.ico"/>
                             <div class='account-bar-name'>Books</div>
                             <div id="book_level" class='account-bar-level'>Level {{ book_stats[3][0] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ book_stats[3][1] }}%">
                                 <div id='xp-bar-fill-book'>
-                                    <div class='xp-increase-fx'><div class='xp-increase-fx-flicker'><div class='xp-increase-glow1'></div><div class='xp-increase-glow2'></div><div class='xp-increase-glow3'></div></div><div class='xp-increase-glow2'></div></div>
+                                    <div class='xp-increase-fx'>
+                                        <div class='xp-increase-fx-flicker'>
+                                            <div class='xp-increase-glow1'></div>
+                                            <div class='xp-increase-glow2'></div>
+                                            <div class='xp-increase-glow3'></div>
+                                        </div>
+                                        <div class='xp-increase-glow2'></div>
+                                    </div>
                                 </div>
                             </div>
                             <div class='account-bar-next-level'>&nbsp{{ book_stats[3][0] | int + 1 }}</div>
@@ -466,10 +487,10 @@ hr {
         <hr class="mt-2 mb-3">
             <div class="row text-center">
                 <div class="col">
-                    <a class="btn btn-primary" href="/serieslist/{{ user_name }}">SeriesList</a>
+                    <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='serieslist', user_name=user_name) }}">SeriesList</a>
                 </div>
                 <div class="col">
-                    <a class="btn btn-primary" href="/animeslist/{{ user_name }}">AnimesList</a>
+                    <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='animelist', user_name=user_name) }}">AnimeList</a>
                 </div>
                 <div class="col">
                     <a class="btn btn-primary" href="/bookslist/{{ user_name }}">BooksList</a>
@@ -498,13 +519,13 @@ hr {
                     {% for friend in friends_list_data %}
                     {% if friend['status'] == "pending" %}
                         {% if user_id == current_user.get_id() %}
-                        <div id="td_{{ friend['user_id'] }}" class="card bg-transparent m-l-10 m-r-10 m-t-8" style="width: 70px; height: 120.5px;">
+                        <div id="card_{{ friend['user_id'] }}" class="card bg-transparent m-l-10 m-r-10 m-t-8" style="width: 70px; height: 120.5px;">
                             <div class="view overlay">
-                                <img class="card-img-top" width="70" height="70" src="/static/profile_pics/{{ friend['picture'] }}" alt="{{ friend['username'] }}">
+                                <img class="card-img-top" width="70" height="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}" alt="{{ friend['username'] }}">
                                 <a class="hover" href="/account/{{ friend['username'] }}">
                                     <div class="mask flex-center rgba-black-strong"></div>
                                 </a>
-                                <a class="btn_right fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                                <a class="btn_right fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'card_{{ friend['user_id'] }}')"></a>
                             </div>
                             <div class="card-body bg-transparent p-0 text-center">
                                 <span class="text-light">{{ friend['username'] }}</span><br>
@@ -515,13 +536,13 @@ hr {
                         {% endif %}
                     {% elif friend['status'] == "request" %}
                         {% if user_id == current_user.get_id() %}
-                        <div id="td_{{ friend['user_id'] }}" class="card bg-transparent m-l-10 m-r-10 m-t-8" style="width: 70px; height: 114px;">
+                        <div id="card_{{ friend['user_id'] }}" class="card bg-transparent m-l-10 m-r-10 m-t-8" style="width: 70px; height: 114px;">
                             <div class="view overlay">
-                                <img class="card-img-top" width="70" height="70" src="/static/profile_pics/{{ friend['picture'] }}" alt="{{ friend['username'] }}">
+                                <img class="card-img-top" width="70" height="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}" alt="{{ friend['username'] }}">
                                 <a class="hover" href="/account/{{ friend['username'] }}">
                                     <div class="mask flex-center rgba-black-strong"></div>
                                 </a>
-                                <a class="btn_right fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                                <a class="btn_right fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'card_{{ friend['user_id'] }}')"></a>
                             </div>
                             <div class="card-body bg-transparent p-0 text-center">
                                 <span class="text-light" >{{ friend['username'] }}</span>
@@ -531,14 +552,14 @@ hr {
                         {% endif %}
                     {% elif friend['status'] == "declined" %}
                     {% else %}
-                        <div id="td_{{ friend['user_id'] }}" class="card bg-transparent m-l-10 m-r-10 m-t-8" style="height: 90px; width: 70px;">
+                        <div id="card_{{ friend['user_id'] }}" class="card bg-transparent m-l-10 m-r-10 m-t-8" style="height: 90px; width: 70px;">
                             <div class="view overlay">
-                                <img class="card-img-top" width="70" height="70" src="/static/profile_pics/{{ friend['picture'] }}" alt="{{ friend['username'] }}">
+                                <img class="card-img-top" width="70" height="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}" alt="{{ friend['username'] }}">
                                 <a class="hover" href="/account/{{ friend['username'] }}">
                                     <div class="mask flex-center rgba-black-strong"></div>
                                 </a>
                                 {% if user_id == current_user.get_id() %}
-                                <a class="btn_right fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                                <a class="btn_right fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'card_{{ friend['user_id'] }}')"></a>
                                 {% endif %}
                             </div>
                             <div class="card-body bg-transparent p-0 text-center">
@@ -873,11 +894,11 @@ function hide(category, arrow) {
 }
 
 
-function delete_friend(friend_id, td_id) {
+function delete_friend(friend_id, card_id) {
     if (!confirm("Are you sure you want to delete this friend from your list?")){
         return false;
     }
-    $("#"+td_id).remove();
+    $("#"+card_id).remove();
     $body = $("body");
     $.ajax ({
         type: "POST",

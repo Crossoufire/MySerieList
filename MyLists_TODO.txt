@@ -2,18 +2,18 @@
 TO DO / FIX FIRST
 	Change the account settings page (80% done)
 	Add year in auto-complete results (50% done)
+	Check the style of the auto-complete selector (50% done)
+	Add "more results" for auto-complete results
 	Add a "read less" for the synopsis modal
 	Check the style of the category selector modal
-	Check the style of the auto-complete selector
-	Add "more results" for auto-complete results
-	Add a statistics page with chart.js (already started the code part)
 	Add an element without refreshing (ajax method)
 	Set the Line height of nav-bar to 1
 	Increase the container size
-	Add stats in navbar (when page done)
 	Change style achievements
 	Add color for friends in hall of fame
 	Add friend without reload in account
+	Add a statistics page with chart.js (already started the code part)
+	Add stats in navbar (when page done)
 
 
 TO DO LATER

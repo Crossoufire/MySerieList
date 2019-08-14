@@ -373,22 +373,17 @@ body.loading .modal_loading {
     <div class="ml-auto">
         <a id="collapse_all" class="fas fa-eye-slash text-light m-r-5" onclick="hide_all_cat()"></a>
         <a id="show_cat_all" class="d-none" onclick="show_all_cat()"></a>
-        <a id="collapse_show" class="m-r-5 text-light" onclick="hide_all_cat()">Collapse all</a>
+        <a id="collapse_show" class=" text-light" onclick="hide_all_cat()">Collapse all</a>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
         <a class="fas fa-bars text-light" onclick="openNav()"></a>
-        <a class="m-r-5 text-light" onclick="openNav()">Categories</a>
+        <a class=" text-light" onclick="openNav()">Categories</a>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
-        {% if element_type == "ANIME" %}
-            <a class="fas fa-th text-light" href="{{ url_for('myanimeslist', user_name=user_name) }}"></a>
-            <a class="m-r-5 text-light" href="{{ url_for('myanimeslist', user_name=user_name) }}">Grid View</a>
-        {% elif element_type == "SERIES" %}
-            <a class="fas fa-th text-light" href="{{ url_for('myserieslist', user_name=user_name) }}"></a>
-            <a class="m-r-5 text-light" href="{{ url_for('myserieslist', user_name=user_name) }}">Grid View</a>
-        {% endif %}
+        <a class="fas fa-th text-light" href="{{ url_for('mymedialist', media_list=media_list, user_name=user_name) }}"></a>
+        <a class=" text-light" href="{{ url_for('mymedialist', media_list=media_list, user_name=user_name) }}">Grid View</a>
     </div>
 </div>
 {% endblock fixed %}
@@ -398,10 +393,10 @@ body.loading .modal_loading {
 <div class="d-flex flex-wrap">
     {% if user_id == current_user.get_id() %}
         <div class="m-t-20 m-b-10">
-        {% if element_type == "ANIME" %}
+        {% if media_list == "animelist" %}
             <input class="form-control text-light add_element" placeholder="Add an anime" type="text" id="autocomplete" onfocus="this.value=''"/>
             <input type="hidden" id="element_id" value=""/>
-        {% elif element_type == "SERIES" %}
+        {% elif media_list == "serieslist" %}
             <input class="form-control text-light add_element" placeholder="Add a Series" type="text" id="autocomplete" onfocus="this.value=''"/>
             <input type="hidden" id="element_id" value=""/>
         {% endif %}
@@ -742,23 +737,13 @@ $(function() {
     $("#autocomplete").catcomplete({
         delay: 500,
         source: function(request, response) {
-            {% if element_type == "ANIME" %}
-                $.getJSON("{{url_for('autocomplete_animes')}}",{
+                $.getJSON("{{url_for('autocomplete', media=media_list)}}",{
                     q: request.term,
                 },
                     function(data) {
                         response(data.matching_results);
                     }
                 );
-            {% elif element_type == "SERIES" %}
-                $.getJSON("{{url_for('autocomplete_series')}}",{
-                    q: request.term,
-                },
-                    function(data) {
-                        response(data.matching_results);
-                    }
-                );
-            {% endif %}
 	    },
 		minLength: 1,
         select: function(event, ui) {
@@ -770,15 +755,11 @@ $(function() {
                 type: "POST",
                 url: "/add_element",
                 contentType: "application/json",
-                data: JSON.stringify({element_id: ui.item.tmdb_id, element_type: '{{ element_type }}' }),
+                data: JSON.stringify({element_id: ui.item.tmdb_id, element_type: '{{ media_list }}' }),
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
-                    {% if element_type == "ANIME" %}
-                        window.location.replace('/animeslist/table/{{ current_user.username }}');
-                    {% elif element_type == "SERIES" %}
-                        window.location.replace('/serieslist/table/{{ current_user.username }}');
-                    {% endif %}
+                    window.location.replace('/{{ media_list }}/table/{{ current_user.username }}');
                 }
             });
         }
@@ -794,14 +775,10 @@ function refreshAll() {
         type: "POST",
         url: "/refresh_all_element",
         contentType: "application/json",
-        data: JSON.stringify({element_type: '{{ element_type }}' }),
+        data: JSON.stringify({element_type: '{{ media_list }}' }),
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            {% if element_type == "ANIME" %}
-                window.location.replace('/animeslist/table/{{ current_user.username }}');
-            {% elif element_type == "SERIES" %}
-                window.location.replace('/serieslist/table/{{ current_user.username }}');
-            {% endif %}
+            window.location.replace('/{{ media_list }}/table/{{ current_user.username }}');
         }
     });
 }
@@ -814,15 +791,11 @@ function refresh(element_id) {
         type: "POST",
         url: "/refresh_single_element",
         contentType: "application/json",
-        data: JSON.stringify({element_id: element_id, element_type: "{{ element_type }}" }),
+        data: JSON.stringify({element_id: element_id, element_type: "{{ media_list }}" }),
         dataType: "json",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            {% if element_type == "ANIME" %}
-                window.location.replace('/animeslist/table/{{ current_user.username }}');
-            {% else %}
-                window.location.replace('/serieslist/table/{{ current_user.username }}');
-            {% endif %}
+            window.location.replace('/{{ media_list }}/table/{{ current_user.username }}');
         }
     });
 }
@@ -1005,7 +978,7 @@ function changeCategory(element_id, new_category, tr_id, mod_id, seas_drop_id, e
         type: "POST",
         url: "/change_element_category",
         contentType: "application/json",
-        data: JSON.stringify({status: new_category, element_id: element_id, element_type: "{{ element_type }}" }),
+        data: JSON.stringify({status: new_category, element_id: element_id, element_type: "{{ media_list }}" }),
         dataType: "json",
         success: function(response) {
             console.log("ok"); }
@@ -1025,7 +998,7 @@ function delete_element(element_id, tr_id) {
         type: "POST",
         url: "/delete_element",
         contentType: "application/json",
-        data: JSON.stringify({delete: element_id, element_type: "{{ element_type }}" }),
+        data: JSON.stringify({delete: element_id, element_type: "{{ media_list }}" }),
         dataType: "json",
         success: function(response) {
             console.log("ok"); }
@@ -1043,7 +1016,7 @@ function updateEpisode(element_id, episode){
         type: "POST",
         url: "/update_element_episode",
         contentType: "application/json",
-        data: JSON.stringify({episode: selected_episode, element_id: element_id, element_type: "{{ element_type }}" }),
+        data: JSON.stringify({episode: selected_episode, element_id: element_id, element_type: "{{ media_list }}" }),
         dataType: "json",
         success: function(response) {
             console.log("ok"); }
@@ -1072,7 +1045,7 @@ function updateSeason(element_id, value, seas_data, ep_drop_id) {
         type: "POST",
         url: "/update_element_season",
         contentType: "application/json",
-        data: JSON.stringify({season: selected_season, element_id: element_id, element_type: "{{ element_type }}" }),
+        data: JSON.stringify({season: selected_season, element_id: element_id, element_type: "{{ media_list }}" }),
         dataType: "json",
         success: function(response) {
             console.log("ok"); }
@@ -1104,7 +1077,7 @@ function add_score(new_score, edit_id, element_id) {
                 type: "POST",
                 url: "/add_score_element",
                 contentType: "application/json",
-                data: JSON.stringify({score_val: edit_score_value, element_id: element_id, element_type: '{{ element_type }}' }),
+                data: JSON.stringify({score_val: edit_score_value, element_id: element_id, element_type: '{{ media_list }}' }),
                 dataType: "json",
                 success: function(response) {
                     console.log('ok'); }
@@ -1138,11 +1111,11 @@ function hide(category, arrow) {
     var category = document.getElementById(category);
     var arrow = document.getElementById(arrow);
 
-    if (category.className === "d-flex flex-wrap"){
+    if (category.className === "d-flex flex-wrap table-responsive-sm"){
         category.className = "d-none";
         arrow.className = "collapse_all fas fa-sm fa-chevron-right";
     } else {
-        category.className = "d-flex flex-wrap";
+        category.className = "d-flex flex-wrap table-responsive-sm";
         arrow.className = "collapse_all fas fa-sm fa-chevron-down";
     }
 }

@@ -710,12 +710,12 @@ def delete_friend():
     return '', 204
 
 
-##################################################### Anime/Serie routes ###############################################
+#################################################### Anime/Series routes ###############################################
 
 
-@app.route("/animeslist/<user_name>", methods=['GET', 'POST'])
+@app.route("/<media_list>/<user_name>", methods=['GET', 'POST'])
 @login_required
-def myanimeslist(user_name):
+def mymedialist(media_list, user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
@@ -734,19 +734,33 @@ def myanimeslist(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    # Get anime data
-    anime_data = db.session.query(Anime, AnimeList,
-                            func.group_concat(AnimeGenre.genre.distinct()),
-                            func.group_concat(AnimeNetwork.network.distinct()),
-                            func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
-                            func.group_concat(AnimeEpisodesPerSeason.episodes)). \
-                            join(AnimeList, AnimeList.anime_id == Anime.id). \
-                            join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
-                            join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
-                            join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
-                            filter(AnimeList.user_id == user.id). \
-                            group_by(Anime.id). \
-                            order_by(Anime.name.asc())
+    # Check the route
+    if media_list == "serieslist":
+        # Get series data
+        element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
+                                       func.group_concat(SeriesNetwork.network.distinct()),
+                                       func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
+                                       func.group_concat(SeriesEpisodesPerSeason.episodes)).\
+                                       join(SeriesList, SeriesList.series_id == Series.id). \
+                                       join(SeriesGenre, SeriesGenre.series_id == Series.id). \
+                                       join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
+                                       join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
+                                       filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
+        covers_path = "/static/series_covers/"
+    elif media_list == "animelist":
+        # Get anime data
+        element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
+                                      func.group_concat(AnimeNetwork.network.distinct()),
+                                      func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
+                                      func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                      join(AnimeList, AnimeList.anime_id == Anime.id). \
+                                      join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
+                                      join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
+                                      join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
+                                      filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
+        covers_path = "/static/animes_covers/"
+    else:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     watching_list    = []
     completed_list   = []
@@ -760,156 +774,59 @@ def myanimeslist(user_name):
     networks = {}
     can_update = {}
 
-    for anime in anime_data:
-        # Change cover path
-        anime[0].image_cover = "/static/animes_covers/{}".format(anime[0].image_cover)
+    for element in element_data:
+        # Change the cover path
+        element[0].image_cover = covers_path +"{}".format(element[0].image_cover)
 
-        if anime[1].status == Status.WATCHING:
-            watching_list.append(anime)
-        elif anime[1].status == Status.COMPLETED:
-            completed_list.append(anime)
-        elif anime[1].status == Status.ON_HOLD:
-            onhold_list.append(anime)
-        elif anime[1].status == Status.RANDOM:
-            random_list.append(anime)
-        elif anime[1].status == Status.DROPPED:
-            dropped_list.append(anime)
-        elif anime[1].status == Status.PLAN_TO_WATCH:
-            plantowatch_list.append(anime)
+        if element[1].status == Status.WATCHING:
+            watching_list.append(element)
+        elif element[1].status == Status.COMPLETED:
+            completed_list.append(element)
+        elif element[1].status == Status.ON_HOLD:
+            onhold_list.append(element)
+        elif element[1].status == Status.RANDOM:
+            random_list.append(element)
+        elif element[1].status == Status.DROPPED:
+            dropped_list.append(element)
+        elif element[1].status == Status.PLAN_TO_WATCH:
+            plantowatch_list.append(element)
 
         # Get episodes per season
-        nb_season = len(anime[4].split(","))
-        eps["{}".format(anime[0].id)] = anime[5].split(",")[:nb_season]
+        nb_season = len(element[4].split(","))
+        eps["{}".format(element[0].id)] = element[5].split(",")[:nb_season]
         # Convert all element to int
-        eps["{}".format(anime[0].id)] = [int(x) for x in eps["{}".format(anime[0].id)]]
+        eps["{}".format(element[0].id)] = [int(x) for x in eps["{}".format(element[0].id)]]
 
         # Get genres
-        genres["{}".format(anime[0].id)] = anime[2]
+        genres["{}".format(element[0].id)] = element[2]
 
         # Get networks
-        networks["{}".format(anime[0].id)] = anime[3]
+        networks["{}".format(element[0].id)] = element[3]
 
         # Can update
-        time_delta = datetime.utcnow() - anime[0].last_update
+        time_delta = datetime.utcnow() - element[0].last_update
         if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
-            can_update["{}".format(anime[0].id)] = True
+            can_update["{}".format(element[0].id)] = True
         else:
-            can_update["{}".format(anime[0].id)] = False
+            can_update["{}".format(element[0].id)] = False
 
-    anime_all_data = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    element_all_data = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
 
     return render_template('mymedialist.html',
-                           title="{}'s AnimeList".format(user_name),
-                           all_data=anime_all_data,
+                           title="{}'s {}".format(user_name, media_list),
+                           all_data=element_all_data,
                            eps=eps,
                            genres=genres,
                            networks=networks,
                            can_update=can_update,
-                           element_type="ANIME",
-                           target_user_id=str(user.id),
-                           target_user_name=user_name)
+                           media_list=media_list,
+                           target_user_name=user_name,
+                           target_user_id=str(user.id))
 
 
-@app.route("/serieslist/<user_name>", methods=['GET', 'POST'])
+@app.route("/<media_list>/table/<user_name>", methods=['GET', 'POST'])
 @login_required
-def myserieslist(user_name):
-    image_error = url_for('static', filename='img/error.jpg')
-    user = User.query.filter_by(username=user_name).first()
-
-    if user is None:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-
-    # Check if the current user can see the target user's list
-    if current_user.id != user.id:
-        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-        if user.id == 1:
-            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-        if user.private:
-            if current_user.get_id() == "1":
-                pass
-            elif friend is None or friend.status != "accepted":
-                image_anonymous = url_for('static', filename='img/anonymous.jpg')
-                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
-
-    # Get series data
-    series_data = db.session.query(Series, SeriesList,
-                            func.group_concat(SeriesGenre.genre.distinct()),
-                            func.group_concat(SeriesNetwork.network.distinct()),
-                            func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                            func.group_concat(SeriesEpisodesPerSeason.episodes)). \
-                            join(SeriesList, SeriesList.series_id == Series.id). \
-                            join(SeriesGenre, SeriesGenre.series_id == Series.id). \
-                            join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
-                            join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
-                            filter(SeriesList.user_id == user.id). \
-                            group_by(Series.id). \
-                            order_by(Series.name.asc())
-
-    watching_list    = []
-    completed_list   = []
-    onhold_list      = []
-    random_list      = []
-    dropped_list     = []
-    plantowatch_list = []
-
-    eps = {}
-    genres = {}
-    networks = {}
-    can_update = {}
-
-    for series in series_data:
-        # Change cover path
-        series[0].image_cover = "/static/series_covers/{}".format(series[0].image_cover)
-
-        if series[1].status == Status.WATCHING:
-            watching_list.append(series)
-        elif series[1].status == Status.COMPLETED:
-            completed_list.append(series)
-        elif series[1].status == Status.ON_HOLD:
-            onhold_list.append(series)
-        elif series[1].status == Status.RANDOM:
-            random_list.append(series)
-        elif series[1].status == Status.DROPPED:
-            dropped_list.append(series)
-        elif series[1].status == Status.PLAN_TO_WATCH:
-            plantowatch_list.append(series)
-
-        # Get episodes per season
-        nb_season = len(series[4].split(","))
-        eps["{}".format(series[0].id)] = series[5].split(",")[:nb_season]
-        # Convert all element to int
-        eps["{}".format(series[0].id)] = [int(x) for x in eps["{}".format(series[0].id)]]
-
-        # Get genres
-        genres["{}".format(series[0].id)] = series[2]
-
-        # Get networks
-        networks["{}".format(series[0].id)] = series[3]
-
-        # Can update
-        time_delta = datetime.utcnow() - series[0].last_update
-        if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
-            can_update["{}".format(series[0].id)] = True
-        else:
-            can_update["{}".format(series[0].id)] = False
-
-    series_all_data = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-
-    return render_template('mymedialist.html',
-                           title="{}'s SeriesList".format(user_name),
-                           all_data=series_all_data,
-                           eps=eps,
-                           genres=genres,
-                           networks=networks,
-                           can_update=can_update,
-                           element_type="SERIES",
-                           target_user_id=str(user.id),
-                           target_user_name=user_name)
-
-
-@app.route("/animeslist/table/<user_name>", methods=['GET', 'POST'])
-@login_required
-def myanimeslist_table(user_name):
+def mymedialist_table(media_list, user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
@@ -927,61 +844,32 @@ def myanimeslist_table(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    watching_list    = AnimeList.query.filter_by(user_id=user.id, status=Status.WATCHING).all()
-    completed_list   = AnimeList.query.filter_by(user_id=user.id, status=Status.COMPLETED).all()
-    onhold_list      = AnimeList.query.filter_by(user_id=user.id, status=Status.ON_HOLD).all()
-    random_list      = AnimeList.query.filter_by(user_id=user.id, status=Status.RANDOM).all()
-    dropped_list     = AnimeList.query.filter_by(user_id=user.id, status=Status.DROPPED).all()
-    plantowatch_list = AnimeList.query.filter_by(user_id=user.id, status=Status.PLAN_TO_WATCH).all()
+    if media_list == "animelist":
+        watching_list    = AnimeList.query.filter_by(user_id=user.id, status=Status.WATCHING).all()
+        completed_list   = AnimeList.query.filter_by(user_id=user.id, status=Status.COMPLETED).all()
+        onhold_list      = AnimeList.query.filter_by(user_id=user.id, status=Status.ON_HOLD).all()
+        random_list      = AnimeList.query.filter_by(user_id=user.id, status=Status.RANDOM).all()
+        dropped_list     = AnimeList.query.filter_by(user_id=user.id, status=Status.DROPPED).all()
+        plantowatch_list = AnimeList.query.filter_by(user_id=user.id, status=Status.PLAN_TO_WATCH).all()
+        list_type = ListType.ANIME
+    elif media_list == "serieslist":
+        watching_list    = SeriesList.query.filter_by(user_id=user.id, status=Status.WATCHING).all()
+        completed_list   = SeriesList.query.filter_by(user_id=user.id, status=Status.COMPLETED).all()
+        onhold_list      = SeriesList.query.filter_by(user_id=user.id, status=Status.ON_HOLD).all()
+        random_list      = SeriesList.query.filter_by(user_id=user.id, status=Status.RANDOM).all()
+        dropped_list     = SeriesList.query.filter_by(user_id=user.id, status=Status.DROPPED).all()
+        plantowatch_list = SeriesList.query.filter_by(user_id=user.id, status=Status.PLAN_TO_WATCH).all()
+        list_type = ListType.SERIES
+    else:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    animes_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-    animes_data = get_list_data(animes_list, ListType.ANIME)
-    element_type = "ANIME"
-    user_id = str(user.id)
+    element_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    element_data = get_list_data(element_list, list_type)
     return render_template('mymedialist_table.html',
-                           title="{}'s AnimeList".format(user_name),
-                           all_data=animes_data,
-                           element_type=element_type,
-                           user_id=user_id,
-                           user_name=user_name)
-
-
-@app.route("/serieslist/table/<user_name>", methods=['GET', 'POST'])
-@login_required
-def myserieslist_table(user_name):
-    image_error = url_for('static', filename='img/error.jpg')
-    user = User.query.filter_by(username=user_name).first()
-
-    if user is None:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-
-    if current_user.id != user.id:
-        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-        if user.id == 1:
-            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-        if user.private:
-            if current_user.get_id() == "1":
-                pass
-            elif friend is None or friend.status != "accepted":
-                image_anonymous = url_for('static', filename='img/anonymous.jpg')
-                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
-
-    watching_list    = SeriesList.query.filter_by(user_id=user.id, status=Status.WATCHING).all()
-    completed_list   = SeriesList.query.filter_by(user_id=user.id, status=Status.COMPLETED).all()
-    onhold_list      = SeriesList.query.filter_by(user_id=user.id, status=Status.ON_HOLD).all()
-    random_list      = SeriesList.query.filter_by(user_id=user.id, status=Status.RANDOM).all()
-    dropped_list     = SeriesList.query.filter_by(user_id=user.id, status=Status.DROPPED).all()
-    plantowatch_list = SeriesList.query.filter_by(user_id=user.id, status=Status.PLAN_TO_WATCH).all()
-
-    series_list = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-    series_data = get_list_data(series_list, ListType.SERIES)
-    element_type = "SERIES"
-    user_id = str(user.id)
-    return render_template('mymedialist_table.html',
-                           title="{}'s SeriesList".format(user_name),
-                           all_data=series_data,
-                           element_type=element_type,
-                           user_id=user_id,
+                           title="{}'s {}".format(user_name, media_list),
+                           all_data=element_data,
+                           media_list=media_list,
+                           user_id=str(user.id),
                            user_name=user_name)
 
 
@@ -998,26 +886,26 @@ def update_element_season():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element exists
-    valide_types = ["ANIME", "SERIES"]
+    valide_types = ["animelist", "serieslist"]
     if element_type not in valide_types:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    if element_type == "ANIME":
+    if element_type == "animelist":
         if Anime.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         if Series.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element is in the current user's list
-    if element_type == "ANIME":
+    if element_type == "animelist":
         if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         if SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the season number is between 1 and <last_season>
-    if element_type == "ANIME":
+    if element_type == "animelist":
         last_season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).order_by(
             AnimeEpisodesPerSeason.season.desc()).first().season
         if season + 1 < 1 or season + 1 > last_season:
@@ -1029,7 +917,7 @@ def update_element_season():
         update.last_episode_watched = 1
         db.session.commit()
         app.logger.info('[{}] Season of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, season + 1))
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         last_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).order_by(
             SeriesEpisodesPerSeason.season.desc()).first().season
         if season + 1 < 1 or season + 1 > last_season:
@@ -1043,7 +931,7 @@ def update_element_season():
         app.logger.info('[{}] Season of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, season + 1))
 
     # Add/replace the total number of episodes watched by the user for this element
-    if element_type == "ANIME":
+    if element_type == "animelist":
         last_episode_watched = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().last_episode_watched
         current_season = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().current_season
         episodes_counter = 0
@@ -1055,7 +943,7 @@ def update_element_season():
         update.number_of_episodes_watched = total_episodes_watched
         db.session.commit()
         app.logger.info('[{}] Total episode watched of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         last_episode_watched = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first().last_episode_watched
         current_season = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first().current_season
         episodes_counter = 0
@@ -1083,28 +971,28 @@ def update_element_episode():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    valid_element_type = ["ANIME", "SERIES"]
+    valid_element_type = ["animelist", "serieslist"]
     if element_type not in valid_element_type:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element exists
-    if element_type == "ANIME":
+    if element_type == "animelist":
         if Anime.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         if Series.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element is in the current user's list
-    if element_type == "ANIME":
+    if element_type == "animelist":
         if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         if SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the episode number is between 1 and <last_episode>
-    if element_type == "ANIME":
+    if element_type == "animelist":
         current_season = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().current_season
         last_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=current_season).first().episodes
         if episode + 1 < 1 or episode + 1 > last_episode:
@@ -1115,7 +1003,7 @@ def update_element_episode():
         update.last_episode_watched = episode + 1
         db.session.commit()
         app.logger.info('[{}] Episode of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, episode + 1))
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         current_season = SeriesList.query.filter_by(user_id=current_user.get_id(),
                                                     series_id=element_id).first().current_season
         last_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=current_season).first().episodes
@@ -1129,7 +1017,7 @@ def update_element_episode():
         app.logger.info('[{}] Episode of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, episode + 1))
 
     # Add/replace the total number of episodes watched by the user for this element
-    if element_type == "ANIME":
+    if element_type == "animelist":
         last_episode_watched = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().last_episode_watched
         episodes_counter = 0
         for i in range(1, current_season):
@@ -1140,7 +1028,7 @@ def update_element_episode():
         update.number_of_episodes_watched = total_episodes_watched
         db.session.commit()
         app.logger.info('[{}] Total episode watched of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         last_episode_watched = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first().last_episode_watched
         episodes_counter = 0
         for i in range(1, current_season):
@@ -1165,31 +1053,31 @@ def delete_element():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    valid_element_type = ["ANIME", "SERIES"]
+    valid_element_type = ["animelist", "serieslist"]
     if element_type not in valid_element_type:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element exists
-    if element_type == "ANIME":
+    if element_type == "animelist":
         if Anime.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         if Series.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element is in the current user's list
-    if element_type == "ANIME":
+    if element_type == "animelist":
         if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         if SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    if element_type == "ANIME":
+    if element_type == "animelist":
         AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).delete()
         db.session.commit()
         app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.get_id(), element_id))
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).delete()
         db.session.commit()
         app.logger.info('[{}] Series with ID {} deleted'.format(current_user.get_id(), element_id))
@@ -1213,13 +1101,13 @@ def change_element_category():
     if element_new_category not in category_list:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    valid_element_type = ["ANIME", "SERIES"]
+    valid_element_type = ["animelist", "serieslist"]
     if element_type not in valid_element_type:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    if element_type == "ANIME":
+    if element_type == "animelist":
         element = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         element = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
     if element is None:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
@@ -1229,7 +1117,7 @@ def change_element_category():
     elif element_new_category == 'Completed':
         element.status = Status.COMPLETED
         # Set Season / Episode to max
-        if element_type == "ANIME":
+        if element_type == "animelist":
             number_season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).count()
             number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
@@ -1243,7 +1131,7 @@ def change_element_category():
             update.number_of_episodes_watched = total_episodes_watched
             app.logger.info('[{}] Total episode watched of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
             db.session.commit()
-        elif element_type == "SERIES":
+        elif element_type == "serieslist":
             number_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).count()
             number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
@@ -1266,11 +1154,11 @@ def change_element_category():
     elif element_new_category == 'Plan to Watch':
         element.status = Status.PLAN_TO_WATCH
         # Set Season/Ep to 1/1
-        if element_type == "SERIES":
+        if element_type == "serieslist":
             series = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
             series.current_season = 1
             series.last_episode_watched = 1
-        elif element_type == "ANIME":
+        elif element_type == "animelist":
             anime = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
             anime.current_season = 1
             anime.last_episode_watched = 1
@@ -1293,20 +1181,20 @@ def refresh_single_element():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element is currently in the user's list
-    if element_type == "ANIME":
+    if element_type == "animelist":
         if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         if SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if there is more than 30 min since the last update
-    if element_type == "ANIME":
+    if element_type == "animelist":
         last_update = Anime.query.filter_by(id=element_id).first().last_update
         time_delta = datetime.utcnow() - last_update
         if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
             refresh_element_data(element_id, ListType.ANIME)
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         last_update = Series.query.filter_by(id=element_id).first().last_update
         time_delta = datetime.utcnow() - last_update
         if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
@@ -1325,7 +1213,7 @@ def refresh_all_element():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    if element_type == "ANIME":
+    if element_type == "animelist":
         animes = AnimeList.query.filter_by(user_id=current_user.get_id()).all()
         for anime in animes:
             # Check if there is more than 30 min since the last update
@@ -1333,7 +1221,7 @@ def refresh_all_element():
             time_delta = datetime.utcnow() - last_update
             if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
                 refresh_element_data(anime.anime_id, ListType.ANIME)
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         series = SeriesList.query.filter_by(user_id=current_user.get_id()).all()
         for single_serie in series:
             # Check if there is more than 30 min since the last update
@@ -1356,9 +1244,9 @@ def add_element():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    if element_type == "ANIME":
+    if element_type == "animelist":
         add_element(element_id, ListType.ANIME)
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         add_element(element_id, ListType.SERIES)
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
@@ -1379,18 +1267,18 @@ def add_score_element():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element exists
-    if element_type == "ANIME":
+    if element_type == "animelist":
         if Anime.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         if Series.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element is in the current user's list
-    if element_type == "ANIME":
+    if element_type == "animelist":
         if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         if SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1398,12 +1286,12 @@ def add_score_element():
     if score_value > 10 or score_value < 0:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    if element_type == "ANIME":
+    if element_type == "animelist":
         anime = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first()
         anime.score = score_value
         db.session.commit()
         app.logger.info('[{}] Anime with ID {} scored {}'.format(current_user.get_id(), element_id, score_value))
-    elif element_type == "SERIES":
+    elif element_type == "serieslist":
         series = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first()
         series.score = score_value
         db.session.commit()
@@ -1412,21 +1300,20 @@ def add_score_element():
     return '', 204
 
 
-@app.route('/autocomplete_animes', methods=['GET'])
+@app.route('/autocomplete/<media>', methods=['GET'])
 @login_required
-def autocomplete_animes():
-    search = request.args.get('q')
-
-    results = autocomplete_search_element(search, ListType.ANIME)
-    return jsonify(matching_results=results)
-
-
-@app.route('/autocomplete_series', methods=['GET'])
-@login_required
-def autocomplete_series():
-    search = request.args.get('q')
-
-    results = autocomplete_search_element(search, ListType.SERIES)
+def autocomplete(media):
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        search = request.args.get('q')
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    if media == "animelist":
+        results = autocomplete_search_element(search, ListType.ANIME)
+    elif media == "serieslist":
+        results = autocomplete_search_element(search, ListType.SERIES)
+    else:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
     return jsonify(matching_results=results)
 
 
@@ -1938,7 +1825,9 @@ def autocomplete_search_element(element_name, list_type):
             else:
                 series_data["poster_path"] = url_for('static', filename="series_covers/default.jpg")
 
-            if data["results"][i]["first_air_date"] is not None:
+
+            tmp = data["results"][i]["first_air_date"].split('-')
+            if tmp != ['']:
                 tmp = data["results"][i]["first_air_date"].split('-')
                 series_data["first_air_date"] = tmp[0]
             else:

@@ -22,22 +22,21 @@ hr {
     {% else %}
     <div style="font-size: 14pt;" class="text-center mb-5">{{ user_name }} has unlocked {{ user_number_achievements }}/{{ user_achievements|length }} achievements.</div>
     {% endif %}
-
     <div class="projects row text-center p-0">
         {% for i in range(0, user_achievements|length) %}
         <div class="text-center col m-b-30 p-b-0 p-l-20 p-r-20">
             <span>{{ user_achievements[i]["level"] }}</span><br>
             <span>{{ user_achievements[i]["time_hours"] }}/{{ user_achievements[i]["threshold"] }} hours watched</span><br>
             {% if user_achievements[i]["threshold"] < user_achievements[i]["time_hours"] %}
-            <a href="#" onclick="test('{{ user_achievements[i]['image_id'] }}')">
-                <img height="100" width="200" src="/static/img/anime_achievements/{{ user_achievements[i]['image_id'] }}.png" alt=""><br>
+            <a data-toggle="collapse" href="#{{ user_achievements[i]['image_id'] }}">
+                <img height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements/') }}{{ user_achievements[i]['image_id'] }}.png" alt=""><br>
             </a>
             {% else %}
-            <a href="#" onclick="test('{{ user_achievements[i]['image_id'] }}')">
-                <img style="filter: grayscale(100%);" height="100" width="200" src="/static/img/anime_achievements/{{ user_achievements[i]['image_id'] }}.png" alt=""><br>
+            <a data-toggle="collapse" href="#{{ user_achievements[i]['image_id'] }}">
+                <img style="filter: grayscale(100%);" height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements/') }}{{ user_achievements[i]['image_id'] }}.png" alt=""><br>
             </a>
             {% endif %}
-            <div id="{{ user_achievements[i]['image_id'] }}" class="details p-t-10">
+            <div id="{{ user_achievements[i]['image_id'] }}" class="collapse p-t-10">
                 <div class="text text-left">
                     <span style="font-size: 14pt;">{{ user_achievements[i]['title'] }}</span>
                     <p class="text-left p-0">{{ user_achievements[i]['description'] }}</p>
@@ -45,7 +44,7 @@ hr {
                     {% for anime in user_achievements[i]['anime_name'] %}
                     <li class="p-0">{{ anime }}</li>
                     {% endfor %}
-                    <div class="m-b-30">----------------------------------------</div>
+                    <div class="m-b-20">----------------------------------------</div>
                 </div>
             </div>
         </div>
@@ -56,20 +55,5 @@ hr {
 
 
 {% block script %}
-<script>
-$(".projects>div>a").on("click", function(e) {
-    e.preventDefault();
-    var div = $(this).parent(),
-    div_height = div.height(),
-    details = div.find(".details"),
-    details_height = details.height(),
-    new_height = details_height;
-    div.toggleClass("current").animate({
-        paddingBottom: '0'}, {duration: 500, queue: false }).siblings().removeClass("current");
-    $(".projects div:not(.current)").animate({
-        paddingBottom: '0'}, {duration: 500, queue: false }).find(".details").slideUp(500);
-    $(".current").find(".details").slideDown(500);
-});
-</script>
 {% endblock script %}
 

@@ -62,7 +62,7 @@ legend {
         {% for i in range(0, data|length) %}
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="/static/img/levels_ranks/{{ data[i][0] }}.ico" alt="">
+                <img height='60' width="60" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data[i][0] }}.ico" alt="">
             </td>
             <td>
                 <strong>{{ data[i][1] }}</strong>
