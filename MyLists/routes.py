@@ -515,7 +515,7 @@ def change_password():
 @app.route("/hall_of_fame")
 @login_required
 def hall_of_fame():
-    # Get list of all users except admin
+
     users = User.query.filter(User.id >= "2").order_by(User.username.asc()).all()
 
     current_user_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="accepted").all()
@@ -528,42 +528,14 @@ def hall_of_fame():
     for friend in current_user_pending_friends:
         friends_pending_list.append(friend.friend_id)
 
-    # hall of fame
-    all_user_data = []
+    all_users_data = []
     for user in users:
-        ranks_and_levels_series = get_all_account_stats(user.id, ListType.SERIES)
-        ranks_and_levels_anime = get_all_account_stats(user.id, ListType.ANIME)
-        ranks_and_levels_books = get_all_account_stats(user.id, ListType.BOOK)
-
-        # Knowledge level calculation + Grade
-        knowledge_level = int(ranks_and_levels_series[3][0]) + int(ranks_and_levels_anime[3][0]) + int(ranks_and_levels_books[3][0])
-
-        list_all_knowledge_ranks = []
-        if platform.system() == "Windows":
-            path = os.path.join(app.root_path, "static\\img\\knowledge_ranks\\knowledge_ranks.csv")
-        else:  # Linux & macOS
-            path = os.path.join(app.root_path, "static/img/knowledge_ranks/knowledge_ranks.csv")
-        with open(path, 'r') as fp:
-            for line in fp:
-                list_all_knowledge_ranks.append(line.split(";"))
-
-        user_knowledge_rank = []
-        # Check if the user has a level greater than 345
-        if int(knowledge_level) > 345:
-            user_knowledge_rank.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
-        else:
-            for rank in list_all_knowledge_ranks:
-                if str(rank[0]) == str(knowledge_level):
-                    user_knowledge_rank.append([str(rank[1]), str(rank[2])])
-
-        # profile picture
-        profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
-        user_data = {"profile_picture": profile_picture,
-                     "username": user.username,
-                     "series": ranks_and_levels_series,
-                     "anime": ranks_and_levels_anime,
-                     "books": ranks_and_levels_books,
-                     "total": [knowledge_level, user_knowledge_rank]}
+        user_data = {"username": user.username,
+                     "profile_picture": user.image_file,
+                     "time_series": user.time_spent_series,
+                     "time_anime": user.time_spent_anime,
+                     "time_books": user.time_spent_book,
+                     "time_total": user.time_spent_series + user.time_spent_anime + user.time_spent_book}
 
         if user.id in friends_list:
             user_data["isfriend"] = True
@@ -574,16 +546,87 @@ def hall_of_fame():
             else:
                 user_data["ispendingfriend"] = False
             user_data["isfriend"] = False
-        if str(user.id) == current_user.get_id():
+
+        if user.id == current_user.id:
             user_data["isprivate"] = False
             user_data["iscurrentuser"] = True
         else:
             user_data["isprivate"] = user.private
             user_data["iscurrentuser"] = False
 
-        all_user_data.append(user_data)
+        all_users_data.append(user_data)
 
-    return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_user_data)
+    return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
+
+    # Get list of all users except admin
+    # users = User.query.filter(User.id >= "2").order_by(User.username.asc()).all()
+    #
+    # current_user_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="accepted").all()
+    # friends_list = []
+    # for friend in current_user_friends:
+    #     friends_list.append(friend.friend_id)
+    #
+    # current_user_pending_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="request").all()
+    # friends_pending_list = []
+    # for friend in current_user_pending_friends:
+    #     friends_pending_list.append(friend.friend_id)
+    #
+    # # hall of fame
+    # all_user_data = []
+    # for user in users:
+    #     ranks_and_levels_series = get_all_account_stats(user.id, ListType.SERIES)
+    #     ranks_and_levels_anime = get_all_account_stats(user.id, ListType.ANIME)
+    #     ranks_and_levels_books = get_all_account_stats(user.id, ListType.BOOK)
+    #
+    #     # Knowledge level calculation + Grade
+    #     knowledge_level = int(ranks_and_levels_series[3][0]) + int(ranks_and_levels_anime[3][0]) + int(ranks_and_levels_books[3][0])
+    #
+    #     list_all_knowledge_ranks = []
+    #     if platform.system() == "Windows":
+    #         path = os.path.join(app.root_path, "static\\img\\knowledge_ranks\\knowledge_ranks.csv")
+    #     else:  # Linux & macOS
+    #         path = os.path.join(app.root_path, "static/img/knowledge_ranks/knowledge_ranks.csv")
+    #     with open(path, 'r') as fp:
+    #         for line in fp:
+    #             list_all_knowledge_ranks.append(line.split(";"))
+    #
+    #     user_knowledge_rank = []
+    #     # Check if the user has a level greater than 345
+    #     if int(knowledge_level) > 345:
+    #         user_knowledge_rank.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
+    #     else:
+    #         for rank in list_all_knowledge_ranks:
+    #             if str(rank[0]) == str(knowledge_level):
+    #                 user_knowledge_rank.append([str(rank[1]), str(rank[2])])
+    #
+    #     # profile picture
+    #     profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
+    #     user_data = {"profile_picture": profile_picture,
+    #                  "username": user.username,
+    #                  "series": ranks_and_levels_series,
+    #                  "anime": ranks_and_levels_anime,
+    #                  "books": ranks_and_levels_books,
+    #                  "total": [knowledge_level, user_knowledge_rank]}
+    #
+    #     if user.id in friends_list:
+    #         user_data["isfriend"] = True
+    #         user_data["ispendingfriend"] = False
+    #     else:
+    #         if user.id in friends_pending_list:
+    #             user_data["ispendingfriend"] = True
+    #         else:
+    #             user_data["ispendingfriend"] = False
+    #         user_data["isfriend"] = False
+    #     if str(user.id) == current_user.get_id():
+    #         user_data["isprivate"] = False
+    #         user_data["iscurrentuser"] = True
+    #     else:
+    #         user_data["isprivate"] = user.private
+    #         user_data["iscurrentuser"] = False
+    #
+    #     all_user_data.append(user_data)
+    #
+    # return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_user_data)
 
 
 @app.route("/achievements/<user_name>")
@@ -1042,31 +1085,40 @@ def update_element_season():
         db.session.commit()
         app.logger.info('[{}] Season of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, season + 1))
 
-    # Add/replace the total number of episodes watched by the user for this element
+    # Compute total anime time spent
     if element_type == "ANIME":
-        last_episode_watched = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().last_episode_watched
-        current_season = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().current_season
-        episodes_counter = 0
-        for i in range(1, current_season):
-            ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=i).first().episodes
-            episodes_counter += ep
-        total_episodes_watched = int(episodes_counter) + int(last_episode_watched)
-        update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
-        update.number_of_episodes_watched = total_episodes_watched
-        db.session.commit()
-        app.logger.info('[{}] Total episode watched of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
+        data = db.session.query(AnimeList, Anime,
+                                func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                join(Anime, Anime.id == AnimeList.anime_id). \
+                                join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
+                                filter(AnimeList.user_id == current_user.id). \
+                                group_by(AnimeList.anime_id).all()
     elif element_type == "SERIES":
-        last_episode_watched = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first().last_episode_watched
-        current_season = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first().current_season
-        episodes_counter = 0
-        for i in range(1, current_season):
-            ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=i).first().episodes
-            episodes_counter += ep
-        total_episodes_watched = int(episodes_counter) + int(last_episode_watched)
-        update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
-        update.number_of_episodes_watched = total_episodes_watched
-        db.session.commit()
-        app.logger.info('[{}] Total episode watched of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
+        data = db.session.query(SeriesList, Series,
+                                func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                                join(Series, Series.id == SeriesList.series_id). \
+                                join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
+                                filter(SeriesList.user_id == current_user.id). \
+                                group_by(SeriesList.series_id).all()
+
+    total_time = 0
+    for element in data:
+        if element[0].status == Status.COMPLETED:
+            total_time += element[1].episode_duration * element[1].total_episodes
+        elif element[0].status != Status.PLAN_TO_WATCH:
+            episodes = element[2].split(",")
+            episodes = [int(x) for x in episodes]
+            for i in range(1, element[0].current_season):
+                total_time += element[1].episode_duration * episodes[i - 1]
+            total_time += element[0].last_episode_watched * element[1].episode_duration
+
+    time_spent = User.query.filter_by(id=current_user.id).first()
+    if element_type == "ANIME":
+        time_spent.time_spent_anime = total_time
+    elif element_type == "SERIES":
+        time_spent.time_spent_series = total_time
+
+    db.session.commit()
 
     return '', 204
 
@@ -1128,29 +1180,41 @@ def update_element_episode():
         db.session.commit()
         app.logger.info('[{}] Episode of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, episode + 1))
 
-    # Add/replace the total number of episodes watched by the user for this element
+    # Compute total anime time spent
     if element_type == "ANIME":
-        last_episode_watched = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().last_episode_watched
-        episodes_counter = 0
-        for i in range(1, current_season):
-            ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=i).first().episodes
-            episodes_counter += ep
-        total_episodes_watched = int(episodes_counter) + int(last_episode_watched)
-        update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
-        update.number_of_episodes_watched = total_episodes_watched
-        db.session.commit()
-        app.logger.info('[{}] Total episode watched of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
+        data = db.session.query(AnimeList, Anime,
+                                func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                join(Anime, Anime.id == AnimeList.anime_id). \
+                                join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
+                                filter(AnimeList.user_id == current_user.id). \
+                                group_by(AnimeList.anime_id).all()
     elif element_type == "SERIES":
-        last_episode_watched = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first().last_episode_watched
-        episodes_counter = 0
-        for i in range(1, current_season):
-            ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=i).first().episodes
-            episodes_counter += ep
-        total_episodes_watched = int(episodes_counter) + int(last_episode_watched)
-        update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
-        update.number_of_episodes_watched = total_episodes_watched
-        db.session.commit()
-        app.logger.info('[{}] Total episode watched of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
+        data = db.session.query(SeriesList, Series,
+                                func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                                join(Series, Series.id == SeriesList.series_id). \
+                                join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
+                                filter(SeriesList.user_id == current_user.id). \
+                                group_by(SeriesList.series_id).all()
+
+    total_time = 0
+    for element in data:
+        if element[0].status == Status.COMPLETED:
+            total_time += element[1].episode_duration * element[1].total_episodes
+        elif element[0].status != Status.PLAN_TO_WATCH:
+            episodes = element[2].split(",")
+            episodes = [int(x) for x in episodes]
+            for i in range(1, element[0].current_season):
+                total_time += element[1].episode_duration * episodes[i - 1]
+            total_time += element[0].last_episode_watched * element[1].episode_duration
+
+    time_spent = User.query.filter_by(id=current_user.id).first()
+    if element_type == "ANIME":
+        time_spent.time_spent_anime = total_time
+    elif element_type == "SERIES":
+        time_spent.time_spent_series = total_time
+
+    db.session.commit()
+
     return '', 204
 
 
@@ -1193,6 +1257,41 @@ def delete_element():
         SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).delete()
         db.session.commit()
         app.logger.info('[{}] Series with ID {} deleted'.format(current_user.get_id(), element_id))
+
+    # Compute total anime time spent
+    if element_type == "ANIME":
+        data = db.session.query(AnimeList, Anime,
+                                func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                join(Anime, Anime.id == AnimeList.anime_id). \
+                                join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
+                                filter(AnimeList.user_id == current_user.id). \
+                                group_by(AnimeList.anime_id).all()
+    elif element_type == "SERIES":
+        data = db.session.query(SeriesList, Series,
+                                func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                                join(Series, Series.id == SeriesList.series_id). \
+                                join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
+                                filter(SeriesList.user_id == current_user.id). \
+                                group_by(SeriesList.series_id).all()
+
+    total_time = 0
+    for element in data:
+        if element[0].status == Status.COMPLETED:
+            total_time += element[1].episode_duration * element[1].total_episodes
+        elif element[0].status != Status.PLAN_TO_WATCH:
+            episodes = element[2].split(",")
+            episodes = [int(x) for x in episodes]
+            for i in range(1, element[0].current_season):
+                total_time += element[1].episode_duration * episodes[i - 1]
+            total_time += element[0].last_episode_watched * element[1].episode_duration
+
+    time_spent = User.query.filter_by(id=current_user.id).first()
+    if element_type == "ANIME":
+        time_spent.time_spent_anime = total_time
+    elif element_type == "SERIES":
+        time_spent.time_spent_series = total_time
+
+    db.session.commit()
 
     return '', 204
 
@@ -2442,17 +2541,36 @@ def add_element_in_base(element_data, element_cover_id, list_type):
 
 def add_element_to_user(element_id, user_id, list_type):
     if list_type == ListType.SERIES:
-        episode_duration = Series.query.filter_by(id=element_id).first().episode_duration
         user_list = SeriesList(user_id=user_id,
                                series_id=element_id,
                                current_season=1,
                                last_episode_watched=1,
-                               status=Status.WATCHING,
-                               episode_duration=episode_duration,
-                               number_of_episodes_watched=1)
-
+                               status=Status.WATCHING)
         app.logger.info('[{}] Added series with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
+
+        # Compute total series time spent
+        all_series_data = db.session.query(SeriesList, Series,
+                                           func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                                           join(Series, Series.id == SeriesList.series_id). \
+                                           join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
+                                           filter(SeriesList.user_id == user_id). \
+                                           group_by(SeriesList.series_id).all()
+
+        total_time = 0
+        for element in all_series_data:
+            if element[0].status == Status.COMPLETED:
+                total_time += element[1].episode_duration * element[1].total_episodes
+            elif element[0].status != Status.PLAN_TO_WATCH:
+                episodes = element[2].split(",")
+                episodes = [int(x) for x in episodes]
+                for i in range(1, element[0].current_season):
+                    total_time += element[1].episode_duration * episodes[i-1]
+                total_time += element[0].last_episode_watched * element[1].episode_duration
+
+        time_spent = User.query.filter_by(id=user_id).first()
+        time_spent.time_spent_series = total_time
+
         db.session.commit()
     elif list_type == ListType.ANIME:
         episode_duration = Anime.query.filter_by(id=element_id).first().episode_duration
@@ -2460,12 +2578,33 @@ def add_element_to_user(element_id, user_id, list_type):
                               anime_id=element_id,
                               current_season=1,
                               last_episode_watched=1,
-                              status=Status.WATCHING,
-                              episode_duration=episode_duration,
-                              number_of_episodes_watched=1)
+                              status=Status.WATCHING)
 
         app.logger.info('[{}] Added anime with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
+
+        # Compute total anime time spent
+        all_anime_data = db.session.query(AnimeList, Anime,
+                                          func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                          join(Anime, Anime.id == AnimeList.anime_id). \
+                                          join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
+                                          filter(AnimeList.user_id == user_id). \
+                                          group_by(AnimeList.anime_id).all()
+
+        total_time = 0
+        for element in all_anime_data:
+            if element[0].status == Status.COMPLETED:
+                total_time += element[1].episode_duration * element[1].total_episodes
+            elif element[0].status != Status.PLAN_TO_WATCH:
+                episodes = element[2].split(",")
+                episodes = [int(x) for x in episodes]
+                for i in range(1, element[0].current_season):
+                    total_time += element[1].episode_duration * episodes[i-1]
+                total_time += element[0].last_episode_watched * element[1].episode_duration
+
+        time_spent = User.query.filter_by(id=user_id).first()
+        time_spent.time_spent_anime = total_time
+
         db.session.commit()
     elif list_type == ListType.BOOK:
         user_list = BookList(user_id=user_id,

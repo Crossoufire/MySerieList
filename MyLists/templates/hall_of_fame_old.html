@@ -77,22 +77,30 @@ hr {
             <tr>
             {% if current_user.get_id() == '1' %}
                 <td>
-                    <img src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
+                    <img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
                 </td>
                 <td>
                     <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
                 </td>
                 <td>
-                    {{ user['time_series'] }}
+                    <img src="static/img/levels_ranks/{{user['series'][4][0][0] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
                 </td>
                 <td>
-                    {{ user['time_anime'] }}
+                    <img src="/static/img/levels_ranks/{{ user['anime'][4][0][0] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['anime'][3][0] }} ({{ user['anime'][3][1] }}%)
                 </td>
                 <td>
-                    {{ user['time_books'] }}
+                    <img src="/static/img/levels_ranks/{{ user['books'][4][0][0] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['books'][3][0] }} ({{ user['books'][3][1] }}%)
                 </td>
                 <td>
-                    {{ user['time_total'] }}
+                    <img src="/static/img/knowledge_ranks/{{ user['total'][1][0][0] }}.png" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['total'][0] }}
                 </td>
                 <td></td>
 
@@ -104,16 +112,24 @@ hr {
                     <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
                 </td>
                 <td class="current_user">
-                    {{ user['time_series'] }}
+                    <img src="/static/img/levels_ranks/{{ user['series'][4][0][0] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
                 </td>
                 <td class="current_user">
-                    {{ user['time_anime'] }}
+                    <img src="/static/img/levels_ranks/{{ user['anime'][4][0][0] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['anime'][3][0] }} ({{ user['anime'][3][1] }}%)
                 </td>
                 <td class="current_user">
-                    {{ user['time_books'] }}
+                    <img src="/static/img/levels_ranks/{{ user['books'][4][0][0] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['books'][3][0] }} ({{ user['books'][3][1] }}%)
                 </td >
                 <td class="current_user">
-                    {{ user['time_total'] }}
+                    <img src="/static/img/knowledge_ranks/{{ user['total'][1][0][0] }}.png" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['total'][0] }}
                 </td>
                 <td class="current_user"></td>
 
@@ -125,16 +141,24 @@ hr {
                     <b>Anonymous</b>
                 </td>
                 <td>
-                    {{ user['time_series'] }}
+                    <img src="/static/img/levels_ranks/{{ user['series'][4][0][0] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
                 </td>
                 <td>
-                    {{ user['time_anime'] }}
+                    <img src="/static/img/levels_ranks/{{ user['anime'][4][0][0] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['anime'][3][0] }} ({{ user['anime'][3][1] }}%)
                 </td>
                 <td>
-                    {{ user['time_books'] }}
+                    <img src="/static/img/levels_ranks/{{ user['books'][4][0][0] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['books'][3][0] }} ({{ user['books'][3][1] }}%)
                 </td>
                 <td>
-                    {{ user['time_total'] }}
+                    <img src="/static/img/knowledge_ranks/{{ user['total'][1][0][0] }}.png" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['total'][0] }}
                 </td>
                 <td></td>
 
@@ -146,16 +170,24 @@ hr {
                     <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
                 </td>
                 <td>
-                    {{ user['time_series'] }}
+                    <img src="/static/img/levels_ranks/{{ user['series'][4][0][0] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['series'][3][0] }} ({{ user['series'][3][1] }}%)
                 </td>
                 <td>
-                    {{ user['time_anime'] }}
+                    <img src="/static/img/levels_ranks/{{ user['anime'][4][0][0] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['anime'][3][0] }} ({{ user['anime'][3][1] }}%)
                 </td>
                 <td>
-                    {{ user['time_books'] }}
+                    <img src="/static/img/levels_ranks/{{ user['books'][4][0][0] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['books'][3][0] }} ({{ user['books'][3][1] }}%)
                 </td>
                 <td>
-                    {{ user['time_total'] }}
+                    <img src="/static/img/knowledge_ranks/{{ user['total'][1][0][0] }}.png" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['total'][0] }}
                 </td>
 
                 {% if user["isfriend"] %}
