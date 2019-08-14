@@ -348,19 +348,25 @@ body.loading .modal_loading {
 {% block fixed %}
 <div class="d-flex flex-wrap">
     <div class="ml-auto">
-        <a id="collapse_all" class="fas fa-eye-slash text-light m-r-5" onclick="hide_all_cat()"></a>
-        <a id="show_cat_all" class="d-none" onclick="show_all_cat()"></a>
-        <a id="collapse_show" class="m-r-5 text-light" onclick="hide_all_cat()">Collapse all</a>
+        <a id="collapse_container" onclick="hide_all_cat()">
+            <span id="collapse_all" class="fas fa-eye-slash text-light m-r-5"></span>
+            <span id="show_cat_all" class="d-none"></span>
+            <span id="collapse_show" class="m-r-5 text-light">Collapse all</span>
+        </a>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
-        <a class="fas fa-bars text-light" onclick="openNav()"></a>
-        <a class="m-r-5 text-light" onclick="openNav()">Categories</a>
+        <a id="nav_container" onclick="openNav()">
+            <span class="fas fa-bars text-light"></span>
+            <span class="text-light">Categories</span>
+        </a>
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
-        <a class="fas fa-th text-light" href="{{ url_for('mybookslist', user_name=user_name) }}"></a>
-        <a class="m-r-5 text-light" href="{{ url_for('mybookslist', user_name=user_name) }}">Grid View</a>
+        <a id="view_container" href="{{ url_for('mybookslist', user_name=user_name) }}">
+            <span class="fas fa-bars text-light"></span>
+            <span class="text-light">Grid view</span>
+        </a>
     </div>
 </div>
 {% endblock fixed %}
@@ -877,12 +883,10 @@ function hide_all_cat() {
     hide.className = "d-none";
     show.className = "fas fa-eye text-light m-r-5";
     $('#collapse_show').text('Expand All');
-    $('#collapse_show').attr('onclick', 'show_all_cat()');
+    $('#collapse_container').attr('onclick', 'show_all_cat()');
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-right');
 }
-</script>
 
-<script type="text/javascript">
 function show_all_cat() {
     var show = document.getElementById('show_cat_all');
     var hide = document.getElementById('collapse_all');
@@ -890,7 +894,7 @@ function show_all_cat() {
     hide.className = "fas fa-eye-slash text-light m-r-5";
     show.className = "d-none";
     $('#collapse_show').text('Collapse All');
-    $('#collapse_show').attr('onclick', 'hide_all_cat()');
+    $('#collapse_container').attr('onclick', 'hide_all_cat()');
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-down');
 }
 </script>
@@ -914,12 +918,12 @@ function hide(category, arrow) {
 <script type="text/javascript">
 function openNav() {
     document.getElementById("mySidenav").style.width = "180px";
+    $('#nav_container').attr('onclick', 'closeNav()');
 }
-</script>
 
-<script type="text/javascript">
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
+    $('#nav_container').attr('onclick', 'openNav()');
 }
 </script>
 

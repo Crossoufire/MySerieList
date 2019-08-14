@@ -97,6 +97,7 @@ def create_user():
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
+    image_error = url_for('static', filename='img/error.jpg')
     login_form = LoginForm()
     register_form = RegistrationForm()
 
@@ -107,11 +108,24 @@ def home():
             flash('Your Account is not activated. Please check your e-mail address to activate your account.', 'danger')
         elif user and bcrypt.check_password_hash(user.password, login_form.login_password.data):
             login_user(user, remember=login_form.login_remember.data)
-            next_page = request.args.get('next')
             app.logger.info('[{}] Logged in'.format(user.id))
             flash("You're now logged in. Welcome {0}".format(login_form.login_username.data), "success")
-            home_page = str(user.homepage.value)
-            return redirect(next_page) if next_page else redirect(url_for(home_page, user_name=current_user.username))
+            next_page = request.args.get('next')
+            if next_page is None:
+                if user.homepage == HomePage.MYSERIESLIST:
+                    return redirect(url_for('mymedialist', media_list='serieslist', user_name=current_user.username))
+                elif user.homepage == HomePage.MYANIMESLIST:
+                    return redirect(url_for('mymedialist', media_list='animelist', user_name=current_user.username))
+                elif user.homepage == HomePage.MYBOOKSLIST:
+                    return redirect(url_for('mybookslist', user_name=current_user.username))
+                elif user.homepage == HomePage.ACCOUNT:
+                    return redirect(url_for('account', user_name=current_user.username))
+                elif user.homepage == HomePage.HALL_OF_FAME:
+                    return redirect(url_for('hall_of_fame'))
+                else:
+                    return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+            else:
+                return redirect(next_page)
         else:
             flash('Login Failed. Please check Username and Password', 'warning')
 
@@ -139,15 +153,15 @@ def home():
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.get_id()).first()
         if user.homepage == HomePage.MYSERIESLIST:
-            return redirect(url_for('myserieslist', user_name=current_user.username))
+            return redirect(url_for('mymedialist', media_list='serieslist', user_name=current_user.username))
         elif user.homepage == HomePage.MYANIMESLIST:
-            return redirect(url_for('myanimeslist', user_name=current_user.username))
+            return redirect(url_for('mymedialist', media_list='animelist', user_name=current_user.username))
         elif user.homepage == HomePage.MYBOOKSLIST:
             return redirect(url_for('mybookslist', user_name=current_user.username))
         elif user.homepage == HomePage.ACCOUNT:
             return redirect(url_for('account', user_name=current_user.username))
         elif user.homepage == HomePage.HALL_OF_FAME:
-            return redirect(url_for('hall_of_fame', user_name=current_user.username))
+            return redirect(url_for('hall_of_fame'))
     else:
         home_header = url_for('static', filename='img/home_header.jpg')
         img1 = url_for('static', filename='img/home_img1.jpg')

@@ -321,9 +321,11 @@ hr {
 {% block fixed %}
 <div class="d-flex flex-wrap">
     <div class="ml-auto">
-        <a id="collapse_all" class="fas fa-eye-slash text-light m-r-5" onclick="hide_all_cat()"></a>
-        <a id="show_cat_all" class="d-none" onclick="show_all_cat()"></a>
-        <a id="collapse_show" class="m-r-5 text-light" onclick="hide_all_cat()">Collapse all</a>
+        <a id="collapse_container" onclick="hide_all_cat()">
+            <span id="collapse_all" class="fas fa-eye-slash text-light m-r-5"></span>
+            <span id="show_cat_all" class="d-none"></span>
+            <span id="collapse_show" class="m-r-5 text-light">Collapse all</span>
+        </a>
     </div>
 </div>
 {% endblock fixed %}
@@ -991,8 +993,8 @@ function hide_all_cat() {
     $('div[id^="collapse"]').attr('class', 'd-none');
     hide.className = "d-none";
     show.className = "fas fa-eye text-light m-r-5";
-    $('#collapse_show').text('Expand All');
-    $('#collapse_show').attr('onclick', 'show_all_cat()');
+    $('#collapse_show').text('Expand all');
+    $('#collapse_container').attr('onclick', 'show_all_cat()');
     $('.collapse_all').attr('class', 'collapse_all fas fa-xs fa-chevron-right');
 }
 
@@ -1002,8 +1004,8 @@ function show_all_cat() {
     $('div[id^="collapse"]').attr('class', 'container-stats');
     hide.className = "fas fa-eye-slash text-light m-r-5";
     show.className = "d-none";
-    $('#collapse_show').text('Collapse All');
-    $('#collapse_show').attr('onclick', 'hide_all_cat()');
+    $('#collapse_show').text('Collapse all');
+    $('#collapse_container').attr('onclick', 'hide_all_cat()');
     $('.collapse_all').attr('class', 'collapse_all fas fa-xs fa-chevron-down');
 }
 {% if user_id == current_user.get_id() %}
