@@ -1041,8 +1041,8 @@ def update_element_season():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element exists
-    valide_types = ["ANIME", "SERIES"]
-    if element_type not in valide_types:
+    valid_types = ["ANIME", "SERIES"]
+    if element_type not in valid_types:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
     if element_type == "ANIME":
         if Anime.query.filter_by(id=element_id).first() is None:
@@ -1085,7 +1085,7 @@ def update_element_season():
         db.session.commit()
         app.logger.info('[{}] Season of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, season + 1))
 
-    # Compute total anime time spent
+    # Compute total time spent
     if element_type == "ANIME":
         data = db.session.query(AnimeList, Anime,
                                 func.group_concat(AnimeEpisodesPerSeason.episodes)). \
@@ -1180,7 +1180,7 @@ def update_element_episode():
         db.session.commit()
         app.logger.info('[{}] Episode of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, episode + 1))
 
-    # Compute total anime time spent
+    # Compute total time spent
     if element_type == "ANIME":
         data = db.session.query(AnimeList, Anime,
                                 func.group_concat(AnimeEpisodesPerSeason.episodes)). \
@@ -1258,7 +1258,7 @@ def delete_element():
         db.session.commit()
         app.logger.info('[{}] Series with ID {} deleted'.format(current_user.get_id(), element_id))
 
-    # Compute total anime time spent
+    # Compute total time spent
     if element_type == "ANIME":
         data = db.session.query(AnimeList, Anime,
                                 func.group_concat(AnimeEpisodesPerSeason.episodes)). \
