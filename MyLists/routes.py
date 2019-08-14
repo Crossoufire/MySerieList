@@ -724,7 +724,7 @@ def delete_friend():
     return '', 204
 
 
-#################################################### Anime/Series routes ###############################################
+#################################################### Media routes ######################################################
 
 
 @app.route("/<media_list>/<user_name>", methods=['GET', 'POST'])
@@ -2152,7 +2152,7 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         try:
             episode_duration = element_data["episode_run_time"][0]
         except:
-            episode_duration = None
+            episode_duration = 0
 
         try:
             origin_country = ""
