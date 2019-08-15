@@ -1675,6 +1675,7 @@ def get_total_time_spent(user_id, list_type):
 
             total_episodes_watched = element.number_of_episodes_watched
             time_spent_min += total_episodes_watched*episode_duration
+            episodes_counter += total_episodes_watched
 
         time_spent_hours = int((time_spent_min/60))
         time_spent_days = round(time_spent_min/(60*24), 1)
