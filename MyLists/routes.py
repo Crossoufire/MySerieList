@@ -297,6 +297,7 @@ def account(user_name):
 
     # Series Statistics, scores and level
     series_stats = get_all_account_stats(user.id, ListType.SERIES)
+    print(series_stats)
     # Animes Statistics, scores and level
     anime_stats = get_all_account_stats(user.id, ListType.ANIME)
     # Books Statistics, scores, and level
@@ -1645,6 +1646,7 @@ def get_total_time_spent(user_id, list_type):
 
             total_episodes_watched = element.number_of_episodes_watched
             time_spent_min += total_episodes_watched*episode_duration
+            episodes_counter += total_episodes_watched
 
         time_spent_hours = int((time_spent_min/60))
         time_spent_days = round(time_spent_min/(60*24), 1)
