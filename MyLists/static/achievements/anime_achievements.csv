@@ -16,8 +16,8 @@ A;75;anime-horror-2;Horror: level 2;Too Many Teeth;You know something is followi
 A;150;anime-horror-3;Horror: level 3;Extreme Phobia;You are terrified, you are transfixed.;genre;14
 A;300;anime-horror-4;Trauma: level MAX;Flowers of Flesh and Blood;It's far too late, now.;genre;14
 A;30;anime-mecha-1;Mecha: level 1;Me? PILOT This Thing?!;A secret organization wants you to pilot a huge mecha. Can you do it?;genre;18
-A;75;anime-mecha-2;Mecha: level 2;Engineer;After watching over 59 mecha anime you should be able to build your own mobile suit. Remember not to kill the rest of us.;genre;18
-A;150;anime-mecha-3;Mecha: level 3;Mechazawa;Having watched over 118 mecha anime, you've probably become a robot already. Nice job, hero.;genre;18
+A;75;anime-mecha-2;Mecha: level 2;Engineer;After watching over 75 hours of meca anime you should be able to build your own mobile suit. Remember not to kill the rest of us.;genre;18
+A;150;anime-mecha-3;Mecha: level 3;Mechazawa;Having watched over 150 hours of mecha anime, you've probably become a robot already. Nice job, hero.;genre;18
 A;300;anime-mecha-4;Mecha: level MAX;Pierce the HEAVENS!;Do the impossible. See the invisible. ROW ROW FIGHT THE POWAH! You just sang that in your head, didn't you?;genre;18
 A;30;anime-music-1;Music: level 1;Gettin' Your Keys On!;You don't know what you've just listened to, but you like it.;genre;19
 A;75;anime-music-2;Music: level 2;This Is Even Better Live;Proudly display the badges you have earned in the fancafe.;genre;19
@@ -54,8 +54,8 @@ A;70;anime-finished-70;Passed 70 Mark;Gotta Watch Them All!;Watched 70 anime. Yo
 A;80;anime-finished-80;Passed 80 Mark;The Collector;Watched 80 animes. No, wait. The plural of anime is anime.;finished;
 A;90;anime-finished-90;Passed 90 Mark;The Maniac;Watched 90 anime. Is this healthy? You should contact your doctor.;finished;
 A;100;anime-finished-100;Passed 100 Mark;The Legend;Watched 100 anime. You're one of the chosen ones. You don't even have to brag, since everyone heard about you.;finished;
-A;110;anime-finished-110;Passed 110 Mark;Database Breaker;Watched 110 anime. Are you having fun, breaking all the rules?;finished;
-A;120;anime-finished-120;Passed 120 Mark;This Is It;Watched 120 anime. There is no higher level. You can stop now. Everyone, go home.;finished;
+A;200;anime-finished-110;Passed 200 Mark;Database Breaker;Watched 200 anime. Are you having fun, breaking all the rules?;finished;
+A;300;anime-finished-120;Passed 300 Mark;This Is It;Watched 300 anime. There is no higher level. You can stop now. Everyone, go home.;finished;
 A;30;anime-game-1;Visual Novel: level 1;Eternal Spring;It all started one fateful morning in April...;visual-novel;
 A;75;anime-game-2;Visual Novel: level 2;At the Gates of Eden;You're so close to heaven, you can almost feel it.;visual-novel;
 A;150;anime-game-3;Visual Novel: level 3;Banquet of the Golden Witch;You've challenged her to a game. There is no turning back, now.;visual-novel;
@@ -71,7 +71,7 @@ A;300;anime-release-classic-4;Nostalgia: level MAX;Blockbuster;Man, do you feel 
 A;10;anime-release-old;Pre-1980 Anime;VHS Master Race;Watched 10 old anime. You overwrote my cartoons with The Karate Kid?! MOOOM!;old;
 A;3;anime-score-very-low;0/10. Play Next One;Less Than Three;Mean anime score lower than 3. Is it hate, or is it love?;score;
 A;5;anime-score-low;My Eyes! It Hurts!;Watching Anime Is Suffering;Mean anime score lower than 5. Someone has to counterweight the fanboys, right?;score;
-A;8;anime-score-high;10/10! EVERYTHING!;I Love Chinese Cartoons;Mean anime score higher than 8. How about using the whole scale and re-rating stuff? That could make you look less like a fanboy...;score;
+A;8;anime-score-high;10/10! EVERYTHING!;I Love Japanese Cartoons;Mean anime score higher than 8. How about using the whole scale and re-rating stuff? That could make you look less like a fanboy...;score;
 A;30;anime-time-1;Time: level 1;Hair Antenna;Whose watch time are you calling puny?;time;
 A;75;anime-time-2;Time: level 2;Endurance Training;By doing a daily ten-episode run, you are sure to become a master in no time!;time;
 A;150;anime-time-3;Time: level 3;Consciousness Upload;Consuming the medium becomes a lot easier once you yourself are raw data.;time;
