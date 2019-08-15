@@ -829,6 +829,9 @@ def achievements(user_name):
 
     # Anime achievements
     user_achievements = get_achievements(user.id, ListType.ANIME)
+    col = 4
+    user_achievements_matrix = [user_achievements[i:i + col] for i in range(0, len(user_achievements), col)]
+
     user_number_achievements = 0
     for i in range(0, len(user_achievements)):
         if user_achievements[i]["threshold"] < user_achievements[i]["time_hours"]:
@@ -839,6 +842,7 @@ def achievements(user_name):
                            user_id=str(user.id),
                            user_name=user_name,
                            user_achievements=user_achievements,
+                           test=user_achievements_matrix,
                            user_number_achievements=user_number_achievements)
 
 

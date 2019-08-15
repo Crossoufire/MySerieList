@@ -23,7 +23,53 @@ hr {
     <div style="font-size: 14pt;" class="text-center mb-5">{{ user_name }} has unlocked {{ user_number_achievements }}/{{ user_achievements|length }} achievements.</div>
     {% endif %}
     <div class="projects row text-center p-0">
-        {% for i in range(0, user_achievements|length) %}
+        <table width="100%">
+            <tbody>
+            {% for i in range(0, test|length) %}
+                <tr>
+                    {% for j in range(0, test[0]|length) %}
+                    <td id="pr_{{ test[i][j]['image_id'] }}" class="filtered" onclick="test('det_{{ test[i][j]['image_id'] }}', 'pr_{{ test[i][j]['image_id'] }}', 'img_{{ test[i][j]['image_id'] }}')">
+                        <span style="font-size: 12pt;">{{ test[i][j]["level"] }}</span><br>
+                        <span style="font-size: 12pt;">{{ test[i][j]["time_hours"] }}/{{ test[i][j]["threshold"] }} hours watched</span><br>
+                        {% if test[i][j]["time_hours"] >= test[i][j]["threshold"] %}
+                        <img id="img_{{ test[i][j]['image_id'] }}" height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ test[i][j]['image_id'] }}.png"/>
+                        {% else %}
+                        <img height="100" width="200" style="filter: grayscale(100%);" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ test[i][j]['image_id'] }}.png"/>
+                        <span></span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                 </tr>
+                <tr>
+                    {% for j in range(0, test[0]|length) %}
+                    <td id="det_{{ test[i][j]['image_id'] }}" class="d-none" colspan="4" style="background: #2c3946; border: black 2px solid;">
+                        <div class="p-l-20 p-t-10 p-r-20">
+                            <span style="font-size: 14pt;">{{ test[i][j]["title"] }}</span><br>
+                            <span style="font-size: 13pt;">{{ test[i][j]["description"] }}</span><br>
+                            <div class="m-2"></div>
+                            <span style="font-size: 13pt;">Number of anime watched: {{ test[i][j]["anime_watched"] }}</span>
+                            <hr class="p-0 m-0">
+                            <ul class="p-t-10">
+                                {% for k in range(0, test[i][j]["anime_name"]|length) %}
+                                <li>
+                                    {{ test[i][j]["anime_name"][k] }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+        {#{% for i in range(0, user_achievements|length) %}
         <div class="text-center col m-b-30 p-b-0 p-l-20 p-r-20">
             <span>{{ user_achievements[i]["level"] }}</span><br>
             <span>{{ user_achievements[i]["time_hours"] }}/{{ user_achievements[i]["threshold"] }} hours watched</span><br>
@@ -50,7 +96,9 @@ hr {
         </div>
         {% endfor %}
     </div>
-</div>
+</div>#}
+
+
 {% endblock content %}
 
 
