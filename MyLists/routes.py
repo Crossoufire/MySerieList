@@ -2419,29 +2419,20 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         themoviedb_id   = element_data["id"]
 
         try:
-            created_by = ""
-            for person in element_data["created_by"]:
-                created_by = created_by + person["name"] + ", "
-            if len(element_data["created_by"]) > 0:
-                created_by = created_by[:-2]
-            else:
-                created_by = None
+            created_by = ', '.join(x['name'] for x in element_data['created_by'])
         except:
             created_by = None
 
         try:
             episode_duration = element_data["episode_run_time"][0]
         except:
-            episode_duration = 0
+            if list_type == ListType.ANIME:
+                episode_duration = 24
+            else:
+                episode_duration = 0
 
         try:
-            origin_country = ""
-            for country in element_data["origin_country"]:
-                origin_country = origin_country + country + ", "
-            if len(element_data["origin_country"]) > 0:
-                origin_country = origin_country[:-2]
-            else:
-                origin_country = None
+            origin_country = ", ".join(element_data["origin_country"])
         except:
             origin_country = None
 
