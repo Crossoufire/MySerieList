@@ -89,6 +89,40 @@ def create_user():
         achievements[i-1].type        = list_all_achievements[i][6]
         achievements[i-1].genre       = genre
 
+
+    if User.query.filter_by(id='2').first() is None:
+        admin = User(username='test',
+                     email='admin@admin.comm',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+
+    if User.query.filter_by(id='3').first() is None:
+        admin = User(username='test2',
+                     email='admin@admin.commm',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+
+    if User.query.filter_by(id='4').first() is None:
+        admin = User(username='test3',
+                     email='admin@admin.commmm',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+
     db.session.commit()
 
 
@@ -244,6 +278,11 @@ def logout():
 def account(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
+    account_data = {}
+    account_data["series"] = {}
+    account_data["anime"] = {}
+    account_data["book"] = {}
+    account_data["username"] = user_name
 
     add_friend_form = AddFriendForm()
     if add_friend_form.validate_on_submit():
@@ -261,65 +300,166 @@ def account(user_name):
     if current_user.id != user.id:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.private:
-            if current_user.get_id() == "1":
-                pass
-            elif friend is None or friend.status != "accepted":
+            if friend is None or friend.status != "accepted":
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
     # Profile picture
     profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
+    account_data["profile_picture"] = profile_picture
 
     # Friends list
-    friends_list = Friend.query.filter_by(user_id=user.id).all()
+    friends_list = db.session.query(User, Friend).\
+                   join(Friend, Friend.friend_id == User.id).\
+                   filter(Friend.user_id == user.id).\
+                   group_by(Friend.friend_id).\
+                   order_by(User.username)
+
     friends_list_data = []
     for friend in friends_list:
-        friend_data_2 = User.query.filter_by(id=friend.friend_id).first()
-        friend_data = {"username": friend_data_2.username,
-                       "user_id": friend.friend_id,
-                       "status": friend.status,
-                       "picture": friend_data_2.image_file}
+        friend_data = {"username": friend[0].username,
+                       "user_id": friend[0].id,
+                       "status": friend[1].status,
+                       "picture": friend[0].image_file}
         friends_list_data.append(friend_data)
 
-    # Series Statistics, scores and level
-    series_stats = get_all_account_stats(user.id, ListType.SERIES)
-    # Animes Statistics, scores and level
-    anime_stats = get_all_account_stats(user.id, ListType.ANIME)
-    # Books Statistics, scores, and level
-    book_stats = get_all_account_stats(user.id, ListType.BOOK)
+    account_data["friends"] = friends_list_data
 
-    # Knowledge level calculation + Grade
-    knowledge_level = int(series_stats[3][0]) + int(anime_stats[3][0]) + int(book_stats[3][0])
+    # Time spent
+    account_data["series"]["time_spent_hour"] = round(user.time_spent_series / 60)
+    account_data["anime"]["time_spent_hour"] = round(user.time_spent_anime / 60)
+    account_data["book"]["time_spent_hour"] = round(user.time_spent_book / 60)
 
-    list_all_knowledge_ranks = []
-    if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\\img\\knowledge_ranks\\knowledge_ranks.csv")
-    else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/img/knowledge_ranks/knowledge_ranks.csv")
-    with open(path, 'r') as fp:
-        for line in fp:
-            list_all_knowledge_ranks.append(line.split(";"))
+    account_data["series"]["time_spent_day"] = round(user.time_spent_series / 1440, 1)
+    account_data["anime"]["time_spent_day"] = round(user.time_spent_anime / 1440, 1)
+    account_data["book"]["time_spent_day"] = round(user.time_spent_book / 1440, 1)
 
-    user_knowledge_rank = []
-    # Check if the user has a level greater than 345
-    if int(knowledge_level) > 345:
-        user_knowledge_rank.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
+    # Mean score
+    account_data["series"]["mean_score"] = get_mean_score(user.id, ListType.SERIES)
+    account_data["anime"]["mean_score"] = get_mean_score(user.id, ListType.ANIME)
+    account_data["book"]["mean_score"] = get_mean_score(user.id, ListType.BOOK)
+
+    # Count elements of each category
+    series_count = get_list_count(user.id, ListType.SERIES)
+    account_data["series"]["watching_count"]    = series_count["watching"]
+    account_data["series"]["completed_count"]   = series_count["completed"]
+    account_data["series"]["onhold_count"]      = series_count["onhold"]
+    account_data["series"]["random_count"]      = series_count["random"]
+    account_data["series"]["dropped_count"]     = series_count["dropped"]
+    account_data["series"]["plantowatch_count"] = series_count["plantowatch"]
+    account_data["series"]["total_count"]       = series_count["total"]
+
+    anime_count = get_list_count(user.id, ListType.ANIME)
+    account_data["anime"]["watching_count"]     = anime_count["watching"]
+    account_data["anime"]["completed_count"]    = anime_count["completed"]
+    account_data["anime"]["onhold_count"]       = anime_count["onhold"]
+    account_data["anime"]["random_count"]       = anime_count["random"]
+    account_data["anime"]["dropped_count"]      = anime_count["dropped"]
+    account_data["anime"]["plantowatch_count"]  = anime_count["plantowatch"]
+    account_data["anime"]["total_count"]        = anime_count["total"]
+
+    book_count = get_list_count(user.id, ListType.BOOK)
+    account_data["book"]["reading_count"]       = book_count["reading"]
+    account_data["book"]["completed_count"]     = book_count["completed"]
+    account_data["book"]["onhold_count"]        = book_count["onhold"]
+    account_data["book"]["dropped_count"]       = book_count["dropped"]
+    account_data["book"]["plantoread_count"]    = book_count["plantoread"]
+    account_data["book"]["total_count"]         = book_count["total"]
+
+    # Count number of episodes
+    all_series_data = db.session.query(SeriesList, SeriesEpisodesPerSeason,
+                                       func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                                       join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
+                                       filter(SeriesList.user_id == user.id). \
+                                       group_by(SeriesList.series_id)
+
+    nb_episodes_watched = 0
+    for element in all_series_data:
+        episodes = element[2].split(",")
+        episodes = [int(x) for x in episodes]
+        for i in range(1, element[0].current_season):
+            nb_episodes_watched += episodes[i - 1]
+        nb_episodes_watched += element[0].last_episode_watched
+    account_data["series"]["nb_ep_watched"] = nb_episodes_watched
+
+    all_anime_data = db.session.query(AnimeList, AnimeEpisodesPerSeason,
+                                      func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                      join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
+                                      filter(AnimeList.user_id == user.id). \
+                                      group_by(AnimeList.anime_id)
+
+    nb_episodes_watched = 0
+    for element in all_anime_data:
+        episodes = element[2].split(",")
+        episodes = [int(x) for x in episodes]
+        for i in range(1, element[0].current_season):
+            nb_episodes_watched += episodes[i - 1]
+        nb_episodes_watched += element[0].last_episode_watched
+    account_data["anime"]["nb_ep_watched"] = nb_episodes_watched
+
+    all_book_data = db.session.query(BookList, Book). \
+                                     join(Book, Book.id == BookList.book_id). \
+                                     filter(BookList.user_id == user.id)
+
+    nb_pages_read = 0
+    for element in all_book_data:
+        if element[0].status == Status.COMPLETED and element[1].page_count is not None:
+            nb_pages_read += element[1].page_count
+    account_data["book"]["nb_pages_read"] = nb_pages_read
+
+    # Element percentages
+    if account_data["series"]["nb_ep_watched"] == 0:
+        account_data["series"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     else:
-        for rank in list_all_knowledge_ranks:
-            if str(rank[0]) == str(knowledge_level):
-                user_knowledge_rank.append([str(rank[1]), str(rank[2])])
+        account_data["series"]["element_percentage"] = [(float(account_data["series"]["watching_count"]/account_data["series"]["total_count"]))*100,
+                                                        (float(account_data["series"]["completed_count"]/account_data["series"]["total_count"]))*100,
+                                                        (float(account_data["series"]["onhold_count"]/account_data["series"]["total_count"]))*100,
+                                                        (float(account_data["series"]["random_count"]/account_data["series"]["total_count"]))*100,
+                                                        (float(account_data["series"]["dropped_count"]/account_data["series"]["total_count"]))*100,
+                                                        (float(account_data["series"]["plantowatch_count"]/account_data["series"]["total_count"]))*100]
+
+    if account_data["anime"]["nb_ep_watched"] == 0:
+        account_data["anime"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    else:
+        account_data["anime"]["element_percentage"] = [(float(account_data["anime"]["watching_count"]/account_data["anime"]["total_count"]))*100,
+                                                        (float(account_data["anime"]["completed_count"]/account_data["anime"]["total_count"]))*100,
+                                                        (float(account_data["anime"]["onhold_count"]/account_data["anime"]["total_count"]))*100,
+                                                        (float(account_data["anime"]["random_count"]/account_data["anime"]["total_count"]))*100,
+                                                        (float(account_data["anime"]["dropped_count"]/account_data["anime"]["total_count"]))*100,
+                                                        (float(account_data["anime"]["plantowatch_count"]/account_data["anime"]["total_count"]))*100]
+
+    if account_data["book"]["nb_pages_read"] == 0:
+        account_data["book"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0]
+    else:
+        account_data["book"]["element_percentage"] = [(float(account_data["book"]["reading_count"]/account_data["book"]["total_count"])) * 100,
+                                                      (float(account_data["book"]["completed_count"]/account_data["book"]["total_count"])) * 100,
+                                                      (float(account_data["book"]["onhold_count"]/account_data["book"]["total_count"])) * 100,
+                                                      (float(account_data["book"]["dropped_count"]/account_data["book"]["total_count"])) * 100,
+                                                      (float(account_data["book"]["plantoread_count"]/account_data["book"]["total_count"])) * 100]
+
+    account_data["knowledge_title"] = ""
+    account_data["knowledge_icon"] = ""
+
+    account_data["series_level"] = ""
+    account_data["series_icon"] = ""
+    account_data["series_title"] = ""
+    account_data["series_percent"] = ""
+
+    account_data["anime_level"] = ""
+    account_data["anime_icon"] = ""
+    account_data["anime_title"] = ""
+    account_data["anime_percent"] = ""
+
+    account_data["book_level"] = ""
+    account_data["book_icon"] = ""
+    account_data["book_title"] = ""
+    account_data["book_percent"] = ""
 
     return render_template('account.html',
                            title="{}'s account".format(user.username),
-                           profile_picture=profile_picture,
-                           friends_list_data=friends_list_data,
+                           data=account_data,
                            form=add_friend_form,
-                           series_stats=series_stats,
-                           anime_stats=anime_stats,
-                           book_stats=book_stats,
-                           user_knowledge_rank=user_knowledge_rank,
-                           user_id=str(user.id),
-                           user_name=user_name)
+                           user_id=str(user.id))
 
 
 @app.route("/anime_achievements")
@@ -1333,28 +1473,57 @@ def change_element_category():
             number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
             element.last_episode_watched = number_episode
-            episodes_counter = 0
-            for i in range(1, number_season):
-                ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=i).first().episodes
-                episodes_counter += ep
-            total_episodes_watched = int(episodes_counter) + int(number_episode)
-            update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
-            update.number_of_episodes_watched = total_episodes_watched
-            app.logger.info('[{}] Total episode watched of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
+
+            # Compute time spent
+            data = db.session.query(AnimeList, Anime,
+                                    func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                    join(Anime, Anime.id == AnimeList.anime_id). \
+                                    join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
+                                    filter(AnimeList.user_id == current_user.id). \
+                                    group_by(AnimeList.anime_id).all()
+            total_time = 0
+            for element in data:
+                if element[0].status == Status.COMPLETED:
+                    total_time += element[1].episode_duration * element[1].total_episodes
+                elif element[0].status != Status.PLAN_TO_WATCH:
+                    episodes = element[2].split(",")
+                    episodes = [int(x) for x in episodes]
+                    for i in range(1, element[0].current_season):
+                        total_time += element[1].episode_duration * episodes[i - 1]
+                    total_time += element[0].last_episode_watched * element[1].episode_duration
+
+            time_spent = User.query.filter_by(id=current_user.id).first()
+            time_spent.time_spent_anime = total_time
+
             db.session.commit()
         elif element_type == "SERIES":
             number_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).count()
             number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
             element.last_episode_watched = number_episode
-            episodes_counter = 0
-            for i in range(1, number_season):
-                ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=i).first().episodes
-                episodes_counter += ep
-            total_episodes_watched = int(episodes_counter) + int(number_episode)
-            update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
-            update.number_of_episodes_watched = total_episodes_watched
-            app.logger.info('[{}] Total episode watched of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, total_episodes_watched))
+
+            # Compute total time spent
+            data = db.session.query(SeriesList, Series,
+                                    func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                                    join(Series, Series.id == SeriesList.series_id). \
+                                    join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
+                                    filter(SeriesList.user_id == current_user.id). \
+                                    group_by(SeriesList.series_id).all()
+
+            total_time = 0
+            for element in data:
+                if element[0].status == Status.COMPLETED:
+                    total_time += element[1].episode_duration * element[1].total_episodes
+                elif element[0].status != Status.PLAN_TO_WATCH:
+                    episodes = element[2].split(",")
+                    episodes = [int(x) for x in episodes]
+                    for i in range(1, element[0].current_season):
+                        total_time += element[1].episode_duration * episodes[i - 1]
+                    total_time += element[0].last_episode_watched * element[1].episode_duration
+
+            time_spent = User.query.filter_by(id=current_user.id).first()
+            time_spent.time_spent_series = total_time
+
             db.session.commit()
     elif element_new_category == 'On Hold':
         element.status = Status.ON_HOLD
@@ -1377,6 +1546,7 @@ def change_element_category():
     app.logger.info('[{}] Category of the element with ID {} changed to {}'.format(current_user.get_id(),
                                                                                    element_id,
                                                                                    element_new_category))
+
     return '', 204
 
 
@@ -1724,7 +1894,7 @@ def get_all_account_stats(user_id, list_type):
     total_time_element = get_total_time_spent(user_id, list_type)
     total_time_in_minutes_element = total_time_element[1]*60
 
-    # Calculation of the corresponding level using the quadratic equation
+    # Compute the corresponding level using the quadratic equation
     element_level_tmp = "{:.2f}".format(round((((625+100*(total_time_in_minutes_element))**(1/2))-25)/50, 2))
     element_level_tmp = str(element_level_tmp)
     element_level = element_level_tmp.split('.')
@@ -1752,58 +1922,72 @@ def get_all_account_stats(user_id, list_type):
     # Recover the mean score for an element
     mean_score_element = get_mean_score(user_id, list_type)
 
-    # Recover the pourcentage of each category
-    nb_of_element = get_list_count(user_id, list_type)
-    total_element = sum(nb_of_element)
+    # Recover the percentage of each category
+    list_count = get_list_count(user_id, list_type)
+    total_element = sum(list_count.values())
     if total_element == 0:
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            element_pourcentage = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            element_percentage = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         elif list_type == ListType.BOOK:
-            element_pourcentage = [0.0, 0.0, 0.0, 0.0, 0.0]
+            element_percentage = [0.0, 0.0, 0.0, 0.0, 0.0]
     else:
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            element_pourcentage = [(float(nb_of_element[0]/total_element))*100,
-                                   (float(nb_of_element[1]/total_element))*100,
-                                   (float(nb_of_element[2]/total_element))*100,
-                                   (float(nb_of_element[3]/total_element))*100,
-                                   (float(nb_of_element[4]/total_element))*100,
-                                   (float(nb_of_element[5]/total_element))*100]
+            element_percentage = [(float(list_count["watching"]/total_element))*100,
+                                  (float(list_count["completed"]/total_element))*100,
+                                  (float(list_count["onhold"]/total_element))*100,
+                                  (float(list_count["random"]/total_element))*100,
+                                  (float(list_count["dropped"]/total_element))*100,
+                                  (float(list_count["plantowatch"]/total_element))*100]
         elif list_type == ListType.BOOK:
-            element_pourcentage = [(float(nb_of_element[0]/total_element))*100,
-                                   (float(nb_of_element[1]/total_element))*100,
-                                   (float(nb_of_element[2]/total_element))*100,
-                                   (float(nb_of_element[3]/total_element))*100,
-                                   (float(nb_of_element[4]/total_element))*100]
+            element_percentage = [(float(list_count["reading"]/total_element))*100,
+                                  (float(list_count["completed"]/total_element))*100,
+                                  (float(list_count["onhold"]/total_element))*100,
+                                  (float(list_count["dropped"]/total_element))*100,
+                                  (float(list_count["plantoread"]/total_element))*100]
 
-    return [nb_of_element, total_time_element, mean_score_element, element_level, user_level_rank, element_pourcentage]
+    return [list_count, total_time_element, mean_score_element, element_level, user_level_rank, element_percentage]
 
 
 def get_list_count(user_id, list_type):
         if list_type is ListType.SERIES:
-            watching = SeriesList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
-            completed = SeriesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
-            onhold = SeriesList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
-            random = SeriesList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
-            dropped = SeriesList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
+            watching    = SeriesList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
+            completed   = SeriesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+            onhold      = SeriesList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
+            random      = SeriesList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
+            dropped     = SeriesList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
             plantowatch = SeriesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
+            total       = SeriesList.query.filter_by(user_id=user_id).count()
         elif list_type is ListType.ANIME:
-            watching = AnimeList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
-            completed = AnimeList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
-            onhold = AnimeList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
-            random = AnimeList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
-            dropped = AnimeList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
+            watching    = AnimeList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
+            completed   = AnimeList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+            onhold      = AnimeList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
+            random      = AnimeList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
+            dropped     = AnimeList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
             plantowatch = AnimeList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
+            total       = AnimeList.query.filter_by(user_id=user_id).count()
         elif list_type is ListType.BOOK:
-            reading = BookList.query.filter_by(user_id=user_id, status=Status.READING).count()
-            completed = BookList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
-            onhold = BookList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
-            dropped = BookList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
-            plantoread = BookList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_READ).count()
+            reading     = BookList.query.filter_by(user_id=user_id, status=Status.READING).count()
+            completed   = BookList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+            onhold      = BookList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
+            dropped     = BookList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
+            plantoread  = BookList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_READ).count()
+            total       = BookList.query.filter_by(user_id=user_id).count()
 
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            statistics = [watching, completed, onhold, random, dropped, plantowatch]
+            statistics = {"watching": watching,
+                          "completed": completed,
+                          "onhold": onhold,
+                          "random": random,
+                          "dropped": dropped,
+                          "plantowatch": plantowatch,
+                          "total": total}
         elif list_type == ListType.BOOK:
-            statistics = [reading, completed, onhold, dropped, plantoread]
+            statistics = {"reading": reading,
+                          "completed": completed,
+                          "onhold": onhold,
+                          "dropped": dropped,
+                          "plantoread": plantoread,
+                          "total": total}
         return statistics
 
 
@@ -1861,30 +2045,26 @@ def get_total_time_spent(user_id, list_type):
 
 def get_mean_score(user_id, list_type):
     if list_type is ListType.SERIES:
-        all_scores  = SeriesList.query.filter_by(user_id=user_id).all()
+        all_scores = SeriesList.query.filter_by(user_id=user_id).all()
     if list_type is ListType.ANIME:
-         all_scores = AnimeList.query.filter_by(user_id=user_id).all()
+        all_scores = AnimeList.query.filter_by(user_id=user_id).all()
     if list_type is ListType.BOOK:
-        all_scores  = BookList.query.filter_by(user_id=user_id).all()
+        all_scores = BookList.query.filter_by(user_id=user_id).all()
 
-    # If no element in the list, mean score = 0
-    if len(all_scores) == 0:
-        mean_score = 0.00
+    if all_scores is None:
+        return 0.00
     else:
-        not_scored = 0
-        score = 0
-        for i in range(0, len(all_scores)):
-            tmp = all_scores[i].score
-            if tmp is None:
-                not_scored += 1
-            else:
-                score += float(all_scores[i].score)
-        if len(all_scores) == not_scored:
-            mean_score = 0.00
-        else:
-            mean_score = round(score/(len(all_scores)-not_scored), 2)
+        counter = 0
+        total_score = 0
+        for element in all_scores:
+            if element.score is not None:
+                total_score += element.score
+                counter += 1
 
-    return mean_score
+        if counter == 0:
+            return 0.00
+
+    return round(total_score/counter, 2)
 
 
 def get_achievements(user_id, list_type):
@@ -2573,7 +2753,6 @@ def add_element_to_user(element_id, user_id, list_type):
 
         db.session.commit()
     elif list_type == ListType.ANIME:
-        episode_duration = Anime.query.filter_by(id=element_id).first().episode_duration
         user_list = AnimeList(user_id=user_id,
                               anime_id=element_id,
                               current_season=1,

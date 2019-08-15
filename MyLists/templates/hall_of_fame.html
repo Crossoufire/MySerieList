@@ -98,7 +98,7 @@ hr {
 
             {% elif user["iscurrentuser"] %}
                 <td class="current_user">
-                    <img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
+                    <img src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
                 </td>
                 <td class="current_user">
                     <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
@@ -140,7 +140,7 @@ hr {
 
             {% else %}
                 <td>
-                    <img src="{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
+                    <img src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
                 </td>
                 <td>
                     <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
