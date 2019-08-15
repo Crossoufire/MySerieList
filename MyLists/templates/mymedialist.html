@@ -175,6 +175,9 @@ body.loading .modal_loading {
 }
 
 .episodes {
+    {% if target_user_id == current_user.get_id() %}
+        cursor: pointer;
+    {% endif %}
     border-style: 1px;
     border-color: black;
     border-radius: 2px;
@@ -184,6 +187,9 @@ body.loading .modal_loading {
 }
 
 .seasons {
+    {% if target_user_id == current_user.get_id() %}
+        cursor: pointer;
+    {% endif %}
     border-style: 1px;
     border-color: black;
     border-radius: 2px;
@@ -459,7 +465,6 @@ body.loading .modal_loading {
 
         {% for data in category %}
             <div id="card_{{ data[0].id }}" class="card bg-transparent m-l-10 m-r-10 m-t-40" style="border-radius: 5px;">
-
                 <div class="view overlay">
                     <img class="card-img-top" width="200" height="300" src="{{ data[0].image_cover }}" alt="{{ data[0].name }}">
                     <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_{{ data[0].id }}" style="cursor: pointer;">
@@ -1053,10 +1058,10 @@ function show_score(footer_id, card_id) {
 
     if (score.className === "d-none footer_score"){
         score.className = "card-footer text-muted text-center p-0";
-        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-15');
+        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-t-40 m-b-15');
     } else {
         score.className = "d-none footer_score";
-        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-40');
+        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-t-40 m-b-15');
     }
 }
 </script>
