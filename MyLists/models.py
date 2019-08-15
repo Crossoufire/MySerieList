@@ -45,6 +45,9 @@ class User(db.Model, UserMixin):
     activated_on = db.Column(db.DateTime)
     transition_email = db.Column(db.String(120))
     homepage = db.Column(db.Enum(HomePage), nullable=False, default=HomePage.MYSERIESLIST)
+    time_spent_series = db.Column(db.Integer, nullable=False, default=0)
+    time_spent_anime = db.Column(db.Integer, nullable=False, default=0)
+    time_spent_book = db.Column(db.Integer, nullable=False, default=0)
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
@@ -113,8 +116,6 @@ class SeriesList(db.Model):
     last_episode_watched = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
     score = db.Column(db.Float)
-    episode_duration = db.Column(db.Integer)
-    number_of_episodes_watched = db.Column(db.Integer)
 
 
 class SeriesEpisodesPerSeason(db.Model):
@@ -170,8 +171,6 @@ class AnimeList(db.Model):
     last_episode_watched = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
     score = db.Column(db.Float)
-    episode_duration = db.Column(db.Integer)
-    number_of_episodes_watched = db.Column(db.Integer)
 
 
 class AnimeEpisodesPerSeason(db.Model):
