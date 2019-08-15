@@ -44,7 +44,90 @@ hr {
     width: 28px;
 }
 
+.card-img-top {
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    border-radius: 3px;
+}
 
+.btn_left{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    opacity: 0;
+}
+
+.btn_left:hover {
+    opacity: 1;
+}
+
+.mask:hover~.btn_left {
+    opacity: 0.7;
+}
+
+.btn_bottom {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    opacity: 0;
+}
+
+.btn_bottom:hover {
+    opacity: 1;
+}
+
+.mask:hover~.btn_bottom {
+    opacity: 0.7;
+}
+
+.btn_right {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    opacity: 0;
+}
+
+.btn_right:hover {
+    opacity: 1;
+}
+
+.mask:hover~.btn_right {
+    opacity: 0.7;
+}
+
+.card {
+    width: 200px;
+}
+
+.font-mask {
+    font-size: 20pt;
+}
+
+.dropdown-item {
+    background-color: #272525;
+    color: #fff;
+    font-weight: 300;
+    font-size: 11pt;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.form-control {
+    height: 2rem;
+    padding: 5px;
+    background-color: #131418;
+    color: #fff;
+    border-radius: 1px;
+    font-size: 11pt;
+    outline: none;
+    box-shadow:none !important;
+}
+
+.dropdown-menu {
+    background-color: #272525;
+    min-width: 9rem;
+}
 /* ############################# pacman loading ############################ */
 .modal_loading {
     display: none;
@@ -113,101 +196,13 @@ body.loading .modal_loading {
 }
 /* ######################################################################### */
 
-
-/* ############################ 599px or more ############################## */
-/* On screens that are 599px or more */
-@media screen and (min-width: 599px) {
-    .card-img-top {
-        border-style: solid;
-        border-width: 1px;
-        border-color: black;
-        border-radius: 3px;
+/* ############################ 768px or less ############################## */
+/* On screens that are 768px or less */
+@media (max-width: 767.98px) {
+    .d-flex {
+        justify-content: center;
     }
 
-    .btn_left{
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        opacity: 0;
-    }
-
-    .btn_left:hover {
-        opacity: 1;
-    }
-
-    .mask:hover~.btn_left {
-        opacity: 0.7;
-    }
-
-    .btn_bottom {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        opacity: 0;
-    }
-
-    .btn_bottom:hover {
-        opacity: 1;
-    }
-
-    .mask:hover~.btn_bottom {
-        opacity: 0.7;
-    }
-
-    .btn_right {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        opacity: 0;
-    }
-
-    .btn_right:hover {
-        opacity: 1;
-    }
-
-    .mask:hover~.btn_right {
-        opacity: 0.7;
-    }
-
-    .card {
-        width: 200px;
-    }
-
-    .font-mask {
-        font-size: 20pt;
-    }
-
-    .dropdown-item {
-        background-color: #272525;
-        color: #fff;
-        font-weight: 300;
-        font-size: 11pt;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    .form-control {
-        height: 2rem;
-        padding: 5px;
-        background-color: #131418;
-        color: #fff;
-        border-radius: 1px;
-        font-size: 11pt;
-        outline: none;
-        box-shadow:none !important;
-    }
-
-    .dropdown-menu {
-        background-color: #272525;
-        min-width: 9rem;
-    }
-}
-/* ######################################################################### */
-
-
-/* ############################ 599px or less ############################## */
-/* On screens that are 599px or less */
-@media screen and (max-width: 599px) {
     .card-img-top {
         height: 202.5px;
         border-style: solid;

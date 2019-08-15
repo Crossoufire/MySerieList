@@ -4,17 +4,17 @@
 {% block css %}
 <!---------- Main CSS ----------->
 <style type="text/css">
-/* On screens that are 730px or less, set the title font size to 30pt */
-@media screen and (max-width: 730px) {
+#title {
+    font-size: 70pt;
+}
+
+/* On screens that are 768px or less */
+@media (max-width: 767.98px) {
     #title {
         font-size: 35pt;
     }
-}
-
-/* On screens that are 730px or more, set the title font size to 70pt */
-@media screen and (min-width: 730px) {
-    #title {
-        font-size: 70pt;
+    .header {
+        height: 300px;
     }
 }
 
@@ -53,7 +53,7 @@
         <div class="carousel-inner">
             <div class="carousel-item active">
                 <div class="view">
-                    <img class="first-slide" src="{{ image_header }}" alt="First slide">
+                    <img class="header" src="{{ image_header }}">
                     <div class="mask d-flex justify-content-center align-items-center">
                         <div class="text-center white-text mx-5 wow fadeIn">
                             <h1 class="mb-4" id="title">
