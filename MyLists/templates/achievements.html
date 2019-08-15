@@ -2,6 +2,28 @@
 
 {% block css %}
 <style>
+table {
+    border-collapse: separate;
+    border-spacing: 15px;
+}
+
+td {
+    border-radius: 5px;
+}
+
+img {
+    cursor: pointer;
+}
+
+ul {
+    -moz-column-count: 4;
+    -moz-column-gap: 20px;
+    -webkit-column-count: 4;
+    -webkit-column-gap: 20px;
+    column-count: 4;
+    column-gap: 20px;
+}
+
 .details {
     display: none;
 }
@@ -103,5 +125,25 @@ hr {
 
 
 {% block script %}
+<script>
+function test(tata, tutu, toto) {
+    if ($("#"+tata).hasClass('d-none')) {
+        if ($("#"+tata).siblings().hasClass('text-left')) {
+            $("#"+tutu).siblings('.filtered').attr('style', 'filter: none;')
+            $("#"+tutu).attr('style', 'filter: drop-shadow(5px 5px 5px grey) invert(0%);')
+            $("#"+tata).siblings('.text-left').attr('class', 'd-none');
+            $("#"+tata).attr('class', 'text-left');
+        } else {
+            $("#"+tutu).attr('class', 'filtered');
+            $("#"+tutu).attr('style', 'filter: drop-shadow(5px 5px 5px grey) invert(0%);')
+            $("#"+tata).attr('class', 'text-left');
+        }
+    } else {
+        $("#"+tutu).attr('class', 'filtered');
+        $("#"+tutu).attr('style', 'filter: none;')
+        $("#"+tata).attr('class', 'd-none');
+    }
+}
+</script>
 {% endblock script %}
 
