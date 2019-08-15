@@ -83,16 +83,24 @@ hr {
                     <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
                 </td>
                 <td>
-                    {{ user['time_series'] }}
+                    <img data-toggle="tooltip" title="{{ user['series_grade_title'] }}" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td>
-                    {{ user['time_anime'] }}
+                    <img data-toggle="tooltip" title="{{ user['anime_grade_title'] }}" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                 </td>
                 <td>
-                    {{ user['time_books'] }}
+                    <img data-toggle="tooltip" title="{{ user['book_grade_title'] }}" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['book_level'] }} ({{ user['book_percent'] }}%)
                 </td>
                 <td>
-                    {{ user['time_total'] }}
+                    <img data-toggle="tooltip" title="{{ user['knowledge_grade_title'] }}" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['knowledge_level'] }}
                 </td>
                 <td></td>
 
@@ -104,16 +112,24 @@ hr {
                     <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
                 </td>
                 <td class="current_user">
-                    {{ user['time_series'] }}
+                    <img data-toggle="tooltip" title="{{ user['series_grade_title'] }}" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td class="current_user">
-                    {{ user['time_anime'] }}
+                    <img data-toggle="tooltip" title="{{ user['anime_grade_title'] }}" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                 </td>
                 <td class="current_user">
-                    {{ user['time_books'] }}
+                    <img data-toggle="tooltip" title="{{ user['book_grade_title'] }}" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['book_level'] }} ({{ user['book_percent'] }}%)
                 </td >
                 <td class="current_user">
-                    {{ user['time_total'] }}
+                    <img data-toggle="tooltip" title="{{ user['knowledge_grade_title'] }}" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['knowledge_level'] }}
                 </td>
                 <td class="current_user"></td>
 
@@ -125,16 +141,24 @@ hr {
                     <b>Anonymous</b>
                 </td>
                 <td>
-                    {{ user['time_series'] }}
+                    <img data-toggle="tooltip" title="{{ user['series_grade_title'] }}" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td>
-                    {{ user['time_anime'] }}
+                    <img data-toggle="tooltip" title="{{ user['anime_grade_title'] }}" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                 </td>
                 <td>
-                    {{ user['time_books'] }}
+                    <img data-toggle="tooltip" title="{{ user['book_grade_title'] }}" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['book_level'] }} ({{ user['book_percent'] }}%)
                 </td>
                 <td>
-                    {{ user['time_total'] }}
+                    <img data-toggle="tooltip" title="{{ user['knowledge_grade_title'] }}" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['knowledge_level'] }}
                 </td>
                 <td></td>
 
@@ -146,16 +170,24 @@ hr {
                     <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
                 </td>
                 <td>
-                    {{ user['time_series'] }}
+                    <img data-toggle="tooltip" title="{{ user['series_grade_title'] }}" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td>
-                    {{ user['time_anime'] }}
+                    <img data-toggle="tooltip" title="{{ user['anime_grade_title'] }}" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                 </td>
                 <td>
-                    {{ user['time_books'] }}
+                     <img data-toggle="tooltip" title="{{ user['book_grade_title'] }}" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['book_level'] }} ({{ user['book_percent'] }}%)
                 </td>
                 <td>
-                    {{ user['time_total'] }}
+                    <img data-toggle="tooltip" title="{{ user['knowledge_grade_title'] }}" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png" style="width: 30px; height: 30px;">
+                    <br>
+                    {{ user['knowledge_level'] }}
                 </td>
                 {% if user["isfriend"] %}
                     <td><i class="fas fa-user-friends"></i></td>

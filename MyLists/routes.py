@@ -89,7 +89,6 @@ def create_user():
         achievements[i-1].type        = list_all_achievements[i][6]
         achievements[i-1].genre       = genre
 
-
     if User.query.filter_by(id='2').first() is None:
         admin = User(username='test',
                      email='admin@admin.comm',
@@ -100,7 +99,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(admin)
-
     if User.query.filter_by(id='3').first() is None:
         admin = User(username='test2',
                      email='admin@admin.commm',
@@ -111,7 +109,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(admin)
-
     if User.query.filter_by(id='4').first() is None:
         admin = User(username='test3',
                      email='admin@admin.commmm',
@@ -122,7 +119,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(admin)
-
     db.session.commit()
 
 
@@ -339,13 +335,13 @@ def account(user_name):
     account_data["friends"] = friends_list_data
 
     # Time spent
-    account_data["series"]["time_spent_hour"] = round(user.time_spent_series / 60)
-    account_data["anime"]["time_spent_hour"] = round(user.time_spent_anime / 60)
-    account_data["book"]["time_spent_hour"] = round(user.time_spent_book / 60)
+    account_data["series"]["time_spent_hour"] = round(user.time_spent_series/60)
+    account_data["anime"]["time_spent_hour"] = round(user.time_spent_anime/60)
+    account_data["book"]["time_spent_hour"] = round(user.time_spent_book/60)
 
-    account_data["series"]["time_spent_day"] = round(user.time_spent_series / 1440, 1)
-    account_data["anime"]["time_spent_day"] = round(user.time_spent_anime / 1440, 1)
-    account_data["book"]["time_spent_day"] = round(user.time_spent_book / 1440, 1)
+    account_data["series"]["time_spent_day"] = round(user.time_spent_series/1440, 1)
+    account_data["anime"]["time_spent_day"] = round(user.time_spent_anime/1440, 1)
+    account_data["book"]["time_spent_day"] = round(user.time_spent_book/1440, 1)
 
     # Mean score
     account_data["series"]["mean_score"] = get_mean_score(user.id, ListType.SERIES)
@@ -391,7 +387,7 @@ def account(user_name):
         episodes = element[2].split(",")
         episodes = [int(x) for x in episodes]
         for i in range(1, element[0].current_season):
-            nb_episodes_watched += episodes[i - 1]
+            nb_episodes_watched += episodes[i-1]
         nb_episodes_watched += element[0].last_episode_watched
     account_data["series"]["nb_ep_watched"] = nb_episodes_watched
 
@@ -406,7 +402,7 @@ def account(user_name):
         episodes = element[2].split(",")
         episodes = [int(x) for x in episodes]
         for i in range(1, element[0].current_season):
-            nb_episodes_watched += episodes[i - 1]
+            nb_episodes_watched += episodes[i-1]
         nb_episodes_watched += element[0].last_episode_watched
     account_data["anime"]["nb_ep_watched"] = nb_episodes_watched
 
@@ -450,23 +446,28 @@ def account(user_name):
                                                       (float(account_data["book"]["dropped_count"]/account_data["book"]["total_count"])) * 100,
                                                       (float(account_data["book"]["plantoread_count"]/account_data["book"]["total_count"])) * 100]
 
-    account_data["knowledge_title"] = ""
-    account_data["knowledge_icon"] = ""
+    series_level = get_level_and_grade(user.time_spent_series)
+    account_data["series_level"] = series_level["level"]
+    account_data["series_percent"] = series_level["level_percent"]
+    account_data["series_grade_id"] = series_level["grade_id"]
+    account_data["series_grade_title"] = series_level["grade_title"]
 
-    account_data["series_level"] = ""
-    account_data["series_icon"] = ""
-    account_data["series_title"] = ""
-    account_data["series_percent"] = ""
+    anime_level = get_level_and_grade(user.time_spent_anime)
+    account_data["anime_level"] = anime_level["level"]
+    account_data["anime_percent"] = anime_level["level_percent"]
+    account_data["anime_grade_id"] = anime_level["grade_id"]
+    account_data["anime_grade_title"] = anime_level["grade_title"]
 
-    account_data["anime_level"] = ""
-    account_data["anime_icon"] = ""
-    account_data["anime_title"] = ""
-    account_data["anime_percent"] = ""
+    book_level = get_level_and_grade(user.time_spent_book)
+    account_data["book_level"] = book_level["level"]
+    account_data["book_percent"] = book_level["level_percent"]
+    account_data["book_grade_id"] = book_level["grade_id"]
+    account_data["book_grade_title"] = book_level["grade_title"]
 
-    account_data["book_level"] = ""
-    account_data["book_icon"] = ""
-    account_data["book_title"] = ""
-    account_data["book_percent"] = ""
+    knowledge_level = int(series_level["level"] + anime_level["level"] + book_level["level"])
+    knowledge_grade = get_knowledge_grade(knowledge_level)
+    account_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
+    account_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
 
     return render_template('account.html',
                            title="{}'s account".format(user.username),
@@ -668,7 +669,6 @@ def change_password():
 @app.route("/hall_of_fame")
 @login_required
 def hall_of_fame():
-
     users = User.query.filter(User.id >= "2").order_by(User.username.asc()).all()
 
     current_user_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="accepted").all()
@@ -683,12 +683,33 @@ def hall_of_fame():
 
     all_users_data = []
     for user in users:
-        user_data = {"username": user.username,
-                     "profile_picture": user.image_file,
-                     "time_series": user.time_spent_series,
-                     "time_anime": user.time_spent_anime,
-                     "time_books": user.time_spent_book,
-                     "time_total": user.time_spent_series + user.time_spent_anime + user.time_spent_book}
+        user_data = {}
+        user_data["username"] = user.username
+        user_data["profile_picture"] = user.image_file
+
+        series_level = get_level_and_grade(user.time_spent_series)
+        user_data["series_level"] = series_level["level"]
+        user_data["series_percent"] = series_level["level_percent"]
+        user_data["series_grade_id"] = series_level["grade_id"]
+        user_data["series_grade_title"] = series_level["grade_title"]
+
+        anime_level = get_level_and_grade(user.time_spent_anime)
+        user_data["anime_level"] = anime_level["level"]
+        user_data["anime_percent"] = anime_level["level_percent"]
+        user_data["anime_grade_id"] = anime_level["grade_id"]
+        user_data["anime_grade_title"] = anime_level["grade_title"]
+
+        book_level = get_level_and_grade(user.time_spent_book)
+        user_data["book_level"] = book_level["level"]
+        user_data["book_percent"] = book_level["level_percent"]
+        user_data["book_grade_id"] = book_level["grade_id"]
+        user_data["book_grade_title"] = book_level["grade_title"]
+
+        knowledge_level = int(series_level["level"] + anime_level["level"] + book_level["level"])
+        knowledge_grade = get_knowledge_grade(knowledge_level)
+        user_data["knowledge_level"] = knowledge_level
+        user_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
+        user_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
 
         if user.id in friends_list:
             user_data["isfriend"] = True
@@ -1790,65 +1811,6 @@ def autocomplete_books():
 ###################################################### Functions #######################################################
 
 
-def get_all_account_stats(user_id, list_type):
-    # Recover the amount of time spent watching an element
-    total_time_element = get_total_time_spent(user_id, list_type)
-    total_time_in_minutes_element = total_time_element[1]*60
-
-    # Compute the corresponding level using the quadratic equation
-    element_level_tmp = "{:.2f}".format(round((((625+100*(total_time_in_minutes_element))**(1/2))-25)/50, 2))
-    element_level_tmp = str(element_level_tmp)
-    element_level = element_level_tmp.split('.')
-    element_level[0] = int(element_level[0])
-
-    # Level and rang calculation + Grade
-    list_all_levels_ranks = []
-    if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\\img\\levels_ranks\\levels_ranks.csv")
-    else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/img/levels_ranks/levels_ranks.csv")
-    with open(path, 'r') as fp:
-        for line in fp:
-            list_all_levels_ranks.append(line.split(";"))
-
-    user_level_rank = []
-    # Check if the user has a level greater than 125
-    if element_level[0] > 125:
-        user_level_rank.append(["General_Grade_4", "General Grade 4"])
-    else:
-        for rank in list_all_levels_ranks:
-            if int(rank[0]) == element_level[0]:
-                user_level_rank.append([str(rank[2]), str(rank[3])])
-
-    # Recover the mean score for an element
-    mean_score_element = get_mean_score(user_id, list_type)
-
-    # Recover the percentage of each category
-    list_count = get_list_count(user_id, list_type)
-    total_element = sum(list_count.values())
-    if total_element == 0:
-        if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            element_percentage = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        elif list_type == ListType.BOOK:
-            element_percentage = [0.0, 0.0, 0.0, 0.0, 0.0]
-    else:
-        if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            element_percentage = [(float(list_count["watching"]/total_element))*100,
-                                  (float(list_count["completed"]/total_element))*100,
-                                  (float(list_count["onhold"]/total_element))*100,
-                                  (float(list_count["random"]/total_element))*100,
-                                  (float(list_count["dropped"]/total_element))*100,
-                                  (float(list_count["plantowatch"]/total_element))*100]
-        elif list_type == ListType.BOOK:
-            element_percentage = [(float(list_count["reading"]/total_element))*100,
-                                  (float(list_count["completed"]/total_element))*100,
-                                  (float(list_count["onhold"]/total_element))*100,
-                                  (float(list_count["dropped"]/total_element))*100,
-                                  (float(list_count["plantoread"]/total_element))*100]
-
-    return [list_count, total_time_element, mean_score_element, element_level, user_level_rank, element_percentage]
-
-
 def get_list_count(user_id, list_type):
         if list_type is ListType.SERIES:
             watching    = SeriesList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
@@ -1892,59 +1854,6 @@ def get_list_count(user_id, list_type):
         return statistics
 
 
-def get_total_time_spent(user_id, list_type):
-    if list_type == ListType.SERIES:
-        list = SeriesList.query.filter(SeriesList.status != Status.PLAN_TO_READ).filter_by(user_id=user_id).all()
-    elif list_type == ListType.ANIME:
-        list = AnimeList.query.filter(AnimeList.status != Status.PLAN_TO_WATCH).filter_by(user_id=user_id).all()
-    elif list_type == ListType.BOOK:
-        list = BookList.query.filter(BookList.status == Status.COMPLETED).filter_by(user_id=user_id).all()
-
-    if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        episodes_counter = 0
-        time_spent_min = 0
-        for element in list:
-            if list_type == ListType.SERIES:
-                #episode_duration = Series.query.filter_by(id=element.series_id).first().episode_duration
-                episode_duration = element.episode_duration
-            elif list_type == ListType.ANIME:
-                #episode_duration = Anime.query.filter_by(id=element.anime_id).first().episode_duration
-                episode_duration = element.episode_duration
-
-            if episode_duration is None:
-                continue
-
-            # current_season = element.current_season
-            # current_ep = element.last_episode_watched
-            # for i in range(1, current_season):
-            #     if list_type == ListType.SERIES:
-            #         ep = SeriesEpisodesPerSeason.query.filter_by(series_id=element.series_id, season=i).first().episodes
-            #     elif list_type == ListType.ANIME:
-            #         ep = AnimeEpisodesPerSeason.query.filter_by(anime_id=element.anime_id, season=i).first().episodes
-            #     episodes_counter += ep
-            #     time_spent_min += ep*episode_duration
-            #
-            # episodes_counter += current_ep
-
-            total_episodes_watched = element.number_of_episodes_watched
-            time_spent_min += total_episodes_watched*episode_duration
-            episodes_counter += total_episodes_watched
-
-        time_spent_hours = int((time_spent_min/60))
-        time_spent_days = round(time_spent_min/(60*24), 1)
-        return [episodes_counter, time_spent_hours, time_spent_days]
-    elif list_type == ListType.BOOK:
-        total_pages = 0
-        for book in list:
-            pages_count = Book.query.filter_by(id=book.book_id).first().page_count
-            if pages_count is not None:
-                total_pages += pages_count
-
-        time_spent_hours = int(((total_pages*2)/60))
-        time_spent_days = round((total_pages*2)/(60*24), 1)
-        return [total_pages, time_spent_hours, time_spent_days]
-
-
 def get_mean_score(user_id, list_type):
     if list_type is ListType.SERIES:
         all_scores = SeriesList.query.filter_by(user_id=user_id).all()
@@ -1962,11 +1871,69 @@ def get_mean_score(user_id, list_type):
             if element.score is not None:
                 total_score += element.score
                 counter += 1
-
         if counter == 0:
             return 0.00
 
     return round(total_score/counter, 2)
+
+
+def get_level_and_grade(total_time_min):
+    # Compute the corresponding level using the quadratic equation
+    element_level_tmp = "{:.2f}".format(round((((625+100*(total_time_min))**(1/2))-25)/50, 2))
+    element_level = element_level_tmp.split('.')
+    element_level[0] = int(element_level[0])
+
+    # Level and grade calculation
+    list_all_levels_ranks = []
+    if platform.system() == "Windows":
+        path = os.path.join(app.root_path, "static\\img\\levels_ranks\\levels_ranks.csv")
+    else:  # Linux & macOS
+        path = os.path.join(app.root_path, "static/img/levels_ranks/levels_ranks.csv")
+    with open(path, 'r') as fp:
+        for line in fp:
+            list_all_levels_ranks.append(line.split(";"))
+
+    user_level_rank = []
+    # Check if the user has a level greater than 125
+    if element_level[0] > 125:
+        user_level_rank.append(["General_Grade_4", "General Grade 4"])
+    else:
+        for rank in list_all_levels_ranks:
+            if int(rank[0]) == element_level[0]:
+                user_level_rank.append([str(rank[2]), str(rank[3])])
+
+    user_data = {"level": element_level[0],
+                 "level_percent": element_level[1],
+                 "grade_id": user_level_rank[0][0],
+                 "grade_title": user_level_rank[0][1]}
+
+    return user_data
+
+
+def get_knowledge_grade(knowledge_level):
+    # Recover knowledge ranks
+    list_all_knowledge_ranks = []
+    if platform.system() == "Windows":
+        path = os.path.join(app.root_path, "static\\img\\knowledge_ranks\\knowledge_ranks.csv")
+    else:  # Linux & macOS
+        path = os.path.join(app.root_path, "static/img/knowledge_ranks/knowledge_ranks.csv")
+    with open(path, 'r') as fp:
+        for line in fp:
+            list_all_knowledge_ranks.append(line.split(";"))
+
+    user_knowledge_rank = []
+    # Check if the user has a level greater than 345
+    if int(knowledge_level) > 345:
+        user_knowledge_rank.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
+    else:
+        for rank in list_all_knowledge_ranks:
+            if str(rank[0]) == str(knowledge_level):
+                user_knowledge_rank.append([str(rank[1]), str(rank[2])])
+
+    user_data = {"grade_id": user_knowledge_rank[0][0],
+                 "grade_title": user_knowledge_rank[0][1]}
+
+    return user_data
 
 
 def get_achievements(user_id, list_type):

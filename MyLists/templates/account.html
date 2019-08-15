@@ -358,7 +358,7 @@ hr {
                 <h2 class="mt-0 account-heading username">{{ data['username'] }}'s profile</h2>
                 {% endif %}
                 <span style="font-size: 14pt;">Knowledge level:&nbsp&nbsp</span>
-                <img height='64' width='64' data-toggle="tooltip" title="{{ data['knowledge_title'] }}" src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_icon'] }}.png"/>
+                <img height='64' width='64' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}" src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
             </div>
             <div class="ml-auto bd-highlight">
                 {% if user_id == current_user.get_id() %}
@@ -373,7 +373,7 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['series_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_icon'] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.ico"/>
                             <span class='account-bar-name'>Series</span>
                             <div id="series_level" class='account-bar-level'>Level {{ data['series_level'] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ data['series_percent'] }}%">
@@ -395,7 +395,7 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['anime_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_icon'] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.ico"/>
                             <div class='account-bar-name'>Anime</div>
                             <div id="anime_level" class='account-bar-level'>Level {{ data['anime_level'] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ data['anime_percent'] }}%">
@@ -417,7 +417,7 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['book_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['book_icon'] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['book_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['book_grade_id'] }}.ico"/>
                             <div class='account-bar-name'>Books</div>
                             <div id="book_level" class='account-bar-level'>Level {{ data['book_level'] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ data['book_title'] }}%">
