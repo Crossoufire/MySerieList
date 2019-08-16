@@ -361,11 +361,11 @@ body.loading .modal_loading {
 
 <div id="mySidenav" class="sidenav" style="height: 280px; padding-top: 30px;">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()" style="padding: 0px; margin-left: 135px;">&times;</a>
-    <a href="#collapse_READING">Reading</a>
-    <a href="#collapse_COMPLETED">Completed</a>
-    <a href="#collapse_ON_HOLD">On Hold</a>
-    <a href="#collapse_DROPPED">Dropped</a>
-    <a href="#collapse_PLAN_TO_READ">Plan to Read</a>
+    <a href="#READING">Reading</a>
+    <a href="#COMPLETED">Completed</a>
+    <a href="#ON_HOLD">On Hold</a>
+    <a href="#DROPPED">Dropped</a>
+    <a href="#PLAN_TO_READ">Plan to Read</a>
 </div>
 
 
@@ -475,43 +475,43 @@ body.loading .modal_loading {
         {% set outer_loop = loop %}
 
         {% for data in category %}
-            <tr id="tr_{{ data['id'] }}">
+            <tr id="tr_{{ data[0].id }}">
                 <td class="text-center">
                     {{ loop.index }}
                 </td>
                 <td class="text-left">
-                    <a data-toggle="modal" data-target="#modal_{{ data['id'] }}">{{ data['title'] }}</a>
+                    <a data-toggle="modal" data-target="#modal_{{ data[0].id }}">{{ data[0].title }}</a>
                 </td>
                 <td class="text-center">
-                    {{ data['authors'] }}
+                    {{ data[0].authors }}
                 </td>
                 <td class="text-center">
-                    {{ data['page_count'] }}
+                    {{ data[0].page_count }}
                 </td>
                 <td class="text-center">
                     {% if user_id == current_user.get_id() %}
-                    <a class="score_size" id="new_{{ data['id'] }}" onclick="edit_score('edit_{{ data['id'] }}', 'new_{{ data['id'] }}')">{{ data['score'] }}</a>
+                    <a class="score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
                     {% else %}
-                    <a class="disabled score_size" id="new_{{ data['id'] }}" onclick="edit_score('edit_{{ data['id'] }}', 'new_{{ data['id'] }}')">{{ data['score'] }}</a>
+                    <a class="disabled score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
                     {% endif %}
-                    <input id="edit_{{ data['id'] }}" class="d-none" type="text" style="max-width: 30px;
+                    <input id="edit_{{ data[0].id }}" class="d-none" type="text" style="max-width: 30px;
                    max-height: 20px;
                    background-color: black;
                    color: white;
                    border: solid;
-                   border-color: black;" onkeydown="add_score('new_{{ data['id'] }}', 'edit_{{ data['id'] }}', '{{ data['id'] }}')">
+                   border-color: black;" onkeydown="add_score('new_{{ data[0].id }}', 'edit_{{ data[0].id }}', '{{ data[0].id }}')">
                 </td>
                 <td class="text-center">
                     {% if user_id == current_user.get_id() %}
-                    <a class="fas fa-bars" data-toggle="modal" data-target="#modal_cat{{ data['id'] }}"></a>
+                    <a class="fas fa-bars" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
                     &nbsp &nbsp
-                    <a class="fas fa-ban" onclick="deletebook('{{ data['id'] }}', 'tr_{{ data['id'] }}')"></a>
+                    <a class="fas fa-ban" onclick="deletebook('{{ data[0].id }}', 'tr_{{ data[0].id }}')"></a>
                     {% endif %}
                 </td>
             </tr>
 
             <!----------- Categories Modal ---------------->
-            <div style="max-width: 220px;" class="modal fade left" id="modal_cat{{ data['id'] }}" tabindex="-1" role="dialog" aria-labelledby="cat_mod" aria-hidden="true">
+            <div style="max-width: 220px;" class="modal fade left" id="modal_cat{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="cat_mod" aria-hidden="true">
                 <div style="max-width: 200px;" class="modal-dialog modal-side modal-top-left modal-sm" role="document">
                     <div style="max-width: 200px; background: #131418;" class="modal-content">
                         <div style="max-width: 200px;" class="modal-header">
@@ -520,33 +520,33 @@ body.loading .modal_loading {
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div id="mod_{{ data['id'] }}" class="modal-body">
+                        <div id="mod_{{ data[0].id }}" class="modal-body">
                             {% if outer_loop.index == 1 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Plan to Read', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Read</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Plan to Read', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Plan to Read</a>
                             {% elif outer_loop.index == 2 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Reading', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Reading</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Plan to Read', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Read</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Reading', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Reading</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Plan to Read', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Plan to Read</a>
                             {% elif outer_loop.index == 3 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Reading', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Reading</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Plan to Read', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Read</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Reading', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Reading</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Plan to Read', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Plan to Read</a>
                             {% elif outer_loop.index == 4 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Reading', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Reading</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Random', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Random</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Plan to Read', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Plan to Read</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Reading', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Reading</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Random', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Random</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Plan to Read', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Plan to Read</a>
                             {% elif outer_loop.index == 5 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Reading', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Reading</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Completed', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'On Hold', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data['id'] }}', 'Dropped', 'tr_{{ data['id'] }}', 'mod_{{ data['id'] }}')">Dropped</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Reading', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Reading</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Completed</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">On Hold</a>
+                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Dropped</a>
                             {% endif %}
                         </div>
                     </div>
@@ -554,23 +554,23 @@ body.loading .modal_loading {
             </div>
 
             <!----------- Book metadata Modal ----------->
-            <div class="modal fade" id="modal_{{ data['id'] }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+            <div class="modal fade" id="modal_{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; background: #131418;">
                         <div class="modal-body">
                             <div class="modal-header">
-                                <h4 class="modal-title">{{ data['title'] }}</h4>
+                                <h4 class="modal-title">{{ data[0].title }}</h4>
                                 <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <p><b>Title</b> : {{ data['title'] }}</p>
-                                <p><b>Author</b> : {{ data['authors'] }}</p>
-                                <p><b>Published Date</b> : {{ data['published_date'] }}</p>
-                                <p><b>N° Pages</b> : {{ data['page_count'] }}</p>
-                                <p><b>Genres</b> : {{ data['categories'] }}</p>
-                                <p class="m-b-0"><b>Synopsis</b> : </p><p class="text-justify show-read-more">{{ data['description'] }}</p>
+                                <p><b>Title</b>: {{ data[0].title }}</p>
+                                <p><b>Author</b>: {{ data[0].authors }}</p>
+                                <p><b>Published Date</b> : {{ data[0].published_date }}</p>
+                                <p><b>N° Pages</b>: {{ data[0].page_count }}</p>
+                                <p><b>Genres</b>: {{ data[0].categories }}</p>
+                                <p class="m-b-0"><b>Synopsis</b>: </p><p class="text-justify show-read-more">{{ data[0].description }}</p>
                             </div>
                         </div>
                     </div>

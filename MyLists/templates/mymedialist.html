@@ -179,6 +179,9 @@ body.loading .modal_loading {
 }
 
 .episodes {
+	{% if target_user_id == current_user.get_id() %}
+	cursor: pointer;
+	{% endif %}
     border-style: 1px;
     border-color: black;
     border-radius: 2px;
@@ -188,6 +191,9 @@ body.loading .modal_loading {
 }
 
 .seasons {
+	{% if target_user_id == current_user.get_id() %}
+	cursor: pointer;
+	{% endif %}
     border-style: 1px;
     border-color: black;
     border-radius: 2px;
@@ -378,12 +384,12 @@ body.loading .modal_loading {
 
 <div id="mySidenav" class="sidenav" style="height: 340px; padding-top: 30px;">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()" style="padding: 0px; margin-left: 135px;">&times;</a>
-    <a href="#collapse_WATCHING">Watching</a>
-    <a href="#collapse_COMPLETED">Completed</a>
-    <a href="#collapse_ON_HOLD">On Hold</a>
-    <a href="#collapse_RANDOM">Random</a>
-    <a href="#collapse_DROPPED">Dropped</a>
-    <a href="#collapse_PLAN_TO_WATCH">Plan to Watch</a>
+    <a href="#WATCHING">Watching</a>
+    <a href="#COMPLETED">Completed</a>
+    <a href="#ON_HOLD">On Hold</a>
+    <a href="#RANDOM">Random</a>
+    <a href="#DROPPED">Dropped</a>
+    <a href="#PLAN_TO_WATCH">Plan to Watch</a>
 </div>
 
 {% for category in all_data %}
