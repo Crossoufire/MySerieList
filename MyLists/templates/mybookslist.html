@@ -12,13 +12,9 @@
     background-repeat: no-repeat;
 }
 
-.ui-autocomplete-category {
-    font-weight: bold;
-    background-color: #131418;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    color: white;
-    text-align: center;
+.ui-menu-item .ui-menu-item-wrapper.ui-state-active {
+    background: #131418 !important;
+    border: solid white 1px;
 }
 </style>
 <!---------------- Main CSS ------------------->
@@ -128,6 +124,7 @@ hr {
     background-color: #272525;
     min-width: 9rem;
 }
+
 /* ############################# pacman loading ############################ */
 .modal_loading {
     display: none;
@@ -137,10 +134,7 @@ hr {
     left: 0;
     height: 100%;
     width: 100%;
-    background: rgba(0, 0, 0, .6)
-                url('{{ url_for("static", filename="img/pacman_loader.gif") }}')
-                50% 50%
-                no-repeat;
+    background: rgba(0, 0, 0, .6) url('{{ url_for("static", filename="img/pacman_loader.gif") }}') 50% 50% no-repeat;
 }
 
 body.loading .modal_loading {
@@ -151,7 +145,6 @@ body.loading .modal_loading {
     display: block;
 }
 /* ######################################################################### */
-
 
 
 /* ################################ card CSS ############################### */
@@ -196,8 +189,8 @@ body.loading .modal_loading {
 }
 /* ######################################################################### */
 
+
 /* ############################ 768px or less ############################## */
-/* On screens that are 768px or less */
 @media (max-width: 767.98px) {
     .d-flex {
         justify-content: center;
@@ -356,7 +349,7 @@ body.loading .modal_loading {
 
         <span class="m-l-5 m-r-5 text-light">||</span>
 
-        <a id="view_container" href="{{ url_for('mybookslist_table', user_name=user_name) }}">
+        <a id="view_container" href="{{ url_for('mybookslist', list_view='table', user_name=user_name) }}">
             <span class="fas fa-bars text-light"></span>
             <span class="text-light">Table view</span>
         </a>

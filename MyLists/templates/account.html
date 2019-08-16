@@ -479,10 +479,10 @@ hr {
                     <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='animelist', list_view='grid', user_name=data['username']) }}">AnimeList</a>
                 </div>
                 <div class="col">
-                    <a class="btn btn-primary" href="/bookslist/{{ data['username'] }}">BooksList</a>
+                    <a class="btn btn-primary" href="{{ url_for('mybookslist', list_view='grid', user_name=data['username']) }}">BooksList</a>
                 </div>
                 <div class="col">
-                    <a class="btn btn-warning" href="/achievements/{{ data['username'] }}">Achievements</a>
+                    <a class="btn btn-warning" href="{{ url_for('achievements', user_name=data['username']) }}">Achievements</a>
                 </div>
             </div>
         {% endif %}
