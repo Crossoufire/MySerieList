@@ -1042,7 +1042,6 @@ def mymedialist(media_list, list_view, user_name):
                                media_list=media_list,
                                target_user_name=user_name,
                                target_user_id=str(user.id))
-
     elif list_view == "table":
         return render_template('mymedialist_table.html',
                                title="{}'s {}".format(user_name, media_list),
@@ -1054,6 +1053,8 @@ def mymedialist(media_list, list_view, user_name):
                                media_list=media_list,
                                target_user_name=user_name,
                                target_user_id=str(user.id))
+    else:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
 
 @app.route('/update_element_season', methods=['POST'])
@@ -1072,6 +1073,8 @@ def update_element_season():
     valide_types = ["animelist", "serieslist"]
     if element_type not in valide_types:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the element exists
     if element_type == "animelist":
         if Anime.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
@@ -1091,27 +1094,25 @@ def update_element_season():
     if element_type == "animelist":
         last_season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).order_by(
             AnimeEpisodesPerSeason.season.desc()).first().season
-        if season + 1 < 1 or season + 1 > last_season:
+        if (season+1 < 1) or (season+1 > last_season):
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
         update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
-
         update.current_season = season + 1
         update.last_episode_watched = 1
         db.session.commit()
-        app.logger.info('[{}] Season of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, season + 1))
+        app.logger.info('[{}] Season of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, season+1))
     elif element_type == "serieslist":
         last_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).order_by(
             SeriesEpisodesPerSeason.season.desc()).first().season
-        if season + 1 < 1 or season + 1 > last_season:
+        if (season+1 < 1) or (season+1 > last_season):
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
         update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
-
         update.current_season = season + 1
         update.last_episode_watched = 1
         db.session.commit()
-        app.logger.info('[{}] Season of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, season + 1))
+        app.logger.info('[{}] Season of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, season+1))
 
     # Compute total time spent
     if element_type == "animelist":
@@ -1132,13 +1133,19 @@ def update_element_season():
     total_time = 0
     for element in data:
         if element[0].status == Status.COMPLETED:
-            total_time += element[1].episode_duration * element[1].total_episodes
+            try:
+                total_time += element[1].episode_duration * element[1].total_episodes
+            except:
+                pass
         elif element[0].status != Status.PLAN_TO_WATCH:
-            episodes = element[2].split(",")
-            episodes = [int(x) for x in episodes]
-            for i in range(1, element[0].current_season):
-                total_time += element[1].episode_duration * episodes[i - 1]
-            total_time += element[0].last_episode_watched * element[1].episode_duration
+            try:
+                episodes = element[2].split(",")
+                episodes = [int(x) for x in episodes]
+                for i in range(1, element[0].current_season):
+                    total_time += element[1].episode_duration * episodes[i-1]
+                total_time += element[0].last_episode_watched * element[1].episode_duration
+            except:
+                pass
 
     time_spent = User.query.filter_by(id=current_user.id).first()
     if element_type == "animelist":
@@ -1187,27 +1194,23 @@ def update_element_episode():
     if element_type == "animelist":
         current_season = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first().current_season
         last_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=current_season).first().episodes
-        if episode + 1 < 1 or episode + 1 > last_episode:
+        if (episode+1 < 1) or (episode+1 > last_episode):
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
         update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
-
         update.last_episode_watched = episode + 1
         db.session.commit()
-        app.logger.info('[{}] Episode of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, episode + 1))
+        app.logger.info('[{}] Episode of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, episode+1))
     elif element_type == "serieslist":
-        current_season = SeriesList.query.filter_by(user_id=current_user.get_id(),
-                                                    series_id=element_id).first().current_season
+        current_season = SeriesList.query.filter_by(user_id=current_user.get_id(),series_id=element_id).first().current_season
         last_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=current_season).first().episodes
-        if episode + 1 < 1 or episode + 1 > last_episode:
+        if (episode+1 < 1) or (episode+1 > last_episode):
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
         update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
-
         update.last_episode_watched = episode + 1
         db.session.commit()
-        app.logger.info('[{}] Episode of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, episode + 1))
-
+        app.logger.info('[{}] Episode of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, episode+1))
 
     # Compute total time spent
     if element_type == "animelist":
@@ -1228,13 +1231,19 @@ def update_element_episode():
     total_time = 0
     for element in data:
         if element[0].status == Status.COMPLETED:
-            total_time += element[1].episode_duration * element[1].total_episodes
+            try:
+                total_time += element[1].episode_duration * element[1].total_episodes
+            except:
+                pass
         elif element[0].status != Status.PLAN_TO_WATCH:
-            episodes = element[2].split(",")
-            episodes = [int(x) for x in episodes]
-            for i in range(1, element[0].current_season):
-                total_time += element[1].episode_duration * episodes[i - 1]
-            total_time += element[0].last_episode_watched * element[1].episode_duration
+            try:
+                episodes = element[2].split(",")
+                episodes = [int(x) for x in episodes]
+                for i in range(1, element[0].current_season):
+                    total_time += element[1].episode_duration * episodes[i-1]
+                total_time += element[0].last_episode_watched * element[1].episode_duration
+            except:
+                pass
 
     time_spent = User.query.filter_by(id=current_user.id).first()
     if element_type == "animelist":
@@ -1278,6 +1287,7 @@ def delete_element():
         if SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
+    # Remove the element from user's list
     if element_type == "animelist":
         AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).delete()
         db.session.commit()
@@ -1287,7 +1297,7 @@ def delete_element():
         db.session.commit()
         app.logger.info('[{}] Series with ID {} deleted'.format(current_user.get_id(), element_id))
 
-    # Compute total time spent
+    # Compute the new total time spent
     if element_type == "animelist":
         data = db.session.query(AnimeList, Anime,
                                 func.group_concat(AnimeEpisodesPerSeason.episodes)). \
@@ -1306,13 +1316,19 @@ def delete_element():
     total_time = 0
     for element in data:
         if element[0].status == Status.COMPLETED:
-            total_time += element[1].episode_duration * element[1].total_episodes
+            try:
+                total_time += element[1].episode_duration * element[1].total_episodes
+            except:
+                pass
         elif element[0].status != Status.PLAN_TO_WATCH:
-            episodes = element[2].split(",")
-            episodes = [int(x) for x in episodes]
-            for i in range(1, element[0].current_season):
-                total_time += element[1].episode_duration * episodes[i - 1]
-            total_time += element[0].last_episode_watched * element[1].episode_duration
+            try:
+                episodes = element[2].split(",")
+                episodes = [int(x) for x in episodes]
+                for i in range(1, element[0].current_season):
+                    total_time += element[1].episode_duration * episodes[i - 1]
+                total_time += element[0].last_episode_watched * element[1].episode_duration
+            except:
+                pass
 
     time_spent = User.query.filter_by(id=current_user.id).first()
     if element_type == "animelist":
@@ -1345,6 +1361,7 @@ def change_element_category():
     if element_type not in valid_element_type:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
+    # Check if the element is in the user's list
     if element_type == "animelist":
         element = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
     elif element_type == "serieslist":
