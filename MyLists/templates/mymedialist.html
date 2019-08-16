@@ -589,21 +589,22 @@ body.loading .modal_loading {
 							</button>
 						</div>
 						<div class="modal-body">
-							<p><b>Original Name</b> : {{ data[0].original_name }}</p>
-							<p><b>Genres</b> : {{ genres["{}".format(data[0].id)] }}</p>
-							<p><b>First air date</b> : {{ data[0].first_air_date }}</p>
-							<p><b>Last air date</b> : {{ data[0].last_air_date }}</p>
-							<p><b>Homepage</b> : <a target="_blank" rel="noopener noreferrer" href="{{ data[0].homepage }}">{{ data[0].homepage }}</a></p>
-							<p><b>In production</b> : {{ data[0].in_production }}</p>
-							<p><b>Networks</b> : {{ networks["{}".format(data[0].id)] }}</p>
-							<p><b>Created by</b> : {{ data[0].created_by }}</p>
-							<p><b>Episode duration</b> : {{ data[0].episode_duration }} min</p>
-							<p><b>Total seasons</b> : {{ data[0].total_seasons }}</p>
-							<p><b>Total episodes</b> : {{ data[0].total_episodes }}</p>
-							<p><b>Origin country</b> : {{ data[0].origin_country }}</p>
-							<p><b>Status</b> : {{ data[0].status }}</p>
+							<p><b>Original Name</b>: {{ data[0].original_name }}</p>
+							<p><b>Genres</b>: {{ genres["{}".format(data[0].id)] }}</p>
+							<p><b>First air date</b>: {{ first_air_date["{}".format(data[0].id)] }}</p>
+							<p><b>Last air date</b>: {{ last_air_date["{}".format(data[0].id)] }}</p>
+							<p><b>Homepage</b>: <a target="_blank" rel="noopener noreferrer" href="{{ data[0].homepage }}">{{ data[0].homepage }}</a></p>
+							<p><b>In production</b>: {{ data[0].in_production }}</p>
+							<p><b>Networks</b>: {{ networks["{}".format(data[0].id)] }}</p>
+							<p><b>Created by</b>: {{ data[0].created_by }}</p>
+							<p><b>Episode duration</b>: {{ data[0].episode_duration }} min</p>
+							<p><b>Total seasons</b>: {{ data[0].total_seasons }}</p>
+							<p><b>Total episodes</b>: {{ data[0].total_episodes }}</p>
+							<p><b>Origin country</b>: {{ data[0].origin_country }}</p>
+							<p><b>TMDb score</b>: {{ data[0].vote_average }}/10</p>
+							<p><b>Status</b>: {{ data[0].status }}</p>
 							<hr class="m-b-10 m-t-10">
-							<p class="m-b-0"><b>Synopsis</b> : </p><p class="text-justify show-read-more">{{ data[0].synopsis }}</p>
+							<p class="m-b-0"><b>Synopsis</b>: </p><p class="text-justify show-read-more">{{ data[0].synopsis }}</p>
 						</div>
 					</div>
 				</div>

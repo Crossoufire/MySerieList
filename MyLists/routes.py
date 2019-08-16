@@ -147,7 +147,7 @@ def home():
                 elif user.homepage == HomePage.MYANIMESLIST:
                     return redirect(url_for('mymedialist', media_list='animelist', list_view='grid', user_name=current_user.username))
                 elif user.homepage == HomePage.MYBOOKSLIST:
-                    return redirect(url_for('mybookslist', user_name=current_user.username))
+                    return redirect(url_for('mybookslist', list_view='grid', user_name=current_user.username))
                 elif user.homepage == HomePage.ACCOUNT:
                     return redirect(url_for('account', user_name=current_user.username))
                 elif user.homepage == HomePage.HALL_OF_FAME:
@@ -992,6 +992,8 @@ def mymedialist(media_list, list_view, user_name):
     genres = {}
     networks = {}
     can_update = {}
+    last_air_date = {}
+    first_air_date = {}
 
     for element in element_data:
         # Change the cover path
@@ -1016,11 +1018,25 @@ def mymedialist(media_list, list_view, user_name):
         # Convert all element to int
         eps["{}".format(element[0].id)] = [int(x) for x in eps["{}".format(element[0].id)]]
 
+        # Change first air time format
+        tmp = element[0].first_air_date.split('-')
+        tmp_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
+        first_air_date["{}".format(element[0].id)] = tmp_air_date
+
+        # Change last air time format
+        tmp = element[0].last_air_date.split('-')
+        tmp_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
+        last_air_date["{}".format(element[0].id)] = tmp_air_date
+
         # Get genres
-        genres["{}".format(element[0].id)] = element[2]
+        tmp = element[2]
+        tmp_genres = tmp.replace(',', ', ')
+        genres["{}".format(element[0].id)] = tmp_genres
 
         # Get networks
-        networks["{}".format(element[0].id)] = element[3]
+        tmp = element[3]
+        tmp_networks = tmp.replace(',', ', ')
+        networks["{}".format(element[0].id)] = tmp_networks
 
         # Can update
         time_delta = datetime.utcnow() - element[0].last_update
@@ -1040,6 +1056,8 @@ def mymedialist(media_list, list_view, user_name):
                                networks=networks,
                                can_update=can_update,
                                media_list=media_list,
+                               last_air_date=last_air_date,
+                               first_air_date=first_air_date,
                                target_user_name=user_name,
                                target_user_id=str(user.id))
     elif list_view == "table":
@@ -1051,6 +1069,8 @@ def mymedialist(media_list, list_view, user_name):
                                networks=networks,
                                can_update=can_update,
                                media_list=media_list,
+                               last_air_date=last_air_date,
+                               first_air_date=first_air_date,
                                target_user_name=user_name,
                                target_user_id=str(user.id))
     else:
@@ -1595,21 +1615,23 @@ def autocomplete(media):
         search = request.args.get('q')
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
     if media == "animelist":
         results = autocomplete_search_element(search, ListType.ANIME)
     elif media == "serieslist":
         results = autocomplete_search_element(search, ListType.SERIES)
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
     return jsonify(matching_results=results)
 
 
 ###################################################### Books Routes ####################################################
 
 
-@app.route("/bookslist/<user_name>", methods=['GET', 'POST'])
+@app.route("/bookslist/<list_view>/<user_name>", methods=['GET', 'POST'])
 @login_required
-def mybookslist(user_name):
+def mybookslist(user_name, list_view):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
@@ -1635,48 +1657,23 @@ def mybookslist(user_name):
 
     book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
     book_data = get_list_data(book_list, ListType.BOOK)
-    user_id = str(user.id)
-    return render_template('mybookslist.html',
-                           title="{}'s BooksList".format(user_name),
-                           user_id=user_id,
-                           all_data=book_data,
-                           user_name=user_name)
 
-
-@app.route("/bookslist/table/<user_name>", methods=['GET', 'POST'])
-@login_required
-def mybookslist_table(user_name):
-    image_error = url_for('static', filename='img/error.jpg')
-    user = User.query.filter_by(username=user_name).first()
-
-    if user is None:
+    if list_view == "grid":
+        return render_template('mybookslist.html',
+                               title="{}'s BooksList".format(user_name),
+                               user_id=str(user.id),
+                               all_data=book_data,
+                               user_name=user_name,
+                               list_view=list_view)
+    elif list_view == "table":
+        return render_template('mybookslist_table.html',
+                               title="{}'s BooksList".format(user_name),
+                               user_id=str(user.id),
+                               all_data=book_data,
+                               user_name=user_name,
+                               list_view=list_view)
+    else:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-
-    if current_user.id != user.id:
-        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-        if user.id == 1:
-            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-        if user.private:
-            if current_user.get_id() == "1":
-                pass
-            elif friend is None or friend.status != "accepted":
-                image_anonymous = url_for('static', filename='img/anonymous.jpg')
-                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
-
-    reading_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=Status.READING).all()
-    completed_list  = BookList.query.filter_by(user_id=current_user.get_id(), status=Status.COMPLETED).all()
-    onhold_list     = BookList.query.filter_by(user_id=current_user.get_id(), status=Status.ON_HOLD).all()
-    dropped_list    = BookList.query.filter_by(user_id=current_user.get_id(), status=Status.DROPPED).all()
-    plantoread_list = BookList.query.filter_by(user_id=current_user.get_id(), status=Status.PLAN_TO_READ).all()
-
-    book_list = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
-    book_data = get_list_data(book_list, ListType.BOOK)
-    user_id = str(user.id)
-    return render_template('mybookslist_table.html',
-                           title="{}'s BooksList".format(user_name),
-                           user_id=user_id,
-                           all_data=book_data,
-                           user_name=user_name)
 
 
 @app.route('/delete_book', methods=['POST'])
@@ -1785,7 +1782,11 @@ def set_book_score():
 @app.route('/autocomplete_books', methods=['GET'])
 @login_required
 def autocomplete_books():
-    search = request.args.get('q')
+    image_error = url_for('static', filename='img/error.jpg')
+    try:
+        search = request.args.get('q')
+    except:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     results = autocomplete_search_element(search, ListType.BOOK)
     return jsonify(matching_results=results)
@@ -2386,8 +2387,7 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         except:
             origin_country = None
 
-        # Check if there is a special season
-        # We do not want to take it into account
+        # Check if there is a special season, we do not want to take it into account
         seasons_data = []
         if len(element_data["seasons"]) == 0:
             return None
@@ -2419,7 +2419,7 @@ def add_element_in_base(element_data, element_cover_id, list_type):
             except:
                 pass
 
-        # Add the element into the table
+        # Add the element to the database
         if list_type == ListType.SERIES:
             element = Series(name=name,
                              original_name=original_name,
@@ -2647,96 +2647,95 @@ def get_list_data(list, list_type):
         for element in category:
             current_element = {}
             # Cover, name, genre and network of the element
-            if list_type == ListType.SERIES:
-                element_data = Series.query.filter_by(id=element.series_id).first()
-                cover_url = url_for('static', filename="series_covers/{}".format(element_data.image_cover))
-                element_data_genres = SeriesGenre.query.filter_by(series_id=element.series_id).all()
-                element_data_networks = SeriesNetwork.query.filter_by(series_id=element.series_id).all()
-            elif list_type == ListType.ANIME:
-                element_data = Anime.query.filter_by(id=element.anime_id).first()
-                cover_url = url_for('static', filename="animes_covers/{}".format(element_data.image_cover))
-                element_data_genres = AnimeGenre.query.filter_by(anime_id=element.anime_id).all()
-                element_data_networks = AnimeNetwork.query.filter_by(anime_id=element.anime_id).all()
-            elif list_type == ListType.BOOK:
-                element_data = Book.query.filter_by(id=element.book_id).first()
-                cover_url = url_for('static', filename="books_covers/{}".format(element_data.image_cover))
+            # if list_type == ListType.SERIES:
+            #     element_data = Series.query.filter_by(id=element.series_id).first()
+            #     cover_url = url_for('static', filename="series_covers/{}".format(element_data.image_cover))
+            #     element_data_genres = SeriesGenre.query.filter_by(series_id=element.series_id).all()
+            #     element_data_networks = SeriesNetwork.query.filter_by(series_id=element.series_id).all()
+            # elif list_type == ListType.ANIME:
+            #     element_data = Anime.query.filter_by(id=element.anime_id).first()
+            #     cover_url = url_for('static', filename="animes_covers/{}".format(element_data.image_cover))
+            #     element_data_genres = AnimeGenre.query.filter_by(anime_id=element.anime_id).all()
+            #     element_data_networks = AnimeNetwork.query.filter_by(anime_id=element.anime_id).all()
+            # elif list_type == ListType.BOOK:
 
+            element_data = Book.query.filter_by(id=element.book_id).first()
+            cover_url = url_for('static', filename="books_covers/{}".format(element_data.image_cover))
             current_element["cover_url"] = cover_url
 
-            if list_type == ListType.SERIES or list_type == ListType.ANIME:
-                # Element meta data
-                current_element["id"] = element_data.id
-                current_element["name"] = element_data.name
-                current_element["original_name"] = element_data.original_name
+            # if list_type == ListType.SERIES or list_type == ListType.ANIME:
+            #     # Element meta data
+            #     current_element["id"] = element_data.id
+            #     current_element["name"] = element_data.name
+            #     current_element["original_name"] = element_data.original_name
+            #
+            #     tmp = []
+            #     for i in range(0, len(element_data_genres)):
+            #         tmp.append(element_data_genres[i].genre)
+            #     current_element["genre"] = ', '.join(tmp)
+            #
+            #     tmp_fair_date = element_data.first_air_date.split('-')
+            #     tmp_fair_date_2 = [tmp_fair_date[2], tmp_fair_date[1], tmp_fair_date[0]]
+            #     fair_date = '-'.join(tmp_fair_date_2)
+            #     current_element["first_air_date"] = fair_date
+            #
+            #     tmp_lair_date = element_data.last_air_date.split('-')
+            #     tmp_lair_date_2 = [tmp_lair_date[2], tmp_lair_date[1], tmp_lair_date[0]]
+            #     lair_date = '-'.join(tmp_lair_date_2)
+            #     current_element["last_air_date"] = lair_date
+            #
+            #     current_element["homepage"] = element_data.homepage
+            #     current_element["in_production"] = element_data.in_production
+            #
+            #     tmp = []
+            #     for i in range(0, len(element_data_networks)):
+            #         tmp.append(element_data_networks[i].network)
+            #     current_element["network"] = ', '.join(tmp)
+            #
+            #     current_element["created_by"] = element_data.created_by
+            #     current_element["episode_duration"] = element_data.episode_duration
+            #     current_element["total_seasons"] = element_data.total_seasons
+            #     current_element["total_episodes"] = element_data.total_episodes
+            #     current_element["origin_country"] = element_data.origin_country
+            #     current_element["status"] = element_data.status
+            #     current_element["synopsis"] = element_data.synopsis
+            #     current_element["score"] = element.score
+            #
+            #     # Can update
+            #     time_delta = datetime.utcnow() - element_data.last_update
+            #     if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
+            #         current_element["can_update"] = True
+            #     else:
+            #         current_element["can_update"] = False
+            #
+            #     # Number of season and the number of ep of each season
+            #     if list_type == ListType.SERIES:
+            #         episodesperseason = SeriesEpisodesPerSeason.query.filter_by(series_id=element_data.id).order_by(SeriesEpisodesPerSeason.season.asc()).all()
+            #     elif list_type == ListType.ANIME:
+            #         episodesperseason = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_data.id).order_by(AnimeEpisodesPerSeason.season.asc()).all()
+            #     tmp = []
+            #     for season in episodesperseason:
+            #         tmp.append(season.episodes)
+            #     current_element["season_data"] = tmp
+            #
+            #     current_element["current_season"] = element.current_season
+            #     current_element["last_episode_watched"] = element.last_episode_watched
+            #     category_element_data.append(current_element)
 
-                tmp = []
-                for i in range(0, len(element_data_genres)):
-                    tmp.append(element_data_genres[i].genre)
-                current_element["genre"] = ', '.join(tmp)
+            # Book meta data
+            current_element["title"] = element_data.title
+            current_element["authors"] = element_data.authors
+            current_element["id"] = element_data.id
+            current_element["published_date"] = element_data.published_date
+            current_element["description"] = element_data.description
+            current_element["page_count"] = element_data.page_count
+            current_element["categories"] = element_data.categories
+            current_element["score"] = element.score
+            category_element_data.append(current_element)
 
-                tmp_fair_date = element_data.first_air_date.split('-')
-                tmp_fair_date_2 = [tmp_fair_date[2], tmp_fair_date[1], tmp_fair_date[0]]
-                fair_date = '-'.join(tmp_fair_date_2)
-                current_element["first_air_date"] = fair_date
-
-                tmp_lair_date = element_data.last_air_date.split('-')
-                tmp_lair_date_2 = [tmp_lair_date[2], tmp_lair_date[1], tmp_lair_date[0]]
-                lair_date = '-'.join(tmp_lair_date_2)
-                current_element["last_air_date"] = lair_date
-
-                current_element["homepage"] = element_data.homepage
-                current_element["in_production"] = element_data.in_production
-
-                tmp = []
-                for i in range(0, len(element_data_networks)):
-                    tmp.append(element_data_networks[i].network)
-                current_element["network"] = ', '.join(tmp)
-
-                current_element["created_by"] = element_data.created_by
-                current_element["episode_duration"] = element_data.episode_duration
-                current_element["total_seasons"] = element_data.total_seasons
-                current_element["total_episodes"] = element_data.total_episodes
-                current_element["origin_country"] = element_data.origin_country
-                current_element["status"] = element_data.status
-                current_element["synopsis"] = element_data.synopsis
-                current_element["score"] = element.score
-
-                # Can update
-                time_delta = datetime.utcnow() - element_data.last_update
-                if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
-                    current_element["can_update"] = True
-                else:
-                    current_element["can_update"] = False
-
-                # Number of season and the number of ep of each season
-                if list_type == ListType.SERIES:
-                    episodesperseason = SeriesEpisodesPerSeason.query.filter_by(series_id=element_data.id).order_by(SeriesEpisodesPerSeason.season.asc()).all()
-                elif list_type == ListType.ANIME:
-                    episodesperseason = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_data.id).order_by(AnimeEpisodesPerSeason.season.asc()).all()
-                tmp = []
-                for season in episodesperseason:
-                    tmp.append(season.episodes)
-                current_element["season_data"] = tmp
-
-                current_element["current_season"] = element.current_season
-                current_element["last_episode_watched"] = element.last_episode_watched
-                category_element_data.append(current_element)
-            elif list_type == ListType.BOOK:
-                # Element meta data
-                current_element["title"] = element_data.title
-                current_element["authors"] = element_data.authors
-                current_element["id"] = element_data.id
-                current_element["published_date"] = element_data.published_date
-                current_element["description"] = element_data.description
-                current_element["page_count"] = element_data.page_count
-                current_element["categories"] = element_data.categories
-                current_element["score"] = element.score
-                category_element_data.append(current_element)
-
-        if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            category_element_data = sorted(category_element_data, key=lambda i: (i['name']))
-        elif list_type == ListType.BOOK:
-            category_element_data = sorted(category_element_data, key=lambda i: (i['title']))
+        # if list_type == ListType.SERIES or list_type == ListType.ANIME:
+        #     category_element_data = sorted(category_element_data, key=lambda i: (i['name']))
+        category_element_data = sorted(category_element_data, key=lambda i: (i['title']))
         all_list_data.append(category_element_data)
 
     return all_list_data
