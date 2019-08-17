@@ -180,6 +180,9 @@ body.loading .modal_loading {
 }
 
 .episodes {
+	{% if target_user_id == current_user.get_id() %}
+	cursor: pointer;
+	{% endif %}
     width: 100px;
     border-style: 1px;
     border-color: black;
@@ -190,6 +193,9 @@ body.loading .modal_loading {
 }
 
 .seasons {
+	{% if target_user_id == current_user.get_id() %}
+	cursor: pointer;
+	{% endif %}
     width: 100px;
     border-style: 1px;
     border-color: black;
@@ -334,6 +340,9 @@ body.loading .modal_loading {
     width: 80px;
 }
 
+.table_country {
+	width: 130px;
+}
 </style>
 {% endblock css %}
 
@@ -410,6 +419,7 @@ body.loading .modal_loading {
 					<th>Name</th>
 					<th class="table_season">Season</th>
 					<th class="table_episode">Episode</th>
+					<th class="table_country">Origin country</th>
 					<th class="table_score">Score</th>
 					{% if target_user_id == current_user.get_id() %}
 					<th class="table_actions">Actions</th>
@@ -432,6 +442,7 @@ body.loading .modal_loading {
 					<th>Name</th>
 					<th class="table_season">Season</th>
 					<th class="table_episode">Episode</th>
+					<th class="table_country">Origin country</th>
 					<th class="table_score">Score</th>
 					{% if target_user_id == current_user.get_id() %}
 					<th class="table_actions">Actions</th>
@@ -454,6 +465,7 @@ body.loading .modal_loading {
 					<th>Name</th>
 					<th class="table_season">Season</th>
 					<th class="table_episode">Episode</th>
+					<th class="table_country">Origin country</th>
 					<th class="table_score">Score</th>
 					{% if target_user_id == current_user.get_id() %}
 					<th class="table_actions">Actions</th>
@@ -476,6 +488,7 @@ body.loading .modal_loading {
 					<th>Name</th>
 					<th class="table_season">Season</th>
 					<th class="table_episode">Episode</th>
+					<th class="table_country">Origin country</th>
 					<th class="table_score">Score</th>
 					{% if target_user_id == current_user.get_id() %}
 					<th class="table_actions">Actions</th>
@@ -498,6 +511,7 @@ body.loading .modal_loading {
 					<th>Name</th>
 					<th class="table_season">Season</th>
 					<th class="table_episode">Episode</th>
+					<th class="table_country">Origin country</th>
 					<th class="table_score">Score</th>
 					{% if target_user_id == current_user.get_id() %}
 					<th class="table_actions">Actions</th>
@@ -520,6 +534,7 @@ body.loading .modal_loading {
 					<th>Name</th>
 					<th class="table_season">Season</th>
 					<th class="table_episode">Episode</th>
+					<th class="table_country">Origin country</th>
 					<th class="table_score">Score</th>
 					{% if target_user_id == current_user.get_id() %}
 					<th class="table_actions">Actions</th>
@@ -567,6 +582,9 @@ body.loading .modal_loading {
 					{% endif %}
 				{% endfor %}
 				</select>
+			</td>
+			<td class="text-center">
+				{{ data[0].origin_country }}
 			</td>
 			<td class="text-center">
 				{% if target_user_id == current_user.get_id() %}

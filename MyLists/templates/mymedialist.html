@@ -399,7 +399,7 @@ body.loading .modal_loading {
 {% for category in all_data %}
 	{% if loop.index == 1 %}
 		<div style="cursor: pointer;" data-toggle="collapse" href="#WATCHING" onclick="turn('WATCHING', 'WATCHING_arrow')">
-			<h2 class="font-weight-light text-center mt-5 mb-0 category-title">WATCHING
+			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">WATCHING
 				<div class="arrow_div float-right">
 					<a class="collapse_all fas fa-sm fa-chevron-down" id="WATCHING_arrow"></a>
 				</div>
@@ -415,47 +415,47 @@ body.loading .modal_loading {
 				</div>
 			</h2>
 		</div>
-		<hr class="mt-2 mb-0">
+		<hr class="mt-2 pb-3 mb-0">
 		<div class="collapse show d-flex flex-wrap" id="COMPLETED">
 	{% elif loop.index == 3 %}
 		<div style="cursor: pointer;" data-toggle="collapse" href="#ON_HOLD" onclick="turn('ON_HOLD', 'ON_HOLD_arrow')">
-			<h2 class="font-weight-light text-center mt-5 mb-0 category-title">ON HOLD
+			<h2 class="font-weight-light text-center pt-3 mb-0 category-title">ON HOLD
 				<div class="arrow_div float-right">
 					<a class="collapse_all fas fa-sm fa-chevron-down" id="ON_HOLD_arrow"></a>
 				</div>
 			</h2>
 		</div>
-		<hr class="mt-2 mb-0">
+		<hr class="mt-2 pb-3 mb-0">
 		<div class="collapse show d-flex flex-wrap" id="ON_HOLD">
 	{% elif loop.index == 4 %}
 		<div style="cursor: pointer;" data-toggle="collapse" href="#RANDOM" onclick="turn('RANDOM', 'RANDOM_arrow')">
-			<h2 class="font-weight-light text-center mt-5 mb-0 category-title">RANDOM
+			<h2 class="font-weight-light text-center pt-3 mb-0 category-title">RANDOM
 				<div class="arrow_div float-right">
 					<a class="collapse_all fas fa-sm fa-chevron-down" id="RANDOM_arrow"></a>
 				</div>
 			</h2>
 		</div>
-		<hr class="mt-2 mb-0">
+		<hr class="mt-2 pb-3 mb-0">
 		<div class="collapse show d-flex flex-wrap" id="RANDOM">
 	{% elif loop.index == 5 %}
 		<div style="cursor: pointer;" data-toggle="collapse" href="#DROPPED" onclick="turn('DROPPED', 'DROPPED_arrow')">
-			<h2 class="font-weight-light text-center mt-5 mb-0 category-title">DROPPED
+			<h2 class="font-weight-light text-center pt-3 mb-0 category-title">DROPPED
 				<div class="arrow_div float-right">
 					<a class="collapse_all fas fa-sm fa-chevron-down" id="DROPPED_arrow"></a>
 				</div>
 			</h2>
 		</div>
-		<hr class="mt-2 mb-0">
+		<hr class="mt-2 pb-3 mb-0">
 		<div class="collapse show d-flex flex-wrap" id="DROPPED">
 	{% elif loop.index == 6 %}
 		<div style="cursor: pointer;" data-toggle="collapse" href="#PLAN_TO_WATCH" onclick="turn('PLAN_TO_WATCH', 'PLAN_TO_WATCH_arrow')">
-			<h2 class="font-weight-light text-center mt-5 mb-0 category-title">PLAN TO WATCH
+			<h2 class="font-weight-light text-center pt-3 mb-0 category-title">PLAN TO WATCH
 				<div class="arrow_div float-right">
 					<a class="collapse_all fas fa-sm fa-chevron-down" id="PLAN_TO_WATCH_arrow"></a>
 				</div>
 			</h2>
 		</div>
-		<hr class="mt-2 mb-0">
+		<hr class="mt-2 pb-3 mb-0">
 		<div class="collapse show d-flex flex-wrap" id="PLAN_TO_WATCH">
 	{% endif %}
 

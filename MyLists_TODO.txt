@@ -14,6 +14,8 @@ TO DO / FIX FIRST
 	Add friend without reload in account
 	Add a statistics page with chart.js (already started the code part)
 	Add stats in navbar (when page done)
+	Add Anime movies (Added multi search from the API)
+	Add series achievements
 
 
 TO DO LATER
@@ -21,7 +23,3 @@ TO DO LATER
 	Add the possibility to have the score display by default or not in the grid lists
 	Add the possibility to select a default view (grid/table) for lists
 	Add ZOOM for the media lists (done on booklist but shady), but it is difficult to implement with cards style
-	Separation of the code for routes
-	Multi selection when changing category
-	Add Anime movies (Added multi search from the API)
-	Add series achievements
