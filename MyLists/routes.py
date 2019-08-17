@@ -1393,6 +1393,7 @@ def change_element_category():
         element.status = Status.WATCHING
     elif element_new_category == 'Completed':
         element.status = Status.COMPLETED
+
         # Set Season / Episode to max
         if element_type == "animelist":
             number_season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).count()
@@ -1420,8 +1421,6 @@ def change_element_category():
 
             time_spent = User.query.filter_by(id=current_user.id).first()
             time_spent.time_spent_anime = total_time
-
-            db.session.commit()
         elif element_type == "serieslist":
             number_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).count()
             number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=number_season).first().episodes
@@ -1435,7 +1434,66 @@ def change_element_category():
                                     join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
                                     filter(SeriesList.user_id == current_user.id). \
                                     group_by(SeriesList.series_id).all()
+            total_time = 0
+            for element in data:
+                if element[0].status == Status.COMPLETED:
+                    total_time += element[1].episode_duration * element[1].total_episodes
+                elif element[0].status != Status.PLAN_TO_WATCH:
+                    episodes = element[2].split(",")
+                    episodes = [int(x) for x in episodes]
+                    for i in range(1, element[0].current_season):
+                        total_time += element[1].episode_duration * episodes[i - 1]
+                    total_time += element[0].last_episode_watched * element[1].episode_duration
 
+            time_spent = User.query.filter_by(id=current_user.id).first()
+            time_spent.time_spent_series = total_time
+    elif element_new_category == 'On Hold':
+        element.status = Status.ON_HOLD
+    elif element_new_category == 'Random':
+        element.status = Status.RANDOM
+    elif element_new_category == 'Dropped':
+        element.status = Status.DROPPED
+    elif element_new_category == 'Plan to Watch':
+        element.status = Status.PLAN_TO_WATCH
+
+        # Set Season/Ep to 1/1
+        if element_type == "animelist":
+            anime = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
+            anime.current_season = 1
+            anime.last_episode_watched = 1
+
+            # Compute time spent
+            data = db.session.query(AnimeList, Anime,
+                                    func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                    join(Anime, Anime.id == AnimeList.anime_id). \
+                                    join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
+                                    filter(AnimeList.user_id == current_user.id). \
+                                    group_by(AnimeList.anime_id).all()
+            total_time = 0
+            for element in data:
+                if element[0].status == Status.COMPLETED:
+                    total_time += element[1].episode_duration * element[1].total_episodes
+                elif element[0].status != Status.PLAN_TO_WATCH:
+                    episodes = element[2].split(",")
+                    episodes = [int(x) for x in episodes]
+                    for i in range(1, element[0].current_season):
+                        total_time += element[1].episode_duration * episodes[i - 1]
+                    total_time += element[0].last_episode_watched * element[1].episode_duration
+
+            time_spent = User.query.filter_by(id=current_user.id).first()
+            time_spent.time_spent_anime = total_time
+        elif element_type == "serieslist":
+            series = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
+            series.current_season = 1
+            series.last_episode_watched = 1
+
+            # Compute total time spent
+            data = db.session.query(SeriesList, Series,
+                                    func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                                    join(Series, Series.id == SeriesList.series_id). \
+                                    join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
+                                    filter(SeriesList.user_id == current_user.id). \
+                                    group_by(SeriesList.series_id).all()
             total_time = 0
             for element in data:
                 if element[0].status == Status.COMPLETED:
@@ -1450,24 +1508,6 @@ def change_element_category():
             time_spent = User.query.filter_by(id=current_user.id).first()
             time_spent.time_spent_series = total_time
 
-            db.session.commit()
-    elif element_new_category == 'On Hold':
-        element.status = Status.ON_HOLD
-    elif element_new_category == 'Random':
-        element.status = Status.RANDOM
-    elif element_new_category == 'Dropped':
-        element.status = Status.DROPPED
-    elif element_new_category == 'Plan to Watch':
-        element.status = Status.PLAN_TO_WATCH
-        # Set Season/Ep to 1/1
-        if element_type == "serieslist":
-            series = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
-            series.current_season = 1
-            series.last_episode_watched = 1
-        elif element_type == "animelist":
-            anime = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
-            anime.current_season = 1
-            anime.last_episode_watched = 1
     db.session.commit()
     app.logger.info('[{}] Category of the element with ID {} changed to {}'.format(current_user.get_id(),
                                                                                    element_id,
@@ -2388,7 +2428,7 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         try:
             created_by = ', '.join(x['name'] for x in element_data['created_by'])
         except:
-            created_by = None
+            created_by = "Unknow"
 
         try:
             episode_duration = element_data["episode_run_time"][0]
@@ -2401,7 +2441,7 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         try:
             origin_country = ", ".join(element_data["origin_country"])
         except:
-            origin_country = None
+            origin_country = "Unknow"
 
         # Check if there is a special season, we do not want to take it into account
         seasons_data = []
@@ -2482,10 +2522,15 @@ def add_element_in_base(element_data, element_cover_id, list_type):
 
         # Add genres
         if list_type == ListType.SERIES:
-            for genre_data in genres_data:
+            if len(genres_data) == 0:
                 genre = SeriesGenre(series_id=element.id,
-                                    genre=genre_data)
+                                    genre="Unknow")
                 db.session.add(genre)
+            else:
+                for genre_data in genres_data:
+                    genre = SeriesGenre(series_id=element.id,
+                                        genre=genre_data)
+                    db.session.add(genre)
         elif list_type == ListType.ANIME:
             try:
                 response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(element_data["name"]))
@@ -2507,15 +2552,20 @@ def add_element_in_base(element_data, element_cover_id, list_type):
                                            genre=genre_data)
                     db.session.add(add_genre)
 
-        # Add the different networks for each serie
-        for network_data in networks_data:
-            if list_type == ListType.SERIES:
-                networks = SeriesNetwork(series_id=element.id,
-                                         network=network_data)
-            elif list_type == ListType.ANIME:
-                networks = AnimeNetwork(anime_id=element.id,
-                                        network=network_data)
-            db.session.add(networks)
+        # Add the different networks for each element
+        if len(networks_data) == 0:
+            network = SeriesNetwork(series_id=element.id,
+                                     network="Unknow")
+            db.session.add(network)
+        else:
+            for network_data in networks_data:
+                if list_type == ListType.SERIES:
+                    network = SeriesNetwork(series_id=element.id,
+                                            network=network_data)
+                elif list_type == ListType.ANIME:
+                    network = AnimeNetwork(anime_id=element.id,
+                                           network=network_data)
+                db.session.add(network)
 
         # Add number of episodes for each season
         for season_data in seasons_data:
