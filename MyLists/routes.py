@@ -842,7 +842,7 @@ def achievements(user_name):
                            user_id=str(user.id),
                            user_name=user_name,
                            user_achievements=user_achievements,
-                           test=user_achievements_matrix,
+                           data=user_achievements_matrix,
                            user_number_achievements=user_number_achievements)
 
 
@@ -1979,60 +1979,151 @@ def get_knowledge_grade(knowledge_level):
 def get_achievements(user_id, list_type):
     if list_type == ListType.ANIME:
         all_achievements = []
+
+        anime_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre_id.distinct()),
+                                        func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
+                                        func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                        join(AnimeList, AnimeList.anime_id == Anime.id). \
+                                        join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
+                                        join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
+                                        filter(AnimeList.user_id == user_id).group_by(Anime.id).order_by(Anime.name.asc())
+
         tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10, tmp_11 = [0 for _ in range(11)]
         time_1, time_2, time_3, time_4, time_5, time_6, time_7, time_8, time_9, time_10, time_11 = [0 for _ in range(11)]
-        animes = AnimeList.query.filter(AnimeList.status != "PLAN_TO_WATCH").filter_by(user_id=user_id).all()
         anime_name_1, anime_name_2, anime_name_3, anime_name_4, anime_name_5, anime_name_6, anime_name_7, \
         anime_name_8, anime_name_9, anime_name_10, anime_name_11 = [[] for _ in range(11)]
-        for anime in animes:
-            genres = AnimeGenre.query.filter_by(anime_id=anime.anime_id).all()
-            anime_name = Anime.query.filter_by(id=anime.anime_id).first().name
+
+        for anime in anime_data:
+            # Get the genre in a list
+            genres = anime[2].split(',')
+
+            # Get episodes per season
+            nb_episodes = anime[4].split(',')
+
             for genre in genres:
+                genre = int(genre)
                 try:
-                    if genre.genre_id == 13:
+                    if genre == 13:
                         tmp_1 += 1
-                        time_1 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                        anime_name_1.append(anime_name)
-                    elif genre.genre_id == 18:
+
+                        ep_duration = int(anime[0].episode_duration)
+                        ep_counter = 0
+                        for i in range(0, anime[1].current_season - 1):
+                            ep_counter += int(nb_episodes[i])
+                        total_episodes_watched = ep_counter + anime[1].last_episode_watched
+                        time_1 += ep_duration * total_episodes_watched
+
+                        anime_name_1.append(anime[0].name)
+                    elif genre == 18:
                         tmp_2 += 1
-                        time_2 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                        anime_name_2.append(anime_name)
-                    elif genre.genre_id == 19:
+
+                        ep_duration = int(anime[0].episode_duration)
+                        ep_counter = 0
+                        for i in range(0, anime[1].current_season - 1):
+                            ep_counter += int(nb_episodes[i])
+                        total_episodes_watched = ep_counter + anime[1].last_episode_watched
+                        time_3 += ep_duration * total_episodes_watched
+
+                        anime_name_2.append(anime[0].name)
+                    elif genre == 19:
                         tmp_3 += 1
-                        time_3 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                        anime_name_3.append(anime_name)
-                    elif genre.genre_id == 7:
+
+                        ep_duration = int(anime[0].episode_duration)
+                        ep_counter = 0
+                        for i in range(0, anime[1].current_season - 1):
+                            ep_counter += int(nb_episodes[i])
+                        total_episodes_watched = ep_counter + anime[1].last_episode_watched
+                        time_3 += ep_duration * total_episodes_watched
+
+                        anime_name_3.append(anime[0].name)
+                    elif genre == 7:
                         tmp_4 += 1
-                        time_4 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                        anime_name_4.append(anime_name)
-                    elif genre.genre_id == 22:
+
+                        ep_duration = int(anime[0].episode_duration)
+                        ep_counter = 0
+                        for i in range(0, anime[1].current_season - 1):
+                            ep_counter += int(nb_episodes[i])
+                        total_episodes_watched = ep_counter + anime[1].last_episode_watched
+                        time_4 += ep_duration * total_episodes_watched
+
+                        anime_name_4.append(anime[0].name)
+                    elif genre == 22:
                         tmp_5 += 1
-                        time_5 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                        anime_name_5.append(anime_name)
-                    elif genre.genre_id == 36:
+
+                        ep_duration = int(anime[0].episode_duration)
+                        ep_counter = 0
+                        for i in range(0, anime[1].current_season - 1):
+                            ep_counter += int(nb_episodes[i])
+                        total_episodes_watched = ep_counter + anime[1].last_episode_watched
+                        time_5 += ep_duration * total_episodes_watched
+
+                        anime_name_5.append(anime[0].name)
+                    elif genre == 36:
                         tmp_6 += 1
-                        time_6 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                        anime_name_6.append(anime_name)
-                    elif genre.genre_id == 29:
+
+                        ep_duration = int(anime[0].episode_duration)
+                        ep_counter = 0
+                        for i in range(0, anime[1].current_season - 1):
+                            ep_counter += int(nb_episodes[i])
+                        total_episodes_watched = ep_counter + anime[1].last_episode_watched
+                        time_6 += ep_duration * total_episodes_watched
+
+                        anime_name_6.append(anime[0].name)
+                    elif genre == 29:
                         tmp_7 += 1
-                        time_7 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                        anime_name_7.append(anime_name)
-                    elif genre.genre_id == 30:
+
+                        ep_duration = int(anime[0].episode_duration)
+                        ep_counter = 0
+                        for i in range(0, anime[1].current_season - 1):
+                            ep_counter += int(nb_episodes[i])
+                        total_episodes_watched = ep_counter + anime[1].last_episode_watched
+                        time_7 += ep_duration * total_episodes_watched
+
+                        anime_name_7.append(anime[0].name)
+                    elif genre == 30:
                         tmp_8 += 1
-                        time_8 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                        anime_name_8.append(anime_name)
-                    elif genre.genre_id == 40:
+
+                        ep_duration = int(anime[0].episode_duration)
+                        ep_counter = 0
+                        for i in range(0, anime[1].current_season - 1):
+                            ep_counter += int(nb_episodes[i])
+                        total_episodes_watched = ep_counter + anime[1].last_episode_watched
+                        time_8 += ep_duration * total_episodes_watched
+
+                        anime_name_8.append(anime[0].name)
+                    elif genre == 40:
                         tmp_9 += 1
-                        time_9 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                        anime_name_9.append(anime_name)
-                    elif genre.genre_id == 14:
+
+                        ep_duration = int(anime[0].episode_duration)
+                        ep_counter = 0
+                        for i in range(0, anime[1].current_season - 1):
+                            ep_counter += int(nb_episodes[i])
+                        total_episodes_watched = ep_counter + anime[1].last_episode_watched
+                        time_9 += ep_duration * total_episodes_watched
+
+                        anime_name_9.append(anime[0].name)
+                    elif genre == 14:
                         tmp_10 += 1
-                        time_10 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                        anime_name_10.append(anime_name)
-                    elif genre.genre_id == 9:
+
+                        ep_duration = int(anime[0].episode_duration)
+                        ep_counter = 0
+                        for i in range(0, anime[1].current_season - 1):
+                            ep_counter += int(nb_episodes[i])
+                        total_episodes_watched = ep_counter + anime[1].last_episode_watched
+                        time_10 += ep_duration * total_episodes_watched
+
+                        anime_name_10.append(anime[0].name)
+                    elif genre == 9:
                         tmp_11 += 1
-                        time_11 += int(anime.episode_duration) * int(anime.number_of_episodes_watched)
-                        anime_name_11.append(anime_name)
+
+                        ep_duration = int(anime[0].episode_duration)
+                        ep_counter = 0
+                        for i in range(0, anime[1].current_season - 1):
+                            ep_counter += int(nb_episodes[i])
+                        total_episodes_watched = ep_counter + anime[1].last_episode_watched
+                        time_11 += ep_duration * total_episodes_watched
+
+                        anime_name_11.append(anime[0].name)
                     else:
                         pass
                 except:
