@@ -4,6 +4,10 @@
 {% block css %}
 <!-------------- Main CSS ------------->
 <style>
+.content > .collapse:not(.show) {
+    display: none !important;
+}
+
 .form_account {
     max-width: 800px;
     margin-top: 40px;
@@ -78,46 +82,43 @@ hr {
     margin: 0 auto;
 }
 
-/* On screens that are 599px or more */
-@media screen and (min-width: 599px) {
-    .account-img {
-        height: 150px;
-        width: 150px;
-        margin-bottom: 15px;
-        border-style: solid;
-        border-width: 1px;
-    }
-
-    .border_account {
-        border-style: solid;
-        border-width: 1px;
-        border-color: grey;
-        border-radius: 3px;
-        padding-top: 30px;
-        padding-bottom: 20px;
-        padding-left: 50px;
-        padding-right: 50px;
-        margin-bottom: 20px;
-    }
-
-    .stat_text {
-        font-size: 12pt;
-    }
-
-    .mini {
-        min-width: 105px;
-    }
-
-    .block {
-	    height: 30px;
-	    color: #fff;
-	    float: left;
-	    background-color: #334D5C;
-    }
+.account-img {
+    height: 150px;
+    width: 150px;
+    margin-bottom: 15px;
+    border-style: solid;
+    border-width: 1px;
 }
 
-/* On screens that are 599px or less */
-@media screen and (max-width: 599px) {
+.border_account {
+    border-style: solid;
+    border-width: 1px;
+    border-color: grey;
+    border-radius: 3px;
+    padding-top: 30px;
+    padding-bottom: 20px;
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-bottom: 20px;
+}
+
+.stat_text {
+    font-size: 12pt;
+}
+
+.mini {
+    min-width: 105px;
+}
+
+.block {
+    height: 30px;
+    color: #fff;
+    float: left;
+    background-color: #334D5C;
+}
+
+/* On screens that are 768px or less */
+@media (max-width: 767.98px) {
     .account-img {
         height: 100px;
         width: 100px;
@@ -304,9 +305,11 @@ hr {
 {% block fixed %}
 <div class="d-flex flex-wrap">
     <div class="ml-auto">
-        <a id="collapse_all" class="fas fa-eye-slash text-light m-r-5" onclick="hide_all_cat()"></a>
-        <a id="show_cat_all" class="d-none" onclick="show_all_cat()"></a>
-        <span id="collapse_show" class="m-r-5 text-light">Collapse all</span>
+        <a id="collapse_container" onclick="hide_all_cat()">
+            <span id="collapse_all" class="fas fa-eye-slash text-light m-r-5"></span>
+            <span id="show_cat_all" class="d-none"></span>
+            <span id="collapse_show" class="m-r-5 text-light">Collapse all</span>
+        </a>
     </div>
 </div>
 {% endblock fixed %}
@@ -346,16 +349,16 @@ hr {
         <!------------------------ Account picture/Username/account settings -------------------------->
         <div class="d-flex flex-wrap-reverse">
             <div class="p-r-10 bd-highlight">
-                <img class="rounded border-light account-img" src="{{ profile_picture }}">
+                <img class="rounded border-light account-img" src="{{ data['profile_picture'] }}">
             </div>
             <div class="bd-highlight">
                 {% if user_id == current_user.get_id() %}
-                <h2 class="mt-0 account-heading username">{{ user_name }}</h2>
+                <h2 class="mt-0 account-heading username">{{ data['username'] }}</h2>
                 {% else %}
-                <h2 class="mt-0 account-heading username">{{ user_name }}'s profile</h2>
+                <h2 class="mt-0 account-heading username">{{ data['username'] }}'s profile</h2>
                 {% endif %}
                 <span style="font-size: 14pt;">Knowledge level:&nbsp&nbsp</span>
-                <img height='64' width='64' data-toggle="tooltip" title="{{ user_knowledge_rank[0][1] }}" src="/static/img/knowledge_ranks/{{ user_knowledge_rank[0][0] }}.png"/>
+                <img height='64' width='64' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}" src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
             </div>
             <div class="ml-auto bd-highlight">
                 {% if user_id == current_user.get_id() %}
@@ -370,45 +373,66 @@ hr {
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ series_stats[4][0][1] }}" src="/static/img/levels_ranks/{{ series_stats[4][0][0] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.ico"/>
                             <span class='account-bar-name'>Series</span>
-                            <div id="series_level" class='account-bar-level'>Level {{ series_stats[3][0] }}</div>
-                            <div class='xp-bar' data-toggle="tooltip" title="{{ series_stats[3][1] }}%">
+                            <div id="series_level" class='account-bar-level'>Level {{ data['series_level'] }}</div>
+                            <div class='xp-bar' data-toggle="tooltip" title="{{ data['series_percent'] }}%">
                                 <div id='xp-bar-fill-series'>
-                                    <div class='xp-increase-fx'><div class='xp-increase-fx-flicker'><div class='xp-increase-glow1'></div><div class='xp-increase-glow2'></div><div class='xp-increase-glow3'></div></div><div class='xp-increase-glow2'></div></div>
+                                    <div class='xp-increase-fx'>
+                                        <div class='xp-increase-fx-flicker'>
+                                            <div class='xp-increase-glow1'></div>
+                                            <div class='xp-increase-glow2'></div>
+                                            <div class='xp-increase-glow3'></div>
+                                        </div>
+                                        <div class='xp-increase-glow2'></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class='account-bar-next-level'>&nbsp{{ series_stats[3][0] | int + 1 }}</div>
+                            <div class='account-bar-next-level'>&nbsp{{ data['series_level'] | int + 1 }}</div>
                         </div>
                     </div>
                 </div>
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ anime_stats[4][0][1] }}" src="/static/img/levels_ranks/{{ anime_stats[4][0][0] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.ico"/>
                             <div class='account-bar-name'>Anime</div>
-                            <div id="anime_level" class='account-bar-level'>Level {{ anime_stats[3][0] }}</div>
-                            <div class='xp-bar' data-toggle="tooltip" title="{{ anime_stats[3][1] }}%">
+                            <div id="anime_level" class='account-bar-level'>Level {{ data['anime_level'] }}</div>
+                            <div class='xp-bar' data-toggle="tooltip" title="{{ data['anime_percent'] }}%">
                                 <div id='xp-bar-fill-anime'>
-                                    <div class='xp-increase-fx'><div class='xp-increase-fx-flicker'><div class='xp-increase-glow1'></div><div class='xp-increase-glow2'></div><div class='xp-increase-glow3'></div></div><div class='xp-increase-glow2'></div></div>
+                                    <div class='xp-increase-fx'>
+                                        <div class='xp-increase-fx-flicker'>
+                                            <div class='xp-increase-glow1'></div>
+                                            <div class='xp-increase-glow2'></div>
+                                            <div class='xp-increase-glow3'></div>
+                                        </div>
+                                        <div class='xp-increase-glow2'></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class='account-bar-next-level'>&nbsp{{ anime_stats[3][0] | int + 1 }}</div>
+                            <div class='account-bar-next-level'>&nbsp{{ data['anime_level'] | int + 1 }}</div>
                         </div>
                     </div>
                 </div>
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ book_stats[4][0][1] }}" src="/static/img/levels_ranks/{{ book_stats[4][0][0] }}.ico"/>
+                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['book_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['book_grade_id'] }}.ico"/>
                             <div class='account-bar-name'>Books</div>
-                            <div id="book_level" class='account-bar-level'>Level {{ book_stats[3][0] }}</div>
-                            <div class='xp-bar' data-toggle="tooltip" title="{{ book_stats[3][1] }}%">
+                            <div id="book_level" class='account-bar-level'>Level {{ data['book_level'] }}</div>
+                            <div class='xp-bar' data-toggle="tooltip" title="{{ data['book_title'] }}%">
                                 <div id='xp-bar-fill-book'>
-                                    <div class='xp-increase-fx'><div class='xp-increase-fx-flicker'><div class='xp-increase-glow1'></div><div class='xp-increase-glow2'></div><div class='xp-increase-glow3'></div></div><div class='xp-increase-glow2'></div></div>
+                                    <div class='xp-increase-fx'>
+                                        <div class='xp-increase-fx-flicker'>
+                                            <div class='xp-increase-glow1'></div>
+                                            <div class='xp-increase-glow2'></div>
+                                            <div class='xp-increase-glow3'></div>
+                                        </div>
+                                        <div class='xp-increase-glow2'></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class='account-bar-next-level'>&nbsp{{ book_stats[3][0] | int + 1 }}</div>
+                            <div class='account-bar-next-level'>&nbsp{{ data['book_level'] | int + 1 }}</div>
                         </div>
                     </div>
                 </div>
@@ -449,127 +473,125 @@ hr {
         <hr class="mt-2 mb-3">
             <div class="row text-center">
                 <div class="col">
-                    <a class="btn btn-primary" href="/serieslist/{{ user_name }}">SeriesList</a>
+                    <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='serieslist', list_view='grid', user_name=data['username']) }}">SeriesList</a>
                 </div>
                 <div class="col">
-                    <a class="btn btn-primary" href="/animeslist/{{ user_name }}">AnimesList</a>
+                    <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='animelist', list_view='grid', user_name=data['username']) }}">AnimeList</a>
                 </div>
                 <div class="col">
-                    <a class="btn btn-primary" href="/bookslist/{{ user_name }}">BooksList</a>
+                    <a class="btn btn-primary" href="{{ url_for('mybookslist', list_view='grid', user_name=data['username']) }}">BooksList</a>
                 </div>
                 <div class="col">
-                    <a class="btn btn-warning" href="/achievements/{{ user_name }}">Achievements</a>
+                    <a class="btn btn-warning" href="{{ url_for('achievements', user_name=data['username']) }}">Achievements</a>
                 </div>
             </div>
         {% endif %}
 
         <!------------------------------------------ Friends ------------------------------------------>
-        <h3 class="font-weight-light text-center mt-4 mb-0">
-            <div class="arrow_div float-left">
-                {% if user_id == current_user.get_id() %}
-                <a class="fas fa-xs fa-user-plus" data-toggle="modal" data-target="#addFriendModal"></a>
-                {% endif %}
-            </div>
-            Friends
-            <div class="arrow_div float-right">
-                <a class="collapse_all fas fa-xs fa-chevron-down" id="FRIENDS_arrow" onclick="hide('collapse_FRIENDS', 'FRIENDS_arrow')"></a>
-            </div>
-        </h3>
-        <hr class="mt-2 mb-3">
-        <div id="collapse_FRIENDS" class="container-stats">
-            <div class="d-flex flex-wrap" style="margin-right: 0px; margin-left: 0px;">
-                    {% for friend in friends_list_data %}
-                    {% if friend['status'] == "pending" %}
-                        {% if user_id == current_user.get_id() %}
-                        <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
-                            <a href="/account/{{ friend['username'] }}">
-                                <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
-                            </a>
-                            <br>
-                            <span style="font-size: 12pt;" class="text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span>
-                            <br>
-                            <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
-                            <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
-                        </div>
-                        {% endif %}
-                    {% elif friend['status'] == "request" %}
-                        {% if user_id == current_user.get_id() %}
-                        <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
-                            <a href="/account/{{ friend['username'] }}">
-                                <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
-                            </a>
-                            <br>
-                            <span style="font-size: 12pt;" class="text-light">{{ friend['username'] }}</span>
-                            <br>
-                            <span>(Pending)</span>
-                            <br>
-                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}','td_{{ friend['user_id'] }}')"></a>
-                        </div>
-                        {% endif %}
-                    {% elif friend['status'] == "declined" %}
-                    {% else %}
-                        <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
-                            {% if user_id == current_user.get_id() %}
-                            <a href="/account/{{ friend['username'] }}">
-                                <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
-                            </a>
-                            <br>
-                            <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
-                            <br>
-                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
-                            {% else %}
-                            <a href="/account/{{ friend['username'] }}">
-                                <img height="70" width="70" src="/static/profile_pics/{{ friend['picture'] }}"/>
-                            </a>
-                            <br>
-                            <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
-                            {% endif %}
-                        </div>
+        <div style="cursor: pointer;" data-toggle="collapse" href="#FRIENDS" onclick="turn('FRIENDS', 'FRIENDS_arrow')">
+            <h3 class="font-weight-light text-center mt-3 mb-0">
+                <div class="arrow_div float-left">
+                    {% if user_id == current_user.get_id() %}
+                    <a class="fas fa-xs fa-user-plus" data-toggle="modal" data-target="#addFriendModal"></a>
                     {% endif %}
-                    {% endfor %}
+                </div>
+                Friends
+                <div class="arrow_div float-right">
+                    <a class="collapse_all fas fa-xs fa-chevron-down" id="FRIENDS_arrow"></a>
+                </div>
+            </h3>
+        </div>
+        <hr class="mt-1 p-b-15 mb-0">
+        <div class="collapse show container-stats" id="FRIENDS">
+            <div class="d-flex flex-wrap" style="margin-right: 0px; margin-left: 0px;">
+                {% for friend in friends_list_data %}
+                {% if friend['status'] == "pending" %}
+                    {% if user_id == current_user.get_id() %}
+                    <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
+                        <a href="/account/{{ friend['username'] }}">
+                            <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
+                        </a>
+                        <br>
+                        <span style="font-size: 12pt;" class="text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span>
+                        <br>
+                        <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
+                        <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
+                    </div>
+                    {% endif %}
+                {% elif friend['status'] == "request" %}
+                    {% if user_id == current_user.get_id() %}
+                    <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
+                        <a href="/account/{{ friend['username'] }}">
+                            <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
+                        </a>
+                        <br>
+                        <span style="font-size: 12pt;" class="text-light">{{ friend['username'] }}</span>
+                        <br>
+                        <span style="font-size: 10pt;">(Pending)</span>
+                        <br>
+                        <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}','td_{{ friend['user_id'] }}')"></a>
+                    </div>
+                    {% endif %}
+                {% elif friend['status'] == "declined" %}
+                {% else %}
+                    <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
+                        <a href="/account/{{ friend['username'] }}">
+                            <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
+                        </a>
+                        <br>
+                        <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
+                        <br>
+                        {% if user_id == current_user.get_id() %}
+                        <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {% endfor %}
             </div>
         </div>
 
         <!---------------------------------------- Statistics ----------------------------------------->
-        <h3 class="font-weight-light text-center mt-4">
-            Series Statistics
-            <div class="arrow_div float-right">
-                <a class="collapse_all fas fa-xs fa-chevron-down" id="SERIES_arrow" onclick="hide('collapse_SERIES', 'SERIES_arrow')"></a>
-            </div>
-        </h3>
-        <hr class="mt-2 mb-3">
-        <div id="collapse_SERIES" class="container-stats">
+        <div style="cursor: pointer;" data-toggle="collapse" href="#SERIES" onclick="turn('SERIES', 'SERIES_arrow')">
+            <h3 class="font-weight-light text-center mt-3 mb-0">
+                Series Statistics
+                <div class="arrow_div float-right">
+                    <a class="collapse_all fas fa-xs fa-chevron-down" id="SERIES_arrow"></a>
+                </div>
+            </h3>
+        </div>
+        <hr class="mt-1 p-b-15 mb-0">
+        <div id="SERIES" class="collapse show container-stats">
             <div class="m-b-5">
-                <span class="stat_text"><b>Days:</b> {{ series_stats[1][2] }}</span>
-                <span class="stat_text float-right"><b>Hours:</b> {{ series_stats[1][1] }}</span>
+                <span class="stat_text"><b>Days:</b> {{ data['series']['time_spent_day'] }}</span>
+                <span class="stat_text float-right"><b>Hours:</b> {{ data['series']['time_spent_hour'] }}</span>
             </div>
             <div class="m-b-5">
-                <span class="stat_text"><b>Mean Score:</b> {{ series_stats[2] }}</span>
+                <span class="stat_text"><b>Mean Score:</b> {{ data['series']['mean_score'] }}</span>
             </div>
 
             <figure class="d-flex">
-                {% if series_stats[5] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
+                {% if data['series']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
                 <span class="block" title="No data" style="background-color: black; border-width: 1px; border-style: solid; border-color: #717171">
                     <span id="100%" class="value"></span>
                 </span>
                 {% else %}
                 <span class="block" title="Watching">
-                    <span id="{{ series_stats[5][0] }}%" class="value"></span>
+                    <span id="{{ data['series']['element_percentage'][0] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Completed">
-                    <span id="{{ series_stats[5][1] }}%" class="value"></span>
+                    <span id="{{ data['series']['element_percentage'][1] }}%" class="value"></span>
                 </span>
                 <span class="block" title="On Hold">
-                    <span id="{{ series_stats[5][2] }}%" class="value"></span>
+                    <span id="{{ data['series']['element_percentage'][2] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Random">
-                    <span id="{{ series_stats[5][3] }}%" class="value"></span>
+                    <span id="{{ data['series']['element_percentage'][3] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Dropped">
-                    <span id="{{ series_stats[5][4] }}%" class="value"></span>
+                    <span id="{{ data['series']['element_percentage'][4] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Plan to Watch">
-                    <span id="{{ series_stats[5][5] }}%" class="value"></span>
+                    <span id="{{ data['series']['element_percentage'][5] }}%" class="value"></span>
                 </span>
                 {% endif %}
             </figure>
@@ -580,13 +602,13 @@ hr {
                         <span class="stat_text">Watching:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ series_stats[0][0] }}</span>
+                        <span class="stat_text">{{ data['series']['watching_count'] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Dropped:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ series_stats[0][4] }}</span>
+                        <span class="stat_text">{{ data['series']['dropped_count'] }}</span>
                     </div>
                 </div>
 
@@ -595,13 +617,13 @@ hr {
                         <span class="stat_text">Completed:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ series_stats[0][1] }}</span>
+                        <span class="stat_text">{{ data['series']['completed_count'] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Plan to Watch:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ series_stats[0][5] }}</span>
+                        <span class="stat_text">{{ data['series']['plantowatch_count'] }}</span>
                     </div>
                 </div>
 
@@ -610,7 +632,7 @@ hr {
                         <span class="stat_text">On Hold:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ series_stats[0][2] }}</span>
+                        <span class="stat_text">{{ data['series']['onhold_count'] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text"></span>
@@ -625,57 +647,59 @@ hr {
                         <span class="stat_text">Random:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ series_stats[0][3] }}</span>
+                        <span class="stat_text">{{ data['series']['random_count'] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Episodes:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ series_stats[1][0] }}</span>
+                        <span class="stat_text">{{ data['series']['nb_ep_watched'] }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <h3 class="font-weight-light text-center mt-4">
-            Anime Statistics
-            <div class="arrow_div float-right">
-                <a class="collapse_all fas fa-xs fa-chevron-down" id="ANIME_arrow" onclick="hide('collapse_ANIME', 'ANIME_arrow')"></a>
-            </div>
-        </h3>
-        <hr class="mt-2 mb-3">
-        <div id="collapse_ANIME" class="container-stats">
+        <div style="cursor: pointer;" data-toggle="collapse" href="#ANIME" onclick="turn('ANIME', 'ANIME_arrow')">
+            <h3 class="font-weight-light text-center mt-3 mb-0">
+                Anime Statistics
+                <div class="arrow_div float-right">
+                    <a class="collapse_all fas fa-xs fa-chevron-down" id="ANIME_arrow"></a>
+                </div>
+            </h3>
+        </div>
+        <hr class="mt-1 p-b-15 mb-0">
+        <div id="ANIME" class="collapse show container-stats">
             <div class="m-b-5">
-                <span class="stat_text"><b>Days:</b> {{ anime_stats[1][2] }}</span>
-                <span class="stat_text float-right"><b>Hours:</b> {{ anime_stats[1][1] }}</span>
+                <span class="stat_text"><b>Days:</b> {{ data['anime']['time_spent_day'] }}</span>
+                <span class="stat_text float-right"><b>Hours:</b> {{ data['anime']['time_spent_hour'] }}</span>
             </div>
             <div class="m-b-5">
-                <span class="stat_text"><b>Mean Score:</b> {{ anime_stats[2] }}</span>
+                <span class="stat_text"><b>Mean Score:</b> {{ data['anime']['mean_score'] }}</span>
             </div>
 
             <figure class="d-flex">
-                {% if anime_stats[5] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
+                {% if data['anime']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
                 <span class="block" title="No data" style="background-color: black !important; border-width: 1px; border-style: solid; border-color: #717171">
                     <span id="100%" class="value"></span>
                 </span>
                 {% else %}
                 <span class="block" title="Watching">
-                    <span id="{{ anime_stats[5][0] }}%" class="value"></span>
+                    <span id="{{ data['anime']['element_percentage'][0] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Completed">
-                    <span id="{{ anime_stats[5][1] }}%" class="value"></span>
+                    <span id="{{ data['anime']['element_percentage'][1] }}%" class="value"></span>
                 </span>
                 <span class="block" title="On Hold">
-                    <span id="{{ anime_stats[5][2] }}%" class="value"></span>
+                    <span id="{{ data['anime']['element_percentage'][2] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Random">
-                    <span id="{{ anime_stats[5][3] }}%" class="value"></span>
+                    <span id="{{ data['anime']['element_percentage'][3] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Dropped">
-                    <span id="{{ anime_stats[5][4] }}%" class="value"></span>
+                    <span id="{{ data['anime']['element_percentage'][4] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Plan to Watch">
-                    <span id="{{ anime_stats[5][5] }}%" class="value"></span>
+                    <span id="{{ data['anime']['element_percentage'][5] }}%" class="value"></span>
                 </span>
                 {% endif %}
             </figure>
@@ -686,13 +710,13 @@ hr {
                         <span class="stat_text">Watching:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ anime_stats[0][0] }}</span>
+                        <span class="stat_text">{{ data['anime']['watching_count'] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Dropped:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ anime_stats[0][4] }}</span>
+                        <span class="stat_text">{{ data['anime']['dropped_count'] }}</span>
                     </div>
                 </div>
 
@@ -701,13 +725,13 @@ hr {
                         <span class="stat_text">Completed:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ anime_stats[0][1] }}</span>
+                        <span class="stat_text">{{ data['anime']['completed_count'] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Plan to Watch:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ anime_stats[0][5] }}</span>
+                        <span class="stat_text">{{ data['anime']['plantowatch_count'] }}</span>
                     </div>
                 </div>
 
@@ -716,7 +740,7 @@ hr {
                         <span class="stat_text">On Hold:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ anime_stats[0][2] }}</span>
+                        <span class="stat_text">{{ data['anime']['onhold_count'] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text"></span>
@@ -731,54 +755,56 @@ hr {
                         <span class="stat_text">Random:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ anime_stats[0][3] }}</span>
+                        <span class="stat_text">{{ data['anime']['random_count'] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Episodes:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ anime_stats[1][0] }}</span>
+                        <span class="stat_text">{{ data['anime']['nb_ep_watched'] }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <h3 class="font-weight-light text-center mt-4">
-            Books Statistics
-            <div class="arrow_div float-right">
-                <a class="collapse_all fas fa-xs fa-chevron-down" id="BOOK_arrow" onclick="hide('collapse_BOOK', 'BOOK_arrow')"></a>
-            </div>
-        </h3>
-        <hr class="mt-2 mb-3">
-        <div id="collapse_BOOK" class="container-stats">
+        <div style="cursor: pointer;" data-toggle="collapse" href="#BOOK" onclick="turn('BOOK', 'BOOK_arrow')">
+            <h3 class="font-weight-light text-center mt-3 mb-0">
+                Books Statistics
+                <div class="arrow_div float-right">
+                    <a class="collapse_all fas fa-xs fa-chevron-down" id="BOOK_arrow"></a>
+                </div>
+            </h3>
+        </div>
+        <hr class="mt-1 p-b-15 mb-0">
+        <div id="BOOK" class="collapse show container-stats">
             <div class="m-b-5">
-                <span class="stat_text"><b>Days:</b> {{ book_stats[1][2] }}</span>
-                <span class="stat_text float-right"><b>Hours:</b> {{ book_stats[1][1] }}</span>
+                <span class="stat_text"><b>Days:</b> {{ data['book']['time_spent_day'] }}</span>
+                <span class="stat_text float-right"><b>Hours:</b> {{ data['book']['time_spent_hour'] }}</span>
             </div>
             <div class="m-b-5">
-                <span class="stat_text"><b>Mean Score:</b> {{ book_stats[2] }}</span>
+                <span class="stat_text"><b>Mean Score:</b> {{ data['book']['mean_score'] }}</span>
             </div>
 
             <figure class="d-flex">
-                {% if book_stats[5] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
+                {% if data['book']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
                 <span class="block" title="No data" style="background-color: black !important; border-width: 1px; border-style: solid; border-color: #717171">
                     <span id="100%" class="value"></span>
                 </span>
                 {% else %}
                 <span class="block" title="Reading">
-                    <span id="{{ book_stats[5][0] }}%" class="value"></span>
+                    <span id="{{ data['book']['element_percentage'][0] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Completed">
-                    <span id="{{ book_stats[5][1] }}%" class="value"></span>
+                    <span id="{{ data['book']['element_percentage'][1] }}%" class="value"></span>
                 </span>
                 <span class="block" title="On Hold">
-                    <span id="{{ book_stats[5][2] }}%" class="value"></span>
+                    <span id="{{ data['book']['element_percentage'][2] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Dropped">
-                    <span id="{{ book_stats[5][3] }}%" class="value"></span>
+                    <span id="{{ data['book']['element_percentage'][3] }}%" class="value"></span>
                 </span>
                 <span class="block" title="Plan to Read">
-                    <span id="{{ book_stats[5][4] }}%" class="value"></span>
+                    <span id="{{ data['book']['element_percentage'][4] }}%" class="value"></span>
                 </span>
                 {% endif %}
             </figure>
@@ -789,13 +815,13 @@ hr {
                         <span class="stat_text">Reading:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ book_stats[0][0] }}</span>
+                        <span class="stat_text">{{ data['book']['reading_count'] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Dropped:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ book_stats[0][3] }}</span>
+                        <span class="stat_text">{{ data['book']['dropped_count'] }}</span>
                     </div>
                 </div>
 
@@ -804,13 +830,13 @@ hr {
                         <span class="stat_text">Completed:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ book_stats[0][1] }}</span>
+                        <span class="stat_text">{{ data['book']['completed_count'] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Plan to Read:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ book_stats[0][4] }}</span>
+                        <span class="stat_text">{{ data['book']['plantoread_count'] }}</span>
                     </div>
                 </div>
 
@@ -819,13 +845,13 @@ hr {
                         <span class="stat_text">On Hold:</span>
                     </div>
                     <div class="col p-0 position">
-                        <span class="stat_text">{{ book_stats[0][2] }}</span>
+                        <span class="stat_text">{{ data['book']['onhold_count'] }}</span>
                     </div>
                     <div class="col mini p-r-0">
                         <span class="stat_text">Pages read:</span>
                     </div>
                     <div class="col p-l-0 position">
-                        <span class="stat_text">{{ book_stats[1][0] }}</span>
+                        <span class="stat_text">{{ data['book']['nb_pages_read'] }}</span>
                     </div>
                 </div>
             </div>
@@ -839,19 +865,17 @@ hr {
 {% block script %}
 <!--------- Main Javascript ---------->
 <script type="text/javascript">
-function hide(category, arrow) {
-    var category = document.getElementById(category);
+function turn(category, arrow) {
     var arrow = document.getElementById(arrow);
+    var category = document.getElementById(category);
 
-    if (category.className === "container-stats"){
-        category.className = "d-none";
-        arrow.className = "collapse_all fas fa-xs fa-chevron-right";
-    } else {
-        category.className = "container-stats";
+    if (category.className === "container-stats collapsing") {
+    } else if (arrow.className === "collapse_all fas fa-xs fa-chevron-right") {
         arrow.className = "collapse_all fas fa-xs fa-chevron-down";
+    } else {
+        arrow.className = "collapse_all fas fa-xs fa-chevron-right";
     }
 }
-
 
 function delete_friend(friend_id, td_id) {
     if (!confirm("Are you sure you want to delete this friend from your list?")){
@@ -883,6 +907,7 @@ function friend_request(friend_id, value) {
     });
 }
 </script>
+
 <!--------- Tooltip Javascript ------------>
 <script type="text/javascript">
 $('.value').each(function() {
@@ -895,6 +920,7 @@ $(function () {
 $('[data-toggle="tooltip"]').tooltip()
 })
 </script>
+
 <!--------- Level XP Javascript ----------->
 <script type="text/javascript">
 $(document).ready(function(){
@@ -914,53 +940,48 @@ $(document).ready(function(){
     $("#xp-bar-fill-series").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
     setTimeout(function() {
         $("#xp-bar-fill-series").css("-webkit-transition", "all 2s ease");
-        $("#xp-bar-fill-series").css("width", "{{ series_stats[3][1] }}%");
+        $("#xp-bar-fill-series").css("width", "{{ data['series_percent'] }}%");
     }, 100);
     setTimeout(function(){
         $(".xp-increase-fx").fadeOut(500);
         $("#xp-bar-fill-series").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-    }, 20*parseFloat({{ series_stats[3][1] }}));
+    }, 40*parseFloat({{ data['series_percent'] }}));
 
 
     $("#xp-bar-fill-anime").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
     setTimeout(function() {
         $("#xp-bar-fill-anime").css("-webkit-transition", "all 2s ease");
-        $("#xp-bar-fill-anime").css("width", "{{ anime_stats[3][1] }}%");
+        $("#xp-bar-fill-anime").css("width", "{{ data['anime_percent'] }}%");
     }, 100);
     setTimeout(function() {
         $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-anime").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-    }, 20*parseFloat({{ anime_stats[3][1] }}));
+    }, 40*parseFloat({{ data['anime_percent'] }}));
 
 
     $("#xp-bar-fill-book").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
     setTimeout(function() {
         $("#xp-bar-fill-book").css("-webkit-transition", "all 2s ease");
-        $("#xp-bar-fill-book").css("width", "{{ book_stats[3][1] }}%");
+        $("#xp-bar-fill-book").css("width", "{{ data['book_title'] }}%");
     }, 100);
     setTimeout(function() {
         $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-book").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-    }, 20*parseFloat({{ book_stats[3][1] }}));
+    }, 40*parseFloat({{ data['book_title'] }}));
 });
 </script>
+
 <!---- Show/collapse all categories scripts ---->
 <script type="text/javascript">
 function hide_all_cat() {
-    var hide = document.getElementById('collapse_all');
-    var show = document.getElementById('show_cat_all');
-    $('div[id^="collapse"]').attr('class', 'd-none');
-    hide.className = "d-none";
-    show.className = "fas fa-eye text-light m-r-5";
-    $('#collapse_show').text('Expand All');
+    $('.collapse.container-stats').collapse('hide');
+    $('#collapse_show').text('Expand all');
+    $('#collapse_container').attr('onclick', 'show_all_cat()');
     $('.collapse_all').attr('class', 'collapse_all fas fa-xs fa-chevron-right');
 }
 
 function show_all_cat() {
-    var show = document.getElementById('show_cat_all');
-    var hide = document.getElementById('collapse_all');
-    $('div[id^="collapse"]').attr('class', 'container-stats');
-    hide.className = "fas fa-eye-slash text-light m-r-5";
-    show.className = "d-none";
-    $('#collapse_show').text('Collapse All');
+    $('.collapse.container-stats').collapse('show');
+    $('#collapse_show').text('Collapse all');
+    $('#collapse_container').attr('onclick', 'hide_all_cat()');
     $('.collapse_all').attr('class', 'collapse_all fas fa-xs fa-chevron-down');
 }
 {% if user_id == current_user.get_id() %}

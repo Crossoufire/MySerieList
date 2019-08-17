@@ -1,66 +1,25 @@
 
 TO DO / FIX FIRST
 	Change the account settings page (80% done)
-	Add a "read less" for the synopsis
-	Check the style of the category selector modal
-	Check the style of the auto-complete selector
+	Add year in auto-complete results (50% done)
+	Check the style of the auto-complete selector (50% done)
 	Add "more results" for auto-complete results
-	Add year in auto-complete results
-	Add lots of statistics (already started the code part, need a page to display + chart.js)
-	Fix bug display season and episode when refresh due to the browser cache (don't know how to repair) but works great otherwise
-	bug element_name for delete_element (JoJo's bizarre adventure for exemple)
-	Hall of Fame "Total" works but not the other (even if we just let number + picture (without pourcentage))
-	achievement dire pourquoi du comment
-	passer en heure/jour pour l'xp
-	ajout element sans refresh
-	diminuer la taille navbar
-	augmenter taille conteneur
-	supprimer ami en haut a droite dans la carte
-	ajout onglet stats + achievement
-	dans la barre rouge : mettre le texte clickable
-	debug false
+	Add a "read less" for the synopsis modal
+	Check the style of the category selector modal
+	Add an element without refreshing (ajax method)
+	Set the Line height of nav-bar to 1
+	Increase the container size
+	Change style achievements
+	Add color for friends in hall of fame
+	Add friend without reload in account
+	Add a statistics page with chart.js (already started the code part)
+	Add stats in navbar (when page done)
+	Add Anime movies (Added multi search from the API)
+	Add series achievements
+
 
 TO DO LATER
 	Add the possibility to change the background color of the website
 	Add the possibility to have the score display by default or not in the grid lists
 	Add the possibility to select a default view (grid/table) for lists
 	Add ZOOM for the media lists (done on booklist but shady), but it is difficult to implement with cards style
-	Separation of the code for routes!!
-	Multi selection when changing category
-	Add Anime movies (Added multi search from the API)
-	Add other achievements
-
-DONE
-	Fix mobile view when displaying table view
-	Remove duplicates of the auto-complete
-	Remove "Local" and "Online" categories of the autocomplete (merge in one)
-	On login/register click focus on the modal
-	On add friend (/account) click focus on the modal
-	Add fixed top bar
-	Add Books list
-	Add jQuery auto-complete with pictures from local + online databases
-	Show all/hide all categories
-	Show all/hide all scores
-	Add fast travel between categories
-	Add Networks in the modal
-	Add Genre in the modal
-	Change synopsis display
-	Add "read more" for synopsis
-	Change button refresh all
-	Change button to icons on card (replace button by <a> with font awesome)
-	Add <a> on card for scores
-	Change position mask only card top instead of all the card
-	Add/change lot of code/refactoring (javascript/jQuery functions, and css cleaning)
-	Change the categories selector with a modal (better for mobile and clearer)
-	Add a pop up window for the series deletion
-	Add mean score in the account
-	Add no transparency for the icons card in mobile display
-	Change the font-size of the score on mobile display
-	Add books simple statistics in account
-	Take the genre from MAL for Anime (useful for the achievements but longer query)
-	Add API key for Google book
-	Add two levels system //  Level X = 50*XP*(1+XP) // Linear levels "Knowledge"
-	Achievements (done for Genres achievements)
-	Add informations pages in account for the grades, levels, and Anime achievements
-	Add a table version for Anime and series lists
-	Find a way to display bars stats account even if no data
