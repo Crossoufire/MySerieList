@@ -26,6 +26,13 @@
     display: none !important;
 }
 
+.collapsing {
+	position: relative;
+	height: 0px;
+	overflow: hidden;
+	transition: height 0.25s ease;
+}
+
 .add_element {
     width: 220px;
     border-top: 0px;
@@ -155,7 +162,6 @@ body.loading .modal_loading {
 
 
 /* ################################ card CSS ############################### */
-
 .modded {
     max-width: 175px;
     padding-right: 0px;
@@ -201,8 +207,6 @@ body.loading .modal_loading {
     -webkit-appearance:none;
     appearance:none;
 }
-
-
 /* ######################################################################### */
 
 
@@ -401,11 +405,11 @@ body.loading .modal_loading {
 				</div>
 			</h2>
 		</div>
-		<hr class="mt-2 mb-0">
+		<hr class="mt-2 pb-3 mb-0">
 		<div class="collapse show d-flex flex-wrap" id="WATCHING">
 	{% elif loop.index == 2 %}
 		<div style="cursor: pointer;" data-toggle="collapse" href="#COMPLETED" onclick="turn('COMPLETED', 'COMPLETED_arrow')">
-			<h2 class="font-weight-light text-center mt-5 mb-0 category-title">COMPLETED
+			<h2 class="font-weight-light text-center pt-3 mb-0 category-title">COMPLETED
 				<div class="arrow_div float-right">
 					<a class="collapse_all fas fa-sm fa-chevron-down" id="COMPLETED_arrow"></a>
 				</div>
@@ -458,7 +462,7 @@ body.loading .modal_loading {
 	{% set outer_loop = loop %}
 
 	{% for data in category %}
-		<div id="card_{{ data[0].id }}" class="card bg-transparent m-l-10 m-r-10 m-t-40" style="border-radius: 5px;">
+		<div id="card_{{ data[0].id }}" class="card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20" style="border-radius: 5px;">
 			<div class="view overlay">
 				<img class="card-img-top" width="200" height="300" src="{{ data[0].image_cover }}" alt="{{ data[0].name }}">
 				<div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_{{ data[0].id }}" style="cursor: pointer;">
@@ -1032,7 +1036,7 @@ function show_all_score() {
     show.className = "d-none";
     $('#show_hide').text('Hide scores');
     $('#score_container').attr('onclick', 'hide_all_score()');
-    $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-t-40 m-b-15');
+    $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-15 m-t-20');
 }
 
 function hide_all_score() {
@@ -1043,7 +1047,7 @@ function hide_all_score() {
     show.className = "fas fa-eye text-light m-r-5";
     $('#show_hide').text('Show scores');
     $('#score_container').attr('onclick', 'show_all_score()');
-    $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-t-40');
+    $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20');
 }
 </script>
 
@@ -1053,10 +1057,10 @@ function show_score(footer_id, card_id) {
 
     if (score.className === "d-none footer_score"){
         score.className = "card-footer text-muted text-center p-0";
-        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-t-40 m-b-15');
+        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-15 m-t-20');
     } else {
         score.className = "d-none footer_score";
-        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-t-40 m-b-15');
+        $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20');
     }
 }
 </script>
