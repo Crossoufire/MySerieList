@@ -420,7 +420,7 @@ hr {
                             <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['book_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['book_grade_id'] }}.ico"/>
                             <div class='account-bar-name'>Books</div>
                             <div id="book_level" class='account-bar-level'>Level {{ data['book_level'] }}</div>
-                            <div class='xp-bar' data-toggle="tooltip" title="{{ data['book_title'] }}%">
+                            <div class='xp-bar' data-toggle="tooltip" title="{{ data['book_percent'] }}%">
                                 <div id='xp-bar-fill-book'>
                                     <div class='xp-increase-fx'>
                                         <div class='xp-increase-fx-flicker'>
@@ -504,7 +504,7 @@ hr {
         <hr class="mt-1 p-b-15 mb-0">
         <div class="collapse show container-stats" id="FRIENDS">
             <div class="d-flex flex-wrap" style="margin-right: 0px; margin-left: 0px;">
-                {% for friend in friends_list_data %}
+                {% for friend in data["friends"] %}
                 {% if friend['status'] == "pending" %}
                     {% if user_id == current_user.get_id() %}
                     <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
@@ -961,11 +961,11 @@ $(document).ready(function(){
     $("#xp-bar-fill-book").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
     setTimeout(function() {
         $("#xp-bar-fill-book").css("-webkit-transition", "all 2s ease");
-        $("#xp-bar-fill-book").css("width", "{{ data['book_title'] }}%");
+        $("#xp-bar-fill-book").css("width", "{{ data['book_percent'] }}%");
     }, 100);
     setTimeout(function() {
         $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-book").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-    }, 40*parseFloat({{ data['book_title'] }}));
+    }, 40*parseFloat({{ data['book_percent'] }}));
 });
 </script>
 

@@ -298,13 +298,13 @@ def account(user_name):
     if add_friend_form.validate_on_submit():
         add_friend(add_friend_form.friend_to_add.data)
 
-    # Protect admin account
-    if user.id == 1 and current_user.id != 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-
     # No account with this username
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
+    # Protect admin account
+    if user.id == 1 and current_user.id != 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
     # Check if the account is private / in the friendslist
     if current_user.id != user.id:
@@ -323,7 +323,9 @@ def account(user_name):
                    join(Friend, Friend.friend_id == User.id).\
                    filter(Friend.user_id == user.id).\
                    group_by(Friend.friend_id).\
-                   order_by(User.username)
+                   order_by(User.username).all()
+
+    print(friends_list)
 
     friends_list_data = []
     for friend in friends_list:
@@ -332,6 +334,7 @@ def account(user_name):
                        "status": friend[1].status,
                        "picture": friend[0].image_file}
         friends_list_data.append(friend_data)
+
     account_data["friends"] = friends_list_data
 
     # Time spent
@@ -2022,7 +2025,7 @@ def get_achievements(user_id, list_type):
                         for i in range(0, anime[1].current_season - 1):
                             ep_counter += int(nb_episodes[i])
                         total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                        time_3 += ep_duration * total_episodes_watched
+                        time_2 += ep_duration * total_episodes_watched
 
                         anime_name_2.append(anime[0].name)
                     elif genre == 19:
