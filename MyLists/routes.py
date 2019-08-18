@@ -323,9 +323,7 @@ def account(user_name):
                    join(Friend, Friend.friend_id == User.id).\
                    filter(Friend.user_id == user.id).\
                    group_by(Friend.friend_id).\
-                   order_by(User.username).all()
-
-    print(friends_list)
+                   order_by(User.username)
 
     friends_list_data = []
     for friend in friends_list:
@@ -1786,6 +1784,21 @@ def change_book_category():
         book.status = Status.PLAN_TO_READ
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Compute total time spent
+    user = User.query.filter_by(id=current_user.get_id()).first()
+    data = db.session.query(Book, BookList). \
+                            join(BookList, BookList.book_id == Book.id). \
+                            filter(BookList.user_id == user.id). \
+                            group_by(BookList.book_id)
+    total_time = 0
+    for book in data:
+        if book[1].status == Status.COMPLETED:
+            try:
+                total_time += book[0].page_count
+            except:
+                pass
+    user.time_spent_book = total_time
 
     db.session.commit()
     app.logger.info('[{}] Category of the book with ID {} changed to {}'.format(current_user.get_id(),
