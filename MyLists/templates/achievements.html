@@ -10,41 +10,82 @@
     <h2 class="text-center mb-3 mt-4">Anime achievements</h2>
     <hr class="mt-2 mb-3">
     {% if current_user.get_id() == user_id %}
-    <div style="font-size: 14pt;" class="text-center mb-5">You have unlocked {{ user_number_achievements }}/{{ user_achievements|length }} achievements.</div>
+    <div style="font-size: 14pt;" class="text-center mb-5">You have unlocked {{ user_number_achievements }}/70 achievements.</div>
     {% else %}
-    <div style="font-size: 14pt;" class="text-center mb-5">{{ user_name }} has unlocked {{ user_number_achievements }}/{{ user_achievements|length }} achievements.</div>
+    <div style="font-size: 14pt;" class="text-center mb-5">{{ user_name }} has unlocked {{ user_number_achievements }}/70 achievements.</div>
     {% endif %}
     <div class="projects row text-center p-0">
+        {% for p in range(0, 6) %}
+        {% if p == 0 %}
+        <div class="ml-auto mr-auto m-b-25 m-t-20" style="font-size: 18pt;">
+            Genre based achievements
+            <hr class="mt-0 mb-0">
+        </div>
+        {% elif p == 1 %}
+        <div class="ml-auto mr-auto m-b-25 m-t-50" style="font-size: 18pt;">
+            Something BIG achievements
+            <hr class="mt-0 mb-0">
+        </div>
+        {% elif p == 2 %}
+        <div class="ml-auto mr-auto m-b-25 m-t-50" style="font-size: 18pt;">
+            Classic achievements
+            <hr class="mt-0 mb-0">
+        </div>
+        {% elif p == 3 %}
+        <div class="ml-auto mr-auto m-b-25 m-t-50" style="font-size: 18pt;">
+            Finished achievements
+            <hr class="mt-0 mb-0">
+        </div>
+        {% elif p == 4 %}
+        <div class="ml-auto mr-auto m-b-25 m-t-50" style="font-size: 18pt;">
+            Time achievements
+            <hr class="mt-0 mb-0">
+        </div>
+        {% else %}
+        <div class="ml-auto mr-auto m-b-25 m-t-50" style="font-size: 18pt;">
+            Score achievements
+            <hr class="mt-0 mb-0">
+        </div>
+        {% endif %}
         <table width="100%">
             <tbody>
-            {% for i in range(0, data|length) %}
+            {% for i in range(0, data[p]|length) %}
                 <tr>
-                    {% for j in range(0, data[0]|length) %}
-                    <td id="pr_{{ data[i][j]['image_id'] }}" class="filtered" onclick="test('det_{{ data[i][j]['image_id'] }}', 'pr_{{ data[i][j]['image_id'] }}', 'img_{{ data[i][j]['image_id'] }}')">
-                        <span style="font-size: 12pt;">{{ data[i][j]["level"] }}</span><br>
-                        <span style="font-size: 12pt;">{{ data[i][j]["time_hours"] }}/{{ data[i][j]["threshold"] }} hours watched</span><br>
-                        {% if data[i][j]["time_hours"] >= data[i][j]["threshold"] %}
-                        <img id="img_{{ data[i][j]['image_id'] }}" height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data[i][j]['image_id'] }}.png"/>
+                    {% for j in range(0, data[p][i]|length) %}
+                    <td id="pr_{{ data[p][i][j]['image_id'] }}" class="filtered" onclick="test('det_{{ data[p][i][j]['image_id'] }}', 'pr_{{ data[p][i][j]['image_id'] }}', 'img_{{ data[p][i][j]['image_id'] }}')">
+                        <span style="font-size: 12pt;">{{ data[p][i][j]["level"] }}</span><br>
+
+                        {% if data[p][i][j]["type"] == "genre" or data[p][i][j]["type"] == "classic" %}
+                        <span style="font-size: 12pt;">{{ data[p][i][j]["time_hours"] }}/{{ data[p][i][j]["threshold"] }} hours watched</span><br>
+                        {% elif data[p][i][j]["type"] == "old" or data[p][i][j]["type"] == "year" or data[p][i][j]["type"] == "finished" or data[p][i][j]["type"] == "long" %}
+                        <span style="font-size: 12pt;">{{ data[p][i][j]["anime_watched"] }}/{{ data[p][i][j]["threshold"] }} anime watched</span><br>
+                        {% elif data[p][i][j]["type"] == "time" %}
+                        <span style="font-size: 12pt;">{{ data[p][i][j]["days_spent"] }}/{{ data[p][i][j]["threshold"] }} days watched</span><br>
+                        {% elif data[p][i][j]["type"] == "score" %}
+                        <span style="font-size: 12pt;">Mean score: {{ data[p][i][j]["mean_score"] }}</span><br>
+                        {% endif %}
+
+                        {% if data[p][i][j]["passed"] == "yes" %}
+                        <img id="img_{{ data[p][i][j]['image_id'] }}" height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data[p][i][j]['image_id'] }}.png"/>
                         {% else %}
-                        <img height="100" width="200" style="filter: grayscale(100%);" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data[i][j]['image_id'] }}.png"/>
-                        <span></span>
+                        <img height="100" width="200" style="filter: grayscale(100%);" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data[p][i][j]['image_id'] }}.png"/>
                         {% endif %}
                     </td>
                     {% endfor %}
                  </tr>
                 <tr>
-                    {% for j in range(0, data[0]|length) %}
-                    <td id="det_{{ data[i][j]['image_id'] }}" class="d-none anime_details" colspan="4">
+                    {% for j in range(0, data[p][i]|length) %}
+                    <td id="det_{{ data[p][i][j]['image_id'] }}" class="d-none anime_details" colspan="4">
                         <div class="p-l-20 p-t-10 p-r-20">
-                            <span style="font-size: 14pt;">{{ data[i][j]["title"] }}</span><br>
-                            <span style="font-size: 13pt;">{{ data[i][j]["description"] }}</span><br>
+                            <span style="font-size: 14pt;">{{ data[p][i][j]["title"] }}</span><br>
+                            <span style="font-size: 13pt;">{{ data[p][i][j]["description"] }}</span><br>
                             <div class="m-2"></div>
-                            <span style="font-size: 13pt;">Number of anime watched: {{ data[i][j]["anime_watched"] }}</span>
+                            <span style="font-size: 13pt;">Number of anime watched: {{ data[p][i][j]["anime_watched"] }}</span>
                             <hr class="p-0 m-0">
                             <ul class="p-t-10">
-                                {% for k in range(0, data[i][j]["anime_name"]|length) %}
+                                {% for k in range(0, data[p][i][j]["anime_name"]|length) %}
                                 <li>
-                                    {{ data[i][j]["anime_name"][k] }}
+                                    {{ data[p][i][j]["anime_name"][k] }}
                                 </li>
                                 {% endfor %}
                             </ul>
@@ -55,6 +96,7 @@
             {% endfor %}
             </tbody>
         </table>
+        {% endfor %}
     </div>
 </div>
 {% endblock content %}
