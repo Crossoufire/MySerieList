@@ -34,7 +34,7 @@
                 {% if current_user.is_authenticated %}
                 <div class="navbar-brand nav-item dropdown m-r-30">
                     <a class="dropdown-toggle" data-toggle="dropdown" style="color: #ffffffe6;" href="#">MyLists<span class="caret"></span></a>
-                    <div class="dropdown-menu bg-dark p-r-0 m-r-0" style="z-index: 101; border: solid; border-color: black; border-width: 1px;">
+                    <div class="dropdown-menu dropdown_mylist bg-dark p-r-0 m-r-0">
                         <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='serieslist', list_view='grid', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MySeriesList</a>
                         <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='animelist', list_view='grid', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyAnimeList</a>
                         <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mybookslist', list_view='grid', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyBooksList</a>
@@ -73,7 +73,7 @@
         </nav>
 
 
-        <nav class="fixed-top" style="z-index: 100; background-color: #330000; top: 57px; !important">
+        <nav class="fixed-top second_navbar">
             <div class="container">
                 {% block fixed %}
                 {% endblock fixed %}
@@ -101,6 +101,7 @@
         {% endblock %}
     </header>
 
+
     <main role="main" class="container">
         <div class="content">
             {% block content %}
@@ -108,14 +109,17 @@
         </div>
     </main>
 
+
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.2/js/mdb.min.js"></script>
 
+
     {% block script %}
     {% endblock %}
+
 
 <footer class="page-footer font-small pt-5">
     <div class="footer-copyright text-center py-3">© 2019 Copyright: MyLists</div>

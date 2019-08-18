@@ -1,37 +1,7 @@
 {% extends "layout.html" %}
 
 {% block css %}
-<style>
-table {
-    border-collapse: separate;
-    border-spacing: 15px;
-}
-
-td {
-    border-radius: 5px;
-}
-
-img {
-    cursor: pointer;
-}
-
-ul {
-    -moz-column-count: 4;
-    -moz-column-gap: 20px;
-    -webkit-column-count: 4;
-    -webkit-column-gap: 20px;
-    column-count: 4;
-    column-gap: 20px;
-}
-
-.details {
-    display: none;
-}
-
-hr {
-    border-top: 1px solid rgba(255, 255, 255, 0.9);
-}
-</style>
+<link href="{{ url_for('static', filename='css/achievements.css') }}" rel="stylesheet">
 {% endblock css %}
 
 
@@ -64,7 +34,7 @@ hr {
                  </tr>
                 <tr>
                     {% for j in range(0, data[0]|length) %}
-                    <td id="det_{{ data[i][j]['image_id'] }}" class="d-none" colspan="4" style="background: #2c3946; border: black 2px solid;">
+                    <td id="det_{{ data[i][j]['image_id'] }}" class="d-none anime_details" colspan="4">
                         <div class="p-l-20 p-t-10 p-r-20">
                             <span style="font-size: 14pt;">{{ data[i][j]["title"] }}</span><br>
                             <span style="font-size: 13pt;">{{ data[i][j]["description"] }}</span><br>
@@ -87,61 +57,27 @@ hr {
         </table>
     </div>
 </div>
-
-
-
-
-        {#{% for i in range(0, user_achievements|length) %}
-        <div class="text-center col m-b-30 p-b-0 p-l-20 p-r-20">
-            <span>{{ user_achievements[i]["level"] }}</span><br>
-            <span>{{ user_achievements[i]["time_hours"] }}/{{ user_achievements[i]["threshold"] }} hours watched</span><br>
-            {% if user_achievements[i]["threshold"] < user_achievements[i]["time_hours"] %}
-            <a data-toggle="collapse" href="#{{ user_achievements[i]['image_id'] }}">
-                <img height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements/') }}{{ user_achievements[i]['image_id'] }}.png" alt=""><br>
-            </a>
-            {% else %}
-            <a data-toggle="collapse" href="#{{ user_achievements[i]['image_id'] }}">
-                <img style="filter: grayscale(100%);" height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements/') }}{{ user_achievements[i]['image_id'] }}.png" alt=""><br>
-            </a>
-            {% endif %}
-            <div id="{{ user_achievements[i]['image_id'] }}" class="collapse p-t-10">
-                <div class="text text-left">
-                    <span style="font-size: 14pt;">{{ user_achievements[i]['title'] }}</span>
-                    <p class="text-justify p-0">{{ user_achievements[i]['description'] }}</p>
-                    <p class="text-left p-0">N° Anime watched: {{ user_achievements[i]['anime_watched'] }}</p>
-                    {% for anime in user_achievements[i]['anime_name'] %}
-                    <li class="p-0">{{ anime }}</li>
-                    {% endfor %}
-                    <div class="m-b-20">----------------------------------------</div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>#}
-
-
 {% endblock content %}
 
 
 {% block script %}
 <script>
-function test(tata, tutu, toto) {
-    if ($("#"+tata).hasClass('d-none')) {
-        if ($("#"+tata).siblings().hasClass('text-left')) {
+function test(tata, tutu) {
+    if ($("#"+tata).hasClass('d-none anime_details')) {
+        if ($("#"+tata).siblings().hasClass('text-left anime_details')) {
             $("#"+tutu).siblings('.filtered').attr('style', 'filter: none;')
             $("#"+tutu).attr('style', 'filter: drop-shadow(5px 5px 5px grey) invert(0%);')
-            $("#"+tata).siblings('.text-left').attr('class', 'd-none');
-            $("#"+tata).attr('class', 'text-left');
+            $("#"+tata).siblings('.text-left').attr('class', 'd-none anime_details');
+            $("#"+tata).attr('class', 'text-left anime_details');
         } else {
             $("#"+tutu).attr('class', 'filtered');
             $("#"+tutu).attr('style', 'filter: drop-shadow(5px 5px 5px grey) invert(0%);')
-            $("#"+tata).attr('class', 'text-left');
+            $("#"+tata).attr('class', 'text-left anime_details');
         }
     } else {
         $("#"+tutu).attr('class', 'filtered');
         $("#"+tutu).attr('style', 'filter: none;')
-        $("#"+tata).attr('class', 'd-none');
+        $("#"+tata).attr('class', 'd-none anime_details');
     }
 }
 </script>

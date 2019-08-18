@@ -1,60 +1,10 @@
 {% extends "layout.html" %}
 
+
 {% block css %}
 <!------ CDN Datatables ------->
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.css"/>
-<!------ MDBootstrap Datatables ------->
-<!-- <link href="{{ url_for('static', filename='css/datatables.min.css') }}" rel="stylesheet"> -->
-
-<style>
-table.dataTable thead .sorting:after,
-table.dataTable thead .sorting:before,
-table.dataTable thead .sorting_asc:after,
-table.dataTable thead .sorting_asc:before,
-table.dataTable thead .sorting_asc_disabled:after,
-table.dataTable thead .sorting_asc_disabled:before,
-table.dataTable thead .sorting_desc:after,
-table.dataTable thead .sorting_desc:before,
-table.dataTable thead .sorting_desc_disabled:after,
-table.dataTable thead .sorting_desc_disabled:before {
-    bottom: .5em;
-}
-
-.table {
-  color: #fff
-}
-
-table.table a {
-    color: #359aff;
-}
-
-.table td {
-    text-align: center;
-    vertical-align: middle;
-}
-
-.table tr {
-    text-align: center;
-    vertical-align: middle;
-}
-
-.current_user {
-    background-color: #2c3946;
-}
-
-a.page-link {
-    color: #ffffff !important;
-}
-
-hr {
-    border-top: 1px solid rgba(255, 255, 255, 0.9)
-}
-
-.arrow_div {
-    height: 21px;
-    width: 21px;
-}
-</style>
+<link href="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.css" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/hall_of_fame.css') }}" rel="stylesheet">
 {% endblock css %}
 
 
@@ -77,28 +27,28 @@ hr {
             <tr>
             {% if current_user.get_id() == '1' %}
                 <td>
-                    <img src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
+                    <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
                 </td>
                 <td>
                     <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
                 </td>
                 <td>
-                    <img src="static/img/levels_ranks/{{ user['series_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.ico">
                     <br>
                     {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td>
-                    <img src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico">
                     <br>
                     {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                 </td>
                 <td>
-                    <img src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico">
                     <br>
                     {{ user['book_level'] }} ({{ user['book_percent'] }}%)
                 </td>
                 <td>
-                    <img src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
                     <br>
                     {{ user['knowledge_level'] }}
                 </td>
@@ -106,28 +56,28 @@ hr {
 
             {% elif user["iscurrentuser"] %}
                 <td class="current_user">
-                    <img src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
+                    <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
                 </td>
                 <td class="current_user">
                     <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
                 </td>
                 <td class="current_user">
-                    <img src="static/img/levels_ranks/{{ user['series_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.ico">
                     <br>
                     {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td class="current_user">
-                    <img src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico">
                     <br>
                     {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                 </td>
                 <td class="current_user">
-                    <img src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico">
                     <br>
                     {{ user['book_level'] }} ({{ user['book_percent'] }}%)
                 </td >
                 <td class="current_user">
-                    <img src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
                     <br>
                     {{ user['knowledge_level'] }}
                 </td>
@@ -135,28 +85,28 @@ hr {
 
             {% elif user["isprivate"] and not user["isfriend"] %}
                 <td>
-                    <img src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}" alt="Anonymous" style="width: 40px; height: 40px;">
+                    <img class="profile_picture" src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}" alt="Anonymous">
                 </td>
                 <td>
                     <b>Anonymous</b>
                 </td>
                 <td>
-                    <img src="static/img/levels_ranks/{{ user['series_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.ico">
                     <br>
                     {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td>
-                    <img src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico">
                     <br>
                     {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                 </td>
                 <td>
-                    <img src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico">
                     <br>
                     {{ user['book_level'] }} ({{ user['book_percent'] }}%)
                 </td>
                 <td>
-                    <img src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
                     <br>
                     {{ user['knowledge_level'] }}
                 </td>
@@ -164,28 +114,28 @@ hr {
 
             {% else %}
                 <td>
-                    <img src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}" style="width: 40px; height: 40px;">
+                    <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
                 </td>
                 <td>
                     <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
                 </td>
                 <td>
-                    <img src="static/img/levels_ranks/{{ user['series_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.ico">
                     <br>
                     {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td>
-                    <img src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico">
                     <br>
                     {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                 </td>
                 <td>
-                     <img src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico" style="width: 30px; height: 30px;">
+                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico">
                     <br>
                     {{ user['book_level'] }} ({{ user['book_percent'] }}%)
                 </td>
                 <td>
-                    <img src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png" style="width: 30px; height: 30px;">
+                    <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
                     <br>
                     {{ user['knowledge_level'] }}
                 </td>
@@ -208,9 +158,6 @@ hr {
 {% block script %}
 <!--------- CDN Datatables ----------->
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>
-<!--------- MDBootstrap Datatables ----------->
-<!-- <script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script> -->
-
 <script>
 function add_friend(username) {
     $body = $("body");
@@ -226,7 +173,6 @@ function add_friend(username) {
     });
 }
 </script>
-
 <script>
 $(document).ready(function () {
     $('#hall_of_fame').DataTable({

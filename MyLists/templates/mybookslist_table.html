@@ -11,125 +11,9 @@
     background-position: right center;
     background-repeat: no-repeat;
 }
-
-.ui-menu-item .ui-menu-item-wrapper.ui-state-active {
-    background: #131418 !important;
-    border: solid white 1px;
-}
 </style>
-<!--------------- Main CSS -------------------->
+<!--------------- Pacman loading -------------------->
 <style>
-.content>.collapse:not(.show) {
-    display: none !important;
-}
-
-.add_book {
-    width: 220px;
-    border-top: 0px;
-    border-left: 0px;
-    border-right: 0px;
-    font-size: 12pt;
-}
-
-.table td {
-    vertical-align: middle;
-}
-
-hr {
-    border-top: 1px solid rgba(255, 255, 255, 0.9)
-}
-
-.arrow_div {
-    height: 28px;
-    width: 28px;
-}
-
-.card-img-top {
-    border-style: solid;
-    border-width: 1px;
-    border-color: black;
-    border-radius: 3px;
-}
-
-.btn_left{
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    opacity: 0;
-}
-
-.btn_left:hover {
-    opacity: 1;
-}
-
-.mask:hover~.btn_left {
-    opacity: 0.7;
-}
-
-.btn_bottom {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    opacity: 0;
-}
-
-.btn_bottom:hover {
-    opacity: 1;
-}
-
-.mask:hover~.btn_bottom {
-    opacity: 0.7;
-}
-
-.btn_right {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    opacity: 0;
-}
-
-.btn_right:hover {
-    opacity: 1;
-}
-
-.mask:hover~.btn_right {
-    opacity: 0.7;
-}
-
-.card {
-    width: 200px;
-}
-
-.font-mask {
-    font-size: 20pt;
-}
-
-.dropdown-item {
-    background-color: #272525;
-    color: #fff;
-    font-weight: 300;
-    font-size: 11pt;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-.form-control {
-    height: 2rem;
-    padding: 5px;
-    background-color: #131418;
-    color: #fff;
-    border-radius: 1px;
-    font-size: 11pt;
-    outline: none;
-    box-shadow:none !important;
-}
-
-.dropdown-menu {
-    background-color: #272525;
-    min-width: 9rem;
-}
-
-
 /* ############################# pacman loading ############################ */
 .modal_loading {
     display: none;
@@ -150,178 +34,8 @@ body.loading .modal_loading {
     display: block;
 }
 /* ######################################################################### */
-
-
-/* ################################ card CSS ############################### */
-.modded {
-    max-width: 175px;
-    padding-right: 0px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
-.scrollable-menu {
-    text-align-last: center;
-}
-
-.show-read-more .more-text{
-    display: none;
-}
-
-.form-control:focus {
-    height: 2rem;
-    padding: 5px;
-    background-color: #131418;
-    color: #fff;
-}
-
-.episodes {
-    width: 100px;
-    border-style: 1px;
-    border-color: black;
-    border-radius: 2px;
-    -moz-appearance:none;
-    -webkit-appearance:none;
-    appearance:none;
-}
-
-.seasons {
-    width: 100px;
-    border-style: 1px;
-    border-color: black;
-    border-radius: 2px;
-    -moz-appearance:none;
-    -webkit-appearance:none;
-    appearance:none;
-}
-/* ######################################################################### */
-
-
-/* ############################ 768 or less ############################## */
-@media screen and (max-width: 767.98px) {
-    .card-img-top {
-        height: 202.5px;
-        border-style: solid;
-        border-width: 1px;
-        border-color: black;
-        border-radius: 3px;
-    }
-
-    .card {
-        width: 135px;
-        padding-right: 0px;
-        margin-left: 5px !important;
-        margin-right: 5px !important;
-        margin-bottom: 20px;
-    }
-
-    .btn_right {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        opacity: 0.8;
-    }
-
-    .btn_bottom {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        opacity: 0.8;
-    }
-
-    .btn_left{
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        opacity: 0.8;
-    }
-
-    .font-mask {
-        font-size: 12pt;
-    }
-
-    .score_size {
-        font-size: 10pt;
-    }
-
-    .dropdown-item {
-        background-color: #272525;
-        max-width: 120px;
-        padding-left: 10px;
-        padding-right: 10px;
-        color: #fff;
-        font-weight: 300;
-        font-size: 9pt;
-    }
-
-    .form-control {
-        height: 2rem;
-        background-color: #131418;
-        color: #fff;
-        border-radius: 1px;
-        font-size: 9pt;
-        outline: none;
-        box-shadow:none !important;
-        align-items: left;
-        padding: 5px;
-    }
-
-    .dropdown-menu {
-        background-color: #272525;
-        max-width: 120px !important;
-    }
-
-    .dropdown-divider {
-        max-width: 120px;
-    }
-
-    .category-title {
-        font-size: 1.5rem;
-    }
-}
-/* ######################################################################### */
-
-
-/* ########################## Sidenav menu ################################# */
-.sidenav {
-  height: 60%;
-  width: 0;
-  position: fixed;
-  z-index: 1;
-  top: 100px;
-  left: 0;
-  background-color: #111;
-  overflow-x: hidden;
-  padding-top: 60px;
-  transition: 0.5s;
-}
-
-.sidenav a {
-  padding: 8px 8px 8px 32px;
-  text-decoration: none;
-  font-size: 20px;
-  color: #818181;
-  display: block;
-  transition: 0.3s;
-}
-
-.sidenav a:hover {
-  color: #f1f1f1;
-}
-
-.sidenav .closebtn {
-  position: absolute;
-  top: 0;
-  right: 25px;
-  font-size: 36px;
-  margin-left: 70px;
-}
-
-@media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav a {font-size: 18px;}
-}
-/* ######################################################################### */
 </style>
+<link href="{{ url_for('static', filename='css/mybookslist_table.css') }}" rel="stylesheet">
 {% endblock css %}
 
 
@@ -363,8 +77,8 @@ body.loading .modal_loading {
 </div>
 
 
-<div id="mySidenav" class="sidenav" style="height: 280px; padding-top: 30px;">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()" style="padding: 0px; margin-left: 135px;">&times;</a>
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
     <a href="#READING">Reading</a>
     <a href="#COMPLETED">Completed</a>
     <a href="#ON_HOLD">On Hold</a>
@@ -373,218 +87,218 @@ body.loading .modal_loading {
 </div>
 
 
-    {% for category in all_data %}
+{% for category in all_data %}
 
-        {% if loop.index == 1 %}
-        <div style="cursor: pointer;" data-toggle="collapse" href="#READING" onclick="turn('READING', 'READING_arrow')">
-            <h2 class="font-weight-light text-center mt-5 mb-0 category-title">READING
-                <div class="arrow_div float-right">
-                    <a class="collapse_all fas fa-sm fa-chevron-down" id="READING_arrow"></a>
-                </div>
-            </h2>
-        </div>
-        <hr class="mt-2 mb-0">
-        <div class="collapse show d-flex flex-wrap table-responsive-sm" id="READING">
-            <table class="table table-sm text-light m-b-0">
-                <thead class="text-center">
-                    <th style="width: 50px;">#</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>N° Pages</th>
-                    <th style="width: 80px;">Score</th>
-                    <th style="width: 80px;">Actions</th>
-                </thead>
-                <tbody id="tbody_READING">
-        {% elif loop.index == 2 %}
-        <div style="cursor: pointer;" data-toggle="collapse" href="#COMPLETED" onclick="turn('COMPLETED', 'COMPLETED_arrow')">
-            <h2 class="font-weight-light text-center mt-5 mb-0 category-title">COMPLETED
-                <div class="arrow_div float-right">
-                    <a class="collapse_all fas fa-sm fa-chevron-down" id="COMPLETED_arrow"></a>
-                </div>
-            </h2>
-        </div>
-        <hr class="mt-2 mb-0">
-        <div class="collapse show d-flex flex-wrap table-responsive-sm" id="COMPLETED">
-            <table class="table table-sm text-light m-b-0">
-                <thead class="text-center">
-                    <th style="width: 50px;">#</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>N° Pages</th>
-                    <th style="width: 80px;">Score</th>
-                    <th style="width: 80px;">Actions</th>
-                </thead>
-                <tbody id="tbody_COMPLETED">
-        {% elif loop.index == 3 %}
-        <div style="cursor: pointer;" data-toggle="collapse" href="#ON_HOLD" onclick="turn('ON_HOLD', 'ON_HOLD_arrow')">
-            <h2 class="font-weight-light text-center mt-5 mb-0 category-title">ON HOLD
-                <div class="arrow_div float-right">
-                    <a class="collapse_all fas fa-sm fa-chevron-down" id="ON_HOLD_arrow"></a>
-                </div>
-            </h2>
-        </div>
-        <hr class="mt-2 mb-0">
-        <div class="collapse show d-flex flex-wrap table-responsive-sm" id="ON_HOLD">
-            <table class="table table-sm text-light m-b-0">
-                <thead class="text-center">
-                    <th style="width: 50px;">#</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>N° Pages</th>
-                    <th style="width: 80px;">Score</th>
-                    <th style="width: 80px;">Actions</th>
-                </thead>
-                <tbody id="tbody_ON_HOLD">
-         {% elif loop.index == 4 %}
-        <div style="cursor: pointer;" data-toggle="collapse" href="#DROPPED" onclick="turn('DROPPED', 'DROPPED_arrow')">
-            <h2 class="font-weight-light text-center mt-5 mb-0 category-title">DROPPED
-                <div class="arrow_div float-right">
-                    <a class="collapse_all fas fa-sm fa-chevron-down" id="DROPPED_arrow"></a>
-                </div>
-            </h2>
-        </div>
-        <hr class="mt-2 mb-0">
-        <div class="collapse show d-flex flex-wrap table-responsive-sm" id="DROPPED">
-            <table class="table table-sm text-light m-b-0">
-                <thead class="text-center">
-                    <th style="width: 50px;">#</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>N° Pages</th>
-                    <th style="width: 80px;">Score</th>
-                    <th style="width: 80px;">Actions</th>
-                </thead>
-                <tbody id="tbody_DROPPED">
-        {% elif loop.index == 5 %}
-        <div style="cursor: pointer;" data-toggle="collapse" href="#PLAN_TO_READ" onclick="turn('PLAN_TO_READ', 'PLAN_TO_READ_arrow')">
-            <h2 class="font-weight-light text-center mt-5 mb-0 category-title">PLAN TO READ
-                <div class="arrow_div float-right">
-                    <a class="collapse_all fas fa-sm fa-chevron-down" id="PLAN_TO_READ_arrow"></a>
-                </div>
-            </h2>
-        </div>
-        <hr class="mt-2 mb-0">
-        <div class="collapse show d-flex flex-wrap table-responsive-sm" id="PLAN_TO_READ">
-            <table class="table table-sm text-light m-b-0">
-                <thead class="text-center">
-                    <th style="width: 80px;">#</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>N° Pages</th>
-                    <th style="width: 80px;">Score</th>
-                    <th style="width: 80px;">Actions</th>
-                </thead>
-                <tbody id="tbody_PLAN_TO_READ">
-        {% endif %}
-        {% set outer_loop = loop %}
+    {% if loop.index == 1 %}
+    <div style="cursor: pointer;" data-toggle="collapse" href="#READING" onclick="turn('READING', 'READING_arrow')">
+        <h2 class="font-weight-light text-center mt-5 mb-0 category-title">READING
+            <div class="arrow_div float-right">
+                <a class="collapse_all fas fa-sm fa-chevron-down" id="READING_arrow"></a>
+            </div>
+        </h2>
+    </div>
+    <hr class="mt-2 mb-0">
+    <div class="collapse show d-flex flex-wrap table-responsive-sm" id="READING">
+        <table class="table table-sm text-light m-b-0">
+            <thead class="text-center">
+                <th style="width: 50px;">#</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>N° Pages</th>
+                <th style="width: 80px;">Score</th>
+                <th style="width: 80px;">Actions</th>
+            </thead>
+            <tbody id="tbody_READING">
+    {% elif loop.index == 2 %}
+    <div style="cursor: pointer;" data-toggle="collapse" href="#COMPLETED" onclick="turn('COMPLETED', 'COMPLETED_arrow')">
+        <h2 class="font-weight-light text-center mt-5 mb-0 category-title">COMPLETED
+            <div class="arrow_div float-right">
+                <a class="collapse_all fas fa-sm fa-chevron-down" id="COMPLETED_arrow"></a>
+            </div>
+        </h2>
+    </div>
+    <hr class="mt-2 mb-0">
+    <div class="collapse show d-flex flex-wrap table-responsive-sm" id="COMPLETED">
+        <table class="table table-sm text-light m-b-0">
+            <thead class="text-center">
+                <th style="width: 50px;">#</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>N° Pages</th>
+                <th style="width: 80px;">Score</th>
+                <th style="width: 80px;">Actions</th>
+            </thead>
+            <tbody id="tbody_COMPLETED">
+    {% elif loop.index == 3 %}
+    <div style="cursor: pointer;" data-toggle="collapse" href="#ON_HOLD" onclick="turn('ON_HOLD', 'ON_HOLD_arrow')">
+        <h2 class="font-weight-light text-center mt-5 mb-0 category-title">ON HOLD
+            <div class="arrow_div float-right">
+                <a class="collapse_all fas fa-sm fa-chevron-down" id="ON_HOLD_arrow"></a>
+            </div>
+        </h2>
+    </div>
+    <hr class="mt-2 mb-0">
+    <div class="collapse show d-flex flex-wrap table-responsive-sm" id="ON_HOLD">
+        <table class="table table-sm text-light m-b-0">
+            <thead class="text-center">
+                <th style="width: 50px;">#</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>N° Pages</th>
+                <th style="width: 80px;">Score</th>
+                <th style="width: 80px;">Actions</th>
+            </thead>
+            <tbody id="tbody_ON_HOLD">
+     {% elif loop.index == 4 %}
+    <div style="cursor: pointer;" data-toggle="collapse" href="#DROPPED" onclick="turn('DROPPED', 'DROPPED_arrow')">
+        <h2 class="font-weight-light text-center mt-5 mb-0 category-title">DROPPED
+            <div class="arrow_div float-right">
+                <a class="collapse_all fas fa-sm fa-chevron-down" id="DROPPED_arrow"></a>
+            </div>
+        </h2>
+    </div>
+    <hr class="mt-2 mb-0">
+    <div class="collapse show d-flex flex-wrap table-responsive-sm" id="DROPPED">
+        <table class="table table-sm text-light m-b-0">
+            <thead class="text-center">
+                <th style="width: 50px;">#</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>N° Pages</th>
+                <th style="width: 80px;">Score</th>
+                <th style="width: 80px;">Actions</th>
+            </thead>
+            <tbody id="tbody_DROPPED">
+    {% elif loop.index == 5 %}
+    <div style="cursor: pointer;" data-toggle="collapse" href="#PLAN_TO_READ" onclick="turn('PLAN_TO_READ', 'PLAN_TO_READ_arrow')">
+        <h2 class="font-weight-light text-center mt-5 mb-0 category-title">PLAN TO READ
+            <div class="arrow_div float-right">
+                <a class="collapse_all fas fa-sm fa-chevron-down" id="PLAN_TO_READ_arrow"></a>
+            </div>
+        </h2>
+    </div>
+    <hr class="mt-2 mb-0">
+    <div class="collapse show d-flex flex-wrap table-responsive-sm" id="PLAN_TO_READ">
+        <table class="table table-sm text-light m-b-0">
+            <thead class="text-center">
+                <th style="width: 80px;">#</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>N° Pages</th>
+                <th style="width: 80px;">Score</th>
+                <th style="width: 80px;">Actions</th>
+            </thead>
+            <tbody id="tbody_PLAN_TO_READ">
+    {% endif %}
+    {% set outer_loop = loop %}
 
-        {% for data in category %}
-            <tr id="tr_{{ data[0].id }}">
-                <td class="text-center">
-                    {{ loop.index }}
-                </td>
-                <td class="text-left">
-                    <a data-toggle="modal" data-target="#modal_{{ data[0].id }}">{{ data[0].title }}</a>
-                </td>
-                <td class="text-center">
-                    {{ data[0].authors }}
-                </td>
-                <td class="text-center">
-                    {{ data[0].page_count }}
-                </td>
-                <td class="text-center">
-                    {% if user_id == current_user.get_id() %}
-                    <a class="score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
-                    {% else %}
-                    <a class="disabled score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
-                    {% endif %}
-                    <input id="edit_{{ data[0].id }}" class="d-none" type="text" style="max-width: 30px;
-                   max-height: 20px;
-                   background-color: black;
-                   color: white;
-                   border: solid;
-                   border-color: black;" onkeydown="add_score('new_{{ data[0].id }}', 'edit_{{ data[0].id }}', '{{ data[0].id }}')">
-                </td>
-                <td class="text-center">
-                    {% if user_id == current_user.get_id() %}
-                    <a class="fas fa-bars" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
-                    &nbsp &nbsp
-                    <a class="fas fa-ban" onclick="deletebook('{{ data[0].id }}', 'tr_{{ data[0].id }}')"></a>
-                    {% endif %}
-                </td>
-            </tr>
+    {% for data in category %}
+        <tr id="tr_{{ data[0].id }}">
+            <td class="text-center">
+                {{ loop.index }}
+            </td>
+            <td class="text-left">
+                <a data-toggle="modal" data-target="#modal_{{ data[0].id }}">{{ data[0].title }}</a>
+            </td>
+            <td class="text-center">
+                {{ data[0].authors }}
+            </td>
+            <td class="text-center">
+                {{ data[0].page_count }}
+            </td>
+            <td class="text-center">
+                {% if user_id == current_user.get_id() %}
+                <a class="score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
+                {% else %}
+                <a class="disabled score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
+                {% endif %}
+                <input id="edit_{{ data[0].id }}" class="d-none" type="text" style="max-width: 30px;
+               max-height: 20px;
+               background-color: black;
+               color: white;
+               border: solid;
+               border-color: black;" onkeydown="add_score('new_{{ data[0].id }}', 'edit_{{ data[0].id }}', '{{ data[0].id }}')">
+            </td>
+            <td class="text-center">
+                {% if user_id == current_user.get_id() %}
+                <a class="fas fa-bars" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
+                &nbsp &nbsp
+                <a class="fas fa-ban" onclick="deletebook('{{ data[0].id }}', 'tr_{{ data[0].id }}')"></a>
+                {% endif %}
+            </td>
+        </tr>
 
-            <!----------- Categories Modal ---------------->
-            <div style="max-width: 220px;" class="modal fade left" id="modal_cat{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="cat_mod" aria-hidden="true">
-                <div style="max-width: 200px;" class="modal-dialog modal-side modal-top-left modal-sm" role="document">
-                    <div style="max-width: 200px; background: #131418;" class="modal-content">
-                        <div style="max-width: 200px;" class="modal-header">
-                            <h5 class="modal-title">Categories</h5>
+        <!----------- Categories Modal ---------------->
+        <div style="max-width: 220px;" class="modal fade left" id="modal_cat{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="cat_mod" aria-hidden="true">
+            <div style="max-width: 200px;" class="modal-dialog modal-side modal-top-left modal-sm" role="document">
+                <div style="max-width: 200px; background: #131418;" class="modal-content">
+                    <div style="max-width: 200px;" class="modal-header">
+                        <h5 class="modal-title">Categories</h5>
+                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div id="mod_{{ data[0].id }}" class="modal-body">
+                        {% if outer_loop.index == 1 %}
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Completed</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">On Hold</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Dropped</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Plan to Read', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Plan to Read</a>
+                        {% elif outer_loop.index == 2 %}
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Reading', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Reading</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">On Hold</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Dropped</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Plan to Read', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Plan to Read</a>
+                        {% elif outer_loop.index == 3 %}
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Reading', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Reading</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Completed</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Dropped</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Plan to Read', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Plan to Read</a>
+                        {% elif outer_loop.index == 4 %}
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Reading', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Reading</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Completed</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">On Hold</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Random', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Random</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Plan to Read', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Plan to Read</a>
+                        {% elif outer_loop.index == 5 %}
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Reading', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Reading</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Completed</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">On Hold</a>
+                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Dropped</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!----------- Book metadata Modal ----------->
+        <div class="modal fade" id="modal_{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; background: #131418;">
+                    <div class="modal-body">
+                        <div class="modal-header">
+                            <h4 class="modal-title">{{ data[0].title }}</h4>
                             <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div id="mod_{{ data[0].id }}" class="modal-body">
-                            {% if outer_loop.index == 1 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Plan to Read', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Plan to Read</a>
-                            {% elif outer_loop.index == 2 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Reading', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Reading</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Plan to Read', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Plan to Read</a>
-                            {% elif outer_loop.index == 3 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Reading', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Reading</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Dropped</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Plan to Read', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Plan to Read</a>
-                            {% elif outer_loop.index == 4 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Reading', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Reading</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Random', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Random</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Plan to Read', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Plan to Read</a>
-                            {% elif outer_loop.index == 5 %}
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Reading', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Reading</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Completed</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">On Hold</a>
-                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changebookCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}')">Dropped</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!----------- Book metadata Modal ----------->
-            <div class="modal fade" id="modal_{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; background: #131418;">
                         <div class="modal-body">
-                            <div class="modal-header">
-                                <h4 class="modal-title">{{ data[0].title }}</h4>
-                                <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <p><b>Title</b>: {{ data[0].title }}</p>
-                                <p><b>Author</b>: {{ data[0].authors }}</p>
-                                <p><b>Published Date</b> : {{ data[0].published_date }}</p>
-                                <p><b>N° Pages</b>: {{ data[0].page_count }}</p>
-                                <p><b>Genres</b>: {{ data[0].categories }}</p>
-                                <p class="m-b-0"><b>Synopsis</b>: </p><p class="text-justify show-read-more">{{ data[0].description }}</p>
-                            </div>
+                            <p><b>Title</b>: {{ data[0].title }}</p>
+                            <p><b>Author</b>: {{ data[0].authors }}</p>
+                            <p><b>Published Date</b> : {{ data[0].published_date }}</p>
+                            <p><b>N° Pages</b>: {{ data[0].page_count }}</p>
+                            <p><b>Genres</b>: {{ data[0].categories }}</p>
+                            <p class="m-b-0"><b>Synopsis</b>: </p><p class="text-justify show-read-more">{{ data[0].description }}</p>
                         </div>
                     </div>
                 </div>
             </div>
-        {% endfor %}
-                </tbody>
-            </table>
         </div>
     {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endfor %}
 <div class="modal_loading"></div>
 {% endblock content %}
 

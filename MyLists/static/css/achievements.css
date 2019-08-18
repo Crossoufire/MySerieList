@@ -1,0 +1,26 @@
+table {
+    border-collapse: separate;
+    border-spacing: 15px;
+}
+
+td {
+    border-radius: 5px;
+}
+
+img {
+    cursor: pointer;
+}
+
+ul {
+    -moz-column-count: 4;
+    -moz-column-gap: 20px;
+    -webkit-column-count: 4;
+    -webkit-column-gap: 20px;
+    column-count: 4;
+    column-gap: 20px;
+}
+
+.anime_details {
+    background: #2c3946;
+    border: black 2px solid;
+}

@@ -1,0 +1,298 @@
+<!-------------- Main CSS ------------->
+.content > .collapse:not(.show) {
+    display: none !important;
+}
+
+.form_account {
+    max-width: 800px;
+    margin-top: 40px;
+}
+
+.modal-content {
+    background: #131418;
+    border: solid 1px white !important;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.table {
+    line-height: 1;
+}
+
+.friends_container {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.friends_div {
+    width: 100px;
+}
+
+.form-control {
+    background: transparent;
+    border-radius: 0px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    color: #fff;
+}
+
+.form-control:focus {
+    background: transparent;
+    border-radius: 0px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    box-shadow: 0 0 0 0rem;
+    color: #fff;
+}
+
+.arrow_div {
+    height: 21px;
+    width: 21px;
+}
+
+.block {
+    background-color: black;
+    border: solid 1px #717171;
+}
+
+.block:nth-of-type(2) {
+	background-color: #45B29D;
+}
+.block:nth-of-type(3) {
+	background-color: #EFC94C;
+}
+.block:nth-of-type(4) {
+	background-color: #E27A3F;
+}
+.block:nth-of-type(5) {
+	background-color: #DF5A49;
+}
+.block:nth-of-type(6) {
+	background-color: #962D3E;
+}
+.block:hover {
+	opacity: 0.75;
+}
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+.account-img {
+    height: 150px;
+    width: 150px;
+    margin-bottom: 15px;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.border_account {
+    border-style: solid;
+    border-width: 1px;
+    border-color: grey;
+    border-radius: 3px;
+    padding-top: 30px;
+    padding-bottom: 20px;
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-bottom: 20px;
+}
+
+.stat_text {
+    font-size: 12pt;
+}
+
+.mini {
+    min-width: 105px;
+}
+
+.block {
+    height: 30px;
+    color: #fff;
+    float: left;
+    background-color: #334D5C;
+}
+
+/* On screens that are 768px or less */
+@media (max-width: 767.98px) {
+    .account-img {
+        height: 100px;
+        width: 100px;
+        margin-bottom: 15px;
+        border-style: solid;
+        border-width: 1px;
+    }
+
+    .btn.btn-sm {
+        padding: .5rem 1rem;
+        font-size: .4rem;
+    }
+
+    .border_account {
+        border-style: solid;
+        border-width: 1px;
+        border-color: grey;
+        border-radius: 3px;
+        padding-top: 30px;
+        padding-bottom: 20px;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-bottom: 20px;
+    }
+
+    .username {
+        font-size: 1.5rem;
+    }
+
+    .stat_text {
+        font-size: 10pt;
+    }
+
+    .mini {
+        min-width: 100px;
+    }
+
+    .block {
+	    height: 25px;
+	    color: #fff;
+	    float: left;
+	    background-color: #334D5C;
+    }
+
+    .position {
+        text-align: right;
+    }
+}
+
+<!---- level + badge + total level ---->
+.account-bar-wrapper {
+    width: 350px;
+}
+
+.account-bar {
+    height: 100%;
+    margin: 0px auto;
+}
+
+.account-bar-name {
+    font-size: 12pt;
+    margin: 0px 0px 0px 5px;
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.account-bar-level {
+    font-size: 12pt;
+    margin: 0px 0px 0px;
+    display: inline-block;
+}
+
+#series_level {
+    margin-left: 20px;
+}
+
+#anime_level {
+    margin-left: 10px;
+}
+
+#book_level {
+    margin-left: 20px;
+}
+
+.account-bar-next-level {
+    display: inline-block;
+    font-size: 12pt;
+}
+
+.xp-bar {
+    height: 10px;
+    width: 250px;
+    background: #035;
+    margin: 0px 0px 0px 5px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#xp-bar-fill-series {
+    height: 100%;
+    width: 0.1%;
+    background: #4d0000;
+    font-size: 12px;
+    line-height: 10px;
+    text-align: right;
+}
+
+#xp-bar-fill-anime {
+    height: 100%;
+    width: 0.1%;
+    background: #0068b3;
+    font-size: 12px;
+    line-height: 10px;
+    text-align: right;
+}
+
+#xp-bar-fill-book {
+    height: 100%;
+    width: 0.1%;
+    background: #004d00;
+    font-size: 12px;
+    line-height: 10px;
+    text-align: right;
+}
+
+.xp-increase-fx {
+    position: relative;
+    display: none;
+    height: 100%;
+}
+
+.xp-increase-glow1 {
+    position: absolute;
+    margin: 0px 0px 0px -2px;
+    left: 0px;
+    top: 0px;
+    background: #fff;
+    width: 5px;
+    height: 100%;
+    border-radius: 0px;
+    -webkit-filter: blur(2px);
+}
+
+.xp-increase-glow2 {
+    position: absolute;
+    margin: -5px 0px 0px -2px;
+    left: 0px;
+    top: 0px;
+    background: #aaf;
+    width: 5px;
+    height: 200%;
+    border-radius: 0px;
+    -webkit-filter: blur(10px);
+}
+
+.xp-increase-glow3 {
+    position: absolute;
+    margin: 0px 0px 0px -5px;
+    left: 0px;
+    top: 0px;
+    background: #fff;
+    width: 10px;
+    height: 100%;
+    border-radius: 5px;
+    -webkit-filter: blur(5px);
+}
+
+.total_score {
+    border-radius: 50%;
+    border: solid red;
+    color: black;
+    display: inline-block;
+    font-weight: bold;
+    line-height: 2.5em;
+    padding-right: 2px;
+    text-align: center;
+    width: 2.8em;
+}

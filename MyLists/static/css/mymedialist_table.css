@@ -1,0 +1,290 @@
+.content>.collapse:not(.show) {
+    display: none !important;
+}
+
+.add_element {
+    width: 220px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    font-size: 12pt;
+}
+
+.arrow_div {
+    height: 28px;
+    width: 28px;
+}
+
+.card-img-top {
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	border-radius: 3px;
+}
+
+.btn_left {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	opacity: 0;
+}
+
+.btn_left:hover {
+	opacity: 1;
+}
+
+.mask:hover~.btn_left {
+	opacity: 0.7;
+}
+
+.btn_bottom {
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+	opacity: 0;
+}
+
+.btn_bottom:hover {
+	opacity: 1;
+}
+
+.mask:hover~.btn_bottom {
+	opacity: 0.7;
+}
+
+.btn_right {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	opacity: 0;
+}
+
+.btn_right:hover {
+	opacity: 1;
+}
+
+.mask:hover~.btn_right {
+	opacity: 0.7;
+}
+
+.card {
+	width: 200px;
+}
+
+.font-mask {
+	font-size: 20pt;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.dropdown-item {
+	background-color: #272525;
+	color: #fff;
+	font-weight: 300;
+	font-size: 11pt;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.form-control {
+	height: 2rem;
+	padding: 5px;
+	background-color: #131418;
+	color: #fff;
+	border-radius: 1px;
+	font-size: 11pt;
+	outline: none;
+	box-shadow: none !important;
+}
+
+.dropdown-menu {
+	background-color: #272525;
+	min-width: 9rem;
+}
+
+
+/* ################################ card CSS ############################### */
+.modded {
+    max-width: 175px;
+    padding-right: 0px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.scrollable-menu {
+    text-align-last: center;
+}
+
+.show-read-more .more-text {
+    display: none;
+}
+
+.form-control:focus {
+    height: 2rem;
+    padding: 5px;
+    background-color: #131418;
+    color: #fff;
+}
+
+.episodes {
+	{% if target_user_id == current_user.get_id() %}
+	cursor: pointer;
+	{% endif %}
+    width: 100px;
+    border-style: 1px;
+    border-color: black;
+    border-radius: 2px;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.seasons {
+	{% if target_user_id == current_user.get_id() %}
+	cursor: pointer;
+	{% endif %}
+    width: 100px;
+    border-style: 1px;
+    border-color: black;
+    border-radius: 2px;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+/* ######################################################################### */
+
+
+/* ############################ 768px or less ############################## */
+@media (max-width: 767.98px) {
+    .card-img-top {
+        height: 202.5px;
+        border-style: solid;
+        border-width: 1px;
+        border-color: black;
+        border-radius: 3px;
+    }
+    .card {
+        width: 135px;
+        padding-right: 0px;
+        margin-left: 5px !important;
+        margin-right: 5px !important;
+        margin-bottom: 20px;
+    }
+    .btn_right {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        opacity: 0.8;
+    }
+    .btn_bottom {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        opacity: 0.8;
+    }
+    .btn_left {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        opacity: 0.8;
+    }
+    .font-mask {
+        font-size: 12pt;
+    }
+    .score_size {
+        font-size: 10pt;
+    }
+    .dropdown-item {
+        background-color: #272525;
+        max-width: 120px;
+        padding-left: 10px;
+        padding-right: 10px;
+        color: #fff;
+        font-weight: 300;
+        font-size: 9pt;
+    }
+    .form-control {
+        height: 2rem;
+        background-color: #131418;
+        color: #fff;
+        border-radius: 1px;
+        font-size: 9pt;
+        outline: none;
+        box-shadow: none !important;
+        align-items: left;
+        padding: 5px;
+    }
+    .dropdown-menu {
+        background-color: #272525;
+        max-width: 120px !important;
+    }
+    .dropdown-divider {
+        max-width: 120px;
+    }
+    .category-title {
+        font-size: 1.5rem;
+    }
+}
+/* ######################################################################### */
+
+
+/* ########################## Sidenav menu ################################# */
+.sidenav {
+    height: 60%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 100px;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    padding-top: 60px;
+    transition: 0.5s;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 70px;
+}
+/* ######################################################################### */
+.table_number {
+    width: 50px;
+}
+
+.table_season {
+    width: 100px;
+}
+
+.table_episode {
+    width: 100px;
+}
+
+.table_score {
+    width: 80px;
+}
+
+.table_actions {
+    width: 80px;
+}
+
+.table_country {
+	width: 130px;
+}

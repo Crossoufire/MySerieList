@@ -2,303 +2,7 @@
 
 
 {% block css %}
-<!-------------- Main CSS ------------->
-<style>
-.content > .collapse:not(.show) {
-    display: none !important;
-}
-
-.form_account {
-    max-width: 800px;
-    margin-top: 40px;
-}
-
-hr {
-    border-top: 1px solid rgba(255, 255, 255, 0.9);
-}
-
-.grey_hr {
-    border-top: 1px solid grey;
-}
-
-.modal-content {
-    background: #131418;
-}
-
-.table tr {
-    text-align: center;
-    vertical-align: middle;
-}
-
-.table td {
-    text-align: center;
-    vertical-align: middle;
-}
-
-.form-control {
-    background: transparent;
-    border-radius: 0px;
-    border-top: 0px;
-    border-left: 0px;
-    border-right: 0px;
-    color: #fff;
-}
-
-.form-control:focus {
-    background: transparent;
-    border-radius: 0px;
-    border-top: 0px;
-    border-left: 0px;
-    border-right: 0px;
-    box-shadow: 0 0 0 0rem;
-    color: #fff;
-}
-
-.arrow_div {
-    height: 21px;
-    width: 21px;
-}
-
-.block:nth-of-type(2) {
-	background-color: #45B29D;
-}
-.block:nth-of-type(3) {
-	background-color: #EFC94C;
-}
-.block:nth-of-type(4) {
-	background-color: #E27A3F;
-}
-.block:nth-of-type(5) {
-	background-color: #DF5A49;
-}
-.block:nth-of-type(6) {
-	background-color: #962D3E;
-}
-.block:hover {
-	opacity: 0.75;
-}
-.col-centered{
-    float: none;
-    margin: 0 auto;
-}
-
-.account-img {
-    height: 150px;
-    width: 150px;
-    margin-bottom: 15px;
-    border-style: solid;
-    border-width: 1px;
-}
-
-.border_account {
-    border-style: solid;
-    border-width: 1px;
-    border-color: grey;
-    border-radius: 3px;
-    padding-top: 30px;
-    padding-bottom: 20px;
-    padding-left: 50px;
-    padding-right: 50px;
-    margin-bottom: 20px;
-}
-
-.stat_text {
-    font-size: 12pt;
-}
-
-.mini {
-    min-width: 105px;
-}
-
-.block {
-    height: 30px;
-    color: #fff;
-    float: left;
-    background-color: #334D5C;
-}
-
-/* On screens that are 768px or less */
-@media (max-width: 767.98px) {
-    .account-img {
-        height: 100px;
-        width: 100px;
-        margin-bottom: 15px;
-        border-style: solid;
-        border-width: 1px;
-    }
-
-    .btn.btn-sm {
-        padding: .5rem 1rem;
-        font-size: .4rem;
-    }
-
-    .border_account {
-        border-style: solid;
-        border-width: 1px;
-        border-color: grey;
-        border-radius: 3px;
-        padding-top: 30px;
-        padding-bottom: 20px;
-        padding-left: 20px;
-        padding-right: 20px;
-        margin-bottom: 20px;
-    }
-
-    .username {
-        font-size: 1.5rem;
-    }
-
-    .stat_text {
-        font-size: 10pt;
-    }
-
-    .mini {
-        min-width: 100px;
-    }
-
-    .block {
-	    height: 25px;
-	    color: #fff;
-	    float: left;
-	    background-color: #334D5C;
-    }
-
-    .position {
-        text-align: right;
-    }
-}
-</style>
-<!---- level + badge + total level ---->
-<style>
-.account-bar-wrapper {
-    width: 350px;
-}
-
-.account-bar {
-    height: 100%;
-    margin: 0px auto;
-}
-
-.account-bar-name {
-    font-size: 12pt;
-    margin: 0px 0px 0px 5px;
-    display: inline-block;
-    vertical-align: bottom;
-}
-
-.account-bar-level {
-    font-size: 12pt;
-    margin: 0px 0px 0px;
-    display: inline-block;
-}
-
-#series_level {
-    margin-left: 20px;
-}
-
-#anime_level {
-    margin-left: 10px;
-}
-
-#book_level {
-    margin-left: 20px;
-}
-
-.account-bar-next-level {
-    display: inline-block;
-    font-size: 12pt;
-}
-
-.xp-bar {
-    height: 10px;
-    width: 250px;
-    background: #035;
-    margin: 0px 0px 0px 5px;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-#xp-bar-fill-series {
-    height: 100%;
-    width: 0.1%;
-    background: #4d0000;
-    font-size: 12px;
-    line-height: 10px;
-    text-align: right;
-}
-
-#xp-bar-fill-anime {
-    height: 100%;
-    width: 0.1%;
-    background: #0068b3;
-    font-size: 12px;
-    line-height: 10px;
-    text-align: right;
-}
-
-#xp-bar-fill-book {
-    height: 100%;
-    width: 0.1%;
-    background: #004d00;
-    font-size: 12px;
-    line-height: 10px;
-    text-align: right;
-}
-
-.xp-increase-fx {
-    position: relative;
-    display: none;
-    height: 100%;
-}
-
-.xp-increase-glow1 {
-    position: absolute;
-    margin: 0px 0px 0px -2px;
-    left: 0px;
-    top: 0px;
-    background: #fff;
-    width: 5px;
-    height: 100%;
-    border-radius: 0px;
-    -webkit-filter: blur(2px);
-}
-
-.xp-increase-glow2 {
-    position: absolute;
-    margin: -5px 0px 0px -2px;
-    left: 0px;
-    top: 0px;
-    background: #aaf;
-    width: 5px;
-    height: 200%;
-    border-radius: 0px;
-    -webkit-filter: blur(10px);
-}
-
-.xp-increase-glow3 {
-    position: absolute;
-    margin: 0px 0px 0px -5px;
-    left: 0px;
-    top: 0px;
-    background: #fff;
-    width: 10px;
-    height: 100%;
-    border-radius: 5px;
-    -webkit-filter: blur(5px);
-}
-
-.total_score {
-    border-radius: 50%;
-    border: solid red;
-    color: black;
-    display: inline-block;
-    font-weight: bold;
-    line-height: 2.5em;
-    padding-right: 2px;
-    text-align: center;
-    width: 2.8em;
-}
-</style>
+<link href="{{ url_for('static', filename='css/account.css') }}" rel="stylesheet">
 {% endblock css %}
 
 
@@ -321,7 +25,7 @@ hr {
     <!---------------------------------------- Add friend modal --------------------------------------->
     <div class="modal fade" id="addFriendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; max-width: 300px; margin-left: auto; margin-right: auto;">
+            <div class="modal-content">
                 <form method="POST" action="">
                     {{ form.hidden_tag() }}
                     <h5 class="border-bottom p-t-20 p-b-15 text-center"><b>Add a Friend</b></h5>
@@ -438,7 +142,7 @@ hr {
                 </div>
             </div>
             <div class="col">
-                <table style="line-height: 1;" class="table table-sm text-light">
+                <table class="table table-sm text-light">
                     <thead>
                     <tr>
                         <th class="text-center" style="font-size: 12pt;" colspan="2">Data Informations</th>
@@ -503,11 +207,11 @@ hr {
         </div>
         <hr class="mt-1 p-b-15 mb-0">
         <div class="collapse show container-stats" id="FRIENDS">
-            <div class="d-flex flex-wrap" style="margin-right: 0px; margin-left: 0px;">
+            <div class="d-flex flex-wrap friends_container">
                 {% for friend in data["friends"] %}
                 {% if friend['status'] == "pending" %}
                     {% if user_id == current_user.get_id() %}
-                    <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
+                    <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
                         <a href="/account/{{ friend['username'] }}">
                             <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
                         </a>
@@ -520,7 +224,7 @@ hr {
                     {% endif %}
                 {% elif friend['status'] == "request" %}
                     {% if user_id == current_user.get_id() %}
-                    <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
+                    <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
                         <a href="/account/{{ friend['username'] }}">
                             <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
                         </a>
@@ -534,7 +238,7 @@ hr {
                     {% endif %}
                 {% elif friend['status'] == "declined" %}
                 {% else %}
-                    <div id="td_{{ friend['user_id'] }}" class="text-center" style="width: 100px;">
+                    <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
                         <a href="/account/{{ friend['username'] }}">
                             <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
                         </a>
@@ -571,7 +275,7 @@ hr {
 
             <figure class="d-flex">
                 {% if data['series']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
-                <span class="block" title="No data" style="background-color: black; border-width: 1px; border-style: solid; border-color: #717171">
+                <span class="block" title="No data">
                     <span id="100%" class="value"></span>
                 </span>
                 {% else %}
@@ -679,7 +383,7 @@ hr {
 
             <figure class="d-flex">
                 {% if data['anime']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
-                <span class="block" title="No data" style="background-color: black !important; border-width: 1px; border-style: solid; border-color: #717171">
+                <span class="block" title="No data">
                     <span id="100%" class="value"></span>
                 </span>
                 {% else %}
@@ -787,7 +491,7 @@ hr {
 
             <figure class="d-flex">
                 {% if data['book']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
-                <span class="block" title="No data" style="background-color: black !important; border-width: 1px; border-style: solid; border-color: #717171">
+                <span class="block" title="No data">
                     <span id="100%" class="value"></span>
                 </span>
                 {% else %}

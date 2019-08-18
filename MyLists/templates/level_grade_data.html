@@ -2,37 +2,14 @@
 
 
 {% block css %}
-<style>
-#hierarchical {
-    width: 100%;
-    height: 100%;
-}
-table {
-    margin: 0 auto;
-}
-table tr {
-    border-bottom: solid 1px grey;
-}
-table td {
-    text-align: center;
-}
-hr {
-    border-top: 1px solid rgba(255, 255, 255, 0.9);
-}
-sub {
-    margin-left: 10px;
-}
-legend {
-    font-size: 12pt;
-}
-</style>
+<link href="{{ url_for('static', filename='css/grade_data.css') }}" rel="stylesheet">
 {% endblock css %}
 
 
 {% block content %}
 <h3 class="font-weight-light text-center mb-4">Levels and Grade data</h3>
 
-<div class="d-flex flex-wrap p-l-10 p-t-10" style="border: black solid 2px; border-radius: 10px; background-color: #47476b;">
+<div class="details d-flex flex-wrap p-l-10 p-t-10">
     <p>
         <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp All these Grades are taken from the video game Halo 3.<br>
         <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp There are 42 different Grades and 125 levels.<br>

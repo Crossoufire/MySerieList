@@ -19,8 +19,24 @@ body {
 main {
   flex: 1 0 auto;
 }
-/* --- Navigation bar CSS ----------------------------------------------------------------------- */
 
+hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.second_navbar {
+    z-index: 100;
+    background-color: #330000;
+    top: 57px; !important
+}
+
+.dropdown_mylist {
+    z-index: 101;
+    border: solid 1px black;
+}
+
+
+/* --- Navigation bar CSS ----------------------------------------------------------------------- */
 .nav-item::after {
     content: '';
     display: block;

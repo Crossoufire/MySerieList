@@ -1,0 +1,46 @@
+<!---------- Main CSS ----------->
+#title {
+    font-size: 70pt;
+}
+
+/* On screens that are 768px or less */
+@media (max-width: 767.98px) {
+    #title {
+        font-size: 35pt;
+    }
+    .header {
+        height: 300px;
+    }
+}
+
+.background_white {
+    border-color: #e2e2e2;
+}
+
+/**************** LOGIN & REGISTER MODAL ***************/
+.modal-content {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    max-width:  343px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #131418;
+    border-radius: 2px !important;
+    border-color: white !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+}
+
+.modal-content a {
+    color:  #f0efee;
+    font-weight: 400;
+    text-align: center;
+    display: inline-block;
+    opacity: 0.6;
+    transition: opacity ease 0.5s;
+}
+
+.title_section {
+    margin-bottom: 2rem !important;
+    margin-top: 2rem !important;
+}

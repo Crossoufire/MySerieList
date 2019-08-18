@@ -2,95 +2,12 @@
 
 
 {% block css %}
-<!-------- Main CSS --------->
-<style>
-hr {
-    border-top: 1px solid rgba(255, 255, 255, 0.9);
-}
-
-.form_account {
-    max-width: 800px;
-    margin-top: 40px;
-}
-
-.border_account {
-    border-style: solid;
-    border-width: 1px;
-    border-color: grey;
-    border-radius: 3px;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-}
-
-label {
-    color: white;
-    height: 20px;
-    padding-top: 3px;
-    float:left;
-    text-align: right;
-}
-
-.list_dropdown {
-    border-style: 1px;
-    border-color: black;
-    border-radius: 2px;
-    -moz-appearance:none;
-    -webkit-appearance:none;
-    appearance:none;
-}
-
-.border_account {
-    padding-top: 30px;
-    padding-left: 50px;
-    padding-right: 50px;
-}
-
-label {
-    width: 180px;
-    margin-right: 20px;
-}
-
-.text-input {
-    width : 280px;
-    padding: 0px !important;
-}
-
-.error-msg {
-    padding-left: 200px;
-}
-
-/* On screens that are 768px or less */
-@media (max-width: 767.98px) {
-    .border_account {
-        padding-top: 20px;
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-    label {
-        width: 130px;
-        margin-right: 10px;
-    }
-
-    .text-input {
-        width : 155px;
-        padding: 0px !important;
-    }
-
-    .error-msg {
-        padding-left: 140px;
-    }
-
-    .custom-btn-size {
-        padding: 6px !important;
-    }
-}
-</style>
+<link href="{{ url_for('static', filename='css/account_settings.css') }}" rel="stylesheet">
 {% endblock css %}
 
 
 {% block content %}
-<div class="container form_account" style="padding-left: 0px; padding-right: 0px;">
+<div class="container form_account">
     <div class="border_account">
         <h3 class="m-b-15 text-center">Account Settings</h3>
         <hr>
