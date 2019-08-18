@@ -2365,23 +2365,24 @@ def get_achievements(user_id, list_type):
         score_achievements = []
         achievements = Achievements.query.filter_by(type="score").all()
         mean_score = get_mean_score(user_id, ListType.ANIME)
+        if mean_score <= 3:
+            tata = 1
+        elif 3 < mean_score <= 5:
+            tata = 2
+        elif 8 <= mean_score <= 10:
+            tata = 3
+        else:
+            tata = "no"
 
         for achievement in achievements:
-            if mean_score <= 3:
+            if tata == 1 and int(achievement.threshold) == 3:
+                passed = "yes"
+            elif tata == 2 and int(achievement.threshold) == 5:
+                passed = "yes"
+            elif tata == 3 and int(achievement.threshold) == 8:
                 passed = "yes"
             else:
                 passed = "no"
-
-            if 3 < mean_score <= 5:
-                passed = "yes"
-            else:
-                passed = "no"
-
-            if 8 <= mean_score <= 10:
-                passed = "yes"
-            else:
-                passed = "no"
-
             achievement_data = {"type": achievement.type,
                                 "threshold": achievement.threshold,
                                 "image_id": achievement.image_id,
