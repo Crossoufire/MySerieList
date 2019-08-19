@@ -758,32 +758,33 @@ def achievements(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    # Anime achievements
+    # Recover the anime achievements
     user_achievements = get_achievements(user.id, ListType.ANIME)
 
+    # Change the results in a matrix 4 by x
     col = 4
-    genres_achievements_matrix        = [user_achievements[0][i:i + col] for i in range(0, len(user_achievements[0]), col)]
-    something_big_achievements_matrix = [user_achievements[1][i:i + col] for i in range(0, len(user_achievements[1]), col)]
-    source_airing_achievements_matrix = [user_achievements[2][i:i + col] for i in range(0, len(user_achievements[2]), col)]
-    finished_achievements_matrix      = [user_achievements[3][i:i + col] for i in range(0, len(user_achievements[3]), col)]
-    time_achievements_matrix          = [user_achievements[4][i:i + col] for i in range(0, len(user_achievements[4]), col)]
-    score_achievements_matrix         = [user_achievements[5][i:i + col] for i in range(0, len(user_achievements[5]), col)]
+    genres_matrix        = [user_achievements[0][i:i + col] for i in range(0, len(user_achievements[0]), col)]
+    miscellaneous_matrix = [user_achievements[1][i:i + col] for i in range(0, len(user_achievements[1]), col)]
+    source_airing_matrix = [user_achievements[2][i:i + col] for i in range(0, len(user_achievements[2]), col)]
+    finished_matrix      = [user_achievements[3][i:i + col] for i in range(0, len(user_achievements[3]), col)]
+    time_matrix          = [user_achievements[4][i:i + col] for i in range(0, len(user_achievements[4]), col)]
+    score_matrix         = [user_achievements[5][i:i + col] for i in range(0, len(user_achievements[5]), col)]
 
-    data = [genres_achievements_matrix, something_big_achievements_matrix, source_airing_achievements_matrix,
-            finished_achievements_matrix, time_achievements_matrix, score_achievements_matrix]
+    data = [genres_matrix, source_airing_matrix, finished_matrix, time_matrix, miscellaneous_matrix, score_matrix]
 
-    user_number_achievements = 0
-    for k in range(0, len(user_achievements)):
-        for i in range(0, len(user_achievements[k])):
-            if user_achievements[k][i]["passed"] == "yes":
-                user_number_achievements += 1
+    # Check how many achievement the user have
+    unlocked_achievements = 0
+    for i in range(0, len(user_achievements)):
+        for j in range(0, len(user_achievements[i])):
+            if user_achievements[i][j]["passed"] == "yes":
+                unlocked_achievements += 1
 
     return render_template("achievements.html",
-                           title='Achievements',
+                           title="{}'s achievements".format(user_name),
+                           data=data,
                            user_id=str(user.id),
                            user_name=user_name,
-                           user_number_achievements=user_number_achievements,
-                           data=data)
+                           unlocked_achievements=unlocked_achievements)
 
 
 @app.route("/anonymous", methods=['GET'])
@@ -1241,7 +1242,6 @@ def change_element_category():
         element = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
     elif element_type == "serieslist":
         element = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
-
     if element is None:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1256,13 +1256,11 @@ def change_element_category():
             number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
             element.last_episode_watched = number_episode
-
         elif element_type == "serieslist":
             number_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).count()
             number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
             element.last_episode_watched = number_episode
-
     elif element_new_category == 'On Hold':
         element.status = Status.ON_HOLD
     elif element_new_category == 'Random':
@@ -1287,7 +1285,6 @@ def change_element_category():
     app.logger.info('[{}] Category of the element with ID {} changed to {}'.format(current_user.get_id(),
                                                                                    element_id,
                                                                                    element_new_category))
-
     # Compute total time spent
     if element_type == "animelist":
         compute_media_time_spent(ListType.ANIME)
@@ -1572,7 +1569,6 @@ def change_book_category():
         book.status = Status.PLAN_TO_READ
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
 
     app.logger.info('[{}] Category of the book with ID {} changed to {}'.format(current_user.get_id(),
                                                                                 book_id,
@@ -3069,6 +3065,7 @@ def send_email_update_email(user):
         app.logger.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'.format(user.id, e))
         return False
 
+
 def compute_media_time_spent(list_type):
     if list_type == ListType.ANIME:
         data = db.session.query(AnimeList, Anime,
@@ -3102,13 +3099,13 @@ def compute_media_time_spent(list_type):
             except:
                 pass
 
-    user = User.query.filter_by(id=current_user.id).first()
     if list_type == ListType.ANIME:
         user.time_spent_anime = total_time
     elif list_type == ListType.SERIES:
         user.time_spent_series = total_time
 
     db.session.commit()
+
 
 def compute_book_time_spent():
     data = db.session.query(Book, BookList). \
@@ -3122,6 +3119,7 @@ def compute_book_time_spent():
                 total_time += book[0].page_count
             except:
                 pass
+
     user = User.query.filter_by(id=current_user.id).first()
     user.time_spent_book = total_time
 

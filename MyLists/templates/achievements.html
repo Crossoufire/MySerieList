@@ -5,47 +5,90 @@
 {% endblock css %}
 
 
+{% block fixed %}
+<div class="d-flex flex-wrap">
+    <div class="ml-auto">
+        <a id="collapse_container" onclick="hide_all_cat()">
+            <span id="collapse_all" class="fas fa-eye-slash text-light m-r-5"></span>
+            <span id="show_cat_all" class="d-none"></span>
+            <span id="collapse_show" class="text-light">Collapse all</span>
+        </a>
+    </div>
+</div>
+{% endblock fixed %}
+
+
 {% block content %}
 <div class="container">
     <h2 class="text-center mb-3 mt-4">Anime achievements</h2>
     <hr class="mt-2 mb-3">
     {% if current_user.get_id() == user_id %}
-    <div style="font-size: 14pt;" class="text-center mb-5">You have unlocked {{ user_number_achievements }}/70 achievements.</div>
+    <div style="font-size: 14pt;" class="text-center mb-5">You have unlocked {{ unlocked_achievements }}/70 achievements.</div>
     {% else %}
-    <div style="font-size: 14pt;" class="text-center mb-5">{{ user_name }} has unlocked {{ user_number_achievements }}/70 achievements.</div>
+    <div style="font-size: 14pt;" class="text-center mb-5">{{ user_name }} has unlocked {{ unlocked_achievements }}/70 achievements.</div>
     {% endif %}
-    <div class="projects row text-center p-0">
+    <div class="projects text-center p-0">
         {% for p in range(0, 6) %}
         {% if p == 0 %}
-        <div class="ml-auto mr-auto m-b-25 m-t-20" style="font-size: 18pt;">
-            Genre based achievements
-            <hr class="mt-0 mb-0">
-        </div>
+        <div style="cursor: pointer;" data-toggle="collapse" href="#GENRE" onclick="turn('GENRE', 'GENRE_arrow')">
+			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">Genre based achievements
+				<div class="arrow_div float-right">
+					<a class="collapse_all fas fa-sm fa-chevron-down" id="GENRE_arrow"></a>
+				</div>
+			</h2>
+		</div>
+		<hr class="mt-2 pb-3 mb-0">
+		<div class="collapse show cat" id="GENRE">
         {% elif p == 1 %}
-        <div class="ml-auto mr-auto m-b-25 m-t-50" style="font-size: 18pt;">
-            Something BIG achievements
-            <hr class="mt-0 mb-0">
-        </div>
+        <div style="cursor: pointer;" data-toggle="collapse" href="#SOURCE" onclick="turn('SOURCE', 'SOURCE_arrow')">
+			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">Source based achievements
+				<div class="arrow_div float-right">
+					<a class="collapse_all fas fa-sm fa-chevron-down" id="SOURCE_arrow"></a>
+				</div>
+			</h2>
+		</div>
+		<hr class="mt-2 pb-3 mb-0">
+		<div class="collapse show cat" id="SOURCE">
         {% elif p == 2 %}
-        <div class="ml-auto mr-auto m-b-25 m-t-50" style="font-size: 18pt;">
-            Classic achievements
-            <hr class="mt-0 mb-0">
-        </div>
+        <div style="cursor: pointer;" data-toggle="collapse" href="#FINISHED" onclick="turn('FINISHED', 'FINISHED_arrow')">
+			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">Anime finished based achievements
+				<div class="arrow_div float-right">
+					<a class="collapse_all fas fa-sm fa-chevron-down" id="FINISHED_arrow"></a>
+				</div>
+			</h2>
+		</div>
+		<hr class="mt-2 pb-3 mb-0">
+		<div class="collapse show cat" id="FINISHED">
         {% elif p == 3 %}
-        <div class="ml-auto mr-auto m-b-25 m-t-50" style="font-size: 18pt;">
-            Finished achievements
-            <hr class="mt-0 mb-0">
-        </div>
+        <div style="cursor: pointer;" data-toggle="collapse" href="#TIME" onclick="turn('TIME', 'TIME_arrow')">
+			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">Time watch based achievements
+				<div class="arrow_div float-right">
+					<a class="collapse_all fas fa-sm fa-chevron-down" id="TIME_arrow"></a>
+				</div>
+			</h2>
+		</div>
+		<hr class="mt-2 pb-3 mb-0">
+		<div class="collapse show cat" id="TIME">
         {% elif p == 4 %}
-        <div class="ml-auto mr-auto m-b-25 m-t-50" style="font-size: 18pt;">
-            Time achievements
-            <hr class="mt-0 mb-0">
-        </div>
+        <div style="cursor: pointer;" data-toggle="collapse" href="#MISC" onclick="turn('MISC', 'MISC_arrow')">
+			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">Misc based achievements
+				<div class="arrow_div float-right">
+					<a class="collapse_all fas fa-sm fa-chevron-down" id="MISC_arrow"></a>
+				</div>
+			</h2>
+		</div>
+		<hr class="mt-2 pb-3 mb-0">
+		<div class="collapse show cat" id="MISC">
         {% else %}
-        <div class="ml-auto mr-auto m-b-25 m-t-50" style="font-size: 18pt;">
-            Score achievements
-            <hr class="mt-0 mb-0">
-        </div>
+        <div style="cursor: pointer;" data-toggle="collapse" href="#SCORE" onclick="turn('SCORE', 'SCORE_arrow')">
+			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">Score based achievements
+				<div class="arrow_div float-right">
+					<a class="collapse_all fas fa-sm fa-chevron-down" id="SCORE_arrow"></a>
+				</div>
+			</h2>
+		</div>
+		<hr class="mt-2 pb-3 mb-0">
+		<div class="collapse show cat" id="SCORE">
         {% endif %}
         <table width="100%">
             <tbody>
@@ -96,6 +139,7 @@
             {% endfor %}
             </tbody>
         </table>
+        </div>
         {% endfor %}
     </div>
 </div>
@@ -103,7 +147,7 @@
 
 
 {% block script %}
-<script>
+<script type="text/javascript">
 function test(tata, tutu) {
     if ($("#"+tata).hasClass('d-none anime_details')) {
         if ($("#"+tata).siblings().hasClass('text-left anime_details')) {
@@ -121,6 +165,35 @@ function test(tata, tutu) {
         $("#"+tutu).attr('style', 'filter: none;')
         $("#"+tata).attr('class', 'd-none anime_details');
     }
+}
+</script>
+<script type="text/javascript">
+function turn(category, arrow) {
+    var arrow = document.getElementById(arrow);
+    var category = document.getElementById(category);
+
+    if (category.className === "d-flex flex-wrap collapsing") {
+    } else if (arrow.className === "collapse_all fas fa-sm fa-chevron-right") {
+        arrow.className = "collapse_all fas fa-sm fa-chevron-down";
+    } else {
+        arrow.className = "collapse_all fas fa-sm fa-chevron-right";
+    }
+}
+</script>
+<!------- Show/collapse all categories --------->
+<script type="text/javascript">
+function hide_all_cat() {
+    $('.collapse.cat').collapse('hide');
+    $('#collapse_show').text('Expand all');
+    $('#collapse_container').attr('onclick', 'show_all_cat()');
+    $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-right');
+}
+
+function show_all_cat() {
+    $('.collapse.cat').collapse('show');
+    $('#collapse_show').text('Collapse all');
+    $('#collapse_container').attr('onclick', 'hide_all_cat()');
+    $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-down');
 }
 </script>
 {% endblock script %}

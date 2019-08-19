@@ -24,3 +24,8 @@ ul {
     background: #2c3946;
     border: black 2px solid;
 }
+
+.arrow_div {
+    height: 28px;
+    width: 28px;
+}
