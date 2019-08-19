@@ -31,7 +31,7 @@
         {% for p in range(0, 6) %}
         {% if p == 0 %}
         <div style="cursor: pointer;" data-toggle="collapse" href="#GENRE" onclick="turn('GENRE', 'GENRE_arrow')">
-			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">Genre based achievements
+			<h2 class="font-weight-light text-center pt-4 mb-0 category-title">Genre based achievements ({{ number_unlocked["genres"] }}/44)
 				<div class="arrow_div float-right">
 					<a class="collapse_all fas fa-sm fa-chevron-down" id="GENRE_arrow"></a>
 				</div>
@@ -41,7 +41,7 @@
 		<div class="collapse show cat" id="GENRE">
         {% elif p == 1 %}
         <div style="cursor: pointer;" data-toggle="collapse" href="#SOURCE" onclick="turn('SOURCE', 'SOURCE_arrow')">
-			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">Source based achievements
+			<h2 class="font-weight-light text-center pt-4 mb-0 category-title">Source based achievements ({{ number_unlocked["source"] }}/4)
 				<div class="arrow_div float-right">
 					<a class="collapse_all fas fa-sm fa-chevron-down" id="SOURCE_arrow"></a>
 				</div>
@@ -51,7 +51,7 @@
 		<div class="collapse show cat" id="SOURCE">
         {% elif p == 2 %}
         <div style="cursor: pointer;" data-toggle="collapse" href="#FINISHED" onclick="turn('FINISHED', 'FINISHED_arrow')">
-			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">Anime finished based achievements
+			<h2 class="font-weight-light text-center pt-4 mb-0 category-title">Anime finished based achievements ({{ number_unlocked["finished"] }}/12)
 				<div class="arrow_div float-right">
 					<a class="collapse_all fas fa-sm fa-chevron-down" id="FINISHED_arrow"></a>
 				</div>
@@ -61,7 +61,7 @@
 		<div class="collapse show cat" id="FINISHED">
         {% elif p == 3 %}
         <div style="cursor: pointer;" data-toggle="collapse" href="#TIME" onclick="turn('TIME', 'TIME_arrow')">
-			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">Time watch based achievements
+			<h2 class="font-weight-light text-center pt-4 mb-0 category-title">Time watch based achievements ({{ number_unlocked["time"] }}/4)
 				<div class="arrow_div float-right">
 					<a class="collapse_all fas fa-sm fa-chevron-down" id="TIME_arrow"></a>
 				</div>
@@ -71,7 +71,7 @@
 		<div class="collapse show cat" id="TIME">
         {% elif p == 4 %}
         <div style="cursor: pointer;" data-toggle="collapse" href="#MISC" onclick="turn('MISC', 'MISC_arrow')">
-			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">Misc based achievements
+			<h2 class="font-weight-light text-center pt-4 mb-0 category-title">Misc based achievements ({{ number_unlocked["misc"] }}/3)
 				<div class="arrow_div float-right">
 					<a class="collapse_all fas fa-sm fa-chevron-down" id="MISC_arrow"></a>
 				</div>
@@ -81,7 +81,7 @@
 		<div class="collapse show cat" id="MISC">
         {% else %}
         <div style="cursor: pointer;" data-toggle="collapse" href="#SCORE" onclick="turn('SCORE', 'SCORE_arrow')">
-			<h2 class="font-weight-light text-center pt-5 mb-0 category-title">Score based achievements
+			<h2 class="font-weight-light text-center pt-4 mb-0 category-title">Score based achievements ({{ number_unlocked["score"] }}/3)
 				<div class="arrow_div float-right">
 					<a class="collapse_all fas fa-sm fa-chevron-down" id="SCORE_arrow"></a>
 				</div>

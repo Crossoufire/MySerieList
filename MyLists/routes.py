@@ -763,18 +763,24 @@ def achievements(user_name):
 
     # Change the results in a matrix 4 by x
     col = 4
-    genres_matrix        = [user_achievements[0][i:i + col] for i in range(0, len(user_achievements[0]), col)]
-    miscellaneous_matrix = [user_achievements[1][i:i + col] for i in range(0, len(user_achievements[1]), col)]
-    source_airing_matrix = [user_achievements[2][i:i + col] for i in range(0, len(user_achievements[2]), col)]
-    finished_matrix      = [user_achievements[3][i:i + col] for i in range(0, len(user_achievements[3]), col)]
-    time_matrix          = [user_achievements[4][i:i + col] for i in range(0, len(user_achievements[4]), col)]
-    score_matrix         = [user_achievements[5][i:i + col] for i in range(0, len(user_achievements[5]), col)]
+    genres_matrix   = [user_achievements[0][i:i + col] for i in range(0, len(user_achievements[0]), col)]
+    misc_matrix     = [user_achievements[1][i:i + col] for i in range(0, len(user_achievements[1]), col)]
+    source_matrix   = [user_achievements[2][i:i + col] for i in range(0, len(user_achievements[2]), col)]
+    finished_matrix = [user_achievements[3][i:i + col] for i in range(0, len(user_achievements[3]), col)]
+    time_matrix     = [user_achievements[4][i:i + col] for i in range(0, len(user_achievements[4]), col)]
+    score_matrix    = [user_achievements[5][i:i + col] for i in range(0, len(user_achievements[5]), col)]
 
-    data = [genres_matrix, source_airing_matrix, finished_matrix, time_matrix, miscellaneous_matrix, score_matrix]
+    data = [genres_matrix, source_matrix, finished_matrix, time_matrix, misc_matrix, score_matrix]
+    number_unlocked = {'genres': user_achievements[6][0],
+                       'source':user_achievements[6][1],
+                       'finished':user_achievements[6][2],
+                       'time':user_achievements[6][3],
+                       'misc':user_achievements[6][4],
+                       'score':user_achievements[6][5]}
 
     # Check how many achievement the user have
     unlocked_achievements = 0
-    for i in range(0, len(user_achievements)):
+    for i in range(0, len(user_achievements)-1):
         for j in range(0, len(user_achievements[i])):
             if user_achievements[i][j]["passed"] == "yes":
                 unlocked_achievements += 1
@@ -784,6 +790,7 @@ def achievements(user_name):
                            data=data,
                            user_id=str(user.id),
                            user_name=user_name,
+                           number_unlocked=number_unlocked,
                            unlocked_achievements=unlocked_achievements)
 
 
@@ -1765,8 +1772,9 @@ def get_knowledge_grade(knowledge_level):
 
 def get_achievements(user_id, list_type):
     if list_type == ListType.ANIME:
-        genres_achievements = []
-        # genre based achievements
+        number_by_types = []
+
+        # Recover all the data
         anime_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre_id.distinct()),
                                         func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
                                         func.group_concat(AnimeEpisodesPerSeason.episodes)). \
@@ -1775,6 +1783,8 @@ def get_achievements(user_id, list_type):
                                         join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
                                         filter(AnimeList.user_id == user_id).group_by(Anime.id).order_by(Anime.name.asc())
 
+        # genre based achievements
+        genres_achievements = []
         tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10, tmp_11 = [0 for _ in range(11)]
         time_1, time_2, time_3, time_4, time_5, time_6, time_7, time_8, time_9, time_10, time_11 = [0 for _ in range(11)]
         anime_name_1, anime_name_2, anime_name_3, anime_name_4, anime_name_5, anime_name_6, anime_name_7, \
@@ -1941,9 +1951,123 @@ def get_achievements(user_id, list_type):
                                     "anime_name": anime_names[i]}
                 genres_achievements.append(achievement_data)
 
+        count = 0
+        for i in range(0, len(genres_achievements)):
+            if genres_achievements[i]["passed"] == "yes":
+                count += 1
+        number_by_types.append(count)
 
-        # Something big: Long runner + old + different years
-        something_big = []
+        # source/airing_date achievements
+        source_achievements = []
+        achievements = Achievements.query.filter_by(type="classic").all()
+        anime_name = []
+        total = 0
+        total_time = 0
+        for anime in anime_data:
+            first_year = int(anime[0].first_air_date.split('-')[0])
+            last_year = int(anime[0].last_air_date.split('-')[0])
+
+            if first_year >= 1981 and last_year <= 2000:
+                # Get episodes per season
+                nb_season = len(anime[3].split(","))
+                nb_episodes = anime[4].split(",")[:nb_season]
+
+                ep_counter = 0
+                for i in range(0, anime[1].current_season - 1):
+                    ep_counter += int(nb_episodes[i])
+                total_episodes_watched = ep_counter + anime[1].last_episode_watched
+                total_time += total_episodes_watched * anime[0].episode_duration
+                total += 1
+                anime_name.append(anime[0].name)
+
+        for achievement in achievements:
+            if int(total_time / 60) >= int(achievement.threshold):
+                passed = "yes"
+            else:
+                passed = "no"
+
+            achievement_data = {"type": achievement.type,
+                                "threshold": achievement.threshold,
+                                "image_id": achievement.image_id,
+                                "level": achievement.level,
+                                "title": achievement.title,
+                                "description": achievement.description,
+                                "time_hours": int(total_time / 60),
+                                "passed": passed,
+                                "anime_watched": total,
+                                "anime_name": anime_name}
+            source_achievements.append(achievement_data)
+
+        count = 0
+        for i in range(0, len(source_achievements)):
+            if source_achievements[i]["passed"] == "yes":
+                count += 1
+        number_by_types.append(count)
+
+        # Finished achievements
+        finished_achievements = []
+        achievements = Achievements.query.filter_by(type="finished").all()
+        total = 0
+        for anime in anime_data:
+            status = anime[0].status
+
+            if status == "Ended" and anime[1].status == Status.COMPLETED:
+                total += 1
+
+        for achievement in achievements:
+            if total >= int(achievement.threshold):
+                passed = "yes"
+            else:
+                passed = "no"
+
+            achievement_data = {"type": achievement.type,
+                                "threshold": achievement.threshold,
+                                "image_id": achievement.image_id,
+                                "level": achievement.level,
+                                "title": achievement.title,
+                                "description": achievement.description,
+                                "passed": passed,
+                                "anime_watched": total}
+            finished_achievements.append(achievement_data)
+
+        count = 0
+        for i in range(0, len(finished_achievements)):
+            if finished_achievements[i]["passed"] == "yes":
+                count += 1
+        number_by_types.append(count)
+
+
+        # Time achievements
+        time_achievements = []
+        achievements = Achievements.query.filter_by(type="time").all()
+        user = User.query.filter_by(id=user_id).first()
+
+        time_spent = int(user.time_spent_anime / 1440)
+
+        for achievement in achievements:
+            if time_spent >= int(achievement.threshold):
+                passed = "yes"
+            else:
+                passed = "no"
+
+            achievement_data = {"type": achievement.type,
+                                "threshold": achievement.threshold,
+                                "image_id": achievement.image_id,
+                                "level": achievement.level,
+                                "title": achievement.title,
+                                "description": achievement.description,
+                                "passed": passed,
+                                "days_spent": time_spent}
+            time_achievements.append(achievement_data)
+
+        count = 0
+        for i in range(0, len(time_achievements)):
+            if time_achievements[i]["passed"] == "yes":
+                count += 1
+        number_by_types.append(count)
+
+        # Miscellaneous: Long runner + old + different years
+        misc_achievements = []
         achievement = Achievements.query.filter_by(type="long").first()
         total = 0
         anime_name = []
@@ -1975,8 +2099,7 @@ def get_achievements(user_id, list_type):
                             "passed": passed,
                             "anime_watched": total,
                             "anime_name": anime_name}
-        something_big.append(achievement_data)
-
+        misc_achievements.append(achievement_data)
 
         achievement = Achievements.query.filter_by(type="old").first()
         total = 0
@@ -2001,8 +2124,7 @@ def get_achievements(user_id, list_type):
                             "passed": passed,
                             "anime_watched": total,
                             "anime_name": anime_name}
-        something_big.append(achievement_data)
-
+        misc_achievements.append(achievement_data)
 
         achievement = Achievements.query.filter_by(type="year").first()
         all_first_air_date = []
@@ -2025,101 +2147,15 @@ def get_achievements(user_id, list_type):
                             "description": achievement.description,
                             "passed": passed,
                             "anime_watched": len(all_first_air_date)}
-        something_big.append(achievement_data)
+        misc_achievements.append(achievement_data)
+
+        count = 0
+        for i in range(0, len(misc_achievements)):
+            if misc_achievements[i]["passed"] == "yes":
+                count += 1
+        number_by_types.append(count)
 
 
-        # source/airing_date achievements
-        source_airing_achievements = []
-        achievements = Achievements.query.filter_by(type="classic").all()
-        anime_name = []
-        total = 0
-        total_time = 0
-        for anime in anime_data:
-            first_year = int(anime[0].first_air_date.split('-')[0])
-            last_year = int(anime[0].last_air_date.split('-')[0])
-
-            if first_year >= 1981 and last_year <= 2000:
-                # Get episodes per season
-                nb_season = len(anime[3].split(","))
-                nb_episodes = anime[4].split(",")[:nb_season]
-
-                ep_counter = 0
-                for i in range(0, anime[1].current_season - 1):
-                    ep_counter += int(nb_episodes[i])
-                total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                total_time += total_episodes_watched * anime[0].episode_duration
-                total += 1
-                anime_name.append(anime[0].name)
-
-        for achievement in achievements:
-            if int(total_time/60) >= int(achievement.threshold):
-                passed = "yes"
-            else:
-                passed = "no"
-
-            achievement_data = {"type": achievement.type,
-                                "threshold": achievement.threshold,
-                                "image_id": achievement.image_id,
-                                "level": achievement.level,
-                                "title": achievement.title,
-                                "description": achievement.description,
-                                "time_hours": int(total_time/60),
-                                "passed": passed,
-                                "anime_watched": total,
-                                "anime_name": anime_name}
-            source_airing_achievements.append(achievement_data)
-
-
-
-        # Finished achievements
-        finished_achievements = []
-        achievements = Achievements.query.filter_by(type="finished").all()
-        total = 0
-        for anime in anime_data:
-            status = anime[0].status
-
-            if status == "Ended" and anime[1].status == Status.COMPLETED:
-                total += 1
-
-        for achievement in achievements:
-            if total >= int(achievement.threshold):
-                passed = "yes"
-            else:
-                passed = "no"
-
-            achievement_data = {"type": achievement.type,
-                                "threshold": achievement.threshold,
-                                "image_id": achievement.image_id,
-                                "level": achievement.level,
-                                "title": achievement.title,
-                                "description": achievement.description,
-                                "passed": passed,
-                                "anime_watched": total}
-            finished_achievements.append(achievement_data)
-
-
-        # Time achievements
-        time_achievements = []
-        achievements = Achievements.query.filter_by(type="time").all()
-        user = User.query.filter_by(id=user_id).first()
-
-        time_spent = int(user.time_spent_anime/1440)
-
-        for achievement in achievements:
-            if time_spent >= int(achievement.threshold):
-                passed = "yes"
-            else:
-                passed = "no"
-
-            achievement_data = {"type": achievement.type,
-                                "threshold": achievement.threshold,
-                                "image_id": achievement.image_id,
-                                "level": achievement.level,
-                                "title": achievement.title,
-                                "description": achievement.description,
-                                "passed": passed,
-                                "days_spent": time_spent}
-            time_achievements.append(achievement_data)
 
 
 
@@ -2128,20 +2164,20 @@ def get_achievements(user_id, list_type):
         achievements = Achievements.query.filter_by(type="score").all()
         mean_score = get_mean_score(user_id, ListType.ANIME)
         if mean_score <= 3:
-            tata = 1
+            tmp = 1
         elif 3 < mean_score <= 5:
-            tata = 2
+            tmp = 2
         elif 8 <= mean_score <= 10:
-            tata = 3
+            tmp = 3
         else:
-            tata = "no"
+            tmp = "no"
 
         for achievement in achievements:
-            if tata == 1 and int(achievement.threshold) == 3:
+            if tmp == 1 and int(achievement.threshold) == 3:
                 passed = "yes"
-            elif tata == 2 and int(achievement.threshold) == 5:
+            elif tmp == 2 and int(achievement.threshold) == 5:
                 passed = "yes"
-            elif tata == 3 and int(achievement.threshold) == 8:
+            elif tmp == 3 and int(achievement.threshold) == 8:
                 passed = "yes"
             else:
                 passed = "no"
@@ -2155,8 +2191,14 @@ def get_achievements(user_id, list_type):
                                 "mean_score": mean_score}
             score_achievements.append(achievement_data)
 
-    return [genres_achievements, something_big, source_airing_achievements, finished_achievements,
-            time_achievements, score_achievements]
+        count = 0
+        for i in range(0, len(score_achievements)):
+            if score_achievements[i]["passed"] == "yes":
+                count += 1
+        number_by_types.append(count)
+
+    return [genres_achievements, misc_achievements, source_achievements, finished_achievements,
+            time_achievements, score_achievements, number_by_types]
 
 
 def autocomplete_search_element(element_name, list_type):
