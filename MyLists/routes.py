@@ -243,7 +243,7 @@ def reset_token(token):
     return render_template('reset_token.html', title='Reset Password', form=form)
 
 
-@app.route("/register_account/<token>", methods=['GET', 'POST'])
+@app.route("/register_account/<token>", methods=['GET'])
 def register_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('home'))
@@ -274,7 +274,7 @@ def admin():
     pass
 
 
-@app.route("/logout")
+@app.route("/logout", methods=['GET'])
 @login_required
 def logout():
     user = User.query.filter_by(id=current_user.get_id()).first()
@@ -477,13 +477,13 @@ def account(user_name):
                            user_id=str(user.id))
 
 
-@app.route("/anime_achievements")
+@app.route("/anime_achievements", methods=['GET'])
 @login_required
 def anime_achievements():
     return render_template('anime_achievements.html', title='Anime achievements')
 
 
-@app.route("/level_grade_data")
+@app.route("/level_grade_data", methods=['GET'])
 @login_required
 def level_grade_data():
     all_ranks_list = []
@@ -515,7 +515,7 @@ def level_grade_data():
     return render_template('level_grade_data.html', title='Level grade data', data=data)
 
 
-@app.route("/knowledge_grade_data")
+@app.route("/knowledge_grade_data", methods=['GET'])
 @login_required
 def knowledge_grade_data():
     all_knowledge_ranks_list = []
@@ -667,7 +667,7 @@ def change_password():
     return render_template('change_password.html', form=form)
 
 
-@app.route("/hall_of_fame")
+@app.route("/hall_of_fame", methods=['GET'])
 @login_required
 def hall_of_fame():
     users = User.query.filter(User.id >= "2").order_by(User.username.asc()).all()
@@ -733,90 +733,20 @@ def hall_of_fame():
 
     return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
 
-    # Get list of all users except admin
-    # users = User.query.filter(User.id >= "2").order_by(User.username.asc()).all()
-    #
-    # current_user_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="accepted").all()
-    # friends_list = []
-    # for friend in current_user_friends:
-    #     friends_list.append(friend.friend_id)
-    #
-    # current_user_pending_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="request").all()
-    # friends_pending_list = []
-    # for friend in current_user_pending_friends:
-    #     friends_pending_list.append(friend.friend_id)
-    #
-    # # hall of fame
-    # all_user_data = []
-    # for user in users:
-    #     ranks_and_levels_series = get_all_account_stats(user.id, ListType.SERIES)
-    #     ranks_and_levels_anime = get_all_account_stats(user.id, ListType.ANIME)
-    #     ranks_and_levels_books = get_all_account_stats(user.id, ListType.BOOK)
-    #
-    #     # Knowledge level calculation + Grade
-    #     knowledge_level = int(ranks_and_levels_series[3][0]) + int(ranks_and_levels_anime[3][0]) + int(ranks_and_levels_books[3][0])
-    #
-    #     list_all_knowledge_ranks = []
-    #     if platform.system() == "Windows":
-    #         path = os.path.join(app.root_path, "static\\img\\knowledge_ranks\\knowledge_ranks.csv")
-    #     else:  # Linux & macOS
-    #         path = os.path.join(app.root_path, "static/img/knowledge_ranks/knowledge_ranks.csv")
-    #     with open(path, 'r') as fp:
-    #         for line in fp:
-    #             list_all_knowledge_ranks.append(line.split(";"))
-    #
-    #     user_knowledge_rank = []
-    #     # Check if the user has a level greater than 345
-    #     if int(knowledge_level) > 345:
-    #         user_knowledge_rank.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4"])
-    #     else:
-    #         for rank in list_all_knowledge_ranks:
-    #             if str(rank[0]) == str(knowledge_level):
-    #                 user_knowledge_rank.append([str(rank[1]), str(rank[2])])
-    #
-    #     # profile picture
-    #     profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
-    #     user_data = {"profile_picture": profile_picture,
-    #                  "username": user.username,
-    #                  "series": ranks_and_levels_series,
-    #                  "anime": ranks_and_levels_anime,
-    #                  "books": ranks_and_levels_books,
-    #                  "total": [knowledge_level, user_knowledge_rank]}
-    #
-    #     if user.id in friends_list:
-    #         user_data["isfriend"] = True
-    #         user_data["ispendingfriend"] = False
-    #     else:
-    #         if user.id in friends_pending_list:
-    #             user_data["ispendingfriend"] = True
-    #         else:
-    #             user_data["ispendingfriend"] = False
-    #         user_data["isfriend"] = False
-    #     if str(user.id) == current_user.get_id():
-    #         user_data["isprivate"] = False
-    #         user_data["iscurrentuser"] = True
-    #     else:
-    #         user_data["isprivate"] = user.private
-    #         user_data["iscurrentuser"] = False
-    #
-    #     all_user_data.append(user_data)
-    #
-    # return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_user_data)
 
-
-@app.route("/achievements/<user_name>")
+@app.route("/achievements/<user_name>", methods=['GET'])
 @login_required
 def achievements(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
-    # Protect admin account
-    if user.id == 1 and current_user.id != 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-
     # No account with this username
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
+    # Protect admin account
+    if user.id == 1 and current_user.id != 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
     # Check if the account is private / in the friendslist
     if current_user.id != user.id:
@@ -856,7 +786,7 @@ def achievements(user_name):
                            data=data)
 
 
-@app.route("/anonymous")
+@app.route("/anonymous", methods=['GET'])
 @login_required
 def anonymous():
     image_anonymous = url_for('static', filename='img/anonymous.jpg')
@@ -950,6 +880,7 @@ def mymedialist(media_list, list_view, user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
+    # Check if the user exists
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
@@ -989,6 +920,11 @@ def mymedialist(media_list, list_view, user_name):
                                         filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
         covers_path = url_for('static', filename='animes_covers/')
     else:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
+    # Check the view type
+    accepted_view = ["grid", "table"]
+    if list_view not in accepted_view:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
     watching_list    = []
@@ -1083,8 +1019,6 @@ def mymedialist(media_list, list_view, user_name):
                                first_air_date=first_air_date,
                                target_user_name=user_name,
                                target_user_id=str(user.id))
-    else:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
 
 @app.route('/update_element_season', methods=['POST'])
@@ -1146,44 +1080,9 @@ def update_element_season():
 
     # Compute total time spent
     if element_type == "animelist":
-        data = db.session.query(AnimeList, Anime,
-                                func.group_concat(AnimeEpisodesPerSeason.episodes)). \
-                                join(Anime, Anime.id == AnimeList.anime_id). \
-                                join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
-                                filter(AnimeList.user_id == current_user.id). \
-                                group_by(AnimeList.anime_id).all()
+        compute_media_time_spent(ListType.ANIME)
     elif element_type == "serieslist":
-        data = db.session.query(SeriesList, Series,
-                                func.group_concat(SeriesEpisodesPerSeason.episodes)). \
-                                join(Series, Series.id == SeriesList.series_id). \
-                                join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
-                                filter(SeriesList.user_id == current_user.id). \
-                                group_by(SeriesList.series_id).all()
-
-    total_time = 0
-    for element in data:
-        if element[0].status == Status.COMPLETED:
-            try:
-                total_time += element[1].episode_duration * element[1].total_episodes
-            except:
-                pass
-        elif element[0].status != Status.PLAN_TO_WATCH:
-            try:
-                episodes = element[2].split(",")
-                episodes = [int(x) for x in episodes]
-                for i in range(1, element[0].current_season):
-                    total_time += element[1].episode_duration * episodes[i-1]
-                total_time += element[0].last_episode_watched * element[1].episode_duration
-            except:
-                pass
-
-    time_spent = User.query.filter_by(id=current_user.id).first()
-    if element_type == "animelist":
-        time_spent.time_spent_anime = total_time
-    elif element_type == "serieslist":
-        time_spent.time_spent_series = total_time
-
-    db.session.commit()
+        compute_media_time_spent(ListType.SERIES)
 
     return '', 204
 
@@ -1244,44 +1143,9 @@ def update_element_episode():
 
     # Compute total time spent
     if element_type == "animelist":
-        data = db.session.query(AnimeList, Anime,
-                                func.group_concat(AnimeEpisodesPerSeason.episodes)). \
-                                join(Anime, Anime.id == AnimeList.anime_id). \
-                                join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
-                                filter(AnimeList.user_id == current_user.id). \
-                                group_by(AnimeList.anime_id).all()
+        compute_media_time_spent(ListType.ANIME)
     elif element_type == "serieslist":
-        data = db.session.query(SeriesList, Series,
-                                func.group_concat(SeriesEpisodesPerSeason.episodes)). \
-                                join(Series, Series.id == SeriesList.series_id). \
-                                join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
-                                filter(SeriesList.user_id == current_user.id). \
-                                group_by(SeriesList.series_id).all()
-
-    total_time = 0
-    for element in data:
-        if element[0].status == Status.COMPLETED:
-            try:
-                total_time += element[1].episode_duration * element[1].total_episodes
-            except:
-                pass
-        elif element[0].status != Status.PLAN_TO_WATCH:
-            try:
-                episodes = element[2].split(",")
-                episodes = [int(x) for x in episodes]
-                for i in range(1, element[0].current_season):
-                    total_time += element[1].episode_duration * episodes[i-1]
-                total_time += element[0].last_episode_watched * element[1].episode_duration
-            except:
-                pass
-
-    time_spent = User.query.filter_by(id=current_user.id).first()
-    if element_type == "animelist":
-        time_spent.time_spent_anime = total_time
-    elif element_type == "serieslist":
-        time_spent.time_spent_series = total_time
-
-    db.session.commit()
+        compute_media_time_spent(ListType.SERIES)
 
     return '', 204
 
@@ -1343,30 +1207,11 @@ def delete_element():
                                 filter(SeriesList.user_id == current_user.id). \
                                 group_by(SeriesList.series_id).all()
 
-    total_time = 0
-    for element in data:
-        if element[0].status == Status.COMPLETED:
-            try:
-                total_time += element[1].episode_duration * element[1].total_episodes
-            except:
-                pass
-        elif element[0].status != Status.PLAN_TO_WATCH:
-            try:
-                episodes = element[2].split(",")
-                episodes = [int(x) for x in episodes]
-                for i in range(1, element[0].current_season):
-                    total_time += element[1].episode_duration * episodes[i - 1]
-                total_time += element[0].last_episode_watched * element[1].episode_duration
-            except:
-                pass
-
-    time_spent = User.query.filter_by(id=current_user.id).first()
+    # Compute total time spent
     if element_type == "animelist":
-        time_spent.time_spent_anime = total_time
+        compute_media_time_spent(ListType.ANIME)
     elif element_type == "serieslist":
-        time_spent.time_spent_series = total_time
-
-    db.session.commit()
+        compute_media_time_spent(ListType.SERIES)
 
     return '', 204
 
@@ -1396,6 +1241,7 @@ def change_element_category():
         element = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
     elif element_type == "serieslist":
         element = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
+
     if element is None:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1411,52 +1257,12 @@ def change_element_category():
             element.current_season = number_season
             element.last_episode_watched = number_episode
 
-            # Compute time spent
-            data = db.session.query(AnimeList, Anime,
-                                    func.group_concat(AnimeEpisodesPerSeason.episodes)). \
-                                    join(Anime, Anime.id == AnimeList.anime_id). \
-                                    join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
-                                    filter(AnimeList.user_id == current_user.id). \
-                                    group_by(AnimeList.anime_id).all()
-            total_time = 0
-            for element in data:
-                if element[0].status == Status.COMPLETED:
-                    total_time += element[1].episode_duration * element[1].total_episodes
-                elif element[0].status != Status.PLAN_TO_WATCH:
-                    episodes = element[2].split(",")
-                    episodes = [int(x) for x in episodes]
-                    for i in range(1, element[0].current_season):
-                        total_time += element[1].episode_duration * episodes[i - 1]
-                    total_time += element[0].last_episode_watched * element[1].episode_duration
-
-            time_spent = User.query.filter_by(id=current_user.id).first()
-            time_spent.time_spent_anime = total_time
         elif element_type == "serieslist":
             number_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).count()
             number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
             element.last_episode_watched = number_episode
 
-            # Compute total time spent
-            data = db.session.query(SeriesList, Series,
-                                    func.group_concat(SeriesEpisodesPerSeason.episodes)). \
-                                    join(Series, Series.id == SeriesList.series_id). \
-                                    join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
-                                    filter(SeriesList.user_id == current_user.id). \
-                                    group_by(SeriesList.series_id).all()
-            total_time = 0
-            for element in data:
-                if element[0].status == Status.COMPLETED:
-                    total_time += element[1].episode_duration * element[1].total_episodes
-                elif element[0].status != Status.PLAN_TO_WATCH:
-                    episodes = element[2].split(",")
-                    episodes = [int(x) for x in episodes]
-                    for i in range(1, element[0].current_season):
-                        total_time += element[1].episode_duration * episodes[i - 1]
-                    total_time += element[0].last_episode_watched * element[1].episode_duration
-
-            time_spent = User.query.filter_by(id=current_user.id).first()
-            time_spent.time_spent_series = total_time
     elif element_new_category == 'On Hold':
         element.status = Status.ON_HOLD
     elif element_new_category == 'Random':
@@ -1472,56 +1278,21 @@ def change_element_category():
             anime.current_season = 1
             anime.last_episode_watched = 1
 
-            # Compute time spent
-            data = db.session.query(AnimeList, Anime,
-                                    func.group_concat(AnimeEpisodesPerSeason.episodes)). \
-                                    join(Anime, Anime.id == AnimeList.anime_id). \
-                                    join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
-                                    filter(AnimeList.user_id == current_user.id). \
-                                    group_by(AnimeList.anime_id).all()
-            total_time = 0
-            for element in data:
-                if element[0].status == Status.COMPLETED:
-                    total_time += element[1].episode_duration * element[1].total_episodes
-                elif element[0].status != Status.PLAN_TO_WATCH:
-                    episodes = element[2].split(",")
-                    episodes = [int(x) for x in episodes]
-                    for i in range(1, element[0].current_season):
-                        total_time += element[1].episode_duration * episodes[i - 1]
-                    total_time += element[0].last_episode_watched * element[1].episode_duration
-
-            time_spent = User.query.filter_by(id=current_user.id).first()
-            time_spent.time_spent_anime = total_time
         elif element_type == "serieslist":
             series = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
             series.current_season = 1
             series.last_episode_watched = 1
 
-            # Compute total time spent
-            data = db.session.query(SeriesList, Series,
-                                    func.group_concat(SeriesEpisodesPerSeason.episodes)). \
-                                    join(Series, Series.id == SeriesList.series_id). \
-                                    join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
-                                    filter(SeriesList.user_id == current_user.id). \
-                                    group_by(SeriesList.series_id).all()
-            total_time = 0
-            for element in data:
-                if element[0].status == Status.COMPLETED:
-                    total_time += element[1].episode_duration * element[1].total_episodes
-                elif element[0].status != Status.PLAN_TO_WATCH:
-                    episodes = element[2].split(",")
-                    episodes = [int(x) for x in episodes]
-                    for i in range(1, element[0].current_season):
-                        total_time += element[1].episode_duration * episodes[i - 1]
-                    total_time += element[0].last_episode_watched * element[1].episode_duration
-
-            time_spent = User.query.filter_by(id=current_user.id).first()
-            time_spent.time_spent_series = total_time
-
     db.session.commit()
     app.logger.info('[{}] Category of the element with ID {} changed to {}'.format(current_user.get_id(),
                                                                                    element_id,
                                                                                    element_new_category))
+
+    # Compute total time spent
+    if element_type == "animelist":
+        compute_media_time_spent(ListType.ANIME)
+    elif element_type == "serieslist":
+        compute_media_time_spent(ListType.SERIES)
 
     return '', 204
 
@@ -1679,12 +1450,13 @@ def autocomplete(media):
 ###################################################### Books Routes ####################################################
 
 
-@app.route("/bookslist/<list_view>/<user_name>", methods=['GET', 'POST'])
+@app.route("/bookslist/<list_view>/<user_name>", methods=['GET'])
 @login_required
 def mybookslist(user_name, list_view):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
+    # Check if user exists
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
@@ -1698,9 +1470,17 @@ def mybookslist(user_name, list_view):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
+    # Check the view type
+    accepted_view = ["grid", "table"]
+    if list_view not in accepted_view:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
     # Get book data
-    element_data = db.session.query(Book, BookList).join(BookList, BookList.book_id == Book.id).\
-                                    filter(BookList.user_id == user.id).group_by(Book.id).order_by(Book.title.asc())
+    element_data = db.session.query(Book, BookList).\
+                                    join(BookList, BookList.book_id == Book.id).\
+                                    filter(BookList.user_id == user.id).\
+                                    group_by(Book.id).\
+                                    order_by(Book.title.asc())
     covers_path = url_for('static', filename='books_covers/')
 
     reading_list    = []
@@ -1738,8 +1518,6 @@ def mybookslist(user_name, list_view):
                                all_data=element_all_data,
                                user_name=user_name,
                                user_id=str(user.id))
-    else:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
 
 @app.route('/delete_book', methods=['POST'])
@@ -1763,6 +1541,7 @@ def delete_book():
     BookList.query.filter_by(book_id=book_id, user_id=current_user.get_id()).delete()
     db.session.commit()
     app.logger.info('[{}] Book with ID {} deleted'.format(current_user.get_id(), book_id))
+    compute_book_time_spent()
     return '', 204
 
 
@@ -1794,25 +1573,11 @@ def change_book_category():
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    # Compute total time spent
-    user = User.query.filter_by(id=current_user.get_id()).first()
-    data = db.session.query(Book, BookList). \
-                            join(BookList, BookList.book_id == Book.id). \
-                            filter(BookList.user_id == user.id). \
-                            group_by(BookList.book_id)
-    total_time = 0
-    for book in data:
-        if book[1].status == Status.COMPLETED:
-            try:
-                total_time += book[0].page_count
-            except:
-                pass
-    user.time_spent_book = total_time
 
-    db.session.commit()
     app.logger.info('[{}] Category of the book with ID {} changed to {}'.format(current_user.get_id(),
                                                                                 book_id,
                                                                                 book_new_category))
+    compute_book_time_spent()
     return '', 204
 
 
@@ -1827,6 +1592,7 @@ def add_book():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     add_element(book_id, ListType.BOOK)
+    compute_book_time_spent()
     return '', 204
 
 
@@ -3302,3 +3068,61 @@ def send_email_update_email(user):
     except Exception as e:
         app.logger.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'.format(user.id, e))
         return False
+
+def compute_media_time_spent(list_type):
+    if list_type == ListType.ANIME:
+        data = db.session.query(AnimeList, Anime,
+                                func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                join(Anime, Anime.id == AnimeList.anime_id). \
+                                join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
+                                filter(AnimeList.user_id == current_user.id). \
+                                group_by(AnimeList.anime_id)
+    elif list_type == ListType.SERIES:
+        data = db.session.query(SeriesList, Series,
+                                func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                                join(Series, Series.id == SeriesList.series_id). \
+                                join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
+                                filter(SeriesList.user_id == current_user.id). \
+                                group_by(SeriesList.series_id)
+
+    total_time = 0
+    for element in data:
+        if element[0].status == Status.COMPLETED:
+            try:
+                total_time += element[1].episode_duration * element[1].total_episodes
+            except:
+                pass
+        elif element[0].status != Status.PLAN_TO_WATCH:
+            try:
+                episodes = element[2].split(",")
+                episodes = [int(x) for x in episodes]
+                for i in range(1, element[0].current_season):
+                    total_time += element[1].episode_duration * episodes[i - 1]
+                total_time += element[0].last_episode_watched * element[1].episode_duration
+            except:
+                pass
+
+    user = User.query.filter_by(id=current_user.id).first()
+    if list_type == ListType.ANIME:
+        user.time_spent_anime = total_time
+    elif list_type == ListType.SERIES:
+        user.time_spent_series = total_time
+
+    db.session.commit()
+
+def compute_book_time_spent():
+    data = db.session.query(Book, BookList). \
+                            join(BookList, BookList.book_id == Book.id). \
+                            filter(BookList.user_id == current_user.id). \
+                            group_by(BookList.book_id)
+    total_time = 0
+    for book in data:
+        if book[1].status == Status.COMPLETED:
+            try:
+                total_time += book[0].page_count
+            except:
+                pass
+    user = User.query.filter_by(id=current_user.id).first()
+    user.time_spent_book = total_time
+
+    db.session.commit()
