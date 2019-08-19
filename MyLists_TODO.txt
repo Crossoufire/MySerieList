@@ -16,6 +16,7 @@ TO DO / FIX FIRST
 	Add stats in navbar (when page done)
 	Add Anime movies (Added multi search from the API)
 	Add series achievements
+	last updated books/anime/series for your friend list
 
 
 TO DO LATER
