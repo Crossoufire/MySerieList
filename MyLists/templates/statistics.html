@@ -1,0 +1,318 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+<link href="{{ url_for('static', filename='css/statistics.css') }}" rel="stylesheet">
+{% endblock css %}
+
+
+{% block fixed %}
+<div class="d-flex flex-wrap">
+    <div class="ml-auto">
+        <a id="collapse_container" onclick="hide_all_cat()">
+            <span id="collapse_all" class="fas fa-eye-slash text-light m-r-5"></span>
+            <span id="show_cat_all" class="d-none"></span>
+            <span id="collapse_show" class="text-light">Collapse all</span>
+        </a>
+    </div>
+</div>
+{% endblock fixed %}
+
+
+{% block content %}
+<div class="container">
+    <div style="cursor: pointer;" data-toggle="collapse" href="#COUNT" onclick="turn('COUNT', 'COUNT_arrow')">
+        <h2 class="font-weight-light text-center pt-5 mb-0 category-title">Ratings vs Count
+            <div class="arrow_div float-right">
+                <a class="collapse_all fas fa-sm fa-chevron-down" id="COUNT_arrow"></a>
+            </div>
+        </h2>
+    </div>
+    <hr class="mt-2 pb-3 mb-0">
+    <div class="collapse show cat" id="COUNT">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <div style="cursor: pointer;" data-toggle="collapse" href="#TIME" onclick="turn('TIME', 'TIME_arrow')">
+        <h2 class="font-weight-light text-center pt-5 mb-0 category-title">Ratings vs Time spent
+            <div class="arrow_div float-right">
+                <a class="collapse_all fas fa-sm fa-chevron-down" id="TIME_arrow"></a>
+            </div>
+        </h2>
+    </div>
+    <hr class="mt-2 pb-3 mb-0">
+    <div class="collapse show cat" id="TIME">
+        <canvas id="myChart2"></canvas>
+    </div>
+
+    <div style="cursor: pointer;" data-toggle="collapse" href="#EPS" onclick="turn('EPS', 'EPS_arrow')">
+        <h2 class="font-weight-light text-center pt-5 mb-0 category-title">Ratings vs Episodes count
+            <div class="arrow_div float-right">
+                <a class="collapse_all fas fa-sm fa-chevron-down" id="EPS_arrow"></a>
+            </div>
+        </h2>
+    </div>
+    <hr class="mt-2 pb-3 mb-0">
+    <div class="collapse show cat" id="EPS">
+        <canvas id="myChart3"></canvas>
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block script %}
+<script>
+var ctx = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ x_abs|safe }},
+        datasets: [{
+            label: 'Series watched',
+            data: {{ y_abs }},
+            backgroundColor: [
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)'
+            ],
+            borderColor: [
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        legend: {
+            labels: {
+                fontColor: "#CCC",
+            }
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    fontColor: "#CCC"
+                },
+                gridLines: {
+                    display: true,
+					drawBorder: true,
+                    color: "rgba(255, 255, 255, 0.2)"
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    fontColor: "#CCC",
+                },
+                gridLines: {
+                    display: true,
+					drawBorder: true,
+                    color: "rgba(255, 255, 255, 0.2)",
+                }
+            }],
+        }
+    }
+});
+</script>
+<script>
+var ctx = document.getElementById('myChart2').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ x_abs|safe }},
+        datasets: [{
+            label: 'Time watched',
+            data: {{ y_abs_2 }},
+            backgroundColor: [
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)'
+            ],
+            borderColor: [
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        legend: {
+            labels: {
+                fontColor: "#CCC",
+            }
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    fontColor: "#CCC"
+                },
+                gridLines: {
+                    display: true,
+					drawBorder: true,
+                    color: "rgba(255, 255, 255, 0.2)"
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    fontColor: "#CCC",
+                },
+                gridLines: {
+                    display: true,
+					drawBorder: true,
+                    color: "rgba(255, 255, 255, 0.2)",
+                }
+            }],
+        }
+    }
+});
+</script>
+<script>
+var ctx = document.getElementById('myChart3').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ x_abs|safe }},
+        datasets: [{
+            label: 'Episodes watched',
+            data: {{ y_abs_3 }},
+            backgroundColor: [
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)'
+            ],
+            borderColor: [
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        legend: {
+            labels: {
+                fontColor: "#CCC",
+            }
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    fontColor: "#CCC"
+                },
+                gridLines: {
+                    display: true,
+					drawBorder: true,
+                    color: "rgba(255, 255, 255, 0.2)"
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    fontColor: "#CCC",
+                },
+                gridLines: {
+                    display: true,
+					drawBorder: true,
+                    color: "rgba(255, 255, 255, 0.2)",
+                }
+            }],
+        }
+    }
+});
+</script>
+
+<script type="text/javascript">
+function test(tata, tutu) {
+    if ($("#"+tata).hasClass('d-none anime_details')) {
+        if ($("#"+tata).siblings().hasClass('text-left anime_details')) {
+            $("#"+tutu).siblings('.filtered').attr('style', 'filter: none;')
+            $("#"+tutu).attr('style', 'filter: drop-shadow(5px 5px 5px grey) invert(0%);')
+            $("#"+tata).siblings('.text-left').attr('class', 'd-none anime_details');
+            $("#"+tata).attr('class', 'text-left anime_details');
+        } else {
+            $("#"+tutu).attr('class', 'filtered');
+            $("#"+tutu).attr('style', 'filter: drop-shadow(5px 5px 5px grey) invert(0%);')
+            $("#"+tata).attr('class', 'text-left anime_details');
+        }
+    } else {
+        $("#"+tutu).attr('class', 'filtered');
+        $("#"+tutu).attr('style', 'filter: none;')
+        $("#"+tata).attr('class', 'd-none anime_details');
+    }
+}
+</script>
+<script type="text/javascript">
+function turn(category, arrow) {
+    var arrow = document.getElementById(arrow);
+    var category = document.getElementById(category);
+
+    if (category.className === "cat collapsing") {
+    } else if (arrow.className === "collapse_all fas fa-sm fa-chevron-right") {
+        arrow.className = "collapse_all fas fa-sm fa-chevron-down";
+    } else {
+        arrow.className = "collapse_all fas fa-sm fa-chevron-right";
+    }
+}
+</script>
+<!------- Show/collapse all categories --------->
+<script type="text/javascript">
+function hide_all_cat() {
+    $('.collapse.cat').collapse('hide');
+    $('#collapse_show').text('Expand all');
+    $('#collapse_container').attr('onclick', 'show_all_cat()');
+    $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-right');
+}
+
+function show_all_cat() {
+    $('.collapse.cat').collapse('show');
+    $('#collapse_show').text('Collapse all');
+    $('#collapse_container').attr('onclick', 'hide_all_cat()');
+    $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-down');
+}
+</script>
+{% endblock script %}

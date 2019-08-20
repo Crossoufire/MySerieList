@@ -794,6 +794,43 @@ def achievements(user_name):
                            unlocked_achievements=unlocked_achievements)
 
 
+@app.route("/statistics/<user_name>", methods=['GET'])
+@login_required
+def statistics(user_name):
+    image_error = url_for('static', filename='img/error.jpg')
+    user = User.query.filter_by(username=user_name).first()
+
+    # No account with this username
+    if user is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
+    # Protect admin account
+    if user.id == 1 and current_user.id != 1:
+        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+
+    # Check if the account is private / in the friendslist
+    if current_user.id != user.id:
+        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        if user.private:
+            if current_user.get_id() == "1":
+                pass
+            elif friend is None or friend.status != "accepted":
+                image_anonymous = url_for('static', filename='img/anonymous.jpg')
+                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
+
+    # Get the statistics
+    stats = get_statistics(user.id, ListType.SERIES)
+
+    return render_template("statistics.html",
+                           title="{}'s statistics".format(user_name),
+                           user_id=str(user.id),
+                           user_name=user_name,
+                           x_abs=stats[0],
+                           y_abs=stats[1],
+                           y_abs_2=stats[2],
+                           y_abs_3=stats[3])
+
+
 @app.route("/anonymous", methods=['GET'])
 @login_required
 def anonymous():
@@ -3166,3 +3203,103 @@ def compute_book_time_spent():
     user.time_spent_book = total_time
 
     db.session.commit()
+
+
+def get_statistics(user_id, list_type):
+    # get the number of series/anime per score
+    user = User.query.filter_by(id=user_id).first()
+    if list_type == ListType.SERIES:
+        score_0 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 0, SeriesList.score < 1).all()
+        score_1 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 1, SeriesList.score < 2).all()
+        score_2 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 2, SeriesList.score < 3).all()
+        score_3 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 3, SeriesList.score < 4).all()
+        score_4 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 4, SeriesList.score < 5).all()
+        score_5 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 5, SeriesList.score < 6).all()
+        score_6 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 6, SeriesList.score < 7).all()
+        score_7 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 7, SeriesList.score < 8).all()
+        score_8 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 8, SeriesList.score < 9).all()
+        score_9 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 9, SeriesList.score <= 10).all()
+    elif list_type == ListType.ANIME:
+        score_0 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 0, AnimeList.score < 1).all()
+        score_1 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 1, AnimeList.score < 2).all()
+        score_2 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 2, AnimeList.score < 3).all()
+        score_3 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 3, AnimeList.score < 4).all()
+        score_4 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 4, AnimeList.score < 5).all()
+        score_5 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 5, AnimeList.score < 6).all()
+        score_6 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 6, AnimeList.score < 7).all()
+        score_7 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 7, AnimeList.score < 8).all()
+        score_8 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 8, AnimeList.score < 9).all()
+        score_9 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 9, AnimeList.score <= 10).all()
+
+    count_score = [score_0, score_1, score_2, score_3, score_4, score_5,score_6, score_7, score_8, score_9]
+
+    element_count_per_score = []
+    for i in range(0, len(count_score)):
+        if count_score[i] is None:
+            element_count_per_score.append(0)
+        else:
+            element_count_per_score.append(len(count_score[i]))
+
+    score = ["0 - 1", "1 - 2", "2 - 3", "3 - 4", "4 - 5", "5 - 6", "6 - 7", "7 - 8", "8 - 9", "9 - 10"]
+
+    print(element_count_per_score)
+
+    # get the time spent watching series/anime per score
+    if list_type == ListType.SERIES:
+        element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
+                                        func.group_concat(SeriesNetwork.network.distinct()),
+                                        func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
+                                        func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                                        join(SeriesList, SeriesList.series_id == Series.id). \
+                                        join(SeriesGenre, SeriesGenre.series_id == Series.id). \
+                                        join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
+                                        join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
+                                        filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
+    elif list_type == ListType.ANIME:
+        element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
+                                        func.group_concat(AnimeNetwork.network.distinct()),
+                                        func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
+                                        func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                        join(AnimeList, AnimeList.anime_id == Anime.id). \
+                                        join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
+                                        join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
+                                        join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
+                                        filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
+
+    all_data = []
+    for i in range(0, len(count_score)):
+        total_episodes_watched = 0
+        total_time = 0
+        for j in range(0, len(count_score[i])):
+            the_series_id = count_score[i][j].series_id
+            time_watched = 0
+            for element in element_data:
+                if the_series_id == element[0].id:
+                    ep_duration = element[0].episode_duration
+
+                    nb_season = len(element[4].split(","))
+                    nb_episodes = element[5].split(",")[:nb_season]
+
+                    ep_counter = 0
+                    for k in range(0, element[1].current_season - 1):
+                       ep_counter += int(nb_episodes[k])
+                    episodes_watched = ep_counter + element[1].last_episode_watched
+                    time_watched += ep_duration * episodes_watched
+
+            total_episodes_watched += episodes_watched
+            total_time += time_watched
+
+        data_by_score = {"episodes_watched": total_episodes_watched,
+                         "time_watched": int(total_time/60)}
+
+        all_data.append(data_by_score)
+
+    time_total_chart = []
+    for data in all_data:
+       time_total_chart.append(data["time_watched"])
+
+    episodes_total_chart = []
+    for data in all_data:
+       episodes_total_chart.append(data["episodes_watched"])
+
+    return [score, element_count_per_score, time_total_chart, episodes_total_chart]
