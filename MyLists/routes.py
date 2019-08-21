@@ -765,20 +765,25 @@ def achievements(user_name):
     col = 4
     genres_matrix   = [user_achievements[0][i:i + col] for i in range(0, len(user_achievements[0]), col)]
     misc_matrix     = [user_achievements[1][i:i + col] for i in range(0, len(user_achievements[1]), col)]
-    source_matrix   = [user_achievements[2][i:i + col] for i in range(0, len(user_achievements[2]), col)]
+    sources_matrix  = [user_achievements[2][i:i + col] for i in range(0, len(user_achievements[2]), col)]
     finished_matrix = [user_achievements[3][i:i + col] for i in range(0, len(user_achievements[3]), col)]
     time_matrix     = [user_achievements[4][i:i + col] for i in range(0, len(user_achievements[4]), col)]
     score_matrix    = [user_achievements[5][i:i + col] for i in range(0, len(user_achievements[5]), col)]
 
-    data = [genres_matrix, source_matrix, finished_matrix, time_matrix, misc_matrix, score_matrix]
+    anime_achievements_data = {"genres": genres_matrix,
+                               "sources": sources_matrix,
+                               "finished": finished_matrix,
+                               "time": time_matrix,
+                               "misc": misc_matrix,
+                               "score": score_matrix}
     number_unlocked = {'genres': user_achievements[6][0],
-                       'source':user_achievements[6][1],
+                       'sources':user_achievements[6][1],
                        'finished':user_achievements[6][2],
                        'time':user_achievements[6][3],
                        'misc':user_achievements[6][4],
                        'score':user_achievements[6][5]}
 
-    # Check how many achievement the user have
+    # Check how many anime achievements the user unlocked
     unlocked_achievements = 0
     for i in range(0, len(user_achievements)-1):
         for j in range(0, len(user_achievements[i])):
@@ -787,7 +792,7 @@ def achievements(user_name):
 
     return render_template("achievements.html",
                            title="{}'s achievements".format(user_name),
-                           data=data,
+                           data=anime_achievements_data,
                            user_id=str(user.id),
                            user_name=user_name,
                            number_unlocked=number_unlocked,
@@ -2191,10 +2196,6 @@ def get_achievements(user_id, list_type):
             if misc_achievements[i]["passed"] == "yes":
                 count += 1
         number_by_types.append(count)
-
-
-
-
 
         # Score achievements
         score_achievements = []
