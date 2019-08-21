@@ -1,12 +1,35 @@
-<!------------ Jquery autocomplete --------->
 .ui-menu-item .ui-menu-item-wrapper.ui-state-active {
     background: #131418 !important;
     border: solid white 1px;
 }
 
-<!---------------- Main CSS ------------------->
+#autocomplete.ui-autocomplete-loading {
+    background-image: url('/static/img/add_loader.gif');
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+
 .content > .collapse:not(.show) {
     display: none !important;
+}
+
+.modal_loading {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, .6) url('/static/img/pacman_loader.gif') 50% 50% no-repeat;
+}
+
+body.loading .modal_loading {
+    overflow: hidden;
+}
+
+body.loading .modal_loading {
+    display: block;
 }
 
 .add_book {

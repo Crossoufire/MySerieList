@@ -10,7 +10,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
   background: #131418;
   margin-top: 5rem;
   color: #e2e2e2;
@@ -34,7 +34,6 @@ hr {
     z-index: 101;
     border: solid 1px black;
 }
-
 
 /* --- Navigation bar CSS ----------------------------------------------------------------------- */
 .nav-item::after {

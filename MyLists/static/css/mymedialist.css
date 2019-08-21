@@ -1,4 +1,33 @@
-<!------------- Main CSS --------------->
+#autocomplete.ui-autocomplete-loading {
+    background-image: url('/static/img/add_loader.gif');
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+
+.ui-menu-item .ui-menu-item-wrapper.ui-state-active {
+    background: #131418 !important;
+    border: solid white 1px;
+}
+
+.modal_loading {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, .6) url('/static/img/pacman_loader.gif') 50% 50% no-repeat;
+}
+
+body.loading .modal_loading {
+    overflow: hidden;
+}
+
+body.loading .modal_loading {
+    display: block;
+}
+
 .content>.collapse:not(.show) {
     display: none !important;
 }
@@ -112,8 +141,6 @@ hr {
     min-width: 9rem;
 }
 
-
-/* ################################ card CSS ############################### */
 .modded {
     max-width: 175px;
     padding-right: 0px;
@@ -159,10 +186,7 @@ hr {
     -webkit-appearance:none;
     appearance:none;
 }
-/* ######################################################################### */
 
-
-/* ############################ 768px or less ############################## */
 @media (max-width: 767.98px) {
     .d-flex {
         justify-content: center;
@@ -236,10 +260,7 @@ hr {
         font-size: 1.5rem;
     }
 }
-/* ######################################################################### */
 
-
-/* ########################## Sidenav menu ################################# */
 .sidenav {
     height: 60%;
     width: 0;
@@ -273,4 +294,3 @@ hr {
     font-size: 36px;
     margin-left: 70px;
 }
-/* ######################################################################### */

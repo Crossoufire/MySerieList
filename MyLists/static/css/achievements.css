@@ -30,12 +30,6 @@ ul {
     width: 28px;
 }
 
-#genres {
-    height: 1000px;
-    overflow: scroll;
-    scrollbar-width: none;
-}
-
 .topnav {
     background-color: #333;
     overflow: hidden;
@@ -57,7 +51,7 @@ ul {
 }
 
 .topnav a.active {
-    background-color: #2c3946;
+    background-color: #1a1a1a;
     color: white;
 }
 
@@ -66,7 +60,7 @@ ul {
 }
 
 @media screen and (max-width: 600px) {
-    .topnav a {
+    .topnav a  {
         display: none;
     }
 
@@ -77,6 +71,7 @@ ul {
 
     .topnav.responsive {
         position: relative;
+        width: 100%;
     }
 
     .topnav.responsive a.icon {
@@ -88,6 +83,6 @@ ul {
     .topnav.responsive a {
         float: none;
         display: block;
-        text-align: center;
+        text-align: left;
     }
 }
