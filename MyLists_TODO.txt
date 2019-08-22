@@ -12,8 +12,7 @@ TO DO / FIX FIRST
 	Change style achievements
 	Add color for friends in hall of fame
 	Add friend without reload in account
-	Add a statistics page with chart.js (already started the code part)
-	Add stats in navbar (when page done)
+	Add a statistics page with chart.js (40%)
 	Add Anime movies (Added multi search from the API)
 	Add series achievements
 	last updated books/anime/series for your friend list

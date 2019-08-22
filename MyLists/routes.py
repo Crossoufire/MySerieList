@@ -759,44 +759,13 @@ def achievements(user_name):
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
     # Recover the anime achievements
-    user_achievements = get_achievements(user.id, ListType.ANIME)
-
-    # Change the results in a matrix 4 by x
-    col = 4
-    genres_matrix   = [user_achievements[0][i:i + col] for i in range(0, len(user_achievements[0]), col)]
-    misc_matrix     = [user_achievements[1][i:i + col] for i in range(0, len(user_achievements[1]), col)]
-    sources_matrix  = [user_achievements[2][i:i + col] for i in range(0, len(user_achievements[2]), col)]
-    finished_matrix = [user_achievements[3][i:i + col] for i in range(0, len(user_achievements[3]), col)]
-    time_matrix     = [user_achievements[4][i:i + col] for i in range(0, len(user_achievements[4]), col)]
-    score_matrix    = [user_achievements[5][i:i + col] for i in range(0, len(user_achievements[5]), col)]
-
-    anime_achievements_data = {"genres": genres_matrix,
-                               "sources": sources_matrix,
-                               "finished": finished_matrix,
-                               "time": time_matrix,
-                               "misc": misc_matrix,
-                               "score": score_matrix}
-    number_unlocked = {'genres': user_achievements[6][0],
-                       'sources':user_achievements[6][1],
-                       'finished':user_achievements[6][2],
-                       'time':user_achievements[6][3],
-                       'misc':user_achievements[6][4],
-                       'score':user_achievements[6][5]}
-
-    # Check how many anime achievements the user unlocked
-    unlocked_achievements = 0
-    for i in range(0, len(user_achievements)-1):
-        for j in range(0, len(user_achievements[i])):
-            if user_achievements[i][j]["passed"] == "yes":
-                unlocked_achievements += 1
+    user_achievements_anime = get_anime_achievements(user.id)
 
     return render_template("achievements.html",
                            title="{}'s achievements".format(user_name),
-                           data=anime_achievements_data,
+                           data=user_achievements_anime,
                            user_id=str(user.id),
-                           user_name=user_name,
-                           number_unlocked=number_unlocked,
-                           unlocked_achievements=unlocked_achievements)
+                           user_name=user_name)
 
 
 @app.route("/statistics/<user_name>", methods=['GET'])
@@ -1812,483 +1781,538 @@ def get_knowledge_grade(knowledge_level):
     return user_data
 
 
-def get_achievements(user_id, list_type):
-    if list_type == ListType.ANIME:
-        number_by_types = []
+def get_anime_achievements(user_id, ):
+    element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre_id.distinct()),
+                                    func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
+                                    func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                    join(AnimeList, AnimeList.anime_id == Anime.id). \
+                                    join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
+                                    join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
+                                    filter(AnimeList.user_id == user_id).group_by(Anime.id).order_by(Anime.name.asc())
 
-        # Recover all the data from database
-        anime_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre_id.distinct()),
+    def get_episodes_and_time(element):
+        # Get episodes per season
+        nb_season = len(element[3].split(","))
+        nb_episodes = element[4].split(",")[:nb_season]
+
+        ep_duration = int(element[0].episode_duration)
+        ep_counter = 0
+        for i in range(0, element[1].current_season - 1):
+            ep_counter += int(nb_episodes[i])
+        episodes_watched = ep_counter + element[1].last_episode_watched
+        time_watched = ep_duration * episodes_watched
+
+        return [episodes_watched, time_watched]
+    unlocked_achievements_per_type = []
+
+    # Genres achievements
+    element_count_1, element_count_2, element_count_3, element_count_4, element_count_5, element_count_6, \
+    element_count_7, element_count_8, element_count_9, element_count_10, element_count_11 = [0 for _ in range(11)]
+    element_time_1, element_time_2, element_time_3, element_time_4, element_time_5, element_time_6, element_time_7, \
+    element_time_8, element_time_9, element_time_10, element_time_11 = [0 for _ in range(11)]
+    element_episodes_1, element_episodes_2, element_episodes_3, element_episodes_4, element_episodes_5, element_episodes_6, \
+    element_episodes_7, element_episodes_8, element_episodes_9, element_episodes_10, element_episodes_11 = [0 for _ in range(11)]
+    element_name_1, element_name_2, element_name_3, element_name_4, element_name_5, element_name_6, element_name_7, \
+    element_name_8, element_name_9, element_name_10, element_name_11 = [[] for _ in range(11)]
+    for element in element_data:
+        # Get the genre in a list
+        genres = element[2].split(',')
+        try:
+            if '13' in genres:
+                element_count_1 += 1
+                element_episodes_1 += get_episodes_and_time(element)[0]
+                element_time_1 += get_episodes_and_time(element)[1]
+                element_name_1.append(element[0].name)
+            if '18' in genres:
+                element_count_2 += 1
+                element_episodes_2 += get_episodes_and_time(element)[0]
+                element_time_2 += get_episodes_and_time(element)[1]
+                element_name_2.append(element[0].name)
+            if '19' in genres:
+                element_count_3 += 1
+                element_episodes_3 += get_episodes_and_time(element)[0]
+                element_time_3 += get_episodes_and_time(element)[1]
+                element_name_3.append(element[0].name)
+            if '7' in genres:
+                element_count_4 += 1
+                element_episodes_4 += get_episodes_and_time(element)[0]
+                element_time_4 += get_episodes_and_time(element)[1]
+                element_name_4.append(element[0].name)
+            if '22' in genres:
+                element_count_5 += 1
+                element_episodes_5 += get_episodes_and_time(element)[0]
+                element_time_5 += get_episodes_and_time(element)[1]
+                element_name_5.append(element[0].name)
+            if '36' in genres:
+                element_count_6 += 1
+                element_episodes_6 += get_episodes_and_time(element)[0]
+                element_time_6 += get_episodes_and_time(element)[1]
+                element_name_6.append(element[0].name)
+            if '29' in genres:
+                element_count_7 += 1
+                element_episodes_7 += get_episodes_and_time(element)[0]
+                element_time_7 += get_episodes_and_time(element)[1]
+                element_name_7.append(element[0].name)
+            if '30' in genres:
+                element_count_8 += 1
+                element_episodes_8 += get_episodes_and_time(element)[0]
+                element_time_8 += get_episodes_and_time(element)[1]
+                element_name_8.append(element[0].name)
+            if '40' in genres:
+                element_count_9 += 1
+                element_episodes_9 += get_episodes_and_time(element)[0]
+                element_time_9 += get_episodes_and_time(element)[1]
+                element_name_9.append(element[0].name)
+            if '14' in genres:
+                element_count_10 += 1
+                element_episodes_10 += get_episodes_and_time(element)[0]
+                element_time_10 += get_episodes_and_time(element)[1]
+                element_name_10.append(element[0].name)
+            if '9' in genres:
+                element_count_11 += 1
+                element_episodes_11 += get_episodes_and_time(element)[0]
+                element_time_11 += get_episodes_and_time(element)[1]
+                element_name_11.append(element[0].name)
+        except:
+            pass
+
+    genre_id = ['13', '18', '19', '7', '22', '36', '29', '30', '40', '14', '9']
+    time_list = [element_time_1, element_time_2, element_time_3, element_time_4, element_time_5, element_time_6,
+                 element_time_7, element_time_8, element_time_9, element_time_10, element_time_11]
+    count_list = [element_count_1, element_count_2, element_count_3, element_count_4, element_count_5, element_count_6,
+                  element_count_7, element_count_8, element_count_9, element_count_10, element_count_11]
+    name_list = [element_name_1, element_name_2, element_name_3, element_name_4, element_name_5, element_name_6,
+                 element_name_7, element_name_8, element_name_9, element_name_10, element_name_11]
+    episodes_list = [element_episodes_1, element_episodes_2, element_episodes_3, element_episodes_4, element_episodes_5,
+                     element_episodes_6, element_episodes_7, element_episodes_8, element_episodes_9, element_episodes_10, element_episodes_11]
+    genres_achievements = []
+    unlocked_achievement = 0
+    for i in range(0, len(genre_id)):
+        achievements = Achievements.query.filter_by(genre=genre_id[i]).all()
+        for achievement in achievements:
+            if int(time_list[i]/60) > int(achievement.threshold):
+                passed = "yes"
+                unlocked_achievement += 1
+            else:
+                passed = "no"
+            achievement_data = {"type": achievement.type,
+                                "threshold": achievement.threshold,
+                                "image_id": achievement.image_id,
+                                "level": achievement.level,
+                                "title": achievement.title,
+                                "description": achievement.description,
+                                "passed": passed,
+                                "element_time": int(time_list[i]/60),
+                                "element_count": count_list[i],
+                                "element_name": name_list[i],
+                                "element_episodes": episodes_list[i]}
+            genres_achievements.append(achievement_data)
+    unlocked_achievements_per_type.append(unlocked_achievement)
+
+    ####################################################################################################################
+
+    # source/airing_date achievements
+    achievements = Achievements.query.filter_by(type="classic").all()
+    element_time = 0
+    element_count = 0
+    element_episodes = 0
+    element_name = []
+    for element in element_data:
+        first_year = int(element[0].first_air_date.split('-')[0])
+        last_year = int(element[0].last_air_date.split('-')[0])
+        if first_year >= 1981 and last_year <= 2000 and element[1].status != Status.PLAN_TO_WATCH:
+            element_count += 1
+            element_episodes += get_episodes_and_time(element)[0]
+            element_time += get_episodes_and_time(element)[1]
+            element_name.append(element[0].name)
+
+    sources_achievements = []
+    unlocked_achievement = 0
+    for achievement in achievements:
+        if int(element_time/60) >= int(achievement.threshold):
+            passed = "yes"
+            unlocked_achievement += 1
+        else:
+            passed = "no"
+
+        achievement_data = {"type": achievement.type,
+                            "threshold": achievement.threshold,
+                            "image_id": achievement.image_id,
+                            "level": achievement.level,
+                            "title": achievement.title,
+                            "description": achievement.description,
+                            "passed": passed,
+                            "element_time": int(element_time/60),
+                            "element_count": element_count,
+                            "element_name": element_name,
+                            "element_episodes": element_episodes}
+        sources_achievements.append(achievement_data)
+    unlocked_achievements_per_type.append(unlocked_achievement)
+
+    ####################################################################################################################
+
+    # Finished achievements
+    achievements = Achievements.query.filter_by(type="finished").all()
+    element_count = 0
+    for element in element_data:
+        status = element[0].status
+        if status == "Ended" and element[1].status == Status.COMPLETED:
+            element_count += 1
+
+    finished_achievements = []
+    unlocked_achievement = 0
+    for achievement in achievements:
+        if element_count >= int(achievement.threshold):
+            passed = "yes"
+            unlocked_achievement += 1
+        else:
+            passed = "no"
+
+        achievement_data = {"type": achievement.type,
+                            "threshold": achievement.threshold,
+                            "image_id": achievement.image_id,
+                            "level": achievement.level,
+                            "title": achievement.title,
+                            "description": achievement.description,
+                            "passed": passed,
+                            "element_count": element_count}
+        finished_achievements.append(achievement_data)
+    unlocked_achievements_per_type.append(unlocked_achievement)
+
+    ####################################################################################################################
+
+    # Time achievements
+    achievements = Achievements.query.filter_by(type="time").all()
+    user = User.query.filter_by(id=user_id).first()
+    time_spent = int(user.time_spent_anime/1440)
+
+    time_achievements = []
+    unlocked_achievement = 0
+    for achievement in achievements:
+        if time_spent >= int(achievement.threshold):
+            passed = "yes"
+            unlocked_achievement += 1
+        else:
+            passed = "no"
+
+        achievement_data = {"type": achievement.type,
+                            "threshold": achievement.threshold,
+                            "image_id": achievement.image_id,
+                            "level": achievement.level,
+                            "title": achievement.title,
+                            "description": achievement.description,
+                            "passed": passed,
+                            "element_time": int(time_spent)}
+        time_achievements.append(achievement_data)
+    unlocked_achievements_per_type.append(unlocked_achievement)
+
+    ####################################################################################################################
+
+    # Miscellaneous: Long runner + old + different years
+    achievement = Achievements.query.filter_by(type="long").first()
+    element_count = 0
+    element_name = []
+    for element in element_data:
+        element_episodes = get_episodes_and_time(element)[0]
+        if int(element_episodes) >= 100:
+            element_count += 1
+            element_name.append(element[0].name)
+
+    misc_achievements = []
+    unlocked_achievement = 0
+    if element_count >= int(achievement.threshold):
+        passed = "yes"
+        unlocked_achievement += 1
+    else:
+        passed = "no"
+
+    achievement_data = {"type": achievement.type,
+                        "threshold": achievement.threshold,
+                        "image_id": achievement.image_id,
+                        "level": achievement.level,
+                        "title": achievement.title,
+                        "description": achievement.description,
+                        "passed": passed,
+                        "element_count": element_count,
+                        "element_name": element_name}
+    misc_achievements.append(achievement_data)
+
+    achievement = Achievements.query.filter_by(type="old").first()
+    element_count = 0
+    element_name = []
+    for element in element_data:
+        year_last_air_date = element[0].last_air_date.split('-')[0]
+        if (int(year_last_air_date) <= 1980) and (element[1].status == Status.COMPLETED):
+            element_count += 1
+            element_name.append(element[0].name)
+
+    if element_count >= int(achievement.threshold):
+        passed = "yes"
+        unlocked_achievement += 1
+    else:
+        passed = "no"
+
+    achievement_data = {"type": achievement.type,
+                        "threshold": achievement.threshold,
+                        "image_id": achievement.image_id,
+                        "level": achievement.level,
+                        "title": achievement.title,
+                        "description": achievement.description,
+                        "passed": passed,
+                        "element_count": element_count,
+                        "element_name": element_name}
+    misc_achievements.append(achievement_data)
+
+    achievement = Achievements.query.filter_by(type="year").first()
+    all_first_air_date = []
+    element_name = []
+    for element in element_data:
+        if element[1].status == Status.COMPLETED:
+            all_first_air_date.append(element[0].first_air_date.split('-')[0])
+    all_first_air_date = list(dict.fromkeys(all_first_air_date))
+
+    if len(all_first_air_date) >= int(achievement.threshold):
+        passed = "yes"
+        unlocked_achievement += 1
+    else:
+        passed = "no"
+
+    achievement_data = {"type": achievement.type,
+                        "threshold": achievement.threshold,
+                        "image_id": achievement.image_id,
+                        "level": achievement.level,
+                        "title": achievement.title,
+                        "description": achievement.description,
+                        "passed": passed,
+                        "element_count": len(all_first_air_date)}
+    misc_achievements.append(achievement_data)
+    unlocked_achievements_per_type.append(unlocked_achievement)
+
+    ####################################################################################################################
+
+    # Score achievements
+    achievements = Achievements.query.filter_by(type="score").all()
+    mean_score = get_mean_score(user_id, ListType.ANIME)
+    if mean_score <= 3:
+        tmp = 1
+    elif 3 < mean_score <= 5:
+        tmp = 2
+    elif 8 <= mean_score <= 10:
+        tmp = 3
+    else:
+        tmp = "no"
+
+    score_achievements = []
+    unlocked_achievement = 0
+    for achievement in achievements:
+        if tmp == 1 and int(achievement.threshold) == 3:
+            passed = "yes"
+            unlocked_achievement += 1
+        elif tmp == 2 and int(achievement.threshold) == 5:
+            passed = "yes"
+            unlocked_achievement += 1
+        elif tmp == 3 and int(achievement.threshold) == 8:
+            passed = "yes"
+            unlocked_achievement += 1
+        else:
+            passed = "no"
+        achievement_data = {"type": achievement.type,
+                            "threshold": achievement.threshold,
+                            "image_id": achievement.image_id,
+                            "level": achievement.level,
+                            "title": achievement.title,
+                            "description": achievement.description,
+                            "passed": passed,
+                            "mean_score": mean_score}
+        score_achievements.append(achievement_data)
+    unlocked_achievements_per_type.append(unlocked_achievement)
+
+    ####################################################################################################################
+
+    # Change the results in a matrix 4 by x
+    col = 4
+    genres_matrix = [genres_achievements[i:i + col] for i in range(0, len(genres_achievements), col)]
+    misc_matrix = [misc_achievements[i:i + col] for i in range(0, len(misc_achievements), col)]
+    sources_matrix = [sources_achievements[i:i + col] for i in range(0, len(sources_achievements), col)]
+    finished_matrix = [finished_achievements[i:i + col] for i in range(0, len(finished_achievements), col)]
+    time_matrix = [time_achievements[i:i + col] for i in range(0, len(time_achievements), col)]
+    score_matrix = [score_achievements[i:i + col] for i in range(0, len(score_achievements), col)]
+
+    anime_achievements_data = {"genres": genres_matrix,
+                               "sources": sources_matrix,
+                               "finished": finished_matrix,
+                               "time": time_matrix,
+                               "misc": misc_matrix,
+                               "score": score_matrix,
+                               "total_unlocked": sum(unlocked_achievements_per_type),
+                               "unlocked_per_type":
+                                   {'genres': unlocked_achievements_per_type[0],
+                                    'sources': unlocked_achievements_per_type[1],
+                                    'finished': unlocked_achievements_per_type[2],
+                                    'time': unlocked_achievements_per_type[3],
+                                    'misc': unlocked_achievements_per_type[4],
+                                    'score': unlocked_achievements_per_type[5]}}
+
+    return anime_achievements_data
+
+
+def compute_media_time_spent(list_type):
+    if list_type == ListType.ANIME:
+        element_data = db.session.query(AnimeList, Anime,
+                                func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                join(Anime, Anime.id == AnimeList.anime_id). \
+                                join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
+                                filter(AnimeList.user_id == current_user.id). \
+                                group_by(AnimeList.anime_id)
+    elif list_type == ListType.SERIES:
+        element_data = db.session.query(SeriesList, Series,
+                                func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                                join(Series, Series.id == SeriesList.series_id). \
+                                join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
+                                filter(SeriesList.user_id == current_user.id). \
+                                group_by(SeriesList.series_id)
+
+    total_time = 0
+    for element in element_data:
+        if element[0].status == Status.COMPLETED:
+            try:
+                total_time += element[1].episode_duration * element[1].total_episodes
+            except:
+                pass
+        elif element[0].status != Status.PLAN_TO_WATCH:
+            try:
+                episodes = element[2].split(",")
+                episodes = [int(x) for x in episodes]
+                for i in range(1, element[0].current_season):
+                    total_time += element[1].episode_duration * episodes[i - 1]
+                total_time += element[0].last_episode_watched * element[1].episode_duration
+            except:
+                pass
+
+    if list_type == ListType.ANIME:
+        user.time_spent_anime = total_time
+    elif list_type == ListType.SERIES:
+        user.time_spent_series = total_time
+
+    db.session.commit()
+
+
+def compute_book_time_spent():
+    books_data = db.session.query(Book, BookList).join(BookList, BookList.book_id == Book.id).\
+                                 filter(BookList.user_id == current_user.id).\
+                                 group_by(BookList.book_id)
+    total_time = 0
+    for book in books_data:
+        if book[1].status == Status.COMPLETED:
+            try:
+                total_time += book[0].page_count
+            except:
+                pass
+
+    user = User.query.filter_by(id=current_user.id).first()
+    user.time_spent_book = total_time
+
+    db.session.commit()
+
+
+def get_statistics(user_id, list_type):
+    # get the number of element per score
+    user = User.query.filter_by(id=user_id).first()
+    if list_type == ListType.SERIES:
+        score_0 = SeriesList.query.filter_by(user_id=user_id).filter(SeriesList.score >= 0, SeriesList.score < 1).all()
+        score_1 = SeriesList.query.filter_by(user_id=user_id).filter(SeriesList.score >= 1, SeriesList.score < 2).all()
+        score_2 = SeriesList.query.filter_by(user_id=user_id).filter(SeriesList.score >= 2, SeriesList.score < 3).all()
+        score_3 = SeriesList.query.filter_by(user_id=user_id).filter(SeriesList.score >= 3, SeriesList.score < 4).all()
+        score_4 = SeriesList.query.filter_by(user_id=user_id).filter(SeriesList.score >= 4, SeriesList.score < 5).all()
+        score_5 = SeriesList.query.filter_by(user_id=user_id).filter(SeriesList.score >= 5, SeriesList.score < 6).all()
+        score_6 = SeriesList.query.filter_by(user_id=user_id).filter(SeriesList.score >= 6, SeriesList.score < 7).all()
+        score_7 = SeriesList.query.filter_by(user_id=user_id).filter(SeriesList.score >= 7, SeriesList.score < 8).all()
+        score_8 = SeriesList.query.filter_by(user_id=user_id).filter(SeriesList.score >= 8, SeriesList.score < 9).all()
+        score_9 = SeriesList.query.filter_by(user_id=user_id).filter(SeriesList.score >= 9, SeriesList.score <= 10).all()
+    elif list_type == ListType.ANIME:
+        score_0 = AnimeList.query.filter_by(user_id=user_id).filter(AnimeList.score >= 0, AnimeList.score < 1).all()
+        score_1 = AnimeList.query.filter_by(user_id=user_id).filter(AnimeList.score >= 1, AnimeList.score < 2).all()
+        score_2 = AnimeList.query.filter_by(user_id=user_id).filter(AnimeList.score >= 2, AnimeList.score < 3).all()
+        score_3 = AnimeList.query.filter_by(user_id=user_id).filter(AnimeList.score >= 3, AnimeList.score < 4).all()
+        score_4 = AnimeList.query.filter_by(user_id=user_id).filter(AnimeList.score >= 4, AnimeList.score < 5).all()
+        score_5 = AnimeList.query.filter_by(user_id=user_id).filter(AnimeList.score >= 5, AnimeList.score < 6).all()
+        score_6 = AnimeList.query.filter_by(user_id=user_id).filter(AnimeList.score >= 6, AnimeList.score < 7).all()
+        score_7 = AnimeList.query.filter_by(user_id=user_id).filter(AnimeList.score >= 7, AnimeList.score < 8).all()
+        score_8 = AnimeList.query.filter_by(user_id=user_id).filter(AnimeList.score >= 8, AnimeList.score < 9).all()
+        score_9 = AnimeList.query.filter_by(user_id=user_id).filter(AnimeList.score >= 9, AnimeList.score <= 10).all()
+
+    elements_per_score = [score_0, score_1, score_2, score_3, score_4, score_5,score_6, score_7, score_8, score_9]
+    element_count_per_score = []
+    for i in range(0, len(elements_per_score)):
+        if elements_per_score[i] is None:
+            element_count_per_score.append(0)
+        else:
+            element_count_per_score.append(len(elements_per_score[i]))
+    scores = ["0 - 1", "1 - 2", "2 - 3", "3 - 4", "4 - 5", "5 - 6", "6 - 7", "7 - 8", "8 - 9", "9 - 10"]
+
+    # Recover the time spent watching element per score
+    if list_type == ListType.SERIES:
+        element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
+                                        func.group_concat(SeriesNetwork.network.distinct()),
+                                        func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
+                                        func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                                        join(SeriesList, SeriesList.series_id == Series.id). \
+                                        join(SeriesGenre, SeriesGenre.series_id == Series.id). \
+                                        join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
+                                        join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
+                                        filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
+    elif list_type == ListType.ANIME:
+        element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
+                                        func.group_concat(AnimeNetwork.network.distinct()),
                                         func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
                                         func.group_concat(AnimeEpisodesPerSeason.episodes)). \
                                         join(AnimeList, AnimeList.anime_id == Anime.id). \
                                         join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
+                                        join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
                                         join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
-                                        filter(AnimeList.user_id == user_id).group_by(Anime.id).order_by(Anime.name.asc())
+                                        filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
 
-        genres_achievements = []
-        tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10, tmp_11 = [0 for _ in range(11)]
-        time_1, time_2, time_3, time_4, time_5, time_6, time_7, time_8, time_9, time_10, time_11 = [0 for _ in range(11)]
-        anime_name_1, anime_name_2, anime_name_3, anime_name_4, anime_name_5, anime_name_6, anime_name_7, \
-        anime_name_8, anime_name_9, anime_name_10, anime_name_11 = [[] for _ in range(11)]
+    all_data = []
+    for i in range(0, len(elements_per_score)):
+        episodes_count_per_score = 0
+        element_time_per_score = 0
+        for j in range(0, len(elements_per_score[i])):
+            if list_type == ListType.SERIES:
+                element_id = elements_per_score[i][j].series_id
+            elif list_type == ListType.ANIME:
+                element_id = elements_per_score[i][j].anime_id
 
-        for anime in anime_data:
-            # Get the genre in a list
-            genres = anime[2].split(',')
-            # Get episodes per season
-            nb_season = len(anime[3].split(","))
-            nb_episodes =  anime[4].split(",")[:nb_season]
+            element_time = 0
+            for element in element_data:
+                if element_id == element[0].id:
+                    ep_duration = element[0].episode_duration
 
-            try:
-                if '13' in genres:
-                    tmp_1 += 1
+                    nb_season = len(element[4].split(","))
+                    nb_episodes = element[5].split(",")[:nb_season]
 
-                    ep_duration = int(anime[0].episode_duration)
                     ep_counter = 0
-                    for i in range(0, anime[1].current_season - 1):
-                        ep_counter += int(nb_episodes[i])
-                    total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                    time_1 += ep_duration * total_episodes_watched
+                    for k in range(0, element[1].current_season - 1):
+                       ep_counter += int(nb_episodes[k])
+                    episodes_count = ep_counter + element[1].last_episode_watched
+                    element_time += ep_duration * episodes_count
 
-                    anime_name_1.append(anime[0].name)
-                if '18' in genres:
-                    tmp_2 += 1
+            episodes_count_per_score += episodes_count
+            element_time_per_score += element_time
 
-                    ep_duration = int(anime[0].episode_duration)
-                    ep_counter = 0
-                    for i in range(0, anime[1].current_season - 1):
-                        ep_counter += int(nb_episodes[i])
-                    total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                    time_2 += ep_duration * total_episodes_watched
+        data_by_score = {"episodes_watched": episodes_count_per_score,
+                         "time_watched": int(element_time_per_score/60)}
 
-                    anime_name_2.append(anime[0].name)
-                if '19' in genres:
-                    tmp_3 += 1
+        all_data.append(data_by_score)
 
-                    ep_duration = int(anime[0].episode_duration)
-                    ep_counter = 0
-                    for i in range(0, anime[1].current_season - 1):
-                        ep_counter += int(nb_episodes[i])
-                    total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                    time_3 += ep_duration * total_episodes_watched
+    time_total_chart = []
+    for data in all_data:
+       time_total_chart.append(data["time_watched"])
 
-                    anime_name_3.append(anime[0].name)
-                if '7' in genres:
-                    tmp_4 += 1
+    episodes_total_chart = []
+    for data in all_data:
+       episodes_total_chart.append(data["episodes_watched"])
 
-                    ep_duration = int(anime[0].episode_duration)
-                    ep_counter = 0
-                    for i in range(0, anime[1].current_season - 1):
-                        ep_counter += int(nb_episodes[i])
-                    total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                    time_4 += ep_duration * total_episodes_watched
-
-                    anime_name_4.append(anime[0].name)
-                if '22' in genres:
-                    tmp_5 += 1
-
-                    ep_duration = int(anime[0].episode_duration)
-                    ep_counter = 0
-                    for i in range(0, anime[1].current_season - 1):
-                        ep_counter += int(nb_episodes[i])
-                    total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                    time_5 += ep_duration * total_episodes_watched
-
-                    anime_name_5.append(anime[0].name)
-                if '36' in genres:
-                    tmp_6 += 1
-
-                    ep_duration = int(anime[0].episode_duration)
-                    ep_counter = 0
-                    for i in range(0, anime[1].current_season - 1):
-                        ep_counter += int(nb_episodes[i])
-                    total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                    time_6 += ep_duration * total_episodes_watched
-
-                    anime_name_6.append(anime[0].name)
-                if '29' in genres:
-                    tmp_7 += 1
-
-                    ep_duration = int(anime[0].episode_duration)
-                    ep_counter = 0
-                    for i in range(0, anime[1].current_season - 1):
-                        ep_counter += int(nb_episodes[i])
-                    total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                    time_7 += ep_duration * total_episodes_watched
-
-                    anime_name_7.append(anime[0].name)
-                if '30' in genres:
-                    tmp_8 += 1
-
-                    ep_duration = int(anime[0].episode_duration)
-                    ep_counter = 0
-                    for i in range(0, anime[1].current_season - 1):
-                        ep_counter += int(nb_episodes[i])
-                    total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                    time_8 += ep_duration * total_episodes_watched
-
-                    anime_name_8.append(anime[0].name)
-                if '40' in genres:
-                    tmp_9 += 1
-
-                    ep_duration = int(anime[0].episode_duration)
-                    ep_counter = 0
-                    for i in range(0, anime[1].current_season - 1):
-                        ep_counter += int(nb_episodes[i])
-                    total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                    time_9 += ep_duration * total_episodes_watched
-
-                    anime_name_9.append(anime[0].name)
-                if '14' in genres:
-                    tmp_10 += 1
-
-                    ep_duration = int(anime[0].episode_duration)
-                    ep_counter = 0
-                    for i in range(0, anime[1].current_season - 1):
-                        ep_counter += int(nb_episodes[i])
-                    total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                    time_10 += ep_duration * total_episodes_watched
-
-                    anime_name_10.append(anime[0].name)
-                if '9' in genres:
-                    tmp_11 += 1
-
-                    ep_duration = int(anime[0].episode_duration)
-                    ep_counter = 0
-                    for i in range(0, anime[1].current_season - 1):
-                        ep_counter += int(nb_episodes[i])
-                    total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                    time_11 += ep_duration * total_episodes_watched
-
-                    anime_name_11.append(anime[0].name)
-            except:
-                pass
-
-        ids = [13, 18, 19, 7, 22, 36, 29, 30, 40, 14, 9]
-        values = [tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10, tmp_11]
-        values_time = [time_1, time_2, time_3, time_4, time_5, time_6, time_7, time_8, time_9, time_10, time_11]
-        anime_names = [anime_name_1, anime_name_2, anime_name_3, anime_name_4, anime_name_5, anime_name_6,
-                       anime_name_7, anime_name_8, anime_name_9, anime_name_10, anime_name_11]
-        for i in range(0, len(ids)):
-            achievements = Achievements.query.filter_by(genre=str(ids[i])).all()
-            for achievement in achievements:
-                if int(values_time[i]/60) > int(achievement.threshold):
-                    passed = "yes"
-                else:
-                    passed= "no"
-                achievement_data = {"type": achievement.type,
-                                    "threshold": achievement.threshold,
-                                    "image_id":achievement.image_id,
-                                    "level":achievement.level,
-                                    "title":achievement.title,
-                                    "description":achievement.description,
-                                    "passed": passed,
-                                    "time_hours":int(values_time[i]/60),
-                                    "anime_watched": values[i],
-                                    "anime_name": anime_names[i]}
-                genres_achievements.append(achievement_data)
-
-
-        # genres_achievements = []
-        # genres_id = ['13']#, '18', '19', '7', '22', '36', '29', '30', '40', '14', '9']
-        # episodes_watched_id = []
-        # time_watched_id = []
-        # anime_name_id = []
-        # count_id = []
-        # for id in genres_id:
-        #     count = 0
-        #     anime_name = []
-        #     total_episodes_watched = 0
-        #     total_time_watched = 0
-        #     for anime in anime_data:
-        #         episodes_watched = 0
-        #         time_watched = 0
-        #         genres_anime = anime[2].split(',')
-        #         if id in genres_anime:
-        #             count += 1
-        #
-        #             nb_season = len(anime[3].split(","))
-        #             nb_episodes = anime[4].split(",")[:nb_season]
-        #
-        #             ep_duration = int(anime[0].episode_duration)
-        #             ep_counter = 0
-        #             for i in range(0, anime[1].current_season - 1):
-        #                 ep_counter += int(nb_episodes[i])
-        #             episodes_watched = ep_counter + anime[1].last_episode_watched
-        #             time_watched += ep_duration * episodes_watched
-        #
-        #             anime_name.append(anime[0].name)
-        #
-        #             total_episodes_watched += episodes_watched
-        #             total_time_watched += time_watched
-        #
-        #     episodes_watched_id.append(total_episodes_watched)
-        #     time_watched_id.append(total_time_watched)
-        #     count_id.append(count)
-        #     anime_name_id.append(anime_name)
-        #
-        # for i in range(0, len(genres_id)):
-        #     achievements = Achievements.query.filter_by(genre=genres_id[i]).all()
-        #     for achievement in achievements:
-        #         if time_watched_id[i]/60 > int(achievement.threshold):
-        #             passed = "yes"
-        #         else:
-        #             passed= "no"
-        #         achievement_data = {"type": achievement.type,
-        #                             "threshold": achievement.threshold,
-        #                             "image_id":achievement.image_id,
-        #                             "level":achievement.level,
-        #                             "title":achievement.title,
-        #                             "description":achievement.description,
-        #                             "passed": passed,
-        #                             "time_hours":int(time_watched_id[i]/60),
-        #                             "anime_watched": count_id[i],
-        #                             "anime_name": anime_name_id[i]}
-        #         genres_achievements.append(achievement_data)
-
-        count = 0
-        for i in range(0, len(genres_achievements)):
-            if genres_achievements[i]["passed"] == "yes":
-                count += 1
-        number_by_types.append(count)
-
-        # source/airing_date achievements
-        source_achievements = []
-        achievements = Achievements.query.filter_by(type="classic").all()
-        total = 0
-        total_time = 0
-        anime_name = []
-        for anime in anime_data:
-            first_year = int(anime[0].first_air_date.split('-')[0])
-            last_year = int(anime[0].last_air_date.split('-')[0])
-
-            if first_year >= 1981 and last_year <= 2000:
-                # Get episodes per season
-                nb_season = len(anime[3].split(","))
-                nb_episodes = anime[4].split(",")[:nb_season]
-
-                ep_counter = 0
-                for i in range(0, anime[1].current_season - 1):
-                    ep_counter += int(nb_episodes[i])
-                total_episodes_watched = ep_counter + anime[1].last_episode_watched
-                total_time += total_episodes_watched * anime[0].episode_duration
-                total += 1
-                anime_name.append(anime[0].name)
-
-        for achievement in achievements:
-            if int(total_time / 60) >= int(achievement.threshold):
-                passed = "yes"
-            else:
-                passed = "no"
-
-            achievement_data = {"type": achievement.type,
-                                "threshold": achievement.threshold,
-                                "image_id": achievement.image_id,
-                                "level": achievement.level,
-                                "title": achievement.title,
-                                "description": achievement.description,
-                                "time_hours": int(total_time / 60),
-                                "passed": passed,
-                                "anime_watched": total,
-                                "anime_name": anime_name}
-            source_achievements.append(achievement_data)
-
-        count = 0
-        for i in range(0, len(source_achievements)):
-            if source_achievements[i]["passed"] == "yes":
-                count += 1
-        number_by_types.append(count)
-
-        # Finished achievements
-        finished_achievements = []
-        achievements = Achievements.query.filter_by(type="finished").all()
-        total = 0
-        for anime in anime_data:
-            status = anime[0].status
-
-            if status == "Ended" and anime[1].status == Status.COMPLETED:
-                total += 1
-
-        for achievement in achievements:
-            if total >= int(achievement.threshold):
-                passed = "yes"
-            else:
-                passed = "no"
-
-            achievement_data = {"type": achievement.type,
-                                "threshold": achievement.threshold,
-                                "image_id": achievement.image_id,
-                                "level": achievement.level,
-                                "title": achievement.title,
-                                "description": achievement.description,
-                                "passed": passed,
-                                "anime_watched": total}
-            finished_achievements.append(achievement_data)
-
-        count = 0
-        for i in range(0, len(finished_achievements)):
-            if finished_achievements[i]["passed"] == "yes":
-                count += 1
-        number_by_types.append(count)
-
-
-        # Time achievements
-        time_achievements = []
-        achievements = Achievements.query.filter_by(type="time").all()
-        user = User.query.filter_by(id=user_id).first()
-
-        time_spent = int(user.time_spent_anime / 1440)
-
-        for achievement in achievements:
-            if time_spent >= int(achievement.threshold):
-                passed = "yes"
-            else:
-                passed = "no"
-
-            achievement_data = {"type": achievement.type,
-                                "threshold": achievement.threshold,
-                                "image_id": achievement.image_id,
-                                "level": achievement.level,
-                                "title": achievement.title,
-                                "description": achievement.description,
-                                "passed": passed,
-                                "days_spent": time_spent}
-            time_achievements.append(achievement_data)
-
-        count = 0
-        for i in range(0, len(time_achievements)):
-            if time_achievements[i]["passed"] == "yes":
-                count += 1
-        number_by_types.append(count)
-
-        # Miscellaneous: Long runner + old + different years
-        misc_achievements = []
-        achievement = Achievements.query.filter_by(type="long").first()
-        total = 0
-        anime_name = []
-        for anime in anime_data:
-            # Get episodes per season
-            nb_season = len(anime[3].split(","))
-            nb_episodes =  anime[4].split(",")[:nb_season]
-
-            ep_counter = 0
-            for i in range(0, anime[1].current_season-1):
-                ep_counter += int(nb_episodes[i])
-            total_episodes_watched = ep_counter + anime[1].last_episode_watched
-
-            if int(total_episodes_watched) >= 100:
-                total += 1
-                anime_name.append(anime[0].name)
-
-        if total >= 10:
-            passed = "yes"
-        else:
-            passed = "no"
-
-        achievement_data = {"type": achievement.type,
-                            "threshold": achievement.threshold,
-                            "image_id": achievement.image_id,
-                            "level": achievement.level,
-                            "title": achievement.title,
-                            "description": achievement.description,
-                            "passed": passed,
-                            "anime_watched": total,
-                            "anime_name": anime_name}
-        misc_achievements.append(achievement_data)
-
-        achievement = Achievements.query.filter_by(type="old").first()
-        total = 0
-        anime_name = []
-        for anime in anime_data:
-            year_last_air_date = anime[0].last_air_date.split('-')[0]
-            if (int(year_last_air_date) <= 1980) and (anime[1].status == Status.COMPLETED):
-                total += 1
-                anime_name.append(anime[0].name)
-
-        if total >= 10:
-            passed = "yes"
-        else:
-            passed = "no"
-
-        achievement_data = {"type": achievement.type,
-                            "threshold": achievement.threshold,
-                            "image_id": achievement.image_id,
-                            "level": achievement.level,
-                            "title": achievement.title,
-                            "description": achievement.description,
-                            "passed": passed,
-                            "anime_watched": total,
-                            "anime_name": anime_name}
-        misc_achievements.append(achievement_data)
-
-        achievement = Achievements.query.filter_by(type="year").first()
-        all_first_air_date = []
-        for anime in anime_data:
-            if anime[1].status == Status.COMPLETED:
-                all_first_air_date.append(anime[0].first_air_date.split('-')[0])
-
-        all_first_air_date = list(dict.fromkeys(all_first_air_date))
-
-        if len(all_first_air_date) >= 10:
-            passed = "yes"
-        else:
-            passed = "no"
-
-        achievement_data = {"type": achievement.type,
-                            "threshold": achievement.threshold,
-                            "image_id": achievement.image_id,
-                            "level": achievement.level,
-                            "title": achievement.title,
-                            "description": achievement.description,
-                            "passed": passed,
-                            "anime_watched": len(all_first_air_date)}
-        misc_achievements.append(achievement_data)
-
-        count = 0
-        for i in range(0, len(misc_achievements)):
-            if misc_achievements[i]["passed"] == "yes":
-                count += 1
-        number_by_types.append(count)
-
-        # Score achievements
-        score_achievements = []
-        achievements = Achievements.query.filter_by(type="score").all()
-        mean_score = get_mean_score(user_id, ListType.ANIME)
-        if mean_score <= 3:
-            tmp = 1
-        elif 3 < mean_score <= 5:
-            tmp = 2
-        elif 8 <= mean_score <= 10:
-            tmp = 3
-        else:
-            tmp = "no"
-
-        for achievement in achievements:
-            if tmp == 1 and int(achievement.threshold) == 3:
-                passed = "yes"
-            elif tmp == 2 and int(achievement.threshold) == 5:
-                passed = "yes"
-            elif tmp == 3 and int(achievement.threshold) == 8:
-                passed = "yes"
-            else:
-                passed = "no"
-            achievement_data = {"type": achievement.type,
-                                "threshold": achievement.threshold,
-                                "image_id": achievement.image_id,
-                                "level": achievement.level,
-                                "title": achievement.title,
-                                "description": achievement.description,
-                                "passed": passed,
-                                "mean_score": mean_score}
-            score_achievements.append(achievement_data)
-
-        count = 0
-        for i in range(0, len(score_achievements)):
-            if score_achievements[i]["passed"] == "yes":
-                count += 1
-        number_by_types.append(count)
-
-    return [genres_achievements, misc_achievements, source_achievements, finished_achievements,
-            time_achievements, score_achievements, number_by_types]
+    return [scores, element_count_per_score, time_total_chart, episodes_total_chart]
 
 
 def autocomplete_search_element(element_name, list_type):
@@ -3196,163 +3220,3 @@ def send_email_update_email(user):
     except Exception as e:
         app.logger.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'.format(user.id, e))
         return False
-
-
-def compute_media_time_spent(list_type):
-    if list_type == ListType.ANIME:
-        data = db.session.query(AnimeList, Anime,
-                                func.group_concat(AnimeEpisodesPerSeason.episodes)). \
-                                join(Anime, Anime.id == AnimeList.anime_id). \
-                                join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
-                                filter(AnimeList.user_id == current_user.id). \
-                                group_by(AnimeList.anime_id)
-    elif list_type == ListType.SERIES:
-        data = db.session.query(SeriesList, Series,
-                                func.group_concat(SeriesEpisodesPerSeason.episodes)). \
-                                join(Series, Series.id == SeriesList.series_id). \
-                                join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
-                                filter(SeriesList.user_id == current_user.id). \
-                                group_by(SeriesList.series_id)
-
-    total_time = 0
-    for element in data:
-        if element[0].status == Status.COMPLETED:
-            try:
-                total_time += element[1].episode_duration * element[1].total_episodes
-            except:
-                pass
-        elif element[0].status != Status.PLAN_TO_WATCH:
-            try:
-                episodes = element[2].split(",")
-                episodes = [int(x) for x in episodes]
-                for i in range(1, element[0].current_season):
-                    total_time += element[1].episode_duration * episodes[i - 1]
-                total_time += element[0].last_episode_watched * element[1].episode_duration
-            except:
-                pass
-
-    if list_type == ListType.ANIME:
-        user.time_spent_anime = total_time
-    elif list_type == ListType.SERIES:
-        user.time_spent_series = total_time
-
-    db.session.commit()
-
-
-def compute_book_time_spent():
-    data = db.session.query(Book, BookList). \
-                            join(BookList, BookList.book_id == Book.id). \
-                            filter(BookList.user_id == current_user.id). \
-                            group_by(BookList.book_id)
-    total_time = 0
-    for book in data:
-        if book[1].status == Status.COMPLETED:
-            try:
-                total_time += book[0].page_count
-            except:
-                pass
-
-    user = User.query.filter_by(id=current_user.id).first()
-    user.time_spent_book = total_time
-
-    db.session.commit()
-
-
-def get_statistics(user_id, list_type):
-    # get the number of series/anime per score
-    user = User.query.filter_by(id=user_id).first()
-    if list_type == ListType.SERIES:
-        score_0 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 0, SeriesList.score < 1).all()
-        score_1 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 1, SeriesList.score < 2).all()
-        score_2 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 2, SeriesList.score < 3).all()
-        score_3 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 3, SeriesList.score < 4).all()
-        score_4 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 4, SeriesList.score < 5).all()
-        score_5 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 5, SeriesList.score < 6).all()
-        score_6 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 6, SeriesList.score < 7).all()
-        score_7 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 7, SeriesList.score < 8).all()
-        score_8 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 8, SeriesList.score < 9).all()
-        score_9 = SeriesList.query.filter_by(user_id=user.id).filter(SeriesList.score >= 9, SeriesList.score <= 10).all()
-    elif list_type == ListType.ANIME:
-        score_0 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 0, AnimeList.score < 1).all()
-        score_1 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 1, AnimeList.score < 2).all()
-        score_2 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 2, AnimeList.score < 3).all()
-        score_3 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 3, AnimeList.score < 4).all()
-        score_4 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 4, AnimeList.score < 5).all()
-        score_5 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 5, AnimeList.score < 6).all()
-        score_6 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 6, AnimeList.score < 7).all()
-        score_7 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 7, AnimeList.score < 8).all()
-        score_8 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 8, AnimeList.score < 9).all()
-        score_9 = AnimeList.query.filter_by(user_id=user.id).filter(AnimeList.score >= 9, AnimeList.score <= 10).all()
-
-    count_score = [score_0, score_1, score_2, score_3, score_4, score_5,score_6, score_7, score_8, score_9]
-
-    element_count_per_score = []
-    for i in range(0, len(count_score)):
-        if count_score[i] is None:
-            element_count_per_score.append(0)
-        else:
-            element_count_per_score.append(len(count_score[i]))
-
-    score = ["0 - 1", "1 - 2", "2 - 3", "3 - 4", "4 - 5", "5 - 6", "6 - 7", "7 - 8", "8 - 9", "9 - 10"]
-
-    print(element_count_per_score)
-
-    # get the time spent watching series/anime per score
-    if list_type == ListType.SERIES:
-        element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
-                                        func.group_concat(SeriesNetwork.network.distinct()),
-                                        func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(SeriesEpisodesPerSeason.episodes)). \
-                                        join(SeriesList, SeriesList.series_id == Series.id). \
-                                        join(SeriesGenre, SeriesGenre.series_id == Series.id). \
-                                        join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
-                                        join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
-                                        filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
-    elif list_type == ListType.ANIME:
-        element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
-                                        func.group_concat(AnimeNetwork.network.distinct()),
-                                        func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(AnimeEpisodesPerSeason.episodes)). \
-                                        join(AnimeList, AnimeList.anime_id == Anime.id). \
-                                        join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
-                                        join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
-                                        join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
-                                        filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
-
-    all_data = []
-    for i in range(0, len(count_score)):
-        total_episodes_watched = 0
-        total_time = 0
-        for j in range(0, len(count_score[i])):
-            the_series_id = count_score[i][j].series_id
-            time_watched = 0
-            for element in element_data:
-                if the_series_id == element[0].id:
-                    ep_duration = element[0].episode_duration
-
-                    nb_season = len(element[4].split(","))
-                    nb_episodes = element[5].split(",")[:nb_season]
-
-                    ep_counter = 0
-                    for k in range(0, element[1].current_season - 1):
-                       ep_counter += int(nb_episodes[k])
-                    episodes_watched = ep_counter + element[1].last_episode_watched
-                    time_watched += ep_duration * episodes_watched
-
-            total_episodes_watched += episodes_watched
-            total_time += time_watched
-
-        data_by_score = {"episodes_watched": total_episodes_watched,
-                         "time_watched": int(total_time/60)}
-
-        all_data.append(data_by_score)
-
-    time_total_chart = []
-    for data in all_data:
-       time_total_chart.append(data["time_watched"])
-
-    episodes_total_chart = []
-    for data in all_data:
-       episodes_total_chart.append(data["episodes_watched"])
-
-    return [score, element_count_per_score, time_total_chart, episodes_total_chart]

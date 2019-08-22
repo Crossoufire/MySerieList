@@ -16,23 +16,24 @@
 </ul>
 
 <div class="tab-content" id="achievements_tab_content">
+
     <div class="tab-pane fade show active" id="anime_tab">
 
         <div>
             {% if current_user.get_id() == user_id %}
-            <div style="font-size: 18pt;" class="text-center mb-3 mt-3">You have unlocked {{ unlocked_achievements }}/70 anime achievements.</div>
+            <div style="font-size: 18pt;" class="text-center mb-3 mt-3">You have unlocked {{ data["total_unlocked"] }}/70 anime achievements.</div>
             {% else %}
-            <div style="font-size: 18pt;" class="text-center mb-3 mt-3">{{ user_name }} has unlocked {{ unlocked_achievements }}/70 anime achievements.</div>
+            <div style="font-size: 18pt;" class="text-center mb-3 mt-3">{{ user_name }} has unlocked {{ data["total_unlocked"] }}/70 anime achievements.</div>
             {% endif %}
         </div>
 
-        <div class="topnav" id="anime_type_topnav">
-            <a class="tablinks active" onclick="openAchievement(event, 'genres')">Genres ({{ number_unlocked["genres"] }}/44)</a>
-            <a class="tablinks" onclick="openAchievement(event, 'sources')">Sources ({{ number_unlocked["sources"] }}/4)</a>
-            <a class="tablinks" onclick="openAchievement(event, 'finished')">Finished ({{ number_unlocked["finished"] }}/12)</a>
-            <a class="tablinks" onclick="openAchievement(event, 'time')">Time ({{ number_unlocked["time"] }}/4)</a>
-            <a class="tablinks" onclick="openAchievement(event, 'misc')">Misc ({{ number_unlocked["misc"] }}/3)</a>
-            <a class="tablinks" onclick="openAchievement(event, 'score')">Score ({{ number_unlocked["score"] }}/3)</a>
+        <div class="topnav" id="type_topnav">
+            <a class="tablinks active" onclick="openAchievement(event, 'genres')">Genres ({{ data["unlocked_per_type"]["genres"] }}/44)</a>
+            <a class="tablinks" onclick="openAchievement(event, 'sources')">Sources ({{ data["unlocked_per_type"]["sources"] }}/4)</a>
+            <a class="tablinks" onclick="openAchievement(event, 'finished')">Finished ({{ data["unlocked_per_type"]["finished"] }}/12)</a>
+            <a class="tablinks" onclick="openAchievement(event, 'time')">Time ({{ data["unlocked_per_type"]["time"] }}/4)</a>
+            <a class="tablinks" onclick="openAchievement(event, 'misc')">Misc ({{ data["unlocked_per_type"]["misc"] }}/3)</a>
+            <a class="tablinks" onclick="openAchievement(event, 'score')">Score ({{ data["unlocked_per_type"]["score"] }}/3)</a>
             <a href="javascript:void(0);" class="icon" onclick="myFunction()">
                 <i class="fa fa-bars"></i>
             </a>
@@ -46,7 +47,7 @@
                     {% for j in range(0, data["genres"][0]|length) %}
                     <td id="pr_{{ data['genres'][i][j]['image_id'] }}" class="filtered" onclick="test('det_{{ data['genres'][i][j]['image_id'] }}', 'pr_{{ data['genres'][i][j]['image_id'] }}', 'img_{{ data['genres'][i][j]['image_id'] }}')">
                         <span style="font-size: 12pt;">{{ data['genres'][i][j]["level"] }}</span><br>
-                        <span style="font-size: 12pt;">{{ data['genres'][i][j]["time_hours"] }}/{{ data['genres'][i][j]["threshold"] }} hours watched</span><br>
+                        <span style="font-size: 12pt;">{{ data['genres'][i][j]["element_time"] }}/{{ data['genres'][i][j]["threshold"] }} hours watched</span><br>
 
                         {% if data['genres'][i][j]["passed"] == "yes" %}
                         <img id="img_{{ data['genres'][i][j]['image_id'] }}" height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data['genres'][i][j]['image_id'] }}.png"/>
@@ -63,12 +64,12 @@
                             <span style="font-size: 14pt;">{{ data['genres'][i][j]["title"] }}</span><br>
                             <span style="font-size: 13pt;">{{ data['genres'][i][j]["description"] }}</span><br>
                             <div class="m-2"></div>
-                            <span style="font-size: 13pt;">Number of anime watched: {{ data['genres'][i][j]["anime_watched"] }}</span>
+                            <span style="font-size: 13pt;">Number of anime watched: {{ data['genres'][i][j]["element_count"] }}</span>
                             <hr class="p-0 m-0">
                             <ul class="p-t-10">
-                                {% for k in range(0, data['genres'][i][j]["anime_name"]|length) %}
+                                {% for k in range(0, data['genres'][i][j]["element_name"]|length) %}
                                 <li>
-                                    {{ data['genres'][i][j]["anime_name"][k] }}
+                                    {{ data['genres'][i][j]["element_name"][k] }}
                                 </li>
                                 {% endfor %}
                             </ul>
@@ -89,7 +90,7 @@
                     {% for j in range(0, data['sources'][0]|length) %}
                     <td id="pr_{{ data['sources'][i][j]['image_id'] }}" class="filtered" onclick="test('det_{{ data['sources'][i][j]['image_id'] }}', 'pr_{{ data['sources'][i][j]['image_id'] }}', 'img_{{ data['sources'][i][j]['image_id'] }}')">
                         <span style="font-size: 12pt;">{{ data['sources'][i][j]["level"] }}</span><br>
-                        <span style="font-size: 12pt;">{{ data['sources'][i][j]["time_hours"] }}/{{ data['sources'][i][j]["threshold"] }} hours watched</span><br>
+                        <span style="font-size: 12pt;">{{ data['sources'][i][j]["element_time"] }}/{{ data['sources'][i][j]["threshold"] }} hours watched</span><br>
 
                         {% if data['sources'][i][j]["passed"] == "yes" %}
                         <img id="img_{{ data['sources'][i][j]['image_id'] }}" height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data['sources'][i][j]['image_id'] }}.png"/>
@@ -106,12 +107,12 @@
                             <span style="font-size: 14pt;">{{ data['sources'][i][j]["title"] }}</span><br>
                             <span style="font-size: 13pt;">{{ data['sources'][i][j]["description"] }}</span><br>
                             <div class="m-2"></div>
-                            <span style="font-size: 13pt;">Number of anime watched: {{ data['sources'][i][j]["anime_watched"] }}</span>
+                            <span style="font-size: 13pt;">Number of anime watched: {{ data['sources'][i][j]["element_count"] }}</span>
                             <hr class="p-0 m-0">
                             <ul class="p-t-10">
-                                {% for k in range(0, data['sources'][i][j]["anime_name"]|length) %}
+                                {% for k in range(0, data['sources'][i][j]["element_name"]|length) %}
                                 <li>
-                                    {{ data['sources'][i][j]["anime_name"][k] }}
+                                    {{ data['sources'][i][j]["element_name"][k] }}
                                 </li>
                                 {% endfor %}
                             </ul>
@@ -132,7 +133,7 @@
                     {% for j in range(0, data['finished'][0]|length) %}
                     <td id="pr_{{ data['finished'][i][j]['image_id'] }}" class="filtered" onclick="test('det_{{ data['finished'][i][j]['image_id'] }}', 'pr_{{ data['finished'][i][j]['image_id'] }}', 'img_{{ data['finished'][i][j]['image_id'] }}')">
                         <span style="font-size: 12pt;">{{ data['finished'][i][j]["level"] }}</span><br>
-                        <span style="font-size: 12pt;">{{ data['finished'][i][j]["anime_watched"] }}/{{ data['finished'][i][j]["threshold"] }} anime watched</span><br>
+                        <span style="font-size: 12pt;">{{ data['finished'][i][j]["element_count"] }}/{{ data['finished'][i][j]["threshold"] }} anime watched</span><br>
 
                         {% if data['finished'][i][j]["passed"] == "yes" %}
                         <img id="img_{{ data['finished'][i][j]['image_id'] }}" height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data['finished'][i][j]['image_id'] }}.png"/>
@@ -145,19 +146,9 @@
                 <tr>
                     {% for j in range(0, data['sources'][0]|length) %}
                     <td id="det_{{ data['finished'][i][j]['image_id'] }}" class="d-none anime_details" colspan="4">
-                        <div class="p-l-20 p-t-10 p-r-20">
+                        <div class="p-l-20 p-t-10 p-r-20 p-b-10">
                             <span style="font-size: 14pt;">{{ data['finished'][i][j]["title"] }}</span><br>
                             <span style="font-size: 13pt;">{{ data['finished'][i][j]["description"] }}</span><br>
-                            <div class="m-2"></div>
-                            <span style="font-size: 13pt;">Number of anime watched: {{ data['finished'][i][j]["anime_watched"] }}</span>
-                            <hr class="p-0 m-0">
-                            <ul class="p-t-10">
-                                {% for k in range(0, data['finished'][i][j]["anime_name"]|length) %}
-                                <li>
-                                    {{ data['finished'][i][j]["anime_name"][k] }}
-                                </li>
-                                {% endfor %}
-                            </ul>
                         </div>
                     </td>
                     {% endfor %}
@@ -175,7 +166,7 @@
                     {% for j in range(0, data['time'][0]|length) %}
                     <td id="pr_{{ data['time'][i][j]['image_id'] }}" class="filtered" onclick="test('det_{{ data['time'][i][j]['image_id'] }}', 'pr_{{ data['time'][i][j]['image_id'] }}', 'img_{{ data['time'][i][j]['image_id'] }}')">
                         <span style="font-size: 12pt;">{{ data['time'][i][j]["level"] }}</span><br>
-                        <span style="font-size: 12pt;">{{ data['time'][i][j]["days_spent"] }}/{{ data['time'][i][j]["threshold"] }} days watched</span><br>
+                        <span style="font-size: 12pt;">{{ data['time'][i][j]["element_time"] }}/{{ data['time'][i][j]["threshold"] }} days watched</span><br>
 
                         {% if data['time'][i][j]["passed"] == "yes" %}
                         <img id="img_{{ data['sources'][i][j]['image_id'] }}" height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data['time'][i][j]['image_id'] }}.png"/>
@@ -188,19 +179,9 @@
                 <tr>
                     {% for j in range(0, data['time'][0]|length) %}
                     <td id="det_{{ data['time'][i][j]['image_id'] }}" class="d-none anime_details" colspan="4">
-                        <div class="p-l-20 p-t-10 p-r-20">
+                        <div class="p-l-20 p-t-10 p-r-20 p-b-10">
                             <span style="font-size: 14pt;">{{ data['time'][i][j]["title"] }}</span><br>
                             <span style="font-size: 13pt;">{{ data['time'][i][j]["description"] }}</span><br>
-                            <div class="m-2"></div>
-                            <span style="font-size: 13pt;">Number of anime watched: {{ data['time'][i][j]["anime_watched"] }}</span>
-                            <hr class="p-0 m-0">
-                            <ul class="p-t-10">
-                                {% for k in range(0, data['time'][i][j]["anime_name"]|length) %}
-                                <li>
-                                    {{ data['time'][i][j]["anime_name"][k] }}
-                                </li>
-                                {% endfor %}
-                            </ul>
                         </div>
                     </td>
                     {% endfor %}
@@ -218,7 +199,7 @@
                     {% for j in range(0, data['misc'][0]|length) %}
                     <td id="pr_{{ data['misc'][i][j]['image_id'] }}" class="filtered" onclick="test('det_{{ data['misc'][i][j]['image_id'] }}', 'pr_{{ data['misc'][i][j]['image_id'] }}', 'img_{{ data['misc'][i][j]['image_id'] }}')">
                         <span style="font-size: 12pt;">{{ data['misc'][i][j]["level"] }}</span><br>
-                        <span style="font-size: 12pt;">{{ data['misc'][i][j]["anime_watched"] }}/{{ data['misc'][i][j]["threshold"] }} anime watched</span><br>
+                        <span style="font-size: 12pt;">{{ data['misc'][i][j]["element_count"] }}/{{ data['misc'][i][j]["threshold"] }} anime watched</span><br>
 
                         {% if data['misc'][i][j]["passed"] == "yes" %}
                         <img id="img_{{ data['misc'][i][j]['image_id'] }}" height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data['misc'][i][j]['image_id'] }}.png"/>
@@ -231,20 +212,27 @@
                 <tr>
                     {% for j in range(0, data['misc'][0]|length) %}
                     <td id="det_{{ data['misc'][i][j]['image_id'] }}" class="d-none anime_details" colspan="4">
+                        {% if data['misc'][i][j]["title"] == "Chronomaster" %}
+                        <div class="p-l-20 p-t-10 p-r-20 p-b-10">
+                            <span style="font-size: 14pt;">{{ data['misc'][i][j]["title"] }}</span><br>
+                            <span style="font-size: 13pt;">{{ data['misc'][i][j]["description"] }}</span><br>
+                        </div>
+                        {% else %}
                         <div class="p-l-20 p-t-10 p-r-20">
                             <span style="font-size: 14pt;">{{ data['misc'][i][j]["title"] }}</span><br>
                             <span style="font-size: 13pt;">{{ data['misc'][i][j]["description"] }}</span><br>
                             <div class="m-2"></div>
-                            <span style="font-size: 13pt;">Number of anime watched: {{ data['misc'][i][j]["anime_watched"] }}</span>
+                            <span style="font-size: 13pt;">Number of anime watched: {{ data['misc'][i][j]["element_count"] }}</span>
                             <hr class="p-0 m-0">
                             <ul class="p-t-10">
-                                {% for k in range(0, data['misc'][i][j]["anime_name"]|length) %}
+                                {% for k in range(0, data['misc'][i][j]["element_name"]|length) %}
                                 <li>
-                                    {{ data['misc'][i][j]["anime_name"][k] }}
+                                    {{ data['misc'][i][j]["element_name"][k] }}
                                 </li>
                                 {% endfor %}
                             </ul>
                         </div>
+                        {% endif %}
                     </td>
                     {% endfor %}
                 </tr>
@@ -274,19 +262,9 @@
                 <tr>
                     {% for j in range(0, data['score'][0]|length) %}
                     <td id="det_{{ data['score'][i][j]['image_id'] }}" class="d-none anime_details" colspan="4">
-                        <div class="p-l-20 p-t-10 p-r-20">
+                        <div class="p-l-20 p-t-10 p-r-20 p-b-10">
                             <span style="font-size: 14pt;">{{ data['score'][i][j]["title"] }}</span><br>
                             <span style="font-size: 13pt;">{{ data['score'][i][j]["description"] }}</span><br>
-                            <div class="m-2"></div>
-                            <span style="font-size: 13pt;">Number of anime watched: {{ data['score'][i][j]["anime_watched"] }}</span>
-                            <hr class="p-0 m-0">
-                            <ul class="p-t-10">
-                                {% for k in range(0, data['score'][i][j]["anime_name"]|length) %}
-                                <li>
-                                    {{ data['score'][i][j]["anime_name"][k] }}
-                                </li>
-                                {% endfor %}
-                            </ul>
                         </div>
                     </td>
                     {% endfor %}
@@ -298,7 +276,111 @@
     </div>
 
     <div class="tab-pane fade" id="series_tab">
+
+         <div>
+            {% if current_user.get_id() == user_id %}
+            <div style="font-size: 18pt;" class="text-center mb-3 mt-3">You have unlocked {{ data["total_unlocked"] }}/70 series achievements.</div>
+            {% else %}
+            <div style="font-size: 18pt;" class="text-center mb-3 mt-3">{{ user_name }} has unlocked {{ data["total_unlocked"] }}/70 series achievements.</div>
+            {% endif %}
+        </div>
+
+        <div class="topnav" id="type_topnav">
+            <a class="tablinks active" onclick="openAchievement(event, 'genres')">Genres ({{ data["unlocked_per_type"]["genres"] }}/28)</a>
+            <a class="tablinks" onclick="openAchievement(event, 'misc')">Misc ({{ data["unlocked_per_type"]["misc"] }}/1)</a>
+            <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+                <i class="fa fa-bars"></i>
+            </a>
+        </div>
+
+        <div id="genres" class="tabcontent">
+            <table class="text-center pt-3" width="100%">
+                <tbody>
+                {% for i in range(0, data["genres"]|length) %}
+                <tr>
+                    {% for j in range(0, data["genres"][0]|length) %}
+                    <td id="pr_{{ data['genres'][i][j]['image_id'] }}" class="filtered" onclick="test('det_{{ data['genres'][i][j]['image_id'] }}', 'pr_{{ data['genres'][i][j]['image_id'] }}', 'img_{{ data['genres'][i][j]['image_id'] }}')">
+                        <span style="font-size: 12pt;">{{ data['genres'][i][j]["level"] }}</span><br>
+                        <span style="font-size: 12pt;">{{ data['genres'][i][j]["element_time"] }}/{{ data['genres'][i][j]["threshold"] }} hours watched</span><br>
+
+                        {% if data['genres'][i][j]["passed"] == "yes" %}
+                        <img id="img_{{ data['genres'][i][j]['image_id'] }}" height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data['genres'][i][j]['image_id'] }}.png"/>
+                        {% else %}
+                        <img height="100" width="200" style="filter: grayscale(100%);" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data['genres'][i][j]['image_id'] }}.png"/>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                 </tr>
+                <tr>
+                    {% for j in range(0, data['genres'][0]|length) %}
+                    <td id="det_{{ data['genres'][i][j]['image_id'] }}" class="d-none anime_details" colspan="4">
+                        <div class="p-l-20 p-t-10 p-r-20">
+                            <span style="font-size: 14pt;">{{ data['genres'][i][j]["title"] }}</span><br>
+                            <span style="font-size: 13pt;">{{ data['genres'][i][j]["description"] }}</span><br>
+                            <div class="m-2"></div>
+                            <span style="font-size: 13pt;">Number of anime watched: {{ data['genres'][i][j]["element_count"] }}</span>
+                            <hr class="p-0 m-0">
+                            <ul class="p-t-10">
+                                {% for k in range(0, data['genres'][i][j]["element_name"]|length) %}
+                                <li>
+                                    {{ data['genres'][i][j]["element_name"][k] }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="misc" class="tabcontent" style="display: none;">
+            <table class="text-center pt-3" width="100%">
+                <tbody>
+                {% for i in range(0, data['misc']|length) %}
+                <tr>
+                    {% for j in range(0, data['misc'][0]|length) %}
+                    <td id="pr_{{ data['misc'][i][j]['image_id'] }}" class="filtered" onclick="test('det_{{ data['misc'][i][j]['image_id'] }}', 'pr_{{ data['misc'][i][j]['image_id'] }}', 'img_{{ data['misc'][i][j]['image_id'] }}')">
+                        <span style="font-size: 12pt;">{{ data['misc'][i][j]["level"] }}</span><br>
+                        <span style="font-size: 12pt;">{{ data['misc'][i][j]["element_count"] }}/{{ data['misc'][i][j]["threshold"] }} anime watched</span><br>
+
+                        {% if data['misc'][i][j]["passed"] == "yes" %}
+                        <img id="img_{{ data['misc'][i][j]['image_id'] }}" height="100" width="200" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data['misc'][i][j]['image_id'] }}.png"/>
+                        {% else %}
+                        <img height="100" width="200" style="filter: grayscale(100%);" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data['misc'][i][j]['image_id'] }}.png"/>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                 </tr>
+                <tr>
+                    {% for j in range(0, data['misc'][0]|length) %}
+                    <td id="det_{{ data['misc'][i][j]['image_id'] }}" class="d-none anime_details" colspan="4">
+                        <div class="p-l-20 p-t-10 p-r-20">
+                            <span style="font-size: 14pt;">{{ data['misc'][i][j]["title"] }}</span><br>
+                            <span style="font-size: 13pt;">{{ data['misc'][i][j]["description"] }}</span><br>
+                            <div class="m-2"></div>
+                            <span style="font-size: 13pt;">Number of anime watched: {{ data['misc'][i][j]["element_count"] }}</span>
+                            <hr class="p-0 m-0">
+                            <ul class="p-t-10">
+                                {% for k in range(0, data['misc'][i][j]["element_name"]|length) %}
+                                <li>
+                                    {{ data['misc'][i][j]["element_name"][k] }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
     </div>
+
 </div>
 {% endblock content %}
 
@@ -307,7 +389,7 @@
 <!--------- navbar type achievements --------->
 <script type="text/javascript">
 function myFunction() {
-    var x = document.getElementById("anime_type_topnav");
+    var x = document.getElementById("type_topnav");
     if (x.className === "topnav") {
         x.className += " responsive";
     } else {
