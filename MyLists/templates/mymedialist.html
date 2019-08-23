@@ -147,8 +147,13 @@
 				{% if target_user_id == current_user.get_id() %}
 					<a class="btn_left fas fa-bars text-light" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
 					<a class="btn_right fas fa-ban text-light" onclick="delete_element('{{ data[0].id }}', 'card_{{ data[0].id }}', '{{ data[0].name }}')"></a>
+					{% if can_update["{}".format(data[0].id)] %}
+						<a class="btn_bottom_right fas fa-sync text-light" onclick="refresh('{{ data[0].id }}')"></a>
+					{% else %}
+						<a class="disabled btn_bottom_right fas fa-sync text-light"></a>
+					{% endif %}
 				{% endif %}
-				<a class="btn_bottom fas fa-caret-square-down" onclick="show_score('footer_{{ data[0].id }}', card_{{ data[0].id }})" style="z-index: 500;"></a>
+				<a class="btn_bottom_left fas fa-caret-square-down" onclick="show_score('footer_{{ data[0].id }}', card_{{ data[0].id }})" style="z-index: 500;"></a>
 			</div>
 
 			<div class="card-body bg-transparent p-0 m-t-5 m-b-1">
@@ -252,11 +257,6 @@
 							<a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}')">On Hold</a>
 							<a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}')">Random</a>
 							<a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}')">Dropped</a>
-						{% endif %}
-						{% if can_update["{}".format(data[0].id)] %}
-							<a style="background-color: #4d0000;" data-dismiss="modal" class="list-group-item modded" onclick="refresh('{{ data[0].id }}')">Refresh metadata</a>
-						{% else %}
-							<a style="background-color: grey;" data-dismiss="modal" class="disabled list-group-item modded" >Refresh metadata</a>
 						{% endif %}
 					</div>
 				</div>

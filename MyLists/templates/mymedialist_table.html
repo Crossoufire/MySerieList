@@ -259,6 +259,12 @@
 				<td class="text-center">
 					<a class="fas fa-bars" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
 					&nbsp &nbsp
+					{% if can_update["{}".format(data[0].id)] %}
+						<a class="fas fa-sync" onclick="refresh('{{ data[0].id }}')"></a>
+						{% else %}
+						<a class="disabled fas fa-sync"></a>
+						{% endif %}
+					&nbsp &nbsp
 					<a class="fas fa-ban" onclick="delete_element('{{ data[0].id }}', 'tr_{{ data[0].id }}')"></a>
 				</td>
 			{% endif %}
@@ -311,11 +317,6 @@
 							<a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}')">On Hold</a>
 							<a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}')">Random</a>
 							<a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}')">Dropped</a>
-						{% endif %}
-						{% if can_update["{}".format(data[0].id)] %}
-							<a style="background-color: #4d0000;" data-dismiss="modal" class="list-group-item modded" onclick="refresh('{{ data[0].id }}')">Refresh metadata</a>
-						{% else %}
-							<a style="background-color: grey;" data-dismiss="modal" class="disabled list-group-item modded" onclick="refresh('{{ data[0].id }}')">Refresh metadata</a>
 						{% endif %}
 					</div>
 				</div>

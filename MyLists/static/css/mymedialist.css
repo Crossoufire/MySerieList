@@ -78,18 +78,33 @@ hr {
     opacity: 0.7;
 }
 
-.btn_bottom {
+.btn_bottom_left {
     position: absolute;
     bottom: 10px;
     left: 10px;
     opacity: 0;
 }
 
-.btn_bottom:hover {
+.btn_bottom_left:hover {
     opacity: 1;
 }
 
-.mask:hover~.btn_bottom {
+.mask:hover~.btn_bottom_left {
+    opacity: 0.7;
+}
+
+.btn_bottom_right {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    opacity: 0;
+}
+
+.btn_bottom_right:hover {
+    opacity: 1;
+}
+
+.mask:hover~.btn_bottom_right {
     opacity: 0.7;
 }
 
@@ -211,17 +226,23 @@ hr {
         right: 10px;
         opacity: 0.8;
     }
-    .btn_bottom {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        opacity: 0.8;
-    }
     .btn_left {
         position: absolute;
         top: 10px;
         left: 10px;
         opacity: 0.8;
+    }
+    .btn_bottom_left {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        opacity: 0.8;
+    }
+    .btn_bottom_right {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        opacity: 0;
     }
     .font-mask {
         font-size: 12pt;
