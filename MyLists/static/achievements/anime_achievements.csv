@@ -2,23 +2,23 @@ media;threshold;image_id;level;title;description;type;genre
 A;30;anime-mystery-1;Mystery: level 1;Growing Suspicions;It's suspicious because nothing looks suspicious, and if it looks suspicious from the start it's obviously suspicious.;genre;7
 A;75;anime-mystery-2;Mystery: level 2;Detective's Assistant;Now it's your business to know what other people don't know too.;genre;7
 A;150;anime-mystery-3;Mystery: level 3;Genius Detective;You're already a genius at unraveling mysteries... but how is it possible that everywhere you go someone ends up dead?;genre;7
-A;300;anime-mystery-4;Mystery: level MAX;Golden Truth;You can solve any mystery by now. The path to the Golden Land has already been revealed to you.;genre;7
+A;300;anime-mystery-4;Mystery: level DETECTIVE;Golden Truth;You can solve any mystery by now. The path to the Golden Land has already been revealed to you.;genre;7
 A;30;anime-pervert-0;Pervert: level 1;Innocent One;Puritan, oblivious, or serial killer in the making? Either way, you made it through No Man's Land without glimpsing a single bra. Good job!;genre;9
 A;75;anime-pervert-1;Pervert: level 2;"I Watch Anime Only for the ""Plot""...";It's not your fault that there is so much fan service... Right?;genre;9
 A;150;anime-pervert-2;Pervert: level 3;Only Accidents! I Swear!;Physics in anime are incredible. When you trip, you always cop a feel.;genre;9
-A;300;anime-pervert-3;Pervert: level MAX;Hentai Overlord;No use denying it! You know what you are...;genre;9
+A;300;anime-pervert-3;Pervert: level HENTAI;Hentai Overlord;No use denying it! You know what you are...;genre;9
 A;30;anime-historical-1;Historical: level 1;History Class;History doesn't have to be boring. There's a lot to learn.;genre;13
 A;75;anime-historical-2;Historical: level 2;A Look at Passing Time;Instead of dreaming of the future, you prefer to look back at the past.;genre;13
 A;150;anime-historical-3;Historical: level 3;Archaeologist;You have learned that sometimes going further just isn't worth it. And yet you try.;genre;13
-A;300;anime-historical-4;Historical: level MAX;Time Machine;Kids these days are boring. You'd rather watch something heart warming about siblings catching fireflies.;genre;13
+A;300;anime-historical-4;Historical: level HISTORIAN;Time Machine;Kids these days are boring. You'd rather watch something heart warming about siblings catching fireflies.;genre;13
 A;30;anime-horror-1;Horror: level 1;Paranoia Fuel;It's not like you needed to sleep tonight, anyway.;genre;14
 A;75;anime-horror-2;Horror: level 2;Too Many Teeth;You know something is following you. You just don't know what.;genre;14
 A;150;anime-horror-3;Horror: level 3;Extreme Phobia;You are terrified, you are transfixed.;genre;14
-A;300;anime-horror-4;Trauma: level MAX;Flowers of Flesh and Blood;It's far too late, now.;genre;14
+A;300;anime-horror-4;Horror: level TRAUMA;Flowers of Flesh and Blood;It's far too late, now.;genre;14
 A;30;anime-mecha-1;Mecha: level 1;Me? PILOT This Thing?!;A secret organization wants you to pilot a huge mecha. Can you do it?;genre;18
 A;75;anime-mecha-2;Mecha: level 2;Engineer;After watching over 75 hours of meca anime you should be able to build your own mobile suit. Remember not to kill the rest of us.;genre;18
 A;150;anime-mecha-3;Mecha: level 3;Mechazawa;Having watched over 150 hours of mecha anime, you've probably become a robot already. Nice job, hero.;genre;18
-A;300;anime-mecha-4;Mecha: level MAX;Pierce the HEAVENS!;Do the impossible. See the invisible. ROW ROW FIGHT THE POWAH! You just sang that in your head, didn't you?;genre;18
+A;300;anime-mecha-4;Mecha: level ENGINEER;Pierce the HEAVENS!;Do the impossible. See the invisible. ROW ROW FIGHT THE POWAH! You just sang that in your head, didn't you?;genre;18
 A;30;anime-music-1;Music: level 1;Gettin' Your Keys On!;You don't know what you've just listened to, but you like it.;genre;19
 A;75;anime-music-2;Music: level 2;This Is Even Better Live;Proudly display the badges you have earned in the fancafe.;genre;19
 A;150;anime-music-3;Music: level 3;Dreaming of the City;Your musical knowledge has expanded so much you are tempted to make a career out of it.;genre;19
@@ -26,15 +26,15 @@ A;300;anime-music-4;Music: level SUPERSTAR;Hall of Fame;The stage is now your se
 A;30;anime-romance-1;Romance: level 1;Stalker;I'll stalk you so hard you won't notice me for 24 episodes. Why don't you love me yet?;genre;22
 A;75;anime-romance-2;Romance: level 2;Unrequited Love;If you won't confess, they'll never know how you feel. But don't bother if you're the best girl - these never win.;genre;22
 A;150;anime-romance-3;Romance: level 3;Sparkles and Bubbles;Every time you two get close you feel butterflies in your stomach. Now kiss.;genre;22
-A;300;anime-romance-4;Romance: FULL LOVE;Heart Full of Love;So many romance anime! You surely are an expert in relationships already.;genre;22
+A;300;anime-romance-4;Romance: Level LOVE;Heart Full of Love;So many romance anime! You surely are an expert in relationships already.;genre;22
 A;30;anime-space-1;Space: level 1;3... 2... 1... Liftoff!;You've taken one small step for man, not such a giant leap for mankind.;genre;29
 A;75;anime-space-2;Space: level 2;The Earth Looks So Small from Up Here;You're finally outside the atmosphere, but there's still a lot to explore.;genre;29
 A;150;anime-space-3;Space: level 3;Interstellar Traveler;You've traveled vast interstellar distances and seen many galaxies in your way.;genre;29
-A;300;anime-space-4;Space: level MAX;Emperor of the Universe;You're the ruler of the whole Universe. There's no one with more power than you.;genre;29
+A;300;anime-space-4;Space: level COSMONAUTE;Emperor of the Universe;You're the ruler of the whole Universe. There's no one with more power than you.;genre;29
 A;30;anime-sports-1;Sports: level 1;Knockout!;You've held your own in the ring, time to go all the way.;genre;30
 A;75;anime-sports-2;Sports: level 2;Get Your Head in the Game;The odds are against you, time to get in the zone.;genre;30
 A;150;anime-sports-3;Sports: level 3;Welcome to the Big Leagues;There's no stopping you, just one final push.;genre;30
-A;300;anime-sports-4;Sports: level MAX;Olympian;First across the finish line, great job!;genre;30
+A;300;anime-sports-4;Sports: level ATHELTE;Olympian;First across the finish line, great job!;genre;30
 A;30;anime-slice-of-life-1;Slice of Life: level 1;Normal High School Boy;Got started into the furious ride with slice-of-life anime.;genre;36
 A;75;anime-slice-of-life-2;Slice of Life: level 2;Cute x ( Girls + Things );Didn't get bored of watching cute girls doing cute things. As if that's possible.;genre;36
 A;150;anime-slice-of-life-3;Slice of Life: level 3;Enjoying Life;Found the equilibrium between boring and interesting.;genre;36
@@ -42,38 +42,38 @@ A;300;anime-slice-of-life-4;Slice of Life: level MAX;Prima Undine;Awarded Ph.D. 
 A;30;anime-psychological-1;Psychological: level 1;What Exactly Did I Just Watch?;You discovered a whole new world of weird. Keep on watching.;genre;40
 A;75;anime-psychological-2;Psychological: level 2;My Mind Is Full of Fuck;Your attempt to wrap your mind around this failed completely.;genre;40
 A;150;anime-psychological-3;Psychological: level 3;Is This the Real Life?;It has become hard to distinguish between reality and fiction.;genre;40
-A;300;anime-psychological-4;Psychological: level MAX;Wired Sound;You've seen too much. You've transcended humanity and operate on another level now.;genre;40
-A;10;anime-episode-long;Anime, That Is;I Like Them Long;Didn't fall asleep while watching long anime series. 100 episodes isn't a big deal to you.;long;
+A;300;anime-psychological-4;Psychological: level MAD;Wired Sound;You've seen too much. You've transcended humanity and operate on another level now.;genre;40
+A;30;anime-game-1;Visual Novel: level 1;Eternal Spring;It all started one fateful morning in April...;visual-novel;
+A;75;anime-game-2;Visual Novel: level 2;At the Gates of Eden;You're so close to heaven, you can almost feel it.;visual-novel;
+A;150;anime-game-3;Visual Novel: level 3;Banquet of the Golden Witch;You've challenged her to a game. There is no turning back, now.;visual-novel;
+A;300;anime-game-4;Visual Novel: level G@MERZ;Hacking to the Gate;All these games have made of you a wizard. You can crack any code without breaking a sweat.;visual-novel;
+A;30;anime-original-1;Original: level 1;Uncharted Waters;You have just stumbled across a wonderful, strange new world.;original;
+A;75;anime-original-2;Original: level 2;Into the Jungle;The deeper you go, the less you want out.;original;
+A;150;anime-original-3;Original: level 3;Center of the Earth;You have forgotten about the outside world, nature has assimilated you. An apple falls - not only have you flowered, you have produced fruit.;original;
+A;300;anime-original-4;Original: level NO ADAPTATION;Transcendence;You have been returned to the primordial ocean. From the highest point in the sky, you can peer into every universe, and lose yourself in an infinity of stories.;original;
+A;30;anime-release-classic-1;Classics: level 1;Cassette Tape;The first time you watched these, you didn't even know what they were.;classic;
+A;75;anime-release-classic-2;Classics: level 2;Solid Color;Bomber jackets, high-waisted jeans, an overload of patterns, and bishies everywhere.;classic;
+A;150;anime-release-classic-3;Classics: level 3;It's Raining... Tragic Backstories!;It might be the nostalgia lens, but you swear things had more substance back then.;classic;
+A;300;anime-release-classic-4;Classics: level NOSTALGIA;Blockbuster;Man, do you feel old as all hell.;classic;
 A;10;anime-finished-10;Passed 10 Mark;The first step;Watched 10 anime. Congratulations, you broke the magical number. Take a breath now, it will only get more difficult.;finished;
 A;20;anime-finished-20;Passed 20 Mark;Casual watcher;Watched 20 anime. You're used to seeing character's eyes bigger than their nose. If they have any nose.;finished;
 A;30;anime-finished-30;Passed 30 Mark;A millionaire;Watched 30 anime. You DID buy all of them, right?;finished;
 A;40;anime-finished-40;Passed 40 Mark;Bragging rights;Watched 40 anime. That's... a lot. You can be proud of yourself, that's for sure.;finished;
-A;50;anime-finished-50;Passed 50 Mark;A lot of free time;Watched 50 anime. Now pause, take a breath and stretch a bit. Remember not to sit too close to the screen.;finished;
+A;50;anime-finished-50;The King: Passed 50 Mark;A lot of free time;Watched 50 anime. Now pause, take a breath and stretch a bit. Remember not to sit too close to the screen.;finished;
 A;60;anime-finished-60;Passed 60 Mark;Not Even My Final Form;Watched 60 anime. Your power level is way above others'. The only way is up.;finished;
 A;70;anime-finished-70;Passed 70 Mark;Gotta Watch Them All!;Watched 70 anime. You should already know what that picture means.;finished;
 A;80;anime-finished-80;Passed 80 Mark;The Collector;Watched 80 animes. No, wait. The plural of anime is anime.;finished;
 A;90;anime-finished-90;Passed 90 Mark;The Maniac;Watched 90 anime. Is this healthy? You should contact your doctor.;finished;
-A;100;anime-finished-100;Passed 100 Mark;The Legend;Watched 100 anime. You're one of the chosen ones. You don't even have to brag, since everyone heard about you.;finished;
-A;200;anime-finished-110;Passed 200 Mark;Database Breaker;Watched 200 anime. Are you having fun, breaking all the rules?;finished;
-A;300;anime-finished-120;Passed 300 Mark;This Is It;Watched 300 anime. There is no higher level. You can stop now. Everyone, go home.;finished;
-A;30;anime-game-1;Visual Novel: level 1;Eternal Spring;It all started one fateful morning in April...;visual-novel;
-A;75;anime-game-2;Visual Novel: level 2;At the Gates of Eden;You're so close to heaven, you can almost feel it.;visual-novel;
-A;150;anime-game-3;Visual Novel: level 3;Banquet of the Golden Witch;You've challenged her to a game. There is no turning back, now.;visual-novel;
-A;300;anime-game-4;Immersion: level MAX;Hacking to the Gate;All these games have made of you a wizard. You can crack any code without breaking a sweat.;visual-novel;
-A;30;anime-original-1;Original: level 1;Uncharted Waters;You have just stumbled across a wonderful, strange new world.;original;
-A;75;anime-original-2;Original: level 2;Into the Jungle;The deeper you go, the less you want out.;original;
-A;150;anime-original-3;Original: level 3;Center of the Earth;You have forgotten about the outside world, nature has assimilated you. An apple falls - not only have you flowered, you have produced fruit.;original;
-A;300;anime-original-4;Original: level MAX;Transcendence;You have been returned to the primordial ocean. From the highest point in the sky, you can peer into every universe, and lose yourself in an infinity of stories.;original;
-A;30;anime-release-classic-1;Classics: level 1;Cassette Tape;The first time you watched these, you didn't even know what they were.;classic;
-A;75;anime-release-classic-2;Classics: level 2;Solid Color;Bomber jackets, high-waisted jeans, an overload of patterns, and bishies everywhere.;classic;
-A;150;anime-release-classic-3;Classics: level 3;It's Raining... Tragic Backstories!;It might be the nostalgia lens, but you swear things had more substance back then.;classic;
-A;300;anime-release-classic-4;Nostalgia: level MAX;Blockbuster;Man, do you feel old as all hell.;classic;
-A;10;anime-release-old;Pre-1980 Anime;VHS Master Race;Watched 10 old anime. You overwrote my cartoons with The Karate Kid?! MOOOM!;old;
-A;3;anime-score-very-low;0/10. Play Next One;Less Than Three;Mean anime score lower than 3. Is it hate, or is it love?;score;
-A;5;anime-score-low;My Eyes! It Hurts!;Watching Anime Is Suffering;Mean anime score lower than 5. Someone has to counterweight the fanboys, right?;score;
-A;8;anime-score-high;10/10! EVERYTHING!;I Love Chinese Cartoons;Mean anime score higher than 8. How about using the whole scale and re-rating stuff? That could make you look less like a fanboy...;score;
+A;100;anime-finished-100;The Lord: Passed 100 Mark;The Legend;Watched 100 anime. You're one of the chosen ones. You don't even have to brag, since everyone heard about you.;finished;
+A;200;anime-finished-110; The Emperor: Passed 200 Mark;Database Breaker;Watched 200 anime. Are you having fun, breaking all the rules?;finished;
+A;300;anime-finished-120;The God: Passed 300 Mark;This Is It;Watched 300 anime. There is no higher level. You can stop now. Everyone, go home.;finished;
 A;30;anime-time-1;Time: level 1;Hair Antenna;Whose watch time are you calling puny?;time;
 A;75;anime-time-2;Time: level 2;Endurance Training;By doing a daily ten-episode run, you are sure to become a master in no time!;time;
 A;150;anime-time-3;Time: level 3;Consciousness Upload;Consuming the medium becomes a lot easier once you yourself are raw data.;time;
-A;300;anime-time-4;Youth: WASTED;Wicked Cultured;By making a deal with the devil, you have ensured access to even the most obscure of materials.;time;
+A;300;anime-time-4;Time: level WASTED YOUTH;Wicked Cultured;By making a deal with the devil, you have ensured access to even the most obscure of materials.;time;
+A;3;anime-score-very-low;0/10. Play Next One;Less Than Three;Mean anime score lower than 3. Is it hate, or is it love?;score;
+A;5;anime-score-low;My Eyes! It Hurts!;Watching Anime Is Suffering;Mean anime score lower than 5. Someone has to counterweight the fanboys, right?;score;
+A;8;anime-score-high;10/10! EVERYTHING!;I Love Chinese Cartoons;Mean anime score higher than 8. How about using the whole scale and re-rating stuff? That could make you look less like a fanboy...;score;
 A;10;anime-year;Tempus Fugit;Chronomaster;Your discerning eye has traveled across the aeons of animation.;year;
+A;10;anime-episode-long;Anime, That Is;I Like Them Long;Didn't fall asleep while watching long anime series. 100 episodes isn't a big deal to you.;long;
+A;10;anime-release-old;Pre-1980 Anime;VHS Master Race;Watched 10 old anime. You overwrote my cartoons with The Karate Kid?! MOOOM!;old;
