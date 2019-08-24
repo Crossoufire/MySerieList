@@ -2395,19 +2395,19 @@ def autocomplete_search_element(element_name, list_type):
             if "genre_ids" in data["results"][i]:
                 genre_ids = data["results"][i]["genre_ids"]
             else:
-                genre_ids = ["Unknow"]
+                genre_ids = ["Unknown"]
 
             # origin_country : list
             if "origin_country" in data["results"][i]:
                 origin_country = data["results"][i]["origin_country"]
             else:
-                origin_country = ["Unknow"]
+                origin_country = ["Unknown"]
 
             # original_language : string
             if "original_language" in data["results"][i]:
                 original_language = data["results"][i]["original_language"]
             else:
-                original_language = "Unknow"
+                original_language = "Unknown"
 
             # To not add anime in the series table, we need to check if it's an anime and if it comes from Japan
             if (16 in genre_ids and "JP" in origin_country) or (16 in genre_ids and original_language == "ja"):
@@ -2422,7 +2422,7 @@ def autocomplete_search_element(element_name, list_type):
             else:
                 series_data["poster_path"] = url_for('static', filename="series_covers/default.jpg")
 
-            if data["results"][i]["first_air_date"].split('-') != ['']:
+            if "first_air_date" in data["results"][i] and data["results"][i]["first_air_date"].split('-') != ['']:
                 series_data["first_air_date"] = data["results"][i]["first_air_date"].split('-')[0]
             else:
                 series_data["first_air_date"] = "Unknown"
@@ -2468,19 +2468,19 @@ def autocomplete_search_element(element_name, list_type):
             if "genre_ids" in data["results"][i]:
                 genre_ids = data["results"][i]["genre_ids"]
             else:
-                genre_ids = ["Unknow"]
+                genre_ids = ["Unknown"]
 
             # origin_country : list
             if "origin_country" in data["results"][i]:
                 origin_country = data["results"][i]["origin_country"]
             else:
-                origin_country = ["Unknow"]
+                origin_country = ["Unknown"]
 
             # original_language : string
             if "original_language" in data["results"][i]:
                 original_language = data["results"][i]["original_language"]
             else:
-                original_language = "Unknow"
+                original_language = "Unknown"
 
             # To add only animes in the anime table, we need to check if it's an anime and it comes from Japan
             if (16 in genre_ids and "JP" in origin_country) or (16 in genre_ids and original_language == "ja"):
@@ -2697,7 +2697,7 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         try:
             created_by = ', '.join(x['name'] for x in element_data['created_by'])
         except:
-            created_by = "Unknow"
+            created_by = "Unknown"
 
         try:
             episode_duration = element_data["episode_run_time"][0]
@@ -2710,7 +2710,7 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         try:
             origin_country = ", ".join(element_data["origin_country"])
         except:
-            origin_country = "Unknow"
+            origin_country = "Unknown"
 
         # Check if there is a special season, we do not want to take it into account
         seasons_data = []
@@ -2795,7 +2795,7 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         if list_type == ListType.SERIES:
             if len(genres_data) == 0:
                 genre = SeriesGenre(series_id=element.id,
-                                    genre="Unknow",
+                                    genre="Unknown",
                                     genre_id=0)
                 db.session.add(genre)
             else:
@@ -2828,7 +2828,7 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         # Add the different networks for each element
         if len(networks_data) == 0:
             network = SeriesNetwork(series_id=element.id,
-                                     network="Unknow")
+                                     network="Unknown")
             db.session.add(network)
         else:
             for network_data in networks_data:
@@ -2989,7 +2989,7 @@ def refresh_element_data(element_id, list_type):
     try:
         created_by = ', '.join(x['name'] for x in element_data['created_by'])
     except:
-        created_by = "Unknow"
+        created_by = "Unknown"
 
     try:
         episode_duration = element_data["episode_run_time"][0]
@@ -3002,7 +3002,7 @@ def refresh_element_data(element_id, list_type):
     try:
         origin_country = ", ".join(element_data["origin_country"])
     except:
-        origin_country = "Unknow"
+        origin_country = "Unknown"
 
     # Check if there is a special season, we do not want to take it into account
     seasons_data = []
