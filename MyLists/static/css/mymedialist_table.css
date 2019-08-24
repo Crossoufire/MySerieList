@@ -124,6 +124,18 @@ body.loading .modal_loading {
     display: none;
 }
 
+.seasons {
+	{% if target_user_id == current_user.get_id() %}
+	cursor: pointer;
+	{% endif %}
+    border-style: 1px;
+    border-color: black;
+    border-radius: 2px;
+    -moz-appearance:none;
+    -webkit-appearance:none;
+    appearance:none;
+}
+
 .episodes {
 	{% if target_user_id == current_user.get_id() %}
 	cursor: pointer;

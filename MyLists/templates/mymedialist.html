@@ -149,8 +149,6 @@
 					<a class="btn_right fas fa-ban text-light" onclick="delete_element('{{ data[0].id }}', 'card_{{ data[0].id }}', '{{ data[0].name }}')"></a>
 					{% if can_update["{}".format(data[0].id)] %}
 						<a class="btn_bottom_right fas fa-sync text-light" onclick="refresh('{{ data[0].id }}')"></a>
-					{% else %}
-						<a class="disabled btn_bottom_right fas fa-sync text-light"></a>
 					{% endif %}
 				{% endif %}
 				<a class="btn_bottom_left fas fa-caret-square-down" onclick="show_score('footer_{{ data[0].id }}', card_{{ data[0].id }})" style="z-index: 500;"></a>

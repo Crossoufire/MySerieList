@@ -10,16 +10,18 @@
 
 {% block content %}
 <div class="container p-0 mt-4">
-    <table id="hall_of_fame" class="table table-striped table-sm table-responsive-lg" cellspacing="0" width="100%">
+    <table id="hall_of_fame" class="table table-striped table-sm table-responsive-md">
         <thead>
             <tr>
-                <th></th>
-                <th class="th-sm">Username</th>
-                <th class="th-sm">Series Levels</th>
-                <th class="th-sm">Anime Levels</th>
-                <th class="th-sm">Books Levels</th>
-                <th class="th-sm">Knowledge Levels</th>
-                <th></th>
+                <th class="text-center"></th>
+                <th class="text-center">Username</th>
+                <th class="text-center">Series levels</th>
+                <th class="text-center">Series success</th>
+                <th class="text-center">Anime levels</th>
+                <th class="text-center">Anime success</th>
+                <th class="text-center">Books levels</th>
+                <th class="text-center">K levels</th>
+                <th class="text-center"></th>
             </tr>
         </thead>
         <tbody>
@@ -38,9 +40,13 @@
                     {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td>
+                </td>
+                <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico">
                     <br>
                     {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
+                </td>
+                <td>
                 </td>
                 <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico">
@@ -67,9 +73,13 @@
                     {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td class="current_user">
+                </td>
+                <td class="current_user">
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico">
                     <br>
                     {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
+                </td>
+                <td class="current_user">
                 </td>
                 <td class="current_user">
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico">
@@ -96,9 +106,13 @@
                     {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td>
+                </td>
+                <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico">
                     <br>
                     {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
+                </td>
+                <td>
                 </td>
                 <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico">
@@ -125,9 +139,13 @@
                     {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td>
+                </td>
+                <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.ico">
                     <br>
                     {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
+                </td>
+                <td>
                 </td>
                 <td>
                      <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.ico">
@@ -158,7 +176,7 @@
 {% block script %}
 <!--------- CDN Datatables ----------->
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>
-<script>
+<script type="text/javascript">
 function add_friend(username) {
     $body = $("body");
     $.ajax ({
@@ -173,12 +191,12 @@ function add_friend(username) {
     });
 }
 </script>
-<script>
+<script type="text/javascript">
 $(document).ready(function () {
     $('#hall_of_fame').DataTable({
-        "order": [[ 5, "desc" ], [ 1, "asc" ]],
+        "order": [[ 6, "desc" ], [ 1, "asc" ]],
         columnDefs: [{orderable: false, targets: 0},
-                     {orderable: false, targets: 6}],
+                     {orderable: false, targets: 8}],
     });
     $('.dataTables_length').addClass('bs-select');
 });

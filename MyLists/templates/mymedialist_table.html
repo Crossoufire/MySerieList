@@ -261,8 +261,6 @@
 					&nbsp &nbsp
 					{% if can_update["{}".format(data[0].id)] %}
 						<a class="fas fa-sync" onclick="refresh('{{ data[0].id }}')"></a>
-						{% else %}
-						<a class="disabled fas fa-sync"></a>
 						{% endif %}
 					&nbsp &nbsp
 					<a class="fas fa-ban" onclick="delete_element('{{ data[0].id }}', 'tr_{{ data[0].id }}')"></a>

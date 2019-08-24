@@ -77,7 +77,7 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(admin)
-
+    # add_achievements_to_db()
     refresh_db_achievements()
     db.session.commit()
 
@@ -1768,7 +1768,7 @@ def get_achievements(user_id, list_type):
         genre_id = ['13', '18', '19', '7', '22', '36', '29', '30', '40', '14', '9']
         media = "A"
     elif list_type == ListType.SERIES:
-        element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
+        element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre_id.distinct()),
                                         func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
                                         func.group_concat(SeriesEpisodesPerSeason.episodes)). \
                                         join(SeriesList, SeriesList.series_id == Series.id). \
@@ -1777,6 +1777,7 @@ def get_achievements(user_id, list_type):
                                         filter(SeriesList.user_id == user_id).group_by(Series.id).order_by(Series.name.asc())
         genre_id = ['9648', '10759', '35', '80', '99', '18', '10765']
         media = "S"
+
     def get_episodes_and_time(element):
         # Get episodes per season
         nb_season = len(element[3].split(","))
@@ -1802,107 +1803,110 @@ def get_achievements(user_id, list_type):
     element_name_1, element_name_2, element_name_3, element_name_4, element_name_5, element_name_6, element_name_7, \
     element_name_8, element_name_9, element_name_10, element_name_11 = [[] for _ in range(11)]
     for element in element_data:
-        # Get the genre in a list
-        genres = element[2].split(',')
+        if element[1].status != Status.PLAN_TO_WATCH and element[1].status != Status.RANDOM:
+            # Get the genre in a list
+            genres = element[2].split(',')
 
-        if list_type == ListType.ANIME:
-            try:
-                if '13' in genres:
-                    element_count_1 += 1
-                    element_episodes_1 += get_episodes_and_time(element)[0]
-                    element_time_1 += get_episodes_and_time(element)[1]
-                    element_name_1.append(element[0].name)
-                if '18' in genres:
-                    element_count_2 += 1
-                    element_episodes_2 += get_episodes_and_time(element)[0]
-                    element_time_2 += get_episodes_and_time(element)[1]
-                    element_name_2.append(element[0].name)
-                if '19' in genres:
-                    element_count_3 += 1
-                    element_episodes_3 += get_episodes_and_time(element)[0]
-                    element_time_3 += get_episodes_and_time(element)[1]
-                    element_name_3.append(element[0].name)
-                if '7' in genres:
-                    element_count_4 += 1
-                    element_episodes_4 += get_episodes_and_time(element)[0]
-                    element_time_4 += get_episodes_and_time(element)[1]
-                    element_name_4.append(element[0].name)
-                if '22' in genres:
-                    element_count_5 += 1
-                    element_episodes_5 += get_episodes_and_time(element)[0]
-                    element_time_5 += get_episodes_and_time(element)[1]
-                    element_name_5.append(element[0].name)
-                if '36' in genres:
-                    element_count_6 += 1
-                    element_episodes_6 += get_episodes_and_time(element)[0]
-                    element_time_6 += get_episodes_and_time(element)[1]
-                    element_name_6.append(element[0].name)
-                if '29' in genres:
-                    element_count_7 += 1
-                    element_episodes_7 += get_episodes_and_time(element)[0]
-                    element_time_7 += get_episodes_and_time(element)[1]
-                    element_name_7.append(element[0].name)
-                if '30' in genres:
-                    element_count_8 += 1
-                    element_episodes_8 += get_episodes_and_time(element)[0]
-                    element_time_8 += get_episodes_and_time(element)[1]
-                    element_name_8.append(element[0].name)
-                if '40' in genres:
-                    element_count_9 += 1
-                    element_episodes_9 += get_episodes_and_time(element)[0]
-                    element_time_9 += get_episodes_and_time(element)[1]
-                    element_name_9.append(element[0].name)
-                if '14' in genres:
-                    element_count_10 += 1
-                    element_episodes_10 += get_episodes_and_time(element)[0]
-                    element_time_10 += get_episodes_and_time(element)[1]
-                    element_name_10.append(element[0].name)
-                if '9' in genres:
-                    element_count_11 += 1
-                    element_episodes_11 += get_episodes_and_time(element)[0]
-                    element_time_11 += get_episodes_and_time(element)[1]
-                    element_name_11.append(element[0].name)
-            except:
-                pass
-        elif list_type == ListType.SERIES:
-            try:
-                if '9648' in genres:
-                    element_count_1 += 1
-                    element_episodes_1 += get_episodes_and_time(element)[0]
-                    element_time_1 += get_episodes_and_time(element)[1]
-                    element_name_1.append(element[0].name)
-                if '10759' in genres:
-                    element_count_2 += 1
-                    element_episodes_2 += get_episodes_and_time(element)[0]
-                    element_time_2 += get_episodes_and_time(element)[1]
-                    element_name_2.append(element[0].name)
-                if '35' in genres:
-                    element_count_3 += 1
-                    element_episodes_3 += get_episodes_and_time(element)[0]
-                    element_time_3 += get_episodes_and_time(element)[1]
-                    element_name_3.append(element[0].name)
-                if '80' in genres:
-                    element_count_4 += 1
-                    element_episodes_4 += get_episodes_and_time(element)[0]
-                    element_time_4 += get_episodes_and_time(element)[1]
-                    element_name_4.append(element[0].name)
-                if '99' in genres:
-                    element_count_5 += 1
-                    element_episodes_5 += get_episodes_and_time(element)[0]
-                    element_time_5 += get_episodes_and_time(element)[1]
-                    element_name_5.append(element[0].name)
-                if '18' in genres:
-                    element_count_6 += 1
-                    element_episodes_6 += get_episodes_and_time(element)[0]
-                    element_time_6 += get_episodes_and_time(element)[1]
-                    element_name_6.append(element[0].name)
-                if '10765' in genres:
-                    element_count_7 += 1
-                    element_episodes_7 += get_episodes_and_time(element)[0]
-                    element_time_7 += get_episodes_and_time(element)[1]
-                    element_name_7.append(element[0].name)
-            except:
-                pass
+            if list_type == ListType.ANIME:
+                try:
+                    if '13' in genres:
+                        element_count_1 += 1
+                        element_episodes_1 += get_episodes_and_time(element)[0]
+                        element_time_1 += get_episodes_and_time(element)[1]
+                        element_name_1.append(element[0].name)
+                    if '18' in genres:
+                        element_count_2 += 1
+                        element_episodes_2 += get_episodes_and_time(element)[0]
+                        element_time_2 += get_episodes_and_time(element)[1]
+                        element_name_2.append(element[0].name)
+                    if '19' in genres:
+                        element_count_3 += 1
+                        element_episodes_3 += get_episodes_and_time(element)[0]
+                        element_time_3 += get_episodes_and_time(element)[1]
+                        element_name_3.append(element[0].name)
+                    if '7' in genres:
+                        element_count_4 += 1
+                        element_episodes_4 += get_episodes_and_time(element)[0]
+                        element_time_4 += get_episodes_and_time(element)[1]
+                        element_name_4.append(element[0].name)
+                    if '22' in genres:
+                        element_count_5 += 1
+                        element_episodes_5 += get_episodes_and_time(element)[0]
+                        element_time_5 += get_episodes_and_time(element)[1]
+                        element_name_5.append(element[0].name)
+                    if '36' in genres:
+                        element_count_6 += 1
+                        element_episodes_6 += get_episodes_and_time(element)[0]
+                        element_time_6 += get_episodes_and_time(element)[1]
+                        element_name_6.append(element[0].name)
+                    if '29' in genres:
+                        element_count_7 += 1
+                        element_episodes_7 += get_episodes_and_time(element)[0]
+                        element_time_7 += get_episodes_and_time(element)[1]
+                        element_name_7.append(element[0].name)
+                    if '30' in genres:
+                        element_count_8 += 1
+                        element_episodes_8 += get_episodes_and_time(element)[0]
+                        element_time_8 += get_episodes_and_time(element)[1]
+                        element_name_8.append(element[0].name)
+                    if '40' in genres:
+                        element_count_9 += 1
+                        element_episodes_9 += get_episodes_and_time(element)[0]
+                        element_time_9 += get_episodes_and_time(element)[1]
+                        element_name_9.append(element[0].name)
+                    if '14' in genres:
+                        element_count_10 += 1
+                        element_episodes_10 += get_episodes_and_time(element)[0]
+                        element_time_10 += get_episodes_and_time(element)[1]
+                        element_name_10.append(element[0].name)
+                    if '9' in genres:
+                        element_count_11 += 1
+                        element_episodes_11 += get_episodes_and_time(element)[0]
+                        element_time_11 += get_episodes_and_time(element)[1]
+                        element_name_11.append(element[0].name)
+                except:
+                    pass
+            elif list_type == ListType.SERIES:
+                try:
+                    if '9648' in genres:
+                        element_count_1 += 1
+                        element_episodes_1 += get_episodes_and_time(element)[0]
+                        element_time_1 += get_episodes_and_time(element)[1]
+                        element_name_1.append(element[0].name)
+                    if '10759' in genres:
+                        element_count_2 += 1
+                        element_episodes_2 += get_episodes_and_time(element)[0]
+                        element_time_2 += get_episodes_and_time(element)[1]
+                        element_name_2.append(element[0].name)
+                    if '35' in genres:
+                        element_count_3 += 1
+                        element_episodes_3 += get_episodes_and_time(element)[0]
+                        element_time_3 += get_episodes_and_time(element)[1]
+                        element_name_3.append(element[0].name)
+                    if '80' in genres:
+                        element_count_4 += 1
+                        element_episodes_4 += get_episodes_and_time(element)[0]
+                        element_time_4 += get_episodes_and_time(element)[1]
+                        element_name_4.append(element[0].name)
+                    if '99' in genres:
+                        element_count_5 += 1
+                        element_episodes_5 += get_episodes_and_time(element)[0]
+                        element_time_5 += get_episodes_and_time(element)[1]
+                        element_name_5.append(element[0].name)
+                    if '18' in genres:
+                        element_count_6 += 1
+                        element_episodes_6 += get_episodes_and_time(element)[0]
+                        element_time_6 += get_episodes_and_time(element)[1]
+                        element_name_6.append(element[0].name)
+                    if '10765' in genres:
+                        element_count_7 += 1
+                        element_episodes_7 += get_episodes_and_time(element)[0]
+                        element_time_7 += get_episodes_and_time(element)[1]
+                        element_name_7.append(element[0].name)
+                except:
+                    pass
+        else:
+            pass
 
     time_list = [element_time_1, element_time_2, element_time_3, element_time_4, element_time_5, element_time_6,
                  element_time_7, element_time_8, element_time_9, element_time_10, element_time_11]
@@ -1946,8 +1950,8 @@ def get_achievements(user_id, list_type):
     element_name = []
     for element in element_data:
         first_year = int(element[0].first_air_date.split('-')[0])
-        last_year = int(element[0].last_air_date.split('-')[0])
-        if first_year >= 1981 and last_year <= 2000 and element[1].status != Status.PLAN_TO_WATCH:
+
+        if 1990 <= first_year <= 2000 and element[1].status != Status.PLAN_TO_WATCH:
             element_count += 1
             element_episodes += get_episodes_and_time(element)[0]
             element_time += get_episodes_and_time(element)[1]
@@ -2193,6 +2197,7 @@ def get_achievements(user_id, list_type):
 
 
 def compute_media_time_spent(list_type):
+    user = User.query.filter_by(id=current_user.get_id()).first()
     if list_type == ListType.ANIME:
         element_data = db.session.query(AnimeList, Anime,
                                 func.group_concat(AnimeEpisodesPerSeason.episodes)). \
@@ -2234,6 +2239,7 @@ def compute_media_time_spent(list_type):
 
 
 def compute_book_time_spent():
+    user = User.query.filter_by(id=current_user.get_id()).first()
     books_data = db.session.query(Book, BookList).join(BookList, BookList.book_id == Book.id).\
                                  filter(BookList.user_id == current_user.id).\
                                  group_by(BookList.book_id)
@@ -2578,6 +2584,8 @@ def add_element(element_id, list_type):
                 except:
                     element_cover_path = None
 
+        print(element_cover_path)
+
         element_cover_id = save_api_cover(element_cover_path, list_type)
 
         if element_cover_id is None:
@@ -2621,7 +2629,8 @@ def get_element_data_from_api(api_id, list_type):
 def save_api_cover(element_cover_path, list_type):
     if element_cover_path is None:
         return "default.jpg"
-        element_cover_id = "{}.jpg".format(secrets.token_hex(8))
+
+    element_cover_id = "{}.jpg".format(secrets.token_hex(8))
 
     if list_type == ListType.SERIES:
         if platform.system() == "Windows":
@@ -2641,13 +2650,13 @@ def save_api_cover(element_cover_path, list_type):
 
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
         try:
-            urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(element_cover_path),
-                                       "{0}{1}".format(local_covers_path, element_cover_id))
+            urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(element_cover_path),
+                                       "{}{}".format(local_covers_path, element_cover_id))
         except:
             return None
     elif list_type == ListType.BOOK:
         try:
-            urllib.request.urlretrieve("{0}".format(element_cover_path), "{0}{1}".format(local_covers_path, element_cover_id))
+            urllib.request.urlretrieve("{}".format(element_cover_path), "{}{}".format(local_covers_path, element_cover_id))
         except:
             return None
 
@@ -2722,9 +2731,11 @@ def add_element_in_base(element_data, element_cover_id, list_type):
                     pass
 
         genres_data = []
+        genres_id = []
         for i in range(len(element_data["genres"])):
             try:
                 genres_data.append(element_data["genres"][i]["name"])
+                genres_id.append(int(element_data["genres"][i]["id"]))
             except:
                 pass
 
@@ -2784,12 +2795,14 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         if list_type == ListType.SERIES:
             if len(genres_data) == 0:
                 genre = SeriesGenre(series_id=element.id,
-                                    genre="Unknow")
+                                    genre="Unknow",
+                                    genre_id=0)
                 db.session.add(genre)
             else:
-                for genre_data in genres_data:
+                for i in range(0, len(genres_data)):
                     genre = SeriesGenre(series_id=element.id,
-                                        genre=genre_data)
+                                        genre=genres_data[i],
+                                        genre_id=genres_id[i])
                     db.session.add(genre)
         elif list_type == ListType.ANIME:
             try:
@@ -3185,10 +3198,11 @@ def send_email_update_email(user):
 
 def add_achievements_to_db():
     list_all_achievements = []
-    path = os.path.join(app.root_path, 'static/achievements/anime_achievements.csv')
+    path = os.path.join(app.root_path, 'static/achievements/achievements.csv')
     with open(path, "r") as fp:
         for line in fp:
             list_all_achievements.append(line.split(";"))
+
     for i in range(1, len(list_all_achievements)):
         try:
             genre = int(list_all_achievements[i][7])
@@ -3207,18 +3221,17 @@ def add_achievements_to_db():
 
 def refresh_db_achievements():
     list_all_achievements = []
-    path = os.path.join(app.root_path, 'static/achievements/anime_achievements.csv')
+    path = os.path.join(app.root_path, 'static/achievements/achievements.csv')
     with open(path, "r") as fp:
         for line in fp:
             list_all_achievements.append(line.split(";"))
 
-    achievements = Achievements.query.filter_by(media="A").all()
+    achievements = Achievements.query.order_by(Achievements.id).all()
     for i in range(1, len(list_all_achievements)):
         try:
             genre = int(list_all_achievements[i][7])
         except:
             genre = None
-
         achievements[i-1].media       = list_all_achievements[i][0]
         achievements[i-1].threshold   = int(list_all_achievements[i][1])
         achievements[i-1].image_id    = list_all_achievements[i][2]

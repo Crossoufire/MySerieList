@@ -129,6 +129,7 @@ class SeriesGenre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
+    genre_id = db.Column(db.Integer, nullable=False)
 
 
 class SeriesNetwork(db.Model):

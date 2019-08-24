@@ -242,7 +242,7 @@ hr {
         position: absolute;
         bottom: 10px;
         right: 10px;
-        opacity: 0;
+        opacity: 0.8;
     }
     .font-mask {
         font-size: 12pt;
