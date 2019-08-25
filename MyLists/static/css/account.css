@@ -54,8 +54,17 @@
 }
 
 .block {
+    height: 30px;
+    color: #fff;
+    float: left;
+    background-color: #334D5C;
+}
+
+.block_no_data {
+    height: 30px;
+    color: #fff;
+    float: left;
     background-color: black;
-    border: solid 1px #717171;
 }
 
 .block:nth-of-type(2) {
@@ -73,9 +82,11 @@
 .block:nth-of-type(6) {
 	background-color: #962D3E;
 }
+
 .block:hover {
 	opacity: 0.75;
 }
+
 .col-centered{
     float: none;
     margin: 0 auto;
@@ -107,13 +118,6 @@
 
 .mini {
     min-width: 105px;
-}
-
-.block {
-    height: 30px;
-    color: #fff;
-    float: left;
-    background-color: #334D5C;
 }
 
 /* On screens that are 768px or less */
@@ -162,12 +166,18 @@
 	    background-color: #334D5C;
     }
 
+    .block_no_data {
+        height: 25px;
+        color: #fff;
+        float: left;
+        background-color: black;
+    }
+
     .position {
         text-align: right;
     }
 }
 
-<!---- level + badge + total level ---->
 .account-bar-wrapper {
     width: 350px;
 }

@@ -77,8 +77,8 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(admin)
-    # add_achievements_to_db()
     refresh_db_achievements()
+
     db.session.commit()
 
 
@@ -1699,7 +1699,7 @@ def get_mean_score(user_id, list_type):
 
 def get_level_and_grade(total_time_min):
     # Compute the corresponding level using the quadratic equation
-    element_level_tmp = "{:.2f}".format(round((((625+100*(total_time_min))**(1/2))-25)/50, 2))
+    element_level_tmp = "{:.2f}".format(round((((400+80*(total_time_min))**(1/2))-20)/40, 2))
     element_level = element_level_tmp.split('.')
     element_level[0] = int(element_level[0])
 
@@ -1712,6 +1712,8 @@ def get_level_and_grade(total_time_min):
     with open(path, 'r') as fp:
         for line in fp:
             list_all_levels_ranks.append(line.split(";"))
+
+    list_all_levels_ranks.pop(0)
 
     user_level_rank = []
     # Check if the user has a level greater than 125

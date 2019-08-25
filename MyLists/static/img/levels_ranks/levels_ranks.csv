@@ -1,126 +1,151 @@
-0;000;Recruit;Recruit
-1;100;Recruit;Recruit
-2;300;Recruit;Recruit
-3;600;Recruit;Recruit
-4;1000;Apprentice;Apprentice
-5;1500;Apprentice;Apprentice
-6;2100;Apprentice;Apprentice
-7;2800;Apprentice_Grade_2;Apprentice Grade 2
-8;3600;Apprentice_Grade_2;Apprentice Grade 2
-9;4500;Apprentice_Grade_2;Apprentice Grade 2
-10;5500;Private;Private
-11;6600;Private;Private
-12;7800;Private;Private
-13;9100;Private_Grade_2;Private Grade 2
-14;10500;Private_Grade_2;Private Grade 2
-15;12000;Private_Grade_2;Private Grade 2
-16;13600;Corporal;Corporal
-17;15300;Corporal;Corporal
-18;17100;Corporal;Corporal
-19;19000;Corporal_Grade_2;Corporal Grade 2
-20;21000;Corporal_Grade_2;Corporal Grade 2
-21;23100;Corporal_Grade_2;Corporal Grade 2
-22;25300;Sergeant;Sergeant
-23;27600;Sergeant;Sergeant
-24;30000;Sergeant;Sergeant
-25;32500;Sergeant_Grade_2;Sergeant Grade 2
-26;35100;Sergeant_Grade_2;Sergeant Grade 2
-27;37800;Sergeant_Grade_2;Sergeant Grade 2
-28;40600;Sergeant_Grade_3;Sergeant Grade 3
-29;43500;Sergeant_Grade_3;Sergeant Grade 3
-30;46500;Sergeant_Grade_3;Sergeant Grade 3
-31;49600;Gunnery_Sergeant;Gunnery Sergeant
-32;52800;Gunnery_Sergeant;Gunnery Sergeant
-33;56100;Gunnery_Sergeant;Gunnery Sergeant
-34;59500;Gunnery_Sergeant_Grade_2;Gunnery Sergeant Grade 2
-35;63000;Gunnery_Sergeant_Grade_2;Gunnery Sergeant Grade 2
-36;66600;Gunnery_Sergeant_Grade_2;Gunnery Sergeant Grade 2
-37;70300;Gunnery_Sergeant_Grade_3;Gunnery Sergeant Grade 3
-38;74100;Gunnery_Sergeant_Grade_3;Gunnery Sergeant Grade 3
-39;78000;Gunnery_Sergeant_Grade_3;Gunnery Sergeant Grade 3
-40;82000;Gunnery_Sergeant_Grade_4;Gunnery Sergeant Grade 4
-41;86100;Gunnery_Sergeant_Grade_4;Gunnery Sergeant Grade 4
-42;90300;Gunnery_Sergeant_Grade_4;Gunnery Sergeant Grade 4
-43;94600;Lieutenant;Lieutenant
-44;99000;Lieutenant;Lieutenant
-45;103500;Lieutenant;Lieutenant
-46;108100;Lieutenant_Grade_2;Lieutenant Grade 2
-47;112800;Lieutenant_Grade_2;Lieutenant Grade 2
-48;117600;Lieutenant_Grade_2;Lieutenant Grade 2
-49;122500;Lieutenant_Grade_3;Lieutenant Grade 3
-50;127500;Lieutenant_Grade_3;Lieutenant Grade 3
-51;132600;Lieutenant_Grade_3;Lieutenant Grade 3
-52;137800;Lieutenant_Grade_4;Lieutenant Grade 4
-53;143100;Lieutenant_Grade_4;Lieutenant Grade 4
-54;148500;Lieutenant_Grade_4;Lieutenant Grade 4
-55;154000;Captain;Captain
-56;159600;Captain;Captain
-57;165300;Captain;Captain
-58;171100;Captain_Grade_2;Captain Grade 2
-59;177000;Captain_Grade_2;Captain Grade 2
-60;183000;Captain_Grade_2;Captain Grade 2
-61;189100;Captain_Grade_3;Captain Grade 3
-62;195300;Captain_Grade_3;Captain Grade 3
-63;201600;Captain_Grade_3;Captain Grade 3
-64;208000;Captain_Grade_4;Captain Grade 4
-65;214500;Captain_Grade_4;Captain Grade 4
-66;221100;Captain_Grade_4;Captain Grade 4
-67;227800;Major;Major
-68;234600;Major;Major
-69;241500;Major;Major
-70;248500;Major_Grade_2;Major Grade 2
-71;255600;Major_Grade_2;Major Grade 2
-72;262800;Major_Grade_2;Major Grade 2
-73;270100;Major_Grade_3;Major Grade 3
-74;277500;Major_Grade_3;Major Grade 3
-75;285000;Major_Grade_3;Major Grade 3
-76;292600;Major_Grade_4;Major Grade 4
-77;300300;Major_Grade_4;Major Grade 4
-78;308100;Major_Grade_4;Major Grade 4
-79;316000;Commander;Commander
-80;324000;Commander;Commander
-81;332100;Commander;Commander
-82;340300;Commander_Grade_2;Commander Grade 2
-83;348600;Commander_Grade_2;Commander Grade 2
-84;357000;Commander_Grade_2;Commander Grade 2
-85;365500;Commander_Grade_3;Commander Grade 3
-86;374100;Commander_Grade_3;Commander Grade 3
-87;382800;Commander_Grade_3;Commander Grade 3
-88;391600;Commander_Grade_4;Commander Grade 4
-89;400500;Commander_Grade_4;Commander Grade 4
-90;409500;Commander_Grade_4;Commander Grade 4
-91;418600;Colonel;Colonel
-92;427800;Colonel;Colonel
-93;437100;Colonel;Colonel
-94;446500;Colonel_Grade_2;Colonel Grade 2
-95;456000;Colonel_Grade_2;Colonel Grade 2
-96;465600;Colonel_Grade_2;Colonel Grade 2
-97;475300;Colonel_Grade_3;Colonel Grade 3
-98;485100;Colonel_Grade_3;Colonel Grade 3
-99;495000;Colonel_Grade_3;Colonel Grade 3
-100;505000;Colonel_Grade_4;Colonel Grade 4
-101;515100;Colonel_Grade_4;Colonel Grade 4
-102;525300;Colonel_Grade_4;Colonel Grade 4
-103;535600;Brigadier;Brigadier
-104;546000;Brigadier;Brigadier
-105;556500;Brigadier;Brigadier
-106;567100;Brigadier_Grade_2;Brigadier Grade 2
-107;577800;Brigadier_Grade_2;Brigadier Grade 2
-108;588600;Brigadier_Grade_2;Brigadier Grade 2
-109;599500;Brigadier_Grade_3;Brigadier Grade 3
-110;610500;Brigadier_Grade_3;Brigadier Grade 3
-111;621600;Brigadier_Grade_3;Brigadier Grade 3
-112;632800;Brigadier_Grade_4;Brigadier Grade 4
-113;644100;Brigadier_Grade_4;Brigadier Grade 4
-114;655500;Brigadier_Grade_4;Brigadier Grade 4
-115;667000;General;General
-116;678600;General;General
-117;690300;General;General
-118;702100;General_Grade_2;General Grade 2
-119;714000;General_Grade_2;General Grade 2
-120;726000;General_Grade_2;General Grade 2
-121;738100;General_Grade_3;General Grade 3
-122;750300;General_Grade_3;General Grade 3
-123;762600;General_Grade_3;General Grade 3
-124;775000;General_Grade_4;General Grade 4
-125;787500;General_Grade_4;General Grade 4
+Level;XP;Image_id;Name
+0;0;ReachRank0;Recruit
+1;40;ReachRank0;Recruit
+2;120;ReachRank0;Recruit
+3;240;ReachRank1;Private
+4;400;ReachRank1;Private
+5;600;ReachRank1;Private
+6;840;ReachRank2;Corporal
+7;1120;ReachRank2;Corporal
+8;1440;ReachRank2;Corporal
+9;1800;ReachRank3;Corporal Grade 2
+10;2200;ReachRank3;Corporal Grade 2
+11;2640;ReachRank3;Corporal Grade 2
+12;3120;ReachRank4;Seargent
+13;3640;ReachRank4;Seargent
+14;4200;ReachRank4;Seargent
+15;4800;ReachRank5;Seargent Grade 2
+16;5440;ReachRank5;Seargent Grade 2
+17;6120;ReachRank5;Seargent Grade 2
+18;6840;ReachRank6;Seargent Grade 3
+19;7600;ReachRank6;Seargent Grade 3
+20;8400;ReachRank6;Seargent Grade 3
+21;9240;ReachRank7;Warrant Officer
+22;10120;ReachRank7;Warrant Officer
+23;11040;ReachRank7;Warrant Officer
+24;12000;ReachRank8;Warrant Officer Grade 2
+25;13000;ReachRank8;Warrant Officer Grade 2
+26;14040;ReachRank8;Warrant Officer Grade 2
+27;15120;ReachRank9;Warrant Officer Grade 3
+28;16240;ReachRank9;Warrant Officer Grade 3
+29;17400;ReachRank9;Warrant Officer Grade 3
+30;18600;ReachRank10;Warrant Officer Grade 4
+31;19840;ReachRank10;Warrant Officer Grade 4
+32;21120;ReachRank10;Warrant Officer Grade 4
+33;22440;ReachRank11;Captain
+34;23800;ReachRank11;Captain
+35;25200;ReachRank11;Captain
+36;26640;ReachRank12;Captain Grade 2
+37;28120;ReachRank12;Captain Grade 2
+38;29640;ReachRank12;Captain Grade 2
+39;31200;ReachRank13;Captain Grade 3
+40;32800;ReachRank13;Captain Grade 3
+41;34440;ReachRank13;Captain Grade 3
+42;36120;ReachRank14;Captain Grade 4
+43;37840;ReachRank14;Captain Grade 4
+44;39600;ReachRank14;Captain Grade 4
+45;41400;ReachRank15;Major
+46;43240;ReachRank15;Major
+47;45120;ReachRank15;Major
+48;47040;ReachRank16;Major Grade 2
+49;49000;ReachRank16;Major Grade 2
+50;51000;ReachRank16;Major Grade 2
+51;53040;ReachRank17;Major Grade 3
+52;55120;ReachRank17;Major Grade 3
+53;57240;ReachRank17;Major Grade 3
+54;59400;ReachRank18;Major Grade 4
+55;61600;ReachRank18;Major Grade 4
+56;63840;ReachRank18;Major Grade 4
+57;66120;ReachRank19;Lt. Colonel
+58;68440;ReachRank19;Lt. Colonel
+59;70800;ReachRank19;Lt. Colonel
+60;73200;ReachRank20;Lt. Colonel Grade 2
+61;75640;ReachRank20;Lt. Colonel Grade 2
+62;78120;ReachRank20;Lt. Colonel Grade 2
+63;80640;ReachRank21;Lt. Colonel Grade 3
+64;83200;ReachRank21;Lt. Colonel Grade 3
+65;85800;ReachRank21;Lt. Colonel Grade 3
+66;88440;ReachRank22;Lt. Colonel Grade 4
+67;91120;ReachRank22;Lt. Colonel Grade 4
+68;93840;ReachRank22;Lt. Colonel Grade 4
+69;96600;ReachRank23;Commander
+70;99400;ReachRank23;Commander
+71;102240;ReachRank23;Commander
+72;105120;ReachRank24;Commander Grade 2
+73;108040;ReachRank24;Commander Grade 2
+74;111000;ReachRank24;Commander Grade 2
+75;114000;ReachRank25;Commander Grade 3
+76;117040;ReachRank25;Commander Grade 3
+77;120120;ReachRank25;Commander Grade 3
+78;123240;ReachRank26;Commander Grade 4
+79;126400;ReachRank26;Commander Grade 4
+80;129600;ReachRank26;Commander Grade 4
+81;132840;ReachRank27;Colonel
+82;136120;ReachRank27;Colonel
+83;139440;ReachRank27;Colonel
+84;142800;ReachRank28;Colonel Grade 2
+85;146200;ReachRank28;Colonel Grade 2
+86;149640;ReachRank28;Colonel Grade 2
+87;153120;ReachRank29;Colonel Grade 3
+88;156640;ReachRank29;Colonel Grade 3
+89;160200;ReachRank29;Colonel Grade 3
+90;163800;ReachRank30;Colonel Grade 4
+91;167440;ReachRank30;Colonel Grade 4
+92;171120;ReachRank30;Colonel Grade 4
+93;174840;ReachRank31;Brigadier
+94;178600;ReachRank31;Brigadier
+95;182400;ReachRank31;Brigadier
+96;186240;ReachRank32;Brigadier Grade 2
+97;190120;ReachRank32;Brigadier Grade 2
+98;194040;ReachRank32;Brigadier Grade 2
+99;198000;ReachRank33;Brigadier Grade 3
+100;202000;ReachRank33;Brigadier Grade 3
+101;206040;ReachRank33;Brigadier Grade 3
+102;210120;ReachRank34;Brigadier Grade 4
+103;214240;ReachRank34;Brigadier Grade 4
+104;218400;ReachRank34;Brigadier Grade 4
+105;222600;ReachRank35;General 
+106;226840;ReachRank35;General 
+107;231120;ReachRank35;General 
+108;235440;ReachRank36;General Grade 2
+109;239800;ReachRank36;General Grade 2
+110;244200;ReachRank36;General Grade 2
+111;248640;ReachRank37;General Grade 3
+112;253120;ReachRank37;General Grade 3
+113;257640;ReachRank37;General Grade 3
+114;262200;ReachRank38;General Grade 4
+115;266800;ReachRank38;General Grade 4
+116;271440;ReachRank38;General Grade 4
+117;276120;ReachRank39;General Grade 5
+118;280840;ReachRank39;General Grade 5
+119;285600;ReachRank39;General Grade 5
+120;290400;ReachRank40;Field Marshall
+121;295240;ReachRank40;Field Marshall
+122;300120;ReachRank40;Field Marshall
+123;305040;ReachRank41;Hero
+124;310000;ReachRank41;Hero
+125;315000;ReachRank41;Hero
+126;320040;ReachRank42;Legend
+127;325120;ReachRank42;Legend
+128;330240;ReachRank42;Legend
+129;335400;ReachRank43;Mythic
+130;340600;ReachRank43;Mythic
+131;345840;ReachRank43;Mythic
+132;351120;ReachRank44;Noble
+133;356440;ReachRank44;Noble
+134;361800;ReachRank44;Noble
+135;367200;ReachRank45;Eclipse
+136;372640;ReachRank45;Eclipse
+137;378120;ReachRank45;Eclipse
+138;383640;ReachRank46;Nova
+139;389200;ReachRank46;Nova
+140;394800;ReachRank46;Nova
+141;400440;ReachRank47;Forerunner
+142;406120;ReachRank47;Forerunner
+143;411840;ReachRank47;Forerunner
+144;417600;ReachRank48;Reclaimer
+145;423400;ReachRank48;Reclaimer
+146;429240;ReachRank48;Reclaimer
+147;435120;ReachRank49;Inheritor
+148;441040;ReachRank49;Inheritor
+149;447000;ReachRank49;Inheritor

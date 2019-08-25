@@ -1,0 +1,126 @@
+0;000;Recruit;Recruit
+1;100;Recruit;Recruit
+2;300;Recruit;Recruit
+3;600;Recruit;Recruit
+4;1000;Apprentice;Apprentice
+5;1500;Apprentice;Apprentice
+6;2100;Apprentice;Apprentice
+7;2800;Apprentice_Grade_2;Apprentice Grade 2
+8;3600;Apprentice_Grade_2;Apprentice Grade 2
+9;4500;Apprentice_Grade_2;Apprentice Grade 2
+10;5500;Private;Private
+11;6600;Private;Private
+12;7800;Private;Private
+13;9100;Private_Grade_2;Private Grade 2
+14;10500;Private_Grade_2;Private Grade 2
+15;12000;Private_Grade_2;Private Grade 2
+16;13600;Corporal;Corporal
+17;15300;Corporal;Corporal
+18;17100;Corporal;Corporal
+19;19000;Corporal_Grade_2;Corporal Grade 2
+20;21000;Corporal_Grade_2;Corporal Grade 2
+21;23100;Corporal_Grade_2;Corporal Grade 2
+22;25300;Sergeant;Sergeant
+23;27600;Sergeant;Sergeant
+24;30000;Sergeant;Sergeant
+25;32500;Sergeant_Grade_2;Sergeant Grade 2
+26;35100;Sergeant_Grade_2;Sergeant Grade 2
+27;37800;Sergeant_Grade_2;Sergeant Grade 2
+28;40600;Sergeant_Grade_3;Sergeant Grade 3
+29;43500;Sergeant_Grade_3;Sergeant Grade 3
+30;46500;Sergeant_Grade_3;Sergeant Grade 3
+31;49600;Gunnery_Sergeant;Gunnery Sergeant
+32;52800;Gunnery_Sergeant;Gunnery Sergeant
+33;56100;Gunnery_Sergeant;Gunnery Sergeant
+34;59500;Gunnery_Sergeant_Grade_2;Gunnery Sergeant Grade 2
+35;63000;Gunnery_Sergeant_Grade_2;Gunnery Sergeant Grade 2
+36;66600;Gunnery_Sergeant_Grade_2;Gunnery Sergeant Grade 2
+37;70300;Gunnery_Sergeant_Grade_3;Gunnery Sergeant Grade 3
+38;74100;Gunnery_Sergeant_Grade_3;Gunnery Sergeant Grade 3
+39;78000;Gunnery_Sergeant_Grade_3;Gunnery Sergeant Grade 3
+40;82000;Gunnery_Sergeant_Grade_4;Gunnery Sergeant Grade 4
+41;86100;Gunnery_Sergeant_Grade_4;Gunnery Sergeant Grade 4
+42;90300;Gunnery_Sergeant_Grade_4;Gunnery Sergeant Grade 4
+43;94600;Lieutenant;Lieutenant
+44;99000;Lieutenant;Lieutenant
+45;103500;Lieutenant;Lieutenant
+46;108100;Lieutenant_Grade_2;Lieutenant Grade 2
+47;112800;Lieutenant_Grade_2;Lieutenant Grade 2
+48;117600;Lieutenant_Grade_2;Lieutenant Grade 2
+49;122500;Lieutenant_Grade_3;Lieutenant Grade 3
+50;127500;Lieutenant_Grade_3;Lieutenant Grade 3
+51;132600;Lieutenant_Grade_3;Lieutenant Grade 3
+52;137800;Lieutenant_Grade_4;Lieutenant Grade 4
+53;143100;Lieutenant_Grade_4;Lieutenant Grade 4
+54;148500;Lieutenant_Grade_4;Lieutenant Grade 4
+55;154000;Captain;Captain
+56;159600;Captain;Captain
+57;165300;Captain;Captain
+58;171100;Captain_Grade_2;Captain Grade 2
+59;177000;Captain_Grade_2;Captain Grade 2
+60;183000;Captain_Grade_2;Captain Grade 2
+61;189100;Captain_Grade_3;Captain Grade 3
+62;195300;Captain_Grade_3;Captain Grade 3
+63;201600;Captain_Grade_3;Captain Grade 3
+64;208000;Captain_Grade_4;Captain Grade 4
+65;214500;Captain_Grade_4;Captain Grade 4
+66;221100;Captain_Grade_4;Captain Grade 4
+67;227800;Major;Major
+68;234600;Major;Major
+69;241500;Major;Major
+70;248500;Major_Grade_2;Major Grade 2
+71;255600;Major_Grade_2;Major Grade 2
+72;262800;Major_Grade_2;Major Grade 2
+73;270100;Major_Grade_3;Major Grade 3
+74;277500;Major_Grade_3;Major Grade 3
+75;285000;Major_Grade_3;Major Grade 3
+76;292600;Major_Grade_4;Major Grade 4
+77;300300;Major_Grade_4;Major Grade 4
+78;308100;Major_Grade_4;Major Grade 4
+79;316000;Commander;Commander
+80;324000;Commander;Commander
+81;332100;Commander;Commander
+82;340300;Commander_Grade_2;Commander Grade 2
+83;348600;Commander_Grade_2;Commander Grade 2
+84;357000;Commander_Grade_2;Commander Grade 2
+85;365500;Commander_Grade_3;Commander Grade 3
+86;374100;Commander_Grade_3;Commander Grade 3
+87;382800;Commander_Grade_3;Commander Grade 3
+88;391600;Commander_Grade_4;Commander Grade 4
+89;400500;Commander_Grade_4;Commander Grade 4
+90;409500;Commander_Grade_4;Commander Grade 4
+91;418600;Colonel;Colonel
+92;427800;Colonel;Colonel
+93;437100;Colonel;Colonel
+94;446500;Colonel_Grade_2;Colonel Grade 2
+95;456000;Colonel_Grade_2;Colonel Grade 2
+96;465600;Colonel_Grade_2;Colonel Grade 2
+97;475300;Colonel_Grade_3;Colonel Grade 3
+98;485100;Colonel_Grade_3;Colonel Grade 3
+99;495000;Colonel_Grade_3;Colonel Grade 3
+100;505000;Colonel_Grade_4;Colonel Grade 4
+101;515100;Colonel_Grade_4;Colonel Grade 4
+102;525300;Colonel_Grade_4;Colonel Grade 4
+103;535600;Brigadier;Brigadier
+104;546000;Brigadier;Brigadier
+105;556500;Brigadier;Brigadier
+106;567100;Brigadier_Grade_2;Brigadier Grade 2
+107;577800;Brigadier_Grade_2;Brigadier Grade 2
+108;588600;Brigadier_Grade_2;Brigadier Grade 2
+109;599500;Brigadier_Grade_3;Brigadier Grade 3
+110;610500;Brigadier_Grade_3;Brigadier Grade 3
+111;621600;Brigadier_Grade_3;Brigadier Grade 3
+112;632800;Brigadier_Grade_4;Brigadier Grade 4
+113;644100;Brigadier_Grade_4;Brigadier Grade 4
+114;655500;Brigadier_Grade_4;Brigadier Grade 4
+115;667000;General;General
+116;678600;General;General
+117;690300;General;General
+118;702100;General_Grade_2;General Grade 2
+119;714000;General_Grade_2;General Grade 2
+120;726000;General_Grade_2;General Grade 2
+121;738100;General_Grade_3;General Grade 3
+122;750300;General_Grade_3;General Grade 3
+123;762600;General_Grade_3;General Grade 3
+124;775000;General_Grade_4;General Grade 4
+125;787500;General_Grade_4;General Grade 4

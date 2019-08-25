@@ -77,7 +77,7 @@
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.ico"/>
+                            <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
                             <span class='account-bar-name'>Series</span>
                             <div id="series_level" class='account-bar-level'>Level {{ data['series_level'] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ data['series_percent'] }}%">
@@ -99,7 +99,7 @@
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.ico"/>
+                            <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
                             <div class='account-bar-name'>Anime</div>
                             <div id="anime_level" class='account-bar-level'>Level {{ data['anime_level'] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ data['anime_percent'] }}%">
@@ -121,7 +121,7 @@
                 <div class="d-flex">
                     <div class='account-bar-wrapper'>
                         <div class='account-bar'>
-                            <img class="float-left m-t-5" height='44' width='44' data-toggle="tooltip" title="{{ data['book_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['book_grade_id'] }}.ico"/>
+                            <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['book_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['book_grade_id'] }}.png"/>
                             <div class='account-bar-name'>Books</div>
                             <div id="book_level" class='account-bar-level'>Level {{ data['book_level'] }}</div>
                             <div class='xp-bar' data-toggle="tooltip" title="{{ data['book_percent'] }}%">
@@ -225,13 +225,11 @@
                 {% elif friend['status'] == "request" %}
                     {% if user_id == current_user.get_id() %}
                     <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
-                        <a href="/account/{{ friend['username'] }}">
-                            <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
+                        <a class="disabled">
+                            <img height="70" width="70" style="filter: blur(3px);" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
                         </a>
                         <br>
                         <span style="font-size: 12pt;" class="text-light">{{ friend['username'] }}</span>
-                        <br>
-                        <span style="font-size: 10pt;">(Pending)</span>
                         <br>
                         <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}','td_{{ friend['user_id'] }}')"></a>
                     </div>
@@ -275,7 +273,7 @@
 
             <figure class="d-flex">
                 {% if data['series']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
-                <span class="block" title="No data">
+                <span class="block_no_data" title="No data">
                     <span id="100%" class="value"></span>
                 </span>
                 {% else %}
@@ -383,7 +381,7 @@
 
             <figure class="d-flex">
                 {% if data['anime']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
-                <span class="block" title="No data">
+                <span class="block_no_data" title="No data">
                     <span id="100%" class="value"></span>
                 </span>
                 {% else %}
@@ -491,7 +489,7 @@
 
             <figure class="d-flex">
                 {% if data['book']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
-                <span class="block" title="No data">
+                <span class="block_no_data" title="No data">
                     <span id="100%" class="value"></span>
                 </span>
                 {% else %}
@@ -619,6 +617,12 @@ $('.value').each(function() {
     $(this).parent().css('width', text);
 });
 $('.block').tooltip();
+// Tooltips Initialization
+$(function () {
+$('[data-toggle="tooltip"]').tooltip()
+})
+
+$('.block_no_data').tooltip();
 // Tooltips Initialization
 $(function () {
 $('[data-toggle="tooltip"]').tooltip()
