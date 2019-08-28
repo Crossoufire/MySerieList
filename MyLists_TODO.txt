@@ -30,6 +30,7 @@
         Remove Origin country colunm in the table view of the AnimeList
         Do not display Original name if equals to Name in the modal
         Add tab in the SeriesList / AnimeList to see directly achievement and stats about this specific list
+        Add tooltip for each icon for the grid view
 
     Bookslist:
         Possibility to edit metadata
@@ -43,8 +44,6 @@
 
     Achievements:
         Add a statistics page with chart.js (40%)
-
-
 
     Global:
         Increase the container size of the website
