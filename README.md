@@ -61,7 +61,7 @@ When you run the program for the first time, it will create a user `admin` with 
  
 ## Misc
 
-We started this project to fulfill our needs. The live version [https://mylists.info](https://mylists.info) runs on a potato server, thus not meant to be used by thousand people at the same time. If you still can see the register button at the top of the homepage, feel free to do it. Otherwise, run your own version of MyLists :)
+We started this project to fulfill our needs. The live version [https://mylists.info](https://mylists.info) runs on a raspberry pi 3B+, thus not meant to be used by thousand of people at the same time. If you can see the register button at the top right of the homepage, feel free to do it. Otherwise, you can run your own version of MyLists ;)
 
 ## Contact
 

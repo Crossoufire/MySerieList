@@ -2592,8 +2592,6 @@ def add_element(element_id, list_type):
                 except:
                     element_cover_path = None
 
-        print(element_cover_path)
-
         element_cover_id = save_api_cover(element_cover_path, list_type)
 
         if element_cover_id is None:
