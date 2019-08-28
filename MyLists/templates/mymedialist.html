@@ -607,7 +607,11 @@ body.loading .modal_loading {
 							<p><b>In production</b>: {{ data[0].in_production }}</p>
 							<p><b>Networks</b>: {{ networks["{}".format(data[0].id)] }}</p>
 							<p><b>Created by</b>: {{ data[0].created_by }}</p>
+							{% if data[0].episode_duration == 0 %}
+							<p><b>Episode duration</b>: Unknown</p>
+							{% else %}
 							<p><b>Episode duration</b>: {{ data[0].episode_duration }} min</p>
+							{% endif %}
 							<p><b>Total seasons</b>: {{ data[0].total_seasons }}</p>
 							<p><b>Total episodes</b>: {{ data[0].total_episodes }}</p>
 							<p><b>Origin country</b>: {{ data[0].origin_country }}</p>

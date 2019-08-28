@@ -1020,14 +1020,21 @@ def mymedialist(media_list, list_view, user_name):
         eps["{}".format(element[0].id)] = [int(x) for x in eps["{}".format(element[0].id)]]
 
         # Change first air time format
-        tmp = element[0].first_air_date.split('-')
-        tmp_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
-        first_air_date["{}".format(element[0].id)] = tmp_air_date
+        try:
+            tmp = element[0].first_air_date.split('-')
+            tmp_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
+            first_air_date["{}".format(element[0].id)] = tmp_air_date
+        except:
+            first_air_date["{}".format(element[0].id)] = "Unknown"
+
 
         # Change last air time format
-        tmp = element[0].last_air_date.split('-')
-        tmp_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
-        last_air_date["{}".format(element[0].id)] = tmp_air_date
+        try:
+            tmp = element[0].last_air_date.split('-')
+            tmp_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
+            last_air_date["{}".format(element[0].id)] = tmp_air_date
+        except:
+            last_air_date["{}".format(element[0].id)] = "Unknown"
 
         # Get genres
         tmp = element[2]
@@ -2517,25 +2524,67 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         return element.id
 
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        name            = element_data["name"]
-        original_name   = element_data["original_name"]
-        first_air_date  = element_data["first_air_date"]
-        last_air_date   = element_data["last_air_date"]
-        homepage        = element_data["homepage"]
-        in_production   = element_data["in_production"]
-        total_seasons   = element_data["number_of_seasons"]
-        total_episodes  = element_data["number_of_episodes"]
-        status          = element_data["status"]
-        vote_average    = element_data["vote_average"]
-        vote_count      = element_data["vote_count"]
-        synopsis        = element_data["overview"]
-        popularity      = element_data["popularity"]
-        themoviedb_id   = element_data["id"]
+        try:
+            name = element_data["name"]
+        except:
+            name = "Unknown"
+        try:
+            original_name = element_data["original_name"]
+        except:
+            original_name = "Unknown"
+        try:
+            first_air_date = element_data["first_air_date"]
+        except:
+            first_air_date = "Unknown"
+        try:
+            last_air_date = element_data["last_air_date"]
+        except:
+            last_air_date = "Unknown"
+        try:
+            homepage = element_data["homepage"]
+        except:
+            homepage = "Unknown"
+        try:
+            in_production = element_data["in_production"]
+        except:
+            in_production = "Unknown"
+        try:
+            total_seasons = element_data["number_of_seasons"]
+        except:
+            total_seasons = "Unknown"
+        try:
+            total_episodes = element_data["number_of_episodes"]
+        except:
+            total_episodes = "Unknown"
+        try:
+            status = element_data["status"]
+        except:
+            status = "Unknown"
+        try:
+            vote_average = element_data["vote_average"]
+        except:
+            vote_average = "Unknown"
+        try:
+            vote_count = element_data["vote_count"]
+        except:
+            vote_count = "Unknown"
+        try:
+            synopsis = element_data["overview"]
+        except:
+            synopsis = "Unknown"
+        try:
+            popularity = element_data["popularity"]
+        except:
+            popularity = "Unknown"
+
+        themoviedb_id = element_data["id"]
 
         try:
             created_by = ', '.join(x['name'] for x in element_data['created_by'])
+            if created_by == "":
+                created_by = "Unknown"
         except:
-            created_by = "Unknow"
+            created_by = "Unknown"
 
         try:
             episode_duration = element_data["episode_run_time"][0]
@@ -2547,8 +2596,10 @@ def add_element_in_base(element_data, element_cover_id, list_type):
 
         try:
             origin_country = ", ".join(element_data["origin_country"])
+            if origin_country == "":
+                origin_country = "Unknown"
         except:
-            origin_country = "Unknow"
+            origin_country = "Unknown"
 
         # Check if there is a special season, we do not want to take it into account
         seasons_data = []
@@ -2662,7 +2713,7 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         # Add the different networks for each element
         if len(networks_data) == 0:
             network = SeriesNetwork(series_id=element.id,
-                                     network="Unknow")
+                                    network="Unknown")
             db.session.add(network)
         else:
             for network_data in networks_data:
@@ -2687,9 +2738,18 @@ def add_element_in_base(element_data, element_cover_id, list_type):
             db.session.add(season)
         db.session.commit()
     elif list_type == ListType.BOOK:
-        title = element_data["volumeInfo"]["title"]
-        authors = element_data["volumeInfo"]["authors"][0]
-        published_date = element_data["volumeInfo"]["publishedDate"]
+        try:
+            title = element_data["volumeInfo"]["title"]
+        except:
+            title = "Unknown"
+        try:
+            authors = element_data["volumeInfo"]["authors"][0]
+        except:
+            authors = "Unknown"
+        try:
+            published_date = element_data["volumeInfo"]["publishedDate"]
+        except:
+            published_date = "Unknown"
         try:
             published_date = published_date[0:4]
         except:
