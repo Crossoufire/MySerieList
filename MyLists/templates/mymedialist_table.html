@@ -80,7 +80,9 @@
 					<th>Name</th>
 					<th class="table_season">Season</th>
 					<th class="table_episode">Episode</th>
+					{% if media_list != "animelist" %}
 					<th class="table_country">Origin country</th>
+					{% endif %}
 					<th class="table_score">Score</th>
 					{% if target_user_id == current_user.get_id() %}
 					<th class="table_actions">Actions</th>
@@ -103,7 +105,9 @@
 					<th>Name</th>
 					<th class="table_season">Season</th>
 					<th class="table_episode">Episode</th>
+					{% if media_list != "animelist" %}
 					<th class="table_country">Origin country</th>
+					{% endif %}
 					<th class="table_score">Score</th>
 					{% if target_user_id == current_user.get_id() %}
 					<th class="table_actions">Actions</th>
@@ -126,7 +130,9 @@
 					<th>Name</th>
 					<th class="table_season">Season</th>
 					<th class="table_episode">Episode</th>
+					{% if media_list != "animelist" %}
 					<th class="table_country">Origin country</th>
+					{% endif %}
 					<th class="table_score">Score</th>
 					{% if target_user_id == current_user.get_id() %}
 					<th class="table_actions">Actions</th>
@@ -149,7 +155,9 @@
 					<th>Name</th>
 					<th class="table_season">Season</th>
 					<th class="table_episode">Episode</th>
+					{% if media_list != "animelist" %}
 					<th class="table_country">Origin country</th>
+					{% endif %}
 					<th class="table_score">Score</th>
 					{% if target_user_id == current_user.get_id() %}
 					<th class="table_actions">Actions</th>
@@ -172,7 +180,9 @@
 					<th>Name</th>
 					<th class="table_season">Season</th>
 					<th class="table_episode">Episode</th>
+					{% if media_list != "animelist" %}
 					<th class="table_country">Origin country</th>
+					{% endif %}
 					<th class="table_score">Score</th>
 					{% if target_user_id == current_user.get_id() %}
 					<th class="table_actions">Actions</th>
@@ -195,7 +205,9 @@
 					<th>Name</th>
 					<th class="table_season">Season</th>
 					<th class="table_episode">Episode</th>
+					{% if media_list != "animelist" %}
 					<th class="table_country">Origin country</th>
+					{% endif %}
 					<th class="table_score">Score</th>
 					{% if target_user_id == current_user.get_id() %}
 					<th class="table_actions">Actions</th>
@@ -244,9 +256,11 @@
 				{% endfor %}
 				</select>
 			</td>
+			{% if media_list != "animelist" %}
 			<td class="text-center">
 				{{ data[0].origin_country }}
 			</td>
+			{% endif %}
 			<td class="text-center">
 				{% if target_user_id == current_user.get_id() %}
 					<a class="score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
@@ -333,7 +347,9 @@
 							</button>
 						</div>
 						<div class="modal-body">
+							{% if data[0].original_name != data[0].name %}
 							<p><b>Original Name</b>: {{ data[0].original_name }}</p>
+                            {% endif %}
 							<p><b>Genres</b>: {{ genres["{}".format(data[0].id)] }}</p>
 							<p><b>First air date</b>: {{ first_air_date["{}".format(data[0].id)] }}</p>
 							<p><b>Last air date</b>: {{ last_air_date["{}".format(data[0].id)] }}</p>
@@ -344,11 +360,10 @@
 							<p><b>Episode duration</b>: {{ data[0].episode_duration }} min</p>
 							<p><b>Total seasons</b>: {{ data[0].total_seasons }}</p>
 							<p><b>Total episodes</b>: {{ data[0].total_episodes }}</p>
-							<p><b>Origin country</b>: {{ data[0].origin_country }}</p>
 							<p><b>TMDb score</b>: {{ data[0].vote_average }}/10</p>
-							<p><b>Status</b> : {{ data[0].status }}</p>
+							<p><b>Status</b>: {{ data[0].status }}</p>
 							<hr class="m-b-10 m-t-10">
-							<p class="m-b-0"><b>Synopsis</b> : </p><p class="text-justify show-read-more">{{ data[0].synopsis }}</p>
+							<p class="m-b-0"><b>Synopsis</b>: {{ data[0].synopsis }}</p>
 						</div>
 					</div>
 				</div>
@@ -801,28 +816,6 @@ function show_all_cat() {
     $('#collapse_container').attr('onclick', 'hide_all_cat()');
     $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-down');
 }
-</script>
-
-<!---------------- Synopsis -------------------->
-<script type="text/javascript">
-$(document).ready(function(){
-	var maxLength = 200;
-	$(".show-read-more").each(function(){
-		var myStr = $(this).text();
-		if($.trim(myStr).length > maxLength){
-			var newStr = myStr.substring(0, maxLength);
-			var removedStr = myStr.substring(maxLength, $.trim(myStr).length);
-			$(this).empty().html(newStr);
-			$(this).append('<a href="javascript:void(0);" class="read-more"> read more...</a>');
-			$(this).append('<span class="more-text">' + removedStr + '</span>');
-		}
-	});
-
-	$(".read-more").click(function(){
-		$(this).siblings(".more-text").contents().unwrap();
-		$(this).remove();
-	});
-});
 </script>
 
 <!----------- Show/hide sidenav bar ------------>
