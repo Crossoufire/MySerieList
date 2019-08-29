@@ -120,10 +120,6 @@ body.loading .modal_loading {
     text-align-last: center;
 }
 
-.show-read-more .more-text {
-    display: none;
-}
-
 .seasons {
 	{% if target_user_id == current_user.get_id() %}
 	cursor: pointer;

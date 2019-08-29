@@ -167,10 +167,6 @@ hr {
     text-align-last: center;
 }
 
-.show-read-more .more-text {
-    display: none;
-}
-
 .form-control:focus {
     height: 2rem;
     padding: 5px;

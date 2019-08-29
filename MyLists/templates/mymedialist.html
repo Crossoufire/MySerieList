@@ -145,13 +145,15 @@
 					<span class="font-mask text-center text-light">{{ data[0].name }}</span>
 				</div>
 				{% if target_user_id == current_user.get_id() %}
-					<a class="btn_left fas fa-bars text-light" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
-					<a class="btn_right fas fa-ban text-light" onclick="delete_element('{{ data[0].id }}', 'card_{{ data[0].id }}', '{{ data[0].name }}')"></a>
+                    <span data-toggle="modal" data-target="#modal_cat{{ data[0].id }}">
+					    <a class="btn_left fas fa-bars text-light tooltip" data-toggle="tooltip" title="Show metadata"></a>
+                    </span>
+					<a class="btn_right fas fa-ban text-light tooltip" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0].id }}', 'card_{{ data[0].id }}', '{{ data[0].name }}')"></a>
 					{% if can_update["{}".format(data[0].id)] %}
-						<a class="btn_bottom_right fas fa-sync text-light" onclick="refresh('{{ data[0].id }}')"></a>
+						<a class="btn_bottom_right fas fa-sync text-light tooltip" data-toggle="tooltip" title="Sync metadata" onclick="refresh('{{ data[0].id }}')"></a>
 					{% endif %}
 				{% endif %}
-				<a class="btn_bottom_left fas fa-caret-square-down" onclick="show_score('footer_{{ data[0].id }}', card_{{ data[0].id }})" style="z-index: 500;"></a>
+				<a class="btn_bottom_left fas fa-caret-square-down tooltip" data-toggle="tooltip" title="Show score" onclick="show_score('footer_{{ data[0].id }}', card_{{ data[0].id }})" style="z-index: 500;"></a>
 			</div>
 
 			<div class="card-body bg-transparent p-0 m-t-5 m-b-1">
@@ -273,7 +275,9 @@
 							</button>
 						</div>
 						<div class="modal-body">
+                            {% if data[0].original_name != data[0].name %}
 							<p><b>Original Name</b>: {{ data[0].original_name }}</p>
+                            {% endif %}
 							<p><b>Genres</b>: {{ genres["{}".format(data[0].id)] }}</p>
 							<p><b>First air date</b>: {{ first_air_date["{}".format(data[0].id)] }}</p>
 							<p><b>Last air date</b>: {{ last_air_date["{}".format(data[0].id)] }}</p>
@@ -288,11 +292,13 @@
 							{% endif %}
 							<p><b>Total seasons</b>: {{ data[0].total_seasons }}</p>
 							<p><b>Total episodes</b>: {{ data[0].total_episodes }}</p>
+							{% if media_list != "animelist" %}
 							<p><b>Origin country</b>: {{ data[0].origin_country }}</p>
+							{% endif %}
 							<p><b>TMDb score</b>: {{ data[0].vote_average }}/10</p>
 							<p><b>Status</b>: {{ data[0].status }}</p>
 							<hr class="m-b-10 m-t-10">
-							<p class="m-b-0"><b>Synopsis</b>: </p><p class="text-justify show-read-more">{{ data[0].synopsis }}</p>
+							<p class="m-b-0"><b>Synopsis</b>: {{ data[0].synopsis }}</p>
 						</div>
 					</div>
 				</div>
@@ -743,28 +749,6 @@ function show_score(footer_id, card_id) {
 }
 </script>
 
-<!------------------ Synopsis ------------------>
-<script type="text/javascript">
-$(document).ready(function() {
-	var maxLength = 200;
-	$(".show-read-more").each(function(){
-		var myStr = $(this).text();
-		if($.trim(myStr).length > maxLength){
-			var newStr = myStr.substring(0, maxLength);
-			var removedStr = myStr.substring(maxLength, $.trim(myStr).length);
-			$(this).empty().html(newStr);
-			$(this).append('<a href="javascript:void(0);" class="read-more"> read more...</a>');
-			$(this).append('<span class="more-text">' + removedStr + '</span>');
-		}
-	});
-
-	$(".read-more").click(function(){
-		$(this).siblings(".more-text").contents().unwrap();
-		$(this).remove();
-	});
-});
-</script>
-
 <!------- Show/collapse all categories --------->
 <script type="text/javascript">
 function hide_all_cat() {
@@ -807,5 +791,14 @@ function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
     $('#nav_container').attr('onclick', 'openNav()');
 }
+</script>
+
+<!----------------- Tooltip -------------------->
+<script type="text/javascript">
+$('.tooltip').tooltip();
+    // Tooltips Initialization
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
 </script>
 {% endblock script %}
