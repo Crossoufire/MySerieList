@@ -272,7 +272,7 @@ def account(user_name):
         return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
     # Check if the account is private / in the friendslist
-    if current_user.id != user.id:
+    if current_user.id != user.id and current_user.id != 1:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.private:
             if friend is None or friend.status != "accepted":
