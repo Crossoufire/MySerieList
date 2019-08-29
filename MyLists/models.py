@@ -3,6 +3,7 @@ from MyLists import db, login_manager, app
 from flask_login import UserMixin
 import enum
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -37,17 +38,17 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
-    password = db.Column(db.String(60), nullable=False)
-    active = db.Column(db.Boolean)
-    private = db.Column(db.Boolean)
     registered_on = db.Column(db.DateTime, nullable=False)
-    activated_on = db.Column(db.DateTime)
-    transition_email = db.Column(db.String(120))
+    password = db.Column(db.String(60), nullable=False)
     homepage = db.Column(db.Enum(HomePage), nullable=False, default=HomePage.MYSERIESLIST)
+    image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     time_spent_series = db.Column(db.Integer, nullable=False, default=0)
     time_spent_anime = db.Column(db.Integer, nullable=False, default=0)
     time_spent_book = db.Column(db.Integer, nullable=False, default=0)
+    private = db.Column(db.Boolean, nullable=False, default=False)
+    active = db.Column(db.Boolean, nullable=False, default=False)
+    transition_email = db.Column(db.String(120))
+    activated_on = db.Column(db.DateTime)
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)

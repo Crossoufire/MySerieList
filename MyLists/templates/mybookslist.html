@@ -132,10 +132,12 @@
                     <span class="font-mask text-center text-light">{{ data[0].title }}</span>
                 </div>
                 {% if user_id == current_user.get_id() %}
-                <a class="btn_left fas fa-bars text-light" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
-                <a class="btn_right fas fa-ban text-light" onclick="deleteBook('{{ data[0].id }}', 'card_{{ data[0].id }}')"></a>
+                <span data-toggle="modal" data-target="#modal_cat{{ data[0].id }}">
+                    <a class="btn_left fas fa-bars text-light tooltip" data-toggle="tooltip" title="Show metadata"></a>
+                </span>
+                <a class="btn_right fas fa-ban text-light tooltip" data-toggle="tooltip" title="Delete" onclick="deleteBook('{{ data[0].id }}', 'card_{{ data[0].id }}')"></a>
                 {% endif %}
-                <a class="btn_bottom fas fa-caret-square-down" onclick="show_score('footer_{{ data[0].id }}', card_{{ data[0].id }})" style="z-index: 500;"></a>
+                <a class="btn_bottom fas fa-caret-square-down tooltip" data-toggle="tooltip" title="Show score" onclick="show_score('footer_{{ data[0].id }}', card_{{ data[0].id }})" style="z-index: 500;"></a>
             </div>
 
             <div id="footer_{{ data[0].id }}" class="d-none footer_score">
@@ -622,5 +624,14 @@ slider.oninput = function() {
     $('.score_size').css('font-size', value/17 + "pt");
     $('.card-footer').css('height', value/8.0645);
 }
+</script>
+
+<!----------------- Tooltip -------------------->
+<script type="text/javascript">
+$('.tooltip').tooltip();
+    // Tooltips Initialization
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
 </script>
 {% endblock script %}
