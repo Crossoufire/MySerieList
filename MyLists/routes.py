@@ -123,8 +123,6 @@ def home():
         user = User(username=register_form.register_username.data,
                     email=register_form.register_email.data,
                     password=hashed_password,
-                    active=False,
-                    private=False,
                     registered_on=datetime.utcnow())
         db.session.add(user)
         db.session.commit()
@@ -551,6 +549,7 @@ def account_settings():
             user.homepage = HomePage.ACCOUNT
         elif form.homepage.data == "hof":
             user.homepage = HomePage.HALL_OF_FAME
+
         db.session.commit()
         app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
                                                                                               old_value,
