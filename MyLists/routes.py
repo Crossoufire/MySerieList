@@ -635,7 +635,7 @@ def change_password():
 @app.route("/hall_of_fame", methods=['GET'])
 @login_required
 def hall_of_fame():
-    users = User.query.filter(User.id >= "2").order_by(User.username.asc()).all()
+    users = User.query.filter(User.id >= "2").filter_by(active=True).order_by(User.username.asc()).all()
 
     current_user_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="accepted").all()
     friends_list = []
