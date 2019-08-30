@@ -898,6 +898,8 @@ def mymedialist(media_list, list_view, user_name):
                                        join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
                                        filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
         covers_path = url_for('static', filename='series_covers/')
+        user_achievements = get_achievements(user.id, ListType.SERIES)
+        media_value = "series_achievements"
     elif media_list == "animelist":
         # Get anime data
         element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
@@ -910,6 +912,8 @@ def mymedialist(media_list, list_view, user_name):
                                         join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
                                         filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
         covers_path = url_for('static', filename='animes_covers/')
+        user_achievements = get_achievements(user.id, ListType.ANIME)
+        media_value = "anime_achievements"
     else:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
@@ -1001,7 +1005,9 @@ def mymedialist(media_list, list_view, user_name):
                                last_air_date=last_air_date,
                                first_air_date=first_air_date,
                                target_user_name=user_name,
-                               target_user_id=str(user.id))
+                               target_user_id=str(user.id),
+                               data=user_achievements,
+                               media_value=media_value)
     elif list_view == "table":
         return render_template('mymedialist_table.html',
                                title="{}'s {}".format(user_name, media_list),
@@ -1014,7 +1020,9 @@ def mymedialist(media_list, list_view, user_name):
                                last_air_date=last_air_date,
                                first_air_date=first_air_date,
                                target_user_name=user_name,
-                               target_user_id=str(user.id))
+                               target_user_id=str(user.id),
+                               data=user_achievements,
+                               media_value=media_value)
 
 
 @app.route('/update_element_season', methods=['POST'])
@@ -2177,31 +2185,30 @@ def get_achievements(user_id, list_type):
 
     ####################################################################################################################
 
-    # Change the results in a matrix 4 by x
-    col = 4
-    genres_matrix = [genres_achievements[i:i + col] for i in range(0, len(genres_achievements), col)]
-    misc_matrix = [misc_achievements[i:i + col] for i in range(0, len(misc_achievements), col)]
-    sources_matrix = [sources_achievements[i:i + col] for i in range(0, len(sources_achievements), col)]
-    finished_matrix = [finished_achievements[i:i + col] for i in range(0, len(finished_achievements), col)]
-    time_matrix = [time_achievements[i:i + col] for i in range(0, len(time_achievements), col)]
-    score_matrix = [score_achievements[i:i + col] for i in range(0, len(score_achievements), col)]
+    # # Change the results in a matrix 4 by x
+    # col = 4
+    # genres_matrix = [genres_achievements[i:i + col] for i in range(0, len(genres_achievements), col)]
+    # misc_matrix = [misc_achievements[i:i + col] for i in range(0, len(misc_achievements), col)]
+    # sources_matrix = [sources_achievements[i:i + col] for i in range(0, len(sources_achievements), col)]
+    # finished_matrix = [finished_achievements[i:i + col] for i in range(0, len(finished_achievements), col)]
+    # time_matrix = [time_achievements[i:i + col] for i in range(0, len(time_achievements), col)]
+    # score_matrix = [score_achievements[i:i + col] for i in range(0, len(score_achievements), col)]
 
-    # achievements_data = {"genres": genres_matrix,
-    #                      "sources": sources_matrix,
-    #                      "finished": finished_matrix,
-    #                      "time": time_matrix,
-    #                      "misc": misc_matrix,
-    #                      "score": score_matrix,
-    #                      "total_unlocked": sum(unlocked_achievements_per_type),
-    #                      "unlocked_per_type":
-    #                          {'genres': unlocked_achievements_per_type[0],
-    #                           'sources': unlocked_achievements_per_type[1],
-    #                           'finished': unlocked_achievements_per_type[2],
-    #                           'time': unlocked_achievements_per_type[3],
-    #                           'misc': unlocked_achievements_per_type[4],
-    #                           'score': unlocked_achievements_per_type[5]}}
+    achievements_data = {"genres": genres_achievements,
+                         "sources": sources_achievements,
+                         "finished": finished_achievements,
+                         "time": time_achievements,
+                         "misc": misc_achievements,
+                         "score": score_achievements,
+                         "total_unlocked": sum(unlocked_achievements_per_type),
+                         "unlocked_per_type":
+                             {'genres': unlocked_achievements_per_type[0],
+                              'sources': unlocked_achievements_per_type[1],
+                              'finished': unlocked_achievements_per_type[2],
+                              'time': unlocked_achievements_per_type[3],
+                              'misc': unlocked_achievements_per_type[4],
+                              'score': unlocked_achievements_per_type[5]}}
 
-    achievements_data = {"genres": genres_achievements}
 
     return achievements_data
 
