@@ -223,7 +223,8 @@ def register_token(token):
 
 @app.route("/test")
 def test():
-    pass
+    user_achievements_anime = get_achievements("2", ListType.ANIME)
+    return render_template('test.html', data=user_achievements_anime)
 
 
 ################################################# Authenticated routes #################################################
@@ -2185,20 +2186,22 @@ def get_achievements(user_id, list_type):
     time_matrix = [time_achievements[i:i + col] for i in range(0, len(time_achievements), col)]
     score_matrix = [score_achievements[i:i + col] for i in range(0, len(score_achievements), col)]
 
-    achievements_data = {"genres": genres_matrix,
-                         "sources": sources_matrix,
-                         "finished": finished_matrix,
-                         "time": time_matrix,
-                         "misc": misc_matrix,
-                         "score": score_matrix,
-                         "total_unlocked": sum(unlocked_achievements_per_type),
-                         "unlocked_per_type":
-                             {'genres': unlocked_achievements_per_type[0],
-                              'sources': unlocked_achievements_per_type[1],
-                              'finished': unlocked_achievements_per_type[2],
-                              'time': unlocked_achievements_per_type[3],
-                              'misc': unlocked_achievements_per_type[4],
-                              'score': unlocked_achievements_per_type[5]}}
+    # achievements_data = {"genres": genres_matrix,
+    #                      "sources": sources_matrix,
+    #                      "finished": finished_matrix,
+    #                      "time": time_matrix,
+    #                      "misc": misc_matrix,
+    #                      "score": score_matrix,
+    #                      "total_unlocked": sum(unlocked_achievements_per_type),
+    #                      "unlocked_per_type":
+    #                          {'genres': unlocked_achievements_per_type[0],
+    #                           'sources': unlocked_achievements_per_type[1],
+    #                           'finished': unlocked_achievements_per_type[2],
+    #                           'time': unlocked_achievements_per_type[3],
+    #                           'misc': unlocked_achievements_per_type[4],
+    #                           'score': unlocked_achievements_per_type[5]}}
+
+    achievements_data = {"genres": genres_achievements}
 
     return achievements_data
 
