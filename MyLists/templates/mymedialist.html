@@ -159,15 +159,15 @@
                             <span class="font-mask text-center text-light">{{ data[0].name }}</span>
                         </div>
                         {% if target_user_id == current_user.get_id() %}
-                        <span data-toggle="modal" data-target="#modal_cat{{ data[0].id }}">
-                            <a class="btn_left fas fa-bars text-light tooltip" data-toggle="tooltip" title="Show metadata"></a>
-                        </span>
-                        <a class="btn_right fas fa-ban text-light tooltip" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0].id }}', 'card_{{ data[0].id }}', '{{ data[0].name }}')"></a>
+                            <a data-toggle="modal" data-target="#modal_cat{{ data[0].id }}">
+                                <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Show metadata"></a>
+                            </a>
+                            <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0].id }}', 'card_{{ data[0].id }}', '{{ data[0].name }}')"></a>
                             {% if can_update["{}".format(data[0].id)] %}
-                            <a class="btn_bottom_right fas fa-sync text-light tooltip" data-toggle="tooltip" title="Sync metadata" onclick="refresh('{{ data[0].id }}')"></a>
+                            <a class="btn_bottom_right fas fa-sync text-light" data-toggle="tooltip" title="Sync metadata" onclick="refresh('{{ data[0].id }}')"></a>
                             {% endif %}
                         {% endif %}
-                        <a class="btn_bottom_left fas fa-caret-square-down tooltip" data-toggle="tooltip" title="Show score" onclick="show_score('footer_{{ data[0].id }}', card_{{ data[0].id }})" style="z-index: 500;"></a>
+                        <a class="btn_bottom_left fas fa-caret-square-down" data-toggle="tooltip" title="Show score" onclick="show_score('footer_{{ data[0].id }}', card_{{ data[0].id }})" style="z-index: 500;"></a>
                     </div>
 
                     <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
