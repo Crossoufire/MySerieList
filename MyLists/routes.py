@@ -271,7 +271,7 @@ def account(user_name):
         return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
     # Check if the account is private / in the friendslist
-    if current_user.id != user.id:
+    if current_user.id != user.id and current_user.id != 1:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.private:
             if friend is None or friend.status != "accepted":
@@ -714,7 +714,7 @@ def achievements(user_name):
         return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
     # Check if the account is private / in the friendslist
-    if current_user.id != user.id:
+    if current_user.id != user.id and current_user.id != 1:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.private:
             if current_user.get_id() == "1":
@@ -752,7 +752,7 @@ def statistics(user_name):
         return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
     # Check if the account is private / in the friendslist
-    if current_user.id != user.id:
+    if current_user.id != user.id and current_user.id != 1:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.private:
             if current_user.get_id() == "1":
@@ -876,7 +876,7 @@ def mymedialist(media_list, list_view, user_name):
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
     # Check if the current user can see the target user's list
-    if current_user.id != user.id:
+    if current_user.id != user.id and current_user.id != 1:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.id == 1:
             return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
@@ -1453,7 +1453,7 @@ def mybookslist(user_name, list_view):
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
     # Check if the current user can see the target user's list
-    if current_user.id != user.id:
+    if current_user.id != user.id and current_user.id != 1:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.id == 1:
             return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
