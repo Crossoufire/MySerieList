@@ -259,20 +259,6 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
     });
 }
 
-// -------------- Edit score ----------------
-function edit_score(edit_id, new_id) {
-    var edit = document.getElementById(edit_id);
-
-    if (edit.className === "d-none") {
-        edit.className = "visible";
-        document.getElementById(new_id).innerHTML = "";
-        $(edit).val('');
-        $(edit).focus();
-    } else {
-        edit.className = "d-none";
-    }
-}
-
 // -------------- Add score -----------------
 function add_score(new_score, edit_id, element_id, media_list) {
     var new_sc = document.getElementById(new_score);
@@ -305,6 +291,20 @@ function add_score(new_score, edit_id, element_id, media_list) {
             return false;
         }
         return true;
+    }
+}
+
+// -------------- Edit score ----------------
+function edit_score(edit_id, new_id) {
+    var edit = document.getElementById(edit_id);
+
+    if (edit.className === "d-none") {
+        edit.className = "visible";
+        document.getElementById(new_id).innerHTML = "";
+        $(edit).val('');
+        $(edit).focus();
+    } else {
+        edit.className = "d-none";
     }
 }
 

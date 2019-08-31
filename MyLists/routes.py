@@ -991,38 +991,24 @@ def mymedialist(media_list, list_view, user_name):
         else:
             can_update["{}".format(element[0].id)] = False
 
-    element_all_data = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
+    element_all_data = [[watching_list, "WATCHING"], [completed_list, "COMPLETED"], [onhold_list, "ON_HOLD"],
+                        [random_list, "RANDOM"], [dropped_list, "DROPPED"], [plantowatch_list, "PLAN_TO_WATCH"]]
 
-    if list_view == "grid":
-        return render_template('mymedialist.html',
-                               title="{}'s {}".format(user_name, media_list),
-                               all_data=element_all_data,
-                               eps=eps,
-                               genres=genres,
-                               networks=networks,
-                               can_update=can_update,
-                               media_list=media_list,
-                               last_air_date=last_air_date,
-                               first_air_date=first_air_date,
-                               target_user_name=user_name,
-                               target_user_id=str(user.id),
-                               data=user_achievements,
-                               media_value=media_value)
-    elif list_view == "table":
-        return render_template('mymedialist_table.html',
-                               title="{}'s {}".format(user_name, media_list),
-                               all_data=element_all_data,
-                               eps=eps,
-                               genres=genres,
-                               networks=networks,
-                               can_update=can_update,
-                               media_list=media_list,
-                               last_air_date=last_air_date,
-                               first_air_date=first_air_date,
-                               target_user_name=user_name,
-                               target_user_id=str(user.id),
-                               data=user_achievements,
-                               media_value=media_value)
+    return render_template('mymedialist.html',
+                           title="{}'s {}".format(user_name, media_list),
+                           all_data=element_all_data,
+                           eps=eps,
+                           genres=genres,
+                           networks=networks,
+                           can_update=can_update,
+                           media_list=media_list,
+                           last_air_date=last_air_date,
+                           first_air_date=first_air_date,
+                           target_user_name=user_name,
+                           target_user_id=str(user.id),
+                           data=user_achievements,
+                           media_value=media_value,
+                           list_view=list_view)
 
 
 @app.route('/update_element_season', methods=['POST'])

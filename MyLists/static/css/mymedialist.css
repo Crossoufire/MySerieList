@@ -300,7 +300,7 @@ body.loading .modal_loading {
 }
 
 .sidenav {
-    height: 60%;
+    height: 360px;
     width: 0;
     position: fixed;
     z-index: 1;
@@ -308,7 +308,7 @@ body.loading .modal_loading {
     left: 0;
     background-color: #111;
     overflow-x: hidden;
-    padding-top: 60px;
+    padding-top: 50px;
     transition: 0.5s;
 }
 
@@ -330,7 +330,8 @@ body.loading .modal_loading {
     top: 0;
     right: 25px;
     font-size: 36px;
-    margin-left: 70px;
+    margin-left: 135px;
+    padding: 0px;
 }
 
 
