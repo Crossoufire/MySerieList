@@ -19,10 +19,545 @@
 {% endblock fixed %}
 
 
+
+
+
+
+
+
+
+
+
+
 {% block content %}
-<div class="container form_account p-0">
-    {% if user_id == current_user.get_id() %}
-    <!---------------------------------------- Add friend modal --------------------------------------->
+<div class="image-position">
+    <div class="image-settings">
+        {% if user_id == current_user.get_id() %}
+        <a class="fas fa-2x fa-cog text-light" data-toggle="tooltip" title="Settings" href="{{ url_for('account_settings') }}"></a>
+        {% endif %}
+    </div>
+    <img height="500" width="1110" src="{{ url_for('static', filename='img/profile_background.jpg') }}" alt=""/>
+    <div class="d-flex flex-wrap image-data">
+        <img height="160" width="160" src="{{ data['profile_picture'] }}">
+        <div class="p-t-10 pl-2 pr-2" style="background-color: rgba(0, 0, 0, 0.7);">
+            <h2 class="text-center">{{ data['username'] }}
+                <img height='50' width='50' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}"
+                 src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
+            </h2>
+
+            <div class="row">
+                <div class="m-l-20 m-r-10 m-b-5 col align-middle text-center">
+                    <img height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
+                    <div>Series <br> 56</div>
+                </div>
+                <div class="col m-b-5 align-middle text-center">
+                    <img height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
+                    <div>Anime <br> 26</div>
+                </div>
+                <div class="m-l-10 m-r-20 m-b-5 col align-middle text-center">
+                    <img height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
+                    <div>Books <br> 12</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-------------- Account picture/Username/account settings ------------>
+
+
+<!----------------- Levels/grades/informations data ------------------->
+<div class="row m-t-10">
+    <div class="col">
+        <div class="d-flex">
+            <div class='account-bar-wrapper'>
+                <div class='account-bar'>
+                    <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
+                    <span class='account-bar-name'>Series</span>
+                    <div id="series_level" class='account-bar-level'>Level {{ data['series_level'] }}</div>
+                    <div class='xp-bar' data-toggle="tooltip" title="{{ data['series_percent'] }}%">
+                        <div id='xp-bar-fill-series'>
+                            <div class='xp-increase-fx'>
+                                <div class='xp-increase-fx-flicker'>
+                                    <div class='xp-increase-glow1'></div>
+                                    <div class='xp-increase-glow2'></div>
+                                    <div class='xp-increase-glow3'></div>
+                                </div>
+                                <div class='xp-increase-glow2'></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='account-bar-next-level'>&nbsp{{ data['series_level'] | int + 1 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex">
+            <div class='account-bar-wrapper'>
+                <div class='account-bar'>
+                    <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
+                    <div class='account-bar-name'>Anime</div>
+                    <div id="anime_level" class='account-bar-level'>Level {{ data['anime_level'] }}</div>
+                    <div class='xp-bar' data-toggle="tooltip" title="{{ data['anime_percent'] }}%">
+                        <div id='xp-bar-fill-anime'>
+                            <div class='xp-increase-fx'>
+                                <div class='xp-increase-fx-flicker'>
+                                    <div class='xp-increase-glow1'></div>
+                                    <div class='xp-increase-glow2'></div>
+                                    <div class='xp-increase-glow3'></div>
+                                </div>
+                                <div class='xp-increase-glow2'></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='account-bar-next-level'>&nbsp{{ data['anime_level'] | int + 1 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex">
+            <div class='account-bar-wrapper'>
+                <div class='account-bar'>
+                    <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['book_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['book_grade_id'] }}.png"/>
+                    <div class='account-bar-name'>Books</div>
+                    <div id="book_level" class='account-bar-level'>Level {{ data['book_level'] }}</div>
+                    <div class='xp-bar' data-toggle="tooltip" title="{{ data['book_percent'] }}%">
+                        <div id='xp-bar-fill-book'>
+                            <div class='xp-increase-fx'>
+                                <div class='xp-increase-fx-flicker'>
+                                    <div class='xp-increase-glow1'></div>
+                                    <div class='xp-increase-glow2'></div>
+                                    <div class='xp-increase-glow3'></div>
+                                </div>
+                                <div class='xp-increase-glow2'></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='account-bar-next-level'>&nbsp{{ data['book_level'] | int + 1 }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <table class="table table-sm text-light">
+            <thead>
+            <tr>
+                <th class="text-center" style="font-size: 12pt;" colspan="2">Data Informations</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="text-left">All anime achievements</td>
+                <td class="text-center">
+                    <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('anime_achievements') }}" target="_blank"></a>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">Grades and levels data</td>
+                <td class="text-center">
+                    <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('level_grade_data') }}" target="_blank"></a>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">Knowledge levels data</td>
+                <td class="text-center">
+                    <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('knowledge_grade_data') }}" target="_blank"></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!----------------- Lists when visiting other accounts ---------------->
+{% if user_id != current_user.get_id() %}
+    <hr class="mt-2 mb-3">
+    <div class="row text-center">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='serieslist', list_view='grid', user_name=data['username']) }}">SeriesList</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='animelist', list_view='grid', user_name=data['username']) }}">AnimeList</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-primary" href="{{ url_for('mybookslist', list_view='grid', user_name=data['username']) }}">BooksList</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-warning" href="{{ url_for('achievements', user_name=data['username']) }}">Achievements</a>
+        </div>
+    </div>
+{% endif %}
+
+<!----------------------------- Friends ------------------------------->
+<div style="cursor: pointer;" data-toggle="collapse" data-target="#FRIENDS" onclick="turn('FRIENDS', 'FRIENDS_arrow')">
+    <h3 class="font-weight-light text-center mt-3 mb-0">
+        <div class="arrow_div float-left">
+            {% if user_id == current_user.get_id() %}
+            <a class="fas fa-xs fa-user-plus" data-toggle="modal" data-target="#addFriendModal"></a>
+            {% endif %}
+        </div>
+        Friends
+        <div class="arrow_div float-right">
+            <a class="collapse_all fas fa-xs fa-chevron-down" id="FRIENDS_arrow"></a>
+        </div>
+    </h3>
+</div>
+<hr class="mt-1 p-b-15 mb-0">
+<div class="collapse show container-stats" id="FRIENDS">
+    <div class="d-flex flex-wrap friends_container">
+        {% for friend in data["friends"] %}
+        {% if friend['status'] == "pending" %}
+            {% if user_id == current_user.get_id() %}
+            <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
+                <a href="/account/{{ friend['username'] }}">
+                    <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
+                </a>
+                <br>
+                <span style="font-size: 12pt;" class="text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span>
+                <br>
+                <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
+                <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
+            </div>
+            {% endif %}
+        {% elif friend['status'] == "request" %}
+            {% if user_id == current_user.get_id() %}
+            <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
+                <a class="disabled">
+                    <img height="70" width="70" style="filter: blur(3px);" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
+                </a>
+                <br>
+                <span style="font-size: 12pt;" class="text-light">{{ friend['username'] }}</span>
+                <br>
+                <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}','td_{{ friend['user_id'] }}')"></a>
+            </div>
+            {% endif %}
+        {% elif friend['status'] == "declined" %}
+        {% else %}
+            <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
+                <a href="/account/{{ friend['username'] }}">
+                    <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
+                </a>
+                <br>
+                <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
+                <br>
+                {% if user_id == current_user.get_id() %}
+                <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                {% endif %}
+            </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<!------------------------ Series statistics --------------------------->
+<div style="cursor: pointer;" data-toggle="collapse" data-target="#SERIES" onclick="turn('SERIES', 'SERIES_arrow')">
+    <h3 class="font-weight-light text-center mt-3 mb-0">
+        Series Statistics
+        <div class="arrow_div float-right">
+            <a class="collapse_all fas fa-xs fa-chevron-down" id="SERIES_arrow"></a>
+        </div>
+    </h3>
+</div>
+<hr class="mt-1 p-b-15 mb-0">
+<div id="SERIES" class="collapse show container-stats">
+    <div class="m-b-5">
+        <span class="stat_text"><b>Days:</b> {{ data['series']['time_spent_day'] }}</span>
+        <span class="stat_text float-right"><b>Hours:</b> {{ data['series']['time_spent_hour'] }}</span>
+    </div>
+    <div class="m-b-5">
+        <span class="stat_text"><b>Mean Score:</b> {{ data['series']['mean_score'] }}</span>
+    </div>
+
+    <figure class="d-flex">
+        {% if data['series']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
+        <span class="block_no_data" title="No data">
+            <span id="100%" class="value"></span>
+        </span>
+        {% else %}
+        <span class="block" title="Watching">
+            <span id="{{ data['series']['element_percentage'][0] }}%" class="value"></span>
+        </span>
+        <span class="block" title="Completed">
+            <span id="{{ data['series']['element_percentage'][1] }}%" class="value"></span>
+        </span>
+        <span class="block" title="On Hold">
+            <span id="{{ data['series']['element_percentage'][2] }}%" class="value"></span>
+        </span>
+        <span class="block" title="Random">
+            <span id="{{ data['series']['element_percentage'][3] }}%" class="value"></span>
+        </span>
+        <span class="block" title="Dropped">
+            <span id="{{ data['series']['element_percentage'][4] }}%" class="value"></span>
+        </span>
+        <span class="block" title="Plan to Watch">
+            <span id="{{ data['series']['element_percentage'][5] }}%" class="value"></span>
+        </span>
+        {% endif %}
+    </figure>
+
+    <div class="m-t-10">
+        <div class="row">
+            <div class="col mini p-r-0">
+                <span class="stat_text">Watching:</span>
+            </div>
+            <div class="col p-0 position">
+                <span class="stat_text">{{ data['series']['watching_count'] }}</span>
+            </div>
+            <div class="col mini p-r-0">
+                <span class="stat_text">Dropped:</span>
+            </div>
+            <div class="col p-l-0 position">
+                <span class="stat_text">{{ data['series']['dropped_count'] }}</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col mini p-r-0">
+                <span class="stat_text">Completed:</span>
+            </div>
+            <div class="col p-0 position">
+                <span class="stat_text">{{ data['series']['completed_count'] }}</span>
+            </div>
+            <div class="col mini p-r-0">
+                <span class="stat_text">Plan to Watch:</span>
+            </div>
+            <div class="col p-l-0 position">
+                <span class="stat_text">{{ data['series']['plantowatch_count'] }}</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col mini p-r-0">
+                <span class="stat_text">On Hold:</span>
+            </div>
+            <div class="col p-0 position">
+                <span class="stat_text">{{ data['series']['onhold_count'] }}</span>
+            </div>
+            <div class="col mini p-r-0">
+                <span class="stat_text"></span>
+            </div>
+            <div class="col p-l-0 position">
+                <span class="stat_text"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col mini p-r-0">
+                <span class="stat_text">Random:</span>
+            </div>
+            <div class="col p-0 position">
+                <span class="stat_text">{{ data['series']['random_count'] }}</span>
+            </div>
+            <div class="col mini p-r-0">
+                <span class="stat_text">Episodes:</span>
+            </div>
+            <div class="col p-l-0 position">
+                <span class="stat_text">{{ data['series']['nb_ep_watched'] }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!------------------------ Anime statistics --------------------------->
+<div style="cursor: pointer;" data-toggle="collapse" data-target="#ANIME" onclick="turn('ANIME', 'ANIME_arrow')">
+    <h3 class="font-weight-light text-center mt-3 mb-0">
+        Anime Statistics
+        <div class="arrow_div float-right">
+            <a class="collapse_all fas fa-xs fa-chevron-down" id="ANIME_arrow"></a>
+        </div>
+    </h3>
+</div>
+<hr class="mt-1 p-b-15 mb-0">
+<div id="ANIME" class="collapse show container-stats">
+    <div class="m-b-5">
+        <span class="stat_text"><b>Days:</b> {{ data['anime']['time_spent_day'] }}</span>
+        <span class="stat_text float-right"><b>Hours:</b> {{ data['anime']['time_spent_hour'] }}</span>
+    </div>
+    <div class="m-b-5">
+        <span class="stat_text"><b>Mean Score:</b> {{ data['anime']['mean_score'] }}</span>
+    </div>
+
+    <figure class="d-flex">
+        {% if data['anime']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
+        <span class="block_no_data" title="No data">
+            <span id="100%" class="value"></span>
+        </span>
+        {% else %}
+        <span class="block" title="Watching">
+            <span id="{{ data['anime']['element_percentage'][0] }}%" class="value"></span>
+        </span>
+        <span class="block" title="Completed">
+            <span id="{{ data['anime']['element_percentage'][1] }}%" class="value"></span>
+        </span>
+        <span class="block" title="On Hold">
+            <span id="{{ data['anime']['element_percentage'][2] }}%" class="value"></span>
+        </span>
+        <span class="block" title="Random">
+            <span id="{{ data['anime']['element_percentage'][3] }}%" class="value"></span>
+        </span>
+        <span class="block" title="Dropped">
+            <span id="{{ data['anime']['element_percentage'][4] }}%" class="value"></span>
+        </span>
+        <span class="block" title="Plan to Watch">
+            <span id="{{ data['anime']['element_percentage'][5] }}%" class="value"></span>
+        </span>
+        {% endif %}
+    </figure>
+
+    <div class="m-t-10">
+        <div class="row">
+            <div class="col mini p-r-0">
+                <span class="stat_text">Watching:</span>
+            </div>
+            <div class="col p-0 position">
+                <span class="stat_text">{{ data['anime']['watching_count'] }}</span>
+            </div>
+            <div class="col mini p-r-0">
+                <span class="stat_text">Dropped:</span>
+            </div>
+            <div class="col p-l-0 position">
+                <span class="stat_text">{{ data['anime']['dropped_count'] }}</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col mini p-r-0">
+                <span class="stat_text">Completed:</span>
+            </div>
+            <div class="col p-0 position">
+                <span class="stat_text">{{ data['anime']['completed_count'] }}</span>
+            </div>
+            <div class="col mini p-r-0">
+                <span class="stat_text">Plan to Watch:</span>
+            </div>
+            <div class="col p-l-0 position">
+                <span class="stat_text">{{ data['anime']['plantowatch_count'] }}</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col mini p-r-0">
+                <span class="stat_text">On Hold:</span>
+            </div>
+            <div class="col p-0 position">
+                <span class="stat_text">{{ data['anime']['onhold_count'] }}</span>
+            </div>
+            <div class="col mini p-r-0">
+                <span class="stat_text"></span>
+            </div>
+            <div class="col p-l-0 position">
+                <span class="stat_text"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col mini p-r-0">
+                <span class="stat_text">Random:</span>
+            </div>
+            <div class="col p-0 position">
+                <span class="stat_text">{{ data['anime']['random_count'] }}</span>
+            </div>
+            <div class="col mini p-r-0">
+                <span class="stat_text">Episodes:</span>
+            </div>
+            <div class="col p-l-0 position">
+                <span class="stat_text">{{ data['anime']['nb_ep_watched'] }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!------------------------ Books statistics --------------------------->
+<div style="cursor: pointer;" data-toggle="collapse" data-target="#BOOK" onclick="turn('BOOK', 'BOOK_arrow')">
+    <h3 class="font-weight-light text-center mt-3 mb-0">
+        Books Statistics
+        <div class="arrow_div float-right">
+            <a class="collapse_all fas fa-xs fa-chevron-down" id="BOOK_arrow"></a>
+        </div>
+    </h3>
+</div>
+<hr class="mt-1 p-b-15 mb-0">
+<div id="BOOK" class="collapse show container-stats">
+    <div class="m-b-5">
+        <span class="stat_text"><b>Days:</b> {{ data['book']['time_spent_day'] }}</span>
+        <span class="stat_text float-right"><b>Hours:</b> {{ data['book']['time_spent_hour'] }}</span>
+    </div>
+    <div class="m-b-5">
+        <span class="stat_text"><b>Mean Score:</b> {{ data['book']['mean_score'] }}</span>
+    </div>
+
+    <figure class="d-flex">
+        {% if data['book']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
+        <span class="block_no_data" title="No data">
+            <span id="100%" class="value"></span>
+        </span>
+        {% else %}
+        <span class="block" title="Reading">
+            <span id="{{ data['book']['element_percentage'][0] }}%" class="value"></span>
+        </span>
+        <span class="block" title="Completed">
+            <span id="{{ data['book']['element_percentage'][1] }}%" class="value"></span>
+        </span>
+        <span class="block" title="On Hold">
+            <span id="{{ data['book']['element_percentage'][2] }}%" class="value"></span>
+        </span>
+        <span class="block" title="Dropped">
+            <span id="{{ data['book']['element_percentage'][3] }}%" class="value"></span>
+        </span>
+        <span class="block" title="Plan to Read">
+            <span id="{{ data['book']['element_percentage'][4] }}%" class="value"></span>
+        </span>
+        {% endif %}
+    </figure>
+
+    <div class="m-t-10">
+        <div class="row">
+            <div class="col mini p-r-0">
+                <span class="stat_text">Reading:</span>
+            </div>
+            <div class="col p-0 position">
+                <span class="stat_text">{{ data['book']['reading_count'] }}</span>
+            </div>
+            <div class="col mini p-r-0">
+                <span class="stat_text">Dropped:</span>
+            </div>
+            <div class="col p-l-0 position">
+                <span class="stat_text">{{ data['book']['dropped_count'] }}</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col mini p-r-0">
+                <span class="stat_text">Completed:</span>
+            </div>
+            <div class="col p-0 position">
+                <span class="stat_text">{{ data['book']['completed_count'] }}</span>
+            </div>
+            <div class="col mini p-r-0">
+                <span class="stat_text">Plan to Read:</span>
+            </div>
+            <div class="col p-l-0 position">
+                <span class="stat_text">{{ data['book']['plantoread_count'] }}</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col mini p-r-0">
+                <span class="stat_text">On Hold:</span>
+            </div>
+            <div class="col p-0 position">
+                <span class="stat_text">{{ data['book']['onhold_count'] }}</span>
+            </div>
+            <div class="col mini p-r-0">
+                <span class="stat_text">Pages read:</span>
+            </div>
+            <div class="col p-l-0 position">
+                <span class="stat_text">{{ data['book']['nb_pages_read'] }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if user_id == current_user.get_id() %}
+    <!------------------- Add friend modal ------------------------>
     <div class="modal fade" id="addFriendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -47,519 +582,8 @@
             </div>
         </div>
     </div>
-    {% endif %}
+{% endif %}
 
-    <div class="border_account">
-        <!------------------------ Account picture/Username/account settings -------------------------->
-        <div class="d-flex flex-wrap-reverse">
-            <div class="p-r-10 bd-highlight">
-                <img class="rounded border-light account-img" src="{{ data['profile_picture'] }}">
-            </div>
-            <div class="bd-highlight">
-                {% if user_id == current_user.get_id() %}
-                <h2 class="mt-0 account-heading username">{{ data['username'] }}</h2>
-                {% else %}
-                <h2 class="mt-0 account-heading username">{{ data['username'] }}'s profile</h2>
-                {% endif %}
-                <span style="font-size: 14pt;">Knowledge level:&nbsp&nbsp</span>
-                <img height='64' width='64' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}" src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
-            </div>
-            <div class="ml-auto bd-highlight">
-                {% if user_id == current_user.get_id() %}
-                <a class="fas fa-2x fa-cog text-light" data-toggle="tooltip" title="Settings" href="{{ url_for('account_settings') }}"></a>
-                {% endif %}
-            </div>
-        </div>
-
-        <!------------------------------- Levels/grades/informations data ----------------------------->
-        <div class="row m-t-10">
-            <div class="col">
-                <div class="d-flex">
-                    <div class='account-bar-wrapper'>
-                        <div class='account-bar'>
-                            <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
-                            <span class='account-bar-name'>Series</span>
-                            <div id="series_level" class='account-bar-level'>Level {{ data['series_level'] }}</div>
-                            <div class='xp-bar' data-toggle="tooltip" title="{{ data['series_percent'] }}%">
-                                <div id='xp-bar-fill-series'>
-                                    <div class='xp-increase-fx'>
-                                        <div class='xp-increase-fx-flicker'>
-                                            <div class='xp-increase-glow1'></div>
-                                            <div class='xp-increase-glow2'></div>
-                                            <div class='xp-increase-glow3'></div>
-                                        </div>
-                                        <div class='xp-increase-glow2'></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class='account-bar-next-level'>&nbsp{{ data['series_level'] | int + 1 }}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex">
-                    <div class='account-bar-wrapper'>
-                        <div class='account-bar'>
-                            <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
-                            <div class='account-bar-name'>Anime</div>
-                            <div id="anime_level" class='account-bar-level'>Level {{ data['anime_level'] }}</div>
-                            <div class='xp-bar' data-toggle="tooltip" title="{{ data['anime_percent'] }}%">
-                                <div id='xp-bar-fill-anime'>
-                                    <div class='xp-increase-fx'>
-                                        <div class='xp-increase-fx-flicker'>
-                                            <div class='xp-increase-glow1'></div>
-                                            <div class='xp-increase-glow2'></div>
-                                            <div class='xp-increase-glow3'></div>
-                                        </div>
-                                        <div class='xp-increase-glow2'></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class='account-bar-next-level'>&nbsp{{ data['anime_level'] | int + 1 }}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex">
-                    <div class='account-bar-wrapper'>
-                        <div class='account-bar'>
-                            <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['book_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['book_grade_id'] }}.png"/>
-                            <div class='account-bar-name'>Books</div>
-                            <div id="book_level" class='account-bar-level'>Level {{ data['book_level'] }}</div>
-                            <div class='xp-bar' data-toggle="tooltip" title="{{ data['book_percent'] }}%">
-                                <div id='xp-bar-fill-book'>
-                                    <div class='xp-increase-fx'>
-                                        <div class='xp-increase-fx-flicker'>
-                                            <div class='xp-increase-glow1'></div>
-                                            <div class='xp-increase-glow2'></div>
-                                            <div class='xp-increase-glow3'></div>
-                                        </div>
-                                        <div class='xp-increase-glow2'></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class='account-bar-next-level'>&nbsp{{ data['book_level'] | int + 1 }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <table class="table table-sm text-light">
-                    <thead>
-                    <tr>
-                        <th class="text-center" style="font-size: 12pt;" colspan="2">Data Informations</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td class="text-left">All anime achievements</td>
-                        <td class="text-center">
-                            <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('anime_achievements') }}" target="_blank"></a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="text-left">Grades and levels data</td>
-                        <td class="text-center">
-                            <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('level_grade_data') }}" target="_blank"></a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="text-left">Knowledge levels data</td>
-                        <td class="text-center">
-                            <a class="text-light fas fa-external-link-square-alt" href="{{ url_for('knowledge_grade_data') }}" target="_blank"></a>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!----------------------------- Lists when visiting other accounts ---------------------------->
-        {% if user_id != current_user.get_id() %}
-        <hr class="mt-2 mb-3">
-            <div class="row text-center">
-                <div class="col">
-                    <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='serieslist', list_view='grid', user_name=data['username']) }}">SeriesList</a>
-                </div>
-                <div class="col">
-                    <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='animelist', list_view='grid', user_name=data['username']) }}">AnimeList</a>
-                </div>
-                <div class="col">
-                    <a class="btn btn-primary" href="{{ url_for('mybookslist', list_view='grid', user_name=data['username']) }}">BooksList</a>
-                </div>
-                <div class="col">
-                    <a class="btn btn-warning" href="{{ url_for('achievements', user_name=data['username']) }}">Achievements</a>
-                </div>
-            </div>
-        {% endif %}
-
-        <!------------------------------------------ Friends ------------------------------------------>
-        <div style="cursor: pointer;" data-toggle="collapse" href="#FRIENDS" onclick="turn('FRIENDS', 'FRIENDS_arrow')">
-            <h3 class="font-weight-light text-center mt-3 mb-0">
-                <div class="arrow_div float-left">
-                    {% if user_id == current_user.get_id() %}
-                    <a class="fas fa-xs fa-user-plus" data-toggle="modal" data-target="#addFriendModal"></a>
-                    {% endif %}
-                </div>
-                Friends
-                <div class="arrow_div float-right">
-                    <a class="collapse_all fas fa-xs fa-chevron-down" id="FRIENDS_arrow"></a>
-                </div>
-            </h3>
-        </div>
-        <hr class="mt-1 p-b-15 mb-0">
-        <div class="collapse show container-stats" id="FRIENDS">
-            <div class="d-flex flex-wrap friends_container">
-                {% for friend in data["friends"] %}
-                {% if friend['status'] == "pending" %}
-                    {% if user_id == current_user.get_id() %}
-                    <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
-                        <a href="/account/{{ friend['username'] }}">
-                            <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
-                        </a>
-                        <br>
-                        <span style="font-size: 12pt;" class="text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span>
-                        <br>
-                        <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
-                        <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
-                    </div>
-                    {% endif %}
-                {% elif friend['status'] == "request" %}
-                    {% if user_id == current_user.get_id() %}
-                    <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
-                        <a class="disabled">
-                            <img height="70" width="70" style="filter: blur(3px);" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
-                        </a>
-                        <br>
-                        <span style="font-size: 12pt;" class="text-light">{{ friend['username'] }}</span>
-                        <br>
-                        <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}','td_{{ friend['user_id'] }}')"></a>
-                    </div>
-                    {% endif %}
-                {% elif friend['status'] == "declined" %}
-                {% else %}
-                    <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
-                        <a href="/account/{{ friend['username'] }}">
-                            <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
-                        </a>
-                        <br>
-                        <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
-                        <br>
-                        {% if user_id == current_user.get_id() %}
-                        <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
-                        {% endif %}
-                    </div>
-                {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-
-        <!---------------------------------------- Statistics ----------------------------------------->
-        <div style="cursor: pointer;" data-toggle="collapse" href="#SERIES" onclick="turn('SERIES', 'SERIES_arrow')">
-            <h3 class="font-weight-light text-center mt-3 mb-0">
-                Series Statistics
-                <div class="arrow_div float-right">
-                    <a class="collapse_all fas fa-xs fa-chevron-down" id="SERIES_arrow"></a>
-                </div>
-            </h3>
-        </div>
-        <hr class="mt-1 p-b-15 mb-0">
-        <div id="SERIES" class="collapse show container-stats">
-            <div class="m-b-5">
-                <span class="stat_text"><b>Days:</b> {{ data['series']['time_spent_day'] }}</span>
-                <span class="stat_text float-right"><b>Hours:</b> {{ data['series']['time_spent_hour'] }}</span>
-            </div>
-            <div class="m-b-5">
-                <span class="stat_text"><b>Mean Score:</b> {{ data['series']['mean_score'] }}</span>
-            </div>
-
-            <figure class="d-flex">
-                {% if data['series']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
-                <span class="block_no_data" title="No data">
-                    <span id="100%" class="value"></span>
-                </span>
-                {% else %}
-                <span class="block" title="Watching">
-                    <span id="{{ data['series']['element_percentage'][0] }}%" class="value"></span>
-                </span>
-                <span class="block" title="Completed">
-                    <span id="{{ data['series']['element_percentage'][1] }}%" class="value"></span>
-                </span>
-                <span class="block" title="On Hold">
-                    <span id="{{ data['series']['element_percentage'][2] }}%" class="value"></span>
-                </span>
-                <span class="block" title="Random">
-                    <span id="{{ data['series']['element_percentage'][3] }}%" class="value"></span>
-                </span>
-                <span class="block" title="Dropped">
-                    <span id="{{ data['series']['element_percentage'][4] }}%" class="value"></span>
-                </span>
-                <span class="block" title="Plan to Watch">
-                    <span id="{{ data['series']['element_percentage'][5] }}%" class="value"></span>
-                </span>
-                {% endif %}
-            </figure>
-
-            <div class="m-t-10">
-                <div class="row">
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Watching:</span>
-                    </div>
-                    <div class="col p-0 position">
-                        <span class="stat_text">{{ data['series']['watching_count'] }}</span>
-                    </div>
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Dropped:</span>
-                    </div>
-                    <div class="col p-l-0 position">
-                        <span class="stat_text">{{ data['series']['dropped_count'] }}</span>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Completed:</span>
-                    </div>
-                    <div class="col p-0 position">
-                        <span class="stat_text">{{ data['series']['completed_count'] }}</span>
-                    </div>
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Plan to Watch:</span>
-                    </div>
-                    <div class="col p-l-0 position">
-                        <span class="stat_text">{{ data['series']['plantowatch_count'] }}</span>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">On Hold:</span>
-                    </div>
-                    <div class="col p-0 position">
-                        <span class="stat_text">{{ data['series']['onhold_count'] }}</span>
-                    </div>
-                    <div class="col mini p-r-0">
-                        <span class="stat_text"></span>
-                    </div>
-                    <div class="col p-l-0 position">
-                        <span class="stat_text"></span>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Random:</span>
-                    </div>
-                    <div class="col p-0 position">
-                        <span class="stat_text">{{ data['series']['random_count'] }}</span>
-                    </div>
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Episodes:</span>
-                    </div>
-                    <div class="col p-l-0 position">
-                        <span class="stat_text">{{ data['series']['nb_ep_watched'] }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div style="cursor: pointer;" data-toggle="collapse" href="#ANIME" onclick="turn('ANIME', 'ANIME_arrow')">
-            <h3 class="font-weight-light text-center mt-3 mb-0">
-                Anime Statistics
-                <div class="arrow_div float-right">
-                    <a class="collapse_all fas fa-xs fa-chevron-down" id="ANIME_arrow"></a>
-                </div>
-            </h3>
-        </div>
-        <hr class="mt-1 p-b-15 mb-0">
-        <div id="ANIME" class="collapse show container-stats">
-            <div class="m-b-5">
-                <span class="stat_text"><b>Days:</b> {{ data['anime']['time_spent_day'] }}</span>
-                <span class="stat_text float-right"><b>Hours:</b> {{ data['anime']['time_spent_hour'] }}</span>
-            </div>
-            <div class="m-b-5">
-                <span class="stat_text"><b>Mean Score:</b> {{ data['anime']['mean_score'] }}</span>
-            </div>
-
-            <figure class="d-flex">
-                {% if data['anime']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
-                <span class="block_no_data" title="No data">
-                    <span id="100%" class="value"></span>
-                </span>
-                {% else %}
-                <span class="block" title="Watching">
-                    <span id="{{ data['anime']['element_percentage'][0] }}%" class="value"></span>
-                </span>
-                <span class="block" title="Completed">
-                    <span id="{{ data['anime']['element_percentage'][1] }}%" class="value"></span>
-                </span>
-                <span class="block" title="On Hold">
-                    <span id="{{ data['anime']['element_percentage'][2] }}%" class="value"></span>
-                </span>
-                <span class="block" title="Random">
-                    <span id="{{ data['anime']['element_percentage'][3] }}%" class="value"></span>
-                </span>
-                <span class="block" title="Dropped">
-                    <span id="{{ data['anime']['element_percentage'][4] }}%" class="value"></span>
-                </span>
-                <span class="block" title="Plan to Watch">
-                    <span id="{{ data['anime']['element_percentage'][5] }}%" class="value"></span>
-                </span>
-                {% endif %}
-            </figure>
-
-            <div class="m-t-10">
-                <div class="row">
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Watching:</span>
-                    </div>
-                    <div class="col p-0 position">
-                        <span class="stat_text">{{ data['anime']['watching_count'] }}</span>
-                    </div>
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Dropped:</span>
-                    </div>
-                    <div class="col p-l-0 position">
-                        <span class="stat_text">{{ data['anime']['dropped_count'] }}</span>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Completed:</span>
-                    </div>
-                    <div class="col p-0 position">
-                        <span class="stat_text">{{ data['anime']['completed_count'] }}</span>
-                    </div>
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Plan to Watch:</span>
-                    </div>
-                    <div class="col p-l-0 position">
-                        <span class="stat_text">{{ data['anime']['plantowatch_count'] }}</span>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">On Hold:</span>
-                    </div>
-                    <div class="col p-0 position">
-                        <span class="stat_text">{{ data['anime']['onhold_count'] }}</span>
-                    </div>
-                    <div class="col mini p-r-0">
-                        <span class="stat_text"></span>
-                    </div>
-                    <div class="col p-l-0 position">
-                        <span class="stat_text"></span>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Random:</span>
-                    </div>
-                    <div class="col p-0 position">
-                        <span class="stat_text">{{ data['anime']['random_count'] }}</span>
-                    </div>
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Episodes:</span>
-                    </div>
-                    <div class="col p-l-0 position">
-                        <span class="stat_text">{{ data['anime']['nb_ep_watched'] }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div style="cursor: pointer;" data-toggle="collapse" href="#BOOK" onclick="turn('BOOK', 'BOOK_arrow')">
-            <h3 class="font-weight-light text-center mt-3 mb-0">
-                Books Statistics
-                <div class="arrow_div float-right">
-                    <a class="collapse_all fas fa-xs fa-chevron-down" id="BOOK_arrow"></a>
-                </div>
-            </h3>
-        </div>
-        <hr class="mt-1 p-b-15 mb-0">
-        <div id="BOOK" class="collapse show container-stats">
-            <div class="m-b-5">
-                <span class="stat_text"><b>Days:</b> {{ data['book']['time_spent_day'] }}</span>
-                <span class="stat_text float-right"><b>Hours:</b> {{ data['book']['time_spent_hour'] }}</span>
-            </div>
-            <div class="m-b-5">
-                <span class="stat_text"><b>Mean Score:</b> {{ data['book']['mean_score'] }}</span>
-            </div>
-
-            <figure class="d-flex">
-                {% if data['book']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
-                <span class="block_no_data" title="No data">
-                    <span id="100%" class="value"></span>
-                </span>
-                {% else %}
-                <span class="block" title="Reading">
-                    <span id="{{ data['book']['element_percentage'][0] }}%" class="value"></span>
-                </span>
-                <span class="block" title="Completed">
-                    <span id="{{ data['book']['element_percentage'][1] }}%" class="value"></span>
-                </span>
-                <span class="block" title="On Hold">
-                    <span id="{{ data['book']['element_percentage'][2] }}%" class="value"></span>
-                </span>
-                <span class="block" title="Dropped">
-                    <span id="{{ data['book']['element_percentage'][3] }}%" class="value"></span>
-                </span>
-                <span class="block" title="Plan to Read">
-                    <span id="{{ data['book']['element_percentage'][4] }}%" class="value"></span>
-                </span>
-                {% endif %}
-            </figure>
-
-            <div class="m-t-10">
-                <div class="row">
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Reading:</span>
-                    </div>
-                    <div class="col p-0 position">
-                        <span class="stat_text">{{ data['book']['reading_count'] }}</span>
-                    </div>
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Dropped:</span>
-                    </div>
-                    <div class="col p-l-0 position">
-                        <span class="stat_text">{{ data['book']['dropped_count'] }}</span>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Completed:</span>
-                    </div>
-                    <div class="col p-0 position">
-                        <span class="stat_text">{{ data['book']['completed_count'] }}</span>
-                    </div>
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Plan to Read:</span>
-                    </div>
-                    <div class="col p-l-0 position">
-                        <span class="stat_text">{{ data['book']['plantoread_count'] }}</span>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">On Hold:</span>
-                    </div>
-                    <div class="col p-0 position">
-                        <span class="stat_text">{{ data['book']['onhold_count'] }}</span>
-                    </div>
-                    <div class="col mini p-r-0">
-                        <span class="stat_text">Pages read:</span>
-                    </div>
-                    <div class="col p-l-0 position">
-                        <span class="stat_text">{{ data['book']['nb_pages_read'] }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="modal_loading"></div>
 {% endblock content %}
 
