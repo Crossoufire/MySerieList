@@ -27,6 +27,7 @@
         Add number of episode per season in the description modal
         Add tab in the SeriesList / AnimeList to see directly achievement and stats about this specific list
         Possibility to edit metadata
+        Change modal info
 
     Bookslist:
         Add several search bar (name, author, etc)
