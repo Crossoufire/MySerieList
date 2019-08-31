@@ -202,48 +202,44 @@
 </div>
 <hr class="mt-1 p-b-15 mb-0">
 <div class="collapse show container-stats" id="FRIENDS">
-    <div class="d-flex flex-wrap friends_container">
-        {% for friend in data["friends"] %}
-        {% if friend['status'] == "pending" %}
-            {% if user_id == current_user.get_id() %}
-            <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
-                <a href="/account/{{ friend['username'] }}">
-                    <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
-                </a>
-                <br>
-                <span style="font-size: 12pt;" class="text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span>
-                <br>
-                <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
-                <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
-            </div>
-            {% endif %}
-        {% elif friend['status'] == "request" %}
-            {% if user_id == current_user.get_id() %}
-            <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
-                <a class="disabled">
-                    <img height="70" width="70" style="filter: blur(3px);" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
-                </a>
-                <br>
-                <span style="font-size: 12pt;" class="text-light">{{ friend['username'] }}</span>
-                <br>
-                <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}','td_{{ friend['user_id'] }}')"></a>
-            </div>
-            {% endif %}
-        {% elif friend['status'] == "declined" %}
-        {% else %}
-            <div id="td_{{ friend['user_id'] }}" class="text-center friends_div">
-                <a href="/account/{{ friend['username'] }}">
-                    <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/>
-                </a>
-                <br>
-                <span style="font-size: 12pt;" class="text-light" >{{ friend['username'] }}</span>
-                <br>
-                {% if user_id == current_user.get_id() %}
-                <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+    <div class="d-flex flex-wrap">
+        <ul class="text-center">
+            {% for friend in data["friends"] %}
+                {% if friend['status'] == "pending" %}
+                    {% if user_id == current_user.get_id() %}
+                        <li id="td_{{ friend['user_id'] }}">
+                            <a href="/account/{{ friend['username'] }}">
+                                <span style="font-size: 12pt;" class="disabled text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span><br>
+                                <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
+                                <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
+                                <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
+                            </a>
+                        </li>
+                    {% endif %}
+                {% elif friend['status'] == "request" %}
+                    {% if user_id == current_user.get_id() %}
+                        <li id="td_{{ friend['user_id'] }}">
+                            <a class="disabled" href="/account/{{ friend['username'] }}">
+                                <span style="font-size: 12pt;" class="disabled text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span><br>
+                                <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}"/><br>
+                                <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                            </a>
+                        </li>
+                    {% endif %}
+                {% elif friend['status'] == "declined" %}
+                {% else %}
+                    <li id="td_{{ friend['user_id'] }}">
+                        <a href="/account/{{ friend['username'] }}">
+                            <span style="font-size: 12pt;" class="disabled text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span><br>
+                            <img height="70" width="70" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
+                            {% if user_id == current_user.get_id() %}
+                                <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                            {% endif %}
+                        </a>
+                    </li>
                 {% endif %}
-            </div>
-        {% endif %}
-        {% endfor %}
+            {% endfor %}
+        </ul>
     </div>
 </div>
 

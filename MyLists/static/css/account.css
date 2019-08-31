@@ -3,6 +3,18 @@
     display: none !important;
 }
 
+ul {
+    padding: 0px;
+    list-style-type: none;
+}
+
+li {
+    display: inline-block;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
 .image-position {
     position: relative;
 }
