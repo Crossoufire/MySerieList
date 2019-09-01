@@ -3,8 +3,7 @@
 Account/Account settings:
 	Change settings page (80% done)
 	Last updated books/anime/series for friends list
-	Change position to delete a friend
-	Possibility to display/hide the score by default in grid lists
+	Possibility to display/hide the score by default for grid lists
 	Possibility to select a default view for the lists
 
 Autocomplete:
@@ -13,7 +12,7 @@ Autocomplete:
 	Add "more results"
 
 Achievements:
-	HTML improvements
+	HTML improvements (85%)
 	Descriptions and titles
 	Add description inside the page
 

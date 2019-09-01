@@ -5,11 +5,14 @@
 <!---------- Jquery autocomplete ---------->
 <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet">
 <!------ Jquery autocomplete loading ------>
-    {% if list_view == 'grid' %}
-        <link href="{{ url_for('static', filename='css/mymedialist.css') }}" rel="stylesheet">
-    {% elif list_view == 'table' %}
-        <link href="{{ url_for('static', filename='css/mymedialist_table.css') }}" rel="stylesheet">
-    {% endif %}
+<link href="{{ url_for('static', filename='css/achievements.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/statistics.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/mymedialist_common.css') }}" rel="stylesheet">
+{% if list_view == 'grid' %}
+    <link href="{{ url_for('static', filename='css/mymedialist.css') }}" rel="stylesheet">
+{% elif list_view == 'table' %}
+    <link href="{{ url_for('static', filename='css/mymedialist_table.css') }}" rel="stylesheet">
+{% endif %}
 {% endblock css %}
 
 
@@ -847,9 +850,12 @@ $(function() {
 });
 </script>
 {% endif %}
-    {% if list_view == 'grid' %}
-        <script src="{{ url_for('static', filename='js/mymedialist.js') }}"></script>
-    {% elif list_view == 'table' %}
-        <script src="{{ url_for('static', filename='js/mymedialist_table.js') }}"></script>
-    {% endif %}
+<script src="{{ url_for('static', filename='js/mymedialist_common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/achievements.js') }}"></script>
+<script src="{{ url_for('static', filename='js/statistics.js') }}"></script>
+{% if list_view == 'grid' %}
+    <script src="{{ url_for('static', filename='js/mymedialist.js') }}"></script>
+{% elif list_view == 'table' %}
+    <script src="{{ url_for('static', filename='js/mymedialist_table.js') }}"></script>
+{% endif %}
 {% endblock script %}

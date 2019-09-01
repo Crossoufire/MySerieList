@@ -432,11 +432,90 @@ def account(user_name):
     account_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
     account_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
 
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_profile_picture(form.picture.data)
+            old_picture_file = user.image_file
+            user.image_file = picture_file
+            db.session.commit()
+            app.logger.info(
+                '[{}] Settings updated : old picture file = {}, new picture file = {}'.format(user.id, old_picture_file,
+                                                                                              user.image_file))
+        if form.username.data != user.username:
+            old_username = user.username
+            user.username = form.username.data
+            db.session.commit()
+            app.logger.info('[{}] Settings updated : old username = {}, new username = {}'.format(user.id, old_username,
+                                                                                                  user.username))
+        if form.isprivate.data != user.private:
+            old_value = user.private
+            user.private = form.isprivate.data
+            db.session.commit()
+            app.logger.info('[{}] Settings updated : old private mode = {}, new private mode = {}'.format(user.id,
+                                                                                                          old_value,
+                                                                                                          form.isprivate.data))
+
+        old_value = user.homepage
+        if form.homepage.data == "msl":
+            user.homepage = HomePage.MYSERIESLIST
+        elif form.homepage.data == "mal":
+            user.homepage = HomePage.MYANIMESLIST
+        elif form.homepage.data == "mbl":
+            user.homepage = HomePage.MYBOOKSLIST
+        elif form.homepage.data == "acc":
+            user.homepage = HomePage.ACCOUNT
+        elif form.homepage.data == "hof":
+            user.homepage = HomePage.HALL_OF_FAME
+
+        db.session.commit()
+        app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
+                                                                                              old_value,
+                                                                                              form.homepage.data))
+        email_changed = False
+        if form.email.data != user.email:
+            old_email = user.email
+            user.transition_email = form.email.data
+            db.session.commit()
+            app.logger.info('[{}] Settings updated : old email = {}, new email = {}'.format(user.id, old_email,
+                                                                                            user.transition_email))
+            email_changed = True
+            if send_email_update_email(user):
+                success = True
+            else:
+                success = False
+                app.logger.error('[SYSTEM] Error while sending the email update email to {}'.format(user.email))
+        if not email_changed:
+            flash("Your account has been updated ! ", 'success')
+        else:
+            if success:
+                flash("Your account has been updated ! Please click on the link to validate your new email address.",
+                      'success')
+            else:
+                flash("There was an error internal error. Please contact the administrator.", 'danger')
+        return redirect(url_for('account', user_name=current_user.username))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+        form.isprivate.data = current_user.private
+
+        if current_user.homepage == HomePage.MYSERIESLIST:
+            form.homepage.data = "msl"
+        elif current_user.homepage == HomePage.MYANIMESLIST:
+            form.homepage.data = "mal"
+        elif current_user.homepage == HomePage.MYBOOKSLIST:
+            form.homepage.data = "mbl"
+        elif current_user.homepage == HomePage.ACCOUNT:
+            form.homepage.data = "acc"
+        elif current_user.homepage == HomePage.HALL_OF_FAME:
+            form.homepage.data = "hof"
+
     return render_template('account.html',
                            title="{}'s account".format(user.username),
                            data=account_data,
-                           form=add_friend_form,
-                           user_id=str(user.id))
+                           form_friends=add_friend_form,
+                           user_id=str(user.id),
+                           form=form)
 
 
 @app.route("/anime_achievements", methods=['GET'])

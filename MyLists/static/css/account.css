@@ -3,16 +3,40 @@
     display: none !important;
 }
 
-ul {
+.bordered {
+    border: solid 1px black;
+}
+
+.nav-pills {
+    vertical-align: middle !important;
+}
+
+.account_tab {
+    border-bottom: white 1px solid;
+}
+
+.account_tab > li > .active {
+    background: #1a1a1a !important;
+}
+
+.account_tab > li > a {
+    color: white;
+}
+
+.friends > ul {
     padding: 0px;
     list-style-type: none;
 }
 
-li {
+.friends > ul > li {
     display: inline-block;
     margin-left: 20px;
     margin-right: 20px;
     margin-bottom: 20px;
+}
+
+.container {
+    padding-top: 0px;
 }
 
 .image-position {
@@ -27,10 +51,11 @@ li {
     z-index: 10;
 }
 
-.image-settings {
+.image-friend {
     position: absolute;
-    top: 5%;
-    right: 3%;
+    right: 30%;
+    left: 10%;
+    bottom: 25%;
     z-index: 10;
 }
 
