@@ -3,6 +3,17 @@
     display: none !important;
 }
 
+.test {
+    list-style-type: none;
+    display: inline-block;
+    padding: 0px;
+    margin: 0px;
+}
+
+.test2 {
+    display: inline-block;
+}
+
 .bordered {
     border: solid 1px black;
 }
@@ -45,9 +56,10 @@
 
 .image-data {
     position: absolute;
+    max-width: 450px;
     right: 30%;
     left: 10%;
-    bottom: 40%;
+    bottom: 45%;
     z-index: 10;
 }
 
@@ -55,7 +67,7 @@
     position: absolute;
     right: 30%;
     left: 10%;
-    bottom: 25%;
+    bottom: 30%;
     z-index: 10;
 }
 

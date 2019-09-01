@@ -4,6 +4,7 @@
 {% block css %}
 <link href="{{ url_for('static', filename='css/account.css') }}" rel="stylesheet">
 <link href="{{ url_for('static', filename='css/account_settings.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
 {% endblock css %}
 
 
@@ -22,36 +23,34 @@
 
 {% block content %}
 <div class="image-position">
-    <img height="380" width="1268" src="{{ url_for('static', filename='img/profile_background.jpg') }}" alt=""/>
+    <img height="420" width="1270" src="{{ url_for('static', filename='img/profile_background.jpg') }}" alt=""/>
     <div class="d-flex flex-wrap image-data">
-        <div class="image-profile">
-            <img height="160" width="160" src="{{ data['profile_picture'] }}">
-        </div>
+        <img height="160" width="160" src="{{ data['profile_picture'] }}">
         <div class="p-t-10 pl-2 pr-2" style="background-color: rgba(0, 0, 0, 0.5);">
             <h2 class="text-center">{{ data['username'] }}
                 <img height='50' width='50' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}"
                  src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
             </h2>
             <hr class="m-0">
-            <div class="row">
-                <div class="col m-l-20 m-r-10 m-b-5 align-middle text-center">
+            <ul class="test text-center">
+                <li class="test2 m-l-25 m-r-25">
                     <img height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
                     <div>Series <br> {{ data['series_level'] }}</div>
-                </div>
-                <div class="col m-b-5 align-middle text-center">
-                    <img height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
+                </li>
+                <li  class="test2">
+                    <img height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
                     <div>Anime <br> {{ data['anime_level'] }}</div>
-                </div>
-                <div class="col m-l-10 m-r-20 m-b-5 align-middle text-center">
-                    <img height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['book_grade_id'] }}.png"/>
+                </li>
+                <li  class="test2 m-l-25 m-r-25">
+                    <img height='40' width='40' data-toggle="tooltip" title="{{ data['book_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['book_grade_id'] }}.png"/>
                     <div>Books <br> {{ data['book_level'] }}</div>
-                </div>
-            </div>
+                </li>
+            </ul>
         </div>
     </div>
-    <div class="image-friend">
+    <div style="transform: skew(-20deg);" class="image-friend">
         {% if user_id == current_user.get_id() %}
-        <button class="btn btn-sm btn-light" data-toggle="modal" data-target="#addFriendModal">Add a friend</button>
+        <button class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addFriendModal">Add a friend</button>
         {% else %}
         <button class="btn btn-sm btn-light" data-toggle="modal" data-target="#addFriendModal">Add friend</button>
         {% endif %}
@@ -76,7 +75,6 @@
 </ul>
 
 <div class="tab-content" id="account_tab_content">
-
     <div id="stats_tab" class="tab-pane fade show active">
         <!--------------- List other accounts --------------->
         {% if user_id != current_user.get_id() %}
@@ -492,7 +490,6 @@
             </div>
         </div>
     </div>
-
     <div id="friends_tab" class="tab-pane fade">
         <div class="collapse show container-stats m-t-30" id="FRIENDS">
             <div class="d-flex flex-wrap friends">
@@ -536,7 +533,6 @@
             </div>
         </div>
     </div>
-
     <div id="infos_tab" class="tab-pane fade">
         <!--------- Levels - grades - infos ------------>
         <div class="row m-t-30 m-l-10 m-r-10">
@@ -636,7 +632,6 @@
             </div>
         </div>
     </div>
-
     {% if user_id == current_user.get_id() %}
     <div id="settings_tab" class="tab-pane fade">
         <div class="container form_account">
@@ -731,7 +726,6 @@
         </div>
     </div>
     {% endif %}
-
 </div>
 
 {% if user_id == current_user.get_id() %}
@@ -768,6 +762,7 @@
 
 {% block script %}
 <!--------- Main Javascript ---------->
+<script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
 <script type="text/javascript">
 function turn(category, arrow) {
     var arrow = document.getElementById(arrow);
