@@ -661,7 +661,6 @@
                     <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}
                 </div>
-
                 <div class="m-t-30">
                     {{ form.submit_account(class="btn btn-outline-info custom-btn-size p-r-6 p-l-6") }}
                     <a class="btn btn-outline-info custom-btn-size p-r-6 p-l-6" href="{{ url_for('change_password') }}" role="button">Change password?</a>
@@ -684,7 +683,7 @@
                     {% if form_friends.friend_to_add.errors %}
                     {{ form_friends.friend_to_add(class="form-control form-control is-invalid") }}
                     <div class="invalid-feedback">
-                        {% for error in form.friend_to_add.errors %}
+                        {% for error in form_friends.friend_to_add.errors %}
                         <span>{{ error }}</span> {% endfor %}
                     </div>
                     {% else %}
