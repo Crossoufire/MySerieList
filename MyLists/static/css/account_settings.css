@@ -1,26 +1,7 @@
-.form_account {
-    max-width: 800px;
-    margin-top: 40px;
-}
 
-.border_account {
-    border-style: solid;
-    border-width: 1px;
-    border-color: grey;
-    border-radius: 3px;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-    padding-left: 0px;
-    padding-right: 0px;
-}
 
-label {
-    color: white;
-    height: 20px;
-    padding-top: 3px;
-    float:left;
-    text-align: right;
-}
+
+
 
 .list_dropdown {
     border-style: 1px;

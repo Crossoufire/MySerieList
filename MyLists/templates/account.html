@@ -3,8 +3,6 @@
 
 {% block css %}
 <link href="{{ url_for('static', filename='css/account.css') }}" rel="stylesheet">
-<link href="{{ url_for('static', filename='css/account_settings.css') }}" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
 {% endblock css %}
 
 
@@ -23,7 +21,7 @@
 
 {% block content %}
 <div class="image-position">
-    <img height="420" class="img-fluid" src="{{ url_for('static', filename='img/profile_background.jpg') }}" alt=""/>
+    <img height="420" width="1270" src="{{ url_for('static', filename='img/profile_background.jpg') }}" alt=""/>
     <div class="d-flex flex-wrap image-data">
         <img height="160" width="160" src="{{ data['profile_picture'] }}">
         <div class="p-t-10 pl-2 pr-2" style="background-color: rgba(0, 0, 0, 0.5);">
@@ -32,16 +30,16 @@
                  src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
             </h2>
             <hr class="m-0">
-            <ul class="test text-center">
-                <li class="test2 m-l-25 m-r-25">
+            <ul class="grade-levels text-center">
+                <li class="grade-levels-2 m-l-25 m-r-25">
                     <img height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
                     <div>Series <br> {{ data['series_level'] }}</div>
                 </li>
-                <li  class="test2">
+                <li  class="grade-levels-2">
                     <img height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
                     <div>Anime <br> {{ data['anime_level'] }}</div>
                 </li>
-                <li  class="test2 m-l-25 m-r-25">
+                <li  class="grade-levels-2 m-l-25 m-r-25">
                     <img height='40' width='40' data-toggle="tooltip" title="{{ data['book_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['book_grade_id'] }}.png"/>
                     <div>Books <br> {{ data['book_level'] }}</div>
                 </li>
@@ -91,9 +89,9 @@
             </div>
         {% endif %}
 
-        <div class="row d-flex m-t-30 m-l-10 m-r-10">
+        <div class="d-flex flex-wrap stats-container">
             <!------------------------ Series statistics --------------------------->
-            <div class="col">
+            <div class="test">
                 <div style="cursor: pointer;" data-toggle="collapse" data-target="#SERIES" onclick="turn('SERIES', 'SERIES_arrow')">
                     <h3 class="font-weight-light text-center mt-3 mb-0">
                         Series Statistics
@@ -202,8 +200,8 @@
                     </div>
                 </div>
             </div>
-            <!------------------------ Anime statistics --------------------------->
-            <div class="col">
+            <!------------------------- Anime statistics --------------------------->
+            <div class="test">
                 <div style="cursor: pointer;" data-toggle="collapse" data-target="#ANIME" onclick="turn('ANIME', 'ANIME_arrow')">
                     <h3 class="font-weight-light text-center mt-3 mb-0">
                         Anime Statistics
@@ -312,11 +310,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="row d-flex m-t-30 m-l-10 m-r-10">
             <!------------------------ Movies statistics --------------------------->
-            <div class="col">
+            <div class="test">
                 <div style="cursor: pointer;" data-toggle="collapse" data-target="#MOVIES" onclick="turn('MOVIES', 'MOVIES_arrow')">
                     <h3 class="font-weight-light text-center mt-3 mb-0">
                         Movies Statistics
@@ -396,8 +391,8 @@
                     </div>
                 </div>
             </div>
-            <!------------------------ Books statistics --------------------------->
-            <div class="col">
+            <!------------------------- Books statistics --------------------------->
+            <div class="test">
                 <div style="cursor: pointer;" data-toggle="collapse" data-target="#BOOK" onclick="turn('BOOK', 'BOOK_arrow')">
                     <h3 class="font-weight-light text-center mt-3 mb-0">
                         Books Statistics
@@ -415,7 +410,6 @@
                     <div class="m-b-5">
                         <span class="stat_text"><b>Mean Score:</b> {{ data['book']['mean_score'] }}</span>
                     </div>
-
                     <figure class="d-flex">
                         {% if data['book']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
                         <span class="block_no_data" title="No data">
@@ -439,7 +433,6 @@
                         </span>
                         {% endif %}
                     </figure>
-
                     <div class="m-t-10">
                         <div class="row">
                             <div class="col mini p-r-0">
@@ -491,46 +484,44 @@
         </div>
     </div>
     <div id="friends_tab" class="tab-pane fade">
-        <div class="collapse show container-stats m-t-30" id="FRIENDS">
-            <div class="d-flex flex-wrap friends">
-                <ul class="text-center">
-                    {% for friend in data["friends"] %}
-                    {% if friend['status'] == "pending" %}
-                    {% if user_id == current_user.get_id() %}
-                    <li id="td_{{ friend['user_id'] }}">
-                        <a href="/account/{{ friend['username'] }}">
-                            <span class="disabled text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span><br>
-                            <img height="100" width="100" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
-                            <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
-                            <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% elif friend['status'] == "request" %}
-                    {% if user_id == current_user.get_id() %}
-                    <li id="td_{{ friend['user_id'] }}">
-                        <a class="disabled" href="/account/{{ friend['username'] }}">
-                            <span class="disabled text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span><br>
-                            <img height="100" width="100" src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}"/><br>
-                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% elif friend['status'] == "declined" %}
-                    {% else %}
-                    <li id="td_{{ friend['user_id'] }}">
-                        <a href="/account/{{ friend['username'] }}">
-                            <span class="disabled text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span><br>
-                            <img height="100" width="100" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
-                            {% if user_id == current_user.get_id() %}
-                            <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
-                            {% endif %}
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
+        <div class="d-flex flex-wrap friends m-t-30">
+            <ul class="text-center">
+                {% for friend in data["friends"] %}
+                {% if friend['status'] == "pending" %}
+                {% if user_id == current_user.get_id() %}
+                <li id="td_{{ friend['user_id'] }}">
+                    <a href="/account/{{ friend['username'] }}">
+                        <span class="disabled text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span><br>
+                        <img height="100" width="100" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
+                        <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
+                        <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
+                    </a>
+                </li>
+                {% endif %}
+                {% elif friend['status'] == "request" %}
+                {% if user_id == current_user.get_id() %}
+                <li id="td_{{ friend['user_id'] }}">
+                    <a class="disabled" href="/account/{{ friend['username'] }}">
+                        <span class="disabled text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span><br>
+                        <img height="100" width="100" src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}"/><br>
+                        <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                    </a>
+                </li>
+                {% endif %}
+                {% elif friend['status'] == "declined" %}
+                {% else %}
+                <li id="td_{{ friend['user_id'] }}">
+                    <a href="/account/{{ friend['username'] }}">
+                        <span class="disabled text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span><br>
+                        <img height="100" width="100" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
+                        {% if user_id == current_user.get_id() %}
+                        <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                        {% endif %}
+                    </a>
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
         </div>
     </div>
     <div id="infos_tab" class="tab-pane fade">
@@ -634,102 +625,55 @@
     </div>
     {% if user_id == current_user.get_id() %}
     <div id="settings_tab" class="tab-pane fade">
-        <div class="container form_account">
-            <div class="border_account">
-                <h3 class="m-b-15 text-center">Account Settings</h3>
-                <hr>
-                <form method="POST" action="" enctype="multipart/form-data">
-                    {{ form.hidden_tag() }}
-                    <div class="container-form">
-                        <!------- Username ------->
-                        <div class="form-group">
-                            {{ form.username.label(class="form-control-label") }}
-                            {% if form.username.errors %}
-                            <div class="md-form">
-                                {{ form.username(class="form-control form-control-lg is-invalid text-light text-input") }}
-                                <div class="invalid-feedback error-msg">
-                                    {% for error in form.username.errors %}
-                                    <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            {% else %}
-                            <div class="md-form">
-                                {{ form.username(class="form-control text-light text-input") }}
-                            </div>
-                            {% endif %}
-                        </div>
-                        <!------ Email ------>
-                        <div class="form-group">
-                            {{ form.email.label(class="form-control-label") }}
-                            {% if form.email.errors %}
-                            <div class="md-form">
-                                {{ form.email(class="form-control is-invalid text-light text-input") }}
-                                <div class="invalid-feedback error-msg">
-                                    {% for error in form.email.errors %}
-                                    <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            {% else %}
-                            <div class="md-form">
-                                {{ form.email(class="form-control text-light text-input") }}
-                            </div>
-                            {% endif %}
-                        </div>
-                        <!------ Default homepage ------>
-                        <div class="form-group">
-                            {{ form.homepage.label(class="form-control-label") }}
-                            {% if form.homepage.errors %}
-                            {{ form.homepage(class="form-control is-invalid text-input") }}
-                            <div class="invalid-feedback error-msg">
-                                {% for error in form.homepage.errors %}
-                                <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                            {% else %}
-                            {{ form.homepage }}
-                            {% endif %}
-                        </div>
-                        <!------ Private ------>
-                        <div class="form-group">
-                            {{ form.isprivate.label(class="form-control-label") }}
-                            {% if form.isprivate.errors %}
-                            {{ form.isprivate(class="form-control is-invalid text-input") }}
-                            <div class="invalid-feedback error-msg">
-                                {% for error in form.isprivate.errors %}
-                                <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                            {% else %}
-                            {{ form.isprivate(class="m-t-9") }}
-                            {% endif %}
-                        </div>
-                        <!------ Profile picture  ------>
-                        <div class="form-group upload-btn-wrapper">
-                            {{ form.picture.label(class="form-control-label") }}
-                            {{ form.picture }}
-                            {% if form.picture.errors %}
-                            {% for error in form.picture.errors %}
-                            <span class="text-danger error-msg">{{ error }}</span><br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <!------ Submit ------>
-                    <div class="text-center m-t-30">
-                        {{ form.submit(class="btn btn-outline-info custom-btn-size") }}
-                        <a class="btn btn-outline-info custom-btn-size" href="{{ url_for('change_password') }}" role="button">Change password?</a>
-                    </div>
-                </form>
-            </div>
+        <div class="d-flex form-center">
+            <form method="POST" action="" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="m-t-30">
+                    {{ form.username.label }}<br>
+                    {{ form.username(size=32) }}<br>
+                    {% for error in form.username.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="m-t-30">
+                    {{ form.email.label }}<br>
+                    {{ form.email(size=32) }}<br>
+                    {% for error in form.email.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="m-t-30">
+                    {{ form.homepage.label }}: &nbsp&nbsp&nbsp {{ form.homepage }}<br>
+                    {% for error in form.homepage.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="m-t-30">
+                    {{ form.isprivate.label }}: &nbsp&nbsp&nbsp {{ form.isprivate(size=32) }}<br>
+                    {% for error in form.isprivate.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="m-t-30">
+                    {{ form.picture.label }}<br>
+                    {{ form.picture(size=32) }}<br>
+                    {% for error in form.picture.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+
+                <div class="m-t-30">
+                    {{ form.submit_account(class="btn btn-outline-info custom-btn-size p-r-6 p-l-6") }}
+                    <a class="btn btn-outline-info custom-btn-size p-r-6 p-l-6" href="{{ url_for('change_password') }}" role="button">Change password?</a>
+                </div>
+            </form>
         </div>
     </div>
     {% endif %}
 </div>
 
-{% if user_id == current_user.get_id() %}
 <!------------------- Add friend modal ------------------------>
+{% if user_id == current_user.get_id() %}
 <div class="modal fade" id="addFriendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -762,7 +706,6 @@
 
 {% block script %}
 <!--------- Main Javascript ---------->
-<script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
 <script type="text/javascript">
 function turn(category, arrow) {
     var arrow = document.getElementById(arrow);
