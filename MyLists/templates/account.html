@@ -23,7 +23,7 @@
 
 {% block content %}
 <div class="image-position">
-    <img height="420" width="1270" src="{{ url_for('static', filename='img/profile_background.jpg') }}" alt=""/>
+    <img height="420" class="img-fluid" src="{{ url_for('static', filename='img/profile_background.jpg') }}" alt=""/>
     <div class="d-flex flex-wrap image-data">
         <img height="160" width="160" src="{{ data['profile_picture'] }}">
         <div class="p-t-10 pl-2 pr-2" style="background-color: rgba(0, 0, 0, 0.5);">

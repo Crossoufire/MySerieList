@@ -7,19 +7,13 @@
 
 
 {% block home_header %}
-<div id="myCarousel" class="carousel text-center" data-ride="carousel">
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <div class="view">
-                <img class="header" src="{{ image_header }}">
-                <div class="mask d-flex justify-content-center align-items-center">
-                    <div class="text-center white-text mx-5 wow fadeIn">
-                        <h1 class="mb-4" id="title">
-                            <strong>Welcome to MyLists</strong>
-                        </h1>
-                    </div>
-                </div>
-            </div>
+<div class="view">
+    <img class="img-fluid" src="{{ image_header }}" alt=""/>
+    <div class="mask d-flex justify-content-center align-items-center">
+        <div class="text-center white-text mx-5 wow fadeIn">
+            <h1 class="title" style="font-size: 50pt; text-shadow: 0 0 2px #000; -moz-text-shadow: 0 0 2px #000; -webkit-text-shadow: 0 0 2px #000;">
+                <strong>Welcome to MyLists</strong>
+            </h1>
         </div>
     </div>
 </div>

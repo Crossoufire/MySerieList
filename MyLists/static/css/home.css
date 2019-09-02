@@ -1,12 +1,13 @@
 <!---------- Main CSS ----------->
-#title {
+.title {
     font-size: 70pt;
 }
 
 /* On screens that are 768px or less */
 @media (max-width: 767.98px) {
-    #title {
-        font-size: 35pt;
+    .title {
+        font-size: 2rem !important;
+        font-weight: 200 !important;
     }
     .header {
         height: 300px;
