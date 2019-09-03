@@ -1,53 +1,41 @@
-table.dataTable thead .sorting:after,
-table.dataTable thead .sorting:before,
-table.dataTable thead .sorting_asc:after,
-table.dataTable thead .sorting_asc:before,
-table.dataTable thead .sorting_asc_disabled:after,
-table.dataTable thead .sorting_asc_disabled:before,
-table.dataTable thead .sorting_desc:after,
-table.dataTable thead .sorting_desc:before,
-table.dataTable thead .sorting_desc_disabled:after,
-table.dataTable thead .sorting_desc_disabled:before {
-    bottom: .5em;
-}
-
-.table {
-  color: #fff
-}
-
-table.table a {
-    color: #359aff;
-}
-
-.table td {
-    text-align: center;
-    vertical-align: middle;
-}
-
-.table tr {
-    text-align: center;
-    vertical-align: middle;
-}
-
-.current_user {
-    background-color: #2c3946;
-}
-
-a.page-link {
-    color: #ffffff !important;
-}
-
-.arrow_div {
-    height: 21px;
-    width: 21px;
-}
 
 .profile_picture {
+    width: 90px;
+    height: 90px;
+}
+
+.grade_picture {
     width: 40px;
     height: 40px;
 }
 
-.grade_picture {
-    width: 30px;
-    height: 30px;
+.row {
+    background: #21263b;
+    border: black 1px solid;
+    width: 800px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.col {
+    margin: auto;
+    padding: 0px;
+}
+
+.hof_container {
+    max-width: 800px;
+}
+
+.skewed {
+    transform: skew(-15deg);
+    -webkit-transform: skew(-15deg);
+    -moz-transform: skew(-15deg);
+}
+
+.deskewed {
+    transform: skew(15deg);
+    -webkit-transform: skew(15deg);
+    -moz-transform: skew(15deg);
 }

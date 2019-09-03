@@ -9,154 +9,55 @@
 
 
 {% block content %}
-<div class="container p-0 mt-4">
-    <table id="hall_of_fame" class="table table-striped table-sm table-responsive-md">
-        <thead>
-            <tr>
-                <th class="text-center"></th>
-                <th class="text-center">Username</th>
-                <th class="text-center">Series levels</th>
-                <th class="text-center">Series success</th>
-                <th class="text-center">Anime levels</th>
-                <th class="text-center">Anime success</th>
-                <th class="text-center">Books levels</th>
-                <th class="text-center">K levels</th>
-                <th class="text-center"></th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for user in all_data %}
-            <tr>
-            {% if current_user.get_id() == '1' %}
-                <td>
-                    <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
-                </td>
-                <td>
-                    <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
-                    <br>
-                    {{ user['series_level'] }} ({{ user['series_percent'] }}%)
-                </td>
-                <td>
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
-                    <br>
-                    {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
-                </td>
-                <td>
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.png">
-                    <br>
-                    {{ user['book_level'] }} ({{ user['book_percent'] }}%)
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
-                    <br>
-                    {{ user['knowledge_level'] }}
-                </td>
-                <td></td>
+<div id="sorts" class="button-group text-center">
+  <button class="btn btn-warning" data-sort-value="username">Username</button>
+  <button class="btn btn-primary" data-sort-value="series">Series</button>
+    <button class="btn btn-primary" data-sort-value="movies">Movies</button>
+</div>
 
-            {% elif user["iscurrentuser"] %}
-                <td class="current_user">
-                    <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
-                </td>
-                <td class="current_user">
-                    <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
-                </td>
-                <td class="current_user">
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
-                    <br>
-                    {{ user['series_level'] }} ({{ user['series_percent'] }}%)
-                </td>
-                <td class="current_user">
-                </td>
-                <td class="current_user">
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
-                    <br>
-                    {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
-                </td>
-                <td class="current_user">
-                </td>
-                <td class="current_user">
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.png">
-                    <br>
-                    {{ user['book_level'] }} ({{ user['book_percent'] }}%)
-                </td >
-                <td class="current_user">
-                    <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
-                    <br>
-                    {{ user['knowledge_level'] }}
-                </td>
-                <td class="current_user"></td>
 
-            {% elif user["isprivate"] and not user["isfriend"] %}
-                <td>
-                    <img class="profile_picture" src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}" alt="Anonymous">
-                </td>
-                <td>
-                    <b>Anonymous</b>
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
-                    <br>
-                    {{ user['series_level'] }} ({{ user['series_percent'] }}%)
-                </td>
-                <td>
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
-                    <br>
-                    {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
-                </td>
-                <td>
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.png">
-                    <br>
-                    {{ user['book_level'] }} ({{ user['book_percent'] }}%)
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
-                    <br>
-                    {{ user['knowledge_level'] }}
-                </td>
-                <td></td>
+<div class="hof_container mr-auto ml-auto m-t-50">
+    {% for user in all_data %}
+        <div class="row">
+            <div class="col text-left picture">
+                <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
+            </div>
 
-            {% else %}
-                <td>
-                    <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
-                </td>
-                <td>
-                    <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
-                    <br>
-                    {{ user['series_level'] }} ({{ user['series_percent'] }}%)
-                </td>
-                <td>
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
-                    <br>
-                    {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
-                </td>
-                <td>
-                </td>
-                <td>
-                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.png">
-                    <br>
-                    {{ user['book_level'] }} ({{ user['book_percent'] }}%)
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
-                    <br>
-                    {{ user['knowledge_level'] }}
-                </td>
+            <div class="col text-center name">
+                <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
+            </div>
+
+            <div class="col text-center series">
+                <div>Series</div>
+                <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
+                <div>{{ user['series_level'] }} ({{ user['anime_percent'] }}%)</div>
+            </div>
+
+            <div class="col text-center anime">
+                <div>Anime</div>
+                <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
+                <div>{{ user['anime_level'] }} ({{ user['anime_percent'] }}%)</div>
+            </div>
+
+            <div class="col text-center books">
+                <div>Books</div>
+                <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.png">
+                <div>{{ user['book_level'] }} ({{ user['book_percent'] }}%)</div>
+            </div>
+
+            <div class="col text-center movies">
+                <div>Movies</div>
+                <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
+                <div>{{ user['series_level'] }} ({{ user['series_percent'] }}%)</div>
+            </div>
+
+            <div class="col text-center k_levels">
+                <div>K Levels</div>
+                <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
+                <div>{{ user['knowledge_level'] }}</div>
+            </div>
+
+            <div class="col text-center friends">
                 {% if user["isfriend"] %}
                     <td><i class="fas fa-user-friends"></i></td>
                 {% elif user["ispendingfriend"] %}
@@ -164,18 +65,18 @@
                 {% else %}
                     <td><a class="fas fa-user-plus" onclick="add_friend('{{ user['username'] }}')"></a></td>
                 {% endif %}
-            {% endif %}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </div>
+        </div>
+    {% endfor %}
 </div>
 {% endblock content %}
 
 
 {% block script %}
-<!--------- CDN Datatables ----------->
-<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>
+<!--------- CDN Isotope ----------->
+<script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
+
+<!----------- Add Friends ------------>
 <script type="text/javascript">
 function add_friend(username) {
     $body = $("body");
@@ -191,14 +92,31 @@ function add_friend(username) {
     });
 }
 </script>
-<script type="text/javascript">
-$(document).ready(function () {
-    $('#hall_of_fame').DataTable({
-        "order": [[ 6, "desc" ], [ 1, "asc" ]],
-        columnDefs: [{orderable: false, targets: 0},
-                     {orderable: false, targets: 8}],
+
+<script>
+var $table = $('.hof_container').isotope({
+    layoutMode: 'vertical',
+    getSortData: {
+        username
+        series: '.series',
+        movies: '.movies',
+    }
+});
+
+// bind sort button click
+$('#sorts').on('click', 'button', function() {
+    var sortValue = $(this).attr('data-sort-value');
+    $table.isotope({ sortBy: sortValue, sortAscending: false });
+});
+
+// change checked class on buttons
+$('.button-group').each( function(i, buttonGroup) {
+    var $buttonGroup = $(buttonGroup);
+    $buttonGroup.on('click', 'button', function() {
+        $buttonGroup.find('.btn-warning').addClass('btn-primary');
+        $buttonGroup.find('.btn-warning').removeClass('btn-warning');
+        $(this).addClass('btn-warning');
     });
-    $('.dataTables_length').addClass('bs-select');
 });
 </script>
 {% endblock script %}

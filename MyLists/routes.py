@@ -48,7 +48,7 @@ def create_user():
         db.session.add(admin)
         add_achievements_to_db()
     if User.query.filter_by(id='2').first() is None:
-        admin = User(username='test',
+        admin = User(username='bbb',
                      email='admin@admin.comm',
                      password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
                      image_file='default.jpg',
@@ -58,7 +58,7 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
     if User.query.filter_by(id='3').first() is None:
-        admin = User(username='test2',
+        admin = User(username='ppp',
                      email='admin@admin.commm',
                      password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
                      image_file='default.jpg',
@@ -68,8 +68,78 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
     if User.query.filter_by(id='4').first() is None:
-        admin = User(username='test3',
+        admin = User(username='ddd',
                      email='admin@admin.commmm',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+    if User.query.filter_by(id='5').first() is None:
+        admin = User(username='ccc',
+                     email='admin@admin.commmmm',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+    if User.query.filter_by(id='6').first() is None:
+        admin = User(username='zzz',
+                     email='admin@admin.commmmmmm',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+    if User.query.filter_by(id='7').first() is None:
+        admin = User(username='iii',
+                     email='admin@admftjfin.commmm',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+    if User.query.filter_by(id='8').first() is None:
+        admin = User(username='aaa',
+                     email='admin@aftjfttfdmin.commmm',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+    if User.query.filter_by(id='9').first() is None:
+        admin = User(username='tesehqht3',
+                     email='admin@aerehrmin.commmm',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+    if User.query.filter_by(id='10').first() is None:
+        admin = User(username='terhqeest3',
+                     email='adminhq(qre@admin.commmm',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+    if User.query.filter_by(id='11').first() is None:
+        admin = User(username='tzefest3',
+                     email='admin@aEQFSHTHdmin.commmm',
                      password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
                      image_file='default.jpg',
                      active=True,
@@ -223,8 +293,7 @@ def register_token(token):
 
 @app.route("/test")
 def test():
-    user_achievements_anime = get_achievements("2", ListType.ANIME)
-    return render_template('test.html', data=user_achievements_anime)
+    return render_template('test.html')
 
 
 ################################################# Authenticated routes #################################################
