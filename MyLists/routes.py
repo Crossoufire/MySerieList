@@ -1047,6 +1047,7 @@ def mymedialist(media_list, list_view, user_name):
                                        filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
         covers_path = url_for('static', filename='series_covers/')
         user_achievements = get_achievements(user.id, ListType.SERIES)
+        stats = get_statistics(user.id, ListType.SERIES)
         media_value = "series_achievements"
     elif media_list == "animelist":
         # Get anime data
@@ -1061,6 +1062,7 @@ def mymedialist(media_list, list_view, user_name):
                                         filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
         covers_path = url_for('static', filename='animes_covers/')
         user_achievements = get_achievements(user.id, ListType.ANIME)
+        stats = get_statistics(user.id, ListType.ANIME)
         media_value = "anime_achievements"
     else:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
@@ -1156,7 +1158,11 @@ def mymedialist(media_list, list_view, user_name):
                            target_user_id=str(user.id),
                            data=user_achievements,
                            media_value=media_value,
-                           list_view=list_view)
+                           list_view=list_view,
+                           x_abs=stats[0],
+                           y_abs=stats[1],
+                           y_abs_2=stats[2],
+                           y_abs_3=stats[3])
 
 
 @app.route('/update_element_season', methods=['POST'])

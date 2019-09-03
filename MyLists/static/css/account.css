@@ -70,7 +70,7 @@
 }
 
 /* On screens that are 768px or less */
-@media (max-width: 491px) {
+@media (max-width: 490px) {
     .image-data {
         justify-content: center;
         position: absolute;

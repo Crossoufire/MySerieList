@@ -772,9 +772,38 @@
     </div>
 
     <div class="tab-pane fade" id="statistics_tab">
-        statistics page
-    </div>
+        <div class="row">
+            <div class="col text-center m-t-40">
+                <h4>Score vs Watched (N°)</h4>
+                <canvas id="myChart"></canvas>
+            </div>
+            <div class="col text-center m-t-40">
+                <h4>Score vs Time (hours)</h4>
+               <canvas id="myChart2"></canvas>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-center m-t-40">
+                <h4>Score vs Episodes</h4>
+                <canvas id="myChart3"></canvas>
+            </div>
+            <div class="col text-center m-t-40">
+                <h4>Genres vs Data</h4>
+                <table class="table table-sm text-light">
+                    <thead>
+                        <th>Genres</th>
+                        <th>Count</th>
+                        <th>Scores</th>
+                        <th>TMDb Scores</th>
+                        <th>Time (Hours)</th>
+                    </thead>
+                    <tbody>
 
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock content %}
 
@@ -852,7 +881,208 @@ $(function() {
 {% endif %}
 <script src="{{ url_for('static', filename='js/mymedialist_common.js') }}"></script>
 <script src="{{ url_for('static', filename='js/achievements.js') }}"></script>
-<script src="{{ url_for('static', filename='js/statistics.js') }}"></script>
+<script type="text/javascript">
+    var ctx = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ x_abs|safe }},
+        datasets: [{
+            label: 'Series watched',
+            data: {{ y_abs }},
+            backgroundColor: [
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)'
+            ],
+            borderColor: [
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        legend: {
+            labels: {
+                fontColor: "#CCC",
+            }
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    fontColor: "#CCC"
+                },
+                gridLines: {
+                    display: true,
+					drawBorder: true,
+                    color: "rgba(255, 255, 255, 0.2)"
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    fontColor: "#CCC",
+                },
+                gridLines: {
+                    display: true,
+					drawBorder: true,
+                    color: "rgba(255, 255, 255, 0.2)",
+                }
+            }],
+        }
+    }
+});
+
+var ctx = document.getElementById('myChart2').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ x_abs|safe }},
+        datasets: [{
+            label: 'Time watched',
+            data: {{ y_abs_2 }},
+            backgroundColor: [
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)'
+            ],
+            borderColor: [
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        legend: {
+            labels: {
+                fontColor: "#CCC",
+            }
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    fontColor: "#CCC"
+                },
+                gridLines: {
+                    display: true,
+					drawBorder: true,
+                    color: "rgba(255, 255, 255, 0.2)"
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    fontColor: "#CCC",
+                },
+                gridLines: {
+                    display: true,
+					drawBorder: true,
+                    color: "rgba(255, 255, 255, 0.2)",
+                }
+            }],
+        }
+    }
+});
+
+var ctx = document.getElementById('myChart3').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ x_abs|safe }},
+        datasets: [{
+            label: 'Episodes watched',
+            data: {{ y_abs_3 }},
+            backgroundColor: [
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)',
+                'rgba(185, 75, 100, 0.7)'
+            ],
+            borderColor: [
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)',
+                'rgba(23, 23, 23, 0.8)'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        legend: {
+            labels: {
+                fontColor: "#CCC",
+            }
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    fontColor: "#CCC"
+                },
+                gridLines: {
+                    display: true,
+					drawBorder: true,
+                    color: "rgba(255, 255, 255, 0.2)"
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    fontColor: "#CCC",
+                },
+                gridLines: {
+                    display: true,
+					drawBorder: true,
+                    color: "rgba(255, 255, 255, 0.2)",
+                }
+            }],
+        }
+    }
+});
+</script>
 {% if list_view == 'grid' %}
     <script src="{{ url_for('static', filename='js/mymedialist.js') }}"></script>
 {% elif list_view == 'table' %}
