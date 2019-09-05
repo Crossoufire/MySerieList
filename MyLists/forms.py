@@ -38,7 +38,7 @@ class UpdateAccountForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png'])])
     isprivate = BooleanField('Private mode')
-    homepage = SelectField('Default homepage', choices=[('msl', 'MySeriesList'), ('mal', 'MyAnimesList'), ('mbl', 'MyBooksList'), ('acc', 'Account'), ('hof', 'Hall of Fame')])
+    homepage = SelectField('Default homepage', choices=[('msl', 'MySeriesList'), ('mml', 'MyMoviesList'), ('mal', 'MyAnimesList'), ('mbl', 'MyBooksList'), ('acc', 'Account'), ('hof', 'Hall of Fame')])
     submit_account = SubmitField('Update account')
 
     def validate_username(self, username):
