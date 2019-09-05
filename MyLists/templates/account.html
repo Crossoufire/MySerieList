@@ -21,7 +21,7 @@
 
 {% block content %}
 <div class="image-position">
-    <img height="420" width="1270" src="{{ url_for('static', filename='img/profile_background.jpg') }}" alt=""/>
+    <img height="420" width="1320" src="{{ url_for('static', filename='img/profile_background.jpg') }}" alt=""/>
     <div class="d-flex flex-wrap image-data">
         <img height="160" width="160" src="{{ data['profile_picture'] }}">
         <div class="p-t-10 pl-2 pr-2" style="background-color: rgba(0, 0, 0, 0.5);">
@@ -31,15 +31,19 @@
             </h2>
             <hr class="m-0">
             <ul class="grade-levels text-center">
-                <li class="grade-levels-2 m-l-25 m-r-25">
+                <li class="grade-levels-2 m-l-10 m-r-10">
                     <img height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
                     <div>Series <br> {{ data['series_level'] }}</div>
                 </li>
-                <li  class="grade-levels-2">
+                <li  class="grade-levels-2 m-l-10 m-r-10">
+                    <img height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
+                    <div>Movies <br> {{ data['movies_level'] }}</div>
+                </li>
+                <li  class="grade-levels-2 m-l-10 m-r-10">
                     <img height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
                     <div>Anime <br> {{ data['anime_level'] }}</div>
                 </li>
-                <li  class="grade-levels-2 m-l-25 m-r-25">
+                <li  class="grade-levels-2 m-l-10 m-r-10">
                     <img height='40' width='40' data-toggle="tooltip" title="{{ data['book_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['book_grade_id'] }}.png"/>
                     <div>Books <br> {{ data['book_level'] }}</div>
                 </li>
@@ -50,7 +54,7 @@
         {% if user_id == current_user.get_id() %}
         <button class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addFriendModal">Add a friend</button>
         {% else %}
-        <button class="btn btn-sm btn-light" data-toggle="modal" data-target="#addFriendModal">Add friend</button>
+        <button class="btn btn-sm btn-light" data-toggle="modal" data-target="#addFriendModal">+ friend</button>
         {% endif %}
     </div>
 </div>
@@ -76,7 +80,7 @@
     <div id="stats_tab" class="tab-pane fade show active">
         <!--------------- List other accounts --------------->
         {% if user_id != current_user.get_id() %}
-            <div class="row text-center m-t-30">
+        <div class="row text-center m-t-30">
                 <div class="col">
                     <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='serieslist', list_view='grid', user_name=data['username']) }}">SeriesList</a>
                 </div>
@@ -323,69 +327,50 @@
                 <hr class="mt-1 p-b-15 mb-0">
                 <div id="MOVIES" class="collapse show container-stats">
                     <div class="m-b-5">
-                        <span class="stat_text"><b>Days:</b> {{ data['book']['time_spent_day'] }}</span>
-                        <span class="stat_text float-right"><b>Hours:</b> {{ data['book']['time_spent_hour'] }}</span>
+                        <span class="stat_text"><b>Days:</b> {{ data['movies']['time_spent_day'] }}</span>
+                        <span class="stat_text float-right"><b>Hours:</b> {{ data['movies']['time_spent_hour'] }}</span>
                     </div>
                     <div class="m-b-5">
-                        <span class="stat_text"><b>Mean Score:</b> {{ data['book']['mean_score'] }}</span>
+                        <span class="stat_text"><b>Mean Score:</b> {{ data['movies']['mean_score'] }}</span>
                     </div>
                     <figure class="d-flex">
-                        {% if data['book']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
+                        {% if data['movies']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
                         <span class="block_no_data" title="No data">
                             <span id="100%" class="value"></span>
                         </span>
                         {% else %}
                         <span class="block" title="Complete">
-                            <span id="{{ data['book']['element_percentage'][0] }}%" class="value"></span>
+                            <span id="{{ data['movies']['element_percentage'][0] }}%" class="value"></span>
                         </span>
                         <span class="block" title="Plan to Watch">
-                            <span id="{{ data['book']['element_percentage'][4] }}%" class="value"></span>
+                            <span id="{{ data['movies']['element_percentage'][4] }}%" class="value"></span>
                         </span>
                         {% endif %}
                     </figure>
                     <div class="m-t-10">
                         <div class="row">
                             <div class="col mini p-r-0">
-                                <span class="stat_text">Reading:</span>
-                            </div>
-                            <div class="col p-0 position">
-                                <span class="stat_text">{{ data['book']['reading_count'] }}</span>
-                            </div>
-                            <div class="col mini p-r-0">
-                                <span class="stat_text">Dropped:</span>
-                            </div>
-                            <div class="col p-l-0 position">
-                                <span class="stat_text">{{ data['book']['dropped_count'] }}</span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col mini p-r-0">
                                 <span class="stat_text">Completed:</span>
                             </div>
                             <div class="col p-0 position">
-                                <span class="stat_text">{{ data['book']['completed_count'] }}</span>
+                                <span class="stat_text">{{ data['movies']['completed_count'] }}</span>
                             </div>
                             <div class="col mini p-r-0">
-                                <span class="stat_text">Plan to Read:</span>
+                                <span class="stat_text">Plan to Watch:</span>
                             </div>
                             <div class="col p-l-0 position">
-                                <span class="stat_text">{{ data['book']['plantoread_count'] }}</span>
+                                <span class="stat_text">{{ data['movies']['plantowatch_count'] }}</span>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col mini p-r-0">
-                                <span class="stat_text">On Hold:</span>
+                                <span class="stat_text">Total movies:</span>
                             </div>
                             <div class="col p-0 position">
-                                <span class="stat_text">{{ data['book']['onhold_count'] }}</span>
+                                <span class="stat_text">{{ data['movies']['total_count'] }}</span>
                             </div>
                             <div class="col mini p-r-0">
-                                <span class="stat_text">Pages read:</span>
-                            </div>
-                            <div class="col p-l-0 position">
-                                <span class="stat_text">{{ data['book']['nb_pages_read'] }}</span>
+                                <span class="stat_text"></span>
                             </div>
                         </div>
                     </div>
@@ -547,6 +532,28 @@
                                 </div>
                             </div>
                             <div class='account-bar-next-level'>&nbsp{{ data['series_level'] | int + 1 }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class='account-bar-wrapper'>
+                        <div class='account-bar'>
+                            <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
+                            <span class='account-bar-name'>Movies</span>
+                            <div id="movies_level" class='account-bar-level'>Level {{ data['movies_level'] }}</div>
+                            <div class='xp-bar' data-toggle="tooltip" title="{{ data['movies_percent'] }}%">
+                                <div id='xp-bar-fill-movies'>
+                                    <div class='xp-increase-fx'>
+                                        <div class='xp-increase-fx-flicker'>
+                                            <div class='xp-increase-glow1'></div>
+                                            <div class='xp-increase-glow2'></div>
+                                            <div class='xp-increase-glow3'></div>
+                                        </div>
+                                        <div class='xp-increase-glow2'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='account-bar-next-level'>&nbsp{{ data['movies_level'] | int + 1 }}</div>
                         </div>
                     </div>
                 </div>
@@ -796,6 +803,17 @@ $(document).ready(function(){
     }, 40*parseFloat({{ data['series_percent'] }}));
 
 
+    $("#xp-bar-fill-movies").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
+    setTimeout(function() {
+        $("#xp-bar-fill-movies").css("-webkit-transition", "all 2s ease");
+        $("#xp-bar-fill-movies").css("width", "{{ data['movies_percent'] }}%");
+    }, 100);
+    setTimeout(function(){
+        $(".xp-increase-fx").fadeOut(500);
+        $("#xp-bar-fill-movies").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
+    }, 40*parseFloat({{ data['movies_percent'] }}));
+
+
     $("#xp-bar-fill-anime").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
     setTimeout(function() {
         $("#xp-bar-fill-anime").css("-webkit-transition", "all 2s ease");
@@ -832,6 +850,7 @@ function show_all_cat() {
     $('#collapse_container').attr('onclick', 'hide_all_cat()');
     $('.collapse_all').attr('class', 'collapse_all fas fa-xs fa-chevron-down');
 }
+
 {% if user_id == current_user.get_id() %}
 $('#addFriendModal').on('shown.bs.modal', function() {
     $('#friend_to_add').focus();

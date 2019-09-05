@@ -1,7 +1,7 @@
 
 .profile_picture {
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
 }
 
 .grade_picture {
@@ -15,8 +15,7 @@
     width: 800px;
     margin-top: 20px;
     margin-bottom: 20px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    height: 103px;
 }
 
 .col {
@@ -25,7 +24,7 @@
 }
 
 .hof_container {
-    max-width: 800px;
+    max-width: 760px;
 }
 
 .skewed {

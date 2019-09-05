@@ -122,4 +122,6 @@ MyLists/static/animes_covers/*
 !MyLists/static/animes_covers/default.jpg
 MyLists/static/books_covers/*
 !MyLists/static/books_covers/default.jpg
+MyLists/static/movies_covers/*
+!MyLists/static/movies_covers/default.jpg
 start.sh

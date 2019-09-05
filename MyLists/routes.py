@@ -21,7 +21,7 @@ from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, Change
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
     Friend, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, Book, BookList, \
-    Achievements
+    Achievements, Movies, MoviesGenre, MoviesList, MoviesProd
 
 
 config.read('config.ini')
@@ -174,6 +174,8 @@ def home():
             if next_page is None:
                 if user.homepage == HomePage.MYSERIESLIST:
                     return redirect(url_for('mymedialist', media_list='serieslist', list_view='grid', user_name=current_user.username))
+                elif user.homepage == HomePage.MYMOVIESLIST:
+                    return redirect(url_for('mymedialist', media_list='movieslist', list_view='grid', user_name=current_user.username))
                 elif user.homepage == HomePage.MYANIMESLIST:
                     return redirect(url_for('mymedialist', media_list='animelist', list_view='grid', user_name=current_user.username))
                 elif user.homepage == HomePage.MYBOOKSLIST:
@@ -210,6 +212,8 @@ def home():
         user = User.query.filter_by(id=current_user.get_id()).first()
         if user.homepage == HomePage.MYSERIESLIST:
             return redirect(url_for('mymedialist', media_list='serieslist', list_view='grid', user_name=current_user.username))
+        if user.homepage == HomePage.MYMOVIESLIST:
+            return redirect(url_for('mymedialist', media_list='movieslist', list_view='grid', user_name=current_user.username))
         elif user.homepage == HomePage.MYANIMESLIST:
             return redirect(url_for('mymedialist', media_list='animelist', list_view='grid', user_name=current_user.username))
         elif user.homepage == HomePage.MYBOOKSLIST:
@@ -321,25 +325,15 @@ def account(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
-    account_data = {}
-    account_data["series"] = {}
-    account_data["anime"] = {}
-    account_data["book"] = {}
-    account_data["username"] = user_name
-
-    add_friend_form = AddFriendForm()
-    if add_friend_form.validate_on_submit():
-        add_friend(add_friend_form.friend_to_add.data)
-
     # No account with this username
     if user is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    # Protect admin account
+    # Protect the admin account
     if user.id == 1 and current_user.id != 1:
         return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
-    # Check if the account is private / in the friendslist
+    # Check if the account is private or in the friends list
     if current_user.id != user.id and current_user.id != 1:
         friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
         if user.private:
@@ -347,160 +341,12 @@ def account(user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    # Profile picture
-    profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
-    account_data["profile_picture"] = profile_picture
+    # Form to add friends
+    add_friend_form = AddFriendForm()
+    if add_friend_form.validate_on_submit():
+        add_friend(add_friend_form.friend_to_add.data)
 
-    # Friends list
-    friends_list = db.session.query(User, Friend).\
-                   join(Friend, Friend.friend_id == User.id).\
-                   filter(Friend.user_id == user.id).\
-                   group_by(Friend.friend_id).\
-                   order_by(User.username)
-
-    friends_list_data = []
-    for friend in friends_list:
-        friend_data = {"username": friend[0].username,
-                       "user_id": friend[0].id,
-                       "status": friend[1].status,
-                       "picture": friend[0].image_file}
-        friends_list_data.append(friend_data)
-
-    account_data["friends"] = friends_list_data
-
-    # Time spent
-    account_data["series"]["time_spent_hour"] = round(user.time_spent_series/60)
-    account_data["anime"]["time_spent_hour"] = round(user.time_spent_anime/60)
-    account_data["book"]["time_spent_hour"] = round(user.time_spent_book/60)
-
-    account_data["series"]["time_spent_day"] = round(user.time_spent_series/1440, 1)
-    account_data["anime"]["time_spent_day"] = round(user.time_spent_anime/1440, 1)
-    account_data["book"]["time_spent_day"] = round(user.time_spent_book/1440, 1)
-
-    # Mean score
-    account_data["series"]["mean_score"] = get_mean_score(user.id, ListType.SERIES)
-    account_data["anime"]["mean_score"] = get_mean_score(user.id, ListType.ANIME)
-    account_data["book"]["mean_score"] = get_mean_score(user.id, ListType.BOOK)
-
-    # Count elements of each category
-    series_count = get_list_count(user.id, ListType.SERIES)
-    account_data["series"]["watching_count"]    = series_count["watching"]
-    account_data["series"]["completed_count"]   = series_count["completed"]
-    account_data["series"]["onhold_count"]      = series_count["onhold"]
-    account_data["series"]["random_count"]      = series_count["random"]
-    account_data["series"]["dropped_count"]     = series_count["dropped"]
-    account_data["series"]["plantowatch_count"] = series_count["plantowatch"]
-    account_data["series"]["total_count"]       = series_count["total"]
-
-    anime_count = get_list_count(user.id, ListType.ANIME)
-    account_data["anime"]["watching_count"]     = anime_count["watching"]
-    account_data["anime"]["completed_count"]    = anime_count["completed"]
-    account_data["anime"]["onhold_count"]       = anime_count["onhold"]
-    account_data["anime"]["random_count"]       = anime_count["random"]
-    account_data["anime"]["dropped_count"]      = anime_count["dropped"]
-    account_data["anime"]["plantowatch_count"]  = anime_count["plantowatch"]
-    account_data["anime"]["total_count"]        = anime_count["total"]
-
-    book_count = get_list_count(user.id, ListType.BOOK)
-    account_data["book"]["reading_count"]       = book_count["reading"]
-    account_data["book"]["completed_count"]     = book_count["completed"]
-    account_data["book"]["onhold_count"]        = book_count["onhold"]
-    account_data["book"]["dropped_count"]       = book_count["dropped"]
-    account_data["book"]["plantoread_count"]    = book_count["plantoread"]
-    account_data["book"]["total_count"]         = book_count["total"]
-
-    # Count number of episodes
-    all_series_data = db.session.query(SeriesList, SeriesEpisodesPerSeason,
-                                       func.group_concat(SeriesEpisodesPerSeason.episodes)). \
-                                       join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
-                                       filter(SeriesList.user_id == user.id). \
-                                       group_by(SeriesList.series_id)
-
-    nb_episodes_watched = 0
-    for element in all_series_data:
-        episodes = element[2].split(",")
-        episodes = [int(x) for x in episodes]
-        for i in range(1, element[0].current_season):
-            nb_episodes_watched += episodes[i-1]
-        nb_episodes_watched += element[0].last_episode_watched
-    account_data["series"]["nb_ep_watched"] = nb_episodes_watched
-
-    all_anime_data = db.session.query(AnimeList, AnimeEpisodesPerSeason,
-                                      func.group_concat(AnimeEpisodesPerSeason.episodes)). \
-                                      join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
-                                      filter(AnimeList.user_id == user.id). \
-                                      group_by(AnimeList.anime_id)
-
-    nb_episodes_watched = 0
-    for element in all_anime_data:
-        episodes = element[2].split(",")
-        episodes = [int(x) for x in episodes]
-        for i in range(1, element[0].current_season):
-            nb_episodes_watched += episodes[i-1]
-        nb_episodes_watched += element[0].last_episode_watched
-    account_data["anime"]["nb_ep_watched"] = nb_episodes_watched
-
-    all_book_data = db.session.query(BookList, Book). \
-                                     join(Book, Book.id == BookList.book_id). \
-                                     filter(BookList.user_id == user.id)
-
-    nb_pages_read = 0
-    for element in all_book_data:
-        if element[0].status == Status.COMPLETED and element[1].page_count is not None:
-            nb_pages_read += element[1].page_count
-    account_data["book"]["nb_pages_read"] = nb_pages_read
-
-    # Element percentages
-    if account_data["series"]["nb_ep_watched"] == 0:
-        account_data["series"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    else:
-        account_data["series"]["element_percentage"] = [(float(account_data["series"]["watching_count"]/account_data["series"]["total_count"]))*100,
-                                                        (float(account_data["series"]["completed_count"]/account_data["series"]["total_count"]))*100,
-                                                        (float(account_data["series"]["onhold_count"]/account_data["series"]["total_count"]))*100,
-                                                        (float(account_data["series"]["random_count"]/account_data["series"]["total_count"]))*100,
-                                                        (float(account_data["series"]["dropped_count"]/account_data["series"]["total_count"]))*100,
-                                                        (float(account_data["series"]["plantowatch_count"]/account_data["series"]["total_count"]))*100]
-    if account_data["anime"]["nb_ep_watched"] == 0:
-        account_data["anime"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    else:
-        account_data["anime"]["element_percentage"] = [(float(account_data["anime"]["watching_count"]/account_data["anime"]["total_count"]))*100,
-                                                        (float(account_data["anime"]["completed_count"]/account_data["anime"]["total_count"]))*100,
-                                                        (float(account_data["anime"]["onhold_count"]/account_data["anime"]["total_count"]))*100,
-                                                        (float(account_data["anime"]["random_count"]/account_data["anime"]["total_count"]))*100,
-                                                        (float(account_data["anime"]["dropped_count"]/account_data["anime"]["total_count"]))*100,
-                                                        (float(account_data["anime"]["plantowatch_count"]/account_data["anime"]["total_count"]))*100]
-    if account_data["book"]["nb_pages_read"] == 0:
-        account_data["book"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0]
-    else:
-        account_data["book"]["element_percentage"] = [(float(account_data["book"]["reading_count"]/account_data["book"]["total_count"])) * 100,
-                                                      (float(account_data["book"]["completed_count"]/account_data["book"]["total_count"])) * 100,
-                                                      (float(account_data["book"]["onhold_count"]/account_data["book"]["total_count"])) * 100,
-                                                      (float(account_data["book"]["dropped_count"]/account_data["book"]["total_count"])) * 100,
-                                                      (float(account_data["book"]["plantoread_count"]/account_data["book"]["total_count"])) * 100]
-
-    series_level = get_level_and_grade(user.time_spent_series)
-    account_data["series_level"] = series_level["level"]
-    account_data["series_percent"] = series_level["level_percent"]
-    account_data["series_grade_id"] = series_level["grade_id"]
-    account_data["series_grade_title"] = series_level["grade_title"]
-
-    anime_level = get_level_and_grade(user.time_spent_anime)
-    account_data["anime_level"] = anime_level["level"]
-    account_data["anime_percent"] = anime_level["level_percent"]
-    account_data["anime_grade_id"] = anime_level["grade_id"]
-    account_data["anime_grade_title"] = anime_level["grade_title"]
-
-    book_level = get_level_and_grade(user.time_spent_book)
-    account_data["book_level"] = book_level["level"]
-    account_data["book_percent"] = book_level["level_percent"]
-    account_data["book_grade_id"] = book_level["grade_id"]
-    account_data["book_grade_title"] = book_level["grade_title"]
-
-    knowledge_level = int(series_level["level"] + anime_level["level"] + book_level["level"])
-    knowledge_grade = get_knowledge_grade(knowledge_level)
-    account_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
-    account_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
-
+    # Account settings form
     form = UpdateAccountForm()
     if form.validate_on_submit():
         if form.picture.data:
@@ -528,6 +374,8 @@ def account(user_name):
         old_value = user.homepage
         if form.homepage.data == "msl":
             user.homepage = HomePage.MYSERIESLIST
+        elif form.homepage.data == "mml":
+            user.homepage = HomePage.MYMOVIESLIST
         elif form.homepage.data == "mal":
             user.homepage = HomePage.MYANIMESLIST
         elif form.homepage.data == "mbl":
@@ -570,6 +418,8 @@ def account(user_name):
 
         if current_user.homepage == HomePage.MYSERIESLIST:
             form.homepage.data = "msl"
+        elif current_user.homepage == HomePage.MYMOVIESLIST:
+            form.homepage.data = "mml"
         elif current_user.homepage == HomePage.MYANIMESLIST:
             form.homepage.data = "mal"
         elif current_user.homepage == HomePage.MYBOOKSLIST:
@@ -578,6 +428,187 @@ def account(user_name):
             form.homepage.data = "acc"
         elif current_user.homepage == HomePage.HALL_OF_FAME:
             form.homepage.data = "hof"
+
+    # Recover the friends list
+    friends_list = db.session.query(User, Friend).join(Friend, Friend.friend_id == User.id).\
+                                    filter(Friend.user_id == user.id).group_by(Friend.friend_id)\
+                                    .order_by(User.username)
+
+    friends_list_data = []
+    for friend in friends_list:
+        friend_data = {"username": friend[0].username,
+                       "user_id": friend[0].id,
+                       "status": friend[1].status,
+                       "picture": friend[0].image_file}
+        friends_list_data.append(friend_data)
+
+    account_data = {}
+    account_data["series"] = {}
+    account_data["movies"] = {}
+    account_data["anime"] = {}
+    account_data["book"] = {}
+    account_data["username"] = user_name
+    account_data["friends"] = friends_list_data
+
+    # Recover the profile picture
+    profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
+    account_data["profile_picture"] = profile_picture
+
+    # Time spent
+    account_data["series"]["time_spent_hour"] = round(user.time_spent_series/60)
+    account_data["movies"]["time_spent_hour"] = round(user.time_spent_movies/60)
+    account_data["anime"]["time_spent_hour"] = round(user.time_spent_anime/60)
+    account_data["book"]["time_spent_hour"] = round(user.time_spent_book/60)
+
+    account_data["series"]["time_spent_day"] = round(user.time_spent_series/1440, 1)
+    account_data["movies"]["time_spent_day"] = round(user.time_spent_movies/1440, 1)
+    account_data["anime"]["time_spent_day"] = round(user.time_spent_anime/1440, 1)
+    account_data["book"]["time_spent_day"] = round(user.time_spent_book/1440, 1)
+
+    # Mean score
+    account_data["series"]["mean_score"] = get_mean_score(user.id, ListType.SERIES)
+    account_data["movies"]["mean_score"] = get_mean_score(user.id, ListType.MOVIES)
+    account_data["anime"]["mean_score"] = get_mean_score(user.id, ListType.ANIME)
+    account_data["book"]["mean_score"] = get_mean_score(user.id, ListType.BOOK)
+
+    # Count elements of each category
+    series_count = get_list_count(user.id, ListType.SERIES)
+    account_data["series"]["watching_count"]    = series_count["watching"]
+    account_data["series"]["completed_count"]   = series_count["completed"]
+    account_data["series"]["onhold_count"]      = series_count["onhold"]
+    account_data["series"]["random_count"]      = series_count["random"]
+    account_data["series"]["dropped_count"]     = series_count["dropped"]
+    account_data["series"]["plantowatch_count"] = series_count["plantowatch"]
+    account_data["series"]["total_count"]       = series_count["total"]
+
+    movies_count = get_list_count(user.id, ListType.MOVIES)
+    account_data["movies"]["completed_count"] = movies_count["completed"]
+    account_data["movies"]["plantowatch_count"] = movies_count["plantowatch"]
+    account_data["movies"]["total_count"] = movies_count["total"]
+
+    anime_count = get_list_count(user.id, ListType.ANIME)
+    account_data["anime"]["watching_count"]     = anime_count["watching"]
+    account_data["anime"]["completed_count"]    = anime_count["completed"]
+    account_data["anime"]["onhold_count"]       = anime_count["onhold"]
+    account_data["anime"]["random_count"]       = anime_count["random"]
+    account_data["anime"]["dropped_count"]      = anime_count["dropped"]
+    account_data["anime"]["plantowatch_count"]  = anime_count["plantowatch"]
+    account_data["anime"]["total_count"]        = anime_count["total"]
+
+    book_count = get_list_count(user.id, ListType.BOOK)
+    account_data["book"]["reading_count"]       = book_count["reading"]
+    account_data["book"]["completed_count"]     = book_count["completed"]
+    account_data["book"]["onhold_count"]        = book_count["onhold"]
+    account_data["book"]["dropped_count"]       = book_count["dropped"]
+    account_data["book"]["plantoread_count"]    = book_count["plantoread"]
+    account_data["book"]["total_count"]         = book_count["total"]
+
+    # Count number of episodes for the series
+    all_series_data = db.session.query(SeriesList, SeriesEpisodesPerSeason,
+                   func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                   join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
+                   filter(SeriesList.user_id == user.id). \
+                   group_by(SeriesList.series_id)
+
+    nb_episodes_watched = 0
+    for element in all_series_data:
+        episodes = element[2].split(",")
+        episodes = [int(x) for x in episodes]
+        for i in range(1, element[0].current_season):
+            nb_episodes_watched += episodes[i-1]
+        nb_episodes_watched += element[0].last_episode_watched
+    account_data["series"]["nb_ep_watched"] = nb_episodes_watched
+
+    # Count number of episodes for the anime
+    all_anime_data = db.session.query(AnimeList, AnimeEpisodesPerSeason,
+                                      func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                      join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
+                                      filter(AnimeList.user_id == user.id). \
+                                      group_by(AnimeList.anime_id)
+
+    nb_episodes_watched = 0
+    for element in all_anime_data:
+        episodes = element[2].split(",")
+        episodes = [int(x) for x in episodes]
+        for i in range(1, element[0].current_season):
+            nb_episodes_watched += episodes[i-1]
+        nb_episodes_watched += element[0].last_episode_watched
+    account_data["anime"]["nb_ep_watched"] = nb_episodes_watched
+
+    # Count number of page read for the books
+    all_book_data = db.session.query(BookList, Book). \
+                                     join(Book, Book.id == BookList.book_id). \
+                                     filter(BookList.user_id == user.id)
+
+    nb_pages_read = 0
+    for element in all_book_data:
+        if element[0].status == Status.COMPLETED and element[1].page_count is not None:
+            nb_pages_read += element[1].page_count
+    account_data["book"]["nb_pages_read"] = nb_pages_read
+
+    # Element percentages
+    if account_data["series"]["nb_ep_watched"] == 0:
+        account_data["series"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    else:
+        account_data["series"]["element_percentage"] = [(float(account_data["series"]["watching_count"]/account_data["series"]["total_count"]))*100,
+                                                        (float(account_data["series"]["completed_count"]/account_data["series"]["total_count"]))*100,
+                                                        (float(account_data["series"]["onhold_count"]/account_data["series"]["total_count"]))*100,
+                                                        (float(account_data["series"]["random_count"]/account_data["series"]["total_count"]))*100,
+                                                        (float(account_data["series"]["dropped_count"]/account_data["series"]["total_count"]))*100,
+                                                        (float(account_data["series"]["plantowatch_count"]/account_data["series"]["total_count"]))*100]
+    if account_data["movies"]["total_count"] == 0:
+        account_data["movies"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    else:
+        account_data["movies"]["element_percentage"] = [
+            (float(account_data["movies"]["completed_count"] / account_data["movies"]["total_count"]))*100,
+            (float(account_data["movies"]["plantowatch_count"] / account_data["movies"]["total_count"]))*100]
+    if account_data["anime"]["nb_ep_watched"] == 0:
+        account_data["anime"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    else:
+        account_data["anime"]["element_percentage"] = [(float(account_data["anime"]["watching_count"]/account_data["anime"]["total_count"]))*100,
+                                                        (float(account_data["anime"]["completed_count"]/account_data["anime"]["total_count"]))*100,
+                                                        (float(account_data["anime"]["onhold_count"]/account_data["anime"]["total_count"]))*100,
+                                                        (float(account_data["anime"]["random_count"]/account_data["anime"]["total_count"]))*100,
+                                                        (float(account_data["anime"]["dropped_count"]/account_data["anime"]["total_count"]))*100,
+                                                        (float(account_data["anime"]["plantowatch_count"]/account_data["anime"]["total_count"]))*100]
+    if account_data["book"]["nb_pages_read"] == 0:
+        account_data["book"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0]
+    else:
+        account_data["book"]["element_percentage"] = [(float(account_data["book"]["reading_count"]/account_data["book"]["total_count"])) * 100,
+                                                      (float(account_data["book"]["completed_count"]/account_data["book"]["total_count"])) * 100,
+                                                      (float(account_data["book"]["onhold_count"]/account_data["book"]["total_count"])) * 100,
+                                                      (float(account_data["book"]["dropped_count"]/account_data["book"]["total_count"])) * 100,
+                                                      (float(account_data["book"]["plantoread_count"]/account_data["book"]["total_count"])) * 100]
+
+    # Grades and levels
+    series_level = get_level_and_grade(user.time_spent_series)
+    account_data["series_level"] = series_level["level"]
+    account_data["series_percent"] = series_level["level_percent"]
+    account_data["series_grade_id"] = series_level["grade_id"]
+    account_data["series_grade_title"] = series_level["grade_title"]
+
+    movies_level = get_level_and_grade(user.time_spent_movies)
+    account_data["movies_level"] = movies_level["level"]
+    account_data["movies_percent"] = movies_level["level_percent"]
+    account_data["movies_grade_id"] = movies_level["grade_id"]
+    account_data["movies_grade_title"] = movies_level["grade_title"]
+
+    anime_level = get_level_and_grade(user.time_spent_anime)
+    account_data["anime_level"] = anime_level["level"]
+    account_data["anime_percent"] = anime_level["level_percent"]
+    account_data["anime_grade_id"] = anime_level["grade_id"]
+    account_data["anime_grade_title"] = anime_level["grade_title"]
+
+    book_level = get_level_and_grade(user.time_spent_book)
+    account_data["book_level"] = book_level["level"]
+    account_data["book_percent"] = book_level["level_percent"]
+    account_data["book_grade_id"] = book_level["grade_id"]
+    account_data["book_grade_title"] = book_level["grade_title"]
+
+    knowledge_level = int(series_level["level"] + movies_level["level"] + anime_level["level"] + book_level["level"])
+    knowledge_grade = get_knowledge_grade(knowledge_level)
+    account_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
+    account_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
 
     return render_template('account.html',
                            title="{}'s account".format(user.username),
@@ -807,6 +838,12 @@ def hall_of_fame():
         user_data["series_grade_id"] = series_level["grade_id"]
         user_data["series_grade_title"] = series_level["grade_title"]
 
+        movies_level = get_level_and_grade(user.time_spent_movies)
+        user_data["movies_level"] = movies_level["level"]
+        user_data["movies_percent"] = movies_level["level_percent"]
+        user_data["movies_grade_id"] = movies_level["grade_id"]
+        user_data["movies_grade_title"] = movies_level["grade_title"]
+
         anime_level = get_level_and_grade(user.time_spent_anime)
         user_data["anime_level"] = anime_level["level"]
         user_data["anime_percent"] = anime_level["level_percent"]
@@ -819,7 +856,7 @@ def hall_of_fame():
         user_data["book_grade_id"] = book_level["grade_id"]
         user_data["book_grade_title"] = book_level["grade_title"]
 
-        knowledge_level = int(series_level["level"] + anime_level["level"] + book_level["level"])
+        knowledge_level = int(series_level["level"] + movies_level["level"] + anime_level["level"] + book_level["level"])
         knowledge_grade = get_knowledge_grade(knowledge_level)
         user_data["knowledge_level"] = knowledge_level
         user_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
@@ -1033,136 +1070,97 @@ def mymedialist(media_list, list_view, user_name):
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
+    # Check the view type
+    accepted_view = ["grid", "table"]
+    if list_view not in accepted_view:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
     # Check the route
     if media_list == "serieslist":
         # Get series data
         element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
-                                       func.group_concat(SeriesNetwork.network.distinct()),
-                                       func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                                       func.group_concat(SeriesEpisodesPerSeason.episodes)).\
-                                       join(SeriesList, SeriesList.series_id == Series.id). \
-                                       join(SeriesGenre, SeriesGenre.series_id == Series.id). \
-                                       join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
-                                       join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
-                                       filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
+                               func.group_concat(SeriesNetwork.network.distinct()),
+                               func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
+                               func.group_concat(SeriesEpisodesPerSeason.episodes)).\
+                               join(SeriesList, SeriesList.series_id == Series.id). \
+                               join(SeriesGenre, SeriesGenre.series_id == Series.id). \
+                               join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
+                               join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
+                               filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
         covers_path = url_for('static', filename='series_covers/')
         user_achievements = get_achievements(user.id, ListType.SERIES)
         stats = get_statistics(user.id, ListType.SERIES)
+        media_all_data = get_all_media_data(element_data, ListType.SERIES, covers_path)
         media_value = "series_achievements"
     elif media_list == "animelist":
         # Get anime data
         element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
-                                        func.group_concat(AnimeNetwork.network.distinct()),
-                                        func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(AnimeEpisodesPerSeason.episodes)). \
-                                        join(AnimeList, AnimeList.anime_id == Anime.id). \
-                                        join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
-                                        join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
-                                        join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
-                                        filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
+                                func.group_concat(AnimeNetwork.network.distinct()),
+                                func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
+                                func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+                                join(AnimeList, AnimeList.anime_id == Anime.id). \
+                                join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
+                                join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
+                                join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
+                                filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
         covers_path = url_for('static', filename='animes_covers/')
+        user_achievements = get_achievements(user.id, ListType.ANIME)
+        stats = get_statistics(user.id, ListType.ANIME)
+        media_all_data = get_all_media_data(element_data, ListType.ANIME, covers_path)
+        media_value = "anime_achievements"
+    elif media_list == "movieslist":
+        # Get movies data
+        element_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre.distinct()),
+                            func.group_concat(MoviesProd.production_company.distinct())). \
+                            join(MoviesList, MoviesList.movies_id == Movies.id). \
+                            join(MoviesGenre, MoviesGenre.movies_id == Movies.id). \
+                            join(MoviesProd, MoviesProd.movies_id == Movies.id). \
+                            filter(MoviesList.user_id == user.id).group_by(Movies.id).order_by(Movies.title.asc())
+        covers_path = url_for('static', filename='movies_covers/')
+        media_all_data = get_all_media_data(element_data, ListType.MOVIES, covers_path)
         user_achievements = get_achievements(user.id, ListType.ANIME)
         stats = get_statistics(user.id, ListType.ANIME)
         media_value = "anime_achievements"
     else:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    # Check the view type
-    accepted_view = ["grid", "table"]
-    if list_view not in accepted_view:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-
-    watching_list    = []
-    completed_list   = []
-    onhold_list      = []
-    random_list      = []
-    dropped_list     = []
-    plantowatch_list = []
-
-    eps = {}
-    genres = {}
-    networks = {}
-    can_update = {}
-    last_air_date = {}
-    first_air_date = {}
-    for element in element_data:
-        # Change the cover path
-        element[0].image_cover = "{}{}".format(covers_path, element[0].image_cover)
-
-        if element[1].status == Status.WATCHING:
-            watching_list.append(element)
-        elif element[1].status == Status.COMPLETED:
-            completed_list.append(element)
-        elif element[1].status == Status.ON_HOLD:
-            onhold_list.append(element)
-        elif element[1].status == Status.RANDOM:
-            random_list.append(element)
-        elif element[1].status == Status.DROPPED:
-            dropped_list.append(element)
-        elif element[1].status == Status.PLAN_TO_WATCH:
-            plantowatch_list.append(element)
-
-        # Get episodes per season
-        nb_season = len(element[4].split(","))
-        eps["{}".format(element[0].id)] = element[5].split(",")[:nb_season]
-        # Convert all element to int
-        eps["{}".format(element[0].id)] = [int(x) for x in eps["{}".format(element[0].id)]]
-
-        # Change first air time format
-        try:
-            tmp = element[0].first_air_date.split('-')
-            tmp_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
-            first_air_date["{}".format(element[0].id)] = tmp_air_date
-        except:
-            first_air_date["{}".format(element[0].id)] = "Unknown"
-
-        # Change last air time format
-        try:
-            tmp = element[0].last_air_date.split('-')
-            tmp_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
-            last_air_date["{}".format(element[0].id)] = tmp_air_date
-        except:
-            last_air_date["{}".format(element[0].id)] = "Unknown"
-
-        # Get genres
-        tmp = element[2]
-        tmp_genres = tmp.replace(',', ', ')
-        genres["{}".format(element[0].id)] = tmp_genres
-
-        # Get networks
-        tmp = element[3]
-        tmp_networks = tmp.replace(',', ', ')
-        networks["{}".format(element[0].id)] = tmp_networks
-
-        # Can update
-        time_delta = datetime.utcnow() - element[0].last_update
-        if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
-            can_update["{}".format(element[0].id)] = True
-        else:
-            can_update["{}".format(element[0].id)] = False
-
-    element_all_data = [[watching_list, "WATCHING"], [completed_list, "COMPLETED"], [onhold_list, "ON_HOLD"],
-                        [random_list, "RANDOM"], [dropped_list, "DROPPED"], [plantowatch_list, "PLAN_TO_WATCH"]]
-
-    return render_template('mymedialist.html',
-                           title="{}'s {}".format(user_name, media_list),
-                           all_data=element_all_data,
-                           eps=eps,
-                           genres=genres,
-                           networks=networks,
-                           can_update=can_update,
-                           media_list=media_list,
-                           last_air_date=last_air_date,
-                           first_air_date=first_air_date,
-                           target_user_name=user_name,
-                           target_user_id=str(user.id),
-                           data=user_achievements,
-                           media_value=media_value,
-                           list_view=list_view,
-                           x_abs=stats[0],
-                           y_abs=stats[1],
-                           y_abs_2=stats[2],
-                           y_abs_3=stats[3])
+    if media_list == "serieslist" or media_list == "animelist":
+        return render_template('mymedialist.html',
+                               title="{}'s {}".format(user_name, media_list),
+                               all_data=media_all_data[6],
+                               eps=media_all_data[0],
+                               genres=media_all_data[1],
+                               networks=media_all_data[2],
+                               can_update=media_all_data[3],
+                               last_air_date=media_all_data[4],
+                               first_air_date=media_all_data[5],
+                               media_list=media_list,
+                               target_user_name=user_name,
+                               target_user_id=str(user.id),
+                               data=user_achievements,
+                               media_value=media_value,
+                               list_view=list_view,
+                               x_abs=stats[0],
+                               y_abs=stats[1],
+                               y_abs_2=stats[2],
+                               y_abs_3=stats[3])
+    elif media_list == "movieslist":
+        return render_template('mymedialist.html',
+                               title="{}'s {}".format(user_name, media_list),
+                               all_data=media_all_data[3],
+                               genres=media_all_data[0],
+                               release_date=media_all_data[1],
+                               prod_companies=media_all_data[2],
+                               media_list=media_list,
+                               target_user_name=user_name,
+                               target_user_id=str(user.id),
+                               list_view=list_view,
+                               data=user_achievements,
+                               media_value=media_value,
+                               x_abs=stats[0],
+                               y_abs=stats[1],
+                               y_abs_2=stats[2],
+                               y_abs_3=stats[3])
 
 
 @app.route('/update_element_season', methods=['POST'])
@@ -1305,7 +1303,7 @@ def delete_element():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    valid_element_type = ["animelist", "serieslist"]
+    valid_element_type = ["animelist", "serieslist", "movieslist"]
     if element_type not in valid_element_type:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1316,6 +1314,9 @@ def delete_element():
     elif element_type == "serieslist":
         if Series.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    elif element_type == "movieslist":
+        if Movies.query.filter_by(id=element_id).first() is None:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element is in the current user's list
     if element_type == "animelist":
@@ -1323,6 +1324,9 @@ def delete_element():
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
     elif element_type == "serieslist":
         if SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first() is None:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    elif element_type == "movieslist":
+        if MoviesList.query.filter_by(user_id=current_user.get_id(), movies_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Remove the element from user's list
@@ -1334,6 +1338,10 @@ def delete_element():
         SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).delete()
         db.session.commit()
         app.logger.info('[{}] Series with ID {} deleted'.format(current_user.get_id(), element_id))
+    elif element_type == "movieslist":
+        MoviesList.query.filter_by(movies_id=element_id, user_id=current_user.get_id()).delete()
+        db.session.commit()
+        app.logger.info('[{}] Movie with ID {} deleted'.format(current_user.get_id(), element_id))
 
     # Compute the new total time spent
     if element_type == "animelist":
@@ -1350,12 +1358,17 @@ def delete_element():
                                 join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
                                 filter(SeriesList.user_id == current_user.id). \
                                 group_by(SeriesList.series_id).all()
+    elif element_type == "movieslist":
+        data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id).\
+            filter(MoviesList.user_id == current_user.id).group_by(MoviesList.movies_id).all()
 
     # Compute total time spent
     if element_type == "animelist":
         compute_media_time_spent(ListType.ANIME)
     elif element_type == "serieslist":
         compute_media_time_spent(ListType.SERIES)
+    elif element_type == "movieslist":
+        compute_media_time_spent(ListType.MOVIES)
 
     return '', 204
 
@@ -1376,7 +1389,7 @@ def change_element_category():
     if element_new_category not in category_list:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    valid_element_type = ["animelist", "serieslist"]
+    valid_element_type = ["animelist", "serieslist", "movieslist"]
     if element_type not in valid_element_type:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1385,6 +1398,8 @@ def change_element_category():
         element = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
     elif element_type == "serieslist":
         element = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
+    elif element_type == "movieslist":
+        element = MoviesList.query.filter_by(movies_id=element_id, user_id=current_user.get_id()).first()
     if element is None:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1418,7 +1433,6 @@ def change_element_category():
             anime = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
             anime.current_season = 1
             anime.last_episode_watched = 1
-
         elif element_type == "serieslist":
             series = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
             series.current_season = 1
@@ -1433,6 +1447,8 @@ def change_element_category():
         compute_media_time_spent(ListType.ANIME)
     elif element_type == "serieslist":
         compute_media_time_spent(ListType.SERIES)
+    elif element_type == "movieslist":
+        compute_media_time_spent(ListType.MOVIES)
 
     return '', 204
 
@@ -1516,6 +1532,8 @@ def add_element():
         add_element(element_id, ListType.ANIME)
     elif element_type == "serieslist":
         add_element(element_id, ListType.SERIES)
+    elif element_type == "movieslist":
+        add_element(element_id, ListType.MOVIES)
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1541,6 +1559,9 @@ def add_score_element():
     elif element_type == "serieslist":
         if Series.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    elif element_type == "movieslist":
+        if Movies.query.filter_by(id=element_id).first() is None:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element is in the current user's list
     if element_type == "animelist":
@@ -1548,6 +1569,9 @@ def add_score_element():
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
     elif element_type == "serieslist":
         if SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first() is None:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    elif element_type == "movieslist":
+        if MoviesList.query.filter_by(user_id=current_user.get_id(), movies_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the score is between 0 and 10:
@@ -1564,6 +1588,11 @@ def add_score_element():
         series.score = score_value
         db.session.commit()
         app.logger.info('[{}] Series with ID {} scored {}'.format(current_user.get_id(), element_id, score_value))
+    elif element_type == "movieslist":
+        movie = MoviesList.query.filter_by(user_id=current_user.get_id(), movies_id=element_id).first()
+        movie.score = score_value
+        db.session.commit()
+        app.logger.info('[{}] Movie with ID {} scored {}'.format(current_user.get_id(), element_id, score_value))
 
     return '', 204
 
@@ -1581,6 +1610,8 @@ def autocomplete(media):
         results = autocomplete_search_element(search, ListType.ANIME)
     elif media == "serieslist":
         results = autocomplete_search_element(search, ListType.SERIES)
+    elif media == "movieslist":
+        results = autocomplete_search_element(search, ListType.MOVIES)
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1802,6 +1833,10 @@ def get_list_count(user_id, list_type):
         dropped     = AnimeList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
         plantowatch = AnimeList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
         total       = AnimeList.query.filter_by(user_id=user_id).count()
+    elif list_type is ListType.MOVIES:
+        completed   = MoviesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+        plantowatch = MoviesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
+        total       = MoviesList.query.filter_by(user_id=user_id).count()
     elif list_type is ListType.BOOK:
         reading     = BookList.query.filter_by(user_id=user_id, status=Status.READING).count()
         completed   = BookList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
@@ -1825,6 +1860,10 @@ def get_list_count(user_id, list_type):
                       "dropped": dropped,
                       "plantoread": plantoread,
                       "total": total}
+    elif list_type == ListType.MOVIES:
+        list_count = {"completed": completed,
+                      "plantowatch": plantowatch,
+                      "total": total}
     return list_count
 
 
@@ -1833,6 +1872,8 @@ def get_mean_score(user_id, list_type):
         all_scores = SeriesList.query.filter_by(user_id=user_id).all()
     if list_type is ListType.ANIME:
         all_scores = AnimeList.query.filter_by(user_id=user_id).all()
+    if list_type is ListType.MOVIES:
+        all_scores = MoviesList.query.filter_by(user_id=user_id).all()
     if list_type is ListType.BOOK:
         all_scores = BookList.query.filter_by(user_id=user_id).all()
 
@@ -2353,6 +2394,120 @@ def get_achievements(user_id, list_type):
     return achievements_data
 
 
+def get_all_media_data(element_data, list_type, covers_path):
+    if list_type != ListType.MOVIES:
+        watching_list = []
+        completed_list = []
+        onhold_list = []
+        random_list = []
+        dropped_list = []
+        plantowatch_list = []
+
+        eps = {}
+        genres = {}
+        networks = {}
+        can_update = {}
+        last_air_date = {}
+        first_air_date = {}
+        for element in element_data:
+            # Change the cover path
+            element[0].image_cover = "{}{}".format(covers_path, element[0].image_cover)
+
+            if element[1].status == Status.WATCHING:
+                watching_list.append(element)
+            elif element[1].status == Status.COMPLETED:
+                completed_list.append(element)
+            elif element[1].status == Status.ON_HOLD:
+                onhold_list.append(element)
+            elif element[1].status == Status.RANDOM:
+                random_list.append(element)
+            elif element[1].status == Status.DROPPED:
+                dropped_list.append(element)
+            elif element[1].status == Status.PLAN_TO_WATCH:
+                plantowatch_list.append(element)
+
+            # Get episodes per season
+            nb_season = len(element[4].split(","))
+            eps["{}".format(element[0].id)] = element[5].split(",")[:nb_season]
+            # Convert all element to int
+            eps["{}".format(element[0].id)] = [int(x) for x in eps["{}".format(element[0].id)]]
+
+            # Change first air time format
+            try:
+                tmp = element[0].first_air_date.split('-')
+                tmp_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
+                first_air_date["{}".format(element[0].id)] = tmp_air_date
+            except:
+                first_air_date["{}".format(element[0].id)] = "Unknown"
+
+            # Change last air time format
+            try:
+                tmp = element[0].last_air_date.split('-')
+                tmp_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
+                last_air_date["{}".format(element[0].id)] = tmp_air_date
+            except:
+                last_air_date["{}".format(element[0].id)] = "Unknown"
+
+            # Get genres
+            tmp = element[2]
+            tmp_genres = tmp.replace(',', ', ')
+            genres["{}".format(element[0].id)] = tmp_genres
+
+            # Get networks
+            tmp = element[3]
+            tmp_networks = tmp.replace(',', ', ')
+            networks["{}".format(element[0].id)] = tmp_networks
+
+            # Can update
+            time_delta = datetime.utcnow() - element[0].last_update
+            if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
+                can_update["{}".format(element[0].id)] = True
+            else:
+                can_update["{}".format(element[0].id)] = False
+
+        element_all_data = [[watching_list, "WATCHING"], [completed_list, "COMPLETED"], [onhold_list, "ON_HOLD"],
+                            [random_list, "RANDOM"], [dropped_list, "DROPPED"], [plantowatch_list, "PLAN_TO_WATCH"]]
+
+        return [eps, genres, networks, can_update, last_air_date, first_air_date, element_all_data]
+    elif list_type == ListType.MOVIES:
+        completed_list = []
+        plantowatch_list = []
+
+        genres = {}
+        release_date = {}
+        prod_companies = {}
+        for element in element_data:
+            # Change the cover path
+            element[0].image_cover = "{}{}".format(covers_path, element[0].image_cover)
+
+            if element[1].status == Status.COMPLETED:
+                completed_list.append(element)
+            elif element[1].status == Status.PLAN_TO_WATCH:
+                plantowatch_list.append(element)
+
+            # Change release date format
+            try:
+                tmp = element[0].release_date.split('-')
+                tmp_release = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
+                release_date["{}".format(element[0].id)] = tmp_release
+            except:
+                release_date["{}".format(element[0].id)] = "Unknown"
+
+            # Get genres
+            tmp = element[2]
+            tmp_genres = tmp.replace(',', ', ')
+            genres["{}".format(element[0].id)] = tmp_genres
+
+            # Get production companies
+            tmp = element[3]
+            tmp_prod_companies = tmp.replace(',', ', ')
+            prod_companies["{}".format(element[0].id)] = tmp_prod_companies
+
+        element_all_data = [[completed_list, "COMPLETED"], [plantowatch_list, "PLAN_TO_WATCH"]]
+
+        return [genres, release_date, prod_companies, element_all_data]
+
+
 def compute_media_time_spent(list_type):
     user = User.query.filter_by(id=current_user.get_id()).first()
     if list_type == ListType.ANIME:
@@ -2362,6 +2517,9 @@ def compute_media_time_spent(list_type):
                                 join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
                                 filter(AnimeList.user_id == current_user.id). \
                                 group_by(AnimeList.anime_id)
+    elif list_type == ListType.MOVIES:
+        element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id).\
+                                        filter(MoviesList.user_id == current_user.id).group_by(MoviesList.movies_id)
     elif list_type == ListType.SERIES:
         element_data = db.session.query(SeriesList, Series,
                                 func.group_concat(SeriesEpisodesPerSeason.episodes)). \
@@ -2370,27 +2528,38 @@ def compute_media_time_spent(list_type):
                                 filter(SeriesList.user_id == current_user.id). \
                                 group_by(SeriesList.series_id)
 
-    total_time = 0
-    for element in element_data:
-        if element[0].status == Status.COMPLETED:
-            try:
-                total_time += element[1].episode_duration * element[1].total_episodes
-            except:
-                pass
-        elif element[0].status != Status.PLAN_TO_WATCH:
-            try:
-                episodes = element[2].split(",")
-                episodes = [int(x) for x in episodes]
-                for i in range(1, element[0].current_season):
-                    total_time += element[1].episode_duration * episodes[i - 1]
-                total_time += element[0].last_episode_watched * element[1].episode_duration
-            except:
-                pass
+    if list_type != ListType.MOVIES:
+        total_time = 0
+        for element in element_data:
+            if element[0].status == Status.COMPLETED:
+                try:
+                    total_time += element[1].episode_duration * element[1].total_episodes
+                except:
+                    pass
+            elif element[0].status != Status.PLAN_TO_WATCH:
+                try:
+                    episodes = element[2].split(",")
+                    episodes = [int(x) for x in episodes]
+                    for i in range(1, element[0].current_season):
+                        total_time += element[1].episode_duration * episodes[i - 1]
+                    total_time += element[0].last_episode_watched * element[1].episode_duration
+                except:
+                    pass
+    elif list_type == ListType.MOVIES:
+        total_time = 0
+        for element in element_data:
+            if element[0].status == Status.COMPLETED:
+                try:
+                    total_time += element[1].runtime
+                except:
+                    pass
 
     if list_type == ListType.ANIME:
         user.time_spent_anime = total_time
     elif list_type == ListType.SERIES:
         user.time_spent_series = total_time
+    elif list_type == ListType.MOVIES:
+        user.time_spent_movies = total_time
 
     db.session.commit()
 
@@ -2660,6 +2829,67 @@ def autocomplete_search_element(element_name, list_type):
             i = i+1
 
         return tmdb_results
+    elif list_type == ListType.MOVIES:
+        while True:
+            try:
+                response = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
+                                        .format(themoviedb_api_key, element_name))
+            except:
+                return [{"nb_results": 0}]
+            if response.status_code == 401:
+                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+                return [{"nb_results": 0}]
+            try:
+                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+            except:
+                return [{"nb_results": 0}]
+            if response.headers["X-RateLimit-Remaining"] == "0":
+                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+                time.sleep(3)
+            else:
+                break
+
+        data = json.loads(response.text)
+        try:
+            if data["total_results"] == 0:
+                return [{"nb_results": 0}]
+        except:
+            return [{"nb_results": 0}]
+
+        # Take only the first 6 results for the autocomplete
+        # There are 20 results per page
+        tmdb_results = []
+        i = 0
+        while i < data["total_results"] and i < 20 and len(tmdb_results) < 6:
+            # genre_ids : list
+            if "genre_ids" in data["results"][i]:
+                genre_ids = data["results"][i]["genre_ids"]
+            else:
+                genre_ids = ["Unknown"]
+
+            # original_language : string
+            if "original_language" in data["results"][i]:
+                original_language = data["results"][i]["original_language"]
+            else:
+                original_language = "Unknown"
+
+            movies_data = {"tmdb_id":  data["results"][i]["id"],
+                           "name":  data["results"][i]["title"]}
+
+            if data["results"][i]["poster_path"] is not None:
+                movies_data["poster_path"] = "{0}{1}".format("http://image.tmdb.org/t/p/w300", data["results"][i]["poster_path"])
+            else:
+                movies_data["poster_path"] = url_for('static', filename="movies_covers/default.jpg")
+
+            if "release_date" in data["results"][i] != ['']:
+                movies_data["first_air_date"] = data["results"][i]["release_date"].split('-')[0]
+            else:
+                movies_data["first_air_date"] = "Unknown"
+
+            tmdb_results.append(movies_data)
+            i = i+1
+
+        return tmdb_results
     elif list_type == ListType.BOOK:
         try:
             response = requests.get("https://www.googleapis.com/books/v1/volumes?q={0}&key={1}".format(element_name, google_book_api_key))
@@ -2695,6 +2925,8 @@ def add_element(element_id, list_type):
         element = Series.query.filter_by(themoviedb_id=element_id).first()
     elif list_type == ListType.ANIME:
         element = Anime.query.filter_by(themoviedb_id=element_id).first()
+    elif list_type == ListType.MOVIES:
+        element = Movies.query.filter_by(themoviedb_id=element_id).first()
     elif list_type == ListType.BOOK:
         element = Book.query.filter_by(google_id=element_id).first()
 
@@ -2707,6 +2939,9 @@ def add_element(element_id, list_type):
         elif list_type == ListType.ANIME:
             if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element.id).first() is not None:
                 return flash("This anime is already in your list", "warning")
+        elif list_type == ListType.MOVIES:
+            if MoviesList.query.filter_by(user_id=current_user.get_id(), movies_id=element.id).first() is not None:
+                return flash("This movie is already in your list", "warning")
         elif list_type == ListType.BOOK:
             if BookList.query.filter_by(user_id=current_user.get_id(), book_id=element.id).first() is not None:
                 return flash("This book is already in your list", "warning")
@@ -2727,7 +2962,7 @@ def add_element(element_id, list_type):
         if element_data is None:
             return flash("There was a problem while getting the info from the API. Please try again later.", "warning")
 
-        if list_type == ListType.SERIES or list_type == ListType.ANIME:
+        if list_type != ListType.BOOK:
             try:
                 element_cover_path = element_data["poster_path"]
             except:
@@ -2770,6 +3005,24 @@ def get_element_data_from_api(api_id, list_type):
                 time.sleep(3)
             else:
                 break
+    if list_type == ListType.MOVIES:
+        while True:
+            try:
+                response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}".format(api_id, themoviedb_api_key))
+            except:
+                return None
+            if response.status_code == 401:
+                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+                return None
+            try:
+                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+            except:
+                return None
+            if response.headers["X-RateLimit-Remaining"] == "0":
+                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+                time.sleep(3)
+            else:
+                break
     elif list_type == ListType.BOOK:
         try:
             response = requests.get("https://www.googleapis.com/books/v1/volumes/{0}".format(api_id))
@@ -2797,13 +3050,18 @@ def save_api_cover(element_cover_path, list_type):
             local_covers_path = os.path.join(app.root_path, "static\\animes_covers\\")
         else:  # Linux & macOS
             local_covers_path = os.path.join(app.root_path, "static/animes_covers/")
+    elif list_type == ListType.MOVIES:
+        if platform.system() == "Windows":
+            local_covers_path = os.path.join(app.root_path, "static\\movies_covers\\")
+        else:  # Linux & macOS
+            local_covers_path = os.path.join(app.root_path, "static/movies_covers/")
     elif list_type == ListType.BOOK:
         if platform.system() == "Windows":
             local_covers_path = os.path.join(app.root_path, "static\\books_covers\\")
         else:  # Linux & macOS
             local_covers_path = os.path.join(app.root_path, "static/books_covers/")
 
-    if list_type == ListType.SERIES or list_type == ListType.ANIME:
+    if list_type != ListType.BOOK:
         try:
             urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(element_cover_path),
                                        "{}{}".format(local_covers_path, element_cover_id))
@@ -2827,6 +3085,8 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         element = Series.query.filter_by(themoviedb_id=element_data["id"]).first()
     elif list_type == ListType.ANIME:
         element = Anime.query.filter_by(themoviedb_id=element_data["id"]).first()
+    elif list_type == ListType.MOVIES:
+        element = Movies.query.filter_by(themoviedb_id=element_data["id"]).first()
     elif list_type == ListType.BOOK:
         element = Book.query.filter_by(google_id=element_data["id"]).first()
 
@@ -3051,6 +3311,134 @@ def add_element_in_base(element_data, element_cover_id, list_type):
                                                 episodes=season_data["episode_count"])
             db.session.add(season)
         db.session.commit()
+    elif list_type == ListType.MOVIES:
+        try:
+            title = element_data["title"]
+        except:
+            title = "Unknown"
+        try:
+            original_title = element_data["original_title"]
+        except:
+            original_title = "Unknown"
+        try:
+            release_date = element_data["release_date"]
+        except:
+            release_date = "Unknown"
+        try:
+            homepage = element_data["homepage"]
+        except:
+            homepage = "Unknown"
+        try:
+            released = element_data["status"]
+        except:
+            released = "Unknown"
+        try:
+            vote_average = element_data["vote_average"]
+        except:
+            vote_average = "Unknown"
+        try:
+            vote_count = element_data["vote_count"]
+        except:
+            vote_count = "Unknown"
+        try:
+            synopsis = element_data["overview"]
+        except:
+            synopsis = "Unknown"
+        try:
+            popularity = element_data["popularity"]
+        except:
+            popularity = "Unknown"
+        try:
+            budget = element_data["budget"]
+        except:
+            budget = "Unknown"
+        try:
+            revenue = element_data["revenue"]
+        except:
+            revenue = "Unknown"
+        try:
+            tagline = element_data["tagline"]
+        except:
+            tagline = "Unknown"
+
+        themoviedb_id = element_data["id"]
+
+        try:
+            runtime = element_data["runtime"]
+            if runtime == None:
+                runtime = 0
+        except:
+            runtime = 0
+
+        try:
+            original_language = element_data["original_language"]
+            if original_language == "":
+                original_language = "Unknown"
+        except:
+            original_language = "Unknown"
+
+        genres_data = []
+        genres_id = []
+        for i in range(len(element_data["genres"])):
+            try:
+                genres_data.append(element_data["genres"][i]["name"])
+                genres_id.append(int(element_data["genres"][i]["id"]))
+            except:
+                pass
+
+        production_companies = []
+        for i in range(len(element_data["production_companies"])):
+            try:
+                production_companies.append(element_data["production_companies"][i]["name"])
+            except:
+                pass
+
+        # Add the element to the database
+        element = Movies(title=title,
+                         original_title=original_title,
+                         image_cover=element_cover_id,
+                         release_date=release_date,
+                         homepage=homepage,
+                         released=released,
+                         runtime=runtime,
+                         original_language=original_language,
+                         vote_average=vote_average,
+                         vote_count=vote_count,
+                         synopsis=synopsis,
+                         popularity=popularity,
+                         budget=budget,
+                         revenue=revenue,
+                         tagline=tagline,
+                         themoviedb_id=themoviedb_id)
+
+        db.session.add(element)
+        db.session.commit()
+
+        # Add genres
+        if len(genres_data) == 0:
+            genre = MoviesGenre(movies_id=element.id,
+                                genre="Unknown",
+                                genre_id=0)
+            db.session.add(genre)
+        else:
+            for i in range(0, len(genres_data)):
+                genre = MoviesGenre(movies_id=element.id,
+                                    genre=genres_data[i],
+                                    genre_id=genres_id[i])
+                db.session.add(genre)
+
+        # Add the different production companies for each element
+        if len(production_companies) == 0:
+            company = MoviesProd(movies_id=element.id,
+                                 production_company="Unknown")
+            db.session.add(company)
+        else:
+            for production_company in production_companies:
+                company = MoviesProd(movies_id=element.id,
+                                     production_company=production_company)
+                db.session.add(company)
+
+        db.session.commit()
     elif list_type == ListType.BOOK:
         try:
             title = element_data["volumeInfo"]["title"]
@@ -3132,6 +3520,17 @@ def add_element_to_user(element_id, user_id, list_type):
                               status=Status.WATCHING)
 
         app.logger.info('[{}] Added anime with the ID {}'.format(user_id, element_id))
+        db.session.add(user_list)
+
+        compute_media_time_spent(list_type)
+
+        db.session.commit()
+    elif list_type == ListType.MOVIES:
+        user_list = MoviesList(user_id=user_id,
+                               movies_id=element_id,
+                               status=Status.COMPLETED)
+
+        app.logger.info('[{}] Added movie with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
 
         compute_media_time_spent(list_type)

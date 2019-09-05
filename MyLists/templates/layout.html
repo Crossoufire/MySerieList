@@ -46,6 +46,7 @@
                     <div class="dropdown-menu dropdown_mylist bg-dark p-r-0 m-r-0">
                         <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='serieslist', list_view='grid', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MySeriesList</a>
                         <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='animelist', list_view='grid', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyAnimeList</a>
+                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='movieslist', list_view='grid', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyMoviesList</a>
                         <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mybookslist', list_view='grid', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyBooksList</a>
                     </div>
                 </div>

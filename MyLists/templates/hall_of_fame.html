@@ -10,9 +10,12 @@
 
 {% block content %}
 <div id="sorts" class="button-group text-center">
-  <button class="btn btn-warning" data-sort-value="username">Username</button>
-  <button class="btn btn-primary" data-sort-value="series">Series</button>
-    <button class="btn btn-primary" data-sort-value="movies">Movies</button>
+    <button class="btn btn-sm btn-warning" data-sort-value="k_levels">K Levels</button>
+    <button class="btn btn-sm btn-primary" data-sort-value="username">Username</button>
+    <button class="btn btn-sm btn-primary" data-sort-value="series">Series</button>
+    <button class="btn btn-sm btn-primary" data-sort-value="movies">Movies</button>
+    <button class="btn btn-sm btn-primary" data-sort-value="anime">Anime</button>
+    <button class="btn btn-sm btn-primary" data-sort-value="books">Books</button>
 </div>
 
 
@@ -23,7 +26,7 @@
                 <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
             </div>
 
-            <div class="col text-center name">
+            <div class="col text-center username">
                 <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
             </div>
 
@@ -31,6 +34,12 @@
                 <div>Series</div>
                 <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
                 <div>{{ user['series_level'] }} ({{ user['anime_percent'] }}%)</div>
+            </div>
+
+            <div class="col text-center movies">
+                <div>Movies</div>
+                <img class="grade_picture" src="static/img/levels_ranks/{{ user['movies_grade_id'] }}.png">
+                <div>{{ user['movies_level'] }} ({{ user['movies_percent'] }}%)</div>
             </div>
 
             <div class="col text-center anime">
@@ -43,12 +52,6 @@
                 <div>Books</div>
                 <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.png">
                 <div>{{ user['book_level'] }} ({{ user['book_percent'] }}%)</div>
-            </div>
-
-            <div class="col text-center movies">
-                <div>Movies</div>
-                <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
-                <div>{{ user['series_level'] }} ({{ user['series_percent'] }}%)</div>
             </div>
 
             <div class="col text-center k_levels">
@@ -97,16 +100,29 @@ function add_friend(username) {
 var $table = $('.hof_container').isotope({
     layoutMode: 'vertical',
     getSortData: {
-        username
+        username: '.username',
         series: '.series',
+        anime: '.anime',
+        books: '.books',
         movies: '.movies',
+        k_levels: '.k_levels'
     }
 });
 
 // bind sort button click
 $('#sorts').on('click', 'button', function() {
     var sortValue = $(this).attr('data-sort-value');
-    $table.isotope({ sortBy: sortValue, sortAscending: false });
+    $table.isotope( {
+        sortBy: sortValue,
+        sortAscending: {
+            username: true,
+            series: false,
+            anime: false,
+            books: false,
+            movies: false,
+            k_levels: false
+        }
+    });
 });
 
 // change checked class on buttons

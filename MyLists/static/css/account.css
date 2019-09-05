@@ -90,7 +90,7 @@
 /* --------------------------------- */
 
 
-/* ------------- Stats -------------- */
+/* ------------- Stats ------------- */
 .stats-container {
     justify-content: space-evenly;
     margin-top: 20px;
@@ -264,8 +264,12 @@
     margin-left: 20px;
 }
 
+#movies_level {
+    margin-left: 13px;
+}
+
 #anime_level {
-    margin-left: 10px;
+    margin-left: 18px;
 }
 
 #book_level {
@@ -290,6 +294,15 @@
     height: 100%;
     width: 0.1%;
     background: #4d0000;
+    font-size: 12px;
+    line-height: 10px;
+    text-align: right;
+}
+
+#xp-bar-fill-movies {
+    height: 100%;
+    width: 0.1%;
+    background: #cccccc;
     font-size: 12px;
     line-height: 10px;
     text-align: right;

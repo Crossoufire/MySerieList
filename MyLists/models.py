@@ -23,6 +23,7 @@ class Status(enum.Enum):
 class ListType(enum.Enum):
     SERIES = "Series"
     ANIME = "Anime"
+    MOVIES = 'Movies'
     BOOK = "Book"
 
 
@@ -31,6 +32,7 @@ class HomePage(enum.Enum):
     HALL_OF_FAME = "hall_of_fame"
     MYSERIESLIST = "myserieslist"
     MYANIMESLIST = "myanimeslist"
+    MYMOVIESLIST = "mymovieslist"
     MYBOOKSLIST = "mybookslist"
 
 
@@ -43,6 +45,7 @@ class User(db.Model, UserMixin):
     homepage = db.Column(db.Enum(HomePage), nullable=False, default=HomePage.MYSERIESLIST)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     time_spent_series = db.Column(db.Integer, nullable=False, default=0)
+    time_spent_movies = db.Column(db.Integer, nullable=False, default=0)
     time_spent_anime = db.Column(db.Integer, nullable=False, default=0)
     time_spent_book = db.Column(db.Integer, nullable=False, default=0)
     private = db.Column(db.Boolean, nullable=False, default=False)
@@ -193,6 +196,50 @@ class AnimeNetwork(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     network = db.Column(db.String(150), nullable=False)
+
+
+######################################################## MOVIES ########################################################
+
+
+class Movies(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(50), nullable=False)
+    original_title = db.Column(db.String(50), nullable=False)
+    release_date = db.Column(db.String(30))
+    homepage = db.Column(db.String(100))
+    released = db.Column(db.String(30))
+    runtime = db.Column(db.Integer)
+    original_language = db.Column(db.String(20))
+    synopsis = db.Column(db.Text)
+    vote_average = db.Column(db.Float)
+    vote_count = db.Column(db.Float)
+    popularity = db.Column(db.Float)
+    budget = db.Column(db.Float)
+    revenue = db.Column(db.Float)
+    tagline = db.Column(db.String(30))
+    image_cover = db.Column(db.String(100), nullable=False)
+    themoviedb_id = db.Column(db.Integer, nullable=False)
+
+
+class MoviesList(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
+    status = db.Column(db.Enum(Status), nullable=False)
+    score = db.Column(db.Float)
+
+
+class MoviesGenre(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
+    genre = db.Column(db.String(100), nullable=False)
+    genre_id = db.Column(db.Integer, nullable=False)
+
+
+class MoviesProd(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    movies_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
+    production_company = db.Column(db.String(150), nullable=False)
 
 
 ######################################################## BOOKS #########################################################
