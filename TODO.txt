@@ -28,10 +28,6 @@ Medialist:
 	Possibility to edit metadata
 	Change modal info
 
-Bookslist:
-	Add several search bar (name, author, etc)
-	Add a "read less" for the synopsis modal
-
 MoviesList:
 	Create the list
 	Option to import a CSV file

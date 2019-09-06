@@ -1,7 +1,7 @@
 from flask_admin import expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from MyLists.models import User, Friend, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, SeriesNetwork, \
-    Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork, Book, BookList
+    Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork
 from MyLists import db, app
 from flask_login import current_user
 from flask_admin import Admin
@@ -175,28 +175,6 @@ class AnimeEpisodeTimestampAdminView(ModelView):
 
 ######################################################### BOOK #########################################################
 
-class BookAdminView(ModelView):
-
-    def is_accessible(self):
-        return current_user.get_id() == '1'
-
-    column_display_pk = True
-    column_exclude_list = ('image_cover', 'description', 'google_id')
-    column_searchable_list = ['title']
-    column_sortable_list = ('id', 'title', 'authors', 'published_date', 'page_count', 'categories')
-    list_template = 'admin/book.html'
-
-
-class BookListAdminView(ModelView):
-
-    def is_accessible(self):
-        return current_user.get_id() == '1'
-
-    column_list = ('user_id', 'book_id', 'commentary', 'read_year', 'status', 'score')
-    column_searchable_list = ('user_id', 'book_id')
-    column_sortable_list = ('user_id', 'book_id', 'status')
-    list_template = 'admin/book_list.html'
-
 
 # Override of the index flask-admin view:
 class MyHomeAdminView(AdminIndexView):
@@ -272,13 +250,3 @@ admin.add_view(AnimeNetworkAdminView(model=AnimeNetwork,
                                      session=db.session,
                                      name="Anime network",
                                      endpoint='anime_network'))
-
-admin.add_view(BookAdminView(model=Book,
-                             session=db.session,
-                             name="Book",
-                             endpoint='book'))
-
-admin.add_view(BookListAdminView(model=BookList,
-                                 session=db.session,
-                                 name="Book list",
-                                 endpoint='book_list'))

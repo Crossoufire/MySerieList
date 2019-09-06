@@ -1,5 +1,5 @@
 
-/* --- General CSS ------------------------------------------------------------------------------ */
+/* ----------------- General CSS ---------------------- */
 .bg-dark {
     background-color: #2c3946 !important;
 }
@@ -39,7 +39,7 @@ hr {
     border: solid 1px black;
 }
 
-/* --- Navigation bar CSS ----------------------------------------------------------------------- */
+/* ------------------ Navigation bar CSS -------------------- */
 .dropdown_mylist > .nav-item::after {
     content: '';
     display: block;

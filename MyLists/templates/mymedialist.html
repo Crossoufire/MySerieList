@@ -6,667 +6,281 @@
 <!---------- Jquery autocomplete ---------->
 <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet">
 {% endif %}
-<link href="{{ url_for('static', filename='css/mymedialist_common.css') }}" rel="stylesheet">
-{% if list_view == 'grid' %}
 <link href="{{ url_for('static', filename='css/mymedialist.css') }}" rel="stylesheet">
-{% elif list_view == 'table' %}
-<link href="{{ url_for('static', filename='css/mymedialist_table.css') }}" rel="stylesheet">
-{% endif %}
 {% endblock css %}
 
 
-{% block fixed %}
-<div class="d-flex flex-wrap">
-    <div class="ml-auto">
-        {% if list_view == 'grid' %}
-        <a id="score_container" onclick="show_all_score()">
-            <span id="show_all" class="fas fa-eye text-light m-r-5"></span>
-            <span id="hide_all" class="d-none"></span>
-            <span id="show_hide" class="text-light">Show scores</span>
-        </a>
-        <span class="m-l-5 m-r-5 text-light">||</span>
-        <a id="view_container" href="{{ url_for('mymedialist', media_list=media_list, list_view='table', user_name=target_user_name) }}">
-            <span class="fas fa-bars text-light"></span>
-            <span id="view_mode" class="text-light">Table view</span>
-        </a>
-        {% elif list_view == 'table' %}
-        <a id="view_container" href="{{ url_for('mymedialist', media_list=media_list, list_view='grid', user_name=target_user_name) }}">
-            <span class="fas fa-bars text-light"></span>
-            <span class="text-light">Grid view</span>
-        </a>
-        {% endif %}
-    </div>
-</div>
-{% endblock fixed %}
-
-
 {% block content %}
-<div>
-    <div class="d-flex flex-wrap m-t-15 m-b-20">
-        {% if target_user_id == current_user.get_id() %}
-        <div>
-            {% if media_list == "movieslist" %}
-            <input class="form-control text-light add_element" placeholder="Add a Movie" type="text" id="autocomplete" onfocus="this.value=''"/>
-            <input type="hidden" id="element_id" value=""/>
-            {% elif media_list == "animelist" %}
-            <input  class="form-control text-light add_element" placeholder="Add an Anime" type="text" id="autocomplete" onfocus="this.value=''"/>
-            <input type="hidden" id="element_id" value=""/>
-            {% elif media_list == "serieslist" %}
-            <input  class="form-control text-light add_element" placeholder="Add a Series" type="text" id="autocomplete" onfocus="this.value=''"/>
-            <input type="hidden" id="element_id" value=""/>
-            {% endif %}
-        </div>
-        {% endif %}
-    </div>
-    {% if media_list == 'movieslist' %}
+<div class="d-flex flex-wrap m-t-15 m-b-20">
+    {% if target_user_id == current_user.get_id() %}
     <div>
-        <div class="d-flex flex-wrap button-group filters-button-group" style="justify-content: center;">
-            <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
-            <button class="btn btn-sm btn-light text-dark" data-filter="#COMPLETED">Completed</button>
-            <button class="btn btn-sm btn-light text-dark" data-filter="#PLAN_TO_WATCH">Plan to Watch</button>
-        </div>
-        {% if list_view == 'grid' %}
-        <div class="grid-iso">
-            {% for category in all_data %}
-            <div class="category" id="{{ category[1] }}" style="width: 100%;">
-                {% if category[1] == 'PLAN_TO_WATCH' %}
-                <h2 class="font-weight-light text-center pt-5 mb-0 category-title">PLAN TO WATCH</h2>
-                {% else %}
-                <h2 class="font-weight-light text-center pt-5 mb-0 category-title">{{ category[1] }}</h2>
-                {% endif %}
-                <hr class="mt-2 pb-3 mb-0">
-                <div class="d-flex flex-wrap {{ category[1] }}">
-                    {% set outer_loop = loop %}
-                    {% for data in category[0] %}
-                        <!------------------- Card -------------------->
-                        <div id="card_{{ data[0].id }}" class="card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20" style="border-radius: 5px;">
-                            <div class="view overlay">
-                                <img class="card-img-top" width="200" height="300" src="{{ data[0].image_cover }}" alt="{{ data[0].title }}">
-                                <div class="mask flex-center rgba-black-strong" style="cursor: pointer;" data-toggle="modal" data-target="#modal_{{ data[0].id }}">
-                                    <span class="font-mask text-center text-light">{{ data[0].title }}</span>
-                                </div>
-                                {% if target_user_id == current_user.get_id() %}
-                                <a class="btn_left fas fa-bars text-light" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
-                                <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0].id }}', 'card_{{ data[0].id }}', '{{ data[0].title }}', '{{ media_list }}')"></a>
-                                {% endif %}
-                                <a class="btn_bottom_left fas fa-caret-square-down" data-toggle="tooltip" title="Show score" onclick="show_score('footer_{{ data[0].id }}', card_{{ data[0].id }})" style="z-index: 500;"></a>
-                            </div>
-
-                            <div id="footer_{{ data[0].id }}" class="d-none footer_score">
-                                {% if target_user_id == current_user.get_id() %}
-                                <span class="score_size"> Score: </span><a class="score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
-                                {% else %}
-                                <span class="score_size"> Score: </span><a class="disabled score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
-                                {% endif %}
-                                <input id="edit_{{ data[0].id }}" class="d-none" type="text" style="max-width: 30px; max-height: 20px; background-color: black; color: white; border: solid; border-color: black;" onkeydown="add_score('new_{{ data[0].id }}', 'edit_{{ data[0].id }}', '{{ data[0].id }}', '{{ media_list }}')">
-                            </div>
-                        </div>
-
-                        <!----------- Categories Modal ---------------->
-                        <div style="max-width: 220px;" class="modal fade left" id="modal_cat{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="cat_mod" aria-hidden="true">
-                            <div style="max-width: 200px;" class="modal-dialog modal-side modal-top-left modal-sm" role="document">
-                                <div style="max-width: 200px; background: #131418;" class="modal-content">
-                                    <div style="max-width: 200px;" class="modal-header">
-                                        <h5 class="modal-title">Categories</h5>
-                                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div id="mod_{{ data[0].id }}" class="modal-body">
-                                        {% if outer_loop.index == 1 %}
-                                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', '{{ media_list }}')">Plan to Watch</a>
-                                        {% elif outer_loop.index == 2 %}
-                                        <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', '{{ media_list }}')">Completed</a>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!----------- Element metadata Modal ----------->
-                        <div class="modal fade" id="modal_{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; background: #131418;">
-                                    <div class="modal-body">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title">{{ data[0].title }}</h4>
-                                            <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            {% if data[0].original_title != data[0].title %}
-                                            <p><b>Original title</b>: {{ data[0].original_title }}</p>
-                                            {% endif %}
-                                            <p><b>Genres</b>: {{ genres["{}".format(data[0].id)] }}</p>
-                                            <p><b>Budget</b>: {{ data[0].budget }}</p>
-                                            <p><b>Revenue</b>: {{ data[0].revenue }}</p>
-                                            <p><b>Release date</b>: {{ release_date["{}".format(data[0].id)] }}</p>
-                                            <p><b>Released</b>: {{ data[0].released }}</p>
-                                            <p><b>Tagline</b>: {{ data[0].tagline }}</p>
-                                            <p><b>Homepage</b>: <a target="_blank" rel="noopener noreferrer" href="{{ data[0].homepage }}">{{ data[0].homepage }}</a></p>
-                                            {% if data[0].runtime == 0 %}
-                                            <p><b>Movie runtime</b>: Unknown</p>
-                                            {% else %}
-                                            <p><b>Movie runtime</b>: {{ data[0].runtime }} min</p>
-                                            {% endif %}
-                                            <p><b>Original language</b>: {{ data[0].original_language }}</p>
-                                            <p><b>TMDb score</b>: {{ data[0].vote_average }}/10</p>
-                                            <p><b>Production companies</b>: {{ prod_companies["{}".format(data[0].id)] }}</p>
-                                            <hr class="m-b-10 m-t-10">
-                                            <p class="m-b-0 text-justify"><b>Synopsis</b>: {{ data[0].synopsis }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% elif list_view == 'table' %}
-        <div class="table-iso">
-            {% for category in all_data %}
-            <div class="category" id="{{ category[1] }}" style="width: 100%;">
-                {% if category[1] == 'PLAN_TO_WATCH' %}
-                <h2 class="font-weight-light text-center pt-5 mb-0 category-title">PLAN TO WATCH</h2>
-                {% else %}
-                <h2 class="font-weight-light text-center pt-5 mb-0 category-title">{{ category[1] }}</h2>
-                {% endif %}
-                <hr class="mt-2 pb-3 mb-0">
-                <div class="{{ category[1] }}">
-                    <table class="table table-sm text-light">
-                        <thead class="text-center">
-                            <th class="table_number">#</th>
-                            <th>Title</th>
-                            <th>Runtime</th>
-                            <th>Release date</th>
-                            <th class="table_country">Original language</th>
-                            <th class="table_score">Score</th>
-                            {% if target_user_id == current_user.get_id() %}
-                            <th class="table_actions">Actions</th>
-                            {% endif %}
-                        </thead>
-                        <tbody id="tbody_{{ category[1] }}">
-                            {% set outer_loop = loop %}
-                            {% for data in category[0] %}
-                            <tr id="tr_{{ data[0].id }}">
-                                <td class="text-center">
-                                    {{ loop.index }}
-                                </td>
-                                <td class="text-left">
-                                    <a data-toggle="modal" data-target="#modal_{{ data[0].id }}">{{ data[0].title }}</a>
-                                </td>
-                                <td class="text-center">
-                                    {% if data[0].runtime == 0 %}
-                                    Unknown
-                                    {% else %}
-                                    {{ data[0].runtime }} min
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    {{ release_date["{}".format(data[0].id)] }}
-                                </td>
-                                <td class="text-center">
-                                    {{ data[0].original_language }}
-                                </td>
-                                <td class="text-center">
-                                    {% if target_user_id == current_user.get_id() %}
-                                    <a class="score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
-                                    {% else %}
-                                    <a class="disabled score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
-                                    {% endif %}
-                                    <input id="edit_{{ data[0].id }}" class="d-none" type="text" style="max-width: 30px; max-height: 20px; background-color: black; color: white; border: solid; border-color: black;" onkeydown="add_score('new_{{ data[0].id }}', 'edit_{{ data[0].id }}', '{{ data[0].id }}', '{{ media_list }}')">
-                                </td>
-                                {% if target_user_id == current_user.get_id() %}
-                                <td class="text-center">
-                                    <a class="fas fa-bars" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
-                                    &nbsp &nbsp
-                                    <a class="fas fa-ban" onclick="delete_element('{{ data[0].id }}', 'tr_{{ data[0].id }}', '{{ media_list }}')"></a>
-                                </td>
-                                {% endif %}
-                            </tr>
-
-                    <!------------------------- Categories Modal ---------------------------->
-                    <div style="max-width: 220px;" class="modal fade left" id="modal_cat{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="cat_mod" aria-hidden="true">
-                        <div style="max-width: 200px;" class="modal-dialog modal-side modal-top-left modal-sm" role="document">
-                            <div style="max-width: 200px; background: #131418;" class="modal-content">
-                                <div style="max-width: 200px;" class="modal-header">
-                                    <h5 class="modal-title">Categories</h5>
-                                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div id="mod_{{ data[0].id }}" class="modal-body">
-                                    {% if outer_loop.index == 1 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', '{{ media_list }}')">Plan to Watch</a>
-                                    {% elif outer_loop.index == 2 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', '{{ media_list }}')">Completed</a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!------------------------ element metadata Modal ----------------------->
-                    <div class="modal fade" id="modal_{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; background: #131418;">
-                                <div class="modal-body">
-                                    <div class="modal-header">
-                                        <h4 class="modal-title">{{ data[0].title }}</h4>
-                                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        {% if data[0].original_title != data[0].title %}
-                                        <p><b>Original title</b>: {{ data[0].original_title }}</p>
-                                        {% endif %}
-                                        <p><b>Genres</b>: {{ genres["{}".format(data[0].id)] }}</p>
-                                        <p><b>Budget</b>: {{ data[0].budget }}</p>
-                                        <p><b>Revenue</b>: {{ data[0].revenue }}</p>
-                                        <p><b>Released</b>: {{ data[0].released }}</p>
-                                        <p><b>Tagline</b>: {{ data[0].tagline }}</p>
-                                        <p><b>Homepage</b>: <a target="_blank" rel="noopener noreferrer" href="{{ data[0].homepage }}">{{ data[0].homepage }}</a></p>
-                                        <p><b>TMDb score</b>: {{ data[0].vote_average }}/10</p>
-                                        <p><b>Production companies</b>: {{ prod_companies["{}".format(data[0].id)] }}</p>
-                                        <hr class="m-b-10 m-t-10">
-                                        <p class="m-b-0 text-justify"><b>Synopsis</b>: {{ data[0].synopsis }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </div>
-    {% elif media_list != 'movieslist' %}
-    <div>
-        <div class="d-flex flex-wrap button-group filters-button-group" style="justify-content: center;">
-            <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
-            <button class="btn btn-sm btn-light text-dark" data-filter="#WATCHING">Watching</button>
-            <button class="btn btn-sm btn-light text-dark" data-filter="#COMPLETED">Completed</button>
-            <button class="btn btn-sm btn-light text-dark" data-filter="#ON_HOLD">On Hold</button>
-            <button class="btn btn-sm btn-light text-dark" data-filter="#RANDOM">Random</button>
-            <button class="btn btn-sm btn-light text-dark" data-filter="#DROPPED">Dropped</button>
-            <button class="btn btn-sm btn-light text-dark" data-filter="#PLAN_TO_WATCH">Plan to Watch</button>
-        </div>
-        {% if list_view == 'grid' %}
-        <div class="grid-iso">
-            {% for category in all_data %}
-            <div class="category" id="{{ category[1] }}" style="width: 100%;">
-                {% if category[1] == 'ON_HOLD' %}
-                <h2 class="font-weight-light text-center pt-5 mb-0 category-title">ON HOLD</h2>
-                {% elif category[1] == 'PLAN_TO_WATCH' %}
-                <h2 class="font-weight-light text-center pt-5 mb-0 category-title">PLAN TO WATCH</h2>
-                {% else %}
-                <h2 class="font-weight-light text-center pt-5 mb-0 category-title">{{ category[1] }}</h2>
-                {% endif %}
-                <hr class="mt-2 pb-3 mb-0">
-                <div class="d-flex flex-wrap {{ category[1] }}">
-                    {% set outer_loop = loop %}
-                    {% for data in category[0] %}
-                    <!------------------- Card -------------------->
-                    <div id="card_{{ data[0].id }}" class="card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20" style="border-radius: 5px;">
-                        <div class="view overlay">
-                            <img class="card-img-top" width="200" height="300" src="{{ data[0].image_cover }}" alt="{{ data[0].name }}">
-                            <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_{{ data[0].id }}" style="cursor: pointer;">
-                                <span class="font-mask text-center text-light">{{ data[0].name }}</span>
-                            </div>
-                            {% if target_user_id == current_user.get_id() %}
-                            <a class="btn_left fas fa-bars text-light" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
-                            <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0].id }}', 'card_{{ data[0].id }}', '{{ data[0].name }}', '{{ media_list }}')"></a>
-                            {% if can_update["{}".format(data[0].id)] %}
-                            <a class="btn_bottom_right fas fa-sync text-light" data-toggle="tooltip" title="Sync metadata" onclick="refresh('{{ data[0].id }}', '{{ media_list }}', '{{ current_user.username }}')"></a>
-                            {% endif %}
-                            {% endif %}
-                            <a class="btn_bottom_left fas fa-caret-square-down" data-toggle="tooltip" title="Show score" onclick="show_score('footer_{{ data[0].id }}', card_{{ data[0].id }})" style="z-index: 500;"></a>
-                        </div>
-
-                        <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
-                            <div class="container p-0">
-                                <div class="row p-0 m-0">
-                                    <div class="col p-0">
-                                        {% if target_user_id == current_user.get_id() %}
-                                        <select id="S_{{ data[0].id }}" class="scrollable-menu text-center form-control p-0 seasons" onchange="updateSeason('{{ data[0].id }}', this, '{{ eps['{}'.format(data[0].id)] }}', 'E_{{ data[0].id }}', '{{ media_list }}')">
-                                            {% else %}
-                                            <select id="S_{{ data[0].id }}" class="disabled scrollable-menu text-center form-control p-0 seasons">
-                                                {% endif %}
-                                                {% for i in range(eps["{}".format(data[0].id)]|length) %}
-                                                {% if i+1 == data[1].current_season %}
-                                                <option selected="selected">Season {{ i+1 }}</option>
-                                                {% else %}
-                                                <option>Season {{ i+1 }}</option>
-                                                {% endif %}
-                                                {% endfor %}
-                                            </select>
-                                    </div>
-                                    <div class="col p-0">
-                                        {% if target_user_id == current_user.get_id() %}
-                                        <select id="E_{{ data[0].id }}" class="scrollable-menu text-center form-control p-0 episodes" onchange="updateEpisode('{{ data[0].id }}', this, '{{ media_list }}')">
-                                            {% else %}
-                                            <select id="E_{{ data[0].id }}" class="disabled scrollable-menu text-center form-control p-0 episodes">
-                                                {% endif %}
-                                                {% for i in range(eps["{}".format(data[0].id)][data[1].current_season-1]) %}
-                                                {% if i+1 == data[1].last_episode_watched %}
-                                                <option selected="selected">Episode {{ i+1 }}</option>
-                                                {% else %}
-                                                <option>Episode {{ i+1 }}</option>
-                                                {% endif %}
-                                                {% endfor %}
-                                            </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="footer_{{ data[0].id }}" class="d-none footer_score">
-                            {% if target_user_id == current_user.get_id() %}
-                            <span class="score_size"> Score: </span><a class="score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
-                            {% else %}
-                            <span class="score_size"> Score: </span><a class="disabled score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
-                            {% endif %}
-                            <input id="edit_{{ data[0].id }}" class="d-none" type="text" style="max-width: 30px; max-height: 20px; background-color: black; color: white; border: solid; border-color: black;" onkeydown="add_score('new_{{ data[0].id }}', 'edit_{{ data[0].id }}', '{{ data[0].id }}', '{{ media_list }}')">
-                        </div>
-                    </div>
-
-                    <!----------- Categories Modal ---------------->
-                    <div style="max-width: 220px;" class="modal fade left" id="modal_cat{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="cat_mod" aria-hidden="true">
-                        <div style="max-width: 200px;" class="modal-dialog modal-side modal-top-left modal-sm" role="document">
-                            <div style="max-width: 200px; background: #131418;" class="modal-content">
-                                <div style="max-width: 200px;" class="modal-header">
-                                    <h5 class="modal-title">Categories</h5>
-                                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div id="mod_{{ data[0].id }}" class="modal-body">
-                                    {% if outer_loop.index == 1 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Random</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
-                                    {% elif outer_loop.index == 2 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Random</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
-                                    {% elif outer_loop.index == 3 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Random</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
-                                    {% elif outer_loop.index == 4 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
-                                    {% elif outer_loop.index == 5 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Random</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
-                                    {% elif outer_loop.index == 6 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Random</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!----------- Element metadata Modal ----------->
-                    <div class="modal fade" id="modal_{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; background: #131418;">
-                                <div class="modal-body">
-                                    <div class="modal-header">
-                                        <h4 class="modal-title">{{ data[0].name }}</h4>
-                                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        {% if data[0].original_name != data[0].name %}
-                                        <p><b>Original Name</b>: {{ data[0].original_name }}</p>
-                                        {% endif %}
-                                        <p><b>Genres</b>: {{ genres["{}".format(data[0].id)] }}</p>
-                                        <p><b>First air date</b>: {{ first_air_date["{}".format(data[0].id)] }}</p>
-                                        <p><b>Last air date</b>: {{ last_air_date["{}".format(data[0].id)] }}</p>
-                                        <p><b>Homepage</b>: <a target="_blank" rel="noopener noreferrer" href="{{ data[0].homepage }}">{{ data[0].homepage }}</a></p>
-                                        <p><b>In production</b>: {{ data[0].in_production }}</p>
-                                        <p><b>Networks</b>: {{ networks["{}".format(data[0].id)] }}</p>
-                                        <p><b>Created by</b>: {{ data[0].created_by }}</p>
-                                        {% if data[0].episode_duration == 0 %}
-                                        <p><b>Episode duration</b>: Unknown</p>
-                                        {% else %}
-                                        <p><b>Episode duration</b>: {{ data[0].episode_duration }} min</p>
-                                        {% endif %}
-                                        <p><b>Total seasons</b>: {{ data[0].total_seasons }}</p>
-                                        <p><b>Total episodes</b>: {{ data[0].total_episodes }}</p>
-                                        {% if media_list != "animelist" %}
-                                        <p><b>Origin country</b>: {{ data[0].origin_country }}</p>
-                                        {% endif %}
-                                        <p><b>TMDb score</b>: {{ data[0].vote_average }}/10</p>
-                                        <p><b>Status</b>: {{ data[0].status }}</p>
-                                        <hr class="m-b-10 m-t-10">
-                                        <p class="m-b-0 text-justify"><b>Synopsis</b>: {{ data[0].synopsis }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% elif list_view == 'table' %}
-        <div class="table-iso">
-            {% for category in all_data %}
-            <div class="category" id="{{ category[1] }}" style="width: 100%;">
-                {% if category[1] == 'ON_HOLD' %}
-                <h2 class="font-weight-light text-center pt-5 mb-0 category-title">ON HOLD</h2>
-                {% elif category[1] == 'PLAN_TO_WATCH' %}
-                <h2 class="font-weight-light text-center pt-5 mb-0 category-title">PLAN TO WATCH</h2>
-                {% else %}
-                <h2 class="font-weight-light text-center pt-5 mb-0 category-title">{{ category[1] }}</h2>
-                {% endif %}
-                <hr class="mt-2 mb-0">
-                <div class="collapse show d-flex flex-wrap table-responsive-sm" id="{{ category[1] }}">
-                    <table class="table table-sm text-light">
-                        <thead class="text-center">
-                            <th class="table_number">#</th>
-                            <th>Name</th>
-                            <th class="table_season">Season</th>
-                            <th class="table_episode">Episode</th>
-                            {% if media_list != "animelist" %}
-                            <th class="table_country">Origin country</th>
-                            {% endif %}
-                            <th class="table_score">Score</th>
-                            {% if target_user_id == current_user.get_id() %}
-                            <th class="table_actions">Actions</th>
-                            {% endif %}
-                        </thead>
-                        <tbody id="tbody_{{ category[1] }}">
-                            {% set outer_loop = loop %}
-                            {% for data in category[0] %}
-                            <tr id="tr_{{ data[0].id }}">
-                                <td class="text-center">
-                                    {{ loop.index }}
-                                </td>
-                                <td class="text-left">
-                                    <a data-toggle="modal" data-target="#modal_{{ data[0].id }}">{{ data[0].name }}</a>
-                                </td>
-                                <td class="text-center">
-                                    {% if target_user_id == current_user.get_id() %}
-                                    <select id="S_{{ data[0].id }}" class="scrollable-menu text-center form-control p-0 seasons" onchange="updateSeason('{{ data[0].id }}', this, '{{ eps['{}'.format(data[0].id)] }}', 'E_{{ data[0].id }}', '{{ media_list }}')">
-                                        {% else %}
-                                        <select id="S_{{ data[0].id }}" class="disabled scrollable-menu text-center form-control p-0 seasons" onchange="updateSeason('{{ data[0].id }}', this, '{{ eps['{}'.format(data[0].id)] }}', 'E_{{ data[0].id }}', '{{ media_list }}')">
-                                            {% endif %}
-                                            {% for i in range(eps["{}".format(data[0].id)]|length) %}
-                                            {% if i+1 == data[1].current_season %}
-                                            <option selected="selected">Season {{ i+1 }}</option>
-                                            {% else %}
-                                            <option>Season {{ i+1 }}</option>
-                                            {% endif %}
-                                            {% endfor %}
-                                        </select>
-                                </td>
-                                <td class="text-center">
-                                    {% if target_user_id == current_user.get_id() %}
-                                    <select id="E_{{ data[0].id }}" class="scrollable-menu text-center form-control p-0 episodes" onchange="updateEpisode('{{ data[0].id }}', this, '{{ media_list }}')">
-                                        {% else %}
-                                        <select id="E_{{ data[0].id }}" class="disabled scrollable-menu text-center form-control p-0 episodes" onchange="updateEpisode('{{ data[0].id }}', this, '{{ media_list }}')">
-                                            {% endif %}
-                                            {% for i in range(eps["{}".format(data[0].id)][data[1].current_season-1]) %}
-                                            {% if i+1 == data[1].last_episode_watched %}
-                                            <option selected="selected">Episode {{ i+1 }}</option>
-                                            {% else %}
-                                            <option>Episode {{ i+1 }}</option>
-                                            {% endif %}
-                                            {% endfor %}
-                                        </select>
-                                </td>
-                                {% if media_list != "animelist" %}
-                                <td class="text-center">
-                                {{ data[0].origin_country }}
-                            </td>
-                                {% endif %}
-                                <td class="text-center">
-                                {% if target_user_id == current_user.get_id() %}
-                                <a class="score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
-                                {% else %}
-                                <a class="disabled score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
-                                {% endif %}
-                                <input id="edit_{{ data[0].id }}" class="d-none" type="text" style="max-width: 30px; max-height: 20px; background-color: black; color: white; border: solid; border-color: black;" onkeydown="add_score('new_{{ data[0].id }}', 'edit_{{ data[0].id }}', '{{ data[0].id }}', '{{ media_list }}')">
-                            </td>
-                                {% if target_user_id == current_user.get_id() %}
-                                <td class="text-center">
-                                <a class="fas fa-bars" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
-                                &nbsp &nbsp
-                                {% if can_update["{}".format(data[0].id)] %}
-                                <a class="fas fa-sync" onclick="refresh('{{ data[0].id }}', '{{ media_list }}')"></a>
-                                {% endif %}
-                                &nbsp &nbsp
-                                <a class="fas fa-ban" onclick="delete_element('{{ data[0].id }}', 'tr_{{ data[0].id }}', '{{ media_list }}')"></a>
-                            </td>
-                                {% endif %}
-                            </tr>
-
-                    <!----------- Categories Modal ---------------->
-                    <div style="max-width: 220px;" class="modal fade left" id="modal_cat{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="cat_mod" aria-hidden="true">
-                        <div style="max-width: 200px;" class="modal-dialog modal-side modal-top-left modal-sm" role="document">
-                            <div style="max-width: 200px; background: #131418;" class="modal-content">
-                                <div style="max-width: 200px;" class="modal-header">
-                                    <h5 class="modal-title">Categories</h5>
-                                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div id="mod_{{ data[0].id }}" class="modal-body">
-                                    {% if outer_loop.index == 1 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Random</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
-                                    {% elif outer_loop.index == 2 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Random</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
-                                    {% elif outer_loop.index == 3 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Random</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
-                                    {% elif outer_loop.index == 4 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
-                                    {% elif outer_loop.index == 5 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Random</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
-                                    {% elif outer_loop.index == 6 %}
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Random</a>
-                                    <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'tr_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps['{}'.format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!----------- element metadata Modal ----------->
-                    <div class="modal fade" id="modal_{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; background: #131418;">
-                                <div class="modal-body">
-                                    <div class="modal-header">
-                                        <h4 class="modal-title">{{ data[0].name }}</h4>
-                                        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        {% if data[0].original_name != data[0].name %}
-                                        <p><b>Original Name</b>: {{ data[0].original_name }}</p>
-                                        {% endif %}
-                                        <p><b>Genres</b>: {{ genres["{}".format(data[0].id)] }}</p>
-                                        <p><b>First air date</b>: {{ first_air_date["{}".format(data[0].id)] }}</p>
-                                        <p><b>Last air date</b>: {{ last_air_date["{}".format(data[0].id)] }}</p>
-                                        <p><b>Homepage</b>: <a target="_blank" rel="noopener noreferrer" href="{{ data[0].homepage }}">{{ data[0].homepage }}</a></p>
-                                        <p><b>In production</b>: {{ data[0].in_production }}</p>
-                                        <p><b>Networks</b>: {{ networks["{}".format(data[0].id)] }}</p>
-                                        <p><b>Created by</b>: {{ data[0].created_by }}</p>
-                                        <p><b>Episode duration</b>: {{ data[0].episode_duration }} min</p>
-                                        <p><b>Total seasons</b>: {{ data[0].total_seasons }}</p>
-                                        <p><b>Total episodes</b>: {{ data[0].total_episodes }}</p>
-                                        <p><b>TMDb score</b>: {{ data[0].vote_average }}/10</p>
-                                        <p><b>Status</b>: {{ data[0].status }}</p>
-                                        <hr class="m-b-10 m-t-10">
-                                        <p class="m-b-0"><b>Synopsis</b>: {{ data[0].synopsis }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            </div>
-            {% endfor %}
-        </div>
+        {% if media_list == "movieslist" %}
+        <input class="form-control text-light add_element" placeholder="Add a Movie" type="text" id="autocomplete" onfocus="this.value=''"/>
+        <input type="hidden" id="element_id" value=""/>
+        {% elif media_list == "animelist" %}
+        <input  class="form-control text-light add_element" placeholder="Add an Anime" type="text" id="autocomplete" onfocus="this.value=''"/>
+        <input type="hidden" id="element_id" value=""/>
+        {% elif media_list == "serieslist" %}
+        <input  class="form-control text-light add_element" placeholder="Add a Series" type="text" id="autocomplete" onfocus="this.value=''"/>
+        <input type="hidden" id="element_id" value=""/>
         {% endif %}
     </div>
     {% endif %}
+</div>
+<div class="d-flex flex-wrap button-group filters-button-group" style="justify-content: center;">
+    {% if media_list != 'movieslist' %}
+    <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter="#WATCHING">Watching</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter="#COMPLETED">Completed</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter="#ON_HOLD">On Hold</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter="#RANDOM">Random</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter="#DROPPED">Dropped</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter="#PLAN_TO_WATCH">Plan to Watch</button>
+    {% else %}
+    <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter="#COMPLETED">Completed</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter="#PLAN_TO_WATCH">Plan to Watch</button>
+    {% endif %}
+</div>
+<div class="grid-iso">
+    {% for category in all_data %}
+    <div class="category" id="{{ category[1] }}" style="width: 100%;">
+        {% if category[1] == 'ON_HOLD' %}
+        <h2 class="font-weight-light text-center pt-5 mb-0 category-title">ON HOLD</h2>
+        {% elif category[1] == 'PLAN_TO_WATCH' %}
+        <h2 class="font-weight-light text-center pt-5 mb-0 category-title">PLAN TO WATCH</h2>
+        {% else %}
+        <h2 class="font-weight-light text-center pt-5 mb-0 category-title">{{ category[1] }}</h2>
+        {% endif %}
+        <hr class="mt-2 pb-3 mb-0">
+        <div class="d-flex flex-wrap {{ category[1] }}">
+            {% set outer_loop = loop %}
+            {% for data in category[0] %}
+            <!------------------- Card -------------------->
+            <div id="card_{{ data[0].id }}" class="card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20" style="border-radius: 5px;">
+                <div class="view overlay">
+                    <img class="card-img-top" width="200" height="300" src="{{ data[0].image_cover }}" alt="{{ data[0].name }}">
+                    <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_{{ data[0].id }}" style="cursor: pointer;">
+                        <span class="font-mask text-center text-light">{{ data[0].name }}</span>
+                    </div>
+                    {% if target_user_id == current_user.get_id() %}
+                    <a class="btn_left fas fa-bars text-light" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
+                    <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0].id }}', 'card_{{ data[0].id }}', '{{ data[0].name }}', '{{ media_list }}')"></a>
+                        {% if media_list != 'movieslist' %}
+                            {% if can_update["{}".format(data[0].id)] %}
+                            <a class="btn_bottom_right fas fa-sync text-light" data-toggle="tooltip" title="Sync metadata" onclick="refresh('{{ data[0].id }}', '{{ media_list }}', '{{ current_user.username }}')"></a>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    <a class="btn_bottom_left fas fa-caret-square-down" data-toggle="tooltip" title="Show score" onclick="show_score('footer_{{ data[0].id }}', card_{{ data[0].id }})" style="z-index: 500;"></a>
+                </div>
+
+                {% if media_list != 'movieslist' %}
+                <div class="card-body bg-transparent p-0 m-t-5 m-b-1">
+                    <div class="container p-0">
+                        <div class="row p-0 m-0">
+                            <div class="col p-0">
+                                {% if target_user_id == current_user.get_id() %}
+                                <select id="S_{{ data[0].id }}" class="scrollable-menu text-center form-control p-0 seasons" onchange="updateSeason('{{ data[0].id }}', this, '{{ eps['{}'.format(data[0].id)] }}', 'E_{{ data[0].id }}', '{{ media_list }}')">
+                                    {% else %}
+                                    <select id="S_{{ data[0].id }}" class="disabled scrollable-menu text-center form-control p-0 seasons">
+                                        {% endif %}
+                                        {% for i in range(eps["{}".format(data[0].id)]|length) %}
+                                        {% if i+1 == data[1].current_season %}
+                                        <option selected="selected">Season {{ i+1 }}</option>
+                                        {% else %}
+                                        <option>Season {{ i+1 }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                            </div>
+                            <div class="col p-0">
+                                {% if target_user_id == current_user.get_id() %}
+                                <select id="E_{{ data[0].id }}" class="scrollable-menu text-center form-control p-0 episodes" onchange="updateEpisode('{{ data[0].id }}', this, '{{ media_list }}')">
+                                    {% else %}
+                                    <select id="E_{{ data[0].id }}" class="disabled scrollable-menu text-center form-control p-0 episodes">
+                                        {% endif %}
+                                        {% for i in range(eps["{}".format(data[0].id)][data[1].current_season-1]) %}
+                                        {% if i+1 == data[1].last_episode_watched %}
+                                        <option selected="selected">Episode {{ i+1 }}</option>
+                                        {% else %}
+                                        <option>Episode {{ i+1 }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div id="footer_{{ data[0].id }}" class="d-none footer_score">
+                    {% if target_user_id == current_user.get_id() %}
+                    <span class="score_size"> Score: </span><a class="score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
+                    {% else %}
+                    <span class="score_size"> Score: </span><a class="disabled score_size" id="new_{{ data[0].id }}" onclick="edit_score('edit_{{ data[0].id }}', 'new_{{ data[0].id }}')">{{ data[1].score }}</a>
+                    {% endif %}
+                    <input id="edit_{{ data[0].id }}" class="d-none" type="text" style="max-width: 30px; max-height: 20px; background-color: black; color: white; border: solid; border-color: black;" onkeydown="add_score('new_{{ data[0].id }}', 'edit_{{ data[0].id }}', '{{ data[0].id }}', '{{ media_list }}')">
+                </div>
+            </div>
+
+                {% if media_list == 'movieslist' %}
+                <!----------- Categories Modal ---------------->
+                <div style="max-width: 220px;" class="modal fade left" id="modal_cat{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="cat_mod" aria-hidden="true">
+                    <div style="max-width: 200px;" class="modal-dialog modal-side modal-top-left modal-sm" role="document">
+                        <div style="max-width: 200px; background: #131418;" class="modal-content">
+                            <div style="max-width: 200px;" class="modal-header">
+                                <h5 class="modal-title">Categories</h5>
+                                <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div id="mod_{{ data[0].id }}" class="modal-body">
+                                {% if outer_loop.index == 1 %}
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', '{{ media_list }}')">Plan to Watch</a>
+                                {% elif outer_loop.index == 2 %}
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', '{{ media_list }}')">Completed</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!----------- Element metadata Modal ----------->
+                <div class="modal fade" id="modal_{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; background: #131418;">
+                            <div class="modal-body">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">{{ data[0].title }}</h4>
+                                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    {% if data[0].original_title != data[0].title %}
+                                    <p><b>Original title</b>: {{ data[0].original_title }}</p>
+                                    {% endif %}
+                                    <p><b>Genres</b>: {{ genres["{}".format(data[0].id)] }}</p>
+                                    <p><b>Budget</b>: {{ data[0].budget }}</p>
+                                    <p><b>Revenue</b>: {{ data[0].revenue }}</p>
+                                    <p><b>Release date</b>: {{ release_date["{}".format(data[0].id)] }}</p>
+                                    <p><b>Released</b>: {{ data[0].released }}</p>
+                                    <p><b>Tagline</b>: {{ data[0].tagline }}</p>
+                                    <p><b>Homepage</b>: <a target="_blank" rel="noopener noreferrer" href="{{ data[0].homepage }}">{{ data[0].homepage }}</a></p>
+                                    {% if data[0].runtime == 0 %}
+                                    <p><b>Movie runtime</b>: Unknown</p>
+                                    {% else %}
+                                    <p><b>Movie runtime</b>: {{ data[0].runtime }} min</p>
+                                    {% endif %}
+                                    <p><b>Original language</b>: {{ data[0].original_language }}</p>
+                                    <p><b>TMDb score</b>: {{ data[0].vote_average }}/10</p>
+                                    <p><b>Production companies</b>: {{ prod_companies["{}".format(data[0].id)] }}</p>
+                                    <hr class="m-b-10 m-t-10">
+                                    <p class="m-b-0 text-justify"><b>Synopsis</b>: {{ data[0].synopsis }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <!----------- Categories Modal ---------------->
+                <div style="max-width: 220px;" class="modal fade left" id="modal_cat{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="cat_mod" aria-hidden="true">
+                    <div style="max-width: 200px;" class="modal-dialog modal-side modal-top-left modal-sm" role="document">
+                        <div style="max-width: 200px; background: #131418;" class="modal-content">
+                            <div style="max-width: 200px;" class="modal-header">
+                                <h5 class="modal-title">Categories</h5>
+                                <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div id="mod_{{ data[0].id }}" class="modal-body">
+                                {% if outer_loop.index == 1 %}
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Random</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
+                                {% elif outer_loop.index == 2 %}
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Random</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
+                                {% elif outer_loop.index == 3 %}
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Random</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
+                                {% elif outer_loop.index == 4 %}
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
+                                {% elif outer_loop.index == 5 %}
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Random</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Plan to Watch</a>
+                                {% elif outer_loop.index == 6 %}
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Watching', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Watching</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Completed</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'On Hold', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">On Hold</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Random', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Random</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Dropped', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', 'S_{{ data[0].id }}', 'E_{{ data[0].id }}', '{{ eps["{}".format(data[0].id)] }}', '{{ media_list }}')">Dropped</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!----------- Element metadata Modal ----------->
+                <div class="modal fade" id="modal_{{ data[0].id }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; background: #131418;">
+                            <div class="modal-body">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">{{ data[0].name }}</h4>
+                                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    {% if data[0].original_name != data[0].name %}
+                                    <p><b>Original Name</b>: {{ data[0].original_name }}</p>
+                                    {% endif %}
+                                    <p><b>Genres</b>: {{ genres["{}".format(data[0].id)] }}</p>
+                                    <p><b>First air date</b>: {{ first_air_date["{}".format(data[0].id)] }}</p>
+                                    <p><b>Last air date</b>: {{ last_air_date["{}".format(data[0].id)] }}</p>
+                                    <p><b>Homepage</b>: <a target="_blank" rel="noopener noreferrer" href="{{ data[0].homepage }}">{{ data[0].homepage }}</a></p>
+                                    <p><b>In production</b>: {{ data[0].in_production }}</p>
+                                    <p><b>Networks</b>: {{ networks["{}".format(data[0].id)] }}</p>
+                                    <p><b>Created by</b>: {{ data[0].created_by }}</p>
+                                    {% if data[0].episode_duration == 0 %}
+                                    <p><b>Episode duration</b>: Unknown</p>
+                                    {% else %}
+                                    <p><b>Episode duration</b>: {{ data[0].episode_duration }} min</p>
+                                    {% endif %}
+                                    <p><b>Total seasons</b>: {{ data[0].total_seasons }}</p>
+                                    <p><b>Total episodes</b>: {{ data[0].total_episodes }}</p>
+                                    {% if media_list != "animelist" %}
+                                    <p><b>Origin country</b>: {{ data[0].origin_country }}</p>
+                                    {% endif %}
+                                    <p><b>TMDb score</b>: {{ data[0].vote_average }}/10</p>
+                                    <p><b>Status</b>: {{ data[0].status }}</p>
+                                    <hr class="m-b-10 m-t-10">
+                                    <p class="m-b-0 text-justify"><b>Synopsis</b>: {{ data[0].synopsis }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
 </div>
 <div class="modal_loading"></div>
 {% endblock content %}
@@ -741,25 +355,15 @@ $(function() {
     });
 });
 </script>
-<!---------------------------------------------->
 {% endif %}
 
 <!------------------ Isotope ------------------->
 <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
-<!---------------------------------------------->
 
 <script src="{{ url_for('static', filename='js/mymedialist_common.js') }}"></script>
 {% if media_list == 'movieslist' %}
-    {% if list_view == 'grid' %}
     <script src="{{ url_for('static', filename='js/mymedialist_movies.js') }}"></script>
-    {% elif list_view == 'table' %}
-    <script src="{{ url_for('static', filename='js/mymedialist_movies_table.js') }}"></script>
-    {% endif %}
 {% elif media_list != 'movieslist' %}
-    {% if list_view == 'grid' %}
     <script src="{{ url_for('static', filename='js/mymedialist.js') }}"></script>
-    {% elif list_view == 'table' %}
-    <script src="{{ url_for('static', filename='js/mymedialist_table.js') }}"></script>
-    {% endif %}
 {% endif %}
 {% endblock script %}

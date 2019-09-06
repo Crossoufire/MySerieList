@@ -11,20 +11,17 @@ def load_user(user_id):
 
 class Status(enum.Enum):
     WATCHING = "Watching"
-    READING = "Reading"
     COMPLETED = "Completed"
     ON_HOLD = "On Hold"
     RANDOM = "Random"
     DROPPED = "Dropped"
     PLAN_TO_WATCH = "Plan to Watch"
-    PLAN_TO_READ = "Plan to Read"
 
 
 class ListType(enum.Enum):
     SERIES = "Series"
     ANIME = "Anime"
     MOVIES = 'Movies'
-    BOOK = "Book"
 
 
 class HomePage(enum.Enum):
@@ -33,7 +30,6 @@ class HomePage(enum.Enum):
     MYSERIESLIST = "myserieslist"
     MYANIMESLIST = "myanimeslist"
     MYMOVIESLIST = "mymovieslist"
-    MYBOOKSLIST = "mybookslist"
 
 
 class User(db.Model, UserMixin):
@@ -47,7 +43,6 @@ class User(db.Model, UserMixin):
     time_spent_series = db.Column(db.Integer, nullable=False, default=0)
     time_spent_movies = db.Column(db.Integer, nullable=False, default=0)
     time_spent_anime = db.Column(db.Integer, nullable=False, default=0)
-    time_spent_book = db.Column(db.Integer, nullable=False, default=0)
     private = db.Column(db.Boolean, nullable=False, default=False)
     active = db.Column(db.Boolean, nullable=False, default=False)
     transition_email = db.Column(db.String(120))
@@ -203,8 +198,8 @@ class AnimeNetwork(db.Model):
 
 class Movies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(50), nullable=False)
-    original_title = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    original_name = db.Column(db.String(50), nullable=False)
     release_date = db.Column(db.String(30))
     homepage = db.Column(db.String(100))
     released = db.Column(db.String(30))
@@ -240,30 +235,6 @@ class MoviesProd(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     movies_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     production_company = db.Column(db.String(150), nullable=False)
-
-
-######################################################## BOOKS #########################################################
-
-
-class Book(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(300), nullable=False)
-    image_cover = db.Column(db.String(100), nullable=False)
-    authors = db.Column(db.String(150), nullable=False)
-    published_date = db.Column(db.String(150))
-    description = db.Column(db.String(50))
-    page_count = db.Column(db.Integer)
-    categories = db.Column(db.String(150))
-    google_id = db.Column(db.String(150), nullable=False)
-
-
-class BookList(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
-    commentary = db.Column(db.String(5000))
-    status = db.Column(db.Enum(Status), nullable=False)
-    score = db.Column(db.Float)
 
 
 ######################################################## ACHIEVEMENTS ##################################################

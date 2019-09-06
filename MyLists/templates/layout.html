@@ -44,10 +44,9 @@
                 <div class="navbar-brand nav-item dropdown m-r-30">
                     <a class="dropdown-toggle" data-toggle="dropdown" style="color: #ffffffe6;" href="#">MyLists<span class="caret"></span></a>
                     <div class="dropdown-menu dropdown_mylist bg-dark p-r-0 m-r-0">
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='serieslist', list_view='grid', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MySeriesList</a>
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='animelist', list_view='grid', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyAnimeList</a>
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='movieslist', list_view='grid', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyMoviesList</a>
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mybookslist', list_view='grid', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyBooksList</a>
+                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='serieslist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MySeriesList</a>
+                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='animelist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyAnimeList</a>
+                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='movieslist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyMoviesList</a>
                     </div>
                 </div>
                 {% else %}
@@ -78,14 +77,6 @@
                     {% endif %}
                     </div>
                 </div>
-            </div>
-        </nav>
-
-
-        <nav class="fixed-top second_navbar">
-            <div class="container">
-                {% block fixed %}
-                {% endblock fixed %}
             </div>
         </nav>
 

@@ -15,7 +15,6 @@
     <button class="btn btn-sm btn-light text-dark" data-sort-value="series">Series</button>
     <button class="btn btn-sm btn-light text-dark" data-sort-value="movies">Movies</button>
     <button class="btn btn-sm btn-light text-dark" data-sort-value="anime">Anime</button>
-    <button class="btn btn-sm btn-light text-dark" data-sort-value="books">Books</button>
 </div>
 
 <div class="hof_container mr-auto ml-auto m-t-50">
@@ -45,12 +44,6 @@
                 <div>Anime</div>
                 <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
                 <div>{{ user['anime_level'] }} ({{ user['anime_percent'] }}%)</div>
-            </div>
-
-            <div class="col text-center books">
-                <div>Books</div>
-                <img class="grade_picture" src="static/img/levels_ranks/{{ user['book_grade_id'] }}.png">
-                <div>{{ user['book_level'] }} ({{ user['book_percent'] }}%)</div>
             </div>
 
             <div class="col text-center k_levels">

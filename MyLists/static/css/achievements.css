@@ -1,6 +1,4 @@
 
-
-/* ----------------- Achievements top navbar ------------------ */
 .topnav {
     background-color: #333;
     overflow: hidden;
@@ -61,7 +59,6 @@
 
 
 /* ----------------- Achievements display ------------------ */
-
 .media_list_detail {
     -moz-column-count: 4;
     -moz-column-gap: 20px;

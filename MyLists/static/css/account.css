@@ -321,15 +321,6 @@ body {
     text-align: right;
 }
 
-#xp-bar-fill-book {
-    height: 100%;
-    width: 0.1%;
-    background: #004d00;
-    font-size: 12px;
-    line-height: 10px;
-    text-align: right;
-}
-
 .xp-increase-fx {
     position: relative;
     display: none;

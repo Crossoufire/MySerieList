@@ -20,14 +20,13 @@ from MyLists.admin_views import User
 from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, ChangePasswordForm, AddFriendForm, \
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
-    Friend, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, Book, BookList, \
+    Friend, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, \
     Achievements, Movies, MoviesGenre, MoviesList, MoviesProd
 
 
 config.read('config.ini')
 try:
     themoviedb_api_key = config['TheMovieDB']['api_key']
-    google_book_api_key = config['GoogleBook']['api_key']
 except:
     print("Config file error. Please read the README to configure the config.ini file properly. Exit.")
     sys.exit()
@@ -173,13 +172,11 @@ def home():
             next_page = request.args.get('next')
             if next_page is None:
                 if user.homepage == HomePage.MYSERIESLIST:
-                    return redirect(url_for('mymedialist', media_list='serieslist', list_view='grid', user_name=current_user.username))
+                    return redirect(url_for('mymedialist', media_list='serieslist', user_name=current_user.username))
                 elif user.homepage == HomePage.MYMOVIESLIST:
-                    return redirect(url_for('mymedialist', media_list='movieslist', list_view='grid', user_name=current_user.username))
+                    return redirect(url_for('mymedialist', media_list='movieslist', user_name=current_user.username))
                 elif user.homepage == HomePage.MYANIMESLIST:
-                    return redirect(url_for('mymedialist', media_list='animelist', list_view='grid', user_name=current_user.username))
-                elif user.homepage == HomePage.MYBOOKSLIST:
-                    return redirect(url_for('mybookslist', list_view='grid', user_name=current_user.username))
+                    return redirect(url_for('mymedialist', media_list='animelist', user_name=current_user.username))
                 elif user.homepage == HomePage.ACCOUNT:
                     return redirect(url_for('account', user_name=current_user.username))
                 elif user.homepage == HomePage.HALL_OF_FAME:
@@ -211,13 +208,11 @@ def home():
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.get_id()).first()
         if user.homepage == HomePage.MYSERIESLIST:
-            return redirect(url_for('mymedialist', media_list='serieslist', list_view='grid', user_name=current_user.username))
+            return redirect(url_for('mymedialist', media_list='serieslist', user_name=current_user.username))
         if user.homepage == HomePage.MYMOVIESLIST:
-            return redirect(url_for('mymedialist', media_list='movieslist', list_view='grid', user_name=current_user.username))
+            return redirect(url_for('mymedialist', media_list='movieslist', user_name=current_user.username))
         elif user.homepage == HomePage.MYANIMESLIST:
-            return redirect(url_for('mymedialist', media_list='animelist', list_view='grid', user_name=current_user.username))
-        elif user.homepage == HomePage.MYBOOKSLIST:
-            return redirect(url_for('mybookslist', list_view='grid', user_name=current_user.username))
+            return redirect(url_for('mymedialist', media_list='animelist', user_name=current_user.username))
         elif user.homepage == HomePage.ACCOUNT:
             return redirect(url_for('account', user_name=current_user.username))
         elif user.homepage == HomePage.HALL_OF_FAME:
@@ -378,8 +373,6 @@ def account(user_name):
             user.homepage = HomePage.MYMOVIESLIST
         elif form.homepage.data == "mal":
             user.homepage = HomePage.MYANIMESLIST
-        elif form.homepage.data == "mbl":
-            user.homepage = HomePage.MYBOOKSLIST
         elif form.homepage.data == "acc":
             user.homepage = HomePage.ACCOUNT
         elif form.homepage.data == "hof":
@@ -403,10 +396,10 @@ def account(user_name):
                 success = False
                 app.logger.error('[SYSTEM] Error while sending the email update email to {}'.format(user.email))
         if not email_changed:
-            flash("Your account has been updated ! ", 'success')
+            flash("Your account has been updated! ", 'success')
         else:
             if success:
-                flash("Your account has been updated ! Please click on the link to validate your new email address.",
+                flash("Your account has been updated! Please click on the link to validate your new email address.",
                       'success')
             else:
                 flash("There was an error internal error. Please contact the administrator.", 'danger')
@@ -422,8 +415,6 @@ def account(user_name):
             form.homepage.data = "mml"
         elif current_user.homepage == HomePage.MYANIMESLIST:
             form.homepage.data = "mal"
-        elif current_user.homepage == HomePage.MYBOOKSLIST:
-            form.homepage.data = "mbl"
         elif current_user.homepage == HomePage.ACCOUNT:
             form.homepage.data = "acc"
         elif current_user.homepage == HomePage.HALL_OF_FAME:
@@ -446,7 +437,6 @@ def account(user_name):
     account_data["series"] = {}
     account_data["movies"] = {}
     account_data["anime"] = {}
-    account_data["book"] = {}
     account_data["username"] = user_name
     account_data["friends"] = friends_list_data
 
@@ -458,18 +448,15 @@ def account(user_name):
     account_data["series"]["time_spent_hour"] = round(user.time_spent_series/60)
     account_data["movies"]["time_spent_hour"] = round(user.time_spent_movies/60)
     account_data["anime"]["time_spent_hour"] = round(user.time_spent_anime/60)
-    account_data["book"]["time_spent_hour"] = round(user.time_spent_book/60)
 
     account_data["series"]["time_spent_day"] = round(user.time_spent_series/1440, 1)
     account_data["movies"]["time_spent_day"] = round(user.time_spent_movies/1440, 1)
     account_data["anime"]["time_spent_day"] = round(user.time_spent_anime/1440, 1)
-    account_data["book"]["time_spent_day"] = round(user.time_spent_book/1440, 1)
 
     # Mean score
     account_data["series"]["mean_score"] = get_mean_score(user.id, ListType.SERIES)
     account_data["movies"]["mean_score"] = get_mean_score(user.id, ListType.MOVIES)
     account_data["anime"]["mean_score"] = get_mean_score(user.id, ListType.ANIME)
-    account_data["book"]["mean_score"] = get_mean_score(user.id, ListType.BOOK)
 
     # Count elements of each category
     series_count = get_list_count(user.id, ListType.SERIES)
@@ -494,14 +481,6 @@ def account(user_name):
     account_data["anime"]["dropped_count"]      = anime_count["dropped"]
     account_data["anime"]["plantowatch_count"]  = anime_count["plantowatch"]
     account_data["anime"]["total_count"]        = anime_count["total"]
-
-    book_count = get_list_count(user.id, ListType.BOOK)
-    account_data["book"]["reading_count"]       = book_count["reading"]
-    account_data["book"]["completed_count"]     = book_count["completed"]
-    account_data["book"]["onhold_count"]        = book_count["onhold"]
-    account_data["book"]["dropped_count"]       = book_count["dropped"]
-    account_data["book"]["plantoread_count"]    = book_count["plantoread"]
-    account_data["book"]["total_count"]         = book_count["total"]
 
     # Count number of episodes for the series
     all_series_data = db.session.query(SeriesList, SeriesEpisodesPerSeason,
@@ -535,17 +514,6 @@ def account(user_name):
         nb_episodes_watched += element[0].last_episode_watched
     account_data["anime"]["nb_ep_watched"] = nb_episodes_watched
 
-    # Count number of page read for the books
-    all_book_data = db.session.query(BookList, Book). \
-                                     join(Book, Book.id == BookList.book_id). \
-                                     filter(BookList.user_id == user.id)
-
-    nb_pages_read = 0
-    for element in all_book_data:
-        if element[0].status == Status.COMPLETED and element[1].page_count is not None:
-            nb_pages_read += element[1].page_count
-    account_data["book"]["nb_pages_read"] = nb_pages_read
-
     # Element percentages
     if account_data["series"]["nb_ep_watched"] == 0:
         account_data["series"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -571,14 +539,6 @@ def account(user_name):
                                                         (float(account_data["anime"]["random_count"]/account_data["anime"]["total_count"]))*100,
                                                         (float(account_data["anime"]["dropped_count"]/account_data["anime"]["total_count"]))*100,
                                                         (float(account_data["anime"]["plantowatch_count"]/account_data["anime"]["total_count"]))*100]
-    if account_data["book"]["nb_pages_read"] == 0:
-        account_data["book"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0]
-    else:
-        account_data["book"]["element_percentage"] = [(float(account_data["book"]["reading_count"]/account_data["book"]["total_count"])) * 100,
-                                                      (float(account_data["book"]["completed_count"]/account_data["book"]["total_count"])) * 100,
-                                                      (float(account_data["book"]["onhold_count"]/account_data["book"]["total_count"])) * 100,
-                                                      (float(account_data["book"]["dropped_count"]/account_data["book"]["total_count"])) * 100,
-                                                      (float(account_data["book"]["plantoread_count"]/account_data["book"]["total_count"])) * 100]
 
     # Grades and levels
     series_level = get_level_and_grade(user.time_spent_series)
@@ -599,13 +559,7 @@ def account(user_name):
     account_data["anime_grade_id"] = anime_level["grade_id"]
     account_data["anime_grade_title"] = anime_level["grade_title"]
 
-    book_level = get_level_and_grade(user.time_spent_book)
-    account_data["book_level"] = book_level["level"]
-    account_data["book_percent"] = book_level["level_percent"]
-    account_data["book_grade_id"] = book_level["grade_id"]
-    account_data["book_grade_title"] = book_level["grade_title"]
-
-    knowledge_level = int(series_level["level"] + movies_level["level"] + anime_level["level"] + book_level["level"])
+    knowledge_level = int(series_level["level"] + movies_level["level"] + anime_level["level"])
     knowledge_grade = get_knowledge_grade(knowledge_level)
     account_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
     account_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
@@ -717,14 +671,13 @@ def account_settings():
             app.logger.info('[{}] Settings updated : old private mode = {}, new private mode = {}'.format(user.id,
                                                                                                           old_value,
                                                                                                           form.isprivate.data))
-
         old_value = user.homepage
         if form.homepage.data == "msl":
             user.homepage = HomePage.MYSERIESLIST
+        elif form.homepage.data == "mml":
+            user.homepage = HomePage.MYMOVIESLIST
         elif form.homepage.data == "mal":
             user.homepage = HomePage.MYANIMESLIST
-        elif form.homepage.data == "mbl":
-            user.homepage = HomePage.MYBOOKSLIST
         elif form.homepage.data == "acc":
             user.homepage = HomePage.ACCOUNT
         elif form.homepage.data == "hof":
@@ -763,10 +716,10 @@ def account_settings():
 
         if current_user.homepage == HomePage.MYSERIESLIST:
             form.homepage.data = "msl"
+        elif current_user.homepage == HomePage.MYMOVIESLIST:
+            form.homepage.data = "mml"
         elif current_user.homepage == HomePage.MYANIMESLIST:
             form.homepage.data = "mal"
-        elif current_user.homepage == HomePage.MYBOOKSLIST:
-            form.homepage.data = "mbl"
         elif current_user.homepage == HomePage.ACCOUNT:
             form.homepage.data = "acc"
         elif current_user.homepage == HomePage.HALL_OF_FAME:
@@ -791,7 +744,7 @@ def email_update_token(token):
     user.transition_email = None
     db.session.commit()
     app.logger.info('[{}] Email successfully changed from {} to {}'.format(user.id, old_email, user.email))
-    flash('Email successfully updated !', 'success')
+    flash('Email successfully updated!', 'success')
 
     return redirect(url_for('home'))
 
@@ -850,13 +803,7 @@ def hall_of_fame():
         user_data["anime_grade_id"] = anime_level["grade_id"]
         user_data["anime_grade_title"] = anime_level["grade_title"]
 
-        book_level = get_level_and_grade(user.time_spent_book)
-        user_data["book_level"] = book_level["level"]
-        user_data["book_percent"] = book_level["level_percent"]
-        user_data["book_grade_id"] = book_level["grade_id"]
-        user_data["book_grade_title"] = book_level["grade_title"]
-
-        knowledge_level = int(series_level["level"] + movies_level["level"] + anime_level["level"] + book_level["level"])
+        knowledge_level = int(series_level["level"] + movies_level["level"] + anime_level["level"])
         knowledge_grade = get_knowledge_grade(knowledge_level)
         user_data["knowledge_level"] = knowledge_level
         user_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
@@ -1050,9 +997,9 @@ def delete_friend():
 #################################################### Media routes ######################################################
 
 
-@app.route("/<media_list>/<list_view>/<user_name>", methods=['GET'])
+@app.route("/<media_list>/<user_name>", methods=['GET'])
 @login_required
-def mymedialist(media_list, list_view, user_name):
+def mymedialist(media_list, user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
@@ -1069,11 +1016,6 @@ def mymedialist(media_list, list_view, user_name):
             if friend is None or friend.status != "accepted":
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
-
-    # Check the view type
-    accepted_view = ["grid", "table"]
-    if list_view not in accepted_view:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
     # Check the route
     if media_list == "serieslist":
@@ -1115,7 +1057,7 @@ def mymedialist(media_list, list_view, user_name):
                             join(MoviesList, MoviesList.movies_id == Movies.id). \
                             join(MoviesGenre, MoviesGenre.movies_id == Movies.id). \
                             join(MoviesProd, MoviesProd.movies_id == Movies.id). \
-                            filter(MoviesList.user_id == user.id).group_by(Movies.id).order_by(Movies.title.asc())
+                            filter(MoviesList.user_id == user.id).group_by(Movies.id).order_by(Movies.name.asc())
         covers_path = url_for('static', filename='movies_covers/')
         media_all_data = get_all_media_data(element_data, ListType.MOVIES, covers_path)
         user_achievements = get_achievements(user.id, ListType.ANIME)
@@ -1139,7 +1081,6 @@ def mymedialist(media_list, list_view, user_name):
                                target_user_id=str(user.id),
                                data=user_achievements,
                                media_value=media_value,
-                               list_view=list_view,
                                x_abs=stats[0],
                                y_abs=stats[1],
                                y_abs_2=stats[2],
@@ -1154,7 +1095,6 @@ def mymedialist(media_list, list_view, user_name):
                                media_list=media_list,
                                target_user_name=user_name,
                                target_user_id=str(user.id),
-                               list_view=list_view,
                                data=user_achievements,
                                media_value=media_value,
                                x_abs=stats[0],
@@ -1618,201 +1558,6 @@ def autocomplete(media):
     return jsonify(matching_results=results)
 
 
-###################################################### Books Routes ####################################################
-
-
-@app.route("/bookslist/<list_view>/<user_name>", methods=['GET'])
-@login_required
-def mybookslist(user_name, list_view):
-    image_error = url_for('static', filename='img/error.jpg')
-    user = User.query.filter_by(username=user_name).first()
-
-    # Check if user exists
-    if user is None:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-
-    # Check if the current user can see the target user's list
-    if current_user.id != user.id and current_user.id != 1:
-        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
-        if user.id == 1:
-            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-        if user.private:
-            if friend is None or friend.status != "accepted":
-                image_anonymous = url_for('static', filename='img/anonymous.jpg')
-                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
-
-    # Check the view type
-    accepted_view = ["grid", "table"]
-    if list_view not in accepted_view:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-
-    # Get book data
-    element_data = db.session.query(Book, BookList).\
-                                    join(BookList, BookList.book_id == Book.id).\
-                                    filter(BookList.user_id == user.id).\
-                                    group_by(Book.id).\
-                                    order_by(Book.title.asc())
-    covers_path = url_for('static', filename='books_covers/')
-
-    reading_list    = []
-    completed_list  = []
-    onhold_list     = []
-    dropped_list    = []
-    plantoread_list = []
-    for element in element_data:
-        # Change the cover path
-        element[0].image_cover = "{0}{1}".format(covers_path, element[0].image_cover)
-
-        if element[1].status == Status.READING:
-            reading_list.append(element)
-        elif element[1].status == Status.COMPLETED:
-            completed_list.append(element)
-        elif element[1].status == Status.ON_HOLD:
-            onhold_list.append(element)
-        elif element[1].status == Status.DROPPED:
-            dropped_list.append(element)
-        elif element[1].status == Status.PLAN_TO_READ:
-            plantoread_list.append(element)
-
-    element_all_data = [reading_list, completed_list, onhold_list, dropped_list, plantoread_list]
-
-    if list_view == "grid":
-        return render_template('mybookslist.html',
-                               title="{}'s bookslist".format(user_name),
-                               all_data=element_all_data,
-                               user_name=user_name,
-                               user_id=str(user.id))
-    elif list_view == "table":
-        return render_template('mybookslist_table.html',
-                               title="{}'s bookslist".format(user_name),
-                               all_data=element_all_data,
-                               user_name=user_name,
-                               user_id=str(user.id))
-
-
-@app.route('/delete_book', methods=['POST'])
-@login_required
-def delete_book():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data = request.get_json()
-        book_id = int(json_data['delete'])
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the book exists
-    if Book.query.filter_by(id=book_id).first() is None:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the book is in the current user's list
-    if BookList.query.filter_by(user_id=current_user.get_id(), book_id=book_id).first() is None:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    BookList.query.filter_by(book_id=book_id, user_id=current_user.get_id()).delete()
-    db.session.commit()
-    app.logger.info('[{}] Book with ID {} deleted'.format(current_user.get_id(), book_id))
-    compute_book_time_spent()
-
-    return '', 204
-
-
-@app.route('/change_book_category', methods=['POST'])
-@login_required
-def change_book_category():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data = request.get_json()
-        book_new_category = json_data['status']
-        book_id = int(json_data['book_id'])
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    book = BookList.query.filter_by(book_id=book_id, user_id=current_user.get_id()).first()
-    if book is None:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    if book_new_category == 'Reading':
-        book.status = Status.READING
-    elif book_new_category == 'Completed':
-        book.status = Status.COMPLETED
-    elif book_new_category == 'On Hold':
-        book.status = Status.ON_HOLD
-    elif book_new_category == 'Dropped':
-        book.status = Status.DROPPED
-    elif book_new_category == 'Plan to Read':
-        book.status = Status.PLAN_TO_READ
-    else:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    app.logger.info('[{}] Category of the book with ID {} changed to {}'.format(current_user.get_id(),
-                                                                                book_id,
-                                                                                book_new_category))
-    compute_book_time_spent()
-
-    return '', 204
-
-
-@app.route('/add_book', methods=['POST'])
-@login_required
-def add_book():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data = request.get_json()
-        book_id = json_data['book_id']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    add_element(book_id, ListType.BOOK)
-    compute_book_time_spent()
-
-    return '', 204
-
-
-@app.route('/set_book_score', methods=['POST'])
-@login_required
-def set_book_score():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data   = request.get_json()
-        score_value = round(float(json_data['score_value']), 2)
-        book_id     = int(json_data['book_id'])
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the book exists
-    if Book.query.filter_by(id=book_id).first() is None:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the book is in the current user's list
-    if BookList.query.filter_by(user_id=current_user.get_id(), book_id=book_id).first() is None:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the score is between 0 and 10:
-    if score_value > 10 or score_value < 0:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    book = BookList.query.filter_by(user_id=current_user.get_id(), book_id=book_id).first()
-    book.score = score_value
-    db.session.commit()
-    app.logger.info('[{}] Book with ID {} scored {}'.format(current_user.get_id(), book_id, score_value))
-
-    return '', 204
-
-
-@app.route('/autocomplete_books', methods=['GET'])
-@login_required
-def autocomplete_books():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        search = request.args.get('q')
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    results = autocomplete_search_element(search, ListType.BOOK)
-
-    return jsonify(matching_results=results)
-
-
 ###################################################### Functions #######################################################
 
 
@@ -1837,13 +1582,6 @@ def get_list_count(user_id, list_type):
         completed   = MoviesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
         plantowatch = MoviesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
         total       = MoviesList.query.filter_by(user_id=user_id).count()
-    elif list_type is ListType.BOOK:
-        reading     = BookList.query.filter_by(user_id=user_id, status=Status.READING).count()
-        completed   = BookList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
-        onhold      = BookList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
-        dropped     = BookList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
-        plantoread  = BookList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_READ).count()
-        total       = BookList.query.filter_by(user_id=user_id).count()
 
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
         list_count = {"watching": watching,
@@ -1852,13 +1590,6 @@ def get_list_count(user_id, list_type):
                       "random": random,
                       "dropped": dropped,
                       "plantowatch": plantowatch,
-                      "total": total}
-    elif list_type == ListType.BOOK:
-        list_count = {"reading": reading,
-                      "completed": completed,
-                      "onhold": onhold,
-                      "dropped": dropped,
-                      "plantoread": plantoread,
                       "total": total}
     elif list_type == ListType.MOVIES:
         list_count = {"completed": completed,
@@ -1874,8 +1605,6 @@ def get_mean_score(user_id, list_type):
         all_scores = AnimeList.query.filter_by(user_id=user_id).all()
     if list_type is ListType.MOVIES:
         all_scores = MoviesList.query.filter_by(user_id=user_id).all()
-    if list_type is ListType.BOOK:
-        all_scores = BookList.query.filter_by(user_id=user_id).all()
 
     if all_scores is None:
         return 0.00
@@ -2564,25 +2293,6 @@ def compute_media_time_spent(list_type):
     db.session.commit()
 
 
-def compute_book_time_spent():
-    user = User.query.filter_by(id=current_user.get_id()).first()
-    books_data = db.session.query(Book, BookList).join(BookList, BookList.book_id == Book.id).\
-                                 filter(BookList.user_id == current_user.id).\
-                                 group_by(BookList.book_id)
-    total_time = 0
-    for book in books_data:
-        if book[1].status == Status.COMPLETED:
-            try:
-                total_time += book[0].page_count
-            except:
-                pass
-
-    user = User.query.filter_by(id=current_user.id).first()
-    user.time_spent_book = total_time
-
-    db.session.commit()
-
-
 def get_statistics(user_id, list_type):
     # get the number of element per score
     user = User.query.filter_by(id=user_id).first()
@@ -2890,33 +2600,6 @@ def autocomplete_search_element(element_name, list_type):
             i = i+1
 
         return tmdb_results
-    elif list_type == ListType.BOOK:
-        try:
-            response = requests.get("https://www.googleapis.com/books/v1/volumes?q={0}&key={1}".format(element_name, google_book_api_key))
-        except:
-            return [{"nb_results": 0}]
-
-        data = json.loads(response.text)
-        try:
-            if data["totalItems"] == 0:
-                return [{"nb_results": 0}]
-        except:
-            return [{"nb_results": 0}]
-
-        google_results = []
-        i = 0
-        while i < 6 and i < data["totalItems"]:
-            book_data = {"google_id": "{0}".format(data["items"][i]["id"]),
-                         "name": "{0}".format(data["items"][i]["volumeInfo"]["title"])}
-            try:
-                book_data["poster_path"] = data["items"][i]["volumeInfo"]["imageLinks"]["thumbnail"]
-            except:
-                book_data["poster_path"] = url_for('static', filename="books_covers/default.jpg")
-
-            google_results.append(book_data)
-            i = i+1
-
-        return google_results
 
 
 def add_element(element_id, list_type):
@@ -2927,8 +2610,6 @@ def add_element(element_id, list_type):
         element = Anime.query.filter_by(themoviedb_id=element_id).first()
     elif list_type == ListType.MOVIES:
         element = Movies.query.filter_by(themoviedb_id=element_id).first()
-    elif list_type == ListType.BOOK:
-        element = Book.query.filter_by(google_id=element_id).first()
 
     # If the ID exist in the database, we direcly add the element to the user's list
     if element is not None:
@@ -2942,9 +2623,6 @@ def add_element(element_id, list_type):
         elif list_type == ListType.MOVIES:
             if MoviesList.query.filter_by(user_id=current_user.get_id(), movies_id=element.id).first() is not None:
                 return flash("This movie is already in your list", "warning")
-        elif list_type == ListType.BOOK:
-            if BookList.query.filter_by(user_id=current_user.get_id(), book_id=element.id).first() is not None:
-                return flash("This book is already in your list", "warning")
 
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
             # Check if there is more than 30 min since the last update
@@ -2962,19 +2640,10 @@ def add_element(element_id, list_type):
         if element_data is None:
             return flash("There was a problem while getting the info from the API. Please try again later.", "warning")
 
-        if list_type != ListType.BOOK:
-            try:
-                element_cover_path = element_data["poster_path"]
-            except:
-                element_cover_path = None
-        elif list_type == ListType.BOOK:
-            try:
-                element_cover_path = element_data["volumeInfo"]["imageLinks"]["small"]
-            except:
-                try:
-                    element_cover_path = element_data["volumeInfo"]["imageLinks"]["thumbnail"]
-                except:
-                    element_cover_path = None
+        try:
+            element_cover_path = element_data["poster_path"]
+        except:
+            element_cover_path = None
 
         element_cover_id = save_api_cover(element_cover_path, list_type)
 
@@ -3023,11 +2692,6 @@ def get_element_data_from_api(api_id, list_type):
                 time.sleep(3)
             else:
                 break
-    elif list_type == ListType.BOOK:
-        try:
-            response = requests.get("https://www.googleapis.com/books/v1/volumes/{0}".format(api_id))
-        except:
-            return None
     else:
         return None
 
@@ -3055,23 +2719,12 @@ def save_api_cover(element_cover_path, list_type):
             local_covers_path = os.path.join(app.root_path, "static\\movies_covers\\")
         else:  # Linux & macOS
             local_covers_path = os.path.join(app.root_path, "static/movies_covers/")
-    elif list_type == ListType.BOOK:
-        if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\\books_covers\\")
-        else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/books_covers/")
 
-    if list_type != ListType.BOOK:
-        try:
-            urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(element_cover_path),
-                                       "{}{}".format(local_covers_path, element_cover_id))
-        except:
-            return None
-    elif list_type == ListType.BOOK:
-        try:
-            urllib.request.urlretrieve("{}".format(element_cover_path), "{}{}".format(local_covers_path, element_cover_id))
-        except:
-            return None
+    try:
+        urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(element_cover_path),
+                                   "{}{}".format(local_covers_path, element_cover_id))
+    except:
+        return None
 
     img = Image.open("{}{}".format(local_covers_path, element_cover_id))
     img = img.resize((300, 450), Image.ANTIALIAS)
@@ -3087,8 +2740,6 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         element = Anime.query.filter_by(themoviedb_id=element_data["id"]).first()
     elif list_type == ListType.MOVIES:
         element = Movies.query.filter_by(themoviedb_id=element_data["id"]).first()
-    elif list_type == ListType.BOOK:
-        element = Book.query.filter_by(google_id=element_data["id"]).first()
 
     if element is not None:
         return element.id
@@ -3313,13 +2964,13 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         db.session.commit()
     elif list_type == ListType.MOVIES:
         try:
-            title = element_data["title"]
+            name = element_data["title"]
         except:
-            title = "Unknown"
+            name = "Unknown"
         try:
-            original_title = element_data["original_title"]
+            original_name = element_data["original_title"]
         except:
-            original_title = "Unknown"
+            original_name = "Unknown"
         try:
             release_date = element_data["release_date"]
         except:
@@ -3394,8 +3045,8 @@ def add_element_in_base(element_data, element_cover_id, list_type):
                 pass
 
         # Add the element to the database
-        element = Movies(title=title,
-                         original_title=original_title,
+        element = Movies(name=name,
+                         original_name=original_name,
                          image_cover=element_cover_id,
                          release_date=release_date,
                          homepage=homepage,
@@ -3439,62 +3090,6 @@ def add_element_in_base(element_data, element_cover_id, list_type):
                 db.session.add(company)
 
         db.session.commit()
-    elif list_type == ListType.BOOK:
-        try:
-            title = element_data["volumeInfo"]["title"]
-        except:
-            title = "Unknown"
-        try:
-            authors = element_data["volumeInfo"]["authors"][0]
-        except:
-            authors = "Unknown"
-        try:
-            published_date = element_data["volumeInfo"]["publishedDate"]
-        except:
-            published_date = "Unknown"
-        try:
-            published_date = published_date[0:4]
-        except:
-            pass
-
-        def clean_html(raw_html):
-            cleaner = re.compile('<.*?>')
-            cleantext = re.sub(cleaner, '', raw_html)
-            return cleantext
-
-        try:
-            description = clean_html(element_data["volumeInfo"]["description"])
-        except:
-            description = None
-
-        try:
-            page_count = element_data["volumeInfo"]["pageCount"]
-        except:
-            page_count = None
-
-        try:
-            categories = element_data["volumeInfo"]["categories"][0]
-
-            if "General" in categories:
-                new_categories = categories.replace("/ General", "")
-                categories = new_categories
-        except:
-            categories = None
-
-        google_id = element_data["id"]
-
-        # Add the element into the table
-        element = Book(title=title,
-                       authors=authors,
-                       image_cover=element_cover_id,
-                       published_date=published_date,
-                       description=description,
-                       page_count=page_count,
-                       categories=categories,
-                       google_id=google_id)
-
-        db.session.add(element)
-        db.session.commit()
 
     return element.id
 
@@ -3535,14 +3130,6 @@ def add_element_to_user(element_id, user_id, list_type):
 
         compute_media_time_spent(list_type)
 
-        db.session.commit()
-    elif list_type == ListType.BOOK:
-        user_list = BookList(user_id=user_id,
-                             book_id=element_id,
-                             status=Status.READING)
-
-        app.logger.info('[{}] Added book with the ID {}'.format(user_id, element_id))
-        db.session.add(user_list)
         db.session.commit()
 
 
