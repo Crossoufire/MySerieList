@@ -1,5 +1,4 @@
 
-
 #autocomplete.ui-autocomplete-loading {
     background-image: url('/static/img/add_loader.gif');
     background-position: right center;
@@ -9,25 +8,6 @@
 .ui-menu-item .ui-menu-item-wrapper.ui-state-active {
     background: #131418 !important;
     border: solid white 1px;
-}
-
-.mr-auto > .nav-tabs {
-    border: none;
-}
-
-.mr-auto > ul > li .nav-link {
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-    color: white !important;
-    background: #1a1a1a !important;
-}
-
-.mr-auto > ul > li .nav-link:hover {
-    color: white;
-    background: #1a1a1a !important;
-    border-color: black;
 }
 
 .modal_loading {
@@ -44,10 +24,6 @@
 body.loading .modal_loading {
     display: block;
     overflow: hidden;
-}
-
-.tab-pane > .collapse:not(.show) {
-    display: none !important;
 }
 
 .add_element {
@@ -124,41 +100,6 @@ body.loading .modal_loading {
     -moz-appearance:none;
     -webkit-appearance:none;
     appearance:none;
-}
-
-.sidenav {
-    height: 360px;
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    top: 100px;
-    left: 0;
-    background-color: #111;
-    overflow-x: hidden;
-    padding-top: 50px;
-    transition: 0.5s;
-}
-
-.sidenav a {
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 20px;
-    color: #818181;
-    display: block;
-    transition: 0.3s;
-}
-
-.sidenav a:hover {
-    color: #f1f1f1;
-}
-
-.sidenav .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    font-size: 36px;
-    margin-left: 135px;
-    padding: 0px;
 }
 
 @media (max-width: 767.98px) {

@@ -3005,7 +3005,7 @@ def get_element_data_from_api(api_id, list_type):
                 time.sleep(3)
             else:
                 break
-    if list_type == ListType.MOVIES:
+    elif list_type == ListType.MOVIES:
         while True:
             try:
                 response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}".format(api_id, themoviedb_api_key))

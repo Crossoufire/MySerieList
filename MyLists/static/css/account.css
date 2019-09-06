@@ -3,6 +3,10 @@
     border: solid 1px black;
 }
 
+body {
+    overflow-x: hidden;
+}
+
 .container {
     padding-top: 0px;
 }

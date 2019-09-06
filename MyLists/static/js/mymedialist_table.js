@@ -169,6 +169,7 @@ function changeCategory(element_id, new_category, tr_id, mod_id, seas_drop_id, e
     }
 
     $body = $("body");
+    $grid.isotope('layout');
     $.ajax ({
         type: "POST",
         url: "/change_element_category",
@@ -198,15 +199,29 @@ function delete_element(element_id, tr_id, media_list) {
     });
 }
 
-// ----------- Turn the arrow ---------------
-function turn(category, arrow) {
-    var arrow = document.getElementById(arrow);
-    var category = document.getElementById(category);
+// --------------- Isotope categories ------------------
+var $grid = $('.table-iso').isotope({
+    itemSelector: '.category',
+    layoutMode: 'masonry'
+});
 
-    if (category.className === "d-flex flex-wrap table-responsive-sm collapsing") {
-    } else if (arrow.className === "collapse_all fas fa-sm fa-chevron-right") {
-        arrow.className = "collapse_all fas fa-sm fa-chevron-down";
-    } else {
-        arrow.className = "collapse_all fas fa-sm fa-chevron-right";
-    }
-}
+// bind filter button click
+$('.filters-button-group').on('click', 'button', function() {
+    var filterValue = $(this).attr('data-filter');
+    console.log(filterValue);
+    $grid.isotope({ filter: filterValue });
+});
+
+// change the class on the selected button
+$('.filters-button-group').each(function(i, buttonGroup) {
+    var $buttonGroup = $(buttonGroup);
+    $buttonGroup.on('click', 'button', function() {
+        $buttonGroup.find('.btn-warning').addClass('btn-light');
+        $buttonGroup.find('.btn-warning').removeClass('btn-warning');
+        $(this).addClass('btn-warning');
+        $(this).removeClass('btn-light');
+    });
+});
+
+
+ $grid.isotope('layout');

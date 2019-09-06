@@ -27,6 +27,7 @@ function changeCategory(element_id, new_category, card_id, mod_id, media_list) {
     }
 
     $body = $("body");
+    $grid.isotope('layout');
     $.ajax ({
         type: "POST",
         url: "/change_element_category",
@@ -97,9 +98,6 @@ function show_score(footer_id, card_id) {
 }
 
 
-// -------------------------------------------------------------------------------
-
-
 // --------------- Isotope categories ------------------
 var $grid = $('.grid-iso').isotope({
     itemSelector: '.category',
@@ -125,4 +123,4 @@ $('.filters-button-group').each(function(i, buttonGroup) {
 });
 
 
-$grid.isotope('layout');
+ $grid.isotope('layout');

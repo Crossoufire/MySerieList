@@ -105,34 +105,6 @@ function add_score(new_score, edit_id, element_id, media_list) {
     }
 }
 
-// --------- Hide all Categories ------------
-function hide_all_cat() {
-    $('.collapse.d-flex').collapse('hide');
-    $('#collapse_show').text('Expand all');
-    $('#collapse_container').attr('onclick', 'show_all_cat()');
-    $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-right');
-}
-
-// --------- Show all Categories ------------
-function show_all_cat() {
-    $('.collapse.d-flex').collapse('show');
-    $('#collapse_show').text('Collapse all');
-    $('#collapse_container').attr('onclick', 'hide_all_cat()');
-    $('.collapse_all').attr('class', 'collapse_all fas fa-sm fa-chevron-down');
-}
-
-// ------------ Open sidebar ----------------
-function openNav() {
-    document.getElementById("mySidenav").style.width = "180px";
-    $('#nav_container').attr('onclick', 'closeNav()');
-}
-
-// ------------ Close sidebar ---------------
-function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
-    $('#nav_container').attr('onclick', 'openNav()');
-}
-
 // --------------- tooltip ------------------
 $('.tooltip').tooltip();
 $(function () {
