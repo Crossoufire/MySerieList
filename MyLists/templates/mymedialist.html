@@ -348,7 +348,7 @@ $(function() {
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
-                    window.location.replace('/{{ media_list }}/grid/{{ current_user.username }}');
+                    window.location.replace('/{{ media_list }}/{{ current_user.username }}');
                 }
             });
         }

@@ -9,7 +9,7 @@ function refresh(element_id, media_list, user_name) {
         dataType: "json",
         beforeSend: function() { $body.addClass("loading"); },
         success: function(response) {
-            window.location.replace('/' + media_list + user_name);
+            window.location.replace('/' + media_list + '/' + user_name);
         }
     });
 }

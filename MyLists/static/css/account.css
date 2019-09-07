@@ -1,8 +1,4 @@
 /* ------------ Main CSS ----------- */
-.bordered {
-    border: solid 1px black;
-}
-
 body {
     overflow-x: hidden;
 }
@@ -10,29 +6,16 @@ body {
 .container {
     padding-top: 0px;
 }
-
-.arrow_div {
-    height: 21px;
-    width: 21px;
-}
-
-.content > .collapse:not(.show) {
-    display: none !important;
-}
 /* --------------------------------- */
 
 
 /* -------------- Tab ------------- */
-.nav-pills {
-    vertical-align: middle !important;
-}
-
 .account_tab {
     border-bottom: white 1px solid;
 }
 
 .account_tab > li > .active {
-    background: #1a1a1a !important;
+    background: rgba(24, 37, 50, 1) !important;
 }
 
 .account_tab > li > a {
@@ -46,34 +29,22 @@ body {
     position: relative;
 }
 
-.grade-levels {
-    list-style-type: none;
-    display: inline-block;
-    padding: 0px;
-    margin: 0px;
-}
-
-.grade-levels-2 {
-    display: inline-block;
-}
-
 .image-data {
     position: absolute;
     max-width: 450px;
     left: 10%;
-    bottom: 45%;
+    bottom: 25%;
     z-index: 10;
 }
 
 .image-friend {
     position: absolute;
-    right: 30%;
     left: 10%;
-    bottom: 30%;
+    bottom: 8%;
     z-index: 10;
 }
 
-/* On screens that are 768px or less */
+/* On screens that are 490px or less */
 @media (max-width: 490px) {
     .image-data {
         justify-content: center;
@@ -95,15 +66,23 @@ body {
 
 
 /* ------------- Stats ------------- */
+.vertical_line {
+    width: 5px;
+    border-left: 2px solid rgba(44, 57, 70, 1);
+    height: 100vh;
+}
+
+hr {
+    border-top: 2px solid rgba(44, 57, 70, 1);
+    margin-top: 2px;
+}
+
 .stats-container {
-    justify-content: space-evenly;
     margin-top: 20px;
 }
 
-.test {
-    min-width: 45%;
-    margin-left: 15px;
-    margin-right: 15px;
+.stats-size {
+    width: 100%;
 }
 
 .block {
@@ -203,9 +182,9 @@ body {
 
 .friends > ul > li {
     display: inline-block;
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 .modal-content {
@@ -236,12 +215,43 @@ body {
 }
 /* --------------------------------- */
 
-
-/* ------------- Info -------------- */
-.table {
-    line-height: 1;
+.barcontainer {
+    position: relative;
+    margin: 0 auto;
+    border: 1px solid white;
+    min-height: 400px;
+    width: 65%;
 }
 
+.bar {
+    position: absolute;
+    display: inline-block;
+    bottom: 0;
+    border: 1px solid black;
+    background: grey;
+    width: 10%;
+    text-align: center;
+}
+
+.bar:nth-child(1) {
+  left: 10%;
+}
+.bar:nth-child(2) {
+  left: 25%;
+}
+.bar:nth-child(3) {
+  left: 45%;
+}
+.bar:nth-child(4) {
+  left: 65%;
+}
+.bar:nth-child(5) {
+  left: 85%;
+}
+
+
+
+/* ------------- Info -------------- */
 .account-bar-wrapper {
     width: 350px;
 }
@@ -274,10 +284,6 @@ body {
 
 #anime_level {
     margin-left: 18px;
-}
-
-#book_level {
-    margin-left: 20px;
 }
 
 .account-bar-next-level {
@@ -366,7 +372,5 @@ body {
 
 
 /* ----------- Settings ------------ */
-.form-center {
-    justify-content: center;
-}
+
 /* --------------------------------- */

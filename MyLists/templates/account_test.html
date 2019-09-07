@@ -1,0 +1,731 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+<link href="{{ url_for('static', filename='css/account.css') }}" rel="stylesheet">
+{% endblock css %}
+
+
+{% block content %}
+<div class="image-position">
+    <img height="300" width="1320" src="{{ url_for('static', filename='img/profile_background.jpg') }}" alt=""/>
+    <div class="d-flex flex-wrap image-data">
+        <img height="160" width="160" src="{{ data['profile_picture'] }}">
+        <div class="p-t-10 pl-2 pr-2" style="background-color: rgba(0, 0, 0, 0.5);">
+            <h2 class="text-center">{{ data['username'] }}
+                <img height='50' width='50' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}"
+                 src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
+            </h2>
+            <hr class="m-0">
+            <ul class="grade-levels text-center">
+                <li class="grade-levels-2 m-l-10 m-r-10">
+                    <img height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
+                    <div>Series <br> {{ data['series_level'] }}</div>
+                </li>
+                <li  class="grade-levels-2 m-l-10 m-r-10">
+                    <img height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
+                    <div>Movies <br> {{ data['movies_level'] }}</div>
+                </li>
+                <li  class="grade-levels-2 m-l-10 m-r-10">
+                    <img height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
+                    <div>Anime <br> {{ data['anime_level'] }}</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div style="transform: skew(-20deg);" class="image-friend">
+        {% if user_id == current_user.get_id() %}
+        <button class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addFriendModal">Add a friend</button>
+        {% else %}
+        <button class="btn btn-sm btn-light" data-toggle="modal" data-target="#addFriendModal">+ friend</button>
+        {% endif %}
+    </div>
+</div>
+
+<ul class="nav nav-pills nav-justified account_tab" style="background: #333;">
+    <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#stats_tab">Stats</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#friends_tab">Friends</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#infos_tab">Infos</a>
+    </li>
+    {% if user_id == current_user.get_id() %}
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#settings_tab">Settings</a>
+    </li>
+    {% endif %}
+</ul>
+
+<div class="tab-content" id="account_tab_content">
+    <div id="stats_tab" class="tab-pane fade show active">
+        <!--------------- List other accounts --------------->
+        {% if user_id != current_user.get_id() %}
+        <div class="row text-center m-t-30">
+                <div class="col">
+                    <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='serieslist', user_name=data['username']) }}">SeriesList</a>
+                </div>
+                <div class="col">
+                    <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='animelist', user_name=data['username']) }}">AnimeList</a>
+                </div>
+                <div class="col">
+                    <a class="btn btn-primary" href="{{ url_for('mymedialist', media_list='movieslist', user_name=data['username']) }}">MoviesList</a>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="d-flex flex-wrap stats-container">
+            <!------------------------ Series statistics --------------------------->
+            <div class="test">
+                <div style="cursor: pointer;" data-toggle="collapse" data-target="#SERIES" onclick="turn('SERIES', 'SERIES_arrow')">
+                    <h3 class="font-weight-light text-center mt-3 mb-0">
+                        Series Statistics
+                        <div class="arrow_div float-right">
+                            <a class="collapse_all fas fa-xs fa-chevron-down" id="SERIES_arrow"></a>
+                        </div>
+                    </h3>
+                </div>
+                <hr class="mt-1 p-b-15 mb-0">
+                <div id="SERIES" class="collapse show container-stats">
+                    <div class="m-b-5">
+                        <span class="stat_text"><b>Days:</b> {{ data['series']['time_spent_day'] }}</span>
+                        <span class="stat_text float-right"><b>Hours:</b> {{ data['series']['time_spent_hour'] }}</span>
+                    </div>
+                    <div class="m-b-5">
+                        <span class="stat_text"><b>Mean Score:</b> {{ data['series']['mean_score'] }}</span>
+                    </div>
+
+                    <figure class="d-flex">
+                        {% if data['series']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
+                        <span class="block_no_data" title="No data">
+                            <span id="100%" class="value"></span>
+                        </span>
+                        {% else %}
+                        <span class="block" title="Watching">
+                            <span id="{{ data['series']['element_percentage'][0] }}%" class="value"></span>
+                        </span>
+                        <span class="block" title="Completed">
+                            <span id="{{ data['series']['element_percentage'][1] }}%" class="value"></span>
+                        </span>
+                        <span class="block" title="On Hold">
+                            <span id="{{ data['series']['element_percentage'][2] }}%" class="value"></span>
+                        </span>
+                        <span class="block" title="Random">
+                            <span id="{{ data['series']['element_percentage'][3] }}%" class="value"></span>
+                        </span>
+                        <span class="block" title="Dropped">
+                            <span id="{{ data['series']['element_percentage'][4] }}%" class="value"></span>
+                        </span>
+                        <span class="block" title="Plan to Watch">
+                            <span id="{{ data['series']['element_percentage'][5] }}%" class="value"></span>
+                        </span>
+                        {% endif %}
+                    </figure>
+
+                    <div class="m-t-10">
+                        <div class="row">
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Watching:</span>
+                            </div>
+                            <div class="col p-0 position">
+                                <span class="stat_text">{{ data['series']['watching_count'] }}</span>
+                            </div>
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Dropped:</span>
+                            </div>
+                            <div class="col p-l-0 position">
+                                <span class="stat_text">{{ data['series']['dropped_count'] }}</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Completed:</span>
+                            </div>
+                            <div class="col p-0 position">
+                                <span class="stat_text">{{ data['series']['completed_count'] }}</span>
+                            </div>
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Plan to Watch:</span>
+                            </div>
+                            <div class="col p-l-0 position">
+                                <span class="stat_text">{{ data['series']['plantowatch_count'] }}</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">On Hold:</span>
+                            </div>
+                            <div class="col p-0 position">
+                                <span class="stat_text">{{ data['series']['onhold_count'] }}</span>
+                            </div>
+                            <div class="col mini p-r-0">
+                                <span class="stat_text"></span>
+                            </div>
+                            <div class="col p-l-0 position">
+                                <span class="stat_text"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Random:</span>
+                            </div>
+                            <div class="col p-0 position">
+                                <span class="stat_text">{{ data['series']['random_count'] }}</span>
+                            </div>
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Episodes:</span>
+                            </div>
+                            <div class="col p-l-0 position">
+                                <span class="stat_text">{{ data['series']['nb_ep_watched'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!------------------------- Anime statistics --------------------------->
+            <div class="test">
+                <div style="cursor: pointer;" data-toggle="collapse" data-target="#ANIME" onclick="turn('ANIME', 'ANIME_arrow')">
+                    <h3 class="font-weight-light text-center mt-3 mb-0">
+                        Anime Statistics
+                        <div class="arrow_div float-right">
+                            <a class="collapse_all fas fa-xs fa-chevron-down" id="ANIME_arrow"></a>
+                        </div>
+                    </h3>
+                </div>
+                <hr class="mt-1 p-b-15 mb-0">
+                <div id="ANIME" class="collapse show container-stats">
+                    <div class="m-b-5">
+                        <span class="stat_text"><b>Days:</b> {{ data['anime']['time_spent_day'] }}</span>
+                        <span class="stat_text float-right"><b>Hours:</b> {{ data['anime']['time_spent_hour'] }}</span>
+                    </div>
+                    <div class="m-b-5">
+                        <span class="stat_text"><b>Mean Score:</b> {{ data['anime']['mean_score'] }}</span>
+                    </div>
+
+                    <figure class="d-flex">
+                        {% if data['anime']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
+                        <span class="block_no_data" title="No data">
+                            <span id="100%" class="value"></span>
+                        </span>
+                        {% else %}
+                        <span class="block" title="Watching">
+                            <span id="{{ data['anime']['element_percentage'][0] }}%" class="value"></span>
+                        </span>
+                        <span class="block" title="Completed">
+                            <span id="{{ data['anime']['element_percentage'][1] }}%" class="value"></span>
+                        </span>
+                        <span class="block" title="On Hold">
+                            <span id="{{ data['anime']['element_percentage'][2] }}%" class="value"></span>
+                        </span>
+                        <span class="block" title="Random">
+                            <span id="{{ data['anime']['element_percentage'][3] }}%" class="value"></span>
+                        </span>
+                        <span class="block" title="Dropped">
+                            <span id="{{ data['anime']['element_percentage'][4] }}%" class="value"></span>
+                        </span>
+                        <span class="block" title="Plan to Watch">
+                            <span id="{{ data['anime']['element_percentage'][5] }}%" class="value"></span>
+                        </span>
+                        {% endif %}
+                    </figure>
+
+                    <div class="m-t-10">
+                        <div class="row">
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Watching:</span>
+                            </div>
+                            <div class="col p-0 position">
+                                <span class="stat_text">{{ data['anime']['watching_count'] }}</span>
+                            </div>
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Dropped:</span>
+                            </div>
+                            <div class="col p-l-0 position">
+                                <span class="stat_text">{{ data['anime']['dropped_count'] }}</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Completed:</span>
+                            </div>
+                            <div class="col p-0 position">
+                                <span class="stat_text">{{ data['anime']['completed_count'] }}</span>
+                            </div>
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Plan to Watch:</span>
+                            </div>
+                            <div class="col p-l-0 position">
+                                <span class="stat_text">{{ data['anime']['plantowatch_count'] }}</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">On Hold:</span>
+                            </div>
+                            <div class="col p-0 position">
+                                <span class="stat_text">{{ data['anime']['onhold_count'] }}</span>
+                            </div>
+                            <div class="col mini p-r-0">
+                                <span class="stat_text"></span>
+                            </div>
+                            <div class="col p-l-0 position">
+                                <span class="stat_text"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Random:</span>
+                            </div>
+                            <div class="col p-0 position">
+                                <span class="stat_text">{{ data['anime']['random_count'] }}</span>
+                            </div>
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Episodes:</span>
+                            </div>
+                            <div class="col p-l-0 position">
+                                <span class="stat_text">{{ data['anime']['nb_ep_watched'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!------------------------ Movies statistics --------------------------->
+            <div class="test">
+                <div style="cursor: pointer;" data-toggle="collapse" data-target="#MOVIES" onclick="turn('MOVIES', 'MOVIES_arrow')">
+                    <h3 class="font-weight-light text-center mt-3 mb-0">
+                        Movies Statistics
+                        <div class="arrow_div float-right">
+                            <a class="collapse_all fas fa-xs fa-chevron-down" id="MOVIES_arrow"></a>
+                        </div>
+                    </h3>
+                </div>
+                <hr class="mt-1 p-b-15 mb-0">
+                <div id="MOVIES" class="collapse show container-stats">
+                    <div class="m-b-5">
+                        <span class="stat_text"><b>Days:</b> {{ data['movies']['time_spent_day'] }}</span>
+                        <span class="stat_text float-right"><b>Hours:</b> {{ data['movies']['time_spent_hour'] }}</span>
+                    </div>
+                    <div class="m-b-5">
+                        <span class="stat_text"><b>Mean Score:</b> {{ data['movies']['mean_score'] }}</span>
+                    </div>
+                    <figure class="d-flex">
+                        {% if data['movies']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
+                        <span class="block_no_data" title="No data">
+                            <span id="100%" class="value"></span>
+                        </span>
+                        {% else %}
+                        <span class="block" title="Complete">
+                            <span id="{{ data['movies']['element_percentage'][0] }}%" class="value"></span>
+                        </span>
+                        <span class="block" title="Plan to Watch">
+                            <span id="{{ data['movies']['element_percentage'][4] }}%" class="value"></span>
+                        </span>
+                        {% endif %}
+                    </figure>
+                    <div class="m-t-10">
+                        <div class="row">
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Completed:</span>
+                            </div>
+                            <div class="col p-0 position">
+                                <span class="stat_text">{{ data['movies']['completed_count'] }}</span>
+                            </div>
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Plan to Watch:</span>
+                            </div>
+                            <div class="col p-l-0 position">
+                                <span class="stat_text">{{ data['movies']['plantowatch_count'] }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col mini p-r-0">
+                                <span class="stat_text">Total movies:</span>
+                            </div>
+                            <div class="col p-0 position">
+                                <span class="stat_text">{{ data['movies']['total_count'] }}</span>
+                            </div>
+                            <div class="col mini p-r-0">
+                                <span class="stat_text"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="friends_tab" class="tab-pane fade">
+        <div class="d-flex flex-wrap friends m-t-30">
+            <ul class="text-center">
+                {% for friend in data["friends"] %}
+                {% if friend['status'] == "pending" %}
+                {% if user_id == current_user.get_id() %}
+                <li id="td_{{ friend['user_id'] }}">
+                    <a href="/account/{{ friend['username'] }}">
+                        <span class="disabled text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span><br>
+                        <img height="100" width="100" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
+                        <a class="fas fa-user-plus m-t-10 m-r-5" style="color: #005ce6;" data-toggle="tooltip" title="Add friend" onclick="friend_request('{{ friend['user_id'] }}', 'accept')"></a>
+                        <a class="fas fa-user-times m-t-10" style="color: red;" data-toggle="tooltip" title="Decline" onclick="friend_request('{{ friend['user_id'] }}', 'decline')"></a>
+                    </a>
+                </li>
+                {% endif %}
+                {% elif friend['status'] == "request" %}
+                {% if user_id == current_user.get_id() %}
+                <li id="td_{{ friend['user_id'] }}">
+                    <a class="disabled" href="/account/{{ friend['username'] }}">
+                        <span class="disabled text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span><br>
+                        <img height="100" width="100" src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}"/><br>
+                        <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                    </a>
+                </li>
+                {% endif %}
+                {% elif friend['status'] == "declined" %}
+                {% else %}
+                <li id="td_{{ friend['user_id'] }}">
+                    <a href="/account/{{ friend['username'] }}">
+                        <span class="disabled text-light" id="{{ friend['user_id'] }}">{{ friend['username'] }}</span><br>
+                        <img height="100" width="100" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
+                        {% if user_id == current_user.get_id() %}
+                        <a class="fas fa-ban" onclick="delete_friend('{{ friend['user_id'] }}', 'td_{{ friend['user_id'] }}')"></a>
+                        {% endif %}
+                    </a>
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div id="infos_tab" class="tab-pane fade">
+        <!--------- Levels - grades - infos ------------>
+        <div class="row m-t-30 m-l-10 m-r-10">
+            <div class="col">
+                <div class="d-flex">
+                    <div class='account-bar-wrapper'>
+                        <div class='account-bar'>
+                            <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
+                            <span class='account-bar-name'>Series</span>
+                            <div id="series_level" class='account-bar-level'>Level {{ data['series_level'] }}</div>
+                            <div class='xp-bar' data-toggle="tooltip" title="{{ data['series_percent'] }}%">
+                                <div id='xp-bar-fill-series'>
+                                    <div class='xp-increase-fx'>
+                                        <div class='xp-increase-fx-flicker'>
+                                            <div class='xp-increase-glow1'></div>
+                                            <div class='xp-increase-glow2'></div>
+                                            <div class='xp-increase-glow3'></div>
+                                        </div>
+                                        <div class='xp-increase-glow2'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='account-bar-next-level'>&nbsp{{ data['series_level'] | int + 1 }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class='account-bar-wrapper'>
+                        <div class='account-bar'>
+                            <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
+                            <span class='account-bar-name'>Movies</span>
+                            <div id="movies_level" class='account-bar-level'>Level {{ data['movies_level'] }}</div>
+                            <div class='xp-bar' data-toggle="tooltip" title="{{ data['movies_percent'] }}%">
+                                <div id='xp-bar-fill-movies'>
+                                    <div class='xp-increase-fx'>
+                                        <div class='xp-increase-fx-flicker'>
+                                            <div class='xp-increase-glow1'></div>
+                                            <div class='xp-increase-glow2'></div>
+                                            <div class='xp-increase-glow3'></div>
+                                        </div>
+                                        <div class='xp-increase-glow2'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='account-bar-next-level'>&nbsp{{ data['movies_level'] | int + 1 }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class='account-bar-wrapper'>
+                        <div class='account-bar'>
+                            <img class="float-left m-t-5 m-r-5" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
+                            <div class='account-bar-name'>Anime</div>
+                            <div id="anime_level" class='account-bar-level'>Level {{ data['anime_level'] }}</div>
+                            <div class='xp-bar' data-toggle="tooltip" title="{{ data['anime_percent'] }}%">
+                                <div id='xp-bar-fill-anime'>
+                                    <div class='xp-increase-fx'>
+                                        <div class='xp-increase-fx-flicker'>
+                                            <div class='xp-increase-glow1'></div>
+                                            <div class='xp-increase-glow2'></div>
+                                            <div class='xp-increase-glow3'></div>
+                                        </div>
+                                        <div class='xp-increase-glow2'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='account-bar-next-level'>&nbsp{{ data['anime_level'] | int + 1 }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <table class="table table-sm text-light">
+                    <thead>
+                    <tr>
+                        <th class="text-center" style="font-size: 14pt;" colspan="2">Data & Infos</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="text-center">
+                            <a class="text-light" href="{{ url_for('anime_achievements') }}" target="_blank">All anime achievements</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            <a class="text-light" href="{{ url_for('level_grade_data') }}" target="_blank">Grades and levels data</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            <a class="text-light" href="{{ url_for('knowledge_grade_data') }}" target="_blank">Knowledge levels data</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% if user_id == current_user.get_id() %}
+    <div id="settings_tab" class="tab-pane fade">
+        <div class="d-flex form-center">
+            <form method="POST" action="" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="m-t-30">
+                    {{ form.username.label }}<br>
+                    {{ form.username(size=32) }}<br>
+                    {% for error in form.username.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="m-t-30">
+                    {{ form.email.label }}<br>
+                    {{ form.email(size=32) }}<br>
+                    {% for error in form.email.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="m-t-30">
+                    {{ form.homepage.label }}: &nbsp&nbsp&nbsp {{ form.homepage }}<br>
+                    {% for error in form.homepage.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="m-t-30">
+                    {{ form.isprivate.label }}: &nbsp&nbsp&nbsp {{ form.isprivate(size=32) }}<br>
+                    {% for error in form.isprivate.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="m-t-30">
+                    {{ form.picture.label }}<br>
+                    {{ form.picture(size=32) }}<br>
+                    {% for error in form.picture.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="m-t-30">
+                    {{ form.submit_account(class="btn btn-outline-info custom-btn-size p-r-6 p-l-6") }}
+                    <a class="btn btn-outline-info custom-btn-size p-r-6 p-l-6" href="{{ url_for('change_password') }}" role="button">Change password?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!------------------- Add friend modal ------------------------>
+{% if user_id == current_user.get_id() %}
+<div class="modal fade" id="addFriendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form method="POST" action="">
+                {{ form_friends.hidden_tag() }}
+                <h5 class="border-bottom p-t-20 p-b-15 text-center"><b>Add a Friend</b></h5>
+                <div class="form-group m-l-40 m-r-40 m-t-15">
+                    {% if form_friends.friend_to_add.errors %}
+                    {{ form_friends.friend_to_add(class="form-control form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form_friends.friend_to_add.errors %}
+                        <span>{{ error }}</span> {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form_friends.friend_to_add(class="form-control", placeholder="Username", onfocus="this.value=''") }}
+                    {% endif %}
+                </div>
+                <div class="form-group m-l-20 m-r-20 text-center">
+                    {{ form_friends.submit(class="btn btn-sm btn-outline-info") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="modal_loading"></div>
+{% endblock content %}
+
+
+{% block script %}
+<!--------- Main Javascript ---------->
+<script type="text/javascript">
+function turn(category, arrow) {
+    var arrow = document.getElementById(arrow);
+    var category = document.getElementById(category);
+
+    if (category.className === "container-stats collapsing") {
+    } else if (arrow.className === "collapse_all fas fa-xs fa-chevron-right") {
+        arrow.className = "collapse_all fas fa-xs fa-chevron-down";
+    } else {
+        arrow.className = "collapse_all fas fa-xs fa-chevron-right";
+    }
+}
+
+function delete_friend(friend_id, td_id) {
+    if (!confirm("Are you sure you want to delete this friend from your list?")){
+        return false;
+    }
+    $("#"+td_id).remove();
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/delete_friend",
+        contentType: "application/json",
+        data: JSON.stringify({delete: friend_id}),
+        dataType: "json",
+        success: function(response) {
+            console.log("ok"); }
+    });
+}
+
+
+function friend_request(friend_id, value) {
+    $.ajax ({
+        type: "POST",
+        url: "/friend_request",
+        contentType: "application/json",
+        data: JSON.stringify({response: friend_id, request: value }),
+        dataType: "json",
+        success: function(response) {
+            window.location.replace('/account/{{ current_user.username }}'); }
+    });
+}
+</script>
+
+<!--------- Tooltip Javascript ------------>
+<script type="text/javascript">
+$('.value').each(function() {
+	var text = $(this).attr('id');
+    $(this).parent().css('width', text);
+});
+
+$('.block').tooltip();
+// Tooltips Initialization
+$(function () {
+$('[data-toggle="tooltip"]').tooltip()
+})
+
+$('.block_no_data').tooltip();
+// Tooltips Initialization
+$(function () {
+$('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+<!--------- Level XP Javascript ----------->
+<script type="text/javascript">
+$(document).ready(function(){
+    $body = $("body");
+    $body.addClass("loading");
+    $(document).click(function() {
+        $body.removeClass("loading");
+    });
+});
+
+$(document).ready(function(){
+    $(".xp-increase-fx-flicker").css("opacity", "1");
+    $(".xp-increase-fx-flicker").animate({"opacity":Math.random()}, 100);
+    $(".xp-increase-fx").css("display", "inline-block");
+
+
+    $("#xp-bar-fill-series").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
+    setTimeout(function() {
+        $("#xp-bar-fill-series").css("-webkit-transition", "all 2s ease");
+        $("#xp-bar-fill-series").css("width", "{{ data['series_percent'] }}%");
+    }, 100);
+    setTimeout(function(){
+        $(".xp-increase-fx").fadeOut(500);
+        $("#xp-bar-fill-series").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
+    }, 40*parseFloat({{ data['series_percent'] }}));
+
+
+    $("#xp-bar-fill-movies").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
+    setTimeout(function() {
+        $("#xp-bar-fill-movies").css("-webkit-transition", "all 2s ease");
+        $("#xp-bar-fill-movies").css("width", "{{ data['movies_percent'] }}%");
+    }, 100);
+    setTimeout(function(){
+        $(".xp-increase-fx").fadeOut(500);
+        $("#xp-bar-fill-movies").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
+    }, 40*parseFloat({{ data['movies_percent'] }}));
+
+
+    $("#xp-bar-fill-anime").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
+    setTimeout(function() {
+        $("#xp-bar-fill-anime").css("-webkit-transition", "all 2s ease");
+        $("#xp-bar-fill-anime").css("width", "{{ data['anime_percent'] }}%");
+    }, 100);
+    setTimeout(function() {
+        $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-anime").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
+    }, 40*parseFloat({{ data['anime_percent'] }}));
+
+
+    $("#xp-bar-fill-book").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
+    setTimeout(function() {
+        $("#xp-bar-fill-book").css("-webkit-transition", "all 2s ease");
+        $("#xp-bar-fill-book").css("width", "{{ data['book_percent'] }}%");
+    }, 100);
+    setTimeout(function() {
+        $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-book").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
+    }, 40*parseFloat({{ data['book_percent'] }}));
+});
+</script>
+
+<!---- Show/collapse all categories scripts ---->
+<script type="text/javascript">
+function hide_all_cat() {
+    $('.collapse.container-stats').collapse('hide');
+    $('#collapse_show').text('Expand all');
+    $('#collapse_container').attr('onclick', 'show_all_cat()');
+    $('.collapse_all').attr('class', 'collapse_all fas fa-xs fa-chevron-right');
+}
+
+function show_all_cat() {
+    $('.collapse.container-stats').collapse('show');
+    $('#collapse_show').text('Collapse all');
+    $('#collapse_container').attr('onclick', 'hide_all_cat()');
+    $('.collapse_all').attr('class', 'collapse_all fas fa-xs fa-chevron-down');
+}
+
+{% if user_id == current_user.get_id() %}
+$('#addFriendModal').on('shown.bs.modal', function() {
+    $('#friend_to_add').focus();
+})
+{% endif %}
+</script>
+{% endblock %}

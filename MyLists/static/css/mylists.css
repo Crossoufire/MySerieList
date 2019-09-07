@@ -10,9 +10,9 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: calc(100vh - 80px);
+    min-height: calc(100vh - 60px);
     background: #131418;
-    margin-top: 5rem;
+    margin-top: 57px;
     color: #e2e2e2;
 }
 
@@ -26,12 +26,6 @@ main {
 
 hr {
     border-top: 1px solid rgba(255, 255, 255, 0.9);
-}
-
-.second_navbar {
-    z-index: 100;
-    background-color: #330000;
-    top: 57px; !important
 }
 
 .dropdown_mylist {
