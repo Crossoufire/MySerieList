@@ -24,10 +24,10 @@
                         {{ form.email(class="form-control", placeholder="E-mail") }}
                     {% endif %}
                 </div>
-                <div class="form-check m-l-30 m-r-30">
+                <div class="form-check m-l-30 m-r-30 text-center">
                     {{ form.recaptcha }}
                     {% for error in form.recaptcha.errors %}
-                        <span>{{ error }}</span>
+                    <span style="color: #dc3545;">{{ error }}</span>
                     {% endfor %}
                 </div>
             </fieldset>
