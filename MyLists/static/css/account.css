@@ -32,15 +32,8 @@ body {
 .image-data {
     position: absolute;
     max-width: 450px;
-    left: 10%;
-    bottom: 25%;
-    z-index: 10;
-}
-
-.image-friend {
-    position: absolute;
-    left: 10%;
-    bottom: 8%;
+    left: 5%;
+    bottom: -7%;
     z-index: 10;
 }
 
@@ -51,25 +44,18 @@ body {
         position: absolute;
         max-width: 450px;
         left: 10%;
-        bottom: 20%;
-        z-index: 10;
-    }
-    .image-friend {
-        position: absolute;
-        right: 30%;
-        left: 10%;
-        bottom: 10%;
+        bottom: 4%;
         z-index: 10;
     }
 }
 /* --------------------------------- */
 
 
-/* ------------- Stats ------------- */
+/* ----------- Overview ------------ */
 .vertical_line {
     width: 5px;
     border-left: 2px solid rgba(44, 57, 70, 1);
-    height: 100vh;
+    height: calc(100vh - 80px);
 }
 
 hr {
@@ -134,7 +120,7 @@ hr {
 
 /* On screens that are 768px or less */
 @media (max-width: 767.97px) {
-    .test {
+    .stats-size {
         min-width: 90%
     }
 
@@ -213,47 +199,10 @@ hr {
     box-shadow: 0 0 0 0rem;
     color: #fff;
 }
-/* --------------------------------- */
 
-.barcontainer {
-    position: relative;
-    margin: 0 auto;
-    border: 1px solid white;
-    min-height: 400px;
-    width: 65%;
-}
-
-.bar {
-    position: absolute;
-    display: inline-block;
-    bottom: 0;
-    border: 1px solid black;
-    background: grey;
-    width: 10%;
-    text-align: center;
-}
-
-.bar:nth-child(1) {
-  left: 10%;
-}
-.bar:nth-child(2) {
-  left: 25%;
-}
-.bar:nth-child(3) {
-  left: 45%;
-}
-.bar:nth-child(4) {
-  left: 65%;
-}
-.bar:nth-child(5) {
-  left: 85%;
-}
-
-
-
-/* ------------- Info -------------- */
+/* ------------ Levels ------------ */
 .account-bar-wrapper {
-    width: 350px;
+    width: 100%;
 }
 
 .account-bar {
@@ -293,7 +242,7 @@ hr {
 
 .xp-bar {
     height: 10px;
-    width: 250px;
+    width: 65%;
     background: #035;
     margin: 0px 0px 0px 5px;
     display: inline-block;
@@ -368,6 +317,29 @@ hr {
     border-radius: 5px;
     -webkit-filter: blur(5px);
 }
+/* --------------------------------- */
+
+
+/* --------- Achievements ---------- */
+.block_achiev {
+    height: 20px;
+    color: #fff;
+    float: left;
+    background-color: #334D5C;
+}
+
+.achiev-name {
+    max-width: 100px;
+}
+
+.achiev-bar {
+    max-width: 230px;
+}
+
+.achiev-value {
+    max-width: 30px;
+}
+
 /* --------------------------------- */
 
 
