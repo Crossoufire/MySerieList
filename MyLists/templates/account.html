@@ -46,8 +46,8 @@
     <div id="overview_tab" class="tab-pane fade show active">
         <div class="row m-t-30">
             <div class="col-md-3">
-                <ul class="p-l-20">
-                    <li>
+                <ul class="p-l-0">
+                    <li class="m-b-20">
                         <h4>
                             <i class="fas fa-user"></i>
                             &nbsp&nbsp Biography
@@ -56,10 +56,10 @@
                         <hr>
                         <p class="text-justify m-b-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi.</p>
                     </li>
-                    <li>
+                    <li class="m-b-20">
                         <h4><i class="fas fa-angle-double-up"></i>&nbsp&nbsp Lists Levels</h4>
                         <hr>
-                        <div class="d-flex">
+                        <div class="d-flex p-l-10">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
@@ -81,7 +81,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex">
+                        <div class="d-flex p-l-10">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
@@ -103,7 +103,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex">
+                        <div class="d-flex p-l-10">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
@@ -126,21 +126,19 @@
                             </div>
                         </div>
                     </li>
-                    <li>
+                    <li class="m-b-20">
                         <h4><i class="fas fa-rss"></i>&nbsp&nbsp Following (4)</h4>
                         <hr>
-                        <div class="d-flex flex-wrap friends" style="min-height: 82px; overflow-y: scroll;">
-                            <ul>
-                                {% for friend in data["friends"] %}
-                                <li>
-                                    <a href="/account/{{ friend['username'] }}">
-                                        <img height="50" width="50" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
-                                        <div style="color: white;" class="text-center" id="{{ friend['user_id'] }}">{{ friend['username'] }}</div>
-                                    </a>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+                        <ul class="p-l-0" style="max-height: 190px; overflow-y: scroll;">
+                            {% for friend in data["friends"] %}
+                            <li class="m-l-13 m-r-13 m-b-13" style="display: inline-block;">
+                                <a href="/account/{{ friend['username'] }}">
+                                    <img style="border-radius: 50%;" height="60" width="60" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
+                                    <div style="color: white;" class="text-center" id="{{ friend['user_id'] }}">{{ friend['username'] }}</div>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     </li>
                     <li>
                         <h4><i class="fas fa-newspaper"></i>&nbsp&nbsp Last follows update</h4>
@@ -152,7 +150,7 @@
                 </ul>
             </div>
             <div class="vertical_line"></div>
-            <div class="col-md-5">
+            <div class="col-md-6">
                 <ul class="p-l-0">
                     <li>
                         <h4><i class="fas fa-chart-pie"></i>&nbsp&nbsp Statistics</h4>
@@ -412,7 +410,7 @@
             </div>
             <div class="vertical_line"></div>
             <div class="col">
-                <ul class="p-l-0 p-r-20">
+                <ul class="p-l-0 p-r-0">
                     <li>
                         <h4><i class="fas fa-chart-pie"></i>&nbsp&nbsp Achievements</h4>
                         <hr>
@@ -439,11 +437,11 @@
                                     </div>
                                     <div class="col achiev-bar">
                                         <span class="block_achiev">
-                                            <span id="50%" class="value"></span>
+                                            <span id="100%" class="value"></span>
                                         </span>
                                     </div>
                                     <div class="col achiev-value">
-                                        2/4
+                                        4/4
                                     </div>
                                 </div>
                                 <div class="row">
@@ -677,8 +675,8 @@
     <div id="follows_tab" class="tab-pane fade">
         <div class="row m-t-30">
             <div class="col-md-3">
-                <ul class="p-l-20">
-                    <li>
+                <ul class="p-l-0">
+                    <li class="m-b-20">
                         <h4>
                             <i class="fas fa-user"></i>
                             &nbsp&nbsp Biography
@@ -687,10 +685,10 @@
                         <hr>
                         <p class="text-justify m-b-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi.</p>
                     </li>
-                    <li>
+                    <li class="m-b-20">
                         <h4><i class="fas fa-angle-double-up"></i>&nbsp&nbsp Lists Levels</h4>
                         <hr>
-                        <div class="d-flex">
+                        <div class="d-flex p-l-10">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
@@ -712,7 +710,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex">
+                        <div class="d-flex p-l-10">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
@@ -734,7 +732,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex">
+                        <div class="d-flex p-l-10">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
@@ -757,47 +755,36 @@
                             </div>
                         </div>
                     </li>
-                    <li>
-                        Data for the levels
-                    </li>
-
                 </ul>
             </div>
             <div class="vertical_line"></div>
-            <div class="col p-l-0">
-                <ul class="follows p-l-0">
-                    <li>
-                        <img src="http://via.placeholder.com/100x100"/>
+            <div class="col-6">
+                <ul class="p-l-20">
+                    {% for friend in data["friends"] %}
+                    <li class="m-r-22 m-l-22" style="display: inline-block;">
+                        <a href="/account/{{ friend['username'] }}">
+                            <img style="border-radius: 50%;" height="100" width="100" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
+                            <div style="color: white;" class="text-center" id="{{ friend['user_id'] }}">{{ friend['username'] }}</div>
+                        </a>
                     </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="vertical_line"></div>
+            <div class="col">
+                <ul class="p-l-0">
                     <li>
-                        <img src="http://via.placeholder.com/100x100"/>
+                        <h4><i class="fas fa-newspaper"></i>&nbsp&nbsp Last follows update</h4>
+                        <hr>
+                        <div class="m-b-10">Psy - series<br>Added Breaking Bad</div>
+                        <div class="m-b-10">Psy - series<br>Breaking Bad<br>S01.E02 <i class="fas fa-arrow-right"></i> S01.E04</div>
+                        <div class="m-b-10">Psy - anime<br>Shingeki no kyojin<br>S02.E04 <i class="fas fa-arrow-right"></i> S02.E08</div>
                     </li>
+                    <hr>
                     <li>
-                        <img src="http://via.placeholder.com/100x100"/>
-                    </li>
-                    <li>
-                        <img src="http://via.placeholder.com/100x100"/>
-                    </li>
-                    <li>
-                        <img src="http://via.placeholder.com/100x100"/>
-                    </li>
-                    <li>
-                        <img src="http://via.placeholder.com/100x100"/>
-                    </li>
-                    <li>
-                        <img src="http://via.placeholder.com/100x100"/>
-                    </li>
-                    <li>
-                        <img src="http://via.placeholder.com/100x100"/>
-                    </li>
-                    <li>
-                        <img src="http://via.placeholder.com/100x100"/>
-                    </li>
-                    <li>
-                        <img src="http://via.placeholder.com/100x100"/>
-                    </li>
-                    <li>
-                        <img src="http://via.placeholder.com/100x100"/>
+                        <div class="m-b-10">Psy - series<br>Added Breaking Bad</div>
+                        <div class="m-b-10">Psy - series<br>Breaking Bad<br>S01.E02 <i class="fas fa-arrow-right"></i> S01.E04</div>
+                        <div>Psy - anime<br>Shingeki no kyojin<br>S02.E04 <i class="fas fa-arrow-right"></i> S02.E08</div>
                     </li>
                 </ul>
             </div>
@@ -806,9 +793,10 @@
 
     {% if user_id == current_user.get_id() %}
     <div id="settings_tab" class="tab-pane fade">
-        <div class="row m-t-30 text-center">
-            <div class="col text-center">
-                <h4><i class="fas fa-sliders-h"></i>&nbsp&nbsp principal settings</h4>
+        <div class="row text-center m-t-50">
+            <div class="col-2"></div>
+            <div class="col-4">
+                <h4><i class="fas fa-sliders-h"></i>&nbsp&nbsp General settings</h4>
                 <hr>
                 <form method="POST" action="" enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
@@ -852,7 +840,7 @@
                 </form>
             </div>
             <div class="vertical_line"></div>
-            <div class="col text-center">
+            <div class="col-4">
                 <h4><i class="fas fa-unlock-alt"></i>&nbsp&nbsp Change your password</h4>
                 <hr>
                 <form method="POST" action="" enctype="multipart/form-data">
@@ -896,6 +884,7 @@
                     </div>
                 </form>
             </div>
+            <div class="col-2"></div>
         </div>
     </div>
     {% endif %}

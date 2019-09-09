@@ -56,18 +56,10 @@ ul {
 
 
 /* ----------- Overview ------------ */
-#overview_tab li {
-    background: rgba(84, 97, 110, 0.4);
-    border-radius: 0px;
-    padding: 10px;
-    margin-bottom: 20px;
-}
-
-
 .vertical_line {
     width: 5px;
     border-left: 2px solid rgba(44, 57, 70, 1);
-    height: calc(100vh - 80px);
+    height: 100wh;
 }
 
 hr {
@@ -168,33 +160,7 @@ hr {
 /* --------------------------------- */
 
 
-/* ------------ Friends ------------ */
-#follows_tab li {
-    background: rgba(84, 97, 110, 0.4);
-    border-radius: 0px;
-    padding: 10px;
-    margin-bottom: 20px;
-}
-
-.follows li {
-    display: inline-block;
-    margin: 20px;
-    padding: 0px !important;
-
-}
-
-.friends > ul {
-    padding: 0px;
-    list-style-type: none;
-}
-
-.friends > ul > li {
-    display: inline-block;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-}
-
+/* ------------ Follows ------------ */
 .modal-content {
     background: #131418;
     border: solid 1px white !important;
@@ -351,15 +317,16 @@ hr {
 }
 
 .achiev-name {
-    max-width: 100px;
+    max-width: 75px;
 }
 
 .achiev-bar {
-    max-width: 220px;
+    max-width: 180px;
 }
 
 .achiev-value {
-    max-width: 40px;
+    max-width: 30px;
+    padding-left: 0px;
 }
 /* --------------------------------- */
 
