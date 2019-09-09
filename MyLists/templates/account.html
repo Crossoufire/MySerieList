@@ -28,6 +28,9 @@
     <li class="nav-item ml-auto">
         <a class="nav-link active" data-toggle="tab" href="#overview_tab">Overview</a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#follows_tab">Follows</a>
+    </li>
     {% if user_id == current_user.get_id() %}
     <li class="nav-item">
         <a class="nav-link" data-toggle="tab" href="#settings_tab">Settings</a>
@@ -43,7 +46,7 @@
     <div id="overview_tab" class="tab-pane fade show active">
         <div class="row m-t-30">
             <div class="col-md-3">
-                <ul style="list-style-type: none; padding-left: 20px;">
+                <ul class="p-l-20">
                     <li>
                         <h4>
                             <i class="fas fa-user"></i>
@@ -51,7 +54,7 @@
                             <a class="fas fa-sm fa-pen p-r-10" style="float: right;"></a>
                         </h4>
                         <hr>
-                        <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi.</p>
+                        <p class="text-justify m-b-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi.</p>
                     </li>
                     <li>
                         <h4><i class="fas fa-angle-double-up"></i>&nbsp&nbsp Lists Levels</h4>
@@ -100,7 +103,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex m-b-16">
+                        <div class="d-flex">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
@@ -126,7 +129,7 @@
                     <li>
                         <h4><i class="fas fa-rss"></i>&nbsp&nbsp Following (4)</h4>
                         <hr>
-                        <div class="d-flex flex-wrap friends m-b-6" style="max-height: 82px; overflow-y: scroll;">
+                        <div class="d-flex flex-wrap friends" style="min-height: 82px; overflow-y: scroll;">
                             <ul>
                                 {% for friend in data["friends"] %}
                                 <li>
@@ -150,255 +153,255 @@
             </div>
             <div class="vertical_line"></div>
             <div class="col-md-5">
-                <ul class="pl-0" style="list-style-type: none;">
+                <ul class="p-l-0">
                     <li>
                         <h4><i class="fas fa-chart-pie"></i>&nbsp&nbsp Statistics</h4>
                         <hr>
-                        <div class="stats-container">
-                            <!------------------------ Series statistics --------------------------->
-                            <div class="stats-size">
-                                <h5 class="text-left m-b-10"><b>Series </b><i class="fas fa-sm fa-external-link-square-alt"></i></h5>
-                                <div id="SERIES" class="m-b-30">
-                                    <div class="m-b-5">
-                                        <span class="stat_text"><b>Days:</b> {{ data['series']['time_spent_day'] }}</span>
-                                        <span class="stat_text float-right"><b>Hours:</b> {{ data['series']['time_spent_hour'] }}</span>
+                        <!------------------------ Series statistics --------------------------->
+                        <div class="stats-size">
+                            <h5 class="text-left m-b-10"><b>Series </b><i class="fas fa-sm fa-external-link-square-alt"></i></h5>
+                            <div id="SERIES" class="m-b-30">
+                                <div class="m-b-5">
+                                    <span class="stat_text"><b>Days:</b> {{ data['series']['time_spent_day'] }}</span>
+                                    <span class="stat_text float-right"><b>Hours:</b> {{ data['series']['time_spent_hour'] }}</span>
+                                </div>
+                                <div class="m-b-5">
+                                    <span class="stat_text"><b>Mean Score:</b> {{ data['series']['mean_score'] }}</span>
+                                </div>
+                                <figure class="d-flex">
+                                    {% if data['series']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
+                                    <span class="block_no_data" title="No data">
+                                <span id="100%" class="value"></span>
+                            </span>
+                                    {% else %}
+                                    <span class="block" title="Watching">
+                                <span id="{{ data['series']['element_percentage'][0] }}%" class="value"></span>
+                            </span>
+                                    <span class="block" title="Completed">
+                                <span id="{{ data['series']['element_percentage'][1] }}%" class="value"></span>
+                            </span>
+                                    <span class="block" title="On Hold">
+                                <span id="{{ data['series']['element_percentage'][2] }}%" class="value"></span>
+                            </span>
+                                    <span class="block" title="Random">
+                                <span id="{{ data['series']['element_percentage'][3] }}%" class="value"></span>
+                            </span>
+                                    <span class="block" title="Dropped">
+                                <span id="{{ data['series']['element_percentage'][4] }}%" class="value"></span>
+                            </span>
+                                    <span class="block" title="Plan to Watch">
+                                <span id="{{ data['series']['element_percentage'][5] }}%" class="value"></span>
+                            </span>
+                                    {% endif %}
+                                </figure>
+                                <div class="m-t-10">
+                                    <div class="row">
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Watching:</span>
+                                        </div>
+                                        <div class="col p-0 position">
+                                            <span class="stat_text">{{ data['series']['watching_count'] }}</span>
+                                        </div>
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Dropped:</span>
+                                        </div>
+                                        <div class="col p-l-0 position">
+                                            <span class="stat_text">{{ data['series']['dropped_count'] }}</span>
+                                        </div>
                                     </div>
-                                    <div class="m-b-5">
-                                        <span class="stat_text"><b>Mean Score:</b> {{ data['series']['mean_score'] }}</span>
+                                    <div class="row">
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Completed:</span>
+                                        </div>
+                                        <div class="col p-0 position">
+                                            <span class="stat_text">{{ data['series']['completed_count'] }}</span>
+                                        </div>
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Plan to Watch:</span>
+                                        </div>
+                                        <div class="col p-l-0 position">
+                                            <span class="stat_text">{{ data['series']['plantowatch_count'] }}</span>
+                                        </div>
                                     </div>
-                                    <figure class="d-flex">
-                                        {% if data['series']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
-                                        <span class="block_no_data" title="No data">
-                                    <span id="100%" class="value"></span>
-                                </span>
-                                        {% else %}
-                                        <span class="block" title="Watching">
-                                    <span id="{{ data['series']['element_percentage'][0] }}%" class="value"></span>
-                                </span>
-                                        <span class="block" title="Completed">
-                                    <span id="{{ data['series']['element_percentage'][1] }}%" class="value"></span>
-                                </span>
-                                        <span class="block" title="On Hold">
-                                    <span id="{{ data['series']['element_percentage'][2] }}%" class="value"></span>
-                                </span>
-                                        <span class="block" title="Random">
-                                    <span id="{{ data['series']['element_percentage'][3] }}%" class="value"></span>
-                                </span>
-                                        <span class="block" title="Dropped">
-                                    <span id="{{ data['series']['element_percentage'][4] }}%" class="value"></span>
-                                </span>
-                                        <span class="block" title="Plan to Watch">
-                                    <span id="{{ data['series']['element_percentage'][5] }}%" class="value"></span>
-                                </span>
-                                        {% endif %}
-                                    </figure>
-                                    <div class="m-t-10">
-                                        <div class="row">
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Watching:</span>
-                                            </div>
-                                            <div class="col p-0 position">
-                                                <span class="stat_text">{{ data['series']['watching_count'] }}</span>
-                                            </div>
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Dropped:</span>
-                                            </div>
-                                            <div class="col p-l-0 position">
-                                                <span class="stat_text">{{ data['series']['dropped_count'] }}</span>
-                                            </div>
+                                    <div class="row">
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">On Hold:</span>
                                         </div>
-                                        <div class="row">
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Completed:</span>
-                                            </div>
-                                            <div class="col p-0 position">
-                                                <span class="stat_text">{{ data['series']['completed_count'] }}</span>
-                                            </div>
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Plan to Watch:</span>
-                                            </div>
-                                            <div class="col p-l-0 position">
-                                                <span class="stat_text">{{ data['series']['plantowatch_count'] }}</span>
-                                            </div>
+                                        <div class="col p-0 position">
+                                            <span class="stat_text">{{ data['series']['onhold_count'] }}</span>
                                         </div>
-                                        <div class="row">
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">On Hold:</span>
-                                            </div>
-                                            <div class="col p-0 position">
-                                                <span class="stat_text">{{ data['series']['onhold_count'] }}</span>
-                                            </div>
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text"></span>
-                                            </div>
-                                            <div class="col p-l-0 position">
-                                                <span class="stat_text"></span>
-                                            </div>
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text"></span>
                                         </div>
-                                        <div class="row">
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Random:</span>
-                                            </div>
-                                            <div class="col p-0 position">
-                                                <span class="stat_text">{{ data['series']['random_count'] }}</span>
-                                            </div>
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Episodes:</span>
-                                            </div>
-                                            <div class="col p-l-0 position">
-                                                <span class="stat_text">{{ data['series']['nb_ep_watched'] }}</span>
-                                            </div>
+                                        <div class="col p-l-0 position">
+                                            <span class="stat_text"></span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Random:</span>
+                                        </div>
+                                        <div class="col p-0 position">
+                                            <span class="stat_text">{{ data['series']['random_count'] }}</span>
+                                        </div>
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Episodes:</span>
+                                        </div>
+                                        <div class="col p-l-0 position">
+                                            <span class="stat_text">{{ data['series']['nb_ep_watched'] }}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!------------------------- Anime statistics --------------------------->
-                            <div class="stats-size">
-                                <h5 class="text-left m-b-10"><b>Anime </b><i class="fas fa-sm fa-external-link-square-alt"></i></h4>
-                                <div id="ANIME" class="m-b-30">
-                                    <div class="m-b-5">
-                                        <span class="stat_text"><b>Days:</b> {{ data['anime']['time_spent_day'] }}</span>
-                                        <span class="stat_text float-right"><b>Hours:</b> {{ data['anime']['time_spent_hour'] }}</span>
+                        </div>
+                        <hr>
+                        <!------------------------- Anime statistics --------------------------->
+                        <div class="stats-size">
+                            <h5 class="text-left m-b-10"><b>Anime </b><i class="fas fa-sm fa-external-link-square-alt"></i></h5>
+                            <div id="ANIME" class="m-b-30">
+                                <div class="m-b-5">
+                                    <span class="stat_text"><b>Days:</b> {{ data['anime']['time_spent_day'] }}</span>
+                                    <span class="stat_text float-right"><b>Hours:</b> {{ data['anime']['time_spent_hour'] }}</span>
+                                </div>
+                                <div class="m-b-5">
+                                    <span class="stat_text"><b>Mean Score:</b> {{ data['anime']['mean_score'] }}</span>
+                                </div>
+                                <figure class="d-flex">
+                                    {% if data['anime']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
+                                    <span class="block_no_data" title="No data">
+                                <span id="100%" class="value"></span>
+                            </span>
+                                    {% else %}
+                                    <span class="block" title="Watching">
+                                <span id="{{ data['anime']['element_percentage'][0] }}%" class="value"></span>
+                            </span>
+                                    <span class="block" title="Completed">
+                                <span id="{{ data['anime']['element_percentage'][1] }}%" class="value"></span>
+                            </span>
+                                    <span class="block" title="On Hold">
+                                <span id="{{ data['anime']['element_percentage'][2] }}%" class="value"></span>
+                            </span>
+                                    <span class="block" title="Random">
+                                <span id="{{ data['anime']['element_percentage'][3] }}%" class="value"></span>
+                            </span>
+                                    <span class="block" title="Dropped">
+                                <span id="{{ data['anime']['element_percentage'][4] }}%" class="value"></span>
+                            </span>
+                                    <span class="block" title="Plan to Watch">
+                                <span id="{{ data['anime']['element_percentage'][5] }}%" class="value"></span>
+                            </span>
+                                    {% endif %}
+                                </figure>
+                                <div class="m-t-10">
+                                    <div class="row">
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Watching:</span>
+                                        </div>
+                                        <div class="col p-0 position">
+                                            <span class="stat_text">{{ data['anime']['watching_count'] }}</span>
+                                        </div>
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Dropped:</span>
+                                        </div>
+                                        <div class="col p-l-0 position">
+                                            <span class="stat_text">{{ data['anime']['dropped_count'] }}</span>
+                                        </div>
                                     </div>
-                                    <div class="m-b-5">
-                                        <span class="stat_text"><b>Mean Score:</b> {{ data['anime']['mean_score'] }}</span>
+                                    <div class="row">
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Completed:</span>
+                                        </div>
+                                        <div class="col p-0 position">
+                                            <span class="stat_text">{{ data['anime']['completed_count'] }}</span>
+                                        </div>
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Plan to Watch:</span>
+                                        </div>
+                                        <div class="col p-l-0 position">
+                                            <span class="stat_text">{{ data['anime']['plantowatch_count'] }}</span>
+                                        </div>
                                     </div>
-                                    <figure class="d-flex">
-                                        {% if data['anime']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
-                                        <span class="block_no_data" title="No data">
-                                    <span id="100%" class="value"></span>
-                                </span>
-                                        {% else %}
-                                        <span class="block" title="Watching">
-                                    <span id="{{ data['anime']['element_percentage'][0] }}%" class="value"></span>
-                                </span>
-                                        <span class="block" title="Completed">
-                                    <span id="{{ data['anime']['element_percentage'][1] }}%" class="value"></span>
-                                </span>
-                                        <span class="block" title="On Hold">
-                                    <span id="{{ data['anime']['element_percentage'][2] }}%" class="value"></span>
-                                </span>
-                                        <span class="block" title="Random">
-                                    <span id="{{ data['anime']['element_percentage'][3] }}%" class="value"></span>
-                                </span>
-                                        <span class="block" title="Dropped">
-                                    <span id="{{ data['anime']['element_percentage'][4] }}%" class="value"></span>
-                                </span>
-                                        <span class="block" title="Plan to Watch">
-                                    <span id="{{ data['anime']['element_percentage'][5] }}%" class="value"></span>
-                                </span>
-                                        {% endif %}
-                                    </figure>
-                                    <div class="m-t-10">
-                                        <div class="row">
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Watching:</span>
-                                            </div>
-                                            <div class="col p-0 position">
-                                                <span class="stat_text">{{ data['anime']['watching_count'] }}</span>
-                                            </div>
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Dropped:</span>
-                                            </div>
-                                            <div class="col p-l-0 position">
-                                                <span class="stat_text">{{ data['anime']['dropped_count'] }}</span>
-                                            </div>
+                                    <div class="row">
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">On Hold:</span>
                                         </div>
-                                        <div class="row">
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Completed:</span>
-                                            </div>
-                                            <div class="col p-0 position">
-                                                <span class="stat_text">{{ data['anime']['completed_count'] }}</span>
-                                            </div>
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Plan to Watch:</span>
-                                            </div>
-                                            <div class="col p-l-0 position">
-                                                <span class="stat_text">{{ data['anime']['plantowatch_count'] }}</span>
-                                            </div>
+                                        <div class="col p-0 position">
+                                            <span class="stat_text">{{ data['anime']['onhold_count'] }}</span>
                                         </div>
-                                        <div class="row">
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">On Hold:</span>
-                                            </div>
-                                            <div class="col p-0 position">
-                                                <span class="stat_text">{{ data['anime']['onhold_count'] }}</span>
-                                            </div>
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text"></span>
-                                            </div>
-                                            <div class="col p-l-0 position">
-                                                <span class="stat_text"></span>
-                                            </div>
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text"></span>
                                         </div>
-                                        <div class="row">
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Random:</span>
-                                            </div>
-                                            <div class="col p-0 position">
-                                                <span class="stat_text">{{ data['anime']['random_count'] }}</span>
-                                            </div>
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Episodes:</span>
-                                            </div>
-                                            <div class="col p-l-0 position">
-                                                <span class="stat_text">{{ data['anime']['nb_ep_watched'] }}</span>
-                                            </div>
+                                        <div class="col p-l-0 position">
+                                            <span class="stat_text"></span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Random:</span>
+                                        </div>
+                                        <div class="col p-0 position">
+                                            <span class="stat_text">{{ data['anime']['random_count'] }}</span>
+                                        </div>
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Episodes:</span>
+                                        </div>
+                                        <div class="col p-l-0 position">
+                                            <span class="stat_text">{{ data['anime']['nb_ep_watched'] }}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!------------------------ Movies statistics --------------------------->
-                            <div class="stats-size">
-                                <h5 class="text-left m-b-10"><b>Movies </b> <i class="fas fa-sm fa-external-link-square-alt"></i></h4>
-                                <div id="MOVIES" class="m-b-30">
-                                    <div class="m-b-5">
-                                        <span class="stat_text"><b>Days:</b> {{ data['movies']['time_spent_day'] }}</span>
-                                        <span class="stat_text float-right"><b>Hours:</b> {{ data['movies']['time_spent_hour'] }}</span>
-                                    </div>
-                                    <div class="m-b-5">
-                                        <span class="stat_text"><b>Mean Score:</b> {{ data['movies']['mean_score'] }}</span>
-                                    </div>
-                                    <figure class="d-flex">
-                                        {% if data['movies']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0] %}
-                                        <span class="block_no_data" title="No data">
-                            <span id="100%" class="value"></span>
-                                </span>
-                                        {% else %}
-                                        <span class="block" title="Complete">
-                                    <span id="{{ data['movies']['element_percentage'][0] }}%" class="value"></span>
-                                </span>
-                                        <span class="block" title="Plan to Watch">
-                                    <span id="{{ data['movies']['element_percentage'][4] }}%" class="value"></span>
-                                </span>
-                                        {% endif %}
-                                    </figure>
-                                    <div class="m-t-10">
-                                        <div class="row">
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Completed:</span>
-                                            </div>
-                                            <div class="col p-0 position">
-                                                <span class="stat_text">{{ data['movies']['completed_count'] }}</span>
-                                            </div>
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Plan to Watch:</span>
-                                            </div>
-                                            <div class="col p-l-0 position">
-                                                <span class="stat_text">{{ data['movies']['plantowatch_count'] }}</span>
-                                            </div>
+                        </div>
+                        <hr>
+                        <!------------------------ Movies statistics --------------------------->
+                        <div class="stats-size">
+                            <h5 class="text-left m-b-10"><b>Movies </b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
+                            <div id="MOVIES">
+                                <div class="m-b-5">
+                                    <span class="stat_text"><b>Days:</b> {{ data['movies']['time_spent_day'] }}</span>
+                                    <span class="stat_text float-right"><b>Hours:</b> {{ data['movies']['time_spent_hour'] }}</span>
+                                </div>
+                                <div class="m-b-5">
+                                    <span class="stat_text"><b>Mean Score:</b> {{ data['movies']['mean_score'] }}</span>
+                                </div>
+                                <figure class="d-flex">
+                                    {% if data["movies"]["element_percentage"] == [0.0, 0.0] %}
+                                    <span class="block_no_data" title="No data">
+                        <span id="100%" class="value"></span>
+                            </span>
+                                    {% else %}
+                                    <span class="block" title="Complete">
+                                <span id="{{ data['movies']['element_percentage'][0] }}%" class="value"></span>
+                            </span>
+                                    <span class="block" title="Plan to Watch">
+                                <span id="{{ data['movies']['element_percentage'][4] }}%" class="value"></span>
+                            </span>
+                                    {% endif %}
+                                </figure>
+                                <div class="m-t-10">
+                                    <div class="row">
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Completed:</span>
                                         </div>
-                                        <div class="row">
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text">Total movies:</span>
-                                            </div>
-                                            <div class="col p-0 position">
-                                                <span class="stat_text">{{ data['movies']['total_count'] }}</span>
-                                            </div>
-                                            <div class="col mini p-r-0">
-                                                <span class="stat_text"></span>
-                                            </div>
+                                        <div class="col p-0 position">
+                                            <span class="stat_text">{{ data['movies']['completed_count'] }}</span>
+                                        </div>
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Plan to Watch:</span>
+                                        </div>
+                                        <div class="col p-l-0 position">
+                                            <span class="stat_text">{{ data['movies']['plantowatch_count'] }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text">Total movies:</span>
+                                        </div>
+                                        <div class="col p-0 position">
+                                            <span class="stat_text">{{ data['movies']['total_count'] }}</span>
+                                        </div>
+                                        <div class="col mini p-r-0">
+                                            <span class="stat_text"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -409,277 +412,392 @@
             </div>
             <div class="vertical_line"></div>
             <div class="col">
-                <ul class="pl-0 p-r-20" style="list-style-type: none;">
+                <ul class="p-l-0 p-r-20">
                     <li>
                         <h4><i class="fas fa-chart-pie"></i>&nbsp&nbsp Achievements</h4>
                         <hr>
-                        <div class="stats-container">
-                            <!------------------------ Series achievements --------------------------->
-                            <div class="stats-size">
-                                <h5 class="text-left m-b-10"><b>Series</b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
-                                <div class="m-b-30">
-                                    <div class="stats-size">
-                                        <div class="m-b-30">
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Genres
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="50%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    22/44
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Sources
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="50%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    2/4
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Finished
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="33%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    4/12
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Time
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="50%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    2/4
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Misc
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="66%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    2/3
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Score
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="33%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    1/3
-                                                </div>
-                                            </div>
-
+                        <!------------------------ Series achievements --------------------------->
+                        <div class="stats-size">
+                            <h5 class="text-left m-b-10"><b>Series</b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
+                            <div class="m-b-30">
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Genres
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <div class="block_achiev">
+                                            <span id="50%" class="value"></span>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <!------------------------ Anime achievements --------------------------->
-                            <div class="stats-size">
-                                <h5 class="text-left m-b-10"><b>Anime</b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
-                                <div class="m-b-30">
-                                    <div class="stats-size">
-                                        <div class="m-b-30">
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Genres
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="50%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    22/44
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Sources
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="50%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    2/4
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Finished
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="33%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    4/12
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Time
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="50%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    2/4
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Misc
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="66%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    2/3
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Score
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="33%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    1/3
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="col achiev-value">
+                                        22/44
                                     </div>
                                 </div>
-                            </div>
-                            <!------------------------ Movies achievements --------------------------->
-                            <div class="stats-size">
-                                <h5 class="text-left m-b-10"><b>Movies</b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
-                                <div class="m-b-30">
-                                    <div class="stats-size">
-                                        <div class="m-b-30">
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Genres
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="50%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    22/44
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Sources
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="50%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    2/4
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Finished
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="33%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    4/12
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Time
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="50%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    2/4
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Misc
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="66%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    2/3
-                                                </div>
-                                            </div>
-                                            <div class="row m-b-11">
-                                                <div class="col achiev-name">
-                                                    Score
-                                                </div>
-                                                <div class="col achiev-bar">
-                                                    <span class="block_achiev">
-                                                        <span id="33%" class="value"></span>
-                                                    </span>
-                                                </div>
-                                                <div class="col achiev-value">
-                                                    1/3
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Sources
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="50%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        2/4
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Finished
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="33%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        4/12
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Time
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="50%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        2/4
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Misc
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="66%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        2/3
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Score
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="33%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        1/3
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <!------------------------ Anime achievements --------------------------->
+                        <div class="stats-size">
+                            <h5 class="text-left m-b-10"><b>Anime</b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
+                            <div class="m-b-30">
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Genres
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <div class="block_achiev">
+                                            <span id="50%" class="value"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        22/44
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Sources
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="50%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        2/4
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Finished
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="33%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        4/12
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Time
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="50%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        2/4
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Misc
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="66%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        2/3
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Score
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="33%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        1/3
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!------------------------ Movies achievements --------------------------->
+                        <div class="stats-size">
+                            <h5 class="text-left m-b-10"><b>Movies</b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
+                            <div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Genres
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <div class="block_achiev">
+                                            <span id="50%" class="value"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        22/44
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Sources
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="50%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        2/4
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Finished
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="33%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        4/12
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Time
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="50%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        2/4
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Misc
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="66%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        2/3
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col achiev-name">
+                                        Score
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev">
+                                            <span id="33%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col achiev-value">
+                                        1/3
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="follows_tab" class="tab-pane fade">
+        <div class="row m-t-30">
+            <div class="col-md-3">
+                <ul class="p-l-20">
+                    <li>
+                        <h4>
+                            <i class="fas fa-user"></i>
+                            &nbsp&nbsp Biography
+                            <a class="fas fa-sm fa-pen p-r-10" style="float: right;"></a>
+                        </h4>
+                        <hr>
+                        <p class="text-justify m-b-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi.</p>
+                    </li>
+                    <li>
+                        <h4><i class="fas fa-angle-double-up"></i>&nbsp&nbsp Lists Levels</h4>
+                        <hr>
+                        <div class="d-flex">
+                            <div class='account-bar-wrapper'>
+                                <div class='account-bar'>
+                                    <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
+                                    <span class='account-bar-name'>Series</span>
+                                    <div id="series_level" class='account-bar-level'>Level {{ data['series_level'] }}</div>
+                                    <div class='xp-bar' data-toggle="tooltip" title="{{ data['series_percent'] }}%">
+                                        <div id='xp-bar-fill-series'>
+                                            <div class='xp-increase-fx'>
+                                                <div class='xp-increase-fx-flicker'>
+                                                    <div class='xp-increase-glow1'></div>
+                                                    <div class='xp-increase-glow2'></div>
+                                                    <div class='xp-increase-glow3'></div>
+                                                </div>
+                                                <div class='xp-increase-glow2'></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class='account-bar-next-level'>&nbsp{{ data['series_level'] | int + 1 }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <div class='account-bar-wrapper'>
+                                <div class='account-bar'>
+                                    <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
+                                    <span class='account-bar-name'>Movies</span>
+                                    <div id="movies_level" class='account-bar-level'>Level {{ data['movies_level'] }}</div>
+                                    <div class='xp-bar' data-toggle="tooltip" title="{{ data['movies_percent'] }}%">
+                                        <div id='xp-bar-fill-movies'>
+                                            <div class='xp-increase-fx'>
+                                                <div class='xp-increase-fx-flicker'>
+                                                    <div class='xp-increase-glow1'></div>
+                                                    <div class='xp-increase-glow2'></div>
+                                                    <div class='xp-increase-glow3'></div>
+                                                </div>
+                                                <div class='xp-increase-glow2'></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class='account-bar-next-level'>&nbsp{{ data['movies_level'] | int + 1 }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <div class='account-bar-wrapper'>
+                                <div class='account-bar'>
+                                    <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
+                                    <div class='account-bar-name'>Anime</div>
+                                    <div id="anime_level" class='account-bar-level'>Level {{ data['anime_level'] }}</div>
+                                    <div class='xp-bar' data-toggle="tooltip" title="{{ data['anime_percent'] }}%">
+                                        <div id='xp-bar-fill-anime'>
+                                            <div class='xp-increase-fx'>
+                                                <div class='xp-increase-fx-flicker'>
+                                                    <div class='xp-increase-glow1'></div>
+                                                    <div class='xp-increase-glow2'></div>
+                                                    <div class='xp-increase-glow3'></div>
+                                                </div>
+                                                <div class='xp-increase-glow2'></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class='account-bar-next-level'>&nbsp{{ data['anime_level'] | int + 1 }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        Data for the levels
+                    </li>
+
+                </ul>
+            </div>
+            <div class="vertical_line"></div>
+            <div class="col p-l-0">
+                <ul class="follows p-l-0">
+                    <li>
+                        <img src="http://via.placeholder.com/100x100"/>
+                    </li>
+                    <li>
+                        <img src="http://via.placeholder.com/100x100"/>
+                    </li>
+                    <li>
+                        <img src="http://via.placeholder.com/100x100"/>
+                    </li>
+                    <li>
+                        <img src="http://via.placeholder.com/100x100"/>
+                    </li>
+                    <li>
+                        <img src="http://via.placeholder.com/100x100"/>
+                    </li>
+                    <li>
+                        <img src="http://via.placeholder.com/100x100"/>
+                    </li>
+                    <li>
+                        <img src="http://via.placeholder.com/100x100"/>
+                    </li>
+                    <li>
+                        <img src="http://via.placeholder.com/100x100"/>
+                    </li>
+                    <li>
+                        <img src="http://via.placeholder.com/100x100"/>
+                    </li>
+                    <li>
+                        <img src="http://via.placeholder.com/100x100"/>
+                    </li>
+                    <li>
+                        <img src="http://via.placeholder.com/100x100"/>
                     </li>
                 </ul>
             </div>

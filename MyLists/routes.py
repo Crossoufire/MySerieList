@@ -525,11 +525,11 @@ def account(user_name):
                                                         (float(account_data["series"]["dropped_count"]/account_data["series"]["total_count"]))*100,
                                                         (float(account_data["series"]["plantowatch_count"]/account_data["series"]["total_count"]))*100]
     if account_data["movies"]["total_count"] == 0:
-        account_data["movies"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        account_data["movies"]["element_percentage"] = [0.0, 0.0]
     else:
         account_data["movies"]["element_percentage"] = [
-            (float(account_data["movies"]["completed_count"] / account_data["movies"]["total_count"]))*100,
-            (float(account_data["movies"]["plantowatch_count"] / account_data["movies"]["total_count"]))*100]
+            (float(account_data["movies"]["completed_count"]/account_data["movies"]["total_count"]))*100,
+            (float(account_data["movies"]["plantowatch_count"]/account_data["movies"]["total_count"]))*100]
     if account_data["anime"]["nb_ep_watched"] == 0:
         account_data["anime"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     else:

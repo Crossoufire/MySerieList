@@ -6,6 +6,10 @@ body {
 .container {
     padding-top: 0px;
 }
+
+ul {
+    list-style: none;
+}
 /* --------------------------------- */
 
 
@@ -52,6 +56,14 @@ body {
 
 
 /* ----------- Overview ------------ */
+#overview_tab li {
+    background: rgba(84, 97, 110, 0.4);
+    border-radius: 0px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+
 .vertical_line {
     width: 5px;
     border-left: 2px solid rgba(44, 57, 70, 1);
@@ -61,10 +73,6 @@ body {
 hr {
     border-top: 2px solid rgba(44, 57, 70, 1);
     margin-top: 2px;
-}
-
-.stats-container {
-    margin-top: 20px;
 }
 
 .stats-size {
@@ -161,6 +169,20 @@ hr {
 
 
 /* ------------ Friends ------------ */
+#follows_tab li {
+    background: rgba(84, 97, 110, 0.4);
+    border-radius: 0px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.follows li {
+    display: inline-block;
+    margin: 20px;
+    padding: 0px !important;
+
+}
+
 .friends > ul {
     padding: 0px;
     list-style-type: none;
@@ -322,9 +344,9 @@ hr {
 
 /* --------- Achievements ---------- */
 .block_achiev {
-    height: 20px;
+    display: inline-block;
+    height: 12px;
     color: #fff;
-    float: left;
     background-color: #334D5C;
 }
 
@@ -333,13 +355,12 @@ hr {
 }
 
 .achiev-bar {
-    max-width: 230px;
+    max-width: 220px;
 }
 
 .achiev-value {
-    max-width: 30px;
+    max-width: 40px;
 }
-
 /* --------------------------------- */
 
 
