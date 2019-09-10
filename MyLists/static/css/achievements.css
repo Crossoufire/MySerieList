@@ -1,62 +1,19 @@
 
-.topnav {
-    background-color: #333;
-    overflow: hidden;
-    z-index: 500;
+#achievements_tabs {
+    margin-top: 30px;
 }
 
-.topnav a {
-    float: left;
-    display: block;
-    color: grey;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 17px;
+.type_achievements_tab {
+    border-bottom: white 1px solid;
 }
 
-.topnav a:hover {
-    background-color: grey;
-    color: black;
+.type_achievements_tab > li > .active {
+    background: rgba(24, 37, 50, 1) !important;
 }
 
-.topnav a.active {
-    background-color: #1a1a1a;
+.type_achievements_tab > li > a {
     color: white;
 }
-
-.topnav .icon {
-    display: none;
-}
-
-@media screen and (max-width: 600px) {
-    .topnav a  {
-        display: none;
-    }
-
-    .topnav a.icon {
-        float: right;
-        display: block;
-    }
-
-    .topnav.responsive {
-        position: relative;
-        width: 100%;
-    }
-
-    .topnav.responsive a.icon {
-        position: absolute;
-        right: 0;
-        top: 0;
-    }
-
-    .topnav.responsive a {
-        float: none;
-        display: block;
-        text-align: left;
-    }
-}
-
 
 /* ----------------- Achievements display ------------------ */
 .media_list_detail {

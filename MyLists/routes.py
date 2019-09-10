@@ -865,8 +865,8 @@ def achievements(user_name):
                            title="{}'s achievements".format(user_name),
                            data_anime=user_achievements_anime,
                            data_series=user_achievements_series,
-                           user_id=str(user.id),
-                           user_name=user_name)
+                           target_user_id=str(user.id),
+                           target_user_name=user_name)
 
 
 @app.route("/statistics/<user_name>", methods=['GET'])
