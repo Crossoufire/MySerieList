@@ -34,11 +34,6 @@ body.loading .modal_loading {
     font-size: 12pt;
 }
 
-.arrow_div {
-    height: 28px;
-    width: 28px;
-}
-
 .dropdown-menu {
 	background-color: #272525;
 	min-width: 9rem;
