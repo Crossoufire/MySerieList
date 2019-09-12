@@ -23,6 +23,8 @@ function changeCategory(element_id, new_category, card_id, mod_id, seas_drop_id,
             "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeCategory(\"" + element_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</a>"
         );
         $("#" + card_id).prependTo(".WATCHING");
+        $("#" + card_id).children('.card-body').show();
+        $("#" + card_id).children().children('.btn_bottom_left').show();
         $('.modal').modal("hide");
     }
 
@@ -48,6 +50,8 @@ function changeCategory(element_id, new_category, card_id, mod_id, seas_drop_id,
             "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeCategory(\"" + element_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</a>"
         );
         $("#" + card_id).prependTo(".COMPLETED");
+        $("#" + card_id).children('.card-body').show();
+        $("#" + card_id).children().children('.btn_bottom_left').show();
         $('.modal').modal("hide");
 
         var season_data = JSON.parse("[" + seas_data + "]");
@@ -89,6 +93,8 @@ function changeCategory(element_id, new_category, card_id, mod_id, seas_drop_id,
             "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeCategory(\"" + element_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</a>"
         );
         $("#" + card_id).prependTo(".ON_HOLD");
+        $("#" + card_id).children('.card-body').show();
+        $("#" + card_id).children().children('.btn_bottom_left').show();
         $('.modal').modal("hide");
     }
 
@@ -114,6 +120,8 @@ function changeCategory(element_id, new_category, card_id, mod_id, seas_drop_id,
             "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeCategory(\"" + element_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</a>"
         );
         $("#" + card_id).prependTo(".RANDOM");
+        $("#" + card_id).children('.card-body').show();
+        $("#" + card_id).children().children('.btn_bottom_left').show();
         $('.modal').modal("hide");
     }
 
@@ -139,6 +147,8 @@ function changeCategory(element_id, new_category, card_id, mod_id, seas_drop_id,
             "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeCategory(\"" + element_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</a>"
         );
         $("#" + card_id).prependTo(".DROPPED");
+        $("#" + card_id).children('.card-body').show();
+        $("#" + card_id).children().children('.btn_bottom_left').show();
         $('.modal').modal("hide");
     }
 
@@ -164,6 +174,8 @@ function changeCategory(element_id, new_category, card_id, mod_id, seas_drop_id,
             "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeCategory(\"" + element_id + "\", \"" + dropped + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Dropped</a>"
         );
         $("#" + card_id).prependTo(".PLAN_TO_WATCH");
+        $("#" + card_id).children('.card-body').hide();
+        $("#" + card_id).children().children('.btn_bottom_left').hide();
         $('.modal').modal("hide");
     }
 

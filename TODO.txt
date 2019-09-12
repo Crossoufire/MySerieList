@@ -3,13 +3,12 @@
 Account/Account settings:
 	Change settings page (80% done)
 	Last updated books/anime/series for friends list
-	Possibility to display/hide the score by default for grid lists
-	Possibility to select a default view for the lists
+	Possibility to display/hide the score by default for the lists
 
 Autocomplete:
 	Add year in the results (50% done)
 	Check the style of the selector (50% done)
-	Add "more results"
+	Add a "more results"
 
 Achievements:
 	HTML improvements (85%)
@@ -17,11 +16,7 @@ Achievements:
 	Add description inside the page
 
 Medialist:
-	Add anime movies
-	Add ZOOM for medialists (done on bookslist but shady), difficult to implement
-	Add an element without refreshing (ajax method)
 	Modify the category's style selector modal
-	Remove Season / Episodes / Score footer / button to show it in PLAN TO WATCH
 	Add sorting option in the table view (on each table)
 	Add number of episode per season in the description modal
 	Add tab in the SeriesList / AnimeList to see directly achievement and stats about this specific list
