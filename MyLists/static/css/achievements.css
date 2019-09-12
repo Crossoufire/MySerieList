@@ -1,4 +1,13 @@
 
+.content .nav-pills .nav-link.active {
+    color: white;
+    background-color: #660000;
+}
+
+.content .nav-pills .nav-link {
+    color: white;
+}
+
 #achievements_tabs {
     margin-top: 30px;
 }

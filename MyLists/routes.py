@@ -1032,10 +1032,7 @@ def mymedialist(media_list, user_name):
                                join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
                                filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
         covers_path = url_for('static', filename='series_covers/')
-        user_achievements = get_achievements(user.id, ListType.SERIES)
-        stats = get_statistics(user.id, ListType.SERIES)
         media_all_data = get_all_media_data(element_data, ListType.SERIES, covers_path)
-        media_value = "series_achievements"
     elif media_list == "animelist":
         # Get anime data
         element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
@@ -1048,10 +1045,7 @@ def mymedialist(media_list, user_name):
                                 join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
                                 filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
         covers_path = url_for('static', filename='animes_covers/')
-        user_achievements = get_achievements(user.id, ListType.ANIME)
-        stats = get_statistics(user.id, ListType.ANIME)
         media_all_data = get_all_media_data(element_data, ListType.ANIME, covers_path)
-        media_value = "anime_achievements"
     elif media_list == "movieslist":
         # Get movies data
         element_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre.distinct()),
@@ -1062,9 +1056,6 @@ def mymedialist(media_list, user_name):
                             filter(MoviesList.user_id == user.id).group_by(Movies.id).order_by(Movies.name.asc())
         covers_path = url_for('static', filename='movies_covers/')
         media_all_data = get_all_media_data(element_data, ListType.MOVIES, covers_path)
-        user_achievements = get_achievements(user.id, ListType.ANIME)
-        stats = get_statistics(user.id, ListType.ANIME)
-        media_value = "anime_achievements"
     else:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
@@ -1080,13 +1071,7 @@ def mymedialist(media_list, user_name):
                                first_air_date=media_all_data[5],
                                media_list=media_list,
                                target_user_name=user_name,
-                               target_user_id=str(user.id),
-                               data=user_achievements,
-                               media_value=media_value,
-                               x_abs=stats[0],
-                               y_abs=stats[1],
-                               y_abs_2=stats[2],
-                               y_abs_3=stats[3])
+                               target_user_id=str(user.id))
     elif media_list == "movieslist":
         return render_template('mymedialist.html',
                                title="{}'s {}".format(user_name, media_list),
@@ -1096,13 +1081,7 @@ def mymedialist(media_list, user_name):
                                prod_companies=media_all_data[2],
                                media_list=media_list,
                                target_user_name=user_name,
-                               target_user_id=str(user.id),
-                               data=user_achievements,
-                               media_value=media_value,
-                               x_abs=stats[0],
-                               y_abs=stats[1],
-                               y_abs_2=stats[2],
-                               y_abs_3=stats[3])
+                               target_user_id=str(user.id))
 
 
 @app.route('/update_element_season', methods=['POST'])
