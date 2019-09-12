@@ -16,7 +16,11 @@
                 <img height='50' width='50' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}"
                  src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
                 {% if user_id != current_user.get_id() %}
-                    <button class="btn btn-sm btn-dark" onclick="follow('{{ data['id'] }}')">Follow</button>
+                    {% if data["isfollowing"] %}
+                    <button class="btn btn-sm btn-dark follow_button" onclick="unfollow('{{ data['id'] }}')">Unfollow</button>
+                    {% else %}
+                    <button class="btn btn-sm btn-dark follow_button" onclick="follow('{{ data['id'] }}')">Follow</button>
+                    {% endif %}
                 {% endif %}
             </h2>
             <div><b>Ranking: &nbsp #12/24</b></div>

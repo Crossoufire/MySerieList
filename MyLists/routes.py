@@ -452,6 +452,12 @@ def account(user_name):
     account_data["username"] = user_name
     account_data["follows"] = follows_list_data
 
+    if user.id != current_user.get_id():
+        if Follow.query.filter_by(user_id=current_user.get_id(), follow_id=user.id).first() is None:
+            account_data["isfollowing"] = False
+        else:
+            account_data["isfollowing"] = True
+
     # Recover the profile picture
     profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
     account_data["profile_picture"] = profile_picture
@@ -828,13 +834,14 @@ def follow():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the follow ID exist in the User database
-    if User.query.filter_by(user_id=follow_id).first() is None:
+    if User.query.filter_by(id=follow_id).first() is None:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Add the new follow to the current user
     new_follow = Follow(user_id=current_user.get_id(),
                         follow_id=follow_id)
     db.session.add(new_follow)
+    db.session.commit()
     app.logger.info('[{}] follow the user with ID {}'.format(current_user.get_id(), follow_id))
 
     return '', 204

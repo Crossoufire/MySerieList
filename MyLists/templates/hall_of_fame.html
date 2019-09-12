@@ -143,10 +143,13 @@
                     <br>
                     {{ user['knowledge_level'] }}
                 </td>
-                {% if user["isfollowing"] %}
-                    <td><i class="fas fa-user-friends"></i></td>
-                    <td><a class="fas fa-user-plus" onclick="follow('{{ user['id'] }}')"></a></td>
-                {% endif %}
+                <td>
+                    {% if user["isfollowing"] %}
+                        <button id="button_{{ user['id'] }}" class="btn btn-sm btn-dark" onclick="unfollow('{{ user['id'] }}', 'button_{{ user['id'] }}')">Unfollow</button>
+                    {% else %}
+                        <button id="button_{{ user['id'] }}" class="btn btn-sm btn-primary" onclick="follow('{{ user['id'] }}', 'button_{{ user['id'] }}')">Follow</button>
+                    {% endif %}
+                </td>
             {% endif %}
             </tr>
         {% endfor %}

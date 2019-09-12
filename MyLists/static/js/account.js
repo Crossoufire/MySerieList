@@ -1,6 +1,8 @@
 
 function follow(follow_id) {
     // the follow button has to change to "unfollow";
+    $('.follow_button').text('Unfollow');
+    $('.follow_button').attr('onclick', 'unfollow('+follow_id+')');
 
     $.ajax ({
         type: "POST",
@@ -15,7 +17,9 @@ function follow(follow_id) {
 
 
 function unfollow(follow_id) {
-    // the follow button has to change to "follow";
+    // the unfollow button has to change to "follow";
+    $('.follow_button').text('Follow');
+    $('.follow_button').attr('onclick', 'follow('+follow_id+')');
 
     $body = $("body");
     $.ajax ({
