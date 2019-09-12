@@ -11,21 +11,22 @@
 
 
 {% block content %}
-<div class="d-flex flex-wrap m-t-15 m-b-20">
+<div class="row m-t-15 m-b-20">
     {% if target_user_id == current_user.get_id() %}
-    <div>
+    <div class="col text-left">
         {% if media_list == "movieslist" %}
         <input class="form-control text-light add_element" placeholder="Add a Movie" type="text" id="autocomplete" onfocus="this.value=''"/>
-        <input type="hidden" id="element_id" value=""/>
         {% elif media_list == "animelist" %}
         <input  class="form-control text-light add_element" placeholder="Add an Anime" type="text" id="autocomplete" onfocus="this.value=''"/>
-        <input type="hidden" id="element_id" value=""/>
         {% elif media_list == "serieslist" %}
         <input  class="form-control text-light add_element" placeholder="Add a Series" type="text" id="autocomplete" onfocus="this.value=''"/>
-        <input type="hidden" id="element_id" value=""/>
         {% endif %}
+        <input type="hidden" id="element_id" value=""/>
     </div>
     {% endif %}
+    <div class="col text-right">
+        <input type="text" id="myElementFilter" class="form-control add_element" onkeyup="searchElement()" placeholder="Search by name">
+    </div>
 </div>
 <div class="d-flex flex-wrap filters-button-group" style="justify-content: center;">
     {% if media_list != 'movieslist' %}
@@ -42,9 +43,9 @@
     <button class="btn btn-sm btn-light text-dark" data-filter="#PLAN_TO_WATCH">Plan to Watch</button>
     {% endif %}
 </div>
-<div class="categories-iso">
+<div id="categories-iso" class="categories-iso">
     {% for category in all_data %}
-    <div class="categories" id="{{ category[1] }}" style="width: 100%;">
+    <div id="{{ category[1] }}" class="categories" style="width: 100%;">
         {% if category[1] == 'ON_HOLD' %}
         <h2 class="font-weight-light text-center pt-5 mb-0 category-title">ON HOLD</h2>
         {% elif category[1] == 'PLAN_TO_WATCH' %}

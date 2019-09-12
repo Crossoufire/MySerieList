@@ -834,6 +834,13 @@
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
+                        {{ form.movies_csv.label }}<br>
+                        {{ form.movies_csv(size=32) }}<br>
+                        {% for error in form.movies_csv.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <div class="m-t-30">
                         {{ form.submit_account(class="btn btn-outline-info custom-btn-size p-r-6 p-l-6") }}
                         <a class="btn btn-outline-info custom-btn-size p-r-6 p-l-6" href="{{ url_for('change_password') }}" role="button">Change password?</a>
                     </div>

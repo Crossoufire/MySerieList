@@ -14,7 +14,6 @@ from flask import render_template, url_for, flash, redirect, request, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from sqlalchemy import func
-
 from MyLists import app, db, bcrypt, mail, config
 from MyLists.admin_views import User
 from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, ChangePasswordForm, AddFriendForm, \
@@ -352,6 +351,9 @@ def account(user_name):
             app.logger.info(
                 '[{}] Settings updated : old picture file = {}, new picture file = {}'.format(user.id, old_picture_file,
                                                                                               user.image_file))
+        if form.movies_csv.data:
+            movies_csv_path = save_movies_csv(form.movies_csv.data)
+            get_movies_from_csv(movies_csv_path, ListType.MOVIES)
         if form.username.data != user.username:
             old_username = user.username
             user.username = form.username.data
@@ -3291,6 +3293,13 @@ def save_profile_picture(form_picture):
     return picture_fn
 
 
+def save_movies_csv(movies_csv):
+    random_hex = secrets.token_hex(8)
+    movies_csv.save(os.path.join(app.root_path, 'static/movies_csv/', random_hex+".csv"))
+
+    return os.path.join(app.root_path, 'static/movies_csv/', random_hex+".csv")
+
+
 def add_friend(friend_username):
     friend_to_add = User.query.filter_by(username=friend_username).first()
     if friend_to_add is None or friend_to_add.id == 1:
@@ -3434,3 +3443,33 @@ def refresh_db_achievements():
         achievements[i-1].description = list_all_achievements[i][5]
         achievements[i-1].type        = list_all_achievements[i][6]
         achievements[i-1].genre       = genre
+
+
+def get_movies_from_csv(movies_csv_path, list_type):
+    if list_type == ListType.MOVIES:
+        all_movies_titles = []
+        with open(movies_csv_path, 'r') as fp:
+            for line in fp:
+                line = line.strip()
+                line = line.lower()
+                all_movies_titles.append(line)
+
+        # Remove the the 'title' column name
+        all_movies_titles.pop(0)
+        # Only differents files name (forbids duplicate)
+        all_movies_titles = list(set(all_movies_titles))
+
+        if len(all_movies_titles) > 1000:
+            return flash("The csv file can't contain more than 1000 movies at a time.", "danger")
+
+
+
+        for movie in all_movies_titles:
+            time.sleep(0.5)
+            try:
+                response = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}".format(themoviedb_api_key, movie))
+                data = json.loads(response.text)
+                movie_id = data["results"][0]["id"]
+                add_element(movie_id, ListType.MOVIES)
+            except:
+                pass

@@ -27,6 +27,7 @@ body.loading .modal_loading {
 }
 
 .add_element {
+    display: inline-block;
     width: 220px;
     border-top: 0px;
     border-left: 0px;
