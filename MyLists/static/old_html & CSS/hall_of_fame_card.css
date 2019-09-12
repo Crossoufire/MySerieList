@@ -1,0 +1,40 @@
+
+.profile_picture {
+    width: 100px;
+    height: 100px;
+}
+
+.grade_picture {
+    width: 40px;
+    height: 40px;
+}
+
+.row {
+    background: #21263b;
+    border: black 1px solid;
+    width: 800px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: 103px;
+}
+
+.col {
+    margin: auto;
+    padding: 0px;
+}
+
+.hof_container {
+    max-width: 760px;
+}
+
+.skewed {
+    transform: skew(-15deg);
+    -webkit-transform: skew(-15deg);
+    -moz-transform: skew(-15deg);
+}
+
+.deskewed {
+    transform: skew(15deg);
+    -webkit-transform: skew(15deg);
+    -moz-transform: skew(15deg);
+}

@@ -1,6 +1,6 @@
 from flask_admin import expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
-from MyLists.models import User, Friend, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, SeriesNetwork, \
+from MyLists.models import User, Follow, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, SeriesNetwork, \
     Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork
 from MyLists import db, app
 from flask_login import current_user
@@ -18,15 +18,15 @@ class UserAdminView(ModelView):
     list_template = 'admin/user.html'
 
 
-class FriendAdminView(ModelView):
+class FollowAdminView(ModelView):
 
     def is_accessible(self):
         return current_user.get_id() == '1'
 
-    column_list = ('user_id', 'friend_id', 'status')
-    column_searchable_list = ('user_id', 'friend_id', 'status')
-    column_sortable_list = ('user_id', 'friend_id', 'status')
-    list_template = 'admin/friend.html'
+    column_list = ('user_id', 'follow_id')
+    column_searchable_list = ('user_id', 'follow_id')
+    column_sortable_list = ('user_id', 'follow_id')
+    list_template = 'admin/follow.html'
 
 
 ######################################################## SERIES ########################################################
@@ -196,10 +196,10 @@ admin.add_view(UserAdminView(model=User,
                              name="User",
                              endpoint='user'))
 
-admin.add_view(FriendAdminView(model=Friend,
+admin.add_view(FollowAdminView(model=Follow,
                                session=db.session,
-                               name="Friend",
-                               endpoint='friend'))
+                               name="Follow",
+                               endpoint='follow'))
 
 admin.add_view(SeriesAdminView(model=Series,
                                session=db.session,

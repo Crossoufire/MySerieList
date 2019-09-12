@@ -15,11 +15,13 @@
             <h2 class="text-center">{{ data['username'] }}
                 <img height='50' width='50' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}"
                  src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
-                <button class="btn btn-sm btn-dark">Follow</button>
+                {% if user_id != current_user.get_id() %}
+                    <button class="btn btn-sm btn-dark" onclick="follow('{{ data['id'] }}')">Follow</button>
+                {% endif %}
             </h2>
             <div><b>Ranking: &nbsp #12/24</b></div>
             <div><b>Joined: &nbsp 04/06/2018</b></div>
-            <div><b>12 &nbsp Followers</b></div>
+            <div><b>12&nbsp Followers</b></div>
         </div>
     </div>
 </div>
@@ -130,11 +132,11 @@
                         <h4><i class="fas fa-rss"></i>&nbsp&nbsp Following (4)</h4>
                         <hr>
                         <ul class="p-l-0" style="max-height: 190px; overflow-y: scroll;">
-                            {% for friend in data["friends"] %}
+                            {% for follow in data["follows"] %}
                             <li class="m-l-13 m-r-13 m-b-13" style="display: inline-block;">
-                                <a href="/account/{{ friend['username'] }}">
-                                    <img style="border-radius: 50%;" height="60" width="60" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
-                                    <div style="color: white;" class="text-center" id="{{ friend['user_id'] }}">{{ friend['username'] }}</div>
+                                <a href="/account/{{ follow['username'] }}">
+                                    <img style="border-radius: 50%;" height="60" width="60" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}"/><br>
+                                    <div style="color: white;" class="text-center" id="{{ follow['user_id'] }}">{{ follow['username'] }}</div>
                                 </a>
                             </li>
                             {% endfor %}
@@ -399,6 +401,9 @@
                                             <span class="stat_text">{{ data['movies']['total_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
+                                            <span class="stat_text"></span>
+                                        </div>
+                                        <div class="col p-l-0 position">
                                             <span class="stat_text"></span>
                                         </div>
                                     </div>
@@ -759,12 +764,24 @@
             </div>
             <div class="vertical_line"></div>
             <div class="col-6">
-                <ul class="p-l-20">
-                    {% for friend in data["friends"] %}
+                {% if user_id == current_user.get_id() %}
+                <form method="POST" action="" enctype="multipart/form-data">
+                    {{ follow_form.hidden_tag() }}
+                    <div>
+                        {{ follow_form.follow_to_add(class='form-control', placeholder='Username') }}<br>
+                        {% for error in follow_form.follow_to_add.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                        {{ follow_form.submit_follow(class="btn btn-outline-info p-r-6 p-l-6") }}
+                    </div>
+                </form>
+                {% endif %}
+                <ul class="m-t-20 p-l-20">
+                    {% for follow in data["follows"] %}
                     <li class="m-r-22 m-l-22" style="display: inline-block;">
-                        <a href="/account/{{ friend['username'] }}">
-                            <img style="border-radius: 50%;" height="100" width="100" src="{{ url_for('static', filename='profile_pics/') }}{{ friend['picture'] }}"/><br>
-                            <div style="color: white;" class="text-center" id="{{ friend['user_id'] }}">{{ friend['username'] }}</div>
+                        <a href="/account/{{ follow['username'] }}">
+                            <img style="border-radius: 50%;" height="100" width="100" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}"/><br>
+                            <div style="color: white;" class="text-center" id="{{ follow['user_id'] }}">{{ follow['username'] }}</div>
                         </a>
                     </li>
                     {% endfor %}
@@ -794,241 +811,134 @@
     {% if user_id == current_user.get_id() %}
     <div id="settings_tab" class="tab-pane fade">
         <div class="row text-center m-t-50">
-            <div class="col-2"></div>
-            <div class="col-4">
+            <div class="col-md-2"></div>
+            <div class="col-md-4">
                 <h4><i class="fas fa-sliders-h"></i>&nbsp&nbsp General settings</h4>
                 <hr>
                 <form method="POST" action="" enctype="multipart/form-data">
-                    {{ form.hidden_tag() }}
+                    {{ settings_form.hidden_tag() }}
                     <div class="m-t-30">
-                        {{ form.username.label }}<br>
-                        {{ form.username(size=32) }}<br>
-                        {% for error in form.username.errors %}
+                        {{ settings_form.username.label }}<br>
+                        {{ settings_form.username() }}<br>
+                        {% for error in settings_form.username.errors %}
                         <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
-                        {{ form.email.label }}<br>
-                        {{ form.email(size=32) }}<br>
-                        {% for error in form.email.errors %}
+                        {{ settings_form.email.label }}<br>
+                        {{ settings_form.email() }}<br>
+                        {% for error in settings_form.email.errors %}
                         <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
-                        {{ form.homepage.label }}: &nbsp&nbsp&nbsp {{ form.homepage }}<br>
-                        {% for error in form.homepage.errors %}
+                        {{ settings_form.homepage.label }}: &nbsp&nbsp&nbsp {{ settings_form.homepage }}<br>
+                        {% for error in settings_form.homepage.errors %}
                         <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
-                        {{ form.isprivate.label }}: &nbsp&nbsp&nbsp {{ form.isprivate(size=32) }}<br>
-                        {% for error in form.isprivate.errors %}
+                        {{ settings_form.isprivate.label }}: &nbsp&nbsp&nbsp {{ settings_form.isprivate() }}<br>
+                        {% for error in settings_form.isprivate.errors %}
                         <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
-                        {{ form.picture.label }}<br>
-                        {{ form.picture(size=32) }}<br>
-                        {% for error in form.picture.errors %}
+                        {{ settings_form.picture.label }}<br>
+                        {{ settings_form.picture() }}<br>
+                        {% for error in settings_form.picture.errors %}
                         <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
-                        {{ form.movies_csv.label }}<br>
-                        {{ form.movies_csv(size=32) }}<br>
-                        {% for error in form.movies_csv.errors %}
+                        {{ settings_form.movies_csv.label }}<br>
+                        {{ settings_form.movies_csv() }}<br>
+                        {% for error in settings_form.movies_csv.errors %}
                         <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
-                        {{ form.submit_account(class="btn btn-outline-info custom-btn-size p-r-6 p-l-6") }}
-                        <a class="btn btn-outline-info custom-btn-size p-r-6 p-l-6" href="{{ url_for('change_password') }}" role="button">Change password?</a>
+                        {{ settings_form.submit_account(class="btn btn-outline-info custom-btn-size p-r-6 p-l-6") }}
                     </div>
                 </form>
             </div>
             <div class="vertical_line"></div>
-            <div class="col-4">
+            <div class="col-md-4">
                 <h4><i class="fas fa-unlock-alt"></i>&nbsp&nbsp Change your password</h4>
                 <hr>
                 <form method="POST" action="" enctype="multipart/form-data">
-                    {{ form.hidden_tag() }}
+                    {{ password_form.hidden_tag() }}
                     <div class="m-t-30">
-                        {{ form.username.label }}<br>
-                        {{ form.username(size=32) }}<br>
-                        {% for error in form.username.errors %}
+                        {{ password_form.current_password.label }}<br>
+                        {{ password_form.current_password() }}<br>
+                        {% for error in password_form.current_password.errors %}
                         <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
-                        {{ form.email.label }}<br>
-                        {{ form.email(size=32) }}<br>
-                        {% for error in form.email.errors %}
+                        {{ password_form.new_password.label }}<br>
+                        {{ password_form.new_password() }}<br>
+                        {% for error in password_form.new_password.errors %}
                         <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
-                        {{ form.homepage.label }}: &nbsp&nbsp&nbsp {{ form.homepage }}<br>
-                        {% for error in form.homepage.errors %}
+                        {{ password_form.confirm_new_password.label }}<br>
+                        {{ password_form.confirm_new_password() }}<br>
+                        {% for error in password_form.confirm_new_password.errors %}
                         <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
-                        {{ form.isprivate.label }}: &nbsp&nbsp&nbsp {{ form.isprivate(size=32) }}<br>
-                        {% for error in form.isprivate.errors %}
-                        <span style="color: red;">[{{ error }}]</span>
-                        {% endfor %}
-                    </div>
-                    <div class="m-t-30">
-                        {{ form.picture.label }}<br>
-                        {{ form.picture(size=32) }}<br>
-                        {% for error in form.picture.errors %}
-                        <span style="color: red;">[{{ error }}]</span>
-                        {% endfor %}
-                    </div>
-                    <div class="m-t-30">
-                        {{ form.submit_account(class="btn btn-outline-info custom-btn-size p-r-6 p-l-6") }}
-                        <a class="btn btn-outline-info custom-btn-size p-r-6 p-l-6" href="{{ url_for('change_password') }}" role="button">Change password?</a>
+                        {{ password_form.submit_password(class="btn btn-outline-info custom-btn-size p-r-6 p-l-6") }}
                     </div>
                 </form>
             </div>
-            <div class="col-2"></div>
+            <div class="col-md-2"></div>
         </div>
     </div>
     {% endif %}
 </div>
-
-<!------------------- Add friend modal ------------------------>
-{% if user_id == current_user.get_id() %}
-<div class="modal fade" id="addFriendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <form method="POST" action="">
-                {{ form_friends.hidden_tag() }}
-                <h5 class="border-bottom p-t-20 p-b-15 text-center"><b>Add a Friend</b></h5>
-                <div class="form-group m-l-40 m-r-40 m-t-15">
-                    {% if form_friends.friend_to_add.errors %}
-                    {{ form_friends.friend_to_add(class="form-control form-control is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form_friends.friend_to_add.errors %}
-                        <span>{{ error }}</span> {% endfor %}
-                    </div>
-                    {% else %}
-                    {{ form_friends.friend_to_add(class="form-control", placeholder="Username", onfocus="this.value=''") }}
-                    {% endif %}
-                </div>
-                <div class="form-group m-l-20 m-r-20 text-center">
-                    {{ form_friends.submit(class="btn btn-sm btn-outline-info") }}
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endif %}
 
 <div class="modal_loading"></div>
 {% endblock content %}
 
 
 {% block script %}
-<!--------- Main Javascript ---------->
-<script type="text/javascript">
-function delete_friend(friend_id, td_id) {
-    if (!confirm("Are you sure you want to delete this friend from your list?")){
-        return false;
-    }
-    $("#"+td_id).remove();
-    $body = $("body");
-    $.ajax ({
-        type: "POST",
-        url: "/delete_friend",
-        contentType: "application/json",
-        data: JSON.stringify({delete: friend_id}),
-        dataType: "json",
-        success: function(response) {
-            console.log("ok"); }
-    });
-}
+<script src="{{ url_for('static', filename='js/account.js') }}" ></script>
+<!------- Lists levels animations --------->
+<script>
+$(".xp-increase-fx-flicker").css("opacity", "1");
+$(".xp-increase-fx-flicker").animate({"opacity":Math.random()}, 100);
+$(".xp-increase-fx").css("display", "inline-block");
 
+$("#xp-bar-fill-series").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
+setTimeout(function() {
+    $("#xp-bar-fill-series").css("-webkit-transition", "all 2s ease");
+    $("#xp-bar-fill-series").css("width", "{{ data['series_percent'] }}%");
+}, 100);
+setTimeout(function(){
+    $(".xp-increase-fx").fadeOut(500);
+    $("#xp-bar-fill-series").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
+}, 2000);
 
-function friend_request(friend_id, value) {
-    $.ajax ({
-        type: "POST",
-        url: "/friend_request",
-        contentType: "application/json",
-        data: JSON.stringify({response: friend_id, request: value }),
-        dataType: "json",
-        success: function(response) {
-            window.location.replace('/account/{{ current_user.username }}'); }
-    });
-}
-</script>
+$("#xp-bar-fill-movies").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
+setTimeout(function() {
+    $("#xp-bar-fill-movies").css("-webkit-transition", "all 2s ease");
+    $("#xp-bar-fill-movies").css("width", "{{ data['movies_percent'] }}%");
+}, 100);
+setTimeout(function(){
+    $(".xp-increase-fx").fadeOut(500);
+    $("#xp-bar-fill-movies").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
+}, 2000);
 
-<!--------- Tooltip Javascript ------------>
-<script type="text/javascript">
-$('.value').each(function() {
-	var text = $(this).attr('id');
-    $(this).parent().css('width', text);
-});
-
-$('.block').tooltip();
-// Tooltips Initialization
-$(function () {
-$('[data-toggle="tooltip"]').tooltip()
-})
-
-$('.block_no_data').tooltip();
-// Tooltips Initialization
-$(function () {
-$('[data-toggle="tooltip"]').tooltip()
-})
-</script>
-
-<!--------- Level XP Javascript ----------->
-<script type="text/javascript">
-$(document).ready(function(){
-    $body = $("body");
-    $body.addClass("loading");
-    $(document).click(function() {
-        $body.removeClass("loading");
-    });
-});
-
-$(document).ready(function(){
-    $(".xp-increase-fx-flicker").css("opacity", "1");
-    $(".xp-increase-fx-flicker").animate({"opacity":Math.random()}, 100);
-    $(".xp-increase-fx").css("display", "inline-block");
-
-
-    $("#xp-bar-fill-series").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
-    setTimeout(function() {
-        $("#xp-bar-fill-series").css("-webkit-transition", "all 2s ease");
-        $("#xp-bar-fill-series").css("width", "{{ data['series_percent'] }}%");
-    }, 100);
-    setTimeout(function(){
-        $(".xp-increase-fx").fadeOut(500);
-        $("#xp-bar-fill-series").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-    }, 40*parseFloat({{ data['series_percent'] }}));
-
-
-    $("#xp-bar-fill-movies").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
-    setTimeout(function() {
-        $("#xp-bar-fill-movies").css("-webkit-transition", "all 2s ease");
-        $("#xp-bar-fill-movies").css("width", "{{ data['movies_percent'] }}%");
-    }, 100);
-    setTimeout(function(){
-        $(".xp-increase-fx").fadeOut(500);
-        $("#xp-bar-fill-movies").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-    }, 40*parseFloat({{ data['movies_percent'] }}));
-
-
-    $("#xp-bar-fill-anime").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
-    setTimeout(function() {
-        $("#xp-bar-fill-anime").css("-webkit-transition", "all 2s ease");
-        $("#xp-bar-fill-anime").css("width", "{{ data['anime_percent'] }}%");
-    }, 100);
-    setTimeout(function() {
-        $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-anime").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-    }, 40*parseFloat({{ data['anime_percent'] }}));
-});
+$("#xp-bar-fill-anime").css("box-shadow", /*"0px 0px 15px #06f, */ "-5px 0px 10px #fff inset");
+setTimeout(function() {
+    $("#xp-bar-fill-anime").css("-webkit-transition", "all 2s ease");
+    $("#xp-bar-fill-anime").css("width", "{{ data['anime_percent'] }}%");
+}, 100);
+setTimeout(function() {
+    $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-anime").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
+}, 2000);
 </script>
 {% endblock %}

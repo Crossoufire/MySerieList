@@ -1,7 +1,6 @@
 
 --------------------------------------------------- TO DO ---------------------------------------------------
-Account/Account settings:
-	Change settings page (80% done)
+Account:
 	Last updated books/anime/series for friends list
 	Possibility to display/hide the score by default for the lists
 
@@ -16,17 +15,15 @@ Achievements:
 	Add description inside the page
 
 Medialist:
-	Modify the category's style selector modal
-	Add sorting option in the table view (on each table)
-	Add number of episode per season in the description modal
-	Add tab in the SeriesList / AnimeList to see directly achievement and stats about this specific list
+	Modify the category selector style (modal)
+	Add episodes per season in the metadata modal
 	Possibility to edit metadata
-	Change modal info
-	Option to import a CSV file
+	Remove the homepage info
+	Option to import a CSV file (for movies)
 
 Hall of Fame:
 	Change the style
 
 Statistics:
-	Stats improvements (40%)
+	Add stats + CSS (30%)
 

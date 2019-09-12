@@ -16,10 +16,10 @@ from flask_mail import Message
 from sqlalchemy import func
 from MyLists import app, db, bcrypt, mail, config
 from MyLists.admin_views import User
-from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, ChangePasswordForm, AddFriendForm, \
+from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, ChangePasswordForm, AddFollowForm, \
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
-    Friend, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, \
+    Follow, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, \
     Achievements, Movies, MoviesGenre, MoviesList, MoviesProd
 
 
@@ -327,67 +327,67 @@ def account(user_name):
     if user.id == 1 and current_user.id != 1:
         return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
-    # Check if the account is private or in the friends list
+    # Check if the account is private or in the follow list
     if current_user.id != user.id and current_user.id != 1:
-        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        follow = Follow.query.filter_by(user_id=current_user.get_id(), follow_id=user.id).first()
         if user.private:
-            if friend is None or friend.status != "accepted":
+            if follow is None:
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
-    # Form to add friends
-    add_friend_form = AddFriendForm()
-    if add_friend_form.validate_on_submit():
-        add_friend(add_friend_form.friend_to_add.data)
+    # Form to add follows
+    follow_form = AddFollowForm()
+    if follow_form.validate_on_submit():
+        add_follow(follow_form.follow_to_add.data)
 
     # Account settings form
-    form = UpdateAccountForm()
-    if form.validate_on_submit():
-        if form.picture.data:
-            picture_file = save_profile_picture(form.picture.data)
+    settings_form = UpdateAccountForm()
+    if settings_form.validate_on_submit():
+        if settings_form.picture.data:
+            picture_file = save_profile_picture(settings_form.picture.data)
             old_picture_file = user.image_file
             user.image_file = picture_file
             db.session.commit()
             app.logger.info(
                 '[{}] Settings updated : old picture file = {}, new picture file = {}'.format(user.id, old_picture_file,
                                                                                               user.image_file))
-        if form.movies_csv.data:
+        if settings_form.movies_csv.data:
             movies_csv_path = save_movies_csv(form.movies_csv.data)
             get_movies_from_csv(movies_csv_path, ListType.MOVIES)
-        if form.username.data != user.username:
+        if settings_form.username.data != user.username:
             old_username = user.username
-            user.username = form.username.data
+            user.username = settings_form.username.data
             db.session.commit()
             app.logger.info('[{}] Settings updated : old username = {}, new username = {}'.format(user.id, old_username,
                                                                                                   user.username))
-        if form.isprivate.data != user.private:
+        if settings_form.isprivate.data != user.private:
             old_value = user.private
-            user.private = form.isprivate.data
+            user.private = settings_form.isprivate.data
             db.session.commit()
             app.logger.info('[{}] Settings updated : old private mode = {}, new private mode = {}'.format(user.id,
                                                                                                           old_value,
                                                                                                           form.isprivate.data))
 
         old_value = user.homepage
-        if form.homepage.data == "msl":
+        if settings_form.homepage.data == "msl":
             user.homepage = HomePage.MYSERIESLIST
-        elif form.homepage.data == "mml":
+        elif settings_form.homepage.data == "mml":
             user.homepage = HomePage.MYMOVIESLIST
-        elif form.homepage.data == "mal":
+        elif settings_form.homepage.data == "mal":
             user.homepage = HomePage.MYANIMESLIST
-        elif form.homepage.data == "acc":
+        elif settings_form.homepage.data == "acc":
             user.homepage = HomePage.ACCOUNT
-        elif form.homepage.data == "hof":
+        elif settings_form.homepage.data == "hof":
             user.homepage = HomePage.HALL_OF_FAME
 
         db.session.commit()
         app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
                                                                                               old_value,
-                                                                                              form.homepage.data))
+                                                                                              settings_form.homepage.data))
         email_changed = False
-        if form.email.data != user.email:
+        if settings_form.email.data != user.email:
             old_email = user.email
-            user.transition_email = form.email.data
+            user.transition_email = settings_form.email.data
             db.session.commit()
             app.logger.info('[{}] Settings updated : old email = {}, new email = {}'.format(user.id, old_email,
                                                                                             user.transition_email))
@@ -407,40 +407,50 @@ def account(user_name):
                 flash("There was an error internal error. Please contact the administrator.", 'danger')
         return redirect(url_for('account', user_name=current_user.username))
     elif request.method == 'GET':
-        form.username.data = current_user.username
-        form.email.data = current_user.email
-        form.isprivate.data = current_user.private
+        settings_form.username.data = current_user.username
+        settings_form.email.data = current_user.email
+        settings_form.isprivate.data = current_user.private
 
         if current_user.homepage == HomePage.MYSERIESLIST:
-            form.homepage.data = "msl"
+            settings_form.homepage.data = "msl"
         elif current_user.homepage == HomePage.MYMOVIESLIST:
-            form.homepage.data = "mml"
+            settings_form.homepage.data = "mml"
         elif current_user.homepage == HomePage.MYANIMESLIST:
-            form.homepage.data = "mal"
+            settings_form.homepage.data = "mal"
         elif current_user.homepage == HomePage.ACCOUNT:
-            form.homepage.data = "acc"
+            settings_form.homepage.data = "acc"
         elif current_user.homepage == HomePage.HALL_OF_FAME:
-            form.homepage.data = "hof"
+            settings_form.homepage.data = "hof"
 
-    # Recover the friends list
-    friends_list = db.session.query(User, Friend).join(Friend, Friend.friend_id == User.id).\
-                                    filter(Friend.user_id == user.id).group_by(Friend.friend_id)\
+    # Change password form
+    password_form = ChangePasswordForm()
+    if password_form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(password_form.confirm_new_password.data).decode('utf-8')
+        current_user.password = hashed_password
+        db.session.commit()
+        app.logger.info('[{}] Password updated'.format(current_user.id))
+        flash('Your password has been successfully updated!', 'success')
+        return redirect(url_for('account', user_name=current_user.username))
+
+    # Recover the follows list
+    follows_list = db.session.query(User, Follow).join(Follow, Follow.follow_id == User.id).\
+                                    filter(Follow.user_id == user.id).group_by(Follow.follow_id)\
                                     .order_by(User.username)
 
-    friends_list_data = []
-    for friend in friends_list:
-        friend_data = {"username": friend[0].username,
-                       "user_id": friend[0].id,
-                       "status": friend[1].status,
-                       "picture": friend[0].image_file}
-        friends_list_data.append(friend_data)
+    follows_list_data = []
+    for follow in follows_list:
+        follow_data = {"username": follow[0].username,
+                       "user_id": follow[0].id,
+                       "picture": follow[0].image_file}
+        follows_list_data.append(follow_data)
 
     account_data = {}
     account_data["series"] = {}
     account_data["movies"] = {}
     account_data["anime"] = {}
+    account_data["id"] = user.id
     account_data["username"] = user_name
-    account_data["friends"] = friends_list_data
+    account_data["follows"] = follows_list_data
 
     # Recover the profile picture
     profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
@@ -569,9 +579,10 @@ def account(user_name):
     return render_template('account.html',
                            title="{}'s account".format(user.username),
                            data=account_data,
-                           form_friends=add_friend_form,
                            user_id=str(user.id),
-                           form=form)
+                           follow_form=follow_form,
+                           settings_form=settings_form,
+                           password_form=password_form)
 
 
 @app.route("/anime_achievements", methods=['GET'])
@@ -644,92 +655,6 @@ def knowledge_grade_data():
     return render_template('knowledge_grade_data.html', title='Knowledge grade data', data=data)
 
 
-@app.route("/account_settings", methods=['GET', 'POST'])
-@login_required
-def account_settings():
-    form = UpdateAccountForm()
-
-    user = User.query.filter_by(id=current_user.get_id()).first()
-
-    if form.validate_on_submit():
-        if form.picture.data:
-            picture_file = save_profile_picture(form.picture.data)
-            old_picture_file = user.image_file
-            user.image_file = picture_file
-            db.session.commit()
-            app.logger.info(
-                '[{}] Settings updated : old picture file = {}, new picture file = {}'.format(user.id, old_picture_file,
-                                                                                              user.image_file))
-        if form.username.data != user.username:
-            old_username = user.username
-            user.username = form.username.data
-            db.session.commit()
-            app.logger.info('[{}] Settings updated : old username = {}, new username = {}'.format(user.id, old_username,
-                                                                                                  user.username))
-        if form.isprivate.data != user.private:
-            old_value = user.private
-            user.private = form.isprivate.data
-            db.session.commit()
-            app.logger.info('[{}] Settings updated : old private mode = {}, new private mode = {}'.format(user.id,
-                                                                                                          old_value,
-                                                                                                          form.isprivate.data))
-        old_value = user.homepage
-        if form.homepage.data == "msl":
-            user.homepage = HomePage.MYSERIESLIST
-        elif form.homepage.data == "mml":
-            user.homepage = HomePage.MYMOVIESLIST
-        elif form.homepage.data == "mal":
-            user.homepage = HomePage.MYANIMESLIST
-        elif form.homepage.data == "acc":
-            user.homepage = HomePage.ACCOUNT
-        elif form.homepage.data == "hof":
-            user.homepage = HomePage.HALL_OF_FAME
-
-        db.session.commit()
-        app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
-                                                                                              old_value,
-                                                                                              form.homepage.data))
-        email_changed = False
-        if form.email.data != user.email:
-            old_email = user.email
-            user.transition_email = form.email.data
-            db.session.commit()
-            app.logger.info('[{}] Settings updated : old email = {}, new email = {}'.format(user.id, old_email,
-                                                                                            user.transition_email))
-            email_changed = True
-            if send_email_update_email(user):
-                success = True
-            else:
-                success = False
-                app.logger.error('[SYSTEM] Error while sending the email update email to {}'.format(user.email))
-        if not email_changed:
-            flash("Your account has been updated ! ", 'success')
-        else:
-            if success:
-                flash("Your account has been updated ! Please click on the link to validate your new email address.",
-                      'success')
-            else:
-                flash("There was an error internal error. Please contact the administrator.", 'danger')
-        return redirect(url_for('account', user_name=current_user.username))
-    elif request.method == 'GET':
-        form.username.data = current_user.username
-        form.email.data = current_user.email
-        form.isprivate.data = current_user.private
-
-        if current_user.homepage == HomePage.MYSERIESLIST:
-            form.homepage.data = "msl"
-        elif current_user.homepage == HomePage.MYMOVIESLIST:
-            form.homepage.data = "mml"
-        elif current_user.homepage == HomePage.MYANIMESLIST:
-            form.homepage.data = "mal"
-        elif current_user.homepage == HomePage.ACCOUNT:
-            form.homepage.data = "acc"
-        elif current_user.homepage == HomePage.HALL_OF_FAME:
-            form.homepage.data = "hof"
-
-    return render_template('account_settings.html', title='Account settings', form=form)
-
-
 @app.route("/email_update/<token>", methods=['GET'])
 @login_required
 def email_update_token(token):
@@ -751,40 +676,21 @@ def email_update_token(token):
     return redirect(url_for('home'))
 
 
-@app.route('/change_password', methods=['GET', 'POST'])
-@login_required
-def change_password():
-    form = ChangePasswordForm()
-    if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.confirm_new_password.data).decode('utf-8')
-        current_user.password = hashed_password
-        db.session.commit()
-        app.logger.info('[{}] Password updated'.format(current_user.id))
-        flash('Your password has been successfully updated!', 'success')
-        return redirect(url_for('account', user_name=current_user.username))
-
-    return render_template('change_password.html', form=form)
-
-
 @app.route("/hall_of_fame", methods=['GET'])
 @login_required
 def hall_of_fame():
     users = User.query.filter(User.id >= "2").filter_by(active=True).order_by(User.username.asc()).all()
 
-    current_user_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="accepted").all()
-    friends_list = []
-    for friend in current_user_friends:
-        friends_list.append(friend.friend_id)
-
-    current_user_pending_friends = Friend.query.filter_by(user_id=current_user.get_id(), status="request").all()
-    friends_pending_list = []
-    for friend in current_user_pending_friends:
-        friends_pending_list.append(friend.friend_id)
+    current_user_follows = Follow.query.filter_by(user_id=current_user.get_id()).all()
+    follows_list = []
+    for follow in current_user_follows:
+        follows_list.append(follow.follow_id)
 
     all_users_data = []
     for user in users:
         user_data = {}
         user_data["username"] = user.username
+        user_data["id"] = user.id
         user_data["profile_picture"] = user.image_file
 
         series_level = get_level_and_grade(user.time_spent_series)
@@ -811,15 +717,10 @@ def hall_of_fame():
         user_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
         user_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
 
-        if user.id in friends_list:
-            user_data["isfriend"] = True
-            user_data["ispendingfriend"] = False
+        if user.id in follows_list:
+            user_data["isfollowing"] = True
         else:
-            if user.id in friends_pending_list:
-                user_data["ispendingfriend"] = True
-            else:
-                user_data["ispendingfriend"] = False
-            user_data["isfriend"] = False
+            user_data["isfollowing"] = False
 
         if user.id == current_user.id:
             user_data["isprivate"] = False
@@ -847,13 +748,13 @@ def achievements(user_name):
     if user.id == 1 and current_user.id != 1:
         return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
-    # Check if the account is private / in the friendslist
+    # Check if the account is private / in the follow list
     if current_user.id != user.id and current_user.id != 1:
-        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        follow = Follow.query.filter_by(user_id=current_user.get_id(), follow_id=user.id).first()
         if user.private:
             if current_user.get_id() == "1":
                 pass
-            elif friend is None or friend.status != "accepted":
+            elif follow is None:
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
@@ -885,13 +786,13 @@ def statistics(user_name):
     if user.id == 1 and current_user.id != 1:
         return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
-    # Check if the account is private / in the friendslist
+    # Check if the account is private / in the follow list
     if current_user.id != user.id and current_user.id != 1:
-        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        follow = Follow.query.filter_by(user_id=current_user.get_id(), follow_id=user.id).first()
         if user.private:
             if current_user.get_id() == "1":
                 pass
-            elif friend is None or friend.status != "accepted":
+            elif follow is None:
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
@@ -916,82 +817,47 @@ def anonymous():
     return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
 
-@app.route("/add_friend_hof", methods=['POST'])
+@app.route("/follow", methods=['POST'])
 @login_required
-def add_friend_hof():
+def follow():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        user_name = json_data['user_name']
+        follow_id = int(json_data['follow'])
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    add_friend(user_name)
+    # Check if the follow ID exist in the User database
+    if User.query.filter_by(user_id=follow_id).first() is None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Add the new follow to the current user
+    new_follow = Follow(user_id=current_user.get_id(),
+                        follow_id=follow_id)
+    db.session.add(new_follow)
+    app.logger.info('[{}] follow the user with ID {}'.format(current_user.get_id(), follow_id))
 
     return '', 204
 
 
-@app.route("/friend_request", methods=['POST'])
+@app.route('/unfollow', methods=['POST'])
 @login_required
-def friend_request():
+def unfollow():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        friend_id = int(json_data['response'])
-        value = json_data['request']
+        follow_id = int(json_data['unfollow'])
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    if value == "accept":
-        # Check if there is an actual pending request
-        user = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id, status="pending").first()
-        if user is None:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-        user.status = 'accepted'
-        db.session.commit()
-
-        user2 = Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id(), status="request").first()
-        if user2 is None:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-        user2.status = 'accepted'
-        db.session.commit()
-        app.logger.info('[{}] Friend request accepted from user with ID {}'.format(current_user.get_id(), friend_id))
-    elif value == "decline":
-        # Check if there is an actual pending request
-        # Otherwise delete the pending request
-        if not Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id, status="pending").delete():
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-        db.session.commit()
-
-        if not Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id(), status="request").delete():
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-        db.session.commit()
-        app.logger.info('[{}] Friend request declined from user with ID {}'.format(current_user.get_id(), friend_id))
-    else:
+    # Check if the unfollow is in the follow list
+    if Follow.query.filter_by(user_id=current_user.get_id(), follow_id=follow_id).first() is None:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    return '', 204
-
-
-@app.route('/delete_friend', methods=['POST'])
-@login_required
-def delete_friend():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data = request.get_json()
-        friend_id = int(json_data['delete'])
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the friend to delete is in the friend list
-    if Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id).first() is None:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Delete the friend
-    Friend.query.filter_by(user_id=current_user.get_id(), friend_id=friend_id).delete()
-    Friend.query.filter_by(user_id=friend_id, friend_id=current_user.get_id()).delete()
+    # Unfollow
+    Follow.query.filter_by(user_id=current_user.get_id(), follow_id=follow_id).delete()
     db.session.commit()
-    app.logger.info('[{}] Friend with ID {} deleted'.format(current_user.get_id(), friend_id))
+    app.logger.info('[{}] Follow with ID {} Unfollowed'.format(current_user.get_id(), follow_id))
 
     return '', 204
 
@@ -1011,11 +877,11 @@ def mymedialist(media_list, user_name):
 
     # Check if the current user can see the target user's list
     if current_user.id != user.id and current_user.id != 1:
-        friend = Friend.query.filter_by(user_id=current_user.get_id(), friend_id=user.id).first()
+        follow = Follow.query.filter_by(user_id=current_user.get_id(), follow_id=user.id).first()
         if user.id == 1:
             return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
         if user.private:
-            if friend is None or friend.status != "accepted":
+            if follow is None:
                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
 
@@ -3279,28 +3145,25 @@ def save_movies_csv(movies_csv):
     return os.path.join(app.root_path, 'static/movies_csv/', random_hex+".csv")
 
 
-def add_friend(friend_username):
-    friend_to_add = User.query.filter_by(username=friend_username).first()
-    if friend_to_add is None or friend_to_add.id == 1:
-        app.logger.info('[{}] Attempt of adding user {} as friend'.format(current_user.get_id(), friend_username))
+def add_follow(follow_username):
+    follow_to_add = User.query.filter_by(username=follow_username).first()
+    if follow_to_add is None or follow_to_add.id == 1:
+        app.logger.info('[{}] Attempt of adding user {} as follow'.format(current_user.get_id(), follow_username))
 
     else:
-        friends = Friend.query.filter_by(user_id=current_user.get_id()).all()
+        follows = Follow.query.filter_by(user_id=current_user.get_id()).all()
 
-        for friend in friends:
-            if friend_to_add.id == friend.friend_id:
-                return flash('Username already in your friend list', 'info')
+        for follow in follows:
+            if follow_to_add.id == follow.follow_id:
+                return flash('User already in your follow list', 'info')
 
-        add_user = Friend(user_id=current_user.get_id(), friend_id=friend_to_add.id, status="request")
-        db.session.add(add_user)
+        add_follow = Follow(user_id=current_user.get_id(),
+                            follow_id=follow_to_add.id)
+        db.session.add(add_follow)
         db.session.commit()
 
-        add_user_2 = Friend(user_id=friend_to_add.id, friend_id=current_user.get_id(), status="pending")
-        db.session.add(add_user_2)
-        db.session.commit()
-
-        app.logger.info('[{}] Friend request sent to user with ID {}'.format(current_user.get_id(), friend_to_add.id))
-        flash("Your friend request has been sent.", 'success')
+        app.logger.info('[{}] is following the user with ID {}'.format(current_user.get_id(), follow_to_add.id))
+        flash("Follow successfully added.", 'success')
 
 
 def send_reset_email(user):
