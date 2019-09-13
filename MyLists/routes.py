@@ -470,11 +470,12 @@ def account(user_name):
     profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
     account_data["profile_picture"] = profile_picture
 
-    # Time spent
+    # Time spent in hours
     account_data["series"]["time_spent_hour"] = round(user.time_spent_series/60)
     account_data["movies"]["time_spent_hour"] = round(user.time_spent_movies/60)
     account_data["anime"]["time_spent_hour"] = round(user.time_spent_anime/60)
 
+    # Time spent in days
     account_data["series"]["time_spent_day"] = round(user.time_spent_series/1440, 1)
     account_data["movies"]["time_spent_day"] = round(user.time_spent_movies/1440, 1)
     account_data["anime"]["time_spent_day"] = round(user.time_spent_anime/1440, 1)
@@ -508,7 +509,7 @@ def account(user_name):
     account_data["anime"]["plantowatch_count"]  = anime_count["plantowatch"]
     account_data["anime"]["total_count"]        = anime_count["total"]
 
-    # Count number of episodes for the series
+    # Count the total number of seen episodes for the series
     all_series_data = db.session.query(SeriesList, SeriesEpisodesPerSeason,
                    func.group_concat(SeriesEpisodesPerSeason.episodes)). \
                    join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
@@ -524,7 +525,7 @@ def account(user_name):
         nb_episodes_watched += element[0].last_episode_watched
     account_data["series"]["nb_ep_watched"] = nb_episodes_watched
 
-    # Count number of episodes for the anime
+    # Count the total number of seen episodes for the anime
     all_anime_data = db.session.query(AnimeList, AnimeEpisodesPerSeason,
                                       func.group_concat(AnimeEpisodesPerSeason.episodes)). \
                                       join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
@@ -566,7 +567,7 @@ def account(user_name):
                                                         (float(account_data["anime"]["dropped_count"]/account_data["anime"]["total_count"]))*100,
                                                         (float(account_data["anime"]["plantowatch_count"]/account_data["anime"]["total_count"]))*100]
 
-    # Grades and levels
+    # Grades and levels for each element
     series_level = get_level_and_grade(user.time_spent_series)
     account_data["series_level"] = series_level["level"]
     account_data["series_percent"] = series_level["level_percent"]

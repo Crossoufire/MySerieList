@@ -1,7 +1,7 @@
 
 --------------------------------------------------- TO DO ---------------------------------------------------
 Account:
-	Last updated books/anime/series for friends list
+	Last updates on  movies/anime/series for the follow list
 	Possibility to display/hide the score by default for the lists
 
 Autocomplete:
@@ -15,14 +15,11 @@ Achievements:
 	Add description inside the page
 
 Medialist:
+	Option to import a CSV file (for movies) (50%)
 	Modify the category selector style (modal)
 	Add episodes per season in the metadata modal
 	Possibility to edit metadata
 	Remove the homepage info
-	Option to import a CSV file (for movies)
-
-Hall of Fame:
-	Change the style
 
 Statistics:
 	Add stats + CSS (30%)
