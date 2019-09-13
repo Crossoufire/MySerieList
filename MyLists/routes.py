@@ -343,6 +343,14 @@ def account(user_name):
     # Account settings form
     settings_form = UpdateAccountForm()
     if settings_form.validate_on_submit():
+        if settings_form.biography.data:
+            user.biography = settings_form.biography.data
+            db.session.commit()
+            app.logger.info('[{}] - Biography updated'.format(user.id))
+        elif settings_form.biography.data == "":
+            user.biography = None
+            db.session.commit()
+            app.logger.info('[{}] - Biography updated'.format(user.id))
         if settings_form.picture.data:
             picture_file = save_profile_picture(settings_form.picture.data)
             old_picture_file = user.image_file
@@ -367,7 +375,6 @@ def account(user_name):
             app.logger.info('[{}] Settings updated : old private mode = {}, new private mode = {}'.format(user.id,
                                                                                                           old_value,
                                                                                                           form.isprivate.data))
-
         old_value = user.homepage
         if settings_form.homepage.data == "msl":
             user.homepage = HomePage.MYSERIESLIST
@@ -407,6 +414,7 @@ def account(user_name):
                 flash("There was an error internal error. Please contact the administrator.", 'danger')
         return redirect(url_for('account', user_name=current_user.username))
     elif request.method == 'GET':
+        settings_form.biography.data = current_user.biography
         settings_form.username.data = current_user.username
         settings_form.email.data = current_user.email
         settings_form.isprivate.data = current_user.private
@@ -588,7 +596,8 @@ def account(user_name):
                            user_id=str(user.id),
                            follow_form=follow_form,
                            settings_form=settings_form,
-                           password_form=password_form)
+                           password_form=password_form,
+                           user_biography=user.biography)
 
 
 @app.route("/anime_achievements", methods=['GET'])
@@ -609,20 +618,22 @@ def level_grade_data():
         for line in fp:
             all_ranks_list.append(line.split(";"))
 
+    all_ranks_list.pop(0)
+
     i, low, incr = [0, 0, 0]
     data = []
     while True:
         rank = all_ranks_list[i][2]
-        if i == len(all_ranks_list)-2:
-            data.append(["General_Grade_4", "General Grade 4", [124, "+"], [(25*low)*(1+low), "+"], [int(((25*low)*(1+low))/60), "+"]])
+        if rank == 'ReachRank49':
+            data.append(["ReachRank49", "Inheritor", [147, "+"], [(20*low)*(1+low), "+"], [int(((20*low)*(1+low))/60), "+"]])
             break
         for j in range(i, len(all_ranks_list)):
             if str(rank) == all_ranks_list[j][2]:
                 incr += 1
             else:
                 data.append([rank, all_ranks_list[j-1][3], [low, incr-1],
-                             [(25*low)*(1+low), ((25*incr)*(1+incr))-1],
-                             [int(((25*low)*(1+low))/60), int((((25*incr)*(1+incr))-1)/60)]])
+                             [(20*low)*(1+low), ((20*incr)*(1+incr))-1],
+                             [int(((20*low)*(1+low))/60), int((((20*incr)*(1+incr))-1)/60)]])
                 i = j
                 low = incr
                 break

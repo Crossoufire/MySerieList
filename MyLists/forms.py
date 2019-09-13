@@ -1,5 +1,5 @@
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField
 from flask_wtf.file import FileField, FileAllowed
 from flask_wtf import FlaskForm, RecaptchaField
 from flask_login import current_user
@@ -34,6 +34,7 @@ class LoginForm(FlaskForm):
 
 
 class UpdateAccountForm(FlaskForm):
+    biography = TextAreaField('Biography')
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png'])])
