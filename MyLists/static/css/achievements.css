@@ -14,6 +14,12 @@
 
 .type_achievements_tab {
     border-bottom: white 1px solid;
+    background: rgba(44, 57, 70, 1);
+}
+
+.type_achievements_tab > li {
+    margin-right: auto;
+    margin-left: auto;
 }
 
 .type_achievements_tab > li > .active {

@@ -18,7 +18,7 @@
         <a id="movies-tab" class="nav-link" data-toggle="tab" href="#movies_tab">MOVIES</a>
     </li>
 </ul>
-<hr class="m-b-50">
+<hr class="m-b-30">
 <div class="tab-content">
     <div id="anime_tab" class="tab-pane fade show active" >
         <div>
@@ -28,8 +28,8 @@
             <div style="font-size: 18pt;" class="text-center mb-3 mt-4">{{ target_user_name }} has unlocked {{ data_anime["total_unlocked"] }}/70 anime achievements.</div>
             {% endif %}
         </div>
-        <ul class="nav type_achievements_tab" style="background: rgba(44, 57, 70, 1);">
-            <li class="nav-item ml-auto">
+        <ul class="nav type_achievements_tab ">
+            <li class="nav-item">
                 <a class="nav-link active" data-toggle="tab" href="#genres_anime">Genres ({{ data_anime["unlocked_per_type"]["genres"] }}/44)</a>
             </li>
             <li class="nav-item">
@@ -44,13 +44,13 @@
             <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#misc_anime">Misc ({{ data_anime["unlocked_per_type"]["misc"] }}/3)</a>
             </li>
-            <li class="nav-item mr-auto">
+            <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#score_anime">Score ({{ data_anime["unlocked_per_type"]["score"] }}/3)</a>
             </li>
         </ul>
         <div class="tab-content" id="achievements_tab_content">
             <div id="genres_anime" class="tab-pane fade show active">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_anime['genres']|length) %}
                     <li>
                         <div class="text-center">
@@ -88,7 +88,7 @@
                 </ul>
             </div>
             <div id="sources_anime" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_anime['sources']|length) %}
                     <li>
                         <div class="text-center">
@@ -126,7 +126,7 @@
                 </ul>
             </div>
             <div id="finished_anime" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_anime['finished']|length) %}
                     <li>
                         <div class="text-center">
@@ -143,7 +143,7 @@
                         </a>
                         {% endif %}
                         <div class="details text-left">
-                            <img src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data_series['finished'][i]['image_id'] }}.png" alt="">
+                            <img src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data_anime['finished'][i]['image_id'] }}.png" alt="">
                             <div class="text">
                                 <span style="font-size: 14pt;">{{ data_anime['finished'][i]["title"] }}</span><br>
                                 <span style="font-size: 13pt;">{{ data_anime['finished'][i]["description"] }}</span>
@@ -154,7 +154,7 @@
                 </ul>
             </div>
             <div id="time_anime" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_anime['time']|length) %}
                     <li>
                         <div class="text-center">
@@ -182,7 +182,7 @@
                 </ul>
             </div>
             <div id="misc_anime" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_anime['misc']|length) %}
                     <li>
                         <div class="text-center">
@@ -227,7 +227,7 @@
                 </ul>
             </div>
             <div id="score_anime" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_anime['score']|length) %}
                     <li>
                         <div class="text-center">
@@ -286,7 +286,7 @@
         </ul>
         <div class="tab-content" id="achievements_tab_content">
             <div id="genres_series" class="tab-pane fade show active">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_series['genres']|length) %}
                     <li>
                         <div class="text-center">
@@ -324,7 +324,7 @@
                 </ul>
             </div>
             <div id="sources_series" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_series['sources']|length) %}
                     <li>
                         <div class="text-center">
@@ -362,7 +362,7 @@
                 </ul>
             </div>
             <div id="finished_series" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_series['finished']|length) %}
                     <li>
                         <div class="text-center">
@@ -390,7 +390,7 @@
                 </ul>
             </div>
             <div id="time_series" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_series['time']|length) %}
                     <li>
                         <div class="text-center">
@@ -418,7 +418,7 @@
                 </ul>
             </div>
             <div id="misc_series" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_series['misc']|length) %}
                     <li>
                         <div class="text-center">
@@ -463,7 +463,7 @@
                 </ul>
             </div>
             <div id="score_series" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_series['score']|length) %}
                     <li>
                         <div class="text-center">
@@ -522,7 +522,7 @@
         </ul>
         <div class="tab-content" id="achievements_tab_content">
             <div id="genres_movies" class="tab-pane fade show active">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_series['genres']|length) %}
                     <li>
                         <div class="text-center">
@@ -560,7 +560,7 @@
                 </ul>
             </div>
             <div id="sources_movies" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_series['sources']|length) %}
                     <li>
                         <div class="text-center">
@@ -598,7 +598,7 @@
                 </ul>
             </div>
             <div id="finished_movies" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_series['finished']|length) %}
                     <li>
                         <div class="text-center">
@@ -626,7 +626,7 @@
                 </ul>
             </div>
             <div id="time_movies" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_series['time']|length) %}
                     <li>
                         <div class="text-center">
@@ -654,7 +654,7 @@
                 </ul>
             </div>
             <div id="misc_movies" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_series['misc']|length) %}
                     <li>
                         <div class="text-center">
@@ -699,7 +699,7 @@
                 </ul>
             </div>
             <div id="score_movies" class="tab-pane fade">
-                <ul class="projects text-center m-t-25">
+                <ul class="projects text-center">
                     {% for i in range(0, data_series['score']|length) %}
                     <li>
                         <div class="text-center">

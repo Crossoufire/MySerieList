@@ -33,6 +33,11 @@ hr {
     border: solid 1px black;
 }
 
+.btn.btn-sm {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
 /* ------------------ Navigation bar CSS -------------------- */
 .dropdown_mylist > .nav-item::after {
     content: '';

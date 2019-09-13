@@ -3,6 +3,8 @@ function follow(follow_id) {
     // the follow button has to change to "unfollow";
     $('.follow_button').text('Unfollow');
     $('.follow_button').attr('onclick', 'unfollow('+follow_id+')');
+    $('.follow_button').addClass('btn-dark');
+    $('.follow_button').removeClass('btn-primary');
 
     $.ajax ({
         type: "POST",
@@ -20,6 +22,8 @@ function unfollow(follow_id) {
     // the unfollow button has to change to "follow";
     $('.follow_button').text('Follow');
     $('.follow_button').attr('onclick', 'follow('+follow_id+')');
+    $('.follow_button').addClass('btn-primary');
+    $('.follow_button').removeClass('btn-dark');
 
     $body = $("body");
     $.ajax ({
@@ -33,6 +37,14 @@ function unfollow(follow_id) {
     });
 }
 
+
+function changeTab() {
+    $('#settings_tab').fadeIn(100);
+    $('#overview').attr('class', 'nav-link');
+    $('#settings').attr('class', 'nav-link active');
+    $('#overview_tab').attr('class', 'tab-pane fade');
+    $('#settings_tab').attr('class', 'tab-pane fade show active');
+}
 
 $(document).ready(function() {
     $body = $("body");

@@ -9,17 +9,17 @@
 
 
 {% block content %}
-<div class="m-t-50">
-    <table id="hall_of_fame" class="table table-striped table-sm table-responsive-md">
+<div class="overflow m-t-30">
+    <table id="hall_of_fame" class="table table-sm table-responsive-sm text-light">
         <thead>
             <tr>
-                <th class="text-center"></th>
+                <th class="picture text-center"></th>
                 <th class="text-center">Username</th>
                 <th class="text-center">Series levels</th>
                 <th class="text-center">Anime levels</th>
                 <th class="text-center">Movies levels</th>
                 <th class="text-center">Knowledge levels</th>
-                <th class="text-center"></th>
+                <th class="follow text-center"></th>
             </tr>
         </thead>
         <tbody>
@@ -34,26 +34,26 @@
                 </td>
                 <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
-                    <br>
+
                     {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td>
                 </td>
                 <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
-                    <br>
+
                     {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                 </td>
                 <td>
                 </td>
                 <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['movies_grade_id'] }}.png">
-                    <br>
+
                     {{ user['movies_level'] }} ({{ user['movies_percent'] }}%)
                 </td>
                 <td>
-                    <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
-                    <br>
+                    <img class="k_grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
+
                     {{ user['knowledge_level'] }}
                 </td>
                 <td></td>
@@ -67,22 +67,22 @@
                 </td>
                 <td class="current_user">
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
-                    <br>
+
                     {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td class="current_user">
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
-                    <br>
+
                     {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                 </td>
                 <td class="current_user">
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['movies_grade_id'] }}.png">
-                    <br>
+
                     {{ user['movies_level'] }} ({{ user['movies_percent'] }}%)
                 </td >
                 <td class="current_user">
-                    <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
-                    <br>
+                    <img class="k_grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
+
                     {{ user['knowledge_level'] }}
                 </td>
                 <td class="current_user"></td>
@@ -96,22 +96,22 @@
                 </td>
                 <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
-                    <br>
+
                     {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
-                    <br>
+
                     {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                 </td>
                 <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['movies_grade_id'] }}.png">
-                    <br>
+
                     {{ user['movies_level'] }} ({{ user['movies_percent'] }}%)
                 </td>
                 <td>
-                    <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
-                    <br>
+                    <img class="k_grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
+
                     {{ user['knowledge_level'] }}
                 </td>
                 <td></td>
@@ -125,22 +125,22 @@
                 </td>
                 <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
-                    <br>
+
                     {{ user['series_level'] }} ({{ user['series_percent'] }}%)
                 </td>
                 <td>
                     <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
-                    <br>
+
                     {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                 </td>
                 <td>
                      <img class="grade_picture" src="static/img/levels_ranks/{{ user['movies_grade_id'] }}.png">
-                    <br>
+
                     {{ user['movies_level'] }} ({{ user['movies_percent'] }}%)
                 </td>
                 <td>
-                    <img class="grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
-                    <br>
+                    <img class="k_grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
+
                     {{ user['knowledge_level'] }}
                 </td>
                 <td>

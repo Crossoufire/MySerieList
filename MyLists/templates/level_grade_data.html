@@ -7,22 +7,22 @@
 
 
 {% block content %}
-<h3 class="font-weight-light text-center mb-4">Levels and Grade data</h3>
+<h3 class="font-weight-light text-center mb-4">Levels and grade data</h3>
 
 <div class="details d-flex flex-wrap p-l-10 p-t-10">
     <p>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp All these Grades are taken from the video game Halo 3.<br>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp There are 42 different Grades and 125 levels.<br>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp You gain a Grade each 3 levels.<br>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp The levels are based on the time spent on each category (Series, Animes, Books).<br>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp We use the quadratic equation: XP = 25*lvl*(1+lvl) <==> Level = (sqrt(625+100*XP)-25)/50<br>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp 1min = 1XP taken from the episode duration for series and anime and 1page = 1XP for the books.<br>
+        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp All these grades are taken from the video game Halo Reach.<br>
+        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp There are 49 different grades and 147 levels.<br>
+        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp You gain a grade each 3 levels.<br>
+        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp The levels are based on the time spent on each category (Series, Anime, Movies).<br>
+        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp We use the quadratic equation: XP = 20*lvl*(1+lvl) <==> Level = (sqrt(400+80*XP)-20)/40<br>
+        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp 1min = 1XP taken from the series and anime episode duration, and from the runtime for the movies.<br>
     </p>
 </div>
 
 
 <legend class="font-weight-light text-center mt-4 mb-4">
-    Each Grade in hierarchical order
+    Each grade in hierarchical order
     <hr class="mt-2 mb-3">
 </legend>
 
@@ -30,7 +30,7 @@
     <table>
         <thead style="border-bottom: solid 2px grey;">
             <th style="min-width: 100px;" class="text-center">Grade</th>
-            <th style="min-width: 200px;" class="text-center">Name</th>
+            <th style="min-width: 200px;" class="text-center">Title</th>
             <th style="min-width: 100px;" class="text-center">Levels</th>
             <th style="min-width: 200px;" class="text-center">XP</th>
             <th style="min-width: 200px;" class="text-center">Equivalent hours</th>
@@ -39,7 +39,7 @@
         {% for i in range(0, data|length) %}
         <tr>
             <td class="text-center">
-                <img height='60' width="60" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data[i][0] }}.ico" alt="">
+                <img height='40' width="40" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data[i][0] }}.png" alt="">
             </td>
             <td>
                 <strong>{{ data[i][1] }}</strong>
