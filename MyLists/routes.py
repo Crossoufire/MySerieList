@@ -352,7 +352,7 @@ def account(user_name):
                 '[{}] Settings updated : old picture file = {}, new picture file = {}'.format(user.id, old_picture_file,
                                                                                               user.image_file))
         if settings_form.movies_csv.data:
-            movies_csv_path = save_movies_csv(form.movies_csv.data)
+            movies_csv_path = save_movies_csv(settings_form.movies_csv.data)
             get_movies_from_csv(movies_csv_path, ListType.MOVIES)
         if settings_form.username.data != user.username:
             old_username = user.username
@@ -3311,10 +3311,8 @@ def get_movies_from_csv(movies_csv_path, list_type):
         if len(all_movies_titles) > 1000:
             return flash("The csv file can't contain more than 1000 movies at a time.", "danger")
 
-
-
         for movie in all_movies_titles:
-            time.sleep(0.5)
+            time.sleep(0.2)
             try:
                 response = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}".format(themoviedb_api_key, movie))
                 data = json.loads(response.text)
