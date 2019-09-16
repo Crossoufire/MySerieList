@@ -53,7 +53,7 @@ $(document).ready(function() {
         $body.removeClass("loading");
     });
 
-    // Statistics size for the figure (anime/series/movies)
+    // Statistics and achievements % for the figure (anime/series/movies)
     $('.value').each(function() {
         var text = $(this).attr('id');
         $(this).parent().css('width', text);

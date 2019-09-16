@@ -591,14 +591,32 @@ def account(user_name):
     account_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
     account_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
 
+    # Recover the anime achievements
+    user_achievements_anime = get_achievements(user.id, ListType.ANIME)
+
+    # Recover the series achievements
+    user_achievements_series = get_achievements(user.id, ListType.SERIES)
+
+    # Add the joined date
+    joined_tmp = user.activated_on
+    joined_tmp = str(joined_tmp.now().date()).split('-')
+    joined_date = "{0}-{1}-{2}".format(joined_tmp[2], joined_tmp[1], joined_tmp[0])
+
+    # Recover the number of followers
+    followers = Follow.query.filter_by(follow_id=user.id).all()
+
     return render_template('account.html',
                            title="{}'s account".format(user.username),
                            data=account_data,
+                           joined=joined_date,
                            user_id=str(user.id),
                            follow_form=follow_form,
+                           followers=len(followers),
                            settings_form=settings_form,
                            password_form=password_form,
-                           user_biography=user.biography)
+                           user_biography=user.biography,
+                           anime_achiev=user_achievements_anime,
+                           series_achiev=user_achievements_series)
 
 
 @app.route("/anime_achievements", methods=['GET'])
@@ -1959,17 +1977,6 @@ def get_achievements(user_id, list_type):
         score_achievements.append(achievement_data)
     unlocked_achievements_per_type.append(unlocked_achievement)
 
-    ####################################################################################################################
-
-    # # Change the results in a matrix 4 by x
-    # col = 4
-    # genres_matrix = [genres_achievements[i:i + col] for i in range(0, len(genres_achievements), col)]
-    # misc_matrix = [misc_achievements[i:i + col] for i in range(0, len(misc_achievements), col)]
-    # sources_matrix = [sources_achievements[i:i + col] for i in range(0, len(sources_achievements), col)]
-    # finished_matrix = [finished_achievements[i:i + col] for i in range(0, len(finished_achievements), col)]
-    # time_matrix = [time_achievements[i:i + col] for i in range(0, len(time_achievements), col)]
-    # score_matrix = [score_achievements[i:i + col] for i in range(0, len(score_achievements), col)]
-
     achievements_data = {"genres": genres_achievements,
                          "sources": sources_achievements,
                          "finished": finished_achievements,
@@ -1984,7 +1991,6 @@ def get_achievements(user_id, list_type):
                               'time': unlocked_achievements_per_type[3],
                               'misc': unlocked_achievements_per_type[4],
                               'score': unlocked_achievements_per_type[5]}}
-
 
     return achievements_data
 
