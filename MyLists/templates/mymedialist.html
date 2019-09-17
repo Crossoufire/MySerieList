@@ -32,30 +32,25 @@
     <div class="d-flex flex-wrap filters-button-group" style="justify-content: center;">
         {% if media_list != 'movieslist' %}
         <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
-        <button class="btn btn-sm btn-light text-dark" data-filter="#WATCHING">Watching</button>
-        <button class="btn btn-sm btn-light text-dark" data-filter="#COMPLETED">Completed</button>
-        <button class="btn btn-sm btn-light text-dark" data-filter="#ON_HOLD">On Hold</button>
-        <button class="btn btn-sm btn-light text-dark" data-filter="#RANDOM">Random</button>
-        <button class="btn btn-sm btn-light text-dark" data-filter="#DROPPED">Dropped</button>
-        <button class="btn btn-sm btn-light text-dark" data-filter="#PLAN_TO_WATCH">Plan to Watch</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.WATCHING">Watching</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.COMPLETED">Completed</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.ON.HOLD">On Hold</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.RANDOM">Random</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.DROPPED">Dropped</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
         {% elif media_list == 'movieslist' %}
         <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
-        <button class="btn btn-sm btn-light text-dark" data-filter="#COMPLETED">Completed</button>
-        <button class="btn btn-sm btn-light text-dark" data-filter="#PLAN_TO_WATCH">Plan to Watch</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.COMPLETED">Completed</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.COMPLETED.ANIMATION">Completed Animation</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
         {% endif %}
     </div>
 </div>
 
 <div id="categories-iso" class="categories-iso">
     {% for category in all_data %}
-    <div id="{{ category[1] }}" class="categories" style="width: 100%;">
-        {% if category[1] == 'ON_HOLD' %}
-        <h2 class="font-weight-light text-center pt-5 mb-0 category-title">ON HOLD</h2>
-        {% elif category[1] == 'PLAN_TO_WATCH' %}
-        <h2 class="font-weight-light text-center pt-5 mb-0 category-title">PLAN TO WATCH</h2>
-        {% else %}
+    <div class="categories {{ category[1] }}" style="width: 100%;">
         <h2 class="font-weight-light text-center pt-5 mb-0 category-title">{{ category[1] }}</h2>
-        {% endif %}
         <hr class="mt-2 pb-3 mb-0">
         {# <select class="filters-select-group-{{ category[1] }}">
             <option data-filter="*" selected="selected" >All</option>

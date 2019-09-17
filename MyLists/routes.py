@@ -2066,13 +2066,14 @@ def get_all_media_data(element_data, list_type, covers_path):
             else:
                 can_update["{}".format(element[0].id)] = False
 
-        element_all_data = [[watching_list, "WATCHING"], [completed_list, "COMPLETED"], [onhold_list, "ON_HOLD"],
-                            [random_list, "RANDOM"], [dropped_list, "DROPPED"], [plantowatch_list, "PLAN_TO_WATCH"]]
+        element_all_data = [[watching_list, "WATCHING"], [completed_list, "COMPLETED"], [onhold_list, "ON HOLD"],
+                            [random_list, "RANDOM"], [dropped_list, "DROPPED"], [plantowatch_list, "PLAN TO WATCH"]]
 
         return [eps, genres, networks, can_update, last_air_date, first_air_date, element_all_data]
     elif list_type == ListType.MOVIES:
         completed_list = []
         plantowatch_list = []
+        completed_list_animation = []
 
         genres = {}
         release_date = {}
@@ -2082,7 +2083,10 @@ def get_all_media_data(element_data, list_type, covers_path):
             element[0].image_cover = "{}{}".format(covers_path, element[0].image_cover)
 
             if element[1].status == Status.COMPLETED:
-                completed_list.append(element)
+                if 'Animation' in element[2]:
+                    completed_list_animation.append(element)
+                else:
+                    completed_list.append(element)
             elif element[1].status == Status.PLAN_TO_WATCH:
                 plantowatch_list.append(element)
 
@@ -2104,7 +2108,8 @@ def get_all_media_data(element_data, list_type, covers_path):
             tmp_prod_companies = tmp.replace(',', ', ')
             prod_companies["{}".format(element[0].id)] = tmp_prod_companies
 
-        element_all_data = [[completed_list, "COMPLETED"], [plantowatch_list, "PLAN_TO_WATCH"]]
+        element_all_data = [[completed_list, "COMPLETED"], [completed_list_animation, "COMPLETED ANIMATION"] ,
+                            [plantowatch_list, "PLAN TO WATCH"]]
 
         return [genres, release_date, prod_companies, element_all_data]
 
