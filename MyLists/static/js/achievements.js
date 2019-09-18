@@ -6,7 +6,7 @@ $(".projects > li > a").on("click", function(e) {
     li_height = li.height(),
     details = li.find(".details"),
     details_height = details.height(),
-    new_height = details_height + 40;
+    new_height = details_height + 30;
     li.toggleClass("current").animate({paddingBottom: new_height}, {duration: 200, queue: false}).siblings().removeClass("current");
     $(".projects li:not(.current)").animate({paddingBottom: '0'}, {duration: 200, queue: false }).find(".details").slideUp(200);
     $(".current").find(".details").slideDown(200);

@@ -1,13 +1,4 @@
 
-.header-image {
-    position: relative;
-    height: 190px;
-    background-image: url('https://www.bates.edu/wordpress/files/2016/07/gradient1.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
 .content .nav-pills .nav-link.active {
     color: white;
     background-color: #660000;

@@ -10,7 +10,7 @@ function changeCategory(element_id, new_category, card_id, mod_id, media_list) {
         $("#"+mod_id).prepend(
             "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeCategory(\"" + element_id + "\", \"" + plan_to_watch + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + media_list + "\")'>Plan to Watch</a>"
         );
-        $("#" + card_id).prependTo(".COMPLETED");
+        $("#" + card_id).prependTo(".d-flex.flex-wrap.COMPLETED");
         $("#" + card_id).children().children('.btn_bottom_left').show();
         $('.modal').modal("hide");
     }
@@ -24,7 +24,7 @@ function changeCategory(element_id, new_category, card_id, mod_id, media_list) {
         $("#"+mod_id).prepend(
             "<a data-dismiss='modal' class='list-group-item text-light bg-dark modded' onclick='changeCategory(\"" + element_id + "\", \"" + completed + "\", \"" + card_id + "\", \"" + mod_id + "\", \"" + media_list + "\")'>Completed</a>"
         );
-        $("#" + card_id).prependTo(".PLAN_TO_WATCH");
+        $("#" + card_id).prependTo(".d-flex.flex-wrap.PLAN.TO.WATCH");
         $("#" + card_id).children().children('.btn_bottom_left').hide();
         $('.modal').modal("hide");
     }

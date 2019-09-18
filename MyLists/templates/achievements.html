@@ -58,6 +58,7 @@
                         <li>
                             <div class="text-center m-b-4">
                                 <span style="font-size: 12pt;">{{ data_anime['genres'][i]["level"] }}</span><br>
+                                <span style="font-size: 12pt;">{{ data_anime['genres'][i]["element_time"] }}/{{ data_anime['genres'][i]["threshold"] }} hours</span>
                             </div>
                             {% if data_anime['genres'][i]["passed"] == "yes" %}
                             <a href="#">
@@ -68,15 +69,12 @@
                                 <img height="100" width="200" style="filter: grayscale(100%);" src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data_anime['genres'][i]['image_id'] }}.png" alt="">
                             </a>
                             {% endif %}
-                            <div class="text-center m-t-8">
-                                <span style="font-size: 12pt;">{{ data_anime['genres'][i]["element_time"] }}/{{ data_anime['genres'][i]["threshold"] }} hours</span>
-                            </div>
                             <div class="details text-left">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_anime['genres'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_anime['genres'][i]["description"] }}</span><br>
                                     <div class="m-2"></div>
-                                    <span style="font-size: 13pt;">Number of anime watched: {{ data_anime['genres'][i]["element_count"] }}</span>
+                                    <span style="font-size: 13pt;">#Anime watched: {{ data_anime['genres'][i]["element_count"] }}</span>
                                     <hr class="p-0 m-0">
                                     <ul class="p-t-10 media_list_detail">
                                         {% for k in range(0, data_anime['genres'][i]["element_name"]|length) %}
@@ -97,7 +95,7 @@
                         <li>
                             <div class="text-center">
                                 <span style="font-size: 12pt;">{{ data_anime['sources'][i]["level"] }}</span><br>
-                                <span style="font-size: 12pt;">{{ data_anime['sources'][i]["element_time"] }}/{{ data_anime['sources'][i]["threshold"] }} hours watched</span><br>
+                                <span style="font-size: 12pt;">{{ data_anime['sources'][i]["element_time"] }}/{{ data_anime['sources'][i]["threshold"] }} hours</span><br>
                             </div>
                             {% if data_anime['sources'][i]["passed"] == "yes" %}
                             <a href="#">
@@ -109,7 +107,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data_anime['sources'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_anime['sources'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_anime['sources'][i]["description"] }}</span><br>
@@ -147,7 +144,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data_anime['finished'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_anime['finished'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_anime['finished'][i]["description"] }}</span>
@@ -175,7 +171,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data_anime['time'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_anime['time'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_anime['time'][i]["description"] }}</span>
@@ -203,7 +198,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data_anime['misc'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     {% if data_anime['misc'][i]["title"] == "Chronomaster" %}
                                     <div class="p-l-20 p-t-10 p-r-20 p-b-10">
@@ -248,7 +242,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/anime_achievements') }}/{{ data_anime['score'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_anime['score'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_anime['score'][i]["description"] }}</span>
@@ -307,7 +300,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/series_achievements') }}/{{ data_series['genres'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_series['genres'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_series['genres'][i]["description"] }}</span><br>
@@ -345,7 +337,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/series_achievements') }}/{{ data_series['sources'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_series['sources'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_series['sources'][i]["description"] }}</span><br>
@@ -383,7 +374,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/series_achievements') }}/{{ data_series['finished'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_series['finished'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_series['finished'][i]["description"] }}</span>
@@ -411,7 +401,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/series_achievements') }}/{{ data_series['time'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_series['time'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_series['time'][i]["description"] }}</span>
@@ -439,7 +428,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/series_achievements') }}/{{ data_series['misc'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     {% if data_series['misc'][i]["title"] == "Chronomaster" %}
                                     <div class="p-l-20 p-t-10 p-r-20 p-b-10">
@@ -484,7 +472,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/series_achievements') }}/{{ data_series['score'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_series['score'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_series['score'][i]["description"] }}</span>
@@ -543,7 +530,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/series_achievements') }}/{{ data_series['genres'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_series['genres'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_series['genres'][i]["description"] }}</span><br>
@@ -581,7 +567,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/series_achievements') }}/{{ data_series['sources'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_series['sources'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_series['sources'][i]["description"] }}</span><br>
@@ -619,7 +604,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/series_achievements') }}/{{ data_series['finished'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_series['finished'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_series['finished'][i]["description"] }}</span>
@@ -647,7 +631,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/series_achievements') }}/{{ data_series['time'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_series['time'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_series['time'][i]["description"] }}</span>
@@ -675,7 +658,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/series_achievements') }}/{{ data_series['misc'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     {% if data_series['misc'][i]["title"] == "Chronomaster" %}
                                     <div class="p-l-20 p-t-10 p-r-20 p-b-10">
@@ -720,7 +702,6 @@
                             </a>
                             {% endif %}
                             <div class="details text-left">
-                                <img src="{{ url_for('static', filename='img/series_achievements') }}/{{ data_series['score'][i]['image_id'] }}.png" alt="">
                                 <div class="text">
                                     <span style="font-size: 14pt;">{{ data_series['score'][i]["title"] }}</span><br>
                                     <span style="font-size: 13pt;">{{ data_series['score'][i]["description"] }}</span>
