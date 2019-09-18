@@ -1,14 +1,11 @@
 /* ------------ Main CSS ----------- */
-body {
-    overflow-x: hidden;
-}
-
-.container {
-    padding-top: 0px;
-}
-
 ul {
     list-style: none;
+}
+
+hr {
+    border-top: 2px solid rgba(44, 57, 70, 1);
+    margin-top: 2px;
 }
 /* --------------------------------- */
 
@@ -29,28 +26,56 @@ ul {
 /* --------------------------------- */
 
 
-/* ---------- Profile Img ---------- */
-.image-position {
+/* ------------ Header ------------- */
+.header-image {
     position: relative;
+    height: 300px;
+    background-image: url('https://www.everynation.org/wp-content/uploads/2018/02/Monthly-Website-Header-background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-.image-data {
+.header-image > img {
     position: absolute;
-    max-width: 450px;
-    left: 5%;
-    bottom: -7%;
+    left: 30px;
+    bottom: -8%;
     z-index: 10;
+    border-radius: 50%;
+    border: solid 3px white;
+    height: 150px;
+    width: 150px;
+}
+
+.header-data {
+    position: absolute;
+    left: 200px;
+    bottom: 3px;
+    z-index: 10;
+}
+
+/* On screens that are 790px or less */
+@media (max-width: 790px) {
+    .header-image > img {
+        bottom: 10px;
+    }
+    .header-data {
+        bottom: 15px;
+    }
 }
 
 /* On screens that are 490px or less */
 @media (max-width: 490px) {
-    .image-data {
-        justify-content: center;
-        position: absolute;
-        max-width: 450px;
-        left: 10%;
-        bottom: 4%;
-        z-index: 10;
+    .header-image > img {
+        left: 10px;
+        bottom: 20px;
+        height: 110px;
+        width: 110px;
+        width: 110px;
+    }
+    .header-data {
+        left: 135px;
+        bottom: 15px;
     }
 }
 /* --------------------------------- */
@@ -63,25 +88,16 @@ ul {
     height: 100wh;
 }
 
-hr {
-    border-top: 2px solid rgba(44, 57, 70, 1);
-    margin-top: 2px;
-}
-
-.stats-size {
-    width: 100%;
-}
-
 .block {
     height: 30px;
-    color: #fff;
+    color: white;
     float: left;
     background-color: #334D5C;
 }
 
 .block_no_data {
     height: 30px;
-    color: #fff;
+    color: white;
     float: left;
     background-color: black;
 }
@@ -231,7 +247,7 @@ hr {
 
 .xp-bar {
     height: 10px;
-    width: 65%;
+    width: 71%;
     background: #035;
     margin: 0px 0px 0px 5px;
     display: inline-block;

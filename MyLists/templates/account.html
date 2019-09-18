@@ -7,12 +7,10 @@
 
 
 {% block content %}
-<div class="image-position">
-    <img height="300" width="1320" src="{{ url_for('static', filename='img/profile_background.jpg') }}" alt=""/>
-    <div class="d-flex flex-wrap image-data">
-        <img style="border-radius: 50%; border: solid 3px white;" height="150" width="150" src="{{ data['profile_picture'] }}">
-        <div class="m-l-20 pr-2">
-            <h2 class="text-center"><b>{{ data['username'] }}</b>
+<div class="header-image">
+    <img src="{{ data['profile_picture'] }}"/>
+    <div class="header-data">
+        <h2 class="text-center"><b>{{ data['username'] }}</b>
                 <img height='50' width='50' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}"
                  src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
                 {% if user_id != current_user.get_id() %}
@@ -23,10 +21,11 @@
                     {% endif %}
                 {% endif %}
             </h2>
-            <div><b>Ranking: #12/24</b></div>
-            <div><b>Joined: {{ joined }}</b></div>
-            <div><b>Followers: {{ followers }}</b></div>
-        </div>
+        <p class="p-0 m-0">
+            <b>Ranking: #12/24</b><br>
+            <b>Joined: {{ joined }}</b><br>
+            <b>Followers: {{ followers }}</b>
+        </p>
     </div>
 </div>
 
@@ -51,7 +50,7 @@
 
     <div id="overview_tab" class="tab-pane fade show active">
         <div class="row m-t-30">
-            <div class="col-md-3">
+            <div class="col">
                 <ul class="p-l-0">
                     <li class="m-b-20">
                         <h4>
@@ -71,7 +70,7 @@
                     <li class="m-b-20">
                         <h4><i class="fas fa-angle-double-up"></i>&nbsp&nbsp Lists Levels</h4>
                         <hr>
-                        <div class="d-flex p-l-10">
+                        <div class="d-flex">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
@@ -93,7 +92,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex p-l-10">
+                        <div class="d-flex">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
@@ -115,7 +114,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex p-l-10">
+                        <div class="d-flex">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
@@ -141,7 +140,7 @@
                     <li class="m-b-20">
                         <h4><i class="fas fa-rss"></i>&nbsp&nbsp Following ({{ data["follows"]|length }}) </h4>
                         <hr>
-                        <ul class="p-l-0" style="max-height: 190px; overflow-y: scroll;">
+                        <ul class="p-l-0" style="min-height: 190px; max-height: 190px; overflow-y: scroll;">
                             {% for follow in data["follows"] %}
                             <li class="m-l-13 m-r-13 m-b-13" style="display: inline-block;">
                                 <a href="/account/{{ follow['username'] }}">
@@ -162,7 +161,7 @@
                 </ul>
             </div>
             <div class="vertical_line"></div>
-            <div class="col-md-6">
+            <div class="col-sm-6">
                 <ul class="p-l-0">
                     <li>
                         <h4><i class="fas fa-chart-pie"></i>&nbsp&nbsp Statistics</h4>
@@ -755,7 +754,7 @@
                     <li class="m-b-20">
                         <h4><i class="fas fa-angle-double-up"></i>&nbsp&nbsp Lists Levels</h4>
                         <hr>
-                        <div class="d-flex p-l-10">
+                        <div class="d-flex">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
@@ -777,7 +776,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex p-l-10">
+                        <div class="d-flex">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
@@ -799,7 +798,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex p-l-10">
+                        <div class="d-flex">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
@@ -829,16 +828,16 @@
                 {% if user_id == current_user.get_id() %}
                 <form method="POST" action="" enctype="multipart/form-data">
                     {{ follow_form.hidden_tag() }}
-                    <div>
-                        {{ follow_form.follow_to_add(class='form-control', placeholder='Username') }}<br>
+                    <div class="d-flex flex-wrap">
+                        {{ follow_form.follow_to_add(style="max-width: 200px;", class='form-control', placeholder='Username') }}
                         {% for error in follow_form.follow_to_add.errors %}
-                        <span style="color: red;">[{{ error }}]</span>
+                        <span style="color: red;">{{ error }}</span>
                         {% endfor %}
-                        {{ follow_form.submit_follow(class="btn btn-outline-info p-r-6 p-l-6") }}
+                        {{ follow_form.submit_follow(class="btn btn-outline-info m-l-20 p-r-12 p-l-12") }}
                     </div>
                 </form>
                 {% endif %}
-                <ul class="m-t-20 p-l-20">
+                <ul class="m-t-30 p-l-20">
                     {% for follow in data["follows"] %}
                     <li class="m-r-22 m-l-22" style="display: inline-block;">
                         <a href="/account/{{ follow['username'] }}">

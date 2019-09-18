@@ -1,4 +1,13 @@
 
+.header-image {
+    position: relative;
+    height: 180px;
+    background-image: url('https://www.bates.edu/wordpress/files/2016/07/gradient4.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 #autocomplete.ui-autocomplete-loading {
     background-image: url('/static/img/add_loader.gif');
     background-position: right center;

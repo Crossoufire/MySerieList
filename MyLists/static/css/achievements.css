@@ -1,4 +1,13 @@
 
+.header-image {
+    position: relative;
+    height: 190px;
+    background-image: url('https://www.bates.edu/wordpress/files/2016/07/gradient1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 .content .nav-pills .nav-link.active {
     color: white;
     background-color: #660000;
@@ -8,18 +17,9 @@
     color: white;
 }
 
-#achievements_tabs {
-    margin-top: 30px;
-}
-
 .type_achievements_tab {
     border-bottom: white 1px solid;
     background: rgba(44, 57, 70, 1);
-}
-
-.type_achievements_tab > li {
-    margin-right: auto;
-    margin-left: auto;
 }
 
 .type_achievements_tab > li > .active {
@@ -71,13 +71,6 @@
     left: 20%;
     padding: 20px;
     background: #2c3946;
-}
-
-.details > img {
-    float: right;
-    margin-left: 20px;
-    width: 15%;
-    height: auto !important;
 }
 
 .details > .text {
