@@ -36,6 +36,9 @@
     <li class="nav-item">
         <a class="nav-link" data-toggle="tab" href="#follows_tab">Follows</a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#achievements_tab">Achievements</a>
+    </li>
     {% if user_id == current_user.get_id() %}
     <li class="nav-item">
         <a id="settings" class="nav-link" data-toggle="tab" href="#settings_tab">Settings</a>
@@ -50,7 +53,7 @@
 
     <div id="overview_tab" class="tab-pane fade show active">
         <div class="row m-t-30">
-            <div class="col">
+            <div class="col-3">
                 <ul class="p-l-0">
                     <li class="m-b-20">
                         <h4>
@@ -151,17 +154,11 @@
                             {% endfor %}
                         </ul>
                     </li>
-                    <li>
-                        <h4><i class="fas fa-newspaper"></i>&nbsp&nbsp Last follows update</h4>
-                        <hr>
-                        <div class="m-b-10">Psy - series<br>Added Breaking Bad</div>
-                        <div class="m-b-10">Psy - series<br>Breaking Bad<br>S01.E02 <i class="fas fa-arrow-right"></i> S01.E04</div>
-                        <div>Psy - anime<br>Shingeki no kyojin<br>S02.E04 <i class="fas fa-arrow-right"></i> S02.E08</div>
-                    </li>
+
                 </ul>
             </div>
             <div class="vertical_line"></div>
-            <div class="col-sm-6">
+            <div class="col">
                 <ul class="p-l-0">
                     <li>
                         <h4><i class="fas fa-chart-pie"></i>&nbsp&nbsp Statistics</h4>
@@ -423,9 +420,9 @@
                 </ul>
             </div>
             <div class="vertical_line"></div>
-            <div class="col">
+            <div class="col-3">
                 <ul class="p-l-0 p-r-0">
-                    <li class="m-b-20">
+                    {#<li class="m-b-20">
                         <h4><i class="fas fa-chart-pie"></i>&nbsp&nbsp Achievements</h4>
                         <hr>
                         <!------------------------ Series achievements --------------------------->
@@ -681,6 +678,13 @@
                                 </div>
                             </div>
                         </div>
+                    </li>#}
+                    <li class="m-b-20">
+                        <h4><i class="fas fa-newspaper"></i>&nbsp&nbsp Last follows update</h4>
+                        <hr>
+                        <div class="m-b-10">Psy - series<br>Added Breaking Bad</div>
+                        <div class="m-b-10">Psy - series<br>Breaking Bad<br>S01.E02 <i class="fas fa-arrow-right"></i> S01.E04</div>
+                        <div>Psy - anime<br>Shingeki no kyojin<br>S02.E04 <i class="fas fa-arrow-right"></i> S02.E08</div>
                     </li>
                     <li>
                         <h4><i class="fas fa-sm fa-info-circle"></i>&nbsp&nbsp Information</h4>
@@ -868,6 +872,54 @@
             </div>
         </div>
     </div>
+
+    <div id="achievements_tab" class="tab-pane fade">
+        <div class="row m-t-30">
+            <div class="col-1 m-l-10">
+                <ul class="p-l-0 text-center">
+                    <li class="m-b-20">
+                        <h4>Anime</h4>
+                    </li>
+                    <li class="m-b-20">
+                        <h4>Series</h4>
+                    </li>
+                    <li class="m-b-20">
+                        <h4>Movies</h4>
+                    </li>
+                </ul>
+            </div>
+            <div class="vertical_line m-r-40"></div>
+            <span class="col">
+                <div class="row">
+                    {% for i in range(0, anime_achiev['genres']|length) %}
+                    <div class="col-4 m-b-40">
+                        <h4>Mystery</h4>
+                        <div class="row">
+                            <div class="col-3">
+                                <img src="http://via.placeholder.com/70x70"/>
+                            </div>
+                            <div class="col">
+                                Badge earned when watching <br> mystery genre anime.
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col achiev-name text-center">
+                                Level 1
+                            </div>
+                            <div class="col achiev-bar">
+                                <span class="block_achiev">
+                                    <span id="45%" class="value"></span>
+                                </span>
+                            </div>
+                            <div class="col achiev-value">
+                                30
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
 
     {% if user_id == current_user.get_id() %}
     <div id="settings_tab" class="tab-pane fade">

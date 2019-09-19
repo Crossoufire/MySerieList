@@ -326,21 +326,23 @@ hr {
 
 
 /* --------- Achievements ---------- */
-.achiev-row {
-}
 
 .achiev-bar {
     max-width: 160px;
-    border-left: solid 1px rgba(44, 57, 70, 1);
-    border-right: solid 1px rgba(44, 57, 70, 1);
-    margin-left: 10px;
+    margin-left: 15px;
     margin-right: 15px;
+    margin-top: 10px;
     padding: 0px;
+    background-color: white;
+    height: 12px;
 }
 
 .block_achiev {
     display: inline-block;
+    margin-bottom: 10px;
     height: 12px;
+    width: 50%;
+    background-color: #4d0000;
 }
 
 .block_achiev.series {
@@ -356,11 +358,14 @@ hr {
 }
 
 .achiev-name {
-    max-width: 80px;
-    padding-right: 0px;
+    max-width: 70px;
+    margin-top: 5px;
+    margin-left: 15px;
+    padding: 0px;
 }
 
 .achiev-value {
+    margin-top: 5px;
     max-width: 50px;
     padding: 0px;
 }
