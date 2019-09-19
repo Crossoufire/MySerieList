@@ -893,26 +893,26 @@
                 <div class="row">
                     {% for i in range(0, anime_achiev['genres']|length) %}
                     <div class="col-4 m-b-40">
-                        <h4>Mystery</h4>
+                        <h4>{{ anime_achiev['genres'][i]['level'] }}</h4>
                         <div class="row">
                             <div class="col-3">
-                                <img src="http://via.placeholder.com/70x70"/>
+                                <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ anime_achiev['genres'][i]['image_id'] }}.png"/>
                             </div>
                             <div class="col">
-                                Badge earned when watching <br> mystery genre anime.
+                                Badge earned when watching <br> {{ anime_achiev['genres'][i]['level'] }} genre anime.
                             </div>
                         </div>
                         <div class="row">
                             <div class="col achiev-name text-center">
-                                Level 1
+                                {{ anime_achiev['genres'][i]['title'] }}
                             </div>
-                            <div class="col achiev-bar">
+                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ (anime_achiev['genres'][i]['element_time']*100)/(anime_achiev['genres'][i]['threshold']) }}%">
                                 <span class="block_achiev">
-                                    <span id="45%" class="value"></span>
+                                    <span id="{{ (anime_achiev['genres'][i]['element_time']*100)/(anime_achiev['genres'][i]['threshold']) }}%" class="value"></span>
                                 </span>
                             </div>
                             <div class="col achiev-value">
-                                30
+                                {{ anime_achiev['genres'][i]['threshold'] }}
                             </div>
                         </div>
                     </div>
