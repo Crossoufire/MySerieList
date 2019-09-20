@@ -135,36 +135,23 @@ hr {
     min-width: 105px;
 }
 
-/* On screens that are 768px or less */
-@media (max-width: 767.97px) {
-    .stats-size {
-        min-width: 90%
-    }
-
-    .mini {
-        min-width: 100px;
-    }
-
-    .block {
-	    height: 25px;
-	    color: #fff;
-	    float: left;
-	    background-color: #334D5C;
-    }
-
-    .block_no_data {
-        height: 25px;
-        color: #fff;
-        float: left;
-        background-color: black;
-    }
-
-    .position {
-        text-align: right;
+/* On screens that are 990px or less */
+@media (max-width: 990px) {
+    #overview_tab {
+        padding-left: 100px;
+        padding-right: 100px;
     }
 }
 
-/* On screens that are 768px or less */
+/* On screens that are 650px or less */
+@media (max-width: 650px) {
+    #overview_tab {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}
+
+/* On screens that are 490px or less */
 @media (max-width: 490px) {
     .stat_text {
         font-size: 10pt;
@@ -247,7 +234,7 @@ hr {
 
 .xp-bar {
     height: 10px;
-    width: 71%;
+    width: 65%;
     background: #035;
     margin: 0px 0px 0px 5px;
     display: inline-block;
@@ -328,12 +315,9 @@ hr {
 /* --------- Achievements ---------- */
 
 .achiev-bar {
-    max-width: 160px;
-    margin-left: 15px;
-    margin-right: 15px;
-    margin-top: 10px;
+    background-color: grey;
     padding: 0px;
-    background-color: white;
+    margin-top: 6px;
     height: 12px;
 }
 
@@ -358,16 +342,7 @@ hr {
 }
 
 .achiev-name {
-    max-width: 70px;
-    margin-top: 5px;
-    margin-left: 15px;
-    padding: 0px;
-}
-
-.achiev-value {
-    margin-top: 5px;
-    max-width: 50px;
-    padding: 0px;
+    width: 105px;
 }
 /* --------------------------------- */
 

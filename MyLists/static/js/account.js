@@ -38,12 +38,12 @@ function unfollow(follow_id) {
 }
 
 
-function changeTab() {
-    $('#settings_tab').fadeIn(100);
+function changeTab(tab, nav) {
+    $('#'+tab);
     $('#overview').attr('class', 'nav-link');
-    $('#settings').attr('class', 'nav-link active');
+    $('#'+nav).attr('class', 'nav-link active');
     $('#overview_tab').attr('class', 'tab-pane fade');
-    $('#settings_tab').attr('class', 'tab-pane fade show active');
+    $('#'+tab).attr('class', 'tab-pane fade show active');
 }
 
 $(document).ready(function() {

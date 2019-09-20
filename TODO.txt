@@ -1,5 +1,6 @@
 
 --------------------------------------------------- TO DO ---------------------------------------------------
+
 Account:
 	Last updates on  movies/anime/series for the follow list
 	Possibility to display/hide the score by default for the lists

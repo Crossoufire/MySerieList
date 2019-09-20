@@ -610,6 +610,7 @@ def account(user_name):
                            data=account_data,
                            joined=joined_date,
                            user_id=str(user.id),
+                           user_name=user_name,
                            follow_form=follow_form,
                            followers=len(followers),
                            settings_form=settings_form,
@@ -2160,22 +2161,34 @@ def get_achievements_test(user_id, list_type):
     for i in range(0, len(genre_id)):
         achievements = AchievementsTest.query.filter_by(media=media, genre=genre_id[i]).all()
         for achievement in achievements:
-            if int(time_list[i]/60) > int(achievement.threshold):
-                passed = "yes"
-                unlocked_achievement += 1
+            if int(time_list[i]/60) < int(achievement.threshold):
+                achievement_data = {"type": achievement.type,
+                                    "threshold": achievement.threshold,
+                                    "image_id": achievement.image_id,
+                                    "level": achievement.level,
+                                    "title": "{} {}".format(achievement.title.split()[0], int(achievement.title.split()[1])-1),
+                                    "element_time": int(time_list[i]/60),
+                                    "element_count": count_list[i],
+                                    "element_name": name_list[i],
+                                    "element_episodes": episodes_list[i],
+                                    "element_percentage": round((int(time_list[i]/60)*100)/(achievement.threshold), 2)}
+                break
             else:
-                passed = "no"
-            achievement_data = {"type": achievement.type,
-                                "threshold": achievement.threshold,
-                                "image_id": achievement.image_id,
-                                "level": achievement.level,
-                                "title": achievement.title,
-                                "passed": passed,
-                                "element_time": int(time_list[i]/60),
-                                "element_count": count_list[i],
-                                "element_name": name_list[i],
-                                "element_episodes": episodes_list[i]}
-            genres_achievements.append(achievement_data)
+                unlocked_achievement += 1
+                if unlocked_achievement == 4:
+                    achievement_data = {"type": achievement.type,
+                                        "threshold": achievement.threshold,
+                                        "image_id": achievement.image_id,
+                                        "level": achievement.level,
+                                        "title": achievement.title,
+                                        "element_time": int(time_list[i] / 60),
+                                        "element_count": count_list[i],
+                                        "element_name": name_list[i],
+                                        "element_episodes": episodes_list[i],
+                                        "element_percentage": round((int(time_list[i]/60)*100)/(achievement.threshold), 2)}
+                    break
+
+        genres_achievements.append(achievement_data)
     unlocked_achievements_per_type.append(unlocked_achievement)
 
     ####################################################################################################################
@@ -2198,23 +2211,22 @@ def get_achievements_test(user_id, list_type):
     sources_achievements = []
     unlocked_achievement = 0
     for achievement in achievements:
-        if int(element_time/60) >= int(achievement.threshold):
-            passed = "yes"
-            unlocked_achievement += 1
+        if int(element_time/60) < int(achievement.threshold):
+            achievement_data = {"type": achievement.type,
+                                "threshold": achievement.threshold,
+                                "image_id": achievement.image_id,
+                                "level": achievement.level,
+                                "title": achievement.title,
+                                "element_time": int(element_time / 60),
+                                "element_count": element_count,
+                                "element_name": element_name,
+                                "element_episodes": element_episodes,
+                                "element_percentage": round((int(element_time/60)*100)/(achievement.threshold), 2)}
+            break
         else:
-            passed = "no"
+            unlocked_achievement += 1
 
-        achievement_data = {"type": achievement.type,
-                            "threshold": achievement.threshold,
-                            "image_id": achievement.image_id,
-                            "level": achievement.level,
-                            "title": achievement.title,
-                            "passed": passed,
-                            "element_time": int(element_time/60),
-                            "element_count": element_count,
-                            "element_name": element_name,
-                            "element_episodes": element_episodes}
-        sources_achievements.append(achievement_data)
+    sources_achievements.append(achievement_data)
     unlocked_achievements_per_type.append(unlocked_achievement)
 
     ####################################################################################################################
@@ -2224,26 +2236,25 @@ def get_achievements_test(user_id, list_type):
     element_count = 0
     for element in element_data:
         status = element[0].status
-        if status == "Ended" and element[1].status == Status.COMPLETED:
+        if (status == "Ended" or status == "Canceled") and element[1].status == Status.COMPLETED:
             element_count += 1
 
     finished_achievements = []
     unlocked_achievement = 0
     for achievement in achievements:
-        if element_count >= int(achievement.threshold):
-            passed = "yes"
-            unlocked_achievement += 1
+        if element_count < int(achievement.threshold):
+            achievement_data = {"type": achievement.type,
+                                "threshold": achievement.threshold,
+                                "image_id": achievement.image_id,
+                                "level": achievement.level,
+                                "title": "{} {}".format(achievement.title.split()[0], int(achievement.title.split()[1])-1),
+                                "element_count": element_count,
+                                "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
+            break
         else:
-            passed = "no"
+            unlocked_achievement += 1
 
-        achievement_data = {"type": achievement.type,
-                            "threshold": achievement.threshold,
-                            "image_id": achievement.image_id,
-                            "level": achievement.level,
-                            "title": achievement.title,
-                            "passed": passed,
-                            "element_count": element_count}
-        finished_achievements.append(achievement_data)
+    finished_achievements.append(achievement_data)
     unlocked_achievements_per_type.append(unlocked_achievement)
 
     ####################################################################################################################
@@ -2260,20 +2271,19 @@ def get_achievements_test(user_id, list_type):
     time_achievements = []
     unlocked_achievement = 0
     for achievement in achievements:
-        if time_spent >= int(achievement.threshold):
-            passed = "yes"
-            unlocked_achievement += 1
+        if time_spent < int(achievement.threshold):
+            achievement_data = {"type": achievement.type,
+                                "threshold": achievement.threshold,
+                                "image_id": achievement.image_id,
+                                "level": achievement.level,
+                                "title": achievement.title,
+                                "element_time": int(time_spent),
+                                "element_percentage": round((time_spent*100)/(achievement.threshold), 2)}
+            break
         else:
-            passed = "no"
+            unlocked_achievement += 1
 
-        achievement_data = {"type": achievement.type,
-                            "threshold": achievement.threshold,
-                            "image_id": achievement.image_id,
-                            "level": achievement.level,
-                            "title": achievement.title,
-                            "passed": passed,
-                            "element_time": int(time_spent)}
-        time_achievements.append(achievement_data)
+    time_achievements.append(achievement_data)
     unlocked_achievements_per_type.append(unlocked_achievement)
 
     ####################################################################################################################
@@ -2290,20 +2300,18 @@ def get_achievements_test(user_id, list_type):
 
     misc_achievements = []
     unlocked_achievement = 0
-    if element_count >= int(achievement.threshold):
-        passed = "yes"
-        unlocked_achievement += 1
+    if element_count < int(achievement.threshold):
+        achievement_data = {"type": achievement.type,
+                            "threshold": achievement.threshold,
+                            "image_id": achievement.image_id,
+                            "level": achievement.level,
+                            "title": achievement.title,
+                            "element_count": element_count,
+                            "element_name": element_name,
+                            "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
     else:
-        passed = "no"
+        unlocked_achievement += 1
 
-    achievement_data = {"type": achievement.type,
-                        "threshold": achievement.threshold,
-                        "image_id": achievement.image_id,
-                        "level": achievement.level,
-                        "title": achievement.title,
-                        "passed": passed,
-                        "element_count": element_count,
-                        "element_name": element_name}
     misc_achievements.append(achievement_data)
 
     achievement = AchievementsTest.query.filter_by(media=media, type="old").first()
@@ -2315,20 +2323,18 @@ def get_achievements_test(user_id, list_type):
             element_count += 1
             element_name.append(element[0].name)
 
-    if element_count >= int(achievement.threshold):
-        passed = "yes"
-        unlocked_achievement += 1
+    if element_count < int(achievement.threshold):
+        achievement_data = {"type": achievement.type,
+                            "threshold": achievement.threshold,
+                            "image_id": achievement.image_id,
+                            "level": achievement.level,
+                            "title": achievement.title,
+                            "element_count": element_count,
+                            "element_name": element_name,
+                            "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
     else:
-        passed = "no"
+        unlocked_achievement += 1
 
-    achievement_data = {"type": achievement.type,
-                        "threshold": achievement.threshold,
-                        "image_id": achievement.image_id,
-                        "level": achievement.level,
-                        "title": achievement.title,
-                        "passed": passed,
-                        "element_count": element_count,
-                        "element_name": element_name}
     misc_achievements.append(achievement_data)
 
     achievement = AchievementsTest.query.filter_by(media=media, type="year").first()
@@ -2339,79 +2345,34 @@ def get_achievements_test(user_id, list_type):
             all_first_air_date.append(element[0].first_air_date.split('-')[0])
     all_first_air_date = list(dict.fromkeys(all_first_air_date))
 
-    if len(all_first_air_date) >= int(achievement.threshold):
-        passed = "yes"
-        unlocked_achievement += 1
-    else:
-        passed = "no"
-
-    achievement_data = {"type": achievement.type,
-                        "threshold": achievement.threshold,
-                        "image_id": achievement.image_id,
-                        "level": achievement.level,
-                        "title": achievement.title,
-                        "passed": passed,
-                        "element_count": len(all_first_air_date)}
-    misc_achievements.append(achievement_data)
-    unlocked_achievements_per_type.append(unlocked_achievement)
-
-    ####################################################################################################################
-
-    # Score achievements
-    achievements = AchievementsTest.query.filter_by(media=media, type="score").all()
-
-    if list_type == ListType.ANIME:
-        mean_score = get_mean_score(user_id, ListType.ANIME)
-    elif list_type == ListType.SERIES:
-        mean_score = get_mean_score(user_id, ListType.SERIES)
-
-    if mean_score <= 3:
-        tmp = 1
-    elif 3 < mean_score <= 5:
-        tmp = 2
-    elif 8 <= mean_score <= 10:
-        tmp = 3
-    else:
-        tmp = "no"
-
-    score_achievements = []
-    unlocked_achievement = 0
-    for achievement in achievements:
-        if tmp == 1 and int(achievement.threshold) == 3:
-            passed = "yes"
-            unlocked_achievement += 1
-        elif tmp == 2 and int(achievement.threshold) == 5:
-            passed = "yes"
-            unlocked_achievement += 1
-        elif tmp == 3 and int(achievement.threshold) == 8:
-            passed = "yes"
-            unlocked_achievement += 1
-        else:
-            passed = "no"
+    if len(all_first_air_date) < int(achievement.threshold):
         achievement_data = {"type": achievement.type,
                             "threshold": achievement.threshold,
                             "image_id": achievement.image_id,
                             "level": achievement.level,
                             "title": achievement.title,
-                            "passed": passed,
-                            "mean_score": mean_score}
-        score_achievements.append(achievement_data)
+                            "element_count": len(all_first_air_date),
+                            "element_percentage": round((len(all_first_air_date)*100)/(achievement.threshold), 2)}
+    else:
+        unlocked_achievement += 1
+
+    misc_achievements.append(achievement_data)
     unlocked_achievements_per_type.append(unlocked_achievement)
+
+    ####################################################################################################################
 
     achievements_data = {"genres": genres_achievements,
                          "sources": sources_achievements,
                          "finished": finished_achievements,
                          "time": time_achievements,
                          "misc": misc_achievements,
-                         "score": score_achievements,
                          "total_unlocked": sum(unlocked_achievements_per_type),
                          "unlocked_per_type":
                              {'genres': unlocked_achievements_per_type[0],
                               'sources': unlocked_achievements_per_type[1],
                               'finished': unlocked_achievements_per_type[2],
                               'time': unlocked_achievements_per_type[3],
-                              'misc': unlocked_achievements_per_type[4],
-                              'score': unlocked_achievements_per_type[5]}}
+                              'misc': unlocked_achievements_per_type[4]}}
 
     return achievements_data
 

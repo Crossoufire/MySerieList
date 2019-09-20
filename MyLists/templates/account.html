@@ -34,33 +34,38 @@
         <a id="overview" class="nav-link active" data-toggle="tab" href="#overview_tab">Overview</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#follows_tab">Follows</a>
+        <a id="follows" class="nav-link" data-toggle="tab" href="#follows_tab">Follows</a>
     </li>
+    {% if user_id != current_user.get_id() %}
+    <li class="nav-item mr-auto">
+    {% else %}
     <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#achievements_tab">Achievements</a>
+    {% endif %}
+        <a id="achievements" class="nav-link" data-toggle="tab" href="#achievements_tab">Achievements</a>
     </li>
+
     {% if user_id == current_user.get_id() %}
-    <li class="nav-item">
+    <li class="nav-item mr-auto">
         <a id="settings" class="nav-link" data-toggle="tab" href="#settings_tab">Settings</a>
     </li>
     {% endif %}
-    <li class="nav-item mr-auto">
-        <a class="nav-link" href="#">Adv stats <i class="fas fa-sm fa-external-link-square-alt"></i></a>
-    </li>
+    {#<li class="nav-item">
+        <a id="stats" class="nav-link" href="#">Adv stats <i class="fas fa-sm fa-external-link-square-alt"></i></a>
+    </li>#}
 </ul>
 
 <div class="tab-content" id="account_tab_content">
 
     <div id="overview_tab" class="tab-pane fade show active">
         <div class="row m-t-30">
-            <div class="col-3">
+            <div class="col-xl-3 col-lg col-md-12">
                 <ul class="p-l-0">
                     <li class="m-b-20">
                         <h4>
                             <i class="fas fa-user"></i>
                             &nbsp&nbsp Biography
                             {% if user_id == current_user.get_id() %}
-                            <a class="fas fa-sm fa-pen p-r-10" onclick="changeTab()" style="float: right;"></a>
+                            <a class="fas fa-sm fa-pen p-r-10" onclick="changeTab('settings_tab', 'settings')" style="float: right;"></a>
                             {% endif %}
                         </h4>
                         <hr>
@@ -141,31 +146,48 @@
                         </div>
                     </li>
                     <li class="m-b-20">
-                        <h4><i class="fas fa-rss"></i>&nbsp&nbsp Following ({{ data["follows"]|length }}) </h4>
+                        <div>
+                            <h4 class="float-left"><i class="fas fa-rss"></i> &nbsp&nbsp Follows</h4>
+                            <h4 class="float-right"><a onclick="changeTab('follows_tab', 'follows')">({{ data["follows"]|length }})</a></h4>
+                            <div style="clear: both;"></div>
+                        </div>
                         <hr>
-                        <ul class="p-l-0" style="min-height: 190px; max-height: 190px; overflow-y: scroll;">
-                            {% for follow in data["follows"] %}
-                            <li class="m-l-13 m-r-13 m-b-13" style="display: inline-block;">
-                                <a href="/account/{{ follow['username'] }}">
-                                    <img style="border-radius: 50%;" height="60" width="60" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}"/><br>
-                                    <div style="color: white;" class="text-center" id="{{ follow['user_id'] }}">{{ follow['username'] }}</div>
-                                </a>
-                            </li>
+                        <div class="row">
+                            {% for i in range(0, data["follows"]|length) %}
+                                {% if i > 2 %}
+                                {% else %}
+                                <div class="col-auto">
+                                    <a href="/account/{{ data['follows'][i]['username'] }}">
+                                        <img style="border-radius: 50%;" height="60" width="60" src="{{ url_for('static', filename='profile_pics/') }}{{ data['follows'][i]['picture'] }}"/><br>
+                                        <div style="color: white;" class="text-center" id="{{ data['follows'][i]['user_id'] }}">{{ data['follows'][i]['username'] }}</div>
+                                    </a>
+                                </div>
+                                {% endif %}
                             {% endfor %}
-                        </ul>
+                        </div>
                     </li>
-
+                    <li class="m-b-20">
+                        <h4><i class="fas fa-newspaper"></i>&nbsp&nbsp Last follows update</h4>
+                        <hr>
+                        <div class="m-b-10">Psy - series<br>Added Breaking Bad</div>
+                        <div class="m-b-10">Psy - series<br>Breaking Bad<br>S01.E02 <i class="fas fa-arrow-right"></i> S01.E04</div>
+                        <div>Psy - anime<br>Shingeki no kyojin<br>S02.E04 <i class="fas fa-arrow-right"></i> S02.E08</div>
+                    </li>
                 </ul>
             </div>
             <div class="vertical_line"></div>
-            <div class="col">
+            <div class="col-xl col-lg-5 col-md-12">
                 <ul class="p-l-0">
                     <li>
                         <h4><i class="fas fa-chart-pie"></i>&nbsp&nbsp Statistics</h4>
                         <hr>
                         <!------------------------ Series statistics --------------------------->
                         <div class="stats-size">
-                            <h5 class="text-left m-b-10"><b>Series </b><i class="fas fa-sm fa-external-link-square-alt"></i></h5>
+                            <h5>
+                                <a class="text-left text-light m-b-10" href="{{ url_for('mymedialist', media_list='serieslist', user_name=user_name) }}">
+                                    <b>Series </b><i class="fas fa-sm fa-external-link-square-alt"></i>
+                                </a>
+                            </h5>
                             <div id="SERIES" class="m-b-30">
                                 <div class="m-b-5">
                                     <span class="stat_text"><b>Days:</b> {{ data['series']['time_spent_day'] }}</span>
@@ -263,7 +285,11 @@
                         <hr>
                         <!------------------------- Anime statistics --------------------------->
                         <div class="stats-size">
-                            <h5 class="text-left m-b-10"><b>Anime </b><i class="fas fa-sm fa-external-link-square-alt"></i></h5>
+                            <h5>
+                                <a class="text-left text-light m-b-10" href="{{ url_for('mymedialist', media_list='animelist', user_name=user_name) }}">
+                                    <b>Anime </b><i class="fas fa-sm fa-external-link-square-alt"></i>
+                                </a>
+                            </h5>
                             <div id="ANIME" class="m-b-30">
                                 <div class="m-b-5">
                                     <span class="stat_text"><b>Days:</b> {{ data['anime']['time_spent_day'] }}</span>
@@ -361,7 +387,11 @@
                         <hr>
                         <!------------------------ Movies statistics --------------------------->
                         <div class="stats-size">
-                            <h5 class="text-left m-b-10"><b>Movies </b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
+                            <h5>
+                                <a class="text-left text-light m-b-10" href="{{ url_for('mymedialist', media_list='movieslist', user_name=user_name) }}">
+                                    <b>Movies </b><i class="fas fa-sm fa-external-link-square-alt"></i>
+                                </a>
+                            </h5>
                             <div id="MOVIES">
                                 <div class="m-b-5">
                                     <span class="stat_text"><b>Days:</b> {{ data['movies']['time_spent_day'] }}</span>
@@ -420,291 +450,115 @@
                 </ul>
             </div>
             <div class="vertical_line"></div>
-            <div class="col-3">
+            <div class="col-xl-3 col-lg col-md-12">
                 <ul class="p-l-0 p-r-0">
-                    {#<li class="m-b-20">
+                    <li class="m-b-20">
                         <h4><i class="fas fa-chart-pie"></i>&nbsp&nbsp Achievements</h4>
                         <hr>
                         <!------------------------ Series achievements --------------------------->
-                        <div class="stats-size">
+                        <div class="stats-size m-b-20">
                             <h5 class="text-left m-b-10"><b>Series</b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
-                            <div class="m-b-30">
-                                <div class="row achiev-row">
-                                    <div class="col achiev-name">
-                                        Genres
+                            <div class="row">
+                                    <div class="col-auto achiev-name">
+                                        Badges
                                     </div>
                                     <div class="col achiev-bar">
                                         <div class="block_achiev series">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['genres'])/28)*100 }}%" class="value"></span>
+                                            <span id="{{ ((series_achiev['unlocked_per_type']['genres'])/14)*100 }}%" class="value"></span>
                                         </div>
                                     </div>
-                                    <div class="col achiev-value">
-                                        {{ series_achiev['unlocked_per_type']['genres'] }}/28
+                                    <div class="col-auto">
+                                        {{ series_achiev['unlocked_per_type']['genres'] }}/14
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Sources
+                            <div class="row">
+                                    <div class="col-auto achiev-name">
+                                        Levels
                                     </div>
                                     <div class="col achiev-bar">
                                         <span class="block_achiev series">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['sources'])/4)*100 }}%" class="value"></span>
+                                            <span id="{{ ((series_achiev['unlocked_per_type']['sources'])/41)*100 }}%" class="value"></span>
                                         </span>
                                     </div>
-                                    <div class="col achiev-value">
-                                        {{ series_achiev['unlocked_per_type']['sources'] }}/4
+                                    <div class="col-auto">
+                                        {{ series_achiev['unlocked_per_type']['sources'] }}/41
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Finished
-                                    </div>
-                                    <div class="col achiev-bar">
-                                        <span class="block_achiev series">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['finished'])/12)*100 }}%" class="value"></span>
-                                        </span>
-                                    </div>
-                                    <div class="col achiev-value">
-                                        {{ series_achiev['unlocked_per_type']['finished'] }}/12
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Time
-                                    </div>
-                                    <div class="col achiev-bar">
-                                        <span class="block_achiev series">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['time'])/4)*100 }}%" class="value"></span>
-                                        </span>
-                                    </div>
-                                    <div class="col achiev-value">
-                                        {{ series_achiev['unlocked_per_type']['time'] }}/4
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Misc
-                                    </div>
-                                    <div class="col achiev-bar">
-                                        <span class="block_achiev series">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['misc'])/3)*100 }}%" class="value"></span>
-                                        </span>
-                                    </div>
-                                    <div class="col achiev-value">
-                                        {{ series_achiev['unlocked_per_type']['misc'] }}/3
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Score
-                                    </div>
-                                    <div class="col achiev-bar">
-                                        <span class="block_achiev">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['score'])/3)*100 }}%" class="value"></span>
-                                        </span>
-                                    </div>
-                                    <div class="col achiev-value">
-                                        {{ series_achiev['unlocked_per_type']['score'] }}/3
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <!------------------------ Anime achievements --------------------------->
-                        <div class="stats-size">
+                        <div class="stats-size m-b-20">
                             <h5 class="text-left m-b-10"><b>Anime</b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
-                            <div class="m-b-30">
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Genres
+                            <div class="row">
+                                    <div class="col-auto achiev-name">
+                                        Badges
                                     </div>
                                     <div class="col achiev-bar">
                                         <div class="block_achiev anime">
-                                            <span id="{{ ((anime_achiev['unlocked_per_type']['genres'])/28)*100 }}%" class="value"></span>
+                                            <span id="{{ ((anime_achiev['unlocked_per_type']['genres'])/18)*100 }}%" class="value"></span>
                                         </div>
                                     </div>
-                                    <div class="col achiev-value">
-                                        {{ anime_achiev['unlocked_per_type']['genres'] }}/28
+                                    <div class="col-auto">
+                                        {{ anime_achiev['unlocked_per_type']['genres'] }}/18
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Sources
+                            <div class="row">
+                                    <div class="col-auto achiev-name">
+                                        Levels
                                     </div>
                                     <div class="col achiev-bar">
                                         <span class="block_achiev anime">
-                                            <span id="{{ ((anime_achiev['unlocked_per_type']['sources'])/4)*100 }}%" class="value"></span>
+                                            <span id="{{ ((anime_achiev['unlocked_per_type']['sources'])/67)*100 }}%" class="value"></span>
                                         </span>
                                     </div>
-                                    <div class="col achiev-value">
-                                        {{ anime_achiev['unlocked_per_type']['sources'] }}/4
+                                    <div class="col-auto">
+                                        {{ anime_achiev['unlocked_per_type']['sources'] }}/67
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Finished
-                                    </div>
-                                    <div class="col achiev-bar">
-                                        <span class="block_achiev anime">
-                                            <span id="{{ ((anime_achiev['unlocked_per_type']['finished'])/12)*100 }}%" class="value"></span>
-                                        </span>
-                                    </div>
-                                    <div class="col achiev-value">
-                                        {{ anime_achiev['unlocked_per_type']['finished'] }}/12
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Time
-                                    </div>
-                                    <div class="col achiev-bar">
-                                        <span class="block_achiev anime">
-                                            <span id="{{ ((anime_achiev['unlocked_per_type']['time'])/4)*100 }}%" class="value"></span>
-                                        </span>
-                                    </div>
-                                    <div class="col achiev-value">
-                                        {{ anime_achiev['unlocked_per_type']['time'] }}/4
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Misc
-                                    </div>
-                                    <div class="col achiev-bar">
-                                        <span class="block_achiev anime">
-                                            <span id="{{ ((anime_achiev['unlocked_per_type']['misc'])/3)*100 }}%" class="value"></span>
-                                        </span>
-                                    </div>
-                                    <div class="col achiev-value">
-                                        {{ anime_achiev['unlocked_per_type']['misc'] }}/3
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Score
-                                    </div>
-                                    <div class="col achiev-bar">
-                                        <span class="block_achiev anime">
-                                            <span id="{{ ((anime_achiev['unlocked_per_type']['score'])/3)*100 }}%" class="value"></span>
-                                        </span>
-                                    </div>
-                                    <div class="col achiev-value">
-                                        {{ anime_achiev['unlocked_per_type']['score'] }}/3
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <!------------------------ Movies achievements --------------------------->
-                        <div class="stats-size">
+                        <div class="stats-size m-b-20">
                             <h5 class="text-left m-b-10"><b>Movies</b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
-                            <div class="m-b-30">
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Genres
+                            <div class="row">
+                                    <div class="col-auto achiev-name">
+                                        Badges
                                     </div>
                                     <div class="col achiev-bar">
                                         <div class="block_achiev movies">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['genres'])/28)*100 }}%" class="value"></span>
+                                            <span id="{{ ((series_achiev['unlocked_per_type']['genres'])/16)*100 }}%" class="value"></span>
                                         </div>
                                     </div>
-                                    <div class="col achiev-value">
-                                        {{ series_achiev['unlocked_per_type']['genres'] }}/28
+                                    <div class="col-auto">
+                                        {{ series_achiev['unlocked_per_type']['genres'] }}/16
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Sources
+                            <div class="row">
+                                    <div class="col-auto achiev-name">
+                                        Levels
                                     </div>
                                     <div class="col achiev-bar">
                                         <span class="block_achiev movies">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['sources'])/4)*100 }}%" class="value"></span>
+                                            <span id="{{ ((series_achiev['unlocked_per_type']['sources'])/44)*100 }}%" class="value"></span>
                                         </span>
                                     </div>
-                                    <div class="col achiev-value">
-                                        {{ series_achiev['unlocked_per_type']['sources'] }}/4
+                                    <div class="col-auto">
+                                        {{ series_achiev['unlocked_per_type']['sources'] }}/44
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Finished
-                                    </div>
-                                    <div class="col achiev-bar">
-                                        <span class="block_achiev movies">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['finished'])/12)*100 }}%" class="value"></span>
-                                        </span>
-                                    </div>
-                                    <div class="col achiev-value">
-                                        {{ series_achiev['unlocked_per_type']['finished'] }}/12
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Time
-                                    </div>
-                                    <div class="col achiev-bar">
-                                        <span class="block_achiev movies">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['time'])/4)*100 }}%" class="value"></span>
-                                        </span>
-                                    </div>
-                                    <div class="col achiev-value">
-                                        {{ series_achiev['unlocked_per_type']['time'] }}/4
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Misc
-                                    </div>
-                                    <div class="col achiev-bar">
-                                        <span class="block_achiev movies">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['misc'])/3)*100 }}%" class="value"></span>
-                                        </span>
-                                    </div>
-                                    <div class="col achiev-value">
-                                        {{ series_achiev['unlocked_per_type']['misc'] }}/3
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col achiev-name">
-                                        Score
-                                    </div>
-                                    <div class="col achiev-bar">
-                                        <span class="block_achiev movies">
-                                        <span class="block_achiev movies">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['score'])/3)*100 }}%" class="value"></span>
-                                        </span>
-                                    </div>
-                                    <div class="col achiev-value">
-                                        {{ series_achiev['unlocked_per_type']['score'] }}/3
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-                    </li>#}
-                    <li class="m-b-20">
-                        <h4><i class="fas fa-newspaper"></i>&nbsp&nbsp Last follows update</h4>
-                        <hr>
-                        <div class="m-b-10">Psy - series<br>Added Breaking Bad</div>
-                        <div class="m-b-10">Psy - series<br>Breaking Bad<br>S01.E02 <i class="fas fa-arrow-right"></i> S01.E04</div>
-                        <div>Psy - anime<br>Shingeki no kyojin<br>S02.E04 <i class="fas fa-arrow-right"></i> S02.E08</div>
                     </li>
                     <li>
                         <h4><i class="fas fa-sm fa-info-circle"></i>&nbsp&nbsp Information</h4>
                         <hr>
                         <ul class="text-left" style="list-style-type: disc; font-size: 13pt;">
                             <li class="m-b-10">
-                                <a href="{{ url_for('anime_achievements') }}" target="_blank">
-                                    Anime achievements data &nbsp
+                                <a class="text-light" href="{{ url_for('level_grade_data') }}" target="_blank">
+                                    Grades and levels data
                                     <i class="text-light fas fa-sm fa-external-link-square-alt"></i>
                                 </a>
                             </li>
                             <li class="m-b-10">
-                                <a href="{{ url_for('level_grade_data') }}" target="_blank">
-                                    Grades and levels data &nbsp
-                                    <i class="text-light fas fa-sm fa-external-link-square-alt"></i>
-                                </a>
-                            </li>
-                            <li class="m-b-10">
-                                <a href="{{ url_for('knowledge_grade_data') }}" target="_blank">
-                                    Knowledge levels data &nbsp
+                                <a class="text-light" href="{{ url_for('knowledge_grade_data') }}" target="_blank">
+                                    Knowledge levels data
                                     <i class="text-light fas fa-sm fa-external-link-square-alt"></i>
                                 </a>
                             </li>
@@ -738,97 +592,7 @@
 
     <div id="follows_tab" class="tab-pane fade">
         <div class="row m-t-30">
-            <div class="col-md-3">
-                <ul class="p-l-0">
-                    <li class="m-b-20">
-                        <h4>
-                            <i class="fas fa-user"></i>
-                            &nbsp&nbsp Biography
-                            {% if user_id == current_user.get_id() %}
-                            <a class="fas fa-sm fa-pen p-r-10" onclick="changeTab()" style="float: right;"></a>
-                            {% endif %}
-                        </h4>
-                        <hr>
-                        {% if user_biography %}
-                        <p class="text-justify m-b-0">{{ user_biography }}</p>
-                        {% else %}
-                        <p class="text-justify m-b-0">If you want, you can add some info about you, click on the pen above to do it ;)</p>
-                        {% endif %}
-                    </li>
-                    <li class="m-b-20">
-                        <h4><i class="fas fa-angle-double-up"></i>&nbsp&nbsp Lists Levels</h4>
-                        <hr>
-                        <div class="d-flex">
-                            <div class='account-bar-wrapper'>
-                                <div class='account-bar'>
-                                    <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
-                                    <span class='account-bar-name'>Series</span>
-                                    <div id="series_level" class='account-bar-level'>Level {{ data['series_level'] }}</div>
-                                    <div class='xp-bar' data-toggle="tooltip" title="{{ data['series_percent'] }}%">
-                                        <div id='xp-bar-fill-series'>
-                                            <div class='xp-increase-fx'>
-                                                <div class='xp-increase-fx-flicker'>
-                                                    <div class='xp-increase-glow1'></div>
-                                                    <div class='xp-increase-glow2'></div>
-                                                    <div class='xp-increase-glow3'></div>
-                                                </div>
-                                                <div class='xp-increase-glow2'></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ data['series_level'] | int + 1 }}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex">
-                            <div class='account-bar-wrapper'>
-                                <div class='account-bar'>
-                                    <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
-                                    <span class='account-bar-name'>Movies</span>
-                                    <div id="movies_level" class='account-bar-level'>Level {{ data['movies_level'] }}</div>
-                                    <div class='xp-bar' data-toggle="tooltip" title="{{ data['movies_percent'] }}%">
-                                        <div id='xp-bar-fill-movies'>
-                                            <div class='xp-increase-fx'>
-                                                <div class='xp-increase-fx-flicker'>
-                                                    <div class='xp-increase-glow1'></div>
-                                                    <div class='xp-increase-glow2'></div>
-                                                    <div class='xp-increase-glow3'></div>
-                                                </div>
-                                                <div class='xp-increase-glow2'></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ data['movies_level'] | int + 1 }}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex">
-                            <div class='account-bar-wrapper'>
-                                <div class='account-bar'>
-                                    <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
-                                    <div class='account-bar-name'>Anime</div>
-                                    <div id="anime_level" class='account-bar-level'>Level {{ data['anime_level'] }}</div>
-                                    <div class='xp-bar' data-toggle="tooltip" title="{{ data['anime_percent'] }}%">
-                                        <div id='xp-bar-fill-anime'>
-                                            <div class='xp-increase-fx'>
-                                                <div class='xp-increase-fx-flicker'>
-                                                    <div class='xp-increase-glow1'></div>
-                                                    <div class='xp-increase-glow2'></div>
-                                                    <div class='xp-increase-glow3'></div>
-                                                </div>
-                                                <div class='xp-increase-glow2'></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ data['anime_level'] | int + 1 }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="vertical_line"></div>
-            <div class="col-6">
+            <div class="col-9">
                 {% if user_id == current_user.get_id() %}
                 <form method="POST" action="" enctype="multipart/form-data">
                     {{ follow_form.hidden_tag() }}
@@ -874,45 +638,84 @@
     </div>
 
     <div id="achievements_tab" class="tab-pane fade">
-        <div class="row m-t-30">
-            <div class="col-1 m-l-10">
-                <ul class="p-l-0 text-center">
-                    <li class="m-b-20">
-                        <h4>Anime</h4>
-                    </li>
-                    <li class="m-b-20">
-                        <h4>Series</h4>
-                    </li>
-                    <li class="m-b-20">
-                        <h4>Movies</h4>
-                    </li>
-                </ul>
+        <div class="row text-center m-t-30">
+            <div class="col-auto ml-auto">
+                <button class="btn btn-sm btn-warning text-dark">Anime</button>
             </div>
-            <div class="vertical_line m-r-40"></div>
-            <span class="col">
+            <div class="col-auto">
+                <button class="btn btn-sm btn-light">Series</button>
+            </div>
+            <div class="col-auto mr-auto">
+                <button class="btn btn-sm btn-light">Movies</button>
+            </div>
+        </div>
+        <div class="row m-t-30">
+            <div class="col">
                 <div class="row">
                     {% for i in range(0, anime_achiev['genres']|length) %}
-                    <div class="col-4 m-b-40">
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
                         <h4>{{ anime_achiev['genres'][i]['level'] }}</h4>
                         <div class="row">
-                            <div class="col-3">
+                            <div class="col-auto">
                                 <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ anime_achiev['genres'][i]['image_id'] }}.png"/>
                             </div>
-                            <div class="col">
+                            <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
                                 Badge earned when watching <br> {{ anime_achiev['genres'][i]['level'] }} genre anime.
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col achiev-name text-center">
+                            <div class="col-auto achiev-name text-center">
                                 {{ anime_achiev['genres'][i]['title'] }}
                             </div>
-                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ (anime_achiev['genres'][i]['element_time']*100)/(anime_achiev['genres'][i]['threshold']) }}%">
+                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['genres'][i]['element_time'] }} hours">
                                 <span class="block_achiev">
-                                    <span id="{{ (anime_achiev['genres'][i]['element_time']*100)/(anime_achiev['genres'][i]['threshold']) }}%" class="value"></span>
+                                    {% if anime_achiev['genres'][i]['element_percentage'] > 100 %}
+                                    <span id="100%" class="value"></span>
+                                    {% else %}
+                                    <span id="{{ anime_achiev['genres'][i]['element_percentage'] }}%" class="value"></span>
+                                    {% endif %}
                                 </span>
                             </div>
-                            <div class="col achiev-value">
-                                {{ anime_achiev['genres'][i]['threshold'] }}
+                            <div class="col-auto">
+                                {% if anime_achiev['genres'][i]['element_percentage'] > 100 %}
+                                        {{ anime_achiev['genres'][i]['element_time'] }}
+                                    {% else %}
+                                        {{ anime_achiev['genres'][i]['threshold'] }}
+                                    {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% for i in range(0, anime_achiev['finished']|length) %}
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
+                        <h4>{{ anime_achiev['finished'][i]['level'] }}</h4>
+                        <div class="row">
+                            <div class="col-auto">
+                                <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ anime_achiev['finished'][i]['image_id'] }}.png"/>
+                            </div>
+                            <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
+                                Badge earned when you <br> finished ended anime.
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-auto achiev-name text-center">
+                                {{ anime_achiev['finished'][i]['title'] }}
+                            </div>
+                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['finished'][i]['element_count'] }} finished">
+                                <span class="block_achiev">
+                                    {% if anime_achiev['finished'][i]['element_percentage'] > 100 %}
+                                    <span id="100%" class="value"></span>
+                                    {% else %}
+                                    <span id="{{ anime_achiev['finished'][i]['element_percentage'] }}%" class="value"></span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                {% if anime_achiev['finished'][i]['element_percentage'] > 100 %}
+                                        {{ anime_achiev['finished'][i]['element_count'] }}
+                                    {% else %}
+                                        {{ anime_achiev['finished'][i]['threshold'] }}
+                                    {% endif %}
                             </div>
                         </div>
                     </div>
@@ -920,6 +723,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
     {% if user_id == current_user.get_id() %}
     <div id="settings_tab" class="tab-pane fade">

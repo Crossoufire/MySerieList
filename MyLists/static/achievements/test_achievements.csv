@@ -2,59 +2,59 @@ media;threshold;image_id;title;level;type;genre
 A;30;anime-mystery;Mystery;Level 1;genre;7
 A;75;anime-mystery;Mystery;Level 2;genre;7
 A;150;anime-mystery;Mystery;Level 3;genre;7
-A;300;anime-mystery;Mystery;Level 4;genre;7
+A;300;anime-mystery;Mystery;Level max;genre;7
 A;30;anime-pervert;Pervert;Level 1;genre;9
 A;75;anime-pervert;Pervert;Level 2;genre;9
 A;150;anime-pervert;Pervert;Level 3;genre;9
-A;300;anime-pervert;Pervert;Level 4;genre;9
+A;300;anime-pervert;Pervert;Level max;genre;9
 A;30;anime-historical;Historical;Level 1;genre;13
 A;75;anime-historical;Historical;Level 2;genre;13
 A;150;anime-historical;Historical;Level 3;genre;13
-A;300;anime-historical;Historical;Level 4;genre;13
+A;300;anime-historical;Historical;Level max;genre;13
 A;30;anime-horror;Horror;Level 1;genre;14
 A;75;anime-horror;Horror;Level 2;genre;14
 A;150;anime-horror;Horror;Level 3;genre;14
-A;300;anime-horror;Horror;Level 4;genre;14
+A;300;anime-horror;Horror;Level max;genre;14
 A;30;anime-mecha;Mecha;Level 1;genre;18
 A;75;anime-mecha;Mecha;Level 2;genre;18
 A;150;anime-mecha;Mecha;Level 3;genre;18
-A;300;anime-mecha;Mecha;Level 4;genre;18
+A;300;anime-mecha;Mecha;Level max;genre;18
 A;30;anime-music;Music;Level 1;genre;19
 A;75;anime-music;Music;Level 2;genre;19
 A;150;anime-music;Music;Level 3;genre;19
-A;300;anime-music;Music;Level 4;genre;19
+A;300;anime-music;Music;Level max;genre;19
 A;30;anime-romance;Romance;Level 1;genre;22
 A;75;anime-romance;Romance;Level 2;genre;22
 A;150;anime-romance;Romance;Level 3;genre;22
-A;300;anime-romance;Romance;Level 4;genre;22
+A;300;anime-romance;Romance;Level max;genre;22
 A;30;anime-space;Space;Level 1;genre;29
 A;75;anime-space;Space;Level 2;genre;29
 A;150;anime-space;Space;Level 3;genre;29
-A;300;anime-space;Space;Level 4;genre;29
+A;300;anime-space;Space;Level max;genre;29
 A;30;anime-sports;Sports;Level 1;genre;30
 A;75;anime-sports;Sports;Level 2;genre;30
 A;150;anime-sports;Sports;Level 3;genre;30
-A;300;anime-sports;Sports;Level 4;genre;30
+A;300;anime-sports;Sports;Level max;genre;30
 A;30;anime-slice-of-life;Slice of Life;Level 1;genre;36
 A;75;anime-slice-of-life;Slice of Life;Level 2;genre;36
 A;150;anime-slice-of-life;Slice of Life;Level 3;genre;36
-A;300;anime-slice-of-life;Slice of Life;Level 4;genre;36
+A;300;anime-slice-of-life;Slice of Life;Level max;genre;36
 A;30;anime-psychological;Psychological;Level 1;genre;40
 A;75;anime-psychological;Psychological;Level 2;genre;40
 A;150;anime-psychological;Psychological;Level 3;genre;40
-A;300;anime-psychological;Psychological;Level 4;genre;40
+A;300;anime-psychological;Psychological;Level max;genre;40
 A;30;anime-game;Visual novel;Level 1;visual-novel;
 A;75;anime-game;Visual novel;Level 2;visual-novel;
 A;150;anime-game;Visual novel;Level 3;visual-novel;
-A;300;anime-game;Visual novel;Level 4;visual-novel;
+A;300;anime-game;Visual novel;Level max;visual-novel;
 A;30;anime-original;Original;Level 1;original;
 A;75;anime-original;Original;Level 2;original;
 A;150;anime-original;Original;Level 3;original;
-A;300;anime-original;Original;Level 4;original;
+A;300;anime-original;Original;Level max;original;
 A;100;anime-release-classic;Classic;Level 1;classic;
 A;250;anime-release-classic;Classic;Level 2;classic;
 A;400;anime-release-classic;Classic;Level 3;classic;
-A;550;anime-release-classic;Classic;Level 4;classic;
+A;550;anime-release-classic;Classic;Level max;classic;
 A;10;anime-finished;Finished;Level 1;finished;
 A;20;anime-finished;Finished;Level 2;finished;
 A;30;anime-finished;Finished;Level 3;finished;
@@ -66,45 +66,42 @@ A;80;anime-finished;Finished;Level 8;finished;
 A;90;anime-finished;Finished;Level 9;finished;
 A;100;anime-finished;Finished;Level 10;finished;
 A;200;anime-finished;Finished;Level 11;finished;
-A;300;anime-finished;Finished;Level 12;finished;
+A;300;anime-finished;Finished;Level max;finished;
 A;30;anime-time;Time;Level 1;time;
 A;75;anime-time;Time;Level 2;time;
 A;150;anime-time;Time;Level 3;time;
-A;300;anime-time;Time;Level 4;time;
-A;3;anime-score-very-low;Score Very Low;Level 1;score;
-A;5;anime-score-low;Score Low;Level 1;score;
-A;8;anime-score-high;Score High;Level 1;score;
-A;10;anime-year;Year;Level 1;year;
-A;10;anime-episode-long;Long Episodes;Level 1;long;
-A;10;anime-release-old;Old;Level 1;old;
+A;300;anime-time;Time;Level max;time;
+A;10;anime-year;Year;Level max;year;
+A;10;anime-episode-long;Long Episodes;Level max;long;
+A;10;anime-release-old;Old;Level max;old;
 S;100;series-mystery;Mystery;Level 1;genre;9648
 S;250;series-mystery;Mystery;Level 2;genre;9648
 S;400;series-mystery;Mystery;Level 3;genre;9648
-S;650;series-mystery;Mystery;Level 4;genre;9648
+S;650;series-mystery;Mystery;Level max;genre;9648
 S;100;series-action-aventure;Action/Adventure;Level 1;genre;10759
 S;250;series-action-aventure;Action/Adventure;Level 2;genre;10759
 S;400;series-action-aventure;Action/Adventure;Level 3;genre;10759
-S;650;series-action-aventure;Action/Adventure;Level 4;genre;10759
+S;650;series-action-aventure;Action/Adventure;Level max;genre;10759
 S;100;series-comedy;Comedy;Level 1;genre;35
 S;300;series-comedy;Comedy;Level 2;genre;35
 S;600;series-comedy;Comedy;Level 3;genre;35
-S;900;series-comedy;Comedy;Level 4;genre;35
+S;900;series-comedy;Comedy;Level max;genre;35
 S;100;series-crime;Crime;Level 1;genre;80
 S;250;series-crime;Crime;Level 2;genre;80
 S;400;series-crime;Crime;Level 3;genre;80
-S;550;series-crime;Crime;Level 4;genre;80
+S;550;series-crime;Crime;Level max;genre;80
 S;30;series-documentary;Documentary;Level 1;genre;99
 S;50;series-documentary;Documentary;Level 2;genre;99
 S;75;series-documentary;Documentary;Level 3;genre;99
-S;100;series-documentary;Documentary;Level 4;genre;99
+S;100;series-documentary;Documentary;Level max;genre;99
 S;500;series-drama;Drama;Level 1;genre;18
 S;1000;series-drama;Drama;Level 2;genre;18
 S;2000;series-drama;Drama;Level 3;genre;18
-S;3000;series-drama;Drama;Level 4;genre;18
+S;3000;series-drama;Drama;Level max;genre;18
 S;100;series-sci-fi-fantasy;Sci-fi Fantasy;Level 1;genre;10765
 S;200;series-sci-fi-fantasy;Sci-fi Fantasy;Level 2;genre;10765
 S;300;series-sci-fi-fantasy;Sci-fi Fantasy;Level 3;genre;10765
-S;400;series-sci-fi-fantasy;Sci-fi Fantasy;Level 4;genre;10765
+S;400;series-sci-fi-fantasy;Sci-fi Fantasy;Level max;genre;10765
 S;5;series-finished;Finished;Level 1;finished;
 S;10;series-finished;Finished;Level 2;finished;
 S;15;series-finished;Finished;Level 3;finished;
@@ -116,18 +113,15 @@ S;40;series-finished;Finished;Level 8;finished;
 S;45;series-finished;Finished;Level 9;finished;
 S;50;series-finished;Finished;Level 10;finished;
 S;75;series-finished;Finished;Level 11;finished;
-S;100;series-finished;Finished;Level 12;finished;
+S;100;series-finished;Finished;Level max;finished;
 S;30;series-time;Time;Level 1;time;
 S;75;series-time;Time;Level 2;time;
 S;150;series-time;Time;Level 3;time;
-S;300;series-time;Time;Level 4;time;
+S;300;series-time;Time;Level max;time;
 S;100;series-classic;Classic;Level 1;classic;
 S;200;series-classic;Classic;Level 2;classic;
 S;400;series-classic;Classic;Level 3;classic;
-S;700;series-classic;Classic;Level 4;classic;
-S;3;series-score-really-low;Score Very Low;Level 1;score;
-S;5;series-score-low;Score Low;Level 1;score;
-S;8;series-score-high;Score High;Level 1;score;
-S;20;series-years;Year;Level 1;year;
-S;10;series-old;Old;Level 1;old;
-S;10;series-lot-episodes;Long Episodes;Level 1;long;
+S;700;series-classic;Classic;Level max;classic;
+S;20;series-years;Year;Level max;year;
+S;10;series-old;Old;Level max;old;
+S;10;series-lot-episodes;Long Episodes;Level max;long;
