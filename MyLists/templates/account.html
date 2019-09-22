@@ -457,7 +457,7 @@
                         <hr>
                         <!------------------------ Series achievements --------------------------->
                         <div class="stats-size m-b-20">
-                            <h5 class="text-left m-b-10"><b>Series</b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
+                            <h5 class="text-left m-b-10"><b>Series</b></h5>
                             <div class="row">
                                     <div class="col-auto achiev-name">
                                         Badges
@@ -487,7 +487,7 @@
                         </div>
                         <!------------------------ Anime achievements --------------------------->
                         <div class="stats-size m-b-20">
-                            <h5 class="text-left m-b-10"><b>Anime</b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
+                            <h5 class="text-left m-b-10"><b>Anime</b></h5>
                             <div class="row">
                                     <div class="col-auto achiev-name">
                                         Badges
@@ -517,7 +517,7 @@
                         </div>
                         <!------------------------ Movies achievements --------------------------->
                         <div class="stats-size m-b-20">
-                            <h5 class="text-left m-b-10"><b>Movies</b> <i class="fas fa-sm fa-external-link-square-alt"></i></h5>
+                            <h5 class="text-left m-b-10"><b>Movies</b></h5>
                             <div class="row">
                                     <div class="col-auto achiev-name">
                                         Badges
@@ -638,18 +638,161 @@
     </div>
 
     <div id="achievements_tab" class="tab-pane fade">
-        <div class="row text-center m-t-30">
-            <div class="col-auto ml-auto">
-                <button class="btn btn-sm btn-warning text-dark">Anime</button>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-sm btn-light">Series</button>
-            </div>
-            <div class="col-auto mr-auto">
-                <button class="btn btn-sm btn-light">Movies</button>
+        <div class="d-flex flex-wrap filters-button-group m-t-30" style="justify-content: center;">
+            <button class="btn btn-sm btn-warning text-dark" onclick="changeBadges('anime')">Anime</button>
+            <button class="btn btn-sm btn-light text-dark" onclick="changeBadges('series')">Series</button>
+            <button class="btn btn-sm btn-light text-dark" onclick="changeBadges('movies')">Movies</button>
+        </div>
+
+        <div id="anime_badges" class="row m-t-30" style="display: block;">
+            <div class="col">
+                <div class="row">
+                    {% for i in range(0, anime_achiev['genres']|length) %}
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
+                        <h4>{{ anime_achiev['genres'][i]['level'] }}</h4>
+                        <div class="row">
+                            <div class="col-auto">
+                                <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ anime_achiev['genres'][i]['image_id'] }}.png"/>
+                            </div>
+                            <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
+                                Badge earned when watching <br> {{ anime_achiev['genres'][i]['level'] }} genre anime.
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-auto achiev-name text-center">
+                                {{ anime_achiev['genres'][i]['title'] }}
+                            </div>
+                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['genres'][i]['element_time'] }} hours">
+                                <span class="block_achiev">
+                                    {% if anime_achiev['genres'][i]['element_percentage'] > 100 %}
+                                    <span id="100%" class="value"></span>
+                                    {% else %}
+                                    <span id="{{ anime_achiev['genres'][i]['element_percentage'] }}%" class="value"></span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                {% if anime_achiev['genres'][i]['element_percentage'] > 100 %}
+                                        {{ anime_achiev['genres'][i]['element_time'] }}
+                                    {% else %}
+                                        {{ anime_achiev['genres'][i]['threshold'] }}
+                                    {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% for i in range(0, anime_achiev['finished']|length) %}
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
+                        <h4>{{ anime_achiev['finished'][i]['level'] }}</h4>
+                        <div class="row">
+                            <div class="col-auto">
+                                <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ anime_achiev['finished'][i]['image_id'] }}.png"/>
+                            </div>
+                            <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
+                                Badge earned when you <br> finished ended anime.
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-auto achiev-name text-center">
+                                {{ anime_achiev['finished'][i]['title'] }}
+                            </div>
+                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['finished'][i]['element_count'] }} finished">
+                                <span class="block_achiev">
+                                    {% if anime_achiev['finished'][i]['element_percentage'] > 100 %}
+                                    <span id="100%" class="value"></span>
+                                    {% else %}
+                                    <span id="{{ anime_achiev['finished'][i]['element_percentage'] }}%" class="value"></span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                {% if anime_achiev['finished'][i]['element_percentage'] > 100 %}
+                                        {{ anime_achiev['finished'][i]['element_count'] }}
+                                    {% else %}
+                                        {{ anime_achiev['finished'][i]['threshold'] }}
+                                    {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
-        <div class="row m-t-30">
+        <div id="series_badges" class="row m-t-30" style="display: none;">
+            <div class="col">
+                <div class="row">
+                    {% for i in range(0, series_achiev['genres']|length) %}
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
+                        <h4>{{ series_achiev['genres'][i]['level'] }}</h4>
+                        <div class="row">
+                            <div class="col-auto">
+                                <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ series_achiev['genres'][i]['image_id'] }}.png"/>
+                            </div>
+                            <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
+                                Badge earned when watching <br> {{ series_achiev['genres'][i]['level'] }} genre series.
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-auto achiev-name text-center">
+                                {{ series_achiev['genres'][i]['title'] }}
+                            </div>
+                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ series_achiev['genres'][i]['element_time'] }} hours">
+                                <span class="block_achiev">
+                                    {% if series_achiev['genres'][i]['element_percentage'] > 100 %}
+                                    <span id="100%" class="value"></span>
+                                    {% else %}
+                                    <span id="{{ series_achiev['genres'][i]['element_percentage'] }}%" class="value"></span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                {% if series_achiev['genres'][i]['element_percentage'] > 100 %}
+                                        {{ series_achiev['genres'][i]['element_time'] }}
+                                    {% else %}
+                                        {{ series_achiev['genres'][i]['threshold'] }}
+                                    {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% for i in range(0, series_achiev['finished']|length) %}
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
+                        <h4>{{ series_achiev['finished'][i]['level'] }}</h4>
+                        <div class="row">
+                            <div class="col-auto">
+                                <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ series_achiev['finished'][i]['image_id'] }}.png"/>
+                            </div>
+                            <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
+                                Badge earned when you <br> finished ended series.
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-auto achiev-name text-center">
+                                {{ series_achiev['finished'][i]['title'] }}
+                            </div>
+                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ series_achiev['finished'][i]['element_count'] }} finished">
+                                <span class="block_achiev">
+                                    {% if series_achiev['finished'][i]['element_percentage'] > 100 %}
+                                    <span id="100%" class="value"></span>
+                                    {% else %}
+                                    <span id="{{ series_achiev['finished'][i]['element_percentage'] }}%" class="value"></span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                {% if series_achiev['finished'][i]['element_percentage'] > 100 %}
+                                        {{ series_achiev['finished'][i]['element_count'] }}
+                                    {% else %}
+                                        {{ series_achiev['finished'][i]['threshold'] }}
+                                    {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div id="movies_badges" class="row m-t-30" style="display: none;">
             <div class="col">
                 <div class="row">
                     {% for i in range(0, anime_achiev['genres']|length) %}

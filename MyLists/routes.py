@@ -1210,7 +1210,7 @@ def change_element_category():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
+    category_list = ["Watching", "Completed", "Completed Animation", "On Hold", "Random", "Dropped", "Plan to Watch"]
     if element_new_category not in category_list:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1244,6 +1244,8 @@ def change_element_category():
             number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=number_season).first().episodes
             element.current_season = number_season
             element.last_episode_watched = number_episode
+    elif element_new_category == 'Completed Animation':
+        element.status = Status.COMPLETED_ANIMATION
     elif element_new_category == 'On Hold':
         element.status = Status.ON_HOLD
     elif element_new_category == 'Random':
@@ -2536,7 +2538,7 @@ def compute_media_time_spent(list_type):
     elif list_type == ListType.MOVIES:
         total_time = 0
         for element in element_data:
-            if element[0].status == Status.COMPLETED:
+            if element[0].status == Status.COMPLETED or element[0].status == Status.COMPLETED_ANIMATION:
                 try:
                     total_time += element[1].runtime
                 except:

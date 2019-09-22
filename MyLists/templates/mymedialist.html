@@ -60,7 +60,11 @@
             <option data-filter=".Drama">Drama</option>
             <option data-filter=".Comedy">Comedy</option>
         </select> #}
+        {% if category[1] == 'COMPLETED ANIMATION' %}
+        <div class="d-flex flex-wrap ANIMATION">
+        {% else %}
         <div class="d-flex flex-wrap {{ category[1] }}">
+        {% endif %}
             {% set outer_loop = loop %}
             {% for data in category[0] %}
                 <!------------------- Card -------------------->
@@ -282,13 +286,20 @@
                             </div>
                             <div id="mod_{{ data[0].id }}" class="modal-body">
                                 {% if outer_loop.index == 1 %}
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed Animation', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', '{{ media_list }}')">Completed Animation</a>
                                 <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', '{{ media_list }}')">Plan to Watch</a>
                                 {% elif outer_loop.index == 2 %}
                                 <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', '{{ media_list }}')">Completed</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Plan to Watch', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', '{{ media_list }}')">Plan to Watch</a>
+                                {% elif outer_loop.index == 3 %}
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', '{{ media_list }}')">Completed</a>
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="changeCategory('{{ data[0].id }}', 'Completed Animation', 'card_{{ data[0].id }}', 'mod_{{ data[0].id }}', '{{ media_list }}')">Completed Animation</a>
                                 {% endif %}
                                 {# {% if outer_loop.index == 1 %}
                                 <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="Category('card_{{ data[0].id }}', 'plantowatch')">Plan to Watch</a>
                                 {% elif outer_loop.index == 2 %}
+                                <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="Category('card_{{ data[0].id }}', 'completed')">Completed</a>
+                                {% elif outer_loop.index == 3 %}
                                 <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="Category('card_{{ data[0].id }}', 'completed')">Completed</a>
                                 {% endif %} #}
                             </div>

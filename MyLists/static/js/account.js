@@ -46,6 +46,36 @@ function changeTab(tab, nav) {
     $('#'+tab).attr('class', 'tab-pane fade show active');
 }
 
+
+function changeBadges(media) {
+    if (media == 'anime') {
+        $('#anime_badges').attr('style', 'display: block;');
+        $('#series_badges').attr('style', 'display: none;');
+        $('#movies_badges').attr('style', 'display: none;');
+    } else if (media == 'series') {
+        $('#anime_badges').attr('style', 'display: none;');
+        $('#series_badges').attr('style', 'display: block;');
+        $('#movies_badges').attr('style', 'display: none;');
+    } else {
+        $('#anime_badges').attr('style', 'display: none;');
+        $('#series_badges').attr('style', 'display: none;');
+        $('#movies_badges').attr('style', 'display: block;');
+    }
+}
+
+
+// change the class on the selected button
+$('.filters-button-group').each(function(i, buttonGroup) {
+    var $buttonGroup = $(buttonGroup);
+    $buttonGroup.on('click', 'button', function() {
+        $buttonGroup.find('.btn-warning').addClass('btn-light');
+        $buttonGroup.find('.btn-warning').removeClass('btn-warning');
+        $(this).addClass('btn-warning');
+        $(this).removeClass('btn-light');
+    });
+});
+
+
 $(document).ready(function() {
     $body = $("body");
     $body.addClass("loading");
