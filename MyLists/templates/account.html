@@ -41,7 +41,7 @@
     {% else %}
     <li class="nav-item">
     {% endif %}
-        <a id="achievements" class="nav-link" data-toggle="tab" href="#achievements_tab">Achievements</a>
+        <a id="achievements" class="nav-link" data-toggle="tab" href="#achievements_tab">Badges</a>
     </li>
 
     {% if user_id == current_user.get_id() %}
@@ -166,13 +166,13 @@
                             {% endfor %}
                         </div>
                     </li>
-                    <li class="m-b-20">
+                    {#<li class="m-b-20">
                         <h4><i class="fas fa-newspaper"></i>&nbsp&nbsp Last follows update</h4>
                         <hr>
                         <div class="m-b-10">Psy - series<br>Added Breaking Bad</div>
                         <div class="m-b-10">Psy - series<br>Breaking Bad<br>S01.E02 <i class="fas fa-arrow-right"></i> S01.E04</div>
                         <div>Psy - anime<br>Shingeki no kyojin<br>S02.E04 <i class="fas fa-arrow-right"></i> S02.E08</div>
-                    </li>
+                    </li>#}
                 </ul>
             </div>
             <div class="vertical_line"></div>
@@ -464,11 +464,11 @@
                                     </div>
                                     <div class="col achiev-bar">
                                         <div class="block_achiev series">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['genres'])/14)*100 }}%" class="value"></span>
+                                            <span id="{{ ((series_achiev['unlocked_badges'])/14)*100 }}%" class="value"></span>
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        {{ series_achiev['unlocked_per_type']['genres'] }}/14
+                                        {{ series_achiev['unlocked_badges'] }}/14
                                     </div>
                                 </div>
                             <div class="row">
@@ -477,11 +477,11 @@
                                     </div>
                                     <div class="col achiev-bar">
                                         <span class="block_achiev series">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['sources'])/41)*100 }}%" class="value"></span>
+                                            <span id="{{ ((series_achiev['unlocked_levels'])/41)*100 }}%" class="value"></span>
                                         </span>
                                     </div>
                                     <div class="col-auto">
-                                        {{ series_achiev['unlocked_per_type']['sources'] }}/41
+                                        {{ series_achiev['unlocked_levels'] }}/41
                                     </div>
                                 </div>
                         </div>
@@ -494,11 +494,11 @@
                                     </div>
                                     <div class="col achiev-bar">
                                         <div class="block_achiev anime">
-                                            <span id="{{ ((anime_achiev['unlocked_per_type']['genres'])/18)*100 }}%" class="value"></span>
+                                            <span id="{{ ((anime_achiev['unlocked_badges'])/18)*100 }}%" class="value"></span>
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        {{ anime_achiev['unlocked_per_type']['genres'] }}/18
+                                        {{ anime_achiev['unlocked_badges'] }}/18
                                     </div>
                                 </div>
                             <div class="row">
@@ -507,11 +507,11 @@
                                     </div>
                                     <div class="col achiev-bar">
                                         <span class="block_achiev anime">
-                                            <span id="{{ ((anime_achiev['unlocked_per_type']['sources'])/67)*100 }}%" class="value"></span>
+                                            <span id="{{ ((anime_achiev['unlocked_levels'])/67)*100 }}%" class="value"></span>
                                         </span>
                                     </div>
                                     <div class="col-auto">
-                                        {{ anime_achiev['unlocked_per_type']['sources'] }}/67
+                                        {{ anime_achiev['unlocked_levels'] }}/67
                                     </div>
                                 </div>
                         </div>
@@ -524,11 +524,11 @@
                                     </div>
                                     <div class="col achiev-bar">
                                         <div class="block_achiev movies">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['genres'])/16)*100 }}%" class="value"></span>
+                                            <span id="{{ ((movies_achiev['unlocked_badges'])/16)*100 }}%" class="value"></span>
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        {{ series_achiev['unlocked_per_type']['genres'] }}/16
+                                        {{ movies_achiev['unlocked_badges'] }}/16
                                     </div>
                                 </div>
                             <div class="row">
@@ -537,11 +537,11 @@
                                     </div>
                                     <div class="col achiev-bar">
                                         <span class="block_achiev movies">
-                                            <span id="{{ ((series_achiev['unlocked_per_type']['sources'])/44)*100 }}%" class="value"></span>
+                                            <span id="{{ ((movies_achiev['unlocked_levels'])/44)*100 }}%" class="value"></span>
                                         </span>
                                     </div>
                                     <div class="col-auto">
-                                        {{ series_achiev['unlocked_per_type']['sources'] }}/44
+                                        {{ movies_achiev['unlocked_levels'] }}/44
                                     </div>
                                 </div>
                         </div>
@@ -592,7 +592,7 @@
 
     <div id="follows_tab" class="tab-pane fade">
         <div class="row m-t-30">
-            <div class="col-9">
+            <div class="col">
                 {% if user_id == current_user.get_id() %}
                 <form method="POST" action="" enctype="multipart/form-data">
                     {{ follow_form.hidden_tag() }}
@@ -616,7 +616,7 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div class="vertical_line"></div>
+            {#<div class="vertical_line"></div>
             <div class="col">
                 <ul class="p-l-0">
                     <li>
@@ -633,7 +633,7 @@
                         <div>Psy - anime<br>Shingeki no kyojin<br>S02.E04 <i class="fas fa-arrow-right"></i> S02.E08</div>
                     </li>
                 </ul>
-            </div>
+            </div>#}
         </div>
     </div>
 
@@ -643,73 +643,38 @@
             <button class="btn btn-sm btn-light text-dark" onclick="changeBadges('series')">Series</button>
             <button class="btn btn-sm btn-light text-dark" onclick="changeBadges('movies')">Movies</button>
         </div>
-
         <div id="anime_badges" class="row m-t-30" style="display: block;">
             <div class="col">
                 <div class="row">
-                    {% for i in range(0, anime_achiev['genres']|length) %}
+                    {% for i in range(0, anime_achiev['all_badges']|length) %}
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
-                        <h4>{{ anime_achiev['genres'][i]['level'] }}</h4>
+                        <h4>{{ anime_achiev['all_badges'][i]['title'] }}</h4>
                         <div class="row">
                             <div class="col-auto">
-                                <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ anime_achiev['genres'][i]['image_id'] }}.png"/>
+                                <img width="70" height="70" src="{{ url_for('static', filename='img/media_badges') }}/{{ anime_achiev['all_badges'][i]['image_id'] }}.png"/>
                             </div>
                             <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
-                                Badge earned when watching <br> {{ anime_achiev['genres'][i]['level'] }} genre anime.
+                                Badge earned when watching <br> anime.
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-auto achiev-name text-center">
-                                {{ anime_achiev['genres'][i]['title'] }}
+                                {{ anime_achiev['all_badges'][i]['level'] }}
                             </div>
-                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['genres'][i]['element_time'] }} hours">
+                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['all_badges'][i]['element_time'] }} hours">
                                 <span class="block_achiev">
-                                    {% if anime_achiev['genres'][i]['element_percentage'] > 100 %}
+                                    {% if anime_achiev['all_badges'][i]['element_percentage'] > 100 %}
                                     <span id="100%" class="value"></span>
                                     {% else %}
-                                    <span id="{{ anime_achiev['genres'][i]['element_percentage'] }}%" class="value"></span>
+                                    <span id="{{ anime_achiev['all_badges'][i]['element_percentage'] }}%" class="value"></span>
                                     {% endif %}
                                 </span>
                             </div>
                             <div class="col-auto">
-                                {% if anime_achiev['genres'][i]['element_percentage'] > 100 %}
-                                        {{ anime_achiev['genres'][i]['element_time'] }}
+                                {% if anime_achiev['all_badges'][i]['element_percentage'] > 100 %}
+                                        {{ anime_achiev['all_badges'][i]['element_time'] }}
                                     {% else %}
-                                        {{ anime_achiev['genres'][i]['threshold'] }}
-                                    {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    {% for i in range(0, anime_achiev['finished']|length) %}
-                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
-                        <h4>{{ anime_achiev['finished'][i]['level'] }}</h4>
-                        <div class="row">
-                            <div class="col-auto">
-                                <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ anime_achiev['finished'][i]['image_id'] }}.png"/>
-                            </div>
-                            <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
-                                Badge earned when you <br> finished ended anime.
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-auto achiev-name text-center">
-                                {{ anime_achiev['finished'][i]['title'] }}
-                            </div>
-                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['finished'][i]['element_count'] }} finished">
-                                <span class="block_achiev">
-                                    {% if anime_achiev['finished'][i]['element_percentage'] > 100 %}
-                                    <span id="100%" class="value"></span>
-                                    {% else %}
-                                    <span id="{{ anime_achiev['finished'][i]['element_percentage'] }}%" class="value"></span>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="col-auto">
-                                {% if anime_achiev['finished'][i]['element_percentage'] > 100 %}
-                                        {{ anime_achiev['finished'][i]['element_count'] }}
-                                    {% else %}
-                                        {{ anime_achiev['finished'][i]['threshold'] }}
+                                        {{ anime_achiev['all_badges'][i]['threshold'] }}
                                     {% endif %}
                             </div>
                         </div>
@@ -721,69 +686,35 @@
         <div id="series_badges" class="row m-t-30" style="display: none;">
             <div class="col">
                 <div class="row">
-                    {% for i in range(0, series_achiev['genres']|length) %}
+                    {% for i in range(0, series_achiev['all_badges']|length) %}
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
-                        <h4>{{ series_achiev['genres'][i]['level'] }}</h4>
+                        <h4>{{ series_achiev['all_badges'][i]['title'] }}</h4>
                         <div class="row">
                             <div class="col-auto">
-                                <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ series_achiev['genres'][i]['image_id'] }}.png"/>
+                                <img width="70" height="70" src="{{ url_for('static', filename='img/media_badges') }}/{{ series_achiev['all_badges'][i]['image_id'] }}.png"/>
                             </div>
                             <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
-                                Badge earned when watching <br> {{ series_achiev['genres'][i]['level'] }} genre series.
+                                Badge earned when watching <br> anime.
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-auto achiev-name text-center">
-                                {{ series_achiev['genres'][i]['title'] }}
+                                {{ series_achiev['all_badges'][i]['level'] }}
                             </div>
-                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ series_achiev['genres'][i]['element_time'] }} hours">
+                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ series_achiev['all_badges'][i]['element_time'] }} hours">
                                 <span class="block_achiev">
-                                    {% if series_achiev['genres'][i]['element_percentage'] > 100 %}
+                                    {% if series_achiev['all_badges'][i]['element_percentage'] > 100 %}
                                     <span id="100%" class="value"></span>
                                     {% else %}
-                                    <span id="{{ series_achiev['genres'][i]['element_percentage'] }}%" class="value"></span>
+                                    <span id="{{ series_achiev['all_badges'][i]['element_percentage'] }}%" class="value"></span>
                                     {% endif %}
                                 </span>
                             </div>
                             <div class="col-auto">
-                                {% if series_achiev['genres'][i]['element_percentage'] > 100 %}
-                                        {{ series_achiev['genres'][i]['element_time'] }}
+                                {% if series_achiev['all_badges'][i]['element_percentage'] > 100 %}
+                                        {{ series_achiev['all_badges'][i]['element_time'] }}
                                     {% else %}
-                                        {{ series_achiev['genres'][i]['threshold'] }}
-                                    {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    {% for i in range(0, series_achiev['finished']|length) %}
-                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
-                        <h4>{{ series_achiev['finished'][i]['level'] }}</h4>
-                        <div class="row">
-                            <div class="col-auto">
-                                <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ series_achiev['finished'][i]['image_id'] }}.png"/>
-                            </div>
-                            <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
-                                Badge earned when you <br> finished ended series.
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-auto achiev-name text-center">
-                                {{ series_achiev['finished'][i]['title'] }}
-                            </div>
-                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ series_achiev['finished'][i]['element_count'] }} finished">
-                                <span class="block_achiev">
-                                    {% if series_achiev['finished'][i]['element_percentage'] > 100 %}
-                                    <span id="100%" class="value"></span>
-                                    {% else %}
-                                    <span id="{{ series_achiev['finished'][i]['element_percentage'] }}%" class="value"></span>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="col-auto">
-                                {% if series_achiev['finished'][i]['element_percentage'] > 100 %}
-                                        {{ series_achiev['finished'][i]['element_count'] }}
-                                    {% else %}
-                                        {{ series_achiev['finished'][i]['threshold'] }}
+                                        {{ series_achiev['all_badges'][i]['threshold'] }}
                                     {% endif %}
                             </div>
                         </div>
@@ -795,69 +726,35 @@
         <div id="movies_badges" class="row m-t-30" style="display: none;">
             <div class="col">
                 <div class="row">
-                    {% for i in range(0, anime_achiev['genres']|length) %}
+                    {% for i in range(0, movies_achiev['all_badges']|length) %}
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
-                        <h4>{{ anime_achiev['genres'][i]['level'] }}</h4>
+                        <h4>{{ movies_achiev['all_badges'][i]['title'] }}</h4>
                         <div class="row">
                             <div class="col-auto">
-                                <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ anime_achiev['genres'][i]['image_id'] }}.png"/>
+                                <img width="70" height="70" src="{{ url_for('static', filename='img/media_badges') }}/{{ movies_achiev['all_badges'][i]['image_id'] }}.png"/>
                             </div>
                             <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
-                                Badge earned when watching <br> {{ anime_achiev['genres'][i]['level'] }} genre anime.
+                                Badge earned when watching <br> anime.
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-auto achiev-name text-center">
-                                {{ anime_achiev['genres'][i]['title'] }}
+                                {{ movies_achiev['all_badges'][i]['level'] }}
                             </div>
-                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['genres'][i]['element_time'] }} hours">
+                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ movies_achiev['all_badges'][i]['element_time'] }} hours">
                                 <span class="block_achiev">
-                                    {% if anime_achiev['genres'][i]['element_percentage'] > 100 %}
+                                    {% if movies_achiev['all_badges'][i]['element_percentage'] > 100 %}
                                     <span id="100%" class="value"></span>
                                     {% else %}
-                                    <span id="{{ anime_achiev['genres'][i]['element_percentage'] }}%" class="value"></span>
+                                    <span id="{{ movies_achiev['all_badges'][i]['element_percentage'] }}%" class="value"></span>
                                     {% endif %}
                                 </span>
                             </div>
                             <div class="col-auto">
-                                {% if anime_achiev['genres'][i]['element_percentage'] > 100 %}
-                                        {{ anime_achiev['genres'][i]['element_time'] }}
+                                {% if movies_achiev['all_badges'][i]['element_percentage'] > 100 %}
+                                        {{ movies_achiev['all_badges'][i]['element_time'] }}
                                     {% else %}
-                                        {{ anime_achiev['genres'][i]['threshold'] }}
-                                    {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    {% for i in range(0, anime_achiev['finished']|length) %}
-                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
-                        <h4>{{ anime_achiev['finished'][i]['level'] }}</h4>
-                        <div class="row">
-                            <div class="col-auto">
-                                <img width="70" height="70" src="{{ url_for('static', filename='img/anime_achievements_test') }}/{{ anime_achiev['finished'][i]['image_id'] }}.png"/>
-                            </div>
-                            <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
-                                Badge earned when you <br> finished ended anime.
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-auto achiev-name text-center">
-                                {{ anime_achiev['finished'][i]['title'] }}
-                            </div>
-                            <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['finished'][i]['element_count'] }} finished">
-                                <span class="block_achiev">
-                                    {% if anime_achiev['finished'][i]['element_percentage'] > 100 %}
-                                    <span id="100%" class="value"></span>
-                                    {% else %}
-                                    <span id="{{ anime_achiev['finished'][i]['element_percentage'] }}%" class="value"></span>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="col-auto">
-                                {% if anime_achiev['finished'][i]['element_percentage'] > 100 %}
-                                        {{ anime_achiev['finished'][i]['element_count'] }}
-                                    {% else %}
-                                        {{ anime_achiev['finished'][i]['threshold'] }}
+                                        {{ movies_achiev['all_badges'][i]['threshold'] }}
                                     {% endif %}
                             </div>
                         </div>

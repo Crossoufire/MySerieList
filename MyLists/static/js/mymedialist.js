@@ -193,6 +193,7 @@ function changeCategory(element_id, new_category, card_id, mod_id, seas_drop_id,
     });
 }
 
+
 // ---------------- Refresh -----------------
 function refresh(element_id, media_list, user_name) {
     $body = $("body");
@@ -209,6 +210,7 @@ function refresh(element_id, media_list, user_name) {
     });
 }
 
+
 // ------------- Update episode ---------------
 function updateEpisode(element_id, episode, media_list) {
     var selected_episode = episode.selectedIndex
@@ -224,6 +226,7 @@ function updateEpisode(element_id, episode, media_list) {
             console.log("ok"); }
     });
 }
+
 
 // -------------- Update season ---------------
 function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {

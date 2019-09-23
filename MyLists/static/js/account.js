@@ -1,6 +1,5 @@
 
 function follow(follow_id) {
-    // the follow button has to change to "unfollow";
     $('.follow_button').text('Unfollow');
     $('.follow_button').attr('onclick', 'unfollow('+follow_id+')');
     $('.follow_button').addClass('btn-dark');
@@ -19,7 +18,6 @@ function follow(follow_id) {
 
 
 function unfollow(follow_id) {
-    // the unfollow button has to change to "follow";
     $('.follow_button').text('Follow');
     $('.follow_button').attr('onclick', 'follow('+follow_id+')');
     $('.follow_button').addClass('btn-primary');
@@ -64,7 +62,6 @@ function changeBadges(media) {
 }
 
 
-// change the class on the selected button
 $('.filters-button-group').each(function(i, buttonGroup) {
     var $buttonGroup = $(buttonGroup);
     $buttonGroup.on('click', 'button', function() {
@@ -91,11 +88,6 @@ $(document).ready(function() {
 
     // Tooltip initialization
     $('.block').tooltip();
-    $(function () {
-    $('[data-toggle="tooltip"]').tooltip()
-    })
-
-    // Tooltip initialization
     $('.block_no_data').tooltip();
     $(function () {
     $('[data-toggle="tooltip"]').tooltip()

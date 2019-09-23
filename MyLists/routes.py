@@ -174,7 +174,7 @@ def home():
                     return redirect(url_for('mymedialist', media_list='serieslist', user_name=current_user.username))
                 elif user.homepage == HomePage.MYMOVIESLIST:
                     return redirect(url_for('mymedialist', media_list='movieslist', user_name=current_user.username))
-                elif user.homepage == HomePage.MYANIMESLIST:
+                elif user.homepage == HomePage.MYANIMELIST:
                     return redirect(url_for('mymedialist', media_list='animelist', user_name=current_user.username))
                 elif user.homepage == HomePage.ACCOUNT:
                     return redirect(url_for('account', user_name=current_user.username))
@@ -210,7 +210,7 @@ def home():
             return redirect(url_for('mymedialist', media_list='serieslist', user_name=current_user.username))
         if user.homepage == HomePage.MYMOVIESLIST:
             return redirect(url_for('mymedialist', media_list='movieslist', user_name=current_user.username))
-        elif user.homepage == HomePage.MYANIMESLIST:
+        elif user.homepage == HomePage.MYANIMELIST:
             return redirect(url_for('mymedialist', media_list='animelist', user_name=current_user.username))
         elif user.homepage == HomePage.ACCOUNT:
             return redirect(url_for('account', user_name=current_user.username))
@@ -381,7 +381,8 @@ def account(user_name):
         elif settings_form.homepage.data == "mml":
             user.homepage = HomePage.MYMOVIESLIST
         elif settings_form.homepage.data == "mal":
-            user.homepage = HomePage.MYANIMESLIST
+            user.homepage = HomePage.MYANIME
+            LIST
         elif settings_form.homepage.data == "acc":
             user.homepage = HomePage.ACCOUNT
         elif settings_form.homepage.data == "hof":
@@ -423,7 +424,7 @@ def account(user_name):
             settings_form.homepage.data = "msl"
         elif current_user.homepage == HomePage.MYMOVIESLIST:
             settings_form.homepage.data = "mml"
-        elif current_user.homepage == HomePage.MYANIMESLIST:
+        elif current_user.homepage == HomePage.MYANIMELIST:
             settings_form.homepage.data = "mal"
         elif current_user.homepage == HomePage.ACCOUNT:
             settings_form.homepage.data = "acc"
@@ -591,11 +592,10 @@ def account(user_name):
     account_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
     account_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
 
-    # Recover the anime achievements
+    # Recover the achievements
     user_achievements_anime = get_achievements_test(user.id, ListType.ANIME)
-
-    # Recover the series achievements
     user_achievements_series = get_achievements_test(user.id, ListType.SERIES)
+    user_achievements_movies = get_achievements_test(user.id, ListType.MOVIES)
 
     # Add the joined date
     joined_tmp = user.activated_on
@@ -617,7 +617,8 @@ def account(user_name):
                            password_form=password_form,
                            user_biography=user.biography,
                            anime_achiev=user_achievements_anime,
-                           series_achiev=user_achievements_series)
+                           series_achiev=user_achievements_series,
+                           movies_achiev=user_achievements_movies)
 
 
 @app.route("/anime_achievements", methods=['GET'])
@@ -935,7 +936,7 @@ def mymedialist(media_list, user_name):
                                join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
                                join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
                                filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
-        covers_path = url_for('static', filename='series_covers/')
+        covers_path = url_for('static', filename='covers/series_covers/')
         media_all_data = get_all_media_data(element_data, ListType.SERIES, covers_path)
     elif media_list == "animelist":
         # Get anime data
@@ -948,7 +949,7 @@ def mymedialist(media_list, user_name):
                                 join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
                                 join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
                                 filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
-        covers_path = url_for('static', filename='animes_covers/')
+        covers_path = url_for('static', filename='covers/anime_covers/')
         media_all_data = get_all_media_data(element_data, ListType.ANIME, covers_path)
     elif media_list == "movieslist":
         # Get movies data
@@ -958,7 +959,7 @@ def mymedialist(media_list, user_name):
                             join(MoviesGenre, MoviesGenre.movies_id == Movies.id). \
                             join(MoviesProd, MoviesProd.movies_id == Movies.id). \
                             filter(MoviesList.user_id == user.id).group_by(Movies.id).order_by(Movies.name.asc())
-        covers_path = url_for('static', filename='movies_covers/')
+        covers_path = url_for('static', filename='covers/movies_covers/')
         media_all_data = get_all_media_data(element_data, ListType.MOVIES, covers_path)
     else:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
@@ -2019,6 +2020,24 @@ def get_achievements_test(user_id, list_type):
                                         filter(SeriesList.user_id == user_id).group_by(Series.id).order_by(Series.name.asc())
         genre_id = ['9648', '10759', '35', '80', '99', '18', '10765']
         media = "S"
+    elif list_type == ListType.MOVIES:
+        element_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre_id.distinct())). \
+                                        join(MoviesList, MoviesList.movies_id == Movies.id). \
+                                        join(MoviesGenre, MoviesGenre.movies_id == Movies.id). \
+                                        filter(MoviesList.user_id == user_id).group_by(Movies.id).order_by(Movies.name.asc())
+        genre_id = ['16', '35', '99', '14', '36', '27', '10402', '9648', '10749', '878', '53']
+        """     "id": 16, "name": "Animation"
+                "id": 35, "name": "Comedy"
+                "id": 99, "name": "Documentary"
+                "id": 14, "name": "Fantasy"
+                "id": 36, "name": "History"
+                "id": 27, "name": "Horror"
+                "id": 10402, "name": "Music"
+                "id": 9648, "name": "Mystery"
+                "id": 10749, "name": "Romance"
+                "id": 878, "name": "Science Fiction"
+            "id": 53, "name": "Thriller" """
+        media = "M"
 
     def get_episodes_and_time(element):
         # Get episodes per season
@@ -2033,7 +2052,12 @@ def get_achievements_test(user_id, list_type):
         time_watched = ep_duration * episodes_watched
 
         return [episodes_watched, time_watched]
-    unlocked_achievements_per_type = []
+
+    unlocked_badges = 0
+    unlocked_levels = 0
+    all_badges = []
+
+    ####################################################################################################################
 
     # Genres achievements
     element_count_1, element_count_2, element_count_3, element_count_4, element_count_5, element_count_6, \
@@ -2147,6 +2171,54 @@ def get_achievements_test(user_id, list_type):
                         element_name_7.append(element[0].name)
                 except:
                     pass
+            elif list_type == ListType.MOVIES:
+                try:
+                    if '16' in genres:
+                        element_count_1 += 1
+                        element_time_1 += element[0].runtime
+                        element_name_1.append(element[0].name)
+                    if '35' in genres:
+                        element_count_2 += 1
+                        element_time_2 += element[0].runtime
+                        element_name_2.append(element[0].name)
+                    if '99' in genres:
+                        element_count_3 += 1
+                        element_time_3 += element[0].runtime
+                        element_name_3.append(element[0].name)
+                    if '14' in genres:
+                        element_count_4 += 1
+                        element_time_4 += element[0].runtime
+                        element_name_4.append(element[0].name)
+                    if '36' in genres:
+                        element_count_5 += 1
+                        element_time_5 += element[0].runtime
+                        element_name_5.append(element[0].name)
+                    if '27' in genres:
+                        element_count_6 += 1
+                        element_time_6 += element[0].runtime
+                        element_name_6.append(element[0].name)
+                    if '10402' in genres:
+                        element_count_7 += 1
+                        element_time_7 += element[0].runtime
+                        element_name_7.append(element[0].name)
+                    if '9648' in genres:
+                        element_count_8 += 1
+                        element_time_8 += element[0].runtime
+                        element_name_8.append(element[0].name)
+                    if '10749' in genres:
+                        element_count_9 += 1
+                        element_time_9 += element[0].runtime
+                        element_name_9.append(element[0].name)
+                    if '878' in genres:
+                        element_count_10 += 1
+                        element_time_10 += element[0].runtime
+                        element_name_10.append(element[0].name)
+                    if '53' in genres:
+                        element_count_11 += 1
+                        element_time_11 += element[0].runtime
+                        element_name_11.append(element[0].name)
+                except:
+                    pass
         else:
             pass
 
@@ -2158,17 +2230,14 @@ def get_achievements_test(user_id, list_type):
                  element_name_7, element_name_8, element_name_9, element_name_10, element_name_11]
     episodes_list = [element_episodes_1, element_episodes_2, element_episodes_3, element_episodes_4, element_episodes_5,
                      element_episodes_6, element_episodes_7, element_episodes_8, element_episodes_9, element_episodes_10, element_episodes_11]
-    genres_achievements = []
-    unlocked_achievement = 0
     for i in range(0, len(genre_id)):
         achievements = AchievementsTest.query.filter_by(media=media, genre=genre_id[i]).all()
         for achievement in achievements:
             if int(time_list[i]/60) < int(achievement.threshold):
-                achievement_data = {"type": achievement.type,
-                                    "threshold": achievement.threshold,
+                achievement_data = {"threshold": achievement.threshold,
                                     "image_id": achievement.image_id,
-                                    "level": achievement.level,
-                                    "title": "{} {}".format(achievement.title.split()[0], int(achievement.title.split()[1])-1),
+                                    "level": "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1])-1),
+                                    "title": achievement.title,
                                     "element_time": int(time_list[i]/60),
                                     "element_count": count_list[i],
                                     "element_name": name_list[i],
@@ -2176,22 +2245,21 @@ def get_achievements_test(user_id, list_type):
                                     "element_percentage": round((int(time_list[i]/60)*100)/(achievement.threshold), 2)}
                 break
             else:
-                unlocked_achievement += 1
-                if unlocked_achievement == 4:
-                    achievement_data = {"type": achievement.type,
-                                        "threshold": achievement.threshold,
+                unlocked_levels += 1
+                if unlocked_levels == 4:
+                    unlocked_badges += 1
+                    achievement_data = {"threshold": achievement.threshold,
                                         "image_id": achievement.image_id,
                                         "level": achievement.level,
                                         "title": achievement.title,
-                                        "element_time": int(time_list[i] / 60),
+                                        "element_time": int(time_list[i]/60),
                                         "element_count": count_list[i],
                                         "element_name": name_list[i],
                                         "element_episodes": episodes_list[i],
                                         "element_percentage": round((int(time_list[i]/60)*100)/(achievement.threshold), 2)}
                     break
 
-        genres_achievements.append(achievement_data)
-    unlocked_achievements_per_type.append(unlocked_achievement)
+        all_badges.append(achievement_data)
 
     ####################################################################################################################
 
@@ -2202,62 +2270,82 @@ def get_achievements_test(user_id, list_type):
     element_episodes = 0
     element_name = []
     for element in element_data:
-        first_year = int(element[0].first_air_date.split('-')[0])
+        if list_type != ListType.MOVIES:
+            first_year = int(element[0].first_air_date.split('-')[0])
+            if 1990 <= first_year <= 2000 and element[1].status != Status.PLAN_TO_WATCH:
+                element_count += 1
+                element_episodes += get_episodes_and_time(element)[0]
+                element_time += get_episodes_and_time(element)[1]
+                element_name.append(element[0].name)
+        elif list_type == ListType.MOVIES:
+            release_date = int(element[0].release_date.split('-')[0])
+            if 1990 <= release_date <= 2000 and element[1].status != Status.PLAN_TO_WATCH:
+                element_count += 1
+                element_time += element[0].runtime
+                element_name.append(element[0].name)
 
-        if 1990 <= first_year <= 2000 and element[1].status != Status.PLAN_TO_WATCH:
-            element_count += 1
-            element_episodes += get_episodes_and_time(element)[0]
-            element_time += get_episodes_and_time(element)[1]
-            element_name.append(element[0].name)
-
-    sources_achievements = []
-    unlocked_achievement = 0
     for achievement in achievements:
         if int(element_time/60) < int(achievement.threshold):
-            achievement_data = {"type": achievement.type,
-                                "threshold": achievement.threshold,
+            achievement_data = {"threshold": achievement.threshold,
                                 "image_id": achievement.image_id,
-                                "level": achievement.level,
+                                "level": "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1])-1),
                                 "title": achievement.title,
-                                "element_time": int(element_time / 60),
+                                "element_time": int(element_time/60),
                                 "element_count": element_count,
                                 "element_name": element_name,
                                 "element_episodes": element_episodes,
                                 "element_percentage": round((int(element_time/60)*100)/(achievement.threshold), 2)}
             break
         else:
-            unlocked_achievement += 1
+            unlocked_levels += 1
+            if unlocked_levels == 4:
+                unlocked_badges += 1
+                achievement_data = {"threshold": achievement.threshold,
+                                    "image_id": achievement.image_id,
+                                    "level": achievement.level,
+                                    "title": achievement.title,
+                                    "element_time": int(element_time/60),
+                                    "element_count": element_count,
+                                    "element_name": element_name,
+                                    "element_episodes": element_episodes,
+                                    "element_percentage": round((int(element_time/60)*100)/(achievement.threshold), 2)}
+                break
 
-    sources_achievements.append(achievement_data)
-    unlocked_achievements_per_type.append(unlocked_achievement)
+    all_badges.append(achievement_data)
 
     ####################################################################################################################
 
-    # Finished achievements
-    achievements = AchievementsTest.query.filter_by(media=media, type="finished").all()
-    element_count = 0
-    for element in element_data:
-        status = element[0].status
-        if (status == "Ended" or status == "Canceled") and element[1].status == Status.COMPLETED:
-            element_count += 1
-
-    finished_achievements = []
-    unlocked_achievement = 0
-    for achievement in achievements:
-        if element_count < int(achievement.threshold):
-            achievement_data = {"type": achievement.type,
-                                "threshold": achievement.threshold,
-                                "image_id": achievement.image_id,
-                                "level": achievement.level,
-                                "title": "{} {}".format(achievement.title.split()[0], int(achievement.title.split()[1])-1),
-                                "element_count": element_count,
-                                "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
-            break
-        else:
-            unlocked_achievement += 1
-
-    finished_achievements.append(achievement_data)
-    unlocked_achievements_per_type.append(unlocked_achievement)
+    # # Finished achievements
+    # achievements = AchievementsTest.query.filter_by(media=media, type="finished").all()
+    # element_count = 0
+    # for element in element_data:
+    #     status = element[0].status
+    #     if (status == "Ended" or status == "Canceled") and (element[1].status == Status.COMPLETED \
+    #             or element[1].status == Status.COMPLETED_ANIMATION):
+    #         element_count += 1
+    #
+    # for achievement in achievements:
+    #     if element_count < int(achievement.threshold):
+    #         achievement_data = {"threshold": achievement.threshold,
+    #                             "image_id": achievement.image_id,
+    #                             "level": "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1])-1),
+    #                             "title": achievement.title,
+    #                             "element_count": element_count,
+    #                             "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
+    #         break
+    #     else:
+    #         unlocked_levels += 1
+    #         if unlocked_levels == 4:
+    #             unlocked_badges += 1
+    #             achievement_data = {"threshold": achievement.threshold,
+    #                                 "image_id": achievement.image_id,
+    #                                 "level": achievement.level,
+    #                                 "title": achievement.title,
+    #                                 "element_count": element_count,
+    #                                 "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
+    #         break
+    #
+    # all_badges.append(achievement_data)
 
     ####################################################################################################################
 
@@ -2269,112 +2357,110 @@ def get_achievements_test(user_id, list_type):
         time_spent = int(user.time_spent_anime/1440)
     elif list_type == ListType.SERIES:
         time_spent = int(user.time_spent_series/1440)
+    elif list_type == ListType.MOVIES:
+        time_spent = int(user.time_spent_movies/1440)
 
-    time_achievements = []
-    unlocked_achievement = 0
     for achievement in achievements:
         if time_spent < int(achievement.threshold):
-            achievement_data = {"type": achievement.type,
-                                "threshold": achievement.threshold,
+            achievement_data = {"threshold": achievement.threshold,
                                 "image_id": achievement.image_id,
-                                "level": achievement.level,
+                                "level": "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1])-1),
                                 "title": achievement.title,
                                 "element_time": int(time_spent),
                                 "element_percentage": round((time_spent*100)/(achievement.threshold), 2)}
             break
         else:
-            unlocked_achievement += 1
+            unlocked_levels += 1
+            if unlocked_levels == 4:
+                unlocked_badges += 1
+                achievement_data = {"threshold": achievement.threshold,
+                                    "image_id": achievement.image_id,
+                                    "level": achievement.level,
+                                    "title": achievement.title,
+                                    "element_time": int(time_spent),
+                                    "element_percentage": round((time_spent*100)/(achievement.threshold), 2)}
+            break
 
-    time_achievements.append(achievement_data)
-    unlocked_achievements_per_type.append(unlocked_achievement)
-
-    ####################################################################################################################
-
-    # Miscellaneous: Long runner + old element + different years of first airing
-    achievement = AchievementsTest.query.filter_by(media=media, type="long").first()
-    element_count = 0
-    element_name = []
-    for element in element_data:
-        element_episodes = get_episodes_and_time(element)[0]
-        if int(element_episodes) >= 100:
-            element_count += 1
-            element_name.append(element[0].name)
-
-    misc_achievements = []
-    unlocked_achievement = 0
-    if element_count < int(achievement.threshold):
-        achievement_data = {"type": achievement.type,
-                            "threshold": achievement.threshold,
-                            "image_id": achievement.image_id,
-                            "level": achievement.level,
-                            "title": achievement.title,
-                            "element_count": element_count,
-                            "element_name": element_name,
-                            "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
-    else:
-        unlocked_achievement += 1
-
-    misc_achievements.append(achievement_data)
-
-    achievement = AchievementsTest.query.filter_by(media=media, type="old").first()
-    element_count = 0
-    element_name = []
-    for element in element_data:
-        year_last_air_date = element[0].last_air_date.split('-')[0]
-        if (int(year_last_air_date) <= 1980) and (element[1].status == Status.COMPLETED):
-            element_count += 1
-            element_name.append(element[0].name)
-
-    if element_count < int(achievement.threshold):
-        achievement_data = {"type": achievement.type,
-                            "threshold": achievement.threshold,
-                            "image_id": achievement.image_id,
-                            "level": achievement.level,
-                            "title": achievement.title,
-                            "element_count": element_count,
-                            "element_name": element_name,
-                            "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
-    else:
-        unlocked_achievement += 1
-
-    misc_achievements.append(achievement_data)
-
-    achievement = AchievementsTest.query.filter_by(media=media, type="year").first()
-    all_first_air_date = []
-    element_name = []
-    for element in element_data:
-        if element[1].status == Status.COMPLETED:
-            all_first_air_date.append(element[0].first_air_date.split('-')[0])
-    all_first_air_date = list(dict.fromkeys(all_first_air_date))
-
-    if len(all_first_air_date) < int(achievement.threshold):
-        achievement_data = {"type": achievement.type,
-                            "threshold": achievement.threshold,
-                            "image_id": achievement.image_id,
-                            "level": achievement.level,
-                            "title": achievement.title,
-                            "element_count": len(all_first_air_date),
-                            "element_percentage": round((len(all_first_air_date)*100)/(achievement.threshold), 2)}
-    else:
-        unlocked_achievement += 1
-
-    misc_achievements.append(achievement_data)
-    unlocked_achievements_per_type.append(unlocked_achievement)
+    all_badges.append(achievement_data)
 
     ####################################################################################################################
 
-    achievements_data = {"genres": genres_achievements,
-                         "sources": sources_achievements,
-                         "finished": finished_achievements,
-                         "time": time_achievements,
-                         "misc": misc_achievements,
-                         "total_unlocked": sum(unlocked_achievements_per_type),
-                         "unlocked_per_type":
-                             {'genres': unlocked_achievements_per_type[0],
-                              'sources': unlocked_achievements_per_type[1],
-                              'finished': unlocked_achievements_per_type[2],
-                              'time': unlocked_achievements_per_type[3],
-                              'misc': unlocked_achievements_per_type[4]}}
+    # # Miscellaneous: Long runner
+    # achievement = AchievementsTest.query.filter_by(media=media, type="long").first()
+    # element_count = 0
+    # element_name = []
+    # for element in element_data:
+    #     element_episodes = get_episodes_and_time(element)[0]
+    #     if int(element_episodes) >= 100:
+    #         element_count += 1
+    #         element_name.append(element[0].name)
+    #
+    # misc_achievements = []
+    # unlocked_achievement = 0
+    # if element_count < int(achievement.threshold):
+    #     achievement_data = {"threshold": achievement.threshold,
+    #                         "image_id": achievement.image_id,
+    #                         "level": achievement.level,
+    #                         "title": achievement.title,
+    #                         "element_count": element_count,
+    #                         "element_name": element_name,
+    #                         "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
+    # else:
+    #     unlocked_achievement += 1
+    #
+    # misc_achievements.append(achievement_data)
+    #
+    # # Miscellaneous: old element
+    # achievement = AchievementsTest.query.filter_by(media=media, type="old").first()
+    # element_count = 0
+    # element_name = []
+    # for element in element_data:
+    #     year_last_air_date = element[0].last_air_date.split('-')[0]
+    #     if (int(year_last_air_date) <= 1980) and (element[1].status == Status.COMPLETED):
+    #         element_count += 1
+    #         element_name.append(element[0].name)
+    #
+    # if element_count < int(achievement.threshold):
+    #     achievement_data = {"threshold": achievement.threshold,
+    #                         "image_id": achievement.image_id,
+    #                         "level": achievement.level,
+    #                         "title": achievement.title,
+    #                         "element_count": element_count,
+    #                         "element_name": element_name,
+    #                         "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
+    # else:
+    #     unlocked_achievement += 1
+    #
+    # misc_achievements.append(achievement_data)
+    #
+    # # Miscellaneous: Different years of first airing
+    # achievement = AchievementsTest.query.filter_by(media=media, type="year").first()
+    # all_first_air_date = []
+    # element_name = []
+    # for element in element_data:
+    #     if element[1].status == Status.COMPLETED:
+    #         all_first_air_date.append(element[0].first_air_date.split('-')[0])
+    # all_first_air_date = list(dict.fromkeys(all_first_air_date))
+    #
+    # if len(all_first_air_date) < int(achievement.threshold):
+    #     achievement_data = {"type": achievement.type,
+    #                         "threshold": achievement.threshold,
+    #                         "image_id": achievement.image_id,
+    #                         "level": achievement.level,
+    #                         "title": achievement.title,
+    #                         "element_count": len(all_first_air_date),
+    #                         "element_percentage": round((len(all_first_air_date)*100)/(achievement.threshold), 2)}
+    # else:
+    #     unlocked_achievement += 1
+    #
+    # misc_achievements.append(achievement_data)
+    # unlocked_achievements_per_type.append(unlocked_achievement)
+
+    ####################################################################################################################
+
+    achievements_data = {"all_badges": all_badges,
+                         "unlocked_badges": unlocked_badges,
+                         "unlocked_levels": unlocked_levels}
 
     return achievements_data
 
@@ -2717,7 +2803,7 @@ def autocomplete_search_element(element_name, list_type):
             if data["results"][i]["poster_path"] is not None:
                 series_data["poster_path"] = "{0}{1}".format("http://image.tmdb.org/t/p/w300", data["results"][i]["poster_path"])
             else:
-                series_data["poster_path"] = url_for('static', filename="series_covers/default.jpg")
+                series_data["poster_path"] = url_for('static', filename="covers/series_covers/default.jpg")
 
             if "first_air_date" in data["results"][i] and data["results"][i]["first_air_date"].split('-') != ['']:
                 series_data["first_air_date"] = data["results"][i]["first_air_date"].split('-')[0]
@@ -2779,7 +2865,7 @@ def autocomplete_search_element(element_name, list_type):
             else:
                 original_language = "Unknown"
 
-            # To add only animes in the anime table, we need to check if it's an anime and it comes from Japan
+            # To add only anime in the anime table, we need to check if it's an anime and it comes from Japan
             if (16 in genre_ids and "JP" in origin_country) or (16 in genre_ids and original_language == "ja"):
                 anime_data = {
                     "tmdb_id": data["results"][i]["id"],
@@ -2789,7 +2875,7 @@ def autocomplete_search_element(element_name, list_type):
                 if data["results"][i]["poster_path"] is not None:
                     anime_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", data["results"][i]["poster_path"])
                 else:
-                    anime_data["poster_path"] = url_for('static', filename="animes_covers/default.jpg")
+                    anime_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
 
                 if data["results"][i]["first_air_date"].split('-') != ['']:
                     anime_data["first_air_date"] = data["results"][i]["first_air_date"].split('-')[0]
@@ -2850,7 +2936,7 @@ def autocomplete_search_element(element_name, list_type):
             if data["results"][i]["poster_path"] is not None:
                 movies_data["poster_path"] = "{0}{1}".format("http://image.tmdb.org/t/p/w300", data["results"][i]["poster_path"])
             else:
-                movies_data["poster_path"] = url_for('static', filename="movies_covers/default.jpg")
+                movies_data["poster_path"] = url_for('static', filename="covers/movies_covers/default.jpg")
 
             if "release_date" in data["results"][i] != ['']:
                 movies_data["first_air_date"] = data["results"][i]["release_date"].split('-')[0]
@@ -2967,19 +3053,19 @@ def save_api_cover(element_cover_path, list_type):
 
     if list_type == ListType.SERIES:
         if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\series_covers\\")
+            local_covers_path = os.path.join(app.root_path, "static\\covers\\series_covers\\")
         else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/series_covers/")
+            local_covers_path = os.path.join(app.root_path, "static/covers/series_covers/")
     elif list_type == ListType.ANIME:
         if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\\animes_covers\\")
+            local_covers_path = os.path.join(app.root_path, "static\\covers\\anime_covers\\")
         else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/animes_covers/")
+            local_covers_path = os.path.join(app.root_path, "static/covers/anime_covers/")
     elif list_type == ListType.MOVIES:
         if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\\movies_covers\\")
+            local_covers_path = os.path.join(app.root_path, "static\\covers\\movies_covers\\")
         else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/movies_covers/")
+            local_covers_path = os.path.join(app.root_path, "static/covers/movies_covers/")
 
     try:
         urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(element_cover_path),
@@ -3422,14 +3508,14 @@ def refresh_element_data(element_id, list_type):
 
     if list_type == ListType.SERIES:
         if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\series_covers\\")
+            local_covers_path = os.path.join(app.root_path, "static\\covers\\series_covers\\")
         else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/series_covers/")
+            local_covers_path = os.path.join(app.root_path, "static/covers/series_covers/")
     elif list_type == ListType.ANIME:
         if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\\animes_covers\\")
+            local_covers_path = os.path.join(app.root_path, "static\\covers\\anime_covers\\")
         else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/animes_covers/")
+            local_covers_path = os.path.join(app.root_path, "static/covers/anime_covers/")
 
     try:
         urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(element_poster),
@@ -3657,7 +3743,7 @@ def send_email_update_email(user):
 
 def add_achievements_to_db():
     list_all_achievements = []
-    path = os.path.join(app.root_path, 'static/achievements/achievements.csv')
+    path = os.path.join(app.root_path, 'static/achievements_csv/achievements.csv')
     with open(path, "r") as fp:
         for line in fp:
             list_all_achievements.append(line.split(";"))
@@ -3678,7 +3764,7 @@ def add_achievements_to_db():
         db.session.add(achievement)
 
     list_all_achievements = []
-    path = os.path.join(app.root_path, 'static/achievements/test_achievements.csv')
+    path = os.path.join(app.root_path, 'static/achievements_csv/test_achievements.csv')
     with open(path, "r") as fp:
         for line in fp:
             list_all_achievements.append(line.split(";"))
@@ -3691,8 +3777,8 @@ def add_achievements_to_db():
         achievement = AchievementsTest(media=list_all_achievements[i][0],
                                        threshold=int(list_all_achievements[i][1]),
                                        image_id=list_all_achievements[i][2],
-                                       level=list_all_achievements[i][3],
-                                       title=list_all_achievements[i][4],
+                                       level=list_all_achievements[i][4],
+                                       title=list_all_achievements[i][3],
                                        type=list_all_achievements[i][5],
                                        genre=genre)
         db.session.add(achievement)
@@ -3700,7 +3786,7 @@ def add_achievements_to_db():
 
 def refresh_db_achievements():
     list_all_achievements = []
-    path = os.path.join(app.root_path, 'static/achievements/achievements.csv')
+    path = os.path.join(app.root_path, 'static/achievements_csv/achievements.csv')
     with open(path, "r") as fp:
         for line in fp:
             list_all_achievements.append(line.split(";"))
@@ -3721,7 +3807,7 @@ def refresh_db_achievements():
         achievements[i-1].genre       = genre
 
     list_all_achievements = []
-    path = os.path.join(app.root_path, 'static/achievements/test_achievements.csv')
+    path = os.path.join(app.root_path, 'static/achievements_csv/test_achievements.csv')
     with open(path, "r") as fp:
         for line in fp:
             list_all_achievements.append(line.split(";"))
@@ -3735,8 +3821,8 @@ def refresh_db_achievements():
         achievements[i-1].media       = list_all_achievements[i][0]
         achievements[i-1].threshold   = int(list_all_achievements[i][1])
         achievements[i-1].image_id    = list_all_achievements[i][2]
-        achievements[i-1].level       = list_all_achievements[i][3]
-        achievements[i-1].title       = list_all_achievements[i][4]
+        achievements[i-1].level       = list_all_achievements[i][4]
+        achievements[i-1].title       = list_all_achievements[i][3]
         achievements[i-1].type        = list_all_achievements[i][5]
         achievements[i-1].genre       = genre
 

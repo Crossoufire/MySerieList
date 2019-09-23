@@ -1,27 +1,52 @@
 
---------------------------------------------------- TO DO ---------------------------------------------------
+---------------------------------------------- BEFORE NEXT UPDATE ----------------------------------------------
+
+MyMediaList:
+    Add show/hide all score
+
+Hall of Fame:
+    OK
 
 Account:
-	Last updates on  movies/anime/series for the follow list
-	Possibility to display/hide the score by default for the lists
+    General:
+        Fix bug forms
+        Add ranking code
+    Overview:
+        Seems OK
+    Follows:
+        Seems OK
+    Badges:
+        Finish images
+        Finish the code
+    Settings:
+        Seems OK
 
-Autocomplete:
-	Add year in the results (50% done)
-	Check the style of the selector (50% done)
-	Add a "more results"
+--------------------------------------------- AFTER NEXT UPDATE ------------------------------------------------
 
-Achievements:
-	HTML improvements (85%)
-	Descriptions and titles
-	Add description inside the page
+Account:
+	Add follow list last updates on movies/anime/series
+	Add a display/hide all scores by default
+	Add the possiblity to change the background image
+	Enhance the bio, picture profile and background profile modifications (without form)
+    Enhance the settings tab CSS/HTML style
 
-Medialist:
-	Option to import a CSV file (for movies) (50%)
-	Modify the category selector style (modal)
+Medialists:
+    Add year in the autocomplete (50% done)
+	Change the autocomplete style (50% done)
+	Add a "more results" to the autocomplete
+	Add the regroup of movies by collection from TMDb
+	Add option to import a CSV file for movies (50% done)
+	Change the category modal style
 	Add episodes per season in the metadata modal
-	Possibility to edit metadata
+	Add the possibility to edit metadata
 	Remove the homepage info
 
-Statistics:
-	Add stats + CSS (30%)
+Advanced Statistics:
+	Add personal advanced statistics for movies/series/anime
 
+Hall of Fame:
+    Add global statistics below the table:
+        How many movies/series/anime in gobal seen
+        Total time & mean score from all users
+        Most watched movie/anime/series
+        etc...

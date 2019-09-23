@@ -29,7 +29,7 @@ class HomePage(enum.Enum):
     ACCOUNT = "account"
     HALL_OF_FAME = "hall_of_fame"
     MYSERIESLIST = "myserieslist"
-    MYANIMESLIST = "myanimeslist"
+    MYANIMELIST = "myanimelist"
     MYMOVIESLIST = "mymovieslist"
 
 

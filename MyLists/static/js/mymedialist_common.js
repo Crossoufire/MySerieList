@@ -19,6 +19,7 @@ function delete_element(element_id, card_id, element_name, media_list) {
     });
 }
 
+
 // ------------ Show all score --------------
 function show_all_score() {
     var show = document.getElementById('show_all');
@@ -31,6 +32,7 @@ function show_all_score() {
     $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-15 m-t-20');
 }
 
+
 // ------------ Hide all score --------------
 function hide_all_score() {
     var hide = document.getElementById('hide_all');
@@ -42,6 +44,7 @@ function hide_all_score() {
     $('#score_container').attr('onclick', 'show_all_score()');
     $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20');
 }
+
 
 // --------------- Edit score ---------------
 function edit_score(edit_id, new_id) {
@@ -57,6 +60,7 @@ function edit_score(edit_id, new_id) {
     }
 }
 
+
 // -------------- Show score ----------------
 function show_score(footer_id, card_id) {
     var score = document.getElementById(footer_id);
@@ -69,6 +73,7 @@ function show_score(footer_id, card_id) {
         $(card_id).attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20');
     }
 }
+
 
 // ---------------- Add score ---------------
 function add_score(new_score, edit_id, element_id, media_list) {
@@ -103,7 +108,6 @@ function add_score(new_score, edit_id, element_id, media_list) {
         return true;
     }
 }
-
 
 
 // --------------- Tooltip ------------------
@@ -183,7 +187,6 @@ $('.filters-button-group').each(function(i, buttonGroup) {
 
 
 $categories.isotope('layout');
-
 
 
 function searchElement() {
