@@ -145,10 +145,10 @@ M;100;fantasy;Fantasy;Level 1;genre;14
 M;250;fantasy;Fantasy;Level 2;genre;14
 M;400;fantasy;Fantasy;Level 3;genre;14
 M;550;fantasy;Fantasy;Level max;genre;14
-M;500;history;Historical;Level 1;genre;36
-M;1000;history;Historical;Level 2;genre;36
-M;2000;history;Historical;Level 3;genre;36
-M;3000;history;Historical;Level max;genre;36
+M;500;historical;Historical;Level 1;genre;36
+M;1000;historical;Historical;Level 2;genre;36
+M;2000;historical;Historical;Level 3;genre;36
+M;3000;historical;Historical;Level max;genre;36
 M;100;horror;Horror;Level 1;genre;27
 M;200;horror;Horror;Level 2;genre;27
 M;300;horror;Horror;Level 3;genre;27
