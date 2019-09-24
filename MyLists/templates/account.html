@@ -22,7 +22,6 @@
                 {% endif %}
             </h2>
         <p class="p-0 m-0">
-            <b>Ranking: #12/24</b><br>
             <b>Joined: {{ joined }}</b><br>
             <b>Followers: {{ followers }}</b>
         </p>
@@ -70,7 +69,7 @@
                         </h4>
                         <hr>
                         {% if user_biography %}
-                        <p class="text-justify m-b-0">{{ user_biography }}</p>
+                        <p style="word-wrap: break-word;" class="text-justify m-b-0">{{ user_biography }}</p>
                         {% else %}
                         <p class="text-justify m-b-0">If you want, you can add some info about you, click on the pen above to do it ;)</p>
                         {% endif %}
@@ -605,16 +604,18 @@
                     </div>
                 </form>
                 {% endif %}
-                <ul class="m-t-30 p-l-20">
+                <div class="row m-t-30">
                     {% for follow in data["follows"] %}
-                    <li class="m-r-22 m-l-22" style="display: inline-block;">
+                    <div class="col-auto m-b-30">
                         <a href="/account/{{ follow['username'] }}">
-                            <img style="border-radius: 50%;" height="100" width="100" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}"/><br>
-                            <div style="color: white;" class="text-center" id="{{ follow['user_id'] }}">{{ follow['username'] }}</div>
+                            <div class="text-center">
+                                <img style="border-radius: 50%;" height="100" width="100" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}"/><br>
+                                <div style="color: white;" id="{{ follow['user_id'] }}">{{ follow['username'] }}</div>
+                            </div>
                         </a>
-                    </li>
+                    </div>
                     {% endfor %}
-                </ul>
+                </div>
             </div>
             {#<div class="vertical_line"></div>
             <div class="col">

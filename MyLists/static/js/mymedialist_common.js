@@ -5,6 +5,7 @@ function delete_element(element_id, card_id, element_name, media_list) {
         return false;
     }
 
+    $categories.isotope('layout');
     $("#"+card_id).remove();
     $body = $("body");
     $.ajax ({
@@ -20,29 +21,17 @@ function delete_element(element_id, card_id, element_name, media_list) {
 }
 
 
-// ------------ Show all score --------------
-function show_all_score() {
-    var show = document.getElementById('show_all');
-    var hide = document.getElementById('hide_all');
-    $('div[id^="footer_"]').attr('class', 'card-footer text-muted text-center p-0');
-    hide.className = "fas fa-eye-slash text-light m-r-5";
-    show.className = "d-none";
-    $('#show_hide').text('Hide scores');
-    $('#score_container').attr('onclick', 'hide_all_score()');
-    $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-15 m-t-20');
-}
-
-
-// ------------ Hide all score --------------
-function hide_all_score() {
-    var hide = document.getElementById('hide_all');
-    var show = document.getElementById('show_all');
-    $('div[id^="footer_"]').attr('class', 'd-none footer_score');
-    hide.className = "d-none";
-    show.className = "fas fa-eye text-light m-r-5";
-    $('#show_hide').text('Show scores');
-    $('#score_container').attr('onclick', 'show_all_score()');
-    $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20');
+// ---------- Show/hide all score -----------
+function all_scores() {
+    if ($('#all_scores').text() == 'Show scores') {
+        $('div[id^="footer_"]').attr('class', 'card-footer text-muted text-center p-0');
+        $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-15 m-t-20');
+        $("#all_scores").text('Hide scores');
+    } else {
+        $('div[id^="footer_"]').attr('class', 'd-none footer_score');
+        $('.card').attr('class', 'card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20');
+        $("#all_scores").text('Show scores');
+    }
 }
 
 
