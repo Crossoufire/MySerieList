@@ -337,12 +337,12 @@ def account(user_name):
 
     # Form to add follows
     follow_form = AddFollowForm()
-    if follow_form.validate_on_submit():
+    if follow_form.submit_follow.data and follow_form.validate():
         add_follow(follow_form.follow_to_add.data)
 
     # Account settings form
     settings_form = UpdateAccountForm()
-    if settings_form.validate_on_submit():
+    if settings_form.submit_account.data and settings_form.validate():
         if settings_form.biography.data:
             user.biography = settings_form.biography.data
             db.session.commit()
@@ -433,7 +433,7 @@ def account(user_name):
 
     # Change password form
     password_form = ChangePasswordForm()
-    if password_form.validate_on_submit():
+    if password_form.submit_password.data and password_form.validate():
         hashed_password = bcrypt.generate_password_hash(password_form.confirm_new_password.data).decode('utf-8')
         current_user.password = hashed_password
         db.session.commit()
@@ -2315,37 +2315,40 @@ def get_achievements_test(user_id, list_type):
 
     ####################################################################################################################
 
-    # # Finished achievements
-    # achievements = AchievementsTest.query.filter_by(media=media, type="finished").all()
-    # element_count = 0
-    # for element in element_data:
-    #     status = element[0].status
-    #     if (status == "Ended" or status == "Canceled") and (element[1].status == Status.COMPLETED \
-    #             or element[1].status == Status.COMPLETED_ANIMATION):
-    #         element_count += 1
-    #
-    # for achievement in achievements:
-    #     if element_count < int(achievement.threshold):
-    #         achievement_data = {"threshold": achievement.threshold,
-    #                             "image_id": achievement.image_id,
-    #                             "level": "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1])-1),
-    #                             "title": achievement.title,
-    #                             "element_count": element_count,
-    #                             "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
-    #         break
-    #     else:
-    #         unlocked_levels += 1
-    #         if unlocked_levels == 4:
-    #             unlocked_badges += 1
-    #             achievement_data = {"threshold": achievement.threshold,
-    #                                 "image_id": achievement.image_id,
-    #                                 "level": achievement.level,
-    #                                 "title": achievement.title,
-    #                                 "element_count": element_count,
-    #                                 "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
-    #         break
-    #
-    # all_badges.append(achievement_data)
+    # Finished achievements
+    achievements = AchievementsTest.query.filter_by(media=media, type="finished").all()
+    element_count = 0
+    for element in element_data:
+        if list_type != ListType.MOVIES:
+            status = element[0].status
+            if (status == "Ended" or status == "Canceled") and element[1].status == Status.COMPLETED:
+                element_count += 1
+        elif list_type == ListType.MOVIES:
+            if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
+                element_count += 1
+
+    for achievement in achievements:
+        if element_count < int(achievement.threshold):
+            achievement_data = {"threshold": achievement.threshold,
+                                "image_id": achievement.image_id,
+                                "level": "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1])-1),
+                                "title": achievement.title,
+                                "element_count": element_count,
+                                "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
+            break
+        else:
+            unlocked_levels += 1
+            if unlocked_levels == 4:
+                unlocked_badges += 1
+                achievement_data = {"threshold": achievement.threshold,
+                                    "image_id": achievement.image_id,
+                                    "level": achievement.level,
+                                    "title": achievement.title,
+                                    "element_count": element_count,
+                                    "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
+            break
+
+    all_badges.append(achievement_data)
 
     ####################################################################################################################
 

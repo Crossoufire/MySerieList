@@ -2,15 +2,14 @@
 ---------------------------------------------- BEFORE NEXT UPDATE ----------------------------------------------
 
 MyMediaList:
-    Add show/hide all score
+    Seems OK
 
 Hall of Fame:
-    OK
+    Seems OK
 
 Account:
     General:
-        Fix bug forms
-        Add ranking code
+        Seems OK
     Overview:
         Seems OK
     Follows:
