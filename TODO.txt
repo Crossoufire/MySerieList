@@ -16,7 +16,7 @@ Account:
         Seems OK
     Badges:
         Finish images
-        Finish the code
+        Seems OK
     Settings:
         Seems OK
 
