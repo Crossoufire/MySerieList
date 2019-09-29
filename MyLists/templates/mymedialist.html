@@ -13,7 +13,7 @@
 {% block content %}
 <div class="row m-b-30">
     {% if target_user_id == current_user.get_id() %}
-    <div class="col m-l-15 m-t-30 text-left">
+    <div class="col m-t-30 add_an_element">
         {% if media_list == "movieslist" %}
         <input style="background: transparent;" class="form-control add_element" placeholder="Add a Movie" type="text" id="autocomplete" onfocus="this.value=''"/>
         {% elif media_list == "animelist" %}
@@ -24,7 +24,7 @@
         <input type="hidden" id="element_id" value=""/>
     </div>
     {% endif %}
-    <div class="col m-r-15 m-t-30 text-right">
+    <div class="col m-t-30 search_by_name">
         <input style="background: transparent;" type="text" id="myElementFilter" class="form-control add_element" onkeyup="searchElement()" placeholder="Search by name">
     </div>
 </div>
@@ -44,7 +44,7 @@
     <button class="btn btn-sm btn-light text-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
     {% endif %}
 </div>
-<button style="float: right; z-index: 10;" id="all_scores" class="btn btn-sm btn-primary text-dark" onclick="all_scores()">Show scores</button>
+    <button id="all_scores" class="btn btn-sm btn-primary text-dark show_score_button" onclick="all_scores()">Show scores</button>
 
 <div id="categories-iso" class="categories-iso">
     {% for category in all_data %}

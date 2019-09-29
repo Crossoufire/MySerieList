@@ -4,8 +4,8 @@ ul {
 }
 
 hr {
-    border-top: 2px solid rgba(44, 57, 70, 1);
-    margin-top: 2px;
+    border-top: 1px solid rgba(44, 57, 70, 1);
+    margin-top: 1px;
 }
 /* --------------------------------- */
 
@@ -234,7 +234,7 @@ hr {
 
 .xp-bar {
     height: 10px;
-    width: 65%;
+    width: 60%;
     background: #035;
     margin: 0px 0px 0px 5px;
     display: inline-block;

@@ -10,7 +10,7 @@
 <div class="header-image">
     <img src="{{ data['profile_picture'] }}"/>
     <div class="header-data">
-        <h2 class="text-center"><b>{{ data['username'] }}</b>
+        <h2><b>{{ data['username'] }}</b>
                 <img height='50' width='50' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}"
                  src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
                 {% if user_id != current_user.get_id() %}
@@ -30,26 +30,26 @@
 
 <ul class="nav account_tab">
     <li class="nav-item ml-auto">
-        <a id="overview" class="nav-link active" data-toggle="tab" href="#overview_tab">Overview</a>
+        <a id="overview" class="nav-link active" data-toggle="tab" href="#overview_tab" style="font-size: 0.9rem;">Overview</a>
     </li>
     <li class="nav-item">
-        <a id="follows" class="nav-link" data-toggle="tab" href="#follows_tab">Follows</a>
+        <a id="follows" class="nav-link" data-toggle="tab" href="#follows_tab" style="font-size: 0.9rem;">Follows</a>
     </li>
     {% if user_id != current_user.get_id() %}
     <li class="nav-item mr-auto">
     {% else %}
     <li class="nav-item">
     {% endif %}
-        <a id="achievements" class="nav-link" data-toggle="tab" href="#badges_tab">Badges</a>
+        <a id="achievements" class="nav-link" data-toggle="tab" href="#badges_tab" style="font-size: 0.9rem;">Badges</a>
     </li>
 
     {% if user_id == current_user.get_id() %}
     <li class="nav-item mr-auto">
-        <a id="settings" class="nav-link" data-toggle="tab" href="#settings_tab">Settings</a>
+        <a id="settings" class="nav-link" data-toggle="tab" href="#settings_tab" style="font-size: 0.9rem;">Settings</a>
     </li>
     {% endif %}
     {#<li class="nav-item">
-        <a id="stats" class="nav-link" href="#">Adv stats <i class="fas fa-sm fa-external-link-square-alt"></i></a>
+        <a id="stats" class="nav-link" href="#">Adv stats <i class="fas fa-sm fa-external-link-square-alt" style="font-size: 0.9rem;"></i></a>
     </li>#}
 </ul>
 
@@ -62,7 +62,7 @@
                     <li class="m-b-20">
                         <h4>
                             <i class="fas fa-user"></i>
-                            &nbsp&nbsp Biography
+                            &nbsp&nbspBiography
                             {% if user_id == current_user.get_id() %}
                             <a class="fas fa-sm fa-pen p-r-10" onclick="changeTab('settings_tab', 'settings')" style="float: right;"></a>
                             {% endif %}
@@ -80,9 +80,13 @@
                         <div class="d-flex">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
-                                    <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
+                                    <img class="float-left m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['series_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['series_grade_id'] }}.png"/>
                                     <span class='account-bar-name'>Series</span>
+                                    {% if data['series_level'] < 10 %}
+                                    <div id="series_level" class='account-bar-level'>Level 0{{ data['series_level'] }}</div>
+                                    {% else %}
                                     <div id="series_level" class='account-bar-level'>Level {{ data['series_level'] }}</div>
+                                    {% endif %}
                                     <div class='xp-bar' data-toggle="tooltip" title="{{ data['series_percent'] }}%">
                                         <div id='xp-bar-fill-series'>
                                             <div class='xp-increase-fx'>
@@ -95,16 +99,24 @@
                                             </div>
                                         </div>
                                     </div>
+                                    {% if data['series_level'] | int + 1 < 10 %}
+                                    <div class='account-bar-next-level'>&nbsp0{{ data['series_level'] | int + 1 }}</div>
+                                    {% else %}
                                     <div class='account-bar-next-level'>&nbsp{{ data['series_level'] | int + 1 }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                         <div class="d-flex">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
-                                    <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
+                                    <img class="float-left m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
                                     <span class='account-bar-name'>Movies</span>
+                                    {% if data['movies_level'] < 10 %}
+                                    <div id="movies_level" class='account-bar-level'>Level 0{{ data['movies_level'] }}</div>
+                                    {% else %}
                                     <div id="movies_level" class='account-bar-level'>Level {{ data['movies_level'] }}</div>
+                                    {% endif %}
                                     <div class='xp-bar' data-toggle="tooltip" title="{{ data['movies_percent'] }}%">
                                         <div id='xp-bar-fill-movies'>
                                             <div class='xp-increase-fx'>
@@ -117,16 +129,24 @@
                                             </div>
                                         </div>
                                     </div>
+                                    {% if data['movies_level'] | int + 1 < 10 %}
+                                    <div class='account-bar-next-level'>&nbsp0{{ data['movies_level'] | int + 1 }}</div>
+                                    {% else %}
                                     <div class='account-bar-next-level'>&nbsp{{ data['movies_level'] | int + 1 }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                         <div class="d-flex">
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
-                                    <img class="float-left m-t-5 m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
+                                    <img class="float-left m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['anime_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['anime_grade_id'] }}.png"/>
                                     <div class='account-bar-name'>Anime</div>
+                                    {% if data['anime_level'] < 10 %}
+                                    <div id="anime_level" class='account-bar-level'>Level 0{{ data['anime_level'] }}</div>
+                                    {% else %}
                                     <div id="anime_level" class='account-bar-level'>Level {{ data['anime_level'] }}</div>
+                                    {% endif %}
                                     <div class='xp-bar' data-toggle="tooltip" title="{{ data['anime_percent'] }}%">
                                         <div id='xp-bar-fill-anime'>
                                             <div class='xp-increase-fx'>
@@ -139,14 +159,21 @@
                                             </div>
                                         </div>
                                     </div>
+                                    {% if data['anime_level'] | int + 1 < 10 %}
+                                    <div class='account-bar-next-level'>&nbsp0{{ data['anime_level'] | int + 1 }}</div>
+                                    {% else %}
                                     <div class='account-bar-next-level'>&nbsp{{ data['anime_level'] | int + 1 }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                     </li>
                     <li class="m-b-20">
                         <div>
-                            <h4 class="float-left"><i class="fas fa-rss"></i> &nbsp&nbsp Follows</h4>
+                            <h4 class="float-left">
+                                <i class="fas fa-rss"></i>
+                                &nbsp&nbspLast Follows
+                            </h4>
                             <h4 class="float-right"><a onclick="changeTab('follows_tab', 'follows')">({{ data["follows"]|length }})</a></h4>
                             <div style="clear: both;"></div>
                         </div>
@@ -178,7 +205,10 @@
             <div class="col-xl col-lg-5 col-md-12">
                 <ul class="p-l-0">
                     <li>
-                        <h4><i class="fas fa-chart-pie"></i>&nbsp&nbsp Statistics</h4>
+                        <h4>
+                            <i class="fas fa-chart-pie"></i>
+                            &nbsp&nbspStatistics
+                        </h4>
                         <hr>
                         <!------------------------ Series statistics --------------------------->
                         <div class="stats-size">
@@ -452,7 +482,10 @@
             <div class="col-xl-3 col-lg col-md-12">
                 <ul class="p-l-0 p-r-0">
                     <li class="m-b-20">
-                        <h4><i class="fas fa-chart-pie"></i>&nbsp&nbsp Badges</h4>
+                        <h4>
+                            <i class="fas fa-chart-pie"></i>
+                            &nbsp&nbspBadges
+                        </h4>
                         <hr>
                         <!------------------------ Series achievements --------------------------->
                         <div class="stats-size m-b-20">
@@ -546,7 +579,10 @@
                         </div>
                     </li>
                     <li>
-                        <h4><i class="fas fa-sm fa-info-circle"></i>&nbsp&nbsp Information</h4>
+                        <h4>
+                            <i class="fas fa-sm fa-info-circle"></i>
+                            &nbsp&nbspInformation
+                        </h4>
                         <hr>
                         <ul class="text-left" style="list-style-type: disc; font-size: 13pt;">
                             <li class="m-b-10">
@@ -560,27 +596,6 @@
                                     Knowledge levels data
                                     <i class="text-light fas fa-sm fa-external-link-square-alt"></i>
                                 </a>
-                            </li>
-                            <li>
-                                Open Source:
-                                <p class="grey-text">
-                                    Totally open source, made with <a href="http://flask.pocoo.org/">Flask</a>.
-                                    You can find the source code on <a href="https://www.github.com/Crossoufire/MyLists">Github.</a>
-                                </p>
-                            </li>
-                            <li>
-                                Found a bug?
-                                <p class="grey-text">
-                                    You can contact us by e-mail at:
-                                    <script language="JavaScript" type="text/javascript">
-                                        var part1 = "contact";
-                                        var part2 = Math.pow(2,6);
-                                        var part3 = String.fromCharCode(part2);
-                                        var part4 = "mylists.info";
-                                        var part5 = part1 + String.fromCharCode(part2) + part4;
-                                        document.write("<a href=" + "mai" + "lto" + ":" + part5 + ">" + part1 + part3 + part4 + "</a>");
-                                    </script>
-                                </p>
                             </li>
                         </ul>
                     </li>
@@ -609,7 +624,7 @@
                     <div class="col-auto m-b-30">
                         <a href="/account/{{ follow['username'] }}">
                             <div class="text-center">
-                                <img style="border-radius: 50%;" height="100" width="100" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}"/><br>
+                                <img style="border-radius: 50%;" height="90" width="90" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}"/><br>
                                 <div style="color: white;" id="{{ follow['user_id'] }}">{{ follow['username'] }}</div>
                             </div>
                         </a>

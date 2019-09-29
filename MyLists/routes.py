@@ -381,8 +381,7 @@ def account(user_name):
         elif settings_form.homepage.data == "mml":
             user.homepage = HomePage.MYMOVIESLIST
         elif settings_form.homepage.data == "mal":
-            user.homepage = HomePage.MYANIME
-            LIST
+            user.homepage = HomePage.MYANIMELIST
         elif settings_form.homepage.data == "acc":
             user.homepage = HomePage.ACCOUNT
         elif settings_form.homepage.data == "hof":

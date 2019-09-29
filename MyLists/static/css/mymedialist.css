@@ -129,6 +129,14 @@ body.loading .modal_loading {
     .category-title {
         font-size: 1.5rem;
     }
+
+
+}
+
+.show_score_button {
+    margin:0 auto;
+    display:block;
+    float: none !important;
 }
 
 .card-img-top {
@@ -268,5 +276,26 @@ body.loading .modal_loading {
     }
     .score_size {
         font-size: 10pt;
+    }
+}
+
+
+.search_by_name {
+    text-align: right!important;
+    margin-right: 15px;
+}
+.add_an_element {
+    text-align: left!important;
+    margin-left: 15px;
+}
+
+@media (max-width: 546.98px) {
+    .search_by_name {
+        text-align: center!important;
+        margin-right: 0px;
+    }
+    .add_an_element {
+        text-align: center!important;
+        margin-left: 0px;
     }
 }
