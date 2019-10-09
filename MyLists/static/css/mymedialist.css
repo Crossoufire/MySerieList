@@ -134,9 +134,9 @@ body.loading .modal_loading {
 }
 
 .show_score_button {
-    margin:0 auto;
-    display:block;
-    float: none !important;
+    margin: 0 auto;
+    display: block;
+    margin-top: 10px;
 }
 
 .card-img-top {

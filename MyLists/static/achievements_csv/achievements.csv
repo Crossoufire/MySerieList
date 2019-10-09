@@ -78,10 +78,10 @@ S;100;mystery;Mystery;Level 1;genre;9648
 S;250;mystery;Mystery;Level 2;genre;9648
 S;400;mystery;Mystery;Level 3;genre;9648
 S;650;mystery;Mystery;Level max;genre;9648
-S;100;action-adventure;Action/Adventure;Level 1;genre;10759
-S;250;action-adventure;Action/Adventure;Level 2;genre;10759
-S;400;action-adventure;Action/Adventure;Level 3;genre;10759
-S;650;action-adventure;Action/Adventure;Level max;genre;10759
+S;100;action;Action/Adventure;Level 1;genre;10759
+S;250;action;Action/Adventure;Level 2;genre;10759
+S;400;action;Action/Adventure;Level 3;genre;10759
+S;650;action;Action/Adventure;Level max;genre;10759
 S;100;comedy;Comedy;Level 1;genre;35
 S;300;comedy;Comedy;Level 2;genre;35
 S;600;comedy;Comedy;Level 3;genre;35
@@ -98,10 +98,10 @@ S;500;drama;Drama;Level 1;genre;18
 S;1000;drama;Drama;Level 2;genre;18
 S;2000;drama;Drama;Level 3;genre;18
 S;3000;drama;Drama;Level max;genre;18
-S;100;sci-fi-fantasy;Sci-fi Fantasy;Level 1;genre;10765
-S;200;sci-fi-fantasy;Sci-fi Fantasy;Level 2;genre;10765
-S;300;sci-fi-fantasy;Sci-fi Fantasy;Level 3;genre;10765
-S;400;sci-fi-fantasy;Sci-fi Fantasy;Level max;genre;10765
+S;100;science-fiction;Sci-fi Fantasy;Level 1;genre;10765
+S;200;science-fiction;Sci-fi Fantasy;Level 2;genre;10765
+S;300;science-fiction;Sci-fi Fantasy;Level 3;genre;10765
+S;400;science-fiction;Sci-fi Fantasy;Level max;genre;10765
 S;5;finished;Finished;Level 1;finished;
 S;10;finished;Finished;Level 2;finished;
 S;15;finished;Finished;Level 3;finished;

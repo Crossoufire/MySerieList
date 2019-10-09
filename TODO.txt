@@ -15,7 +15,6 @@ Account:
     Follows:
         Seems OK
     Badges:
-        Finish images
         Seems OK
     Settings:
         Seems OK
