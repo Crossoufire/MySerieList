@@ -61,12 +61,12 @@
                         {{ form.email(class="form-control", placeholder="E-mail") }}
                     {% endif %}
                 </div>
-                <div class="form-check m-l-30 m-r-30">
+                {#<div class="form-check m-l-30 m-r-30">
                     {{ form.recaptcha }}
                     {% for error in form.recaptcha.errors %}
                         <span>{{ error }}</span>
                     {% endfor %}
-                </div>
+                </div>#}
             </fieldset>
             <div class="form-check m-l-30 m-r-30 text-center">
                 {{ form.submit(class="btn btn-outline-info") }}
