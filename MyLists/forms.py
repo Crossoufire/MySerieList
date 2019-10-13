@@ -80,7 +80,6 @@ class AddFriendForm(FlaskForm):
 
 class ResetPasswordRequestForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
-    recaptcha = RecaptchaField()
     submit = SubmitField('Request Password Reset')
 
     def validate_email(self, email):
