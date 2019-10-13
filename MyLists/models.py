@@ -248,17 +248,5 @@ class Achievements(db.Model):
     image_id = db.Column(db.String(100), nullable=False)
     level = db.Column(db.String(100), nullable=False)
     title = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(200), nullable=False)
-    type = db.Column(db.String(100), nullable=False)
-    genre = db.Column(db.String(100))
-
-
-class AchievementsTest(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    media = db.Column(db.String(10), nullable=False)
-    threshold = db.Column(db.Integer, nullable=False)
-    image_id = db.Column(db.String(100), nullable=False)
-    level = db.Column(db.String(100), nullable=False)
-    title = db.Column(db.String(100), nullable=False)
     type = db.Column(db.String(100), nullable=False)
     genre = db.Column(db.String(100))

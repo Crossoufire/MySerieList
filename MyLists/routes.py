@@ -20,7 +20,7 @@ from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, Change
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
     Follow, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, \
-    Achievements, Movies, MoviesGenre, MoviesList, MoviesProd, AchievementsTest
+    Achievements, Movies, MoviesGenre, MoviesList, MoviesProd
 
 
 config.read('config.ini')
@@ -45,106 +45,6 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
         add_achievements_to_db()
-    if User.query.filter_by(id='2').first() is None:
-        admin = User(username='bbb',
-                     email='admin@admin.comm',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
-    if User.query.filter_by(id='3').first() is None:
-        admin = User(username='ppp',
-                     email='admin@admin.commm',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
-    if User.query.filter_by(id='4').first() is None:
-        admin = User(username='ddd',
-                     email='admin@admin.commmm',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
-    if User.query.filter_by(id='5').first() is None:
-        admin = User(username='ccc',
-                     email='admin@admin.commmmm',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
-    if User.query.filter_by(id='6').first() is None:
-        admin = User(username='zzz',
-                     email='admin@admin.commmmmmm',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
-    if User.query.filter_by(id='7').first() is None:
-        admin = User(username='iii',
-                     email='admin@admftjfin.commmm',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
-    if User.query.filter_by(id='8').first() is None:
-        admin = User(username='aaa',
-                     email='admin@aftjfttfdmin.commmm',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
-    if User.query.filter_by(id='9').first() is None:
-        admin = User(username='tesehqht3',
-                     email='admin@aerehrmin.commmm',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
-    if User.query.filter_by(id='10').first() is None:
-        admin = User(username='terhqeest3',
-                     email='adminhq(qre@admin.commmm',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
-    if User.query.filter_by(id='11').first() is None:
-        admin = User(username='tzefest3',
-                     email='admin@aEQFSHTHdmin.commmm',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
     refresh_db_achievements()
 
     db.session.commit()
@@ -1746,19 +1646,24 @@ def get_achievements(user_id, list_type):
     episodes_list = [element_episodes_1, element_episodes_2, element_episodes_3, element_episodes_4, element_episodes_5,
                      element_episodes_6, element_episodes_7, element_episodes_8, element_episodes_9, element_episodes_10, element_episodes_11]
     for i in range(0, len(genre_id)):
-        achievements = AchievementsTest.query.filter_by(media=media, genre=genre_id[i]).all()
+        achievements = Achievements.query.filter_by(media=media, genre=genre_id[i]).all()
         for achievement in achievements:
             if int(time_list[i]/60) < int(achievement.threshold):
+                if achievement.level == "Level max":
+                    level = "Level 3"
+                else:
+                    level = "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1]) - 1)
                 achievement_data = {"type": achievement.type,
                                     "threshold": achievement.threshold,
                                     "image_id": achievement.image_id,
-                                    "level": "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1])-1),
+                                    "level": level,
                                     "title": achievement.title,
                                     "element_time": int(time_list[i]/60),
                                     "element_count": count_list[i],
                                     "element_name": name_list[i],
                                     "element_episodes": episodes_list[i],
                                     "element_percentage": round((int(time_list[i]/60)*100)/(achievement.threshold), 2)}
+                print(achievement_data)
                 break
             else:
                 unlocked_levels += 1
@@ -1781,7 +1686,7 @@ def get_achievements(user_id, list_type):
     ####################################################################################################################
 
     # source/airing_date achievements
-    achievements = AchievementsTest.query.filter_by(media=media, type="classic").all()
+    achievements = Achievements.query.filter_by(media=media, type="classic").all()
     element_time = 0
     element_count = 0
     element_episodes = 0
@@ -1802,11 +1707,15 @@ def get_achievements(user_id, list_type):
                 element_name.append(element[0].name)
 
     for achievement in achievements:
-        if int(element_time/60) < int(achievement.threshold):
+        if (element_time/60) < achievement.threshold:
+            if achievement.level == "Level max":
+                level = "Level 3"
+            else:
+                level = "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1]) - 1)
             achievement_data = {"type": achievement.type,
                                 "threshold": achievement.threshold,
                                 "image_id": achievement.image_id,
-                                "level": "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1])-1),
+                                "level": level,
                                 "title": achievement.title,
                                 "element_time": int(element_time/60),
                                 "element_count": element_count,
@@ -1835,7 +1744,7 @@ def get_achievements(user_id, list_type):
     ####################################################################################################################
 
     # Finished achievements
-    achievements = AchievementsTest.query.filter_by(media=media, type="finished").all()
+    achievements = Achievements.query.filter_by(media=media, type="finished").all()
     element_count = 0
     for element in element_data:
         if list_type != ListType.MOVIES:
@@ -1848,17 +1757,21 @@ def get_achievements(user_id, list_type):
 
     for achievement in achievements:
         if element_count < int(achievement.threshold):
+            if achievement.level == "Level max":
+                level = "Level 11"
+            else:
+                level = "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1]) - 1)
             achievement_data = {"type": achievement.type,
                                 "threshold": achievement.threshold,
                                 "image_id": achievement.image_id,
-                                "level": "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1])-1),
+                                "level": level,
                                 "title": achievement.title,
                                 "element_count": element_count,
                                 "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
             break
         else:
             unlocked_levels += 1
-            if unlocked_levels == 4:
+            if unlocked_levels == 12:
                 unlocked_badges += 1
                 achievement_data = {"type": achievement.type,
                                     "threshold": achievement.threshold,
@@ -1874,7 +1787,7 @@ def get_achievements(user_id, list_type):
     ####################################################################################################################
 
     # Time achievements
-    achievements = AchievementsTest.query.filter_by(media=media, type="time").all()
+    achievements = Achievements.query.filter_by(media=media, type="time").all()
     user = User.query.filter_by(id=user_id).first()
 
     if list_type == ListType.ANIME:
@@ -1886,10 +1799,14 @@ def get_achievements(user_id, list_type):
 
     for achievement in achievements:
         if time_spent < int(achievement.threshold):
+            if achievement.level == "Level max":
+                level = "Level 3"
+            else:
+                level = "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1]) - 1)
             achievement_data = {"type": achievement.type,
                                 "threshold": achievement.threshold,
                                 "image_id": achievement.image_id,
-                                "level": "{} {}".format(achievement.level.split()[0], int(achievement.level.split()[1])-1),
+                                "level": level,
                                 "title": achievement.title,
                                 "element_time": int(time_spent),
                                 "element_percentage": round((time_spent*100)/(achievement.threshold), 2)}
@@ -1912,7 +1829,7 @@ def get_achievements(user_id, list_type):
     ####################################################################################################################
 
     # Miscellaneous: Long runner
-    achievement = AchievementsTest.query.filter_by(media=media, type="long").first()
+    achievement = Achievements.query.filter_by(media=media, type="long").first()
     element_count = 0
     element_name = []
     for element in element_data:
@@ -1951,7 +1868,7 @@ def get_achievements(user_id, list_type):
     all_badges.append(achievement_data)
 
     # Miscellaneous: old element
-    achievement = AchievementsTest.query.filter_by(media=media, type="old").first()
+    achievement = Achievements.query.filter_by(media=media, type="old").first()
     element_count = 0
     element_name = []
     for element in element_data:
@@ -1990,7 +1907,7 @@ def get_achievements(user_id, list_type):
     all_badges.append(achievement_data)
 
     # Miscellaneous: Different years of first airing
-    achievement = AchievementsTest.query.filter_by(media=media, type="year").first()
+    achievement = Achievements.query.filter_by(media=media, type="year").first()
     all_air_date = []
     element_name = []
     for element in element_data:
@@ -2845,10 +2762,17 @@ def add_element_in_base(element_data, element_cover_id, list_type):
                                            genre_id=int(genre["mal_id"]))
                     db.session.add(add_genre)
             except:
-                for genre_data in genres_data:
+                if len(genres_data) == 0:
                     add_genre = AnimeGenre(anime_id=element.id,
-                                           genre=genre_data)
+                                            genre="Unknown",
+                                            genre_id=0)
                     db.session.add(add_genre)
+                else:
+                    for i in range(0, len(genres_data)):
+                        add_genre = AnimeGenre(anime_id=element.id,
+                                               genre=genres_data[i],
+                                               genre_id=genres_id[i])
+                        db.session.add(add_genre)
 
         # Add the different networks for each element
         if len(networks_data) == 0:
@@ -3321,13 +3245,13 @@ def add_achievements_to_db():
             genre = int(list_all_achievements[i][6])
         except:
             genre = None
-        achievement = AchievementsTest(media=list_all_achievements[i][0],
-                                       threshold=int(list_all_achievements[i][1]),
-                                       image_id=list_all_achievements[i][2],
-                                       level=list_all_achievements[i][4],
-                                       title=list_all_achievements[i][3],
-                                       type=list_all_achievements[i][5],
-                                       genre=genre)
+        achievement = Achievements(media=list_all_achievements[i][0],
+                                   threshold=int(list_all_achievements[i][1]),
+                                   image_id=list_all_achievements[i][2],
+                                   level=list_all_achievements[i][4],
+                                   title=list_all_achievements[i][3],
+                                   type=list_all_achievements[i][5],
+                                   genre=genre)
         db.session.add(achievement)
 
 
@@ -3338,7 +3262,7 @@ def refresh_db_achievements():
         for line in fp:
             list_all_achievements.append(line.split(";"))
 
-    achievements = AchievementsTest.query.order_by(AchievementsTest.id).all()
+    achievements = Achievements.query.order_by(Achievements.id).all()
     for i in range(1, len(list_all_achievements)):
         try:
             genre = int(list_all_achievements[i][6])
