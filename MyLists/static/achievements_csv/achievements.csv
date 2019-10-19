@@ -125,50 +125,50 @@ S;700;classic;Classic;Level max;classic;
 S;20;year;Year;Level max;year;
 S;10;old;Old;Level max;old;
 S;10;long;Long Episodes;Level max;long;
-M;100;mystery;Mystery;Level 1;genre;9648
-M;250;mystery;Mystery;Level 2;genre;9648
-M;400;mystery;Mystery;Level 3;genre;9648
-M;650;mystery;Mystery;Level max;genre;9648
-M;100;animation;Animation;Level 1;genre;16
-M;250;animation;Animation;Level 2;genre;16
-M;400;animation;Animation;Level 3;genre;16
-M;650;animation;Animation;Level max;genre;16
-M;100;comedy;Comedy;Level 1;genre;35
-M;300;comedy;Comedy;Level 2;genre;35
-M;600;comedy;Comedy;Level 3;genre;35
-M;900;comedy;Comedy;Level max;genre;35
-M;30;documentary;Documentary;Level 1;genre;99
-M;50;documentary;Documentary;Level 2;genre;99
-M;75;documentary;Documentary;Level 3;genre;99
-M;100;documentary;Documentary;Level max;genre;99
-M;100;fantasy;Fantasy;Level 1;genre;14
-M;250;fantasy;Fantasy;Level 2;genre;14
-M;400;fantasy;Fantasy;Level 3;genre;14
-M;550;fantasy;Fantasy;Level max;genre;14
-M;500;historical;Historical;Level 1;genre;36
-M;1000;historical;Historical;Level 2;genre;36
-M;2000;historical;Historical;Level 3;genre;36
-M;3000;historical;Historical;Level max;genre;36
-M;100;horror;Horror;Level 1;genre;27
-M;200;horror;Horror;Level 2;genre;27
-M;300;horror;Horror;Level 3;genre;27
-M;400;horror;Horror;Level max;genre;27
-M;100;music;Music;Level 1;genre;10402
-M;200;music;Music;Level 2;genre;10402
-M;300;music;Music;Level 3;genre;10402
-M;400;music;Music;Level max;genre;10402
-M;100;romance;Romance;Level 1;genre;10749
-M;200;romance;Romance;Level 2;genre;10749
-M;300;romance;Romance;Level 3;genre;10749
-M;400;romance;Romance;Level max;genre;10749
-M;100;science-fiction;Science Fiction;Level 1;genre;878
-M;200;science-fiction;Science Fiction;Level 2;genre;878
-M;300;science-fiction;Science Fiction;Level 3;genre;878
-M;400;science-fiction;Science Fiction;Level max;genre;878
-M;100;thriller;Thriller;Level 1;genre;53
-M;200;thriller;Thriller;Level 2;genre;53
-M;300;thriller;Thriller;Level 3;genre;53
-M;400;thriller;Thriller;Level max;genre;53
+M;30;mystery;Mystery;Level 1;genre;9648
+M;75;mystery;Mystery;Level 2;genre;9648
+M;150;mystery;Mystery;Level 3;genre;9648
+M;300;mystery;Mystery;Level max;genre;9648
+M;30;animation;Animation;Level 1;genre;16
+M;75;animation;Animation;Level 2;genre;16
+M;150;animation;Animation;Level 3;genre;16
+M;300;animation;Animation;Level max;genre;16
+M;30;comedy;Comedy;Level 1;genre;35
+M;75;comedy;Comedy;Level 2;genre;35
+M;150;comedy;Comedy;Level 3;genre;35
+M;300;comedy;Comedy;Level max;genre;35
+M;10;documentary;Documentary;Level 1;genre;99
+M;20;documentary;Documentary;Level 2;genre;99
+M;30;documentary;Documentary;Level 3;genre;99
+M;50;documentary;Documentary;Level max;genre;99
+M;30;fantasy;Fantasy;Level 1;genre;14
+M;75;fantasy;Fantasy;Level 2;genre;14
+M;150;fantasy;Fantasy;Level 3;genre;14
+M;300;fantasy;Fantasy;Level max;genre;14
+M;30;historical;Historical;Level 1;genre;36
+M;75;historical;Historical;Level 2;genre;36
+M;150;historical;Historical;Level 3;genre;36
+M;300;historical;Historical;Level max;genre;36
+M;30;horror;Horror;Level 1;genre;27
+M;75;horror;Horror;Level 2;genre;27
+M;150;horror;Horror;Level 3;genre;27
+M;300;horror;Horror;Level max;genre;27
+M;10;music;Music;Level 1;genre;10402
+M;20;music;Music;Level 2;genre;10402
+M;30;music;Music;Level 3;genre;10402
+M;50;music;Music;Level max;genre;10402
+M;30;romance;Romance;Level 1;genre;10749
+M;75;romance;Romance;Level 2;genre;10749
+M;150;romance;Romance;Level 3;genre;10749
+M;300;romance;Romance;Level max;genre;10749
+M;30;science-fiction;Science Fiction;Level 1;genre;878
+M;75;science-fiction;Science Fiction;Level 2;genre;878
+M;150;science-fiction;Science Fiction;Level 3;genre;878
+M;300;science-fiction;Science Fiction;Level max;genre;878
+M;30;thriller;Thriller;Level 1;genre;53
+M;75;thriller;Thriller;Level 2;genre;53
+M;150;thriller;Thriller;Level 3;genre;53
+M;300;thriller;Thriller;Level max;genre;53
 M;50;finished;Finished;Level 1;finished;
 M;100;finished;Finished;Level 2;finished;
 M;150;finished;Finished;Level 3;finished;
@@ -180,15 +180,15 @@ M;400;finished;Finished;Level 8;finished;
 M;450;finished;Finished;Level 9;finished;
 M;500;finished;Finished;Level 10;finished;
 M;750;finished;Finished;Level 11;finished;
-M;1000;finished;Finished;Level max;finished;
+M;1500;finished;Finished;Level max;finished;
 M;30;time;Time;Level 1;time;
 M;75;time;Time;Level 2;time;
 M;150;time;Time;Level 3;time;
 M;300;time;Time;Level max;time;
-M;100;classic;Classic;Level 1;classic;
-M;200;classic;Classic;Level 2;classic;
-M;400;classic;Classic;Level 3;classic;
-M;700;classic;Classic;Level max;classic;
-M;20;year;Year;Level max;year;
+M;30;classic;Classic;Level 1;classic;
+M;75;classic;Classic;Level 2;classic;
+M;150;classic;Classic;Level 3;classic;
+M;300;classic;Classic;Level max;classic;
+M;30;year;Year;Level max;year;
 M;10;old;Old Movies;Level max;old;
-M;10;long;Long Movies;Level max;long;
+M;70;long;Long Movies;Level max;long;

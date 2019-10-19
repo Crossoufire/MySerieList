@@ -1,6 +1,6 @@
 
 // ------------- Delete element -------------
-function delete_element(element_id, card_id, element_name, media_list) {
+function delete_element(element_id, card_id, media_list) {
     if (!confirm("Are you sure you want to delete this from your list?")) {
         return false;
     }

@@ -259,9 +259,9 @@ def account(user_name):
             app.logger.info(
                 '[{}] Settings updated : old picture file = {}, new picture file = {}'.format(user.id, old_picture_file,
                                                                                               user.image_file))
-        if settings_form.movies_csv.data:
-            movies_csv_path = save_movies_csv(settings_form.movies_csv.data)
-            get_movies_from_csv(movies_csv_path, ListType.MOVIES)
+        # if settings_form.movies_csv.data:
+        #     movies_csv_path = save_movies_csv(settings_form.movies_csv.data)
+        #     get_movies_from_csv(movies_csv_path, ListType.MOVIES)
         if settings_form.username.data != user.username:
             old_username = user.username
             user.username = settings_form.username.data
@@ -498,7 +498,7 @@ def account(user_name):
 
     # Add the joined date
     joined_tmp = user.activated_on
-    joined_tmp = str(joined_tmp.now().date()).split('-')
+    joined_tmp = str(joined_tmp.date()).split('-')
     joined_date = "{0}-{1}-{2}".format(joined_tmp[2], joined_tmp[1], joined_tmp[0])
 
     # Recover the number of followers

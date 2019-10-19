@@ -926,13 +926,13 @@
                         <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
                     </div>
-                    <div class="m-t-30">
+                    {#<div class="m-t-30">
                         {{ settings_form.movies_csv.label }}<br>
                         {{ settings_form.movies_csv() }}<br>
                         {% for error in settings_form.movies_csv.errors %}
                         <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
-                    </div>
+                    </div>#}
                     <div class="m-t-30">
                         {{ settings_form.submit_account(class="btn btn-outline-info custom-btn-size p-r-6 p-l-6") }}
                     </div>
