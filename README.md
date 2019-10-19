@@ -1,6 +1,6 @@
 # MyLists
 
-MyLists is a website with a beautiful and clear interface which allows you to track all your TV shows / Animes / Books. It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see you friends' list and compare it to yours. You can see a live version here : [https://mylists.info](https://mylists.info).
+MyLists is a website with a beautiful and clear interface which allows you to track all your TV shows / Anime / Movies. It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see you friends' list and compare it to yours. You can see a live version here : [https://mylists.info](https://mylists.info).
 
 ![MyLists](https://raw.githubusercontent.com/Crossoufire/MyLists/master/MyLists/static/img/home_img1.jpg)
 
@@ -8,7 +8,7 @@ MyLists uses [Flask](http://flask.pocoo.org/) and [Material Design for Bootstrap
 
 ## Features
 
-* Create a list of all your TV shows / Animes / Books
+* Create a list of all your TV shows / Anime / Movies
 * Compare your list with your friends
 * Get statistics about your list (time spent, number of episodes watched, etc)
 * More to come !
@@ -44,9 +44,6 @@ private_key = <private key of Google reCAPTCHA>
 
 [TheMovieDB]
 api_key = <API key of TheMovieDB. You need to register on their website to get one>
-
-[GoogleBook]
-api_key = <API key of Google Books. You need to register on their website to get one>
 ```
 
 For example if you want to use Gmail, set `server = smtp.gmail.com` and `port = 465` . If you need more settings, feel free to adapt it as you want (file `Mylists/__init__.py`, parameters `app.config['MAIL_X]`).
@@ -61,7 +58,7 @@ When you run the program for the first time, it will create a user `admin` with 
  
 ## Misc
 
-We started this project to fulfill our needs. The live version [https://mylists.info](https://mylists.info) runs on a potato server, thus not meant to be used by thousand people at the same time. If you still can see the register button at the top of the homepage, feel free to do it. Otherwise, run your own version of MyLists :)
+We started this project to fulfill our needs. The live version [https://mylists.info](https://mylists.info) runs on a raspberry pi 3B+, thus not meant to be used by thousand of people at the same time. If you can see the register button at the top right of the homepage, feel free to do it. Otherwise, you can run your own version of MyLists ;)
 
 ## Contact
 

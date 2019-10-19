@@ -1,5 +1,5 @@
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField
 from flask_wtf.file import FileField, FileAllowed
 from flask_wtf import FlaskForm, RecaptchaField
 from flask_login import current_user
@@ -34,12 +34,14 @@ class LoginForm(FlaskForm):
 
 
 class UpdateAccountForm(FlaskForm):
+    biography = TextAreaField('Biography', validators=[Length(max=200)])
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png'])])
+    # movies_csv = FileField('Movies titles csv', validators=[FileAllowed(['csv'])])
     isprivate = BooleanField('Private mode')
-    homepage = SelectField('Default homepage', choices=[('msl', 'MySeriesList'), ('mal', 'MyAnimesList'), ('mbl', 'MyBooksList'), ('acc', 'Account'), ('hof', 'Hall of Fame')])
-    submit = SubmitField('Update account')
+    homepage = SelectField('Default homepage', choices=[('msl', 'MySeriesList'), ('mml', 'MyMoviesList'), ('mal', 'MyAnimesList'), ('acc', 'Account'), ('hof', 'Hall of Fame')])
+    submit_account = SubmitField('Update account')
 
     def validate_username(self, username):
         if username.data != current_user.username:
@@ -58,7 +60,7 @@ class ChangePasswordForm(FlaskForm):
     current_password = PasswordField('Current password', validators=[DataRequired()])
     new_password = PasswordField('Choose new password', validators=[DataRequired(), Length(min=6)])
     confirm_new_password = PasswordField('Confirm new password', validators=[DataRequired(), EqualTo('new_password')])
-    submit = SubmitField('Update Password')
+    submit_password = SubmitField('Update Password')
 
     def validate_current_password(self, current_password):
         user = User.query.filter_by(id=current_user.get_id()).first()
@@ -66,14 +68,14 @@ class ChangePasswordForm(FlaskForm):
             raise ValidationError("Incorrect current password")
 
 
-class AddFriendForm(FlaskForm):
-    friend_to_add = StringField('Type a Username')
-    submit = SubmitField('Send friend request')
+class AddFollowForm(FlaskForm):
+    follow_to_add = StringField('Type a Username')
+    submit_follow = SubmitField('follow')
 
-    def validate_friend_to_add(self, friend_to_add):
-        if friend_to_add.data == current_user.username:
-            raise ValidationError("You cannot add yourself")
-        user = User.query.filter_by(username=friend_to_add.data).first()
+    def validate_follow_to_add(self, follow_to_add):
+        if follow_to_add.data == current_user.username:
+            raise ValidationError("You cannot follow yourself")
+        user = User.query.filter_by(username=follow_to_add.data).first()
         if user is None or user.id == 1:
             raise ValidationError("User not found")
 

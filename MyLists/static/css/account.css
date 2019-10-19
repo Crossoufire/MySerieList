@@ -1,0 +1,352 @@
+/* ------------ Main CSS ----------- */
+ul {
+    list-style: none;
+}
+
+hr {
+    border-top: 1px solid rgba(44, 57, 70, 1);
+    margin-top: 1px;
+}
+/* --------------------------------- */
+
+
+/* -------------- Tabs ------------- */
+.account_tab {
+    border-bottom: white 1px solid;
+    background: rgba(44, 57, 70, 1);
+}
+
+.account_tab > li > .active {
+    background: rgba(24, 37, 50, 1) !important;
+}
+
+.account_tab > li > a {
+    color: white;
+}
+/* --------------------------------- */
+
+
+/* ------------ Header ------------- */
+.header-image {
+    position: relative;
+    height: 300px;
+    background-image: url('https://www.everynation.org/wp-content/uploads/2018/02/Monthly-Website-Header-background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.header-image > img {
+    position: absolute;
+    left: 30px;
+    bottom: -8%;
+    z-index: 10;
+    border-radius: 50%;
+    border: solid 3px white;
+    height: 150px;
+    width: 150px;
+}
+
+.header-data {
+    position: absolute;
+    left: 200px;
+    bottom: 3px;
+    z-index: 10;
+}
+
+/* On screens that are 790px or less */
+@media (max-width: 790px) {
+    .header-image > img {
+        bottom: 10px;
+    }
+    .header-data {
+        bottom: 15px;
+    }
+}
+
+/* On screens that are 490px or less */
+@media (max-width: 490px) {
+    .header-image > img {
+        left: 10px;
+        bottom: 20px;
+        height: 110px;
+        width: 110px;
+        width: 110px;
+    }
+    .header-data {
+        left: 135px;
+        bottom: 15px;
+    }
+}
+/* --------------------------------- */
+
+
+/* ----------- Overview ------------ */
+.vertical_line {
+    width: 5px;
+    border-left: 2px solid rgba(44, 57, 70, 1);
+    height: 100wh;
+}
+
+.block {
+    height: 30px;
+    color: white;
+    float: left;
+    background-color: #334D5C;
+}
+
+.block_no_data {
+    height: 30px;
+    color: white;
+    float: left;
+    background-color: black;
+}
+
+.block:nth-of-type(2) {
+	background-color: #45B29D;
+}
+.block:nth-of-type(3) {
+	background-color: #EFC94C;
+}
+.block:nth-of-type(4) {
+	background-color: #E27A3F;
+}
+.block:nth-of-type(5) {
+	background-color: #DF5A49;
+}
+.block:nth-of-type(6) {
+	background-color: #962D3E;
+}
+
+.block:hover {
+	opacity: 0.75;
+}
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+.stat_text {
+    font-size: 12pt;
+}
+
+.mini {
+    min-width: 105px;
+}
+
+/* On screens that are 990px or less */
+@media (max-width: 990px) {
+    #overview_tab {
+        padding-left: 100px;
+        padding-right: 100px;
+    }
+}
+
+/* On screens that are 650px or less */
+@media (max-width: 650px) {
+    #overview_tab {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}
+
+/* On screens that are 490px or less */
+@media (max-width: 490px) {
+    .stat_text {
+        font-size: 10pt;
+    }
+
+    .mini {
+        min-width: 100px;
+    }
+}
+/* --------------------------------- */
+
+
+/* ------------ Follows ------------ */
+.modal-content {
+    background: #131418;
+    border: solid 1px white !important;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-control {
+    background: transparent;
+    border-radius: 0px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    color: #fff;
+}
+
+.form-control:focus {
+    background: transparent;
+    border-radius: 0px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    box-shadow: 0 0 0 0rem;
+    color: #fff;
+}
+
+/* ------------ Levels ------------ */
+.account-bar-wrapper {
+    width: 100%;
+}
+
+.account-bar {
+    height: 100%;
+    margin: 0px auto;
+}
+
+.account-bar-name {
+    font-size: 12pt;
+    margin: 0px 0px 0px 5px;
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.account-bar-level {
+    font-size: 12pt;
+    margin: 0px 0px 0px;
+    display: inline-block;
+}
+
+#series_level {
+    margin-left: 20px;
+}
+
+#movies_level {
+    margin-left: 13px;
+}
+
+#anime_level {
+    margin-left: 18px;
+}
+
+.account-bar-next-level {
+    display: inline-block;
+    font-size: 12pt;
+}
+
+.xp-bar {
+    height: 10px;
+    width: 60%;
+    background: #035;
+    margin: 0px 0px 0px 5px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#xp-bar-fill-series {
+    height: 100%;
+    width: 0.1%;
+    background: #4d0000;
+    font-size: 12px;
+    line-height: 10px;
+    text-align: right;
+}
+
+#xp-bar-fill-movies {
+    height: 100%;
+    width: 0.1%;
+    background: #cccccc;
+    font-size: 12px;
+    line-height: 10px;
+    text-align: right;
+}
+
+#xp-bar-fill-anime {
+    height: 100%;
+    width: 0.1%;
+    background: #0068b3;
+    font-size: 12px;
+    line-height: 10px;
+    text-align: right;
+}
+
+.xp-increase-fx {
+    position: relative;
+    display: none;
+    height: 100%;
+}
+
+.xp-increase-glow1 {
+    position: absolute;
+    margin: 0px 0px 0px -2px;
+    left: 0px;
+    top: 0px;
+    background: #fff;
+    width: 5px;
+    height: 100%;
+    border-radius: 0px;
+    -webkit-filter: blur(2px);
+}
+
+.xp-increase-glow2 {
+    position: absolute;
+    margin: -5px 0px 0px -2px;
+    left: 0px;
+    top: 0px;
+    background: #aaf;
+    width: 5px;
+    height: 200%;
+    border-radius: 0px;
+    -webkit-filter: blur(10px);
+}
+
+.xp-increase-glow3 {
+    position: absolute;
+    margin: 0px 0px 0px -5px;
+    left: 0px;
+    top: 0px;
+    background: #fff;
+    width: 10px;
+    height: 100%;
+    border-radius: 5px;
+    -webkit-filter: blur(5px);
+}
+/* --------------------------------- */
+
+
+/* --------- Achievements ---------- */
+
+.achiev-bar {
+    background-color: grey;
+    padding: 0px;
+    margin-top: 6px;
+    height: 12px;
+}
+
+.block_achiev {
+    display: inline-block;
+    margin-bottom: 10px;
+    height: 12px;
+    width: 50%;
+    background-color: #4d0000;
+}
+
+.block_achiev.series {
+    background-color: #4d0000;
+}
+
+.block_achiev.anime {
+    background-color: #0068b3;
+}
+
+.block_achiev.movies {
+    background-color: white;
+}
+
+.achiev-name {
+    width: 105px;
+}
+/* --------------------------------- */
+
+
+/* ----------- Settings ------------ */
+
+/* --------------------------------- */

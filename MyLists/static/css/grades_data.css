@@ -1,0 +1,31 @@
+
+#hierarchical {
+    width: 100%;
+    height: 100%;
+}
+
+table {
+    margin: 0 auto;
+}
+
+thead {
+    border-botton: solid 2px grey;
+}
+
+tr {
+    border-bottom: solid 1px grey;
+}
+
+td {
+    text-align: center;
+}
+
+legend {
+    font-size: 12pt;
+}
+
+.details {
+    border: black solid 2px;
+    border-radius: 10px;
+    background-color: #47476b;
+}

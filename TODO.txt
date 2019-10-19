@@ -1,0 +1,50 @@
+
+---------------------------------------------- BEFORE NEXT UPDATE ----------------------------------------------
+
+MyMediaList:
+    Seems OK
+
+Hall of Fame:
+    Seems OK
+
+Account:
+    General:
+        Seems OK
+    Overview:
+        Seems OK
+    Follows:
+        Seems OK
+    Badges:
+        Seems OK
+    Settings:
+        Seems OK
+
+--------------------------------------------- AFTER NEXT UPDATE ------------------------------------------------
+
+Account:
+	Add follow list last updates on movies/anime/series
+	Add a display/hide all scores by default
+	Add the possiblity to change the background image
+	Enhance the bio, picture profile and background profile modifications (without form)
+    Enhance the settings tab CSS/HTML style
+
+Medialists:
+    Add year in the autocomplete (50% done)
+	Change the autocomplete style (50% done)
+	Add a "more results" to the autocomplete
+	Add the regroup of movies by collection from TMDb
+	Add option to import a CSV file for movies (50% done)
+	Change the category modal style
+	Add episodes per season in the metadata modal
+	Add the possibility to edit metadata
+	Remove the homepage info
+
+Advanced Statistics:
+	Add personal advanced statistics for movies/series/anime
+
+Hall of Fame:
+    Add global statistics below the table:
+        How many movies/series/anime in gobal seen
+        Total time & mean score from all users
+        Most watched movie/anime/series
+        etc...

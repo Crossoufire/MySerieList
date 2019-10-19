@@ -3,6 +3,7 @@ from MyLists import db, login_manager, app
 from flask_login import UserMixin
 import enum
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -10,44 +11,44 @@ def load_user(user_id):
 
 class Status(enum.Enum):
     WATCHING = "Watching"
-    READING = "Reading"
     COMPLETED = "Completed"
+    COMPLETED_ANIMATION = "Completed Animation"
     ON_HOLD = "On Hold"
     RANDOM = "Random"
     DROPPED = "Dropped"
     PLAN_TO_WATCH = "Plan to Watch"
-    PLAN_TO_READ = "Plan to Read"
 
 
 class ListType(enum.Enum):
     SERIES = "Series"
     ANIME = "Anime"
-    BOOK = "Book"
+    MOVIES = 'Movies'
 
 
 class HomePage(enum.Enum):
     ACCOUNT = "account"
     HALL_OF_FAME = "hall_of_fame"
     MYSERIESLIST = "myserieslist"
-    MYANIMESLIST = "myanimeslist"
-    MYBOOKSLIST = "mybookslist"
+    MYANIMELIST = "myanimelist"
+    MYMOVIESLIST = "mymovieslist"
 
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
-    password = db.Column(db.String(60), nullable=False)
-    active = db.Column(db.Boolean)
-    private = db.Column(db.Boolean)
     registered_on = db.Column(db.DateTime, nullable=False)
-    activated_on = db.Column(db.DateTime)
-    transition_email = db.Column(db.String(120))
+    password = db.Column(db.String(60), nullable=False)
     homepage = db.Column(db.Enum(HomePage), nullable=False, default=HomePage.MYSERIESLIST)
+    image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     time_spent_series = db.Column(db.Integer, nullable=False, default=0)
+    time_spent_movies = db.Column(db.Integer, nullable=False, default=0)
     time_spent_anime = db.Column(db.Integer, nullable=False, default=0)
-    time_spent_book = db.Column(db.Integer, nullable=False, default=0)
+    private = db.Column(db.Boolean, nullable=False, default=False)
+    active = db.Column(db.Boolean, nullable=False, default=False)
+    biography = db.Column(db.Text)
+    transition_email = db.Column(db.String(120))
+    activated_on = db.Column(db.DateTime)
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
@@ -75,11 +76,10 @@ class User(db.Model, UserMixin):
             return user
 
 
-class Friend(db.Model):
+class Follow(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    friend_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    status = db.Column(db.String(50))
+    follow_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 ######################################################## SERIES ########################################################
@@ -129,6 +129,7 @@ class SeriesGenre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
+    genre_id = db.Column(db.Integer, nullable=False)
 
 
 class SeriesNetwork(db.Model):
@@ -193,28 +194,48 @@ class AnimeNetwork(db.Model):
     network = db.Column(db.String(150), nullable=False)
 
 
-######################################################## BOOKS #########################################################
+######################################################## MOVIES ########################################################
 
 
-class Book(db.Model):
+class Movies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(300), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    original_name = db.Column(db.String(50), nullable=False)
+    release_date = db.Column(db.String(30))
+    homepage = db.Column(db.String(100))
+    released = db.Column(db.String(30))
+    runtime = db.Column(db.Integer)
+    original_language = db.Column(db.String(20))
+    synopsis = db.Column(db.Text)
+    vote_average = db.Column(db.Float)
+    vote_count = db.Column(db.Float)
+    popularity = db.Column(db.Float)
+    budget = db.Column(db.Float)
+    revenue = db.Column(db.Float)
+    tagline = db.Column(db.String(30))
     image_cover = db.Column(db.String(100), nullable=False)
-    authors = db.Column(db.String(150), nullable=False)
-    published_date = db.Column(db.String(150))
-    description = db.Column(db.String(50))
-    page_count = db.Column(db.Integer)
-    categories = db.Column(db.String(150))
-    google_id = db.Column(db.String(150), nullable=False)
+    themoviedb_id = db.Column(db.Integer, nullable=False)
 
 
-class BookList(db.Model):
+class MoviesList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
-    commentary = db.Column(db.String(5000))
+    movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
     score = db.Column(db.Float)
+
+
+class MoviesGenre(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
+    genre = db.Column(db.String(100), nullable=False)
+    genre_id = db.Column(db.Integer, nullable=False)
+
+
+class MoviesProd(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    movies_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
+    production_company = db.Column(db.String(150), nullable=False)
 
 
 ######################################################## ACHIEVEMENTS ##################################################
@@ -227,6 +248,5 @@ class Achievements(db.Model):
     image_id = db.Column(db.String(100), nullable=False)
     level = db.Column(db.String(100), nullable=False)
     title = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(200), nullable=False)
     type = db.Column(db.String(100), nullable=False)
     genre = db.Column(db.String(100))

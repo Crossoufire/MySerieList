@@ -2,69 +2,21 @@
 
 
 {% block css %}
-<!---------- Main CSS ----------->
-<style type="text/css">
-#title {
-    font-size: 70pt;
-}
-
-/* On screens that are 768px or less */
-@media (max-width: 767.98px) {
-    #title {
-        font-size: 35pt;
-    }
-    .header {
-        height: 300px;
-    }
-}
-
-.background_white {
-    border-color: #e2e2e2;
-}
-
-/**************** LOGIN & REGISTER MODAL ***************/
-.modal-content {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    max-width:  343px;
-    margin-left: auto;
-    margin-right: auto;
-    background-color: #131418;
-    border-radius: 2px !important;
-    border-style: solid !important;
-    border-color: white !important;
-    border-width: 1px !important;
-}
-
-.modal-content a {
-    color:  #f0efee;
-    font-weight: 400;
-    text-align: center;
-    display: inline-block;
-    opacity: 0.6;
-    transition: opacity ease 0.5s;
-}
-</style>
+<link href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet">
 {% endblock %}
 
 
 {% block home_header %}
-    <div id="myCarousel" class="carousel text-center" data-ride="carousel">
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <div class="view">
-                    <img class="header" src="{{ image_header }}">
-                    <div class="mask d-flex justify-content-center align-items-center">
-                        <div class="text-center white-text mx-5 wow fadeIn">
-                            <h1 class="mb-4" id="title">
-                                <strong>Welcome to MyLists</strong>
-                            </h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="view">
+    <img class="img-fluid" src="{{ image_header }}" alt=""/>
+    <div class="mask d-flex justify-content-center align-items-center">
+        <div class="text-center white-text mx-5 wow fadeIn">
+            <h1 class="title" style="font-size: 50pt; text-shadow: 0 0 2px #000; -moz-text-shadow: 0 0 2px #000; -webkit-text-shadow: 0 0 2px #000;">
+                <strong>Welcome to MyLists</strong>
+            </h1>
         </div>
     </div>
+</div>
 {% endblock %}
 
 
@@ -72,7 +24,7 @@
     <!----------------------- Login modal ------------------------------->
     <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
+            <div class="modal-content">
                 <div class="modal-body">
                     <div class="modal-header">
                         <h4 class="modal-title">Login</h4>
@@ -129,7 +81,7 @@
     <!----------------------- Register modal ---------------------------->
     <div class="modal fade" id="modalRegisterForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white;">
+            <div class="modal-content">
                 <div class="modal-body">
                     <div class="modal-header">
                         <h4 class="modal-title">Register</h4>
@@ -208,8 +160,8 @@
     </div>
 
     <section>
-        <h1 class="my-5 h3 text-center" style="margin-bottom: 2rem !important; margin-top: 2rem !important">TRACK YOUR TV SHOWS & ANIMES AND NEVER GET LOST</h1>
-        <h5 class="my-5 text-center" style="margin-bottom: 2rem !important; margin-top: 2rem !important">MyLists has a beautiful and clear interface which allows you to track all your TV shows and animes without remembering what was your last watched episode. It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see your friends' list and compare it to yours.</h5>
+        <h1 class="title_section my-5 h3 text-center">TRACK YOUR TV SHOWS & ANIME AND NEVER GET LOST</h1>
+        <h5 class="title_section my-5 text-center" >MyLists has a beautiful and clear interface which allows you to track all your TV shows and anime without remembering what was your last watched episode. It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see your friends' list and compare it to yours.</h5>
         <div class="row wow fadeIn">
             <div class="col-md-12 flex-center">
                 <img src="{{ img1 }}" class="img-fluid z-depth-1-half" alt="">
@@ -219,8 +171,8 @@
     <hr class="my-5 background_white">
 
     <section>
-        <h1 class="my-5 h3 text-center" style="margin-bottom: 2rem !important; margin-top: 2rem !important">COMPARE YOUR LIST WITH OTHER USERS</h1>
-        <h5 class="my-5 text-center" style="margin-bottom: 2rem !important; margin-top: 2rem !important">MyLists includes a Hall of Fame of all registered users. By default, all users can see the List of everyone. You can also set your profile to private, so only your friends can see your List.</h5>
+        <h1 class="title_section my-5 h3 text-center">COMPARE YOUR LIST WITH OTHER USERS</h1>
+        <h5 class="title_section my-5 text-center">MyLists includes a Hall of Fame of all registered users. By default, all users can see the List of everyone. You can also set your profile to private, so only your friends can see your List.</h5>
         <div class="row wow fadeIn">
             <div class="col-md-12 flex-center">
                 <img src="{{ img2 }}" class="img-fluid z-depth-1-half" alt="">
@@ -254,13 +206,37 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-4">
+
+            <div class="col-xl-3 col-lg-6">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fas fa-ad fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">No ads</h5>
+                        <p class="grey-text mt-2">You will not find any ads here, we don't do that here, and we want to keep it that way as long as possible.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-6">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fas fa-dollar-sign fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">100% free</h5>
+                        <p class="grey-text mt-2">You only need to create an account to access all the content.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-6">
+
                 <div class="row">
                     <div class="col-2">
                         <i class="fas fa-comments fa-2x mb-1 indigo-text" aria-hidden="true"></i>
                     </div>
                     <div class="col-10 mb-2">
-                        <h5 class="feature-title font-bold mb-1">Found a bug ?</h5>
+                        <h5 class="feature-title font-bold mb-1">Found a bug?</h5>
                         <p class="grey-text mt-2">You can contact us by e-mail at: <script language="JavaScript" type="text/javascript">
                             var part1 = "contact";
                             var part2 = Math.pow(2,6);

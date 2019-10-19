@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+<link href="{{ url_for('static', filename='css/account_settings.css') }}" rel="stylesheet">
+{% endblock css %}
+
+
+{% block content %}
+<div class="container form_account">
+    <div class="border_account">
+        <h3 class="m-b-15 text-center">Account Settings</h3>
+        <hr>
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="container-form">
+
+                <!------- Username ------->
+                <div class="form-group">
+                    {{ form.username.label(class="form-control-label") }}
+                    {% if form.username.errors %}
+                        <div class="md-form">
+                        {{ form.username(class="form-control is-invalid text-light text-input") }}
+                            <div class="invalid-feedback error-msg">
+                                {% for error in form.username.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="md-form">
+                        {{ form.username(class="form-control text-light text-input") }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!------ Email ------>
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    {% if form.email.errors %}
+                        <div class="md-form">
+                        {{ form.email(class="form-control is-invalid text-light text-input") }}
+                            <div class="invalid-feedback error-msg">
+                                {% for error in form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="md-form">
+                        {{ form.email(class="form-control text-light text-input") }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!------ Default homepage ------>
+                <div class="form-group">
+                    {{ form.homepage.label(class="form-control-label") }}
+                    {% if form.homepage.errors %}
+                        {{ form.homepage(class="form-control is-invalid text-input") }}
+                        <div class="invalid-feedback error-msg">
+                            {% for error in form.homepage.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.homepage }}
+                    {% endif %}
+                </div>
+
+                <!------ Private ------>
+                <div class="form-group">
+                    {{ form.isprivate.label(class="form-control-label") }}
+                    {% if form.isprivate.errors %}
+                        {{ form.isprivate(class="form-control is-invalid text-input") }}
+                        <div class="invalid-feedback error-msg">
+                            {% for error in form.isprivate.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.isprivate(class="m-t-9") }}
+                    {% endif %}
+                </div>
+
+                <!------ Profile picture  ------>
+                <div class="form-group upload-btn-wrapper">
+                    {{ form.picture.label(class="form-control-label") }}
+                    {{ form.picture }}
+                    {% if form.picture.errors %}
+                        {% for error in form.picture.errors %}
+                            <span class="text-danger error-msg">{{ error }}</span><br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!------ Submit ------>
+            <div class="text-center m-t-30">
+                {{ form.submit(class="btn btn-outline-info custom-btn-size") }}
+                <a class="btn btn-outline-info custom-btn-size" href="{{ url_for('change_password') }}" role="button">Change password?</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

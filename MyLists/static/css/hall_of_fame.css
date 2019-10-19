@@ -1,0 +1,67 @@
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+    bottom: .5em;
+}
+
+table.table-sm td, table.table-sm th {
+    padding: 5px;
+}
+
+table.table th {
+    font-size: 12pt;
+}
+
+div.col-sm-12 {
+    margin-top: 15px;
+}
+
+table.table a {
+    color: #359aff;
+    font-size: 11pt;
+}
+
+.table tr {
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+.table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.current_user {
+    background-color: #2c3946;
+}
+
+.profile_picture {
+    width: 60px;
+    height: 60px;
+}
+
+.grade_picture {
+    width: 35px;
+    height: 35px;
+}
+
+.k_grade_picture {
+    width: 40px;
+    height: 40px;
+}
+
+.picture {
+    max-width: 60px;
+}
+
+.follow {
+    max-width: 50px;
+}
