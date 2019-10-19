@@ -2045,6 +2045,16 @@ def get_achievements(user_id, list_type):
     element_episodes_11 = [0 for _ in range(11)]
     element_name_1, element_name_2, element_name_3, element_name_4, element_name_5, element_name_6, element_name_7, \
     element_name_8, element_name_9, element_name_10, element_name_11 = [[] for _ in range(11)]
+    element_time_classic = 0
+    element_count_classic = 0
+    element_episodes_classic = 0
+    element_count_finished = 0
+    element_count_long = 0
+    element_count_old = 0
+    all_air_date_years = []
+    element_name_old = []
+    element_name_long = []
+    element_name_classic = []
     for element in element_data:
         if element[1].status != Status.PLAN_TO_WATCH and element[1].status != Status.RANDOM:
             # Get the genre in a list
@@ -2199,10 +2209,6 @@ def get_achievements(user_id, list_type):
         else:
             pass
 
-        element_time_classic = 0
-        element_count_classic = 0
-        element_episodes_classic = 0
-        element_name_classic = []
         if list_type != ListType.MOVIES:
             first_year = int(element[0].first_air_date.split('-')[0])
             if 1990 <= first_year <= 2000 and element[1].status != Status.PLAN_TO_WATCH:
@@ -2217,7 +2223,6 @@ def get_achievements(user_id, list_type):
                 element_time_classic += element[0].runtime
                 element_name_classic.append(element[0].name)
 
-        element_count_finished = 0
         if list_type != ListType.MOVIES:
             status = element[0].status
             if (status == "Ended" or status == "Canceled") and element[1].status == Status.COMPLETED:
@@ -2226,8 +2231,6 @@ def get_achievements(user_id, list_type):
             if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
                 element_count_finished += 1
 
-        element_count_long = 0
-        element_name_long = []
         if list_type != ListType.MOVIES:
             element_episodes = get_episodes_and_time(element)[0]
             if int(element_episodes) >= 100:
@@ -2239,8 +2242,6 @@ def get_achievements(user_id, list_type):
                 element_count_long += 1
                 element_name_long.append(element[0].name)
 
-        element_count_old = 0
-        element_name_old = []
         if list_type != ListType.MOVIES:
             year_last_air_date = element[0].last_air_date.split('-')[0]
             if (int(year_last_air_date) <= 1980) and (element[1].status == Status.COMPLETED):
@@ -2253,7 +2254,6 @@ def get_achievements(user_id, list_type):
                 element_count_old += 1
                 element_name_old.append(element[0].name)
 
-        all_air_date_years = []
         if list_type != ListType.MOVIES:
                 if element[1].status == Status.COMPLETED:
                     all_air_date_years.append(element[0].first_air_date.split('-')[0])
