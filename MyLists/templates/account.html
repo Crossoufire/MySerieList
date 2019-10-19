@@ -716,8 +716,11 @@
                                 </div>
                             <div class="col-auto">
                                 {% if anime_achiev['all_badges'][i]['element_percentage'] > 100 %}
-                                    {{ anime_achiev['all_badges'][i]['element_time'] }}
-                                    {{ anime_achiev['all_badges'][i]['element_count'] }}
+                                    {% if anime_achiev['all_badges'][i]['element_time'] %}
+                                        {{ anime_achiev['all_badges'][i]['element_time'] }}
+                                    {% else %}
+                                        {{ anime_achiev['all_badges'][i]['element_count'] }}
+                                    {% endif %}
                                 {% else %}
                                     {{ anime_achiev['all_badges'][i]['threshold'] }}
                                 {% endif %}
@@ -785,7 +788,11 @@
                                 </div>
                             <div class="col-auto">
                                 {% if series_achiev['all_badges'][i]['element_percentage'] > 100 %}
-                                    {{ series_achiev['all_badges'][i]['element_time'] }}
+                                    {% if series_achiev['all_badges'][i]['element_time'] %}
+                                        {{ series_achiev['all_badges'][i]['element_time'] }}
+                                    {% else %}
+                                        {{ series_achiev['all_badges'][i]['element_count'] }}
+                                    {% endif %}
                                 {% else %}
                                     {{ series_achiev['all_badges'][i]['threshold'] }}
                                 {% endif %}
@@ -826,7 +833,7 @@
                         </div>
                         <div class="row">
                             <div class="col-auto achiev-name text-center">
-                                {{ anime_achiev['all_badges'][i]['level'] }}
+                                {{ movies_achiev['all_badges'][i]['level'] }}
                             </div>
                             {% if movies_achiev['all_badges'][i]['type'] == 'genre' %}
                                 <div class="col achiev-bar" data-toggle="tooltip" title="{{ movies_achiev['all_badges'][i]['element_time'] }} hours">
@@ -853,10 +860,14 @@
                                 </div>
                             <div class="col-auto">
                                 {% if movies_achiev['all_badges'][i]['element_percentage'] > 100 %}
+                                    {% if movies_achiev['all_badges'][i]['element_time'] %}
                                         {{ movies_achiev['all_badges'][i]['element_time'] }}
                                     {% else %}
-                                        {{ movies_achiev['all_badges'][i]['threshold'] }}
+                                        {{ movies_achiev['all_badges'][i]['element_count'] }}
                                     {% endif %}
+                                {% else %}
+                                    {{ movies_achiev['all_badges'][i]['threshold'] }}
+                                {% endif %}
                             </div>
                         </div>
                     </div>

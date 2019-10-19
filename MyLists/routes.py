@@ -19,8 +19,8 @@ from MyLists.admin_views import User
 from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, ChangePasswordForm, AddFollowForm, \
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
-    Follow, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, \
-    Achievements, Movies, MoviesGenre, MoviesList, MoviesProd
+    Follow, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, Achievements, Movies, \
+    MoviesGenre, MoviesList, MoviesProd
 
 
 config.read('config.ini')
@@ -1479,8 +1479,9 @@ def get_achievements(user_id, list_type):
     element_count_7, element_count_8, element_count_9, element_count_10, element_count_11 = [0 for _ in range(11)]
     element_time_1, element_time_2, element_time_3, element_time_4, element_time_5, element_time_6, element_time_7, \
     element_time_8, element_time_9, element_time_10, element_time_11 = [0 for _ in range(11)]
-    element_episodes_1, element_episodes_2, element_episodes_3, element_episodes_4, element_episodes_5, element_episodes_6, \
-    element_episodes_7, element_episodes_8, element_episodes_9, element_episodes_10, element_episodes_11 = [0 for _ in range(11)]
+    element_episodes_1, element_episodes_2, element_episodes_3, element_episodes_4, element_episodes_5, \
+    element_episodes_6, element_episodes_7, element_episodes_8, element_episodes_9, element_episodes_10, \
+    element_episodes_11 = [0 for _ in range(11)]
     element_name_1, element_name_2, element_name_3, element_name_4, element_name_5, element_name_6, element_name_7, \
     element_name_8, element_name_9, element_name_10, element_name_11 = [[] for _ in range(11)]
     for element in element_data:
@@ -1644,9 +1645,11 @@ def get_achievements(user_id, list_type):
     name_list = [element_name_1, element_name_2, element_name_3, element_name_4, element_name_5, element_name_6,
                  element_name_7, element_name_8, element_name_9, element_name_10, element_name_11]
     episodes_list = [element_episodes_1, element_episodes_2, element_episodes_3, element_episodes_4, element_episodes_5,
-                     element_episodes_6, element_episodes_7, element_episodes_8, element_episodes_9, element_episodes_10, element_episodes_11]
+                     element_episodes_6, element_episodes_7, element_episodes_8, element_episodes_9,
+                     element_episodes_10, element_episodes_11]
     for i in range(0, len(genre_id)):
         achievements = Achievements.query.filter_by(media=media, genre=genre_id[i]).all()
+        test = 0
         for achievement in achievements:
             if int(time_list[i]/60) < int(achievement.threshold):
                 if achievement.level == "Level max":
@@ -1663,11 +1666,11 @@ def get_achievements(user_id, list_type):
                                     "element_name": name_list[i],
                                     "element_episodes": episodes_list[i],
                                     "element_percentage": round((int(time_list[i]/60)*100)/(achievement.threshold), 2)}
-                print(achievement_data)
                 break
             else:
                 unlocked_levels += 1
-                if unlocked_levels == 4:
+                test += 1
+                if test == 4:
                     unlocked_badges += 1
                     achievement_data = {"type": achievement.type,
                                         "threshold": achievement.threshold,
@@ -1706,6 +1709,7 @@ def get_achievements(user_id, list_type):
                 element_time += element[0].runtime
                 element_name.append(element[0].name)
 
+    test = 0
     for achievement in achievements:
         if (element_time/60) < achievement.threshold:
             if achievement.level == "Level max":
@@ -1725,7 +1729,8 @@ def get_achievements(user_id, list_type):
             break
         else:
             unlocked_levels += 1
-            if unlocked_levels == 4:
+            test += 1
+            if test == 4:
                 unlocked_badges += 1
                 achievement_data = {"type": achievement.type,
                                     "threshold": achievement.threshold,
@@ -1755,8 +1760,9 @@ def get_achievements(user_id, list_type):
             if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
                 element_count += 1
 
+    test = 0
     for achievement in achievements:
-        if element_count < int(achievement.threshold):
+        if int(element_count) < int(achievement.threshold):
             if achievement.level == "Level max":
                 level = "Level 11"
             else:
@@ -1771,7 +1777,8 @@ def get_achievements(user_id, list_type):
             break
         else:
             unlocked_levels += 1
-            if unlocked_levels == 12:
+            test += 1
+            if test == 12:
                 unlocked_badges += 1
                 achievement_data = {"type": achievement.type,
                                     "threshold": achievement.threshold,
@@ -1780,7 +1787,7 @@ def get_achievements(user_id, list_type):
                                     "title": achievement.title,
                                     "element_count": element_count,
                                     "element_percentage": round((element_count*100)/(achievement.threshold), 2)}
-            break
+                break
 
     all_badges.append(achievement_data)
 
@@ -1797,6 +1804,7 @@ def get_achievements(user_id, list_type):
     elif list_type == ListType.MOVIES:
         time_spent = int(user.time_spent_movies/1440)
 
+    test = 0
     for achievement in achievements:
         if time_spent < int(achievement.threshold):
             if achievement.level == "Level max":
@@ -1813,7 +1821,8 @@ def get_achievements(user_id, list_type):
             break
         else:
             unlocked_levels += 1
-            if unlocked_levels == 4:
+            test += 1
+            if test == 4:
                 unlocked_badges += 1
                 achievement_data = {"type": achievement.type,
                                     "threshold": achievement.threshold,
@@ -1822,7 +1831,7 @@ def get_achievements(user_id, list_type):
                                     "title": achievement.title,
                                     "element_time": int(time_spent),
                                     "element_percentage": round((time_spent*100)/(achievement.threshold), 2)}
-            break
+                break
 
     all_badges.append(achievement_data)
 
