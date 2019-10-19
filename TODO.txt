@@ -1,24 +1,4 @@
 
----------------------------------------------- BEFORE NEXT UPDATE ----------------------------------------------
-
-MyMediaList:
-    Seems OK
-
-Hall of Fame:
-    Seems OK
-
-Account:
-    General:
-        Seems OK
-    Overview:
-        Seems OK
-    Follows:
-        Seems OK
-    Badges:
-        Seems OK
-    Settings:
-        Seems OK
-
 --------------------------------------------- AFTER NEXT UPDATE ------------------------------------------------
 
 Account:
