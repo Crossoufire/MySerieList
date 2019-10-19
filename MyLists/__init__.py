@@ -25,7 +25,7 @@ except:
 app = Flask(__name__)
 app.config["SECRET_KEY"] = flask_secret
 
-app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SECURE"] = False
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -34,7 +34,7 @@ app.config['RECAPTCHA_PUBLIC_KEY'] = captcha_public
 app.config['RECAPTCHA_PRIVATE_KEY'] = captcha_private
 app.config['RECAPTCHA_DATA_ATTRS'] = {'theme': 'dark', 'size': 'small'}
 
-app.config['TESTING'] = False
+app.config['TESTING'] = True
 
 app.config['MAIL_SERVER'] = server
 app.config['MAIL_PORT'] = port
