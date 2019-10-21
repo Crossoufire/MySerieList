@@ -216,7 +216,6 @@ def logout():
 @app.route("/account/<user_name>", methods=['GET', 'POST'])
 @login_required
 def account(user_name):
-    start = time.time()
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
@@ -349,17 +348,17 @@ def account(user_name):
     follows_list_data = []
     for follow in follows_list:
         follow_data = {"username": follow[0].username,
-                       "user_id": follow[0].id,
-                       "picture": follow[0].image_file}
+                       "user_id" : follow[0].id,
+                       "picture" : follow[0].image_file}
         follows_list_data.append(follow_data)
 
-    account_data = {}
-    account_data["series"] = {}
-    account_data["movies"] = {}
-    account_data["anime"] = {}
-    account_data["id"] = user.id
+    account_data             = {}
+    account_data["series"]   = {}
+    account_data["movies"]   = {}
+    account_data["anime"]    = {}
+    account_data["id"]       = user.id
     account_data["username"] = user_name
-    account_data["follows"] = follows_list_data
+    account_data["follows"]  = follows_list_data
 
     if user.id != current_user.get_id():
         if Follow.query.filter_by(user_id=current_user.get_id(), follow_id=user.id).first() is None:
@@ -374,17 +373,17 @@ def account(user_name):
     # Time spent in hours
     account_data["series"]["time_spent_hour"] = round(user.time_spent_series/60)
     account_data["movies"]["time_spent_hour"] = round(user.time_spent_movies/60)
-    account_data["anime"]["time_spent_hour"] = round(user.time_spent_anime/60)
+    account_data["anime"]["time_spent_hour"]  = round(user.time_spent_anime/60)
 
     # Time spent in days
     account_data["series"]["time_spent_day"] = round(user.time_spent_series/1440, 1)
     account_data["movies"]["time_spent_day"] = round(user.time_spent_movies/1440, 1)
-    account_data["anime"]["time_spent_day"] = round(user.time_spent_anime/1440, 1)
+    account_data["anime"]["time_spent_day"]  = round(user.time_spent_anime/1440, 1)
 
     # Mean score
     account_data["series"]["mean_score"] = get_mean_score(user.id, ListType.SERIES)
     account_data["movies"]["mean_score"] = get_mean_score(user.id, ListType.MOVIES)
-    account_data["anime"]["mean_score"] = get_mean_score(user.id, ListType.ANIME)
+    account_data["anime"]["mean_score"]  = get_mean_score(user.id, ListType.ANIME)
 
     # Count elements of each category
     series_count = get_list_count(user.id, ListType.SERIES)
@@ -397,9 +396,10 @@ def account(user_name):
     account_data["series"]["total_count"]       = series_count["total"]
 
     movies_count = get_list_count(user.id, ListType.MOVIES)
-    account_data["movies"]["completed_count"] = movies_count["completed"]
-    account_data["movies"]["plantowatch_count"] = movies_count["plantowatch"]
-    account_data["movies"]["total_count"] = movies_count["total"]
+    account_data["movies"]["completed_count"]           = movies_count["completed"]
+    account_data["movies"]["completed_animation_count"] = movies_count["completed_animation"]
+    account_data["movies"]["plantowatch_count"]         = movies_count["plantowatch"]
+    account_data["movies"]["total_count"]               = movies_count["total"]
 
     anime_count = get_list_count(user.id, ListType.ANIME)
     account_data["anime"]["watching_count"]     = anime_count["watching"]
@@ -442,71 +442,74 @@ def account(user_name):
         nb_episodes_watched += element[0].last_episode_watched
     account_data["anime"]["nb_ep_watched"] = nb_episodes_watched
 
-    # Element percentages
+    # Media percentages
     if account_data["series"]["nb_ep_watched"] == 0:
         account_data["series"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     else:
-        account_data["series"]["element_percentage"] = [(float(account_data["series"]["watching_count"]/account_data["series"]["total_count"]))*100,
-                                                        (float(account_data["series"]["completed_count"]/account_data["series"]["total_count"]))*100,
-                                                        (float(account_data["series"]["onhold_count"]/account_data["series"]["total_count"]))*100,
-                                                        (float(account_data["series"]["random_count"]/account_data["series"]["total_count"]))*100,
-                                                        (float(account_data["series"]["dropped_count"]/account_data["series"]["total_count"]))*100,
-                                                        (float(account_data["series"]["plantowatch_count"]/account_data["series"]["total_count"]))*100]
+        account_data["series"]["element_percentage"] = [
+            (float(account_data["series"]["watching_count"]/account_data["series"]["total_count"]))*100,
+            (float(account_data["series"]["completed_count"]/account_data["series"]["total_count"]))*100,
+            (float(account_data["series"]["onhold_count"]/account_data["series"]["total_count"]))*100,
+            (float(account_data["series"]["random_count"]/account_data["series"]["total_count"]))*100,
+            (float(account_data["series"]["dropped_count"]/account_data["series"]["total_count"]))*100,
+            (float(account_data["series"]["plantowatch_count"]/account_data["series"]["total_count"]))*100]
     if account_data["movies"]["total_count"] == 0:
-        account_data["movies"]["element_percentage"] = [0.0, 0.0]
+        account_data["movies"]["element_percentage"] = [0.0, 0.0, 0.0]
     else:
         account_data["movies"]["element_percentage"] = [
             (float(account_data["movies"]["completed_count"]/account_data["movies"]["total_count"]))*100,
+            (float(account_data["movies"]["completed_animation_count"]/account_data["movies"]["total_count"]))*100,
             (float(account_data["movies"]["plantowatch_count"]/account_data["movies"]["total_count"]))*100]
     if account_data["anime"]["nb_ep_watched"] == 0:
         account_data["anime"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     else:
-        account_data["anime"]["element_percentage"] = [(float(account_data["anime"]["watching_count"]/account_data["anime"]["total_count"]))*100,
-                                                        (float(account_data["anime"]["completed_count"]/account_data["anime"]["total_count"]))*100,
-                                                        (float(account_data["anime"]["onhold_count"]/account_data["anime"]["total_count"]))*100,
-                                                        (float(account_data["anime"]["random_count"]/account_data["anime"]["total_count"]))*100,
-                                                        (float(account_data["anime"]["dropped_count"]/account_data["anime"]["total_count"]))*100,
-                                                        (float(account_data["anime"]["plantowatch_count"]/account_data["anime"]["total_count"]))*100]
+        account_data["anime"]["element_percentage"] = [
+            (float(account_data["anime"]["watching_count"]/account_data["anime"]["total_count"]))*100,
+            (float(account_data["anime"]["completed_count"]/account_data["anime"]["total_count"]))*100,
+            (float(account_data["anime"]["onhold_count"]/account_data["anime"]["total_count"]))*100,
+            (float(account_data["anime"]["random_count"]/account_data["anime"]["total_count"]))*100,
+            (float(account_data["anime"]["dropped_count"]/account_data["anime"]["total_count"]))*100,
+            (float(account_data["anime"]["plantowatch_count"]/account_data["anime"]["total_count"]))*100]
 
-    # Grades and levels for each element
+    # Grades and levels for each media
     series_level = get_level_and_grade(user.time_spent_series)
-    account_data["series_level"] = series_level["level"]
-    account_data["series_percent"] = series_level["level_percent"]
-    account_data["series_grade_id"] = series_level["grade_id"]
+    account_data["series_level"]       = series_level["level"]
+    account_data["series_percent"]     = series_level["level_percent"]
+    account_data["series_grade_id"]    = series_level["grade_id"]
     account_data["series_grade_title"] = series_level["grade_title"]
 
     movies_level = get_level_and_grade(user.time_spent_movies)
-    account_data["movies_level"] = movies_level["level"]
-    account_data["movies_percent"] = movies_level["level_percent"]
-    account_data["movies_grade_id"] = movies_level["grade_id"]
+    account_data["movies_level"]       = movies_level["level"]
+    account_data["movies_percent"]     = movies_level["level_percent"]
+    account_data["movies_grade_id"]    = movies_level["grade_id"]
     account_data["movies_grade_title"] = movies_level["grade_title"]
 
     anime_level = get_level_and_grade(user.time_spent_anime)
-    account_data["anime_level"] = anime_level["level"]
-    account_data["anime_percent"] = anime_level["level_percent"]
-    account_data["anime_grade_id"] = anime_level["grade_id"]
+    account_data["anime_level"]       = anime_level["level"]
+    account_data["anime_percent"]     = anime_level["level_percent"]
+    account_data["anime_grade_id"]    = anime_level["grade_id"]
     account_data["anime_grade_title"] = anime_level["grade_title"]
 
     knowledge_level = int(series_level["level"] + movies_level["level"] + anime_level["level"])
     knowledge_grade = get_knowledge_grade(knowledge_level)
-    account_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
+    account_data["knowledge_grade_id"]    = knowledge_grade["grade_id"]
     account_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
 
-    # Recover the achievements
-    user_achievements_anime = get_achievements(user.id, ListType.ANIME)
+    # Recover the badges/achievements
+    user_achievements_anime  = get_achievements(user.id, ListType.ANIME)
     user_achievements_series = get_achievements(user.id, ListType.SERIES)
     user_achievements_movies = get_achievements(user.id, ListType.MOVIES)
 
-    # Add the joined date
+    # Add the activated/registered date
     joined_tmp = user.activated_on
+    if joined_tmp is None:
+        joined_tmp = user.registered_on
     joined_tmp = str(joined_tmp.date()).split('-')
     joined_date = "{0}-{1}-{2}".format(joined_tmp[2], joined_tmp[1], joined_tmp[0])
 
     # Recover the number of followers
     followers = Follow.query.filter_by(follow_id=user.id).all()
 
-    end = time.time()
-    print(end - start)
     return render_template('account.html',
                            title="{}'s account".format(user.username),
                            data=account_data,
@@ -613,7 +616,6 @@ def email_update_token(token):
 @app.route("/hall_of_fame", methods=['GET'])
 @login_required
 def hall_of_fame():
-    start = time.time()
     users = User.query.filter(User.id >= "2").filter_by(active=True).order_by(User.username.asc()).all()
 
     current_user_follows = Follow.query.filter_by(user_id=current_user.get_id()).all()
@@ -666,8 +668,6 @@ def hall_of_fame():
 
         all_users_data.append(user_data)
 
-    end = time.time()
-    print(end - start)
     return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
 
 
@@ -768,7 +768,6 @@ def unfollow():
 @app.route("/<media_list>/<user_name>", methods=['GET'])
 @login_required
 def mymedialist(media_list, user_name):
-    start = time.time()
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
@@ -827,8 +826,6 @@ def mymedialist(media_list, user_name):
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
     if media_list == "serieslist" or media_list == "animelist":
-        end = time.time()
-        print(end - start)
         return render_template('mymedialist.html',
                                title="{}'s {}".format(user_name, media_list),
                                all_data=media_all_data[6],
@@ -842,8 +839,7 @@ def mymedialist(media_list, user_name):
                                target_user_name=user_name,
                                target_user_id=str(user.id))
     elif media_list == "movieslist":
-        end = time.time()
-        print(end - start)
+
         return render_template('mymedialist.html',
                                title="{}'s {}".format(user_name, media_list),
                                all_data=media_all_data[3],
@@ -1333,9 +1329,10 @@ def get_list_count(user_id, list_type):
         plantowatch = AnimeList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
         total       = AnimeList.query.filter_by(user_id=user_id).count()
     elif list_type is ListType.MOVIES:
-        completed   = MoviesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
-        plantowatch = MoviesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
-        total       = MoviesList.query.filter_by(user_id=user_id).count()
+        completed           = MoviesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+        completed_animation = MoviesList.query.filter_by(user_id=user_id, status=Status.COMPLETED_ANIMATION).count()
+        plantowatch         = MoviesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
+        total               = MoviesList.query.filter_by(user_id=user_id).count()
 
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
         list_count = {"watching": watching,
@@ -1347,6 +1344,7 @@ def get_list_count(user_id, list_type):
                       "total": total}
     elif list_type == ListType.MOVIES:
         list_count = {"completed": completed,
+                      "completed_animation": completed_animation,
                       "plantowatch": plantowatch,
                       "total": total}
     return list_count
@@ -1485,7 +1483,6 @@ def old_get_achievements(user_id, list_type):
 
     ####################################################################################################################
 
-    start = time.time()
     # Genres achievements
     element_count_1, element_count_2, element_count_3, element_count_4, element_count_5, element_count_6, \
     element_count_7, element_count_8, element_count_9, element_count_10, element_count_11 = [0 for _ in range(11)]
@@ -1698,11 +1695,8 @@ def old_get_achievements(user_id, list_type):
 
         all_badges.append(achievement_data)
 
-    end = time.time()
-    print(end - start)
     ####################################################################################################################
 
-    start = time.time()
     # source/airing_date achievements
     achievements = Achievements.query.filter_by(media=media, type="classic").all()
     element_time = 0
@@ -1761,11 +1755,8 @@ def old_get_achievements(user_id, list_type):
 
     all_badges.append(achievement_data)
 
-    end = time.time()
-    print(end - start)
     ####################################################################################################################
 
-    start = time.time()
     # Finished achievements
     achievements = Achievements.query.filter_by(media=media, type="finished").all()
     element_count = 0
@@ -1809,11 +1800,8 @@ def old_get_achievements(user_id, list_type):
 
     all_badges.append(achievement_data)
 
-    end = time.time()
-    print(end - start)
     ####################################################################################################################
 
-    start = time.time()
     # Time achievements
     achievements = Achievements.query.filter_by(media=media, type="time").all()
     user = User.query.filter_by(id=user_id).first()
@@ -1856,11 +1844,8 @@ def old_get_achievements(user_id, list_type):
 
     all_badges.append(achievement_data)
 
-    end = time.time()
-    print(end - start)
     ####################################################################################################################
 
-    start = time.time()
     # Miscellaneous: Long runner
     achievement = Achievements.query.filter_by(media=media, type="long").first()
     element_count = 0
@@ -1980,13 +1965,10 @@ def old_get_achievements(user_id, list_type):
                          "unlocked_badges": unlocked_badges,
                          "unlocked_levels": unlocked_levels}
 
-    end = time.time()
-    print(end - start)
     return achievements_data
 
 
 def get_achievements(user_id, list_type):
-    start = time.time()
     if list_type == ListType.ANIME:
         element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre_id.distinct()),
                                         func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
@@ -2505,8 +2487,6 @@ def get_achievements(user_id, list_type):
                          "unlocked_badges": unlocked_badges,
                          "unlocked_levels": unlocked_levels}
 
-    end = time.time()
-    print(end - start)
     return achievements_data
 
 
@@ -2598,10 +2578,9 @@ def get_all_media_data(element_data, list_type, covers_path):
             element[0].image_cover = "{}{}".format(covers_path, element[0].image_cover)
 
             if element[1].status == Status.COMPLETED:
-                if 'Animation' in element[2]:
-                    completed_list_animation.append(element)
-                else:
-                    completed_list.append(element)
+                completed_list.append(element)
+            elif element[1].status == Status.COMPLETED_ANIMATION:
+                completed_list_animation.append(element)
             elif element[1].status == Status.PLAN_TO_WATCH:
                 plantowatch_list.append(element)
 
@@ -2958,8 +2937,7 @@ def autocomplete_search_element(element_name, list_type):
         except:
             return [{"nb_results": 0}]
 
-        # Take only the first 6 results for the autocomplete
-        # There are 20 results per page
+        # Take only the first 6 results for the autocomplete. There are 20 results per page
         tmdb_results = []
         i = 0
         while i < data["total_results"] and i < 20 and len(tmdb_results) < 6:
@@ -3044,7 +3022,7 @@ def add_element(element_id, list_type):
             flash("There was a problem while getting the poster from the API. Please try to refresh later.", "warning")
 
         element_id = add_element_in_base(element_data, element_cover_id, list_type)
-        add_element_to_user(element_id, int(current_user.get_id()), list_type)
+        add_element_to_user(element_id, int(current_user.get_id()), list_type, element_data)
 
 
 def get_element_data_from_api(api_id, list_type):
@@ -3493,7 +3471,7 @@ def add_element_in_base(element_data, element_cover_id, list_type):
     return element.id
 
 
-def add_element_to_user(element_id, user_id, list_type):
+def add_element_to_user(element_id, user_id, list_type, element_data):
     if list_type == ListType.SERIES:
         user_list = SeriesList(user_id=user_id,
                                series_id=element_id,
@@ -3520,9 +3498,21 @@ def add_element_to_user(element_id, user_id, list_type):
 
         db.session.commit()
     elif list_type == ListType.MOVIES:
-        user_list = MoviesList(user_id=user_id,
-                               movies_id=element_id,
-                               status=Status.COMPLETED)
+        try:
+            for i in range(0, len(element_data["genres"])):
+                if "Animation" in element_data["genres"][i]["name"]:
+                    animation = True
+                    break
+        except:
+            animation = False
+        if animation:
+            user_list = MoviesList(user_id=user_id,
+                                   movies_id=element_id,
+                                   status=Status.COMPLETED_ANIMATION)
+        else:
+            user_list = MoviesList(user_id=user_id,
+                                   movies_id=element_id,
+                                   status=Status.COMPLETED)
 
         app.logger.info('[{}] Added movie with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)

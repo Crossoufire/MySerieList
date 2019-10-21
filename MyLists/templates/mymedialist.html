@@ -323,8 +323,8 @@
                                     <p><b>Original title</b>: {{ data[0].original_name }}</p>
                                     {% endif %}
                                     <p><b>Genres</b>: {{ genres["{}".format(data[0].id)] }}</p>
-                                    <p><b>Budget</b>: {{ data[0].budget }}</p>
-                                    <p><b>Revenue</b>: {{ data[0].revenue }}</p>
+                                    <p><b>Budget</b>: {{ '{:,} $'.format(data[0].budget|int).replace(',', ' ') }}</p>
+                                    <p><b>Revenue</b>: {{ '{:,} $'.format(data[0].revenue|int).replace(',', ' ') }}</p>
                                     <p><b>Release date</b>: {{ release_date["{}".format(data[0].id)] }}</p>
                                     <p><b>Released</b>: {{ data[0].released }}</p>
                                     <p><b>Tagline</b>: {{ data[0].tagline }}</p>

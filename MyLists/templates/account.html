@@ -288,10 +288,10 @@
                                             <span class="stat_text">{{ data['series']['onhold_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text"></span>
+                                            <span class="stat_text">Total Series:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text"></span>
+                                            <span class="stat_text">{{ data['series']['total_count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -390,10 +390,10 @@
                                             <span class="stat_text">{{ data['anime']['onhold_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text"></span>
+                                            <span class="stat_text">Total Anime:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text"></span>
+                                            <span class="stat_text">{{ data['anime']['total_count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -430,17 +430,20 @@
                                     <span class="stat_text"><b>Mean Score:</b> {{ data['movies']['mean_score'] }}</span>
                                 </div>
                                 <figure class="d-flex">
-                                    {% if data["movies"]["element_percentage"] == [0.0, 0.0] %}
+                                    {% if data["movies"]["element_percentage"] == [0.0, 0.0, 0.0] %}
                                     <span class="block_no_data" title="No data">
-                        <span id="100%" class="value"></span>
-                            </span>
+                                        <span id="100%" class="value"></span>
+                                    </span>
                                     {% else %}
-                                    <span class="block" title="Complete">
-                                <span id="{{ data['movies']['element_percentage'][0] }}%" class="value"></span>
-                            </span>
+                                    <span class="block" title="Completed">
+                                        <span id="{{ data['movies']['element_percentage'][0] }}%" class="value"></span>
+                                    </span>
+                                    <span class="block" title="Completed Animation">
+                                        <span id="{{ data['movies']['element_percentage'][1] }}%" class="value"></span>
+                                    </span>
                                     <span class="block" title="Plan to Watch">
-                                <span id="{{ data['movies']['element_percentage'][4] }}%" class="value"></span>
-                            </span>
+                                        <span id="{{ data['movies']['element_percentage'][2] }}%" class="value"></span>
+                                    </span>
                                     {% endif %}
                                 </figure>
                                 <div class="m-t-10">
@@ -460,16 +463,16 @@
                                     </div>
                                     <div class="row">
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Total movies:</span>
+                                            <span class="stat_text">Completed Anime:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat_text">{{ data['movies']['total_count'] }}</span>
+                                            <span class="stat_text">{{ data['movies']['completed_animation_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text"></span>
+                                            <span class="stat_text">Total movies:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text"></span>
+                                            <span class="stat_text">{{ data['movies']['total_count'] }}</span>
                                         </div>
                                     </div>
                                 </div>
