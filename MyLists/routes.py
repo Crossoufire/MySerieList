@@ -274,7 +274,7 @@ def account(user_name):
             db.session.commit()
             app.logger.info('[{}] Settings updated : old private mode = {}, new private mode = {}'.format(user.id,
                                                                                                           old_value,
-                                                                                                          form.isprivate.data))
+                                                                                                          settings_form.isprivate.data))
         old_value = user.homepage
         if settings_form.homepage.data == "msl":
             user.homepage = HomePage.MYSERIESLIST
