@@ -1,7 +1,7 @@
 from flask_admin import expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from MyLists.models import User, Follow, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, SeriesNetwork, \
-    Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork
+    Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork, Movies, MoviesGenre, MoviesList, MoviesProd
 from MyLists import db, app
 from flask_login import current_user
 from flask_admin import Admin
@@ -101,7 +101,7 @@ class SeriesEpisodeTimestampAdminView(ModelView):
     list_template = 'admin/series_episode_timestamp.html'
 
 
-######################################################## ANIME ########################################################
+######################################################## ANIME #########################################################
 
 
 class AnimeAdminView(ModelView):
@@ -173,8 +173,54 @@ class AnimeEpisodeTimestampAdminView(ModelView):
     list_template = 'admin/anime_episode_timestamp.html'
 
 
-######################################################### BOOK #########################################################
+######################################################## MOVIE #########################################################
 
+class MoviesAdminView(ModelView):
+
+    def is_accessible(self):
+        return current_user.get_id() == '1'
+
+    column_display_pk = True
+    column_exclude_list = ('homepage', 'released', 'synopsis', 'tagline', 'image_cover', 'themoviedb_id')
+    column_searchable_list = ['name']
+    column_sortable_list = ('id', 'name', 'original_name', 'release_date', 'runtime', 'original_language', 'vote_average',
+                            'vote_count', 'popularity', 'budget', 'revenue')
+    list_template = 'admin/movies.html'
+
+
+class MoviesGenreAdminView(ModelView):
+
+    def is_accessible(self):
+        return current_user.get_id() == '1'
+
+    column_list = ('movies_id', 'genre')
+    column_searchable_list = ['movies_id']
+    column_sortable_list = ('movies_id', 'genre')
+    list_template = 'admin/movies_genre.html'
+
+
+class MoviesListAdminView(ModelView):
+
+    def is_accessible(self):
+        return current_user.get_id() == '1'
+
+    column_list = ('user_id', 'movies_id', 'status', 'score')
+    column_searchable_list = ('user_id', 'movies_id', 'status')
+    column_sortable_list = ('id', 'user_id', 'movies_id', 'status')
+    list_template = 'admin/movies_list.html'
+
+
+class MoviesProdAdminView(ModelView):
+
+    def is_accessible(self):
+        return current_user.get_id() == '1'
+
+    column_list = ('movies_id', 'production_company')
+    column_searchable_list = ('movies_id', 'production_company')
+    column_sortable_list = ('movies_id', 'production_company')
+    list_template = 'admin/movies_prod.html'
+
+########################################################################################################################
 
 # Override of the index flask-admin view:
 class MyHomeAdminView(AdminIndexView):
@@ -250,3 +296,23 @@ admin.add_view(AnimeNetworkAdminView(model=AnimeNetwork,
                                      session=db.session,
                                      name="Anime network",
                                      endpoint='anime_network'))
+#####
+admin.add_view(MoviesAdminView(model=Movies,
+                               session=db.session,
+                               name="Movies",
+                               endpoint='movies'))
+
+admin.add_view(MoviesListAdminView(model=MoviesList,
+                                   session=db.session,
+                                   name="Movies list",
+                                   endpoint='movies_list'))
+
+admin.add_view(MoviesGenreAdminView(model=MoviesGenre,
+                                    session=db.session,
+                                    name="Movies genre",
+                                    endpoint='movies_genre'))
+
+admin.add_view(MoviesProdAdminView(model=MoviesProd,
+                                   session=db.session,
+                                   name="Movies production network",
+                                   endpoint='movies_prod'))
