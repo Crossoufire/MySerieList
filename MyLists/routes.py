@@ -1215,15 +1215,20 @@ def add_element():
         json_data = request.get_json()
         element_id = int(json_data['element_id'])
         element_type = json_data['element_type']
+        element_cat = json_data['element_cat']
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
+    category_list = ["Watching", "Completed", "Completed Animation", "On Hold", "Random", "Dropped", "Plan to Watch"]
+    if element_cat not in category_list:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
     if element_type == "animelist":
-        add_element(element_id, ListType.ANIME)
+        add_element(element_id, ListType.ANIME, element_cat)
     elif element_type == "serieslist":
-        add_element(element_id, ListType.SERIES)
+        add_element(element_id, ListType.SERIES, element_cat)
     elif element_type == "movieslist":
-        add_element(element_id, ListType.MOVIES)
+        add_element(element_id, ListType.MOVIES, element_cat)
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -2972,7 +2977,7 @@ def autocomplete_search_element(element_name, list_type):
         return tmdb_results
 
 
-def add_element(element_id, list_type):
+def add_element(element_id, list_type, element_cat):
     # Check if the ID element exist in the database
     if list_type == ListType.SERIES:
         element = Series.query.filter_by(themoviedb_id=element_id).first()
@@ -3001,7 +3006,7 @@ def add_element(element_id, list_type):
             if time_delta.days > 0 or (time_delta.seconds/1800 > 1):  # 30 min
                 refresh_element_data(element.id, list_type)
 
-        add_element_to_user(element.id, int(current_user.get_id()), list_type)
+        add_element_to_user(element.id, int(current_user.get_id()), list_type, element_cat)
 
     # Otherwise we need to recover the data from an online API
     else:
@@ -3022,7 +3027,7 @@ def add_element(element_id, list_type):
             flash("There was a problem while getting the poster from the API. Please try to refresh later.", "warning")
 
         element_id = add_element_in_base(element_data, element_cover_id, list_type)
-        add_element_to_user(element_id, int(current_user.get_id()), list_type, element_data)
+        add_element_to_user(element_id, int(current_user.get_id()), list_type, element_cat)
 
 
 def get_element_data_from_api(api_id, list_type):
@@ -3471,13 +3476,28 @@ def add_element_in_base(element_data, element_cover_id, list_type):
     return element.id
 
 
-def add_element_to_user(element_id, user_id, list_type, element_data):
+def add_element_to_user(element_id, user_id, list_type, element_cat):
+    if element_cat == "Watching":
+        selected_cat = Status.WATCHING
+    elif element_cat == "Completed":
+        selected_cat = Status.COMPLETED
+    elif element_cat == "On Hold":
+        selected_cat = Status.ON_HOLD
+    elif element_cat == "Random":
+        selected_cat = Status.RANDOM
+    elif element_cat == "Dropped":
+        selected_cat = Status.DROPPED
+    elif element_cat == "Plan to Watch":
+        selected_cat = Status.PLAN_TO_WATCH
+    elif element_cat == "Completed Animation":
+        selected_cat = Status.COMPLETED_ANIMATION
+
     if list_type == ListType.SERIES:
         user_list = SeriesList(user_id=user_id,
                                series_id=element_id,
                                current_season=1,
                                last_episode_watched=1,
-                               status=Status.WATCHING)
+                               status=selected_cat)
         app.logger.info('[{}] Added series with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
 
@@ -3489,7 +3509,7 @@ def add_element_to_user(element_id, user_id, list_type, element_data):
                               anime_id=element_id,
                               current_season=1,
                               last_episode_watched=1,
-                              status=Status.WATCHING)
+                              status=selected_cat)
 
         app.logger.info('[{}] Added anime with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
@@ -3498,21 +3518,9 @@ def add_element_to_user(element_id, user_id, list_type, element_data):
 
         db.session.commit()
     elif list_type == ListType.MOVIES:
-        try:
-            for i in range(0, len(element_data["genres"])):
-                if "Animation" in element_data["genres"][i]["name"]:
-                    animation = True
-                    break
-        except:
-            animation = False
-        if animation:
-            user_list = MoviesList(user_id=user_id,
-                                   movies_id=element_id,
-                                   status=Status.COMPLETED_ANIMATION)
-        else:
-            user_list = MoviesList(user_id=user_id,
-                                   movies_id=element_id,
-                                   status=Status.COMPLETED)
+        user_list = MoviesList(user_id=user_id,
+                               movies_id=element_id,
+                               status=selected_cat)
 
         app.logger.info('[{}] Added movie with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)

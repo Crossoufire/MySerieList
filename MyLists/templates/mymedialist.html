@@ -15,11 +15,32 @@
     {% if target_user_id == current_user.get_id() %}
     <div class="col m-t-30 add_an_element">
         {% if media_list == "movieslist" %}
-        <input style="background: transparent;" class="form-control add_element" placeholder="Add a Movie" type="text" id="autocomplete" onfocus="this.value=''"/>
+        <input style="background: transparent;" class="form-control add_element" placeholder="Add a Movie" type="text" id="autocomplete"/>
+        <select id="list_select">
+            <option selected="selected">Completed</option>
+            <option>Completed Animation</option>
+            <option>Plan to Watch</option>
+        </select>
         {% elif media_list == "animelist" %}
-        <input style="background: transparent;" class="form-control add_element" placeholder="Add an Anime" type="text" id="autocomplete" onfocus="this.value=''"/>
+        <input style="background: transparent;" class="form-control add_element" placeholder="Add an Anime" type="text" id="autocomplete"/>
+        <select id="list_select">
+            <option selected="selected">Watching</option>
+            <option>Completed</option>
+            <option>On Hold</option>
+            <option>Random</option>
+            <option>Dropped</option>
+            <option>Plan to Watch</option>
+        </select>
         {% elif media_list == "serieslist" %}
-        <input style="background: transparent;" class="form-control add_element" placeholder="Add a Series" type="text" id="autocomplete" onfocus="this.value=''"/>
+        <input style="background: transparent;" class="form-control add_element" placeholder="Add a Series" type="text" id="autocomplete"/>
+        <select id="list_select">
+            <option selected="selected">Watching</option>
+            <option>Completed</option>
+            <option>On Hold</option>
+            <option>Random</option>
+            <option>Dropped</option>
+            <option>Plan to Watch</option>
+        </select>
         {% endif %}
         <input type="hidden" id="element_id" value=""/>
     </div>
@@ -361,6 +382,9 @@
 <!------------ Jquery Autocomplete ------------->
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
+$('.add_element').val('');
+$('#list_select').prop('selectedIndex', 0);
+
 $.widget("custom.catcomplete", $.ui.autocomplete, {
     _create: function() {
         this._super();
@@ -414,7 +438,7 @@ $(function() {
                 type: "POST",
                 url: "/add_element",
                 contentType: "application/json",
-                data: JSON.stringify({element_id: ui.item.tmdb_id, element_type: '{{ media_list }}' }),
+                data: JSON.stringify({element_id: ui.item.tmdb_id, element_type: '{{ media_list }}', element_cat: $("#list_select").val() }),
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {
