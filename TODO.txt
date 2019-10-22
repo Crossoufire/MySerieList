@@ -28,3 +28,35 @@ Hall of Fame:
         Total time & mean score from all users
         Most watched movie/anime/series
         etc...
+
+------------------------------------------------------------------------------------------
+
+Media list :
+plan to watch : enlever season / ep
+movielist : bouton completed ne montre pas la bonne vue (completed + completed animation)
+quand on ajoute un film qui n'est pas encore sorti -> le mettre direct en plan to watch
+
+account :
+biographie : au lieu de mettre un texte par défaut, quand y'a rien, mettre un message en italique en gris clair comme MAL
+Statistics : ajouter le total de watching, completed, etc pour Series et Anime
+			 barre movies buggé affiche pas les plan to watch
+onglet follows : quand on rajouter un user inexistant, "user not found mal" aligné
+				 refresh qui renvoie dans l'onglet overview
+				 centrer les follow en vue mobile
+onglet Settings : prendre toute la largeur pour les 2 colonnes
+
+level_grade_data :
+vue mobile illisible
+vue tablette a ameliorer (probleme navbar, encadré violet)
+
+
+knowledge_grade_data :
+enlever books -> formule math cohérente ?
+vue mobile probleme (footer, encadré violet, tout pas centré)
+
+
+HoF :
+on peut pas cliquer massivement sur follow / unfollow / follow etc
+
+HomePage :
+refaire avec movies
