@@ -3,38 +3,39 @@ TODO ------------------------------------------------
 
 Account:
 	Add: Follow list last updates on movies/anime/series
+    Add: Possiblity to change the background image
 	Add: Display/hide all scores by default
-	Add: Possiblity to change the background image
-	Add: Grey italic message for biography when no info
-	Enhance: Bio, picture profile and background profile modifications (without form)
+	Enhance: Bio, profile and background pictures changes without the use of the settings form
+	Enhance: Code of "get_achievements" method (50% done)
     Enhance: Settings tab CSS/HTML style
-    Enhance: Coding of "get_achievements" method
+DONE - Enhance: Grey italic message for biography when no info
 DONE - Fix: Align the error text in the follow tab when adding a non existing user
 DONE - Fix: Refresh that put you back in the overview tab
-DONE - Fix: Center the follows in mobile display
 DONE - Fix: Take all the width for the setting tab
+DONE - Fix: Center the follows in mobile display
 DONE - Fix: Total media in overview tab
 
 
 Medialists:
-    Add: Year in the autocomplete (50% done)
-    Add: A "more results" to the autocomplete
-	Add: Regroup of movies by collection from TMDb
+    Add: Movies not released directly in plan to watch ??? => You choose the category when adding the media so...
+    Add: On another user's list possibility to add the media to the current user's list
 	Add: Option to import a CSV file for movies (50% done)
-	Add: Not released movie directly in plan to watch
+	Add: Regroup movies saga by collection from TMDb
 	Add: Episodes per season in the metadata modal
+	Add: A "more results" to the autocomplete
 	Add: Possibility to edit metadata
 	Enhance: Change the autocomplete style (50% done)
+	Enhance: Year in the autocomplete (50% done)
 	Enhance: Change the category modal style
-DONE - Fix: Remove homepage info in modal
+DONE - Fix: Spaces between thousands in revenue and budget movies
 DONE - Fix: Completed button show completed + completed animation
 DONE - Fix: Remove season/ep of plan to watch
-DONE - Fix: Spaces between thousands in revenue and budget movies
+DONE - Fix: Remove homepage info in modal
 
 
 Hall of Fame:
     Add: Global statistics below the table:
-           - How many movies/series/anime in gobal seen
+           - How many movies/series/anime watched
            - Total time & mean score from all users
            - Most watched movie/anime/series
 DONE - Fix: massive follow/unfollow click
@@ -55,4 +56,4 @@ Advanced Statistics:
 
 
 HomePage :
-    Fix: Change books for movies
+    Fix: Update the pictures
