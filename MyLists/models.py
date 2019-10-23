@@ -138,6 +138,12 @@ class SeriesNetwork(db.Model):
     network = db.Column(db.String(150), nullable=False)
 
 
+class SeriesActors(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
+    name = db.Column(db.String(150))
+
+
 ######################################################## ANIME #########################################################
 
 
@@ -194,6 +200,12 @@ class AnimeNetwork(db.Model):
     network = db.Column(db.String(150), nullable=False)
 
 
+class AnimeActors(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
+    name = db.Column(db.String(150))
+
+
 ######################################################## MOVIES ########################################################
 
 
@@ -234,8 +246,14 @@ class MoviesGenre(db.Model):
 
 class MoviesProd(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    movies_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
+    movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     production_company = db.Column(db.String(150), nullable=False)
+
+
+class MoviesActors(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
+    name = db.Column(db.String(150))
 
 
 ######################################################## ACHIEVEMENTS ##################################################

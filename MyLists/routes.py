@@ -20,7 +20,7 @@ from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, Change
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
     Follow, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, Achievements, Movies, \
-    MoviesGenre, MoviesList, MoviesProd
+    MoviesGenre, MoviesList, MoviesProd, MoviesActors, SeriesActors, AnimeActors
 
 
 config.read('config.ini')
@@ -46,7 +46,6 @@ def create_user():
         db.session.add(admin)
         add_achievements_to_db()
     refresh_db_achievements()
-
     db.session.commit()
 
 
@@ -789,37 +788,46 @@ def mymedialist(media_list, user_name):
     if media_list == "serieslist":
         # Get series data
         element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
-                               func.group_concat(SeriesNetwork.network.distinct()),
-                               func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                               func.group_concat(SeriesEpisodesPerSeason.episodes)).\
-                               join(SeriesList, SeriesList.series_id == Series.id). \
-                               join(SeriesGenre, SeriesGenre.series_id == Series.id). \
-                               join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
-                               join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
-                               filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
+                                        func.group_concat(SeriesNetwork.network.distinct()),
+                                        func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
+                                        func.group_concat(SeriesEpisodesPerSeason.episodes),
+                                        func.group_concat(SeriesActors.name.distinct())).\
+                                        join(SeriesList, SeriesList.series_id == Series.id). \
+                                        join(SeriesGenre, SeriesGenre.series_id == Series.id). \
+                                        join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
+                                        join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
+                                        join(SeriesActors, SeriesActors.series_id == Series.themoviedb_id). \
+                                        filter(SeriesList.user_id == user.id).group_by(Series.id).\
+                                        order_by(Series.name.asc())
         covers_path = url_for('static', filename='covers/series_covers/')
         media_all_data = get_all_media_data(element_data, ListType.SERIES, covers_path)
     elif media_list == "animelist":
         # Get anime data
         element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
-                                func.group_concat(AnimeNetwork.network.distinct()),
-                                func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
-                                func.group_concat(AnimeEpisodesPerSeason.episodes)). \
-                                join(AnimeList, AnimeList.anime_id == Anime.id). \
-                                join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
-                                join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
-                                join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
-                                filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
+                                        func.group_concat(AnimeNetwork.network.distinct()),
+                                        func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
+                                        func.group_concat(AnimeEpisodesPerSeason.episodes),
+                                        func.group_concat(AnimeActors.name.distinct())). \
+                                        join(AnimeList, AnimeList.anime_id == Anime.id). \
+                                        join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
+                                        join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
+                                        join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
+                                        join(AnimeActors, AnimeActors.anime_id == Anime.themoviedb_id). \
+                                        filter(AnimeList.user_id == user.id).group_by(Anime.id).\
+                                        order_by(Anime.name.asc())
         covers_path = url_for('static', filename='covers/anime_covers/')
         media_all_data = get_all_media_data(element_data, ListType.ANIME, covers_path)
     elif media_list == "movieslist":
         # Get movies data
         element_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre.distinct()),
-                            func.group_concat(MoviesProd.production_company.distinct())). \
-                            join(MoviesList, MoviesList.movies_id == Movies.id). \
-                            join(MoviesGenre, MoviesGenre.movies_id == Movies.id). \
-                            join(MoviesProd, MoviesProd.movies_id == Movies.id). \
-                            filter(MoviesList.user_id == user.id).group_by(Movies.id).order_by(Movies.name.asc())
+                                        func.group_concat(MoviesProd.production_company.distinct()),
+                                        func.group_concat(MoviesActors.name.distinct())).\
+                                        join(MoviesList, MoviesList.movies_id == Movies.id). \
+                                        join(MoviesGenre, MoviesGenre.movies_id == Movies.id). \
+                                        join(MoviesProd, MoviesProd.movies_id == Movies.id). \
+                                        join(MoviesActors, MoviesActors.movies_id == Movies.themoviedb_id). \
+                                        filter(MoviesList.user_id == user.id).group_by(Movies.id).\
+                                        order_by(Movies.name.asc())
         covers_path = url_for('static', filename='covers/movies_covers/')
         media_all_data = get_all_media_data(element_data, ListType.MOVIES, covers_path)
     else:
@@ -828,24 +836,25 @@ def mymedialist(media_list, user_name):
     if media_list == "serieslist" or media_list == "animelist":
         return render_template('mymedialist.html',
                                title="{}'s {}".format(user_name, media_list),
-                               all_data=media_all_data[6],
+                               all_data=media_all_data[7],
                                eps=media_all_data[0],
                                genres=media_all_data[1],
-                               networks=media_all_data[2],
-                               can_update=media_all_data[3],
-                               last_air_date=media_all_data[4],
-                               first_air_date=media_all_data[5],
+                               actors=media_all_data[2],
+                               networks=media_all_data[3],
+                               can_update=media_all_data[4],
+                               last_air_date=media_all_data[5],
+                               first_air_date=media_all_data[6],
                                media_list=media_list,
                                target_user_name=user_name,
                                target_user_id=str(user.id))
     elif media_list == "movieslist":
-
         return render_template('mymedialist.html',
                                title="{}'s {}".format(user_name, media_list),
-                               all_data=media_all_data[3],
+                               all_data=media_all_data[4],
                                genres=media_all_data[0],
-                               release_date=media_all_data[1],
-                               prod_companies=media_all_data[2],
+                               actors=media_all_data[1],
+                               release_date=media_all_data[2],
+                               prod_companies=media_all_data[3],
                                media_list=media_list,
                                target_user_name=user_name,
                                target_user_id=str(user.id))
@@ -1956,6 +1965,7 @@ def get_all_media_data(element_data, list_type, covers_path):
 
         eps = {}
         genres = {}
+        actors = {}
         networks = {}
         can_update = {}
         last_air_date = {}
@@ -1999,6 +2009,11 @@ def get_all_media_data(element_data, list_type, covers_path):
             except:
                 last_air_date["{}".format(element[0].id)] = "Unknown"
 
+            # Get actors
+            tmp = element[6]
+            tmp_actors = tmp.replace(',', ', ')
+            actors["{}".format(element[0].id)] = tmp_actors
+
             # Get genres
             tmp = element[2]
             tmp_genres = tmp.replace(',', ', ')
@@ -2019,13 +2034,14 @@ def get_all_media_data(element_data, list_type, covers_path):
         element_all_data = [[watching_list, "WATCHING"], [completed_list, "COMPLETED"], [onhold_list, "ON HOLD"],
                             [random_list, "RANDOM"], [dropped_list, "DROPPED"], [plantowatch_list, "PLAN TO WATCH"]]
 
-        return [eps, genres, networks, can_update, last_air_date, first_air_date, element_all_data]
+        return [eps, genres, actors, networks, can_update, last_air_date, first_air_date, element_all_data]
     elif list_type == ListType.MOVIES:
         completed_list = []
         plantowatch_list = []
         completed_list_animation = []
 
         genres = {}
+        actors = {}
         release_date = {}
         prod_companies = {}
         for element in element_data:
@@ -2047,6 +2063,11 @@ def get_all_media_data(element_data, list_type, covers_path):
             except:
                 release_date["{}".format(element[0].id)] = "Unknown"
 
+            # Get actors
+            tmp = element[4]
+            tmp_actors = tmp.replace(',', ', ')
+            actors["{}".format(element[0].id)] = tmp_actors
+
             # Get genres
             tmp = element[2]
             tmp_genres = tmp.replace(',', ', ')
@@ -2060,7 +2081,7 @@ def get_all_media_data(element_data, list_type, covers_path):
         element_all_data = [[completed_list, "COMPLETED"], [completed_list_animation, "COMPLETED ANIMATION"] ,
                             [plantowatch_list, "PLAN TO WATCH"]]
 
-        return [genres, release_date, prod_companies, element_all_data]
+        return [genres, actors, release_date, prod_companies, element_all_data]
 
 
 def compute_media_time_spent(list_type):
@@ -2461,6 +2482,7 @@ def add_element(element_id, list_type, element_cat):
     # Otherwise we need to recover the data from an online API
     else:
         element_data = get_element_data_from_api(element_id, list_type)
+        element_actors = get_element_actors_from_api(element_id, list_type)
 
         if element_data is None:
             return flash("There was a problem while getting the info from the API. Please try again later.", "warning")
@@ -2476,7 +2498,7 @@ def add_element(element_id, list_type, element_cat):
             element_cover_id = "default.jpg"
             flash("There was a problem while getting the poster from the API. Please try to refresh later.", "warning")
 
-        element_id = add_element_in_base(element_data, element_cover_id, list_type)
+        element_id = add_element_in_base(element_data, element_actors, element_cover_id, list_type)
         add_element_to_user(element_id, int(current_user.get_id()), list_type, element_cat)
 
 
@@ -2503,6 +2525,49 @@ def get_element_data_from_api(api_id, list_type):
         while True:
             try:
                 response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}".format(api_id, themoviedb_api_key))
+            except:
+                return None
+            if response.status_code == 401:
+                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+                return None
+            try:
+                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+            except:
+                return None
+            if response.headers["X-RateLimit-Remaining"] == "0":
+                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+                time.sleep(3)
+            else:
+                break
+    else:
+        return None
+
+    return json.loads(response.text)
+
+
+def get_element_actors_from_api(api_id, list_type):
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
+        while True:
+            try:
+                response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}".format(api_id, themoviedb_api_key))
+            except:
+                return None
+            if response.status_code == 401:
+                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+                return None
+            try:
+                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+            except:
+                return None
+            if response.headers["X-RateLimit-Remaining"] == "0":
+                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+                time.sleep(3)
+            else:
+                break
+    elif list_type == ListType.MOVIES:
+        while True:
+            try:
+                response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}".format(api_id, themoviedb_api_key))
             except:
                 return None
             if response.status_code == 401:
@@ -2558,7 +2623,7 @@ def save_api_cover(element_cover_path, list_type):
     return element_cover_id
 
 
-def add_element_in_base(element_data, element_cover_id, list_type):
+def add_element_in_base(element_data, element_actors, element_cover_id, list_type):
     if list_type == ListType.SERIES:
         element = Series.query.filter_by(themoviedb_id=element_data["id"]).first()
     elif list_type == ListType.ANIME:
@@ -2665,6 +2730,15 @@ def add_element_in_base(element_data, element_cover_id, list_type):
                 except:
                     pass
 
+        actors_names = []
+        for i in range(0, len(element_actors["cast"])):
+            try:
+                actors_names.append(element_actors["cast"][i]["name"])
+                if i == 4:
+                    break
+            except:
+                pass
+
         genres_data = []
         genres_id = []
         for i in range(len(element_data["genres"])):
@@ -2725,6 +2799,28 @@ def add_element_in_base(element_data, element_cover_id, list_type):
 
         db.session.add(element)
         db.session.commit()
+
+        # Add Actors
+        if list_type == ListType.SERIES:
+            if len(actors_names) == 0:
+                actors = SeriesActors(series_id=element.id,
+                                      name="Unknown")
+                db.session.add(actors)
+            else:
+                for i in range(0, len(actors_names)):
+                    actors = SeriesActors(series_id=element.id,
+                                        name=actors_names[i])
+                    db.session.add(actors)
+        elif list_type == ListType.ANIME:
+            if len(actors_names) == 0:
+                actors = AnimeActors(anime_id=element.id,
+                                     name="Unknown")
+                db.session.add(actors)
+            else:
+                for i in range(0, len(actors_names)):
+                    actors = AnimeActors(anime_id=element.id,
+                                         name=actors_names[i])
+                    db.session.add(actors)
 
         # Add genres
         if list_type == ListType.SERIES:
@@ -2860,6 +2956,15 @@ def add_element_in_base(element_data, element_cover_id, list_type):
         except:
             original_language = "Unknown"
 
+        actors_name = []
+        for i in range(0, len(element_actors["cast"])):
+            try:
+                actors_name.append(element_actors["cast"][i]["name"])
+                if i == 4:
+                    break
+            except:
+                pass
+
         genres_data = []
         genres_id = []
         for i in range(len(element_data["genres"])):
@@ -2896,6 +3001,17 @@ def add_element_in_base(element_data, element_cover_id, list_type):
 
         db.session.add(element)
         db.session.commit()
+
+        # Add Actors
+        if len(actors_name) == 0:
+            actors = MoviesActors(movies_id=element.id,
+                                  name="Unknown")
+            db.session.add(actors)
+        else:
+            for i in range(0, len(actors_name)):
+                actors = MoviesActors(movies_id=element.id,
+                                      name=actors_name[i])
+                db.session.add(actors)
 
         # Add genres
         if len(genres_data) == 0:
@@ -3316,3 +3432,97 @@ def get_movies_from_csv(movies_csv_path, list_type):
                 add_element(movie_id, ListType.MOVIES)
             except:
                 pass
+
+
+def add_actors_movies():
+    all_movies = Movies.query.all()
+    for i in range(0, len(all_movies)):
+        movies_id = all_movies[i].themoviedb_id
+        response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}".format(movies_id, themoviedb_api_key))
+        element_actors = json.loads(response.text)
+
+        try:
+            actors_names = []
+            for j in range(0, len(element_actors["cast"])):
+                try:
+                    actors_names.append(element_actors["cast"][j]["name"])
+                    if j == 3:
+                        break
+                except:
+                    pass
+        except:
+            pass
+
+        if len(actors_names) == 0:
+            actors = MoviesActors(movies_id=movies_id,
+                                  name="Unknown")
+            db.session.add(actors)
+        else:
+            for k in range(0, len(actors_names)):
+                actors = MoviesActors(movies_id=movies_id,
+                                      name=actors_names[k])
+                db.session.add(actors)
+
+        db.session.commit()
+
+def add_actors_series():
+    all_series = Series.query.all()
+    for i in range(0, len(all_series)):
+        series_id = all_series[i].themoviedb_id
+        response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}".format(series_id, themoviedb_api_key))
+        element_actors = json.loads(response.text)
+
+        try:
+            actors_names = []
+            for j in range(0, len(element_actors["cast"])):
+                try:
+                    actors_names.append(element_actors["cast"][j]["name"])
+                    if j == 3:
+                        break
+                except:
+                    pass
+        except:
+            pass
+
+        if len(actors_names) == 0:
+            actors = SeriesActors(series_id=series_id,
+                                  name="Unknown")
+            db.session.add(actors)
+        else:
+            for k in range(0, len(actors_names)):
+                actors = SeriesActors(series_id=series_id,
+                                      name=actors_names[k])
+                db.session.add(actors)
+
+        db.session.commit()
+
+def add_actors_anime():
+    all_anime = Anime.query.all()
+    for i in range(0, len(all_anime)):
+        anime_id = all_anime[i].themoviedb_id
+        response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}".format(anime_id, themoviedb_api_key))
+        element_actors = json.loads(response.text)
+
+        try:
+            actors_names = []
+            for j in range(0, len(element_actors["cast"])):
+                try:
+                    actors_names.append(element_actors["cast"][j]["name"])
+                    if j == 3:
+                        break
+                except:
+                    pass
+        except:
+            pass
+
+        if len(actors_names) == 0:
+            actors = AnimeActors(anime_id=anime_id,
+                                 name="Unknown")
+            db.session.add(actors)
+        else:
+            for k in range(0, len(actors_names)):
+                actors = AnimeActors(anime_id=anime_id,
+                                     name=actors_names[k])
+                db.session.add(actors)
+
+        db.session.commit()
