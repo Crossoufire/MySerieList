@@ -72,12 +72,12 @@ class AddFollowForm(FlaskForm):
     follow_to_add = StringField('Type a Username')
     submit_follow = SubmitField('follow')
 
-    def validate_follow_to_add(self, follow_to_add):
-        if follow_to_add.data == current_user.username:
-            raise ValidationError("You cannot follow yourself")
-        user = User.query.filter_by(username=follow_to_add.data).first()
-        if user is None or user.id == 1:
-            raise ValidationError("User not found")
+    # def validate_follow_to_add(self, follow_to_add):
+    #     if follow_to_add.data == current_user.username:
+    #         raise ValidationError("You cannot follow yourself")
+    #     user = User.query.filter_by(username=follow_to_add.data).first()
+    #     if user is None or user.id == 1:
+    #         raise ValidationError("User not found")
 
 
 class ResetPasswordRequestForm(FlaskForm):

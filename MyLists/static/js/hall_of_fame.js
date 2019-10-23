@@ -11,7 +11,7 @@ $(document).ready(function () {
 
 function follow(follow_id, button_id) {
     $('#'+button_id).text('Unfollow');
-    $('#'+button_id).attr('onclick', 'unfollow('+follow_id+')');
+    $('#'+button_id).attr('onclick', "unfollow(\"" + follow_id + "\", \"" + button_id + "\")");
     $('#'+button_id).addClass('btn-dark');
     $('#'+button_id).removeClass('btn-primary');
 
@@ -29,7 +29,7 @@ function follow(follow_id, button_id) {
 
 function unfollow(follow_id, button_id) {
     $('#'+button_id).text('Follow');
-    $('#'+button_id).attr('onclick', 'follow('+follow_id+')');
+    $('#'+button_id).attr('onclick', "follow(\"" + follow_id + "\", \"" + button_id + "\")");
     $('#'+button_id).addClass('btn-primary');
     $('#'+button_id).removeClass('btn-dark');
 

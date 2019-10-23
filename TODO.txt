@@ -8,10 +8,12 @@ Account:
 	Add: Grey italic message for biography when no info
 	Enhance: Bio, picture profile and background profile modifications (without form)
     Enhance: Settings tab CSS/HTML style
-    Fix: Align the error text in the follow tab when adding a non existing user
-    Fix: Refresh that put you back in the overview tab
-    Fix: Center the follows in mobile display
-    Fix: Take all the width for the setting tab
+    Enhance: Coding of "get_achievements" method
+DONE - Fix: Align the error text in the follow tab when adding a non existing user
+DONE - Fix: Refresh that put you back in the overview tab
+DONE - Fix: Center the follows in mobile display
+DONE - Fix: Take all the width for the setting tab
+DONE - Fix: Total media in overview tab
 
 
 Medialists:
@@ -24,33 +26,32 @@ Medialists:
 	Add: Possibility to edit metadata
 	Enhance: Change the autocomplete style (50% done)
 	Enhance: Change the category modal style
-	Fix: Remove season/ep of plan to watch
-	Fix: Remove homepage info in modal
-	Fix: Completed button show completed + completed animation
-
-
-Advanced Statistics:
-	Add:  Personal advanced statistics for media
+DONE - Fix: Remove homepage info in modal
+DONE - Fix: Completed button show completed + completed animation
+DONE - Fix: Remove season/ep of plan to watch
+DONE - Fix: Spaces between thousands in revenue and budget movies
 
 
 Hall of Fame:
-
     Add: Global statistics below the table:
            - How many movies/series/anime in gobal seen
            - Total time & mean score from all users
            - Most watched movie/anime/series
-    Fix: massive follow/unfollow click
+DONE - Fix: massive follow/unfollow click
 
 
 Level Grade Data :
-    Fix: Mobile illisible display
-    Fix: Tablet display
+DONE - Fix: Mobile illisible display
+DONE - Fix: Tablet display
 
 
 Knowledge Grade Data :
-    Fix: Remove the books
-    Fix: Mobile illisible display
-    Fix: Tablet display
+DONE - Fix: Mobile illisible display
+DONE - Fix: Tablet display
+
+
+Advanced Statistics:
+	Add:  Personal advanced statistics for media
 
 
 HomePage :

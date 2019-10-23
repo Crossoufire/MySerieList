@@ -11,11 +11,11 @@
 
 <div class="details d-flex flex-wrap p-l-10 p-t-10">
     <p>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp All these grades are taken from the unity assets store.<br>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp There are 24 different grades. You gain a grade each 15 levels.<br>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp You gain a grade until you reach the level 345. Min = 555 days Max = 1658 days.<br>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp The knowledge grades are based on the sum of the different levels (Series, Anime, Movies).<br>
-        <i class="fas fa-xs fa-circle"></i>&nbsp &nbsp We use the linear equation: Grade = (lvl(Series)+lvl(Anime)+lvl(Books))/15.<br>
+        <i class="fas fa-xs fa-circle text-justify"></i>&nbsp &nbsp All these grades are taken from the unity assets store.<br>
+        <i class="fas fa-xs fa-circle text-justify"></i>&nbsp &nbsp There are 24 different grades. You gain a grade each 15 levels.<br>
+        <i class="fas fa-xs fa-circle text-justify"></i>&nbsp &nbsp You gain a grade until you reach the level 345. Min = 555 days Max = 1658 days.<br>
+        <i class="fas fa-xs fa-circle text-justify"></i>&nbsp &nbsp The knowledge grades are based on the sum of the different levels (Series, Anime, Movies).<br>
+        <i class="fas fa-xs fa-circle text-justify"></i>&nbsp &nbsp We use the linear equation: Grade = (lvl(Series)+lvl(Anime)+lvl(Movies))/15.<br>
     </p>
 </div>
 
@@ -24,7 +24,7 @@
     <hr class="mt-2 mb-3">
 </legend>
 <div class="container-stats">
-    <table>
+    <table class="table table-sm table-responsive-auto text-light">
         <thead style="border-bottom: solid 2px grey;">
             <th style="min-width: 100px;" class="text-center">Grade</th>
             <th style="min-width: 200px;" class="text-center">Title</th>
@@ -32,18 +32,18 @@
         </thead>
         <tbody>
         {% for i in range(0, data|length) %}
-        <tr>
+        <tr class="text-center align-middle mt-auto mb-auto">
             <td class="text-center">
                 <img height='60' width="60" src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data[i][0] }}.png" alt="">
             </td>
             <td>
-                <strong>{{ data[i][1] }}</strong>
+                <strong class="text-center align-middle">{{ data[i][1] }}</strong>
             </td>
             <td>
                 {% if i == data|length - 1 %}
-                <strong>{{ data[i][2][0] }}{{ data[i][2][1] }}</strong>
+                <strong class="text-center align-middle">{{ data[i][2][0] }}{{ data[i][2][1] }}</strong>
                 {% else %}
-                <strong>{{ data[i][2][0] }} - {{ data[i][2][1] }}</strong>
+                <strong class="text-center align-middle">{{ data[i][2][0] }} - {{ data[i][2][1] }}</strong>
                 {% endif %}
             </td>
         </tr>
