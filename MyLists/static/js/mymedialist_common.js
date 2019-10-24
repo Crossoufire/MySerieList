@@ -186,7 +186,13 @@ function searchElement() {
     cards = cardContainer.getElementsByClassName("card");
     for (i = 0; i < cards.length; i++) {
         title = cards[i].querySelector(".font-mask");
+        title2 = cards[i].querySelector(".font-mask.test");
+        actors = cards[i].querySelector(".actors_yes");
         if (title.innerText.toUpperCase().indexOf(filter) > -1) {
+            cards[i].style.display = "";
+        } else if (title2.innerText.toUpperCase().indexOf(filter) > -1) {
+            cards[i].style.display = "";
+        } else if (actors.innerText.toUpperCase().indexOf(filter) > -1) {
             cards[i].style.display = "";
         } else {
             cards[i].style.display = "none";

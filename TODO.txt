@@ -17,13 +17,13 @@ DONE - Fix: Total media in overview tab
 
 
 Medialists:
-    Add: Movies not released directly in plan to watch ??? => You choose the category when adding the media so...
     Add: On another user's list possibility to add the media to the current user's list
 	Add: Option to import a CSV file for movies (50% done)
 	Add: Regroup movies saga by collection from TMDb
 	Add: Episodes per season in the metadata modal
 	Add: A "more results" to the autocomplete
 	Add: Possibility to edit metadata
+DONE - Add: Actors in the metadata modal + search by actor
 	Enhance: Change the autocomplete style (50% done)
 	Enhance: Year in the autocomplete (50% done)
 	Enhance: Change the category modal style

@@ -45,7 +45,18 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
         add_achievements_to_db()
+    if User.query.filter_by(id='2').first() is None:
+        user = User(username='bbb',
+                     email='bbb@bbb.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(user)
     refresh_db_achievements()
+    # automatic_media_refresh()
     db.session.commit()
 
 
@@ -186,11 +197,6 @@ def register_token(token):
     flash('Your account has been activated.', 'success')
 
     return redirect(url_for('home'))
-
-
-@app.route("/test")
-def test():
-    return render_template('test.html')
 
 
 ################################################# Authenticated routes #################################################
@@ -796,7 +802,7 @@ def mymedialist(media_list, user_name):
                                         join(SeriesGenre, SeriesGenre.series_id == Series.id). \
                                         join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
                                         join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
-                                        join(SeriesActors, SeriesActors.series_id == Series.themoviedb_id). \
+                                        join(SeriesActors, SeriesActors.series_id == Series.id). \
                                         filter(SeriesList.user_id == user.id).group_by(Series.id).\
                                         order_by(Series.name.asc())
         covers_path = url_for('static', filename='covers/series_covers/')
@@ -812,7 +818,7 @@ def mymedialist(media_list, user_name):
                                         join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
                                         join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
                                         join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
-                                        join(AnimeActors, AnimeActors.anime_id == Anime.themoviedb_id). \
+                                        join(AnimeActors, AnimeActors.anime_id == Anime.id). \
                                         filter(AnimeList.user_id == user.id).group_by(Anime.id).\
                                         order_by(Anime.name.asc())
         covers_path = url_for('static', filename='covers/anime_covers/')
@@ -825,7 +831,7 @@ def mymedialist(media_list, user_name):
                                         join(MoviesList, MoviesList.movies_id == Movies.id). \
                                         join(MoviesGenre, MoviesGenre.movies_id == Movies.id). \
                                         join(MoviesProd, MoviesProd.movies_id == Movies.id). \
-                                        join(MoviesActors, MoviesActors.movies_id == Movies.themoviedb_id). \
+                                        join(MoviesActors, MoviesActors.movies_id == Movies.id). \
                                         filter(MoviesList.user_id == user.id).group_by(Movies.id).\
                                         order_by(Movies.name.asc())
         covers_path = url_for('static', filename='covers/movies_covers/')
@@ -2690,6 +2696,7 @@ def add_element_in_base(element_data, element_actors, element_cover_id, list_typ
 
         themoviedb_id = element_data["id"]
 
+        # Created by
         try:
             created_by = ', '.join(x['name'] for x in element_data['created_by'])
             if created_by == "":
@@ -2697,14 +2704,18 @@ def add_element_in_base(element_data, element_actors, element_cover_id, list_typ
         except:
             created_by = "Unknown"
 
+        # Episode duration
         try:
             episode_duration = element_data["episode_run_time"][0]
+            if episode_duration == "":
+                episode_duration = 0
         except:
             if list_type == ListType.ANIME:
                 episode_duration = 24
             else:
                 episode_duration = 0
 
+        # Origin country
         try:
             origin_country = ", ".join(element_data["origin_country"])
             if origin_country == "":
@@ -2712,15 +2723,15 @@ def add_element_in_base(element_data, element_actors, element_cover_id, list_typ
         except:
             origin_country = "Unknown"
 
-        # Check if there is a special season, we do not want to take it into account
+        # Check if a special season exist, we do not want to take it into account
         seasons_data = []
         if len(element_data["seasons"]) == 0:
             return None
 
-        if element_data["seasons"][0]["season_number"] == 0:  # Special season
+        if element_data["seasons"][0]["season_number"] == 0:
             for i in range(len(element_data["seasons"])):
                 try:
-                    seasons_data.append(element_data["seasons"][i + 1])
+                    seasons_data.append(element_data["seasons"][i+1])
                 except:
                     pass
         else:
@@ -2730,30 +2741,42 @@ def add_element_in_base(element_data, element_actors, element_cover_id, list_typ
                 except:
                     pass
 
+        # Actors names
         actors_names = []
-        for i in range(0, len(element_actors["cast"])):
-            try:
-                actors_names.append(element_actors["cast"][i]["name"])
-                if i == 4:
-                    break
-            except:
-                pass
+        try:
+            for i in range(0, len(element_actors["cast"])):
+                try:
+                    actors_names.append(element_actors["cast"][i]["name"])
+                    if i == 4:
+                        break
+                except:
+                    pass
+        except:
+            pass
 
+        # Genres
         genres_data = []
         genres_id = []
-        for i in range(len(element_data["genres"])):
-            try:
-                genres_data.append(element_data["genres"][i]["name"])
-                genres_id.append(int(element_data["genres"][i]["id"]))
-            except:
-                pass
+        try:
+            for i in range(len(element_data["genres"])):
+                try:
+                    genres_data.append(element_data["genres"][i]["name"])
+                    genres_id.append(int(element_data["genres"][i]["id"]))
+                except:
+                    pass
+        except:
+            pass
 
+        # Network
         networks_data = []
-        for i in range(len(element_data["networks"])):
-            try:
-                networks_data.append(element_data["networks"][i]["name"])
-            except:
-                pass
+        try:
+            for i in range(len(element_data["networks"])):
+                try:
+                    networks_data.append(element_data["networks"][i]["name"])
+                except:
+                    pass
+        except:
+            pass
 
         # Add the element to the database
         if list_type == ListType.SERIES:
@@ -2863,7 +2886,7 @@ def add_element_in_base(element_data, element_actors, element_cover_id, list_typ
                                                genre_id=genres_id[i])
                         db.session.add(add_genre)
 
-        # Add the different networks for each element
+        # Add networks
         if len(networks_data) == 0:
             network = SeriesNetwork(series_id=element.id,
                                     network="Unknown")
@@ -2889,6 +2912,7 @@ def add_element_in_base(element_data, element_actors, element_cover_id, list_typ
                                                 season=season_data["season_number"],
                                                 episodes=season_data["episode_count"])
             db.session.add(season)
+
         db.session.commit()
     elif list_type == ListType.MOVIES:
         try:
@@ -2942,6 +2966,7 @@ def add_element_in_base(element_data, element_actors, element_cover_id, list_typ
 
         themoviedb_id = element_data["id"]
 
+        # Runtime
         try:
             runtime = element_data["runtime"]
             if runtime == None:
@@ -2949,6 +2974,7 @@ def add_element_in_base(element_data, element_actors, element_cover_id, list_typ
         except:
             runtime = 0
 
+        # Original language
         try:
             original_language = element_data["original_language"]
             if original_language == "":
@@ -2956,30 +2982,42 @@ def add_element_in_base(element_data, element_actors, element_cover_id, list_typ
         except:
             original_language = "Unknown"
 
+        # Actors names
         actors_name = []
-        for i in range(0, len(element_actors["cast"])):
-            try:
-                actors_name.append(element_actors["cast"][i]["name"])
-                if i == 4:
-                    break
-            except:
-                pass
+        try:
+            for i in range(0, len(element_actors["cast"])):
+                try:
+                    actors_name.append(element_actors["cast"][i]["name"])
+                    if i == 4:
+                        break
+                except:
+                    pass
+        except:
+            pass
 
+        # Genres
         genres_data = []
         genres_id = []
-        for i in range(len(element_data["genres"])):
-            try:
-                genres_data.append(element_data["genres"][i]["name"])
-                genres_id.append(int(element_data["genres"][i]["id"]))
-            except:
-                pass
+        try:
+            for i in range(0, len(element_data["genres"])):
+                try:
+                    genres_data.append(element_data["genres"][i]["name"])
+                    genres_id.append(int(element_data["genres"][i]["id"]))
+                except:
+                    pass
+        except:
+            pass
 
+        # Production companies
         production_companies = []
-        for i in range(len(element_data["production_companies"])):
-            try:
-                production_companies.append(element_data["production_companies"][i]["name"])
-            except:
-                pass
+        try:
+            for i in range(0, len(element_data["production_companies"])):
+                try:
+                    production_companies.append(element_data["production_companies"][i]["name"])
+                except:
+                    pass
+        except:
+            pass
 
         # Add the element to the database
         element = Movies(name=name,
@@ -3026,7 +3064,7 @@ def add_element_in_base(element_data, element_actors, element_cover_id, list_typ
                                     genre_id=genres_id[i])
                 db.session.add(genre)
 
-        # Add the different production companies for each element
+        # Add production companies
         if len(production_companies) == 0:
             company = MoviesProd(movies_id=element.id,
                                  production_company="Unknown")
@@ -3106,6 +3144,404 @@ def refresh_element_data(element_id, list_type):
 
     if element_data is None:
         return flash("There was an error while refreshing. Please try again later.")
+
+    name            = element_data["name"]
+    original_name   = element_data["original_name"]
+    first_air_date  = element_data["first_air_date"]
+    last_air_date   = element_data["last_air_date"]
+    homepage        = element_data["homepage"]
+    in_production   = element_data["in_production"]
+    total_seasons   = element_data["number_of_seasons"]
+    total_episodes  = element_data["number_of_episodes"]
+    status          = element_data["status"]
+    vote_average    = element_data["vote_average"]
+    vote_count      = element_data["vote_count"]
+    synopsis        = element_data["overview"]
+    popularity      = element_data["popularity"]
+    element_poster  = element_data["poster_path"]
+
+    if list_type == ListType.SERIES:
+        if platform.system() == "Windows":
+            local_covers_path = os.path.join(app.root_path, "static\\covers\\series_covers\\")
+        else:  # Linux & macOS
+            local_covers_path = os.path.join(app.root_path, "static/covers/series_covers/")
+    elif list_type == ListType.ANIME:
+        if platform.system() == "Windows":
+            local_covers_path = os.path.join(app.root_path, "static\\covers\\anime_covers\\")
+        else:  # Linux & macOS
+            local_covers_path = os.path.join(app.root_path, "static/covers/anime_covers/")
+
+    try:
+        urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(element_poster),
+                                   "{}{}".format(local_covers_path, element.image_cover))
+
+        img = Image.open(local_covers_path + element.image_cover)
+        img = img.resize((300, 450), Image.ANTIALIAS)
+        img.save(local_covers_path + element.image_cover, quality=90)
+    except:
+        flash("There was an error while downloading the cover. Please try again later.")
+
+    try:
+        created_by = ', '.join(x['name'] for x in element_data['created_by'])
+    except:
+        created_by = "Unknown"
+
+    try:
+        episode_duration = element_data["episode_run_time"][0]
+    except:
+        if list_type == ListType.ANIME:
+            episode_duration = 24
+        else:
+            episode_duration = 0
+
+    try:
+        origin_country = ", ".join(element_data["origin_country"])
+    except:
+        origin_country = "Unknown"
+
+    # Check if there is a special season, we do not want to take it into account
+    seasons_data = []
+    if len(element_data["seasons"]) == 0:
+        return None
+
+    if element_data["seasons"][0]["season_number"] == 0:  # Special season
+        for i in range(len(element_data["seasons"])):
+            try:
+                seasons_data.append(element_data["seasons"][i + 1])
+            except:
+                pass
+    else:
+        for i in range(len(element_data["seasons"])):
+            try:
+                seasons_data.append(element_data["seasons"][i])
+            except:
+                pass
+
+    genres_data = []
+    for i in range(len(element_data["genres"])):
+        try:
+            genres_data.append(element_data["genres"][i]["name"])
+        except:
+            pass
+
+    networks_data = []
+    for i in range(len(element_data["networks"])):
+        try:
+            networks_data.append(element_data["networks"][i]["name"])
+        except:
+            pass
+
+    # Update the element
+    element.name                = name
+    element.original_name       = original_name
+    element.first_air_date      = first_air_date
+    element.last_air_date       = last_air_date
+    element.homepage            = homepage
+    element.in_production       = in_production
+    element.created_by          = created_by
+    element.total_seasons       = total_seasons
+    element.total_episodes      = total_episodes
+    element.episode_duration    = episode_duration
+    element.origin_country      = origin_country
+    element.status              = status
+    element.vote_average        = vote_average
+    element.vote_count          = vote_count
+    element.synopsis            = synopsis
+    element.popularity          = popularity
+    element.last_update         = datetime.utcnow()
+
+    # Update the number of seasons and episodes
+    for season_data in seasons_data:
+        if list_type == ListType.SERIES:
+            season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=season_data["season_number"]).first()
+            if season is None:
+                season = SeriesEpisodesPerSeason(series_id=element.id,
+                                                 season=season_data["season_number"],
+                                                 episodes=season_data["episode_count"])
+                db.session.add(season)
+            else:
+                season.episodes = season_data["episode_count"]
+        elif list_type == ListType.ANIME:
+            season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id,
+                                                            season=season_data["season_number"]).first()
+            if season is None:
+                season = AnimeEpisodesPerSeason(anime_id=element.id,
+                                                season=season_data["season_number"],
+                                                episodes=season_data["episode_count"])
+                db.session.add(season)
+            else:
+                season.episodes = season_data["episode_count"]
+
+    # TODO: refresh Networks and Genres
+    db.session.commit()
+    app.logger.info("[{}] Refreshed the element with the ID {}".format(current_user.get_id(), element_id))
+
+
+def new_refresh_element_data(api_id, list_type):
+    element_data = get_element_data_from_api(api_id, list_type)
+    element_actors = get_element_actors_from_api(api_id, list_type)
+
+    if list_type != ListType.MOVIES:
+        if element_data is None:
+            pass
+        else:
+            try:
+                name = element_data["name"]
+            except:
+                name = "Unknown"
+            try:
+                original_name = element_data["original_name"]
+            except:
+                original_name = "Unknown"
+            try:
+                first_air_date = element_data["first_air_date"]
+            except:
+                first_air_date = "Unknown"
+            try:
+                last_air_date = element_data["last_air_date"]
+            except:
+                last_air_date = "Unknown"
+            try:
+                homepage = element_data["homepage"]
+            except:
+                homepage = "Unknown"
+            try:
+                in_production = element_data["in_production"]
+            except:
+                in_production = "Unknown"
+            try:
+                total_seasons = element_data["number_of_seasons"]
+            except:
+                total_seasons = "Unknown"
+            try:
+                total_episodes = element_data["number_of_episodes"]
+            except:
+                total_episodes = "Unknown"
+            try:
+                status = element_data["status"]
+            except:
+                status = "Unknown"
+            try:
+                vote_average = element_data["vote_average"]
+            except:
+                vote_average = "Unknown"
+            try:
+                vote_count = element_data["vote_count"]
+            except:
+                vote_count = "Unknown"
+            try:
+                synopsis = element_data["overview"]
+            except:
+                synopsis = "Unknown"
+            try:
+                popularity = element_data["popularity"]
+            except:
+                popularity = "Unknown"
+
+            themoviedb_id = element_data["id"]
+
+            # Created by
+            try:
+                created_by = ', '.join(x['name'] for x in element_data['created_by'])
+                if created_by == "":
+                    created_by = "Unknown"
+            except:
+                created_by = "Unknown"
+
+            # Episode duration
+            try:
+                episode_duration = element_data["episode_run_time"][0]
+                if episode_duration == "":
+                    episode_duration = 0
+            except:
+                if list_type == ListType.ANIME:
+                    episode_duration = 24
+                else:
+                    episode_duration = 0
+
+            # Origin country
+            try:
+                origin_country = ", ".join(element_data["origin_country"])
+                if origin_country == "":
+                    origin_country = "Unknown"
+            except:
+                origin_country = "Unknown"
+
+            # Check if a special season exist, we do not want to take it into account
+            seasons_data = []
+            if len(element_data["seasons"]) == 0:
+                return None
+
+            if element_data["seasons"][0]["season_number"] == 0:
+                for i in range(len(element_data["seasons"])):
+                    try:
+                        seasons_data.append(element_data["seasons"][i + 1])
+                    except:
+                        pass
+            else:
+                for i in range(len(element_data["seasons"])):
+                    try:
+                        seasons_data.append(element_data["seasons"][i])
+                    except:
+                        pass
+
+            # Actors names
+            actors_names = []
+            try:
+                for i in range(0, len(element_actors["cast"])):
+                    try:
+                        actors_names.append(element_actors["cast"][i]["name"])
+                        if i == 4:
+                            break
+                    except:
+                        pass
+            except:
+                pass
+
+            # Genres
+            genres_data = []
+            genres_id = []
+            try:
+                for i in range(len(element_data["genres"])):
+                    try:
+                        genres_data.append(element_data["genres"][i]["name"])
+                        genres_id.append(int(element_data["genres"][i]["id"]))
+                    except:
+                        pass
+            except:
+                pass
+
+            # Network
+            networks_data = []
+            try:
+                for i in range(len(element_data["networks"])):
+                    try:
+                        networks_data.append(element_data["networks"][i]["name"])
+                    except:
+                        pass
+            except:
+                pass
+
+            element.name = name
+            element.original_name = original_name
+            element.first_air_date = first_air_date
+            element.last_air_date = last_air_date
+            element.homepage = homepage
+            element.in_production = in_production
+            element.created_by = created_by
+            element.episode_duration = episode_duration
+            element.total_seasons = total_seasons
+            element.total_episodes = total_episodes
+            element.origin_country = origin_country
+            element.status = status
+            element.vote_average = vote_average
+            element.vote_count = vote_count
+            element.synopsis = synopsis
+            element.popularity = popularity
+            element.image_cover = image_cover
+            element.themoviedb_id = themoviedb_id
+            element.last_update = last_update
+
+            db.session.commit()
+
+            # Add Actors
+            if list_type == ListType.SERIES:
+                if len(actors_names) == 0:
+                    actors = SeriesActors(series_id=element.id,
+                                          name="Unknown")
+                    db.session.add(actors)
+                else:
+                    for i in range(0, len(actors_names)):
+                        actors = SeriesActors(series_id=element.id,
+                                              name=actors_names[i])
+                        db.session.add(actors)
+            elif list_type == ListType.ANIME:
+                if len(actors_names) == 0:
+                    actors = AnimeActors(anime_id=element.id,
+                                         name="Unknown")
+                    db.session.add(actors)
+                else:
+                    for i in range(0, len(actors_names)):
+                        actors = AnimeActors(anime_id=element.id,
+                                             name=actors_names[i])
+                        db.session.add(actors)
+
+            # Add genres
+            if list_type == ListType.SERIES:
+                if len(genres_data) == 0:
+                    genre = SeriesGenre(series_id=element.id,
+                                        genre="Unknown",
+                                        genre_id=0)
+                    db.session.add(genre)
+                else:
+                    for i in range(0, len(genres_data)):
+                        genre = SeriesGenre(series_id=element.id,
+                                            genre=genres_data[i],
+                                            genre_id=genres_id[i])
+                        db.session.add(genre)
+            elif list_type == ListType.ANIME:
+                try:
+                    response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(element_data["name"]))
+                    data_mal = json.loads(response.text)
+                    mal_id = data_mal["results"][0]["mal_id"]
+
+                    response = requests.get("https://api.jikan.moe/v3/anime/{}".format(mal_id))
+                    data_mal = json.loads(response.text)
+                    genres = data_mal["genres"]
+
+                    for genre in genres:
+                        add_genre = AnimeGenre(anime_id=element.id,
+                                               genre=genre["name"],
+                                               genre_id=int(genre["mal_id"]))
+                        db.session.add(add_genre)
+                except:
+                    if len(genres_data) == 0:
+                        add_genre = AnimeGenre(anime_id=element.id,
+                                               genre="Unknown",
+                                               genre_id=0)
+                        db.session.add(add_genre)
+                    else:
+                        for i in range(0, len(genres_data)):
+                            add_genre = AnimeGenre(anime_id=element.id,
+                                                   genre=genres_data[i],
+                                                   genre_id=genres_id[i])
+                            db.session.add(add_genre)
+
+            # Add networks
+            if len(networks_data) == 0:
+                network = SeriesNetwork(series_id=element.id,
+                                        network="Unknown")
+                db.session.add(network)
+            else:
+                for network_data in networks_data:
+                    if list_type == ListType.SERIES:
+                        network = SeriesNetwork(series_id=element.id,
+                                                network=network_data)
+                    elif list_type == ListType.ANIME:
+                        network = AnimeNetwork(anime_id=element.id,
+                                               network=network_data)
+                    db.session.add(network)
+
+            # Add number of episodes for each season
+            for season_data in seasons_data:
+                if list_type == ListType.SERIES:
+                    season = SeriesEpisodesPerSeason(series_id=element.id,
+                                                     season=season_data["season_number"],
+                                                     episodes=season_data["episode_count"])
+                elif list_type == ListType.ANIME:
+                    season = AnimeEpisodesPerSeason(anime_id=element.id,
+                                                    season=season_data["season_number"],
+                                                    episodes=season_data["episode_count"])
+                db.session.add(season)
+
+            db.session.commit()
+
+
+
+
+
+
+
 
     name            = element_data["name"]
     original_name   = element_data["original_name"]
@@ -3360,6 +3796,38 @@ def send_email_update_email(user):
     except Exception as e:
         app.logger.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'.format(user.id, e))
         return False
+
+
+def automatic_media_refresh():
+    all_movies = Movies.query.all()
+
+    all_movies_id_list = []
+    for i in range(0, len(all_movies)):
+        all_movies_id_list.append(all_movies[i].themoviedb_id)
+
+    while True:
+        try:
+            response = requests.get("https://api.themoviedb.org/3/movie/changes?api_key={0}".format(themoviedb_api_key))
+        except:
+            return None
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            return None
+        try:
+            app.logger.info('[SYSTEM] N° requests available: {}'.format(response.headers["X-RateLimit-Remaining"]))
+        except:
+            return None
+        if response.headers["X-RateLimit-Remaining"] == "0":
+            app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+            time.sleep(3)
+        else:
+            break
+    all_id_movies_changes = json.loads(response.text)
+
+    for i in range(0, len(all_id_movies_changes["results"])):
+        if all_id_movies_changes["results"][i]["id"] in all_movies_id_list:
+            new_refresh_element_data(all_id_movies_changes["results"][i]["id"], ListType.MOVIES)
+
 
 
 def add_achievements_to_db():

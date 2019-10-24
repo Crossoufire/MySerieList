@@ -46,7 +46,7 @@
     </div>
     {% endif %}
     <div class="col m-t-30 search_by_name">
-        <input style="background: transparent;" type="text" id="myElementFilter" class="form-control add_element" onkeyup="searchElement()" placeholder="Search by title">
+        <input style="background: transparent;" type="text" id="myElementFilter" class="form-control add_element" onkeyup="searchElement()" placeholder="Search by title or actor">
     </div>
 </div>
 <div class="d-flex flex-wrap filters-button-group" style="justify-content: center;">
@@ -91,6 +91,8 @@
                         <img class="card-img-top" width="200" height="300" src="{{ data[0].image_cover }}" alt="{{ data[0].name }}">
                         <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_{{ data[0].id }}" style="cursor: pointer;">
                             <span class="font-mask text-center text-light">{{ data[0].name }}</span>
+                            <span class="font-mask test text-center text-light" style="display: none;">{{ data[0].original_name }}</span>
+                            <span class="actors_yes" style="display: none;">{{ actors["{}".format(data[0].id)] }}</span>
                         </div>
                         {% if target_user_id == current_user.get_id() %}
                             <a class="btn_left fas fa-bars text-light" data-toggle="modal" data-target="#modal_cat{{ data[0].id }}"></a>
