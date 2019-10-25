@@ -8,3 +8,5 @@ flask-admin
 Pillow
 requests
 regex
+apscheduler
+atexit

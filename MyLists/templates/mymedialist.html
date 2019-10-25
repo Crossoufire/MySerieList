@@ -99,8 +99,50 @@
                             <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0].id }}', 'card_{{ data[0].id }}', '{{ media_list }}')"></a>
                             {% if media_list != 'movieslist' %}
                                 {% if can_update["{}".format(data[0].id)] %}
-                                <a class="btn_bottom_right fas fa-sync text-light" data-toggle="tooltip" title="Sync metadata" onclick="refresh('{{ data[0].id }}', '{{ media_list }}', '{{ current_user.username }}')"></a>
+                                    <a class="btn_bottom_right fas fa-sync text-light" data-toggle="tooltip" title="Sync metadata" onclick="refresh('{{ data[0].id }}', '{{ media_list }}', '{{ current_user.username }}')"></a>
                                 {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <a class="btn_left fas fa-plus text-light" data-toggle="modal" data-target="#modal_other_{{ data[0].id }}"></a>
+                            {% if media_list != 'movieslist' %}
+                            <div style="max-width: 220px;" class="modal fade left" id="modal_other_{{ data[0].id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div style="max-width: 200px;" class="modal-dialog modal-side modal-top-left modal-sm" role="document">
+                                    <div style="max-width: 200px; background: #131418;" class="modal-content">
+                                        <div style="max-width: 200px;" class="modal-header">
+                                            <h5 class="modal-title">Categories</h5>
+                                            <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Watching', '{{ data[0].name }}')">Watching</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Completed', '{{ data[0].name }}')">Completed</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'On Hold', '{{ data[0].name }}')">On Hold</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Random', '{{ data[0].name }}')">Random</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Dropped', '{{ data[0].name }}')">Dropped</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Plan to Watch', '{{ data[0].name }}')">Plan to Watch</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div style="max-width: 220px;" class="modal fade left" id="modal_other_{{ data[0].id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div style="max-width: 200px;" class="modal-dialog modal-side modal-top-left modal-sm" role="document">
+                                    <div style="max-width: 200px; background: #131418;" class="modal-content">
+                                        <div style="max-width: 200px;" class="modal-header">
+                                            <h5 class="modal-title">Categories</h5>
+                                            <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Completed', '{{ data[0].name }}')">Completed</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Animation', '{{ data[0].name }}')">Completed Animation</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Plan to Watch', '{{ data[0].name }}')">Plan to Watch</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             {% endif %}
                         {% endif %}
                         {% if category[1] != 'PLAN TO WATCH' %}
@@ -450,6 +492,8 @@ $(function() {
     });
 });
 </script>
+{% else %}
+<script src="{{ url_for('static', filename='js/test.js') }}"></script>
 {% endif %}
 
 <!------------------ Isotope ------------------->

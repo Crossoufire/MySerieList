@@ -635,24 +635,6 @@
                     {% endfor %}
                 </div>
             </div>
-            {#<div class="vertical_line"></div>
-            <div class="col">
-                <ul class="p-l-0">
-                    <li>
-                        <h4><i class="fas fa-newspaper"></i>&nbsp&nbsp Last follows update</h4>
-                        <hr>
-                        <div class="m-b-10">Psy - series<br>Added Breaking Bad</div>
-                        <div class="m-b-10">Psy - series<br>Breaking Bad<br>S01.E02 <i class="fas fa-arrow-right"></i> S01.E04</div>
-                        <div class="m-b-10">Psy - anime<br>Shingeki no kyojin<br>S02.E04 <i class="fas fa-arrow-right"></i> S02.E08</div>
-                    </li>
-                    <hr>
-                    <li>
-                        <div class="m-b-10">Psy - series<br>Added Breaking Bad</div>
-                        <div class="m-b-10">Psy - series<br>Breaking Bad<br>S01.E02 <i class="fas fa-arrow-right"></i> S01.E04</div>
-                        <div>Psy - anime<br>Shingeki no kyojin<br>S02.E04 <i class="fas fa-arrow-right"></i> S02.E08</div>
-                    </li>
-                </ul>
-            </div>#}
         </div>
     </div>
 
@@ -928,13 +910,6 @@
                         <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
                     </div>
-                    {#<div class="m-t-30">
-                        {{ settings_form.movies_csv.label }}<br>
-                        {{ settings_form.movies_csv() }}<br>
-                        {% for error in settings_form.movies_csv.errors %}
-                        <span style="color: red;">[{{ error }}]</span>
-                        {% endfor %}
-                    </div>#}
                     <div class="m-t-30">
                         {{ settings_form.submit_account(class="btn btn-outline-info custom-btn-size p-r-6 p-l-6 m-b-40") }}
                     </div>
