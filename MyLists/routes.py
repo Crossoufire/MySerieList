@@ -3638,7 +3638,7 @@ def add_follow(follow_username):
     follow_to_add = User.query.filter_by(username=follow_username).first()
 
     if follow_to_add is None or follow_to_add.id == 1:
-        app.logger.info('[{}] Attempt of adding user {} as follow'.format(current_user.get_id(), follow_username))
+        app.logger.info('[{}] Attempt to follow user {}'.format(current_user.get_id(), follow_username))
         return flash('This user does not exist', 'warning')
 
     if follow_to_add.username is current_user.username:

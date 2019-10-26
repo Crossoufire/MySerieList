@@ -3,18 +3,16 @@ TODO ------------------------------------------------
 
 Account:
 	Add: Follow list last updates on movies/anime/series
-    Add: Possiblity to change the background image
+    Add: Possibility to change the background image
 	Add: Display/hide all scores by default
 	Enhance: Bio, profile and background pictures changes without the use of the settings form
 	Enhance: Code of "get_achievements" method (50% done)
-    Enhance: Settings tab CSS/HTML style
+    Enhance: Settings tab CSS/HTML style + take all the width for the setting tab
 DONE - Enhance: Grey italic message for biography when no info
 DONE - Fix: Align the error text in the follow tab when adding a non existing user
 DONE - Fix: Refresh that put you back in the overview tab
-DONE - Fix: Take all the width for the setting tab
 DONE - Fix: Center the follows in mobile display
 DONE - Fix: Total media in overview tab
-
 
 Medialists:
 	Add: Option to import a CSV file for movies (50% done)

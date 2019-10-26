@@ -70,8 +70,10 @@
                         <hr>
                         {% if user_biography %}
                         <p style="word-wrap: break-word;" class="text-justify m-b-0">{{ user_biography }}</p>
-                        {% else %}
+                        {% elif user_id == current_user.get_id() %}
                         <p class="text-justify m-b-0" style="color: grey;"><i>No biography yet. Write it now. Click on the pen above to edit.</i></p>
+                        {% else %}
+                        <p class="text-justify m-b-0" style="color: grey;"><i>No biography.</i></p>
                         {% endif %}
                     </li>
                     <li class="m-b-20">
@@ -618,7 +620,7 @@
                         {% for error in follow_form.follow_to_add.errors %}
                             <div class="m-l-10 mt-auto mb-auto" style="color: red;">{{ error }}</div>
                         {% endfor %}
-                        {{ follow_form.submit_follow(class="btn btn-outline-info m-l-20 p-r-12 p-l-12") }}
+                        {{ follow_form.submit_follow(class="btn btn-outline-info m-t-0 m-l-20 p-r-12 p-l-12") }}
                     </div>
                 </form>
                 {% endif %}
