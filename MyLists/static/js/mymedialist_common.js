@@ -18,6 +18,7 @@ function delete_element(element_id, card_id, media_list) {
             console.log("ok");
         }
     });
+    $categories.isotope('layout');
 }
 
 
@@ -186,11 +187,11 @@ function searchElement() {
     cards = cardContainer.getElementsByClassName("card");
     for (i = 0; i < cards.length; i++) {
         title = cards[i].querySelector(".font-mask");
-        title2 = cards[i].querySelector(".font-mask.test");
+        original_title = cards[i].querySelector(".original_title");
         actors = cards[i].querySelector(".actors_yes");
         if (title.innerText.toUpperCase().indexOf(filter) > -1) {
             cards[i].style.display = "";
-        } else if (title2.innerText.toUpperCase().indexOf(filter) > -1) {
+        } else if (original_title.innerText.toUpperCase().indexOf(filter) > -1) {
             cards[i].style.display = "";
         } else if (actors.innerText.toUpperCase().indexOf(filter) > -1) {
             cards[i].style.display = "";

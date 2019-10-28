@@ -18,7 +18,6 @@
         <input style="background: transparent;" class="form-control add_element" placeholder="Add a Movie" type="text" id="autocomplete"/>
         <select id="list_select">
             <option selected="selected">Completed</option>
-            <option>Completed Animation</option>
             <option>Plan to Watch</option>
         </select>
         {% elif media_list == "animelist" %}
@@ -91,7 +90,7 @@
                         <img class="card-img-top" width="200" height="300" src="{{ data[0].image_cover }}" alt="{{ data[0].name }}">
                         <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_{{ data[0].id }}" style="cursor: pointer;">
                             <span class="font-mask text-center text-light">{{ data[0].name }}</span>
-                            <span class="font-mask test text-center text-light" style="display: none;">{{ data[0].original_name }}</span>
+                            <span class="original_title" style="display: none;">{{ data[0].original_name }}</span>
                             <span class="actors_yes" style="display: none;">{{ actors["{}".format(data[0].id)] }}</span>
                         </div>
                         {% if target_user_id == current_user.get_id() %}
@@ -115,12 +114,12 @@
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Watching', '{{ data[0].name }}')">Watching</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Completed', '{{ data[0].name }}')">Completed</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'On Hold', '{{ data[0].name }}')">On Hold</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Random', '{{ data[0].name }}')">Random</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Dropped', '{{ data[0].name }}')">Dropped</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Plan to Watch', '{{ data[0].name }}')">Plan to Watch</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0].id }}', '{{ media_list }}', 'Watching', '{{ data[0].name }}')">Watching</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0].id }}', '{{ media_list }}', 'Completed', '{{ data[0].name }}')">Completed</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0].id }}', '{{ media_list }}', 'On Hold', '{{ data[0].name }}')">On Hold</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0].id }}', '{{ media_list }}', 'Random', '{{ data[0].name }}')">Random</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0].id }}', '{{ media_list }}', 'Dropped', '{{ data[0].name }}')">Dropped</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0].id }}', '{{ media_list }}', 'Plan to Watch', '{{ data[0].name }}')">Plan to Watch</a>
                                         </div>
                                     </div>
                                 </div>
@@ -136,9 +135,8 @@
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Completed', '{{ data[0].name }}')">Completed</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Animation', '{{ data[0].name }}')">Completed Animation</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="test('{{ data[0].id }}', '{{ media_list }}', 'Plan to Watch', '{{ data[0].name }}')">Plan to Watch</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0].id }}', '{{ media_list }}', 'Completed', '{{ data[0].name }}')">Completed</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0].id }}', '{{ media_list }}', 'Plan to Watch', '{{ data[0].name }}')">Plan to Watch</a>
                                         </div>
                                     </div>
                                 </div>
@@ -312,8 +310,6 @@
                                     <p><b>Genres</b>: {{ genres["{}".format(data[0].id)] }}</p>
                                     <p><b>First air date</b>: {{ first_air_date["{}".format(data[0].id)] }}</p>
                                     <p><b>Last air date</b>: {{ last_air_date["{}".format(data[0].id)] }}</p>
-                                    {#<p><b>Homepage</b>: <a target="_blank" rel="noopener noreferrer" href="{{ data[0].homepage }}">{{ data[0].homepage }}</a></p>#}
-                                    {#<p><b>In production</b>: {{ data[0].in_production }}</p>#}
                                     <p><b>Networks</b>: {{ networks["{}".format(data[0].id)] }}</p>
                                     <p><b>Created by</b>: {{ data[0].created_by }}</p>
                                     {% if data[0].episode_duration == 0 %}
@@ -493,7 +489,7 @@ $(function() {
 });
 </script>
 {% else %}
-<script src="{{ url_for('static', filename='js/test.js') }}"></script>
+<script src="{{ url_for('static', filename='js/add_to_user.js') }}"></script>
 {% endif %}
 
 <!------------------ Isotope ------------------->

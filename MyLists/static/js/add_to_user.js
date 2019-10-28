@@ -1,5 +1,5 @@
 
-function test(element_id, media_type, add_cat, media_name) {
+function add_user(element_id, media_type, add_cat, media_name) {
     $body = $("body");
     $.ajax ({
         type: "POST",

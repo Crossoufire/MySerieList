@@ -812,7 +812,7 @@ def mymedialist(media_list, user_name):
         element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
                                         func.group_concat(SeriesNetwork.network.distinct()),
                                         func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(SeriesEpisodesPerSeason.episodes),
+                                        func.group_concat(SeriesEpisodesPerSeason.episodes.distinct()),
                                         func.group_concat(SeriesActors.name.distinct())).\
                                         join(SeriesList, SeriesList.series_id == Series.id). \
                                         join(SeriesGenre, SeriesGenre.series_id == Series.id). \
@@ -828,7 +828,7 @@ def mymedialist(media_list, user_name):
         element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
                                         func.group_concat(AnimeNetwork.network.distinct()),
                                         func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(AnimeEpisodesPerSeason.episodes),
+                                        func.group_concat(AnimeEpisodesPerSeason.episodes.distinct()),
                                         func.group_concat(AnimeActors.name.distinct())). \
                                         join(AnimeList, AnimeList.anime_id == Anime.id). \
                                         join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
@@ -858,25 +858,25 @@ def mymedialist(media_list, user_name):
     if media_list == "serieslist" or media_list == "animelist":
         return render_template('mymedialist.html',
                                title="{}'s {}".format(user_name, media_list),
-                               all_data=media_all_data[7],
-                               eps=media_all_data[0],
-                               genres=media_all_data[1],
-                               actors=media_all_data[2],
-                               networks=media_all_data[3],
-                               can_update=media_all_data[4],
-                               last_air_date=media_all_data[5],
-                               first_air_date=media_all_data[6],
+                               eps=media_all_data["episodes"],
+                               genres=media_all_data["genres"],
+                               actors=media_all_data["actors"],
+                               networks=media_all_data["networks"],
+                               all_data=media_all_data["all_data"],
+                               can_update=media_all_data["can_update"],
+                               last_air_date=media_all_data["last_air_date"],
+                               first_air_date=media_all_data["first_air_date"],
                                media_list=media_list,
                                target_user_name=user_name,
                                target_user_id=str(user.id))
     elif media_list == "movieslist":
         return render_template('mymedialist.html',
                                title="{}'s {}".format(user_name, media_list),
-                               all_data=media_all_data[4],
-                               genres=media_all_data[0],
-                               actors=media_all_data[1],
-                               release_date=media_all_data[2],
-                               prod_companies=media_all_data[3],
+                               all_data=media_all_data["all_data"],
+                               genres=media_all_data["genres"],
+                               actors=media_all_data["actors"],
+                               release_date=media_all_data["release_date"],
+                               prod_companies=media_all_data["prod_companies"],
                                media_list=media_list,
                                target_user_name=user_name,
                                target_user_id=str(user.id))
@@ -1187,7 +1187,7 @@ def add_to_medialist():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    category_list = ["Watching", "Completed", "Animation", "On Hold", "Random", "Dropped", "Plan to Watch"]
+    category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
     if add_category not in category_list:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1289,7 +1289,7 @@ def add_element():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    category_list = ["Watching", "Completed", "Completed Animation", "On Hold", "Random", "Dropped", "Plan to Watch"]
+    category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
     if element_cat not in category_list:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -2071,19 +2071,28 @@ def get_all_media_data(element_data, list_type, covers_path):
                 last_air_date["{}".format(element[0].id)] = "Unknown"
 
             # Get actors
-            tmp = element[6]
-            tmp_actors = tmp.replace(',', ', ')
-            actors["{}".format(element[0].id)] = tmp_actors
+            try:
+                tmp = element[6]
+                tmp_actors = tmp.replace(',', ', ')
+                actors["{}".format(element[0].id)] = tmp_actors
+            except:
+                actors["{}".format(element[0].id)] = "Unknown"
 
             # Get genres
-            tmp = element[2]
-            tmp_genres = tmp.replace(',', ', ')
-            genres["{}".format(element[0].id)] = tmp_genres
+            try:
+                tmp = element[2]
+                tmp_genres = tmp.replace(',', ', ')
+                genres["{}".format(element[0].id)] = tmp_genres
+            except:
+                genres["{}".format(element[0].id)] = "Unknown"
 
             # Get networks
-            tmp = element[3]
-            tmp_networks = tmp.replace(',', ', ')
-            networks["{}".format(element[0].id)] = tmp_networks
+            try:
+                tmp = element[3]
+                tmp_networks = tmp.replace(',', ', ')
+                networks["{}".format(element[0].id)] = tmp_networks
+            except:
+                networks["{}".format(element[0].id)] = "Unknown"
 
             # Can update
             time_delta = datetime.utcnow() - element[0].last_update
@@ -2095,7 +2104,16 @@ def get_all_media_data(element_data, list_type, covers_path):
         element_all_data = [[watching_list, "WATCHING"], [completed_list, "COMPLETED"], [onhold_list, "ON HOLD"],
                             [random_list, "RANDOM"], [dropped_list, "DROPPED"], [plantowatch_list, "PLAN TO WATCH"]]
 
-        return [eps, genres, actors, networks, can_update, last_air_date, first_air_date, element_all_data]
+        all_data_media = {"episodes": eps,
+                          "genres": genres,
+                          "actors": actors,
+                          "networks": networks,
+                          "can_update": can_update,
+                          "last_air_date": last_air_date,
+                          "first_air_date": first_air_date,
+                          "all_data": element_all_data}
+
+        return all_data_media
     elif list_type == ListType.MOVIES:
         completed_list = []
         plantowatch_list = []
@@ -2125,24 +2143,39 @@ def get_all_media_data(element_data, list_type, covers_path):
                 release_date["{}".format(element[0].id)] = "Unknown"
 
             # Get actors
-            tmp = element[4]
-            tmp_actors = tmp.replace(',', ', ')
-            actors["{}".format(element[0].id)] = tmp_actors
+            try:
+                tmp = element[4]
+                tmp_actors = tmp.replace(',', ', ')
+                actors["{}".format(element[0].id)] = tmp_actors
+            except:
+                actors["{}".format(element[0].id)] = "Unknown"
 
             # Get genres
-            tmp = element[2]
-            tmp_genres = tmp.replace(',', ', ')
-            genres["{}".format(element[0].id)] = tmp_genres
+            try:
+                tmp = element[2]
+                tmp_genres = tmp.replace(',', ', ')
+                genres["{}".format(element[0].id)] = tmp_genres
+            except:
+                genres["{}".format(element[0].id)] = "Unknown"
 
             # Get production companies
-            tmp = element[3]
-            tmp_prod_companies = tmp.replace(',', ', ')
-            prod_companies["{}".format(element[0].id)] = tmp_prod_companies
+            try:
+                tmp = element[3]
+                tmp_prod_companies = tmp.replace(',', ', ')
+                prod_companies["{}".format(element[0].id)] = tmp_prod_companies
+            except:
+                prod_companies["{}".format(element[0].id)] = "Unknown"
 
         element_all_data = [[completed_list, "COMPLETED"], [completed_list_animation, "COMPLETED ANIMATION"] ,
                             [plantowatch_list, "PLAN TO WATCH"]]
 
-        return [genres, actors, release_date, prod_companies, element_all_data]
+        all_data_media = {"genres": genres,
+                          "actors": actors,
+                          "release_date": release_date,
+                          "prod_companies": prod_companies,
+                          "all_data": element_all_data}
+
+        return all_data_media
 
 
 def compute_media_time_spent(list_type):
@@ -2313,7 +2346,8 @@ def autocomplete_search_element(element_name, list_type):
                 app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
                 return [{"nb_results": 0}]
             try:
-                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+                app.logger.info('[SYSTEM] Number of requests available : {}'
+                                .format(response.headers["X-RateLimit-Remaining"]))
             except:
                 return [{"nb_results": 0}]
             if response.headers["X-RateLimit-Remaining"] == "0":
@@ -2362,7 +2396,8 @@ def autocomplete_search_element(element_name, list_type):
                            "name":  data["results"][i]["name"]}
 
             if data["results"][i]["poster_path"] is not None:
-                series_data["poster_path"] = "{0}{1}".format("http://image.tmdb.org/t/p/w300", data["results"][i]["poster_path"])
+                series_data["poster_path"] = "{0}{1}".format("http://image.tmdb.org/t/p/w300",
+                                                             data["results"][i]["poster_path"])
             else:
                 series_data["poster_path"] = url_for('static', filename="covers/series_covers/default.jpg")
 
@@ -2386,7 +2421,8 @@ def autocomplete_search_element(element_name, list_type):
                 app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
                 return [{"nb_results": 0}]
             try:
-                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+                app.logger.info('[SYSTEM] Number of requests available : {}'
+                                .format(response.headers["X-RateLimit-Remaining"]))
             except:
                 return [{"nb_results": 0}]
             if response.headers["X-RateLimit-Remaining"] == "0":
@@ -2458,7 +2494,8 @@ def autocomplete_search_element(element_name, list_type):
                 app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
                 return [{"nb_results": 0}]
             try:
-                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+                app.logger.info('[SYSTEM] Number of requests available : {}'
+                                .format(response.headers["X-RateLimit-Remaining"]))
             except:
                 return [{"nb_results": 0}]
             if response.headers["X-RateLimit-Remaining"] == "0":
@@ -2518,7 +2555,7 @@ def add_element(element_id, list_type, element_cat):
     elif list_type == ListType.MOVIES:
         element = Movies.query.filter_by(themoviedb_id=element_id).first()
 
-    # If the ID exist in the database, we direcly add the element to the user's list
+    # If the ID exist in the database, we add the element to the user's list
     if element is not None:
         # Check if the element is already in the current's user list
         if list_type == ListType.SERIES:
@@ -2540,7 +2577,7 @@ def add_element(element_id, list_type, element_cat):
 
         add_element_to_user(element.id, int(current_user.get_id()), list_type, element_cat)
 
-    # Otherwise we need to recover the data from an online API
+    # Otherwise we recover the data from an API
     else:
         element_data = get_element_data_from_api(element_id, list_type)
         element_actors = get_element_actors_from_api(element_id, list_type)
@@ -2567,14 +2604,16 @@ def get_element_data_from_api(api_id, list_type):
     if list_type != ListType.MOVIES:
         while True:
             try:
-                response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}".format(api_id, themoviedb_api_key))
+                response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}"
+                                        .format(api_id, themoviedb_api_key))
             except:
                 return None
             if response.status_code == 401:
                 app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
                 return None
             try:
-                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+                app.logger.info('[SYSTEM] Number of requests available : {}'
+                                .format(response.headers["X-RateLimit-Remaining"]))
             except:
                 return None
             if response.headers["X-RateLimit-Remaining"] == "0":
@@ -2585,14 +2624,16 @@ def get_element_data_from_api(api_id, list_type):
     elif list_type == ListType.MOVIES:
         while True:
             try:
-                response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}".format(api_id, themoviedb_api_key))
+                response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
+                                        .format(api_id, themoviedb_api_key))
             except:
                 return None
             if response.status_code == 401:
                 app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
                 return None
             try:
-                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+                app.logger.info('[SYSTEM] Number of requests available : {}'
+                                .format(response.headers["X-RateLimit-Remaining"]))
             except:
                 return None
             if response.headers["X-RateLimit-Remaining"] == "0":
@@ -2610,14 +2651,16 @@ def get_element_actors_from_api(api_id, list_type):
     if list_type != ListType.MOVIES:
         while True:
             try:
-                response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}".format(api_id, themoviedb_api_key))
+                response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
+                                        .format(api_id, themoviedb_api_key))
             except:
                 return None
             if response.status_code == 401:
                 app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
                 return None
             try:
-                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+                app.logger.info('[SYSTEM] Number of requests available : {}'
+                                .format(response.headers["X-RateLimit-Remaining"]))
             except:
                 return None
             if response.headers["X-RateLimit-Remaining"] == "0":
@@ -2628,14 +2671,16 @@ def get_element_actors_from_api(api_id, list_type):
     elif list_type == ListType.MOVIES:
         while True:
             try:
-                response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}".format(api_id, themoviedb_api_key))
+                response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
+                                        .format(api_id, themoviedb_api_key))
             except:
                 return None
             if response.status_code == 401:
                 app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
                 return None
             try:
-                app.logger.info('[SYSTEM] Number of requests available : {}'.format(response.headers["X-RateLimit-Remaining"]))
+                app.logger.info('[SYSTEM] Number of requests available : {}'
+                                .format(response.headers["X-RateLimit-Remaining"]))
             except:
                 return None
             if response.headers["X-RateLimit-Remaining"] == "0":
@@ -3148,35 +3193,68 @@ def add_element_to_user(element_id, user_id, list_type, element_cat):
         selected_cat = Status.DROPPED
     elif element_cat == "Plan to Watch":
         selected_cat = Status.PLAN_TO_WATCH
-    elif element_cat == "Completed Animation":
-        selected_cat = Status.COMPLETED_ANIMATION
 
     if list_type == ListType.SERIES:
-        user_list = SeriesList(user_id=user_id,
-                               series_id=element_id,
-                               current_season=1,
-                               last_episode_watched=1,
-                               status=selected_cat)
-        app.logger.info('[{}] Added series with the ID {}'.format(user_id, element_id))
+        # Set season/episode to max if the "completed" category is selected
+        if selected_cat == Status.COMPLETED:
+            number_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).count()
+            number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id,
+                                                                     season=number_season).first().episodes
+
+            user_list = SeriesList(user_id=user_id,
+                                   series_id=element_id,
+                                   current_season=number_season,
+                                   last_episode_watched=number_episode,
+                                   status=selected_cat)
+        else:
+            user_list = SeriesList(user_id=user_id,
+                                   series_id=element_id,
+                                   current_season=1,
+                                   last_episode_watched=1,
+                                   status=selected_cat)
+
+        app.logger.info('[{}] Added a series with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
 
         compute_media_time_spent(list_type)
 
         db.session.commit()
     elif list_type == ListType.ANIME:
-        user_list = AnimeList(user_id=user_id,
-                              anime_id=element_id,
-                              current_season=1,
-                              last_episode_watched=1,
-                              status=selected_cat)
+        # Set season/episode to max if the "completed" category is selected
+        if selected_cat == Status.COMPLETED:
+            number_season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).count()
+            number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id,
+                                                                    season=number_season).first().episodes
 
-        app.logger.info('[{}] Added anime with the ID {}'.format(user_id, element_id))
+            user_list = AnimeList(user_id=user_id,
+                                  anime_id=element_id,
+                                  current_season=number_season,
+                                  last_episode_watched=number_episode,
+                                  status=selected_cat)
+        else:
+            user_list = AnimeList(user_id=user_id,
+                                  anime_id=element_id,
+                                  current_season=1,
+                                  last_episode_watched=1,
+                                  status=selected_cat)
+
+        app.logger.info('[{}] Added an anime with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
 
         compute_media_time_spent(list_type)
 
         db.session.commit()
     elif list_type == ListType.MOVIES:
+        # If contain the animation genre ==> "Completed Animation"
+        if selected_cat == Status.COMPLETED:
+            genres = MoviesGenre.query.filter_by(movies_id=element_id).all()
+            for genre in genres:
+                if (genre.genre_id == 16) or (genre.genre == "Animation"):
+                    selected_cat = Status.COMPLETED_ANIMATION
+                    break
+                else:
+                    selected_cat = Status.COMPLETED
+
         user_list = MoviesList(user_id=user_id,
                                movies_id=element_id,
                                status=selected_cat)
@@ -3888,8 +3966,10 @@ def refresh_db_achievements():
 def add_actors_movies():
     all_movies = Movies.query.all()
     for i in range(0, len(all_movies)):
-        movies_id = all_movies[i].themoviedb_id
-        response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}".format(movies_id, themoviedb_api_key))
+        tmdb_movies_id = all_movies[i].themoviedb_id
+        movies_id = all_movies[i].id
+        response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
+                                .format(tmdb_movies_id, themoviedb_api_key))
         element_actors = json.loads(response.text)
 
         try:
@@ -3919,8 +3999,10 @@ def add_actors_movies():
 def add_actors_series():
     all_series = Series.query.all()
     for i in range(0, len(all_series)):
-        series_id = all_series[i].themoviedb_id
-        response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}".format(series_id, themoviedb_api_key))
+        tmdb_series_id = all_series[i].themoviedb_id
+        series_id = all_series[i].id
+        response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
+                                .format(tmdb_series_id, themoviedb_api_key))
         element_actors = json.loads(response.text)
 
         try:
@@ -3950,8 +4032,10 @@ def add_actors_series():
 def add_actors_anime():
     all_anime = Anime.query.all()
     for i in range(0, len(all_anime)):
-        anime_id = all_anime[i].themoviedb_id
-        response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}".format(anime_id, themoviedb_api_key))
+        tmdb_anime_id = all_anime[i].themoviedb_id
+        anime_id = all_anime[i].id
+        response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
+                                .format(tmdb_anime_id, themoviedb_api_key))
         element_actors = json.loads(response.text)
 
         try:
