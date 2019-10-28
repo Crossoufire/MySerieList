@@ -45,36 +45,6 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
         add_achievements_to_db()
-    if User.query.filter_by(id='2').first() is None:
-        user = User(username='bbb',
-                     email='bbb@bbb.com',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(user)
-    if User.query.filter_by(id='3').first() is None:
-        user = User(username='ccc',
-                    email='ccc@ccc.com',
-                    password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                    image_file='default.jpg',
-                    active=True,
-                    private=False,
-                    registered_on=datetime.utcnow(),
-                    activated_on=datetime.utcnow())
-        db.session.add(user)
-    if User.query.filter_by(id='4').first() is None:
-        user = User(username='ddd',
-                    email='ddd@ddd.com',
-                    password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                    image_file='default.jpg',
-                    active=True,
-                    private=False,
-                    registered_on=datetime.utcnow(),
-                    activated_on=datetime.utcnow())
-        db.session.add(user)
     refresh_db_achievements()
     db.session.commit()
 
@@ -812,7 +782,7 @@ def mymedialist(media_list, user_name):
         element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
                                         func.group_concat(SeriesNetwork.network.distinct()),
                                         func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(SeriesEpisodesPerSeason.episodes.distinct()),
+                                        func.group_concat(SeriesEpisodesPerSeason.episodes),
                                         func.group_concat(SeriesActors.name.distinct())).\
                                         join(SeriesList, SeriesList.series_id == Series.id). \
                                         join(SeriesGenre, SeriesGenre.series_id == Series.id). \
@@ -828,7 +798,7 @@ def mymedialist(media_list, user_name):
         element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
                                         func.group_concat(AnimeNetwork.network.distinct()),
                                         func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(AnimeEpisodesPerSeason.episodes.distinct()),
+                                        func.group_concat(AnimeEpisodesPerSeason.episodes),
                                         func.group_concat(AnimeActors.name.distinct())). \
                                         join(AnimeList, AnimeList.anime_id == Anime.id). \
                                         join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \

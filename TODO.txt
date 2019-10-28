@@ -8,6 +8,7 @@ Account:
 	Enhance: Bio, profile and background pictures changes without the use of the settings form
 	Enhance: Code of "get_achievements" method (50% done)
     Enhance: Settings tab CSS/HTML style
+    Enhance: Add green corner on other lists
 
 
 Medialists:
