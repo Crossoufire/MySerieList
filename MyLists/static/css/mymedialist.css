@@ -139,6 +139,10 @@ body.loading .modal_loading {
     margin-top: 10px;
 }
 
+.card {
+    border-radius: 5px;
+}
+
 .card-img-top {
     border-style: solid;
     border-width: 1px;
@@ -170,7 +174,18 @@ body.loading .modal_loading {
 
 
 /* --------- Ribbons ---------- */
-.ribbon{
+
+.ribbon {
+    border-style: solid;
+    border-width: 0 35px 35px 0;
+    border-color: transparent #2d6f22;
+    position: absolute;
+	right: 1px;
+	top: 1px;
+}
+
+/*
+.ribbon {
 	width: 20px;
 	height: 40px;
 	padding: 0px;
@@ -183,6 +198,7 @@ body.loading .modal_loading {
 	right: 8px;
 	top: 1px;
 }
+*/
 
 /*
 .ribbon {
@@ -203,6 +219,10 @@ body.loading .modal_loading {
 
 .btn_bottom_left:hover {
     opacity: 1;
+}
+
+.mask.rgba-black-strong {
+    cursor: pointer;
 }
 
 .mask:hover~.btn_bottom_left {
@@ -312,11 +332,17 @@ body.loading .modal_loading {
     }
 }
 
+#list_select {
+    text-align: center!important;
+    margin-top: 5px;
+    margin-left: 40px;
+}
 
 .search_by_name {
     text-align: right!important;
     margin-right: 15px;
 }
+
 .add_an_element {
     text-align: left!important;
     margin-left: 15px;
@@ -331,4 +357,15 @@ body.loading .modal_loading {
         text-align: center!important;
         margin-left: 0px;
     }
+    #list_select {
+        margin-left: 0px;
+    }
+}
+
+.filters-button-group {
+    justify-content: center;
+}
+
+.categories {
+    width: 100%;
 }

@@ -2,34 +2,36 @@
 TODO ------------------------------------------------
 
 Account:
-	Add: Follow list last updates on movies/anime/series
+	Add: The last media updates of the user's follow list
     Add: Possibility to change the background image
 	Add: Display/hide all scores by default
-	Enhance: Bio, profile and background pictures changes without the use of the settings form
-	Enhance: Code of "get_achievements" method (50% done)
+	Enhance: Bio, profile and back pictures changes without the settings form
+	Enhance: Code of "get_achievements()" method (50% done)
     Enhance: Settings tab CSS/HTML style
-    Enhance: Add green corner on other lists
+    Enhance: Not satisfied by the badges display, not clear enough
 
 
 Medialists:
-	Add: Regroup movies saga by collection from TMDb - Hard to do
-	Add: Episodes per season in the metadata modal
-	Add: A "more results" to the autocomplete
-	Enhance: Change the autocomplete style (50% done)
+	Add: Regroup movies by TMDb's collections - Hard to do
+	Add: "More results" to the autocomplete
+	Add: Movie director in metadata modal
+	Enhance: Possibility to show or not the shared triangle ?
 	Enhance: Year in the autocomplete (50% done)
-	Enhance: Change the category modal style
+	Enhance: CSS/HTML style of the search bars
+	Enhance: Autocomplete style (50% done)
+	Enhance: Style of the categories modal
 
 
 Hall of Fame:
-    Add: Global statistics below the table:
-           - How many movies/series/anime watched
+    Add: Global website statistics below the table:
+           - How many media watched
            - Total time & mean score from all users
-           - Most watched movie/anime/series
+           - Most watched media
 
 
 Advanced Statistics:
 	Add:  Personal advanced statistics for media
 
 
-HomePage :
+Homepage :
     Fix: Update the pictures

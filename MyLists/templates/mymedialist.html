@@ -15,13 +15,15 @@
     {% if target_user_id == current_user.get_id() %}
     <div class="col m-t-30 add_an_element">
         {% if media_list == "movieslist" %}
-        <input style="background: transparent;" class="form-control add_element" placeholder="Add a Movie" type="text" id="autocomplete"/>
+        <input class="form-control add_element" placeholder="Add a Movie" type="text" id="autocomplete"/>
+        <br>
         <select id="list_select">
             <option selected="selected">Completed</option>
             <option>Plan to Watch</option>
         </select>
         {% elif media_list == "animelist" %}
-        <input style="background: transparent;" class="form-control add_element" placeholder="Add an Anime" type="text" id="autocomplete"/>
+        <input class="form-control add_element" placeholder="Add an Anime" type="text" id="autocomplete"/>
+        <br>
         <select id="list_select">
             <option selected="selected">Watching</option>
             <option>Completed</option>
@@ -31,7 +33,8 @@
             <option>Plan to Watch</option>
         </select>
         {% elif media_list == "serieslist" %}
-        <input style="background: transparent;" class="form-control add_element" placeholder="Add a Series" type="text" id="autocomplete"/>
+        <input class="form-control add_element" placeholder="Add a Series" type="text" id="autocomplete"/>
+        <br>
         <select id="list_select">
             <option selected="selected">Watching</option>
             <option>Completed</option>
@@ -45,10 +48,10 @@
     </div>
     {% endif %}
     <div class="col m-t-30 search_by_name">
-        <input style="background: transparent;" type="text" id="myElementFilter" class="form-control add_element" onkeyup="searchElement()" placeholder="Search by title or actor">
+        <input type="text" id="myElementFilter" class="form-control add_element" onkeyup="searchElement()" placeholder="Search by title or actor">
     </div>
 </div>
-<div class="d-flex flex-wrap filters-button-group" style="justify-content: center;">
+<div class="d-flex flex-wrap filters-button-group">
     {% if media_list != 'movieslist' %}
     <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
     <button class="btn btn-sm btn-light text-dark" data-filter=".categories.WATCHING">Watching</button>
@@ -64,14 +67,14 @@
     <button class="btn btn-sm btn-light text-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
     {% endif %}
 </div>
-    <button id="all_scores" class="btn btn-sm btn-primary text-dark show_score_button" onclick="all_scores()">Show scores</button>
+    <button id="all_scores" class="btn btn-sm btn-primary text-light show_score_button" onclick="all_scores()">Show scores</button>
 
 <div id="categories-iso" class="categories-iso">
     {% for category in all_data %}
     {% if category[1] == 'COMPLETED' %}
-    <div class="categories {{ category[1] }} C" style="width: 100%;">
+    <div class="categories {{ category[1] }} C">
     {% else %}
-    <div class="categories {{ category[1] }}" style="width: 100%;">
+    <div class="categories {{ category[1] }}">
     {% endif %}
         <h2 class="font-weight-light text-center mt-5 mb-0 category-title p-t-10">
             {{ category[1] }}
@@ -85,10 +88,10 @@
             {% set outer_loop = loop %}
             {% for data in category[0] %}
                 <!------------------- Card -------------------->
-                <div id="card_{{ data[0][0].id }}" class="card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20" style="border-radius: 5px;">
+                <div id="card_{{ data[0][0].id }}" class="card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20">
                     <div class="view overlay">
                         <img class="card-img-top" width="200" height="300" src="{{ data[0][0].image_cover }}" alt="{{ data[0][0].name }}">
-                        <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_{{ data[0][0].id }}" style="cursor: pointer;">
+                        <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_{{ data[0][0].id }}">
                             <span class="font-mask text-center text-light">{{ data[0][0].name }}</span>
                             <span class="original_title" style="display: none;">{{ data[0][0].original_name }}</span>
                             <span class="actors_yes" style="display: none;">{{ actors["{}".format(data[0][0].id)] }}</span>
@@ -323,6 +326,7 @@
                                     {% endif %}
                                     <p><b>Total seasons</b>: {{ data[0][0].total_seasons }}</p>
                                     <p><b>Total episodes</b>: {{ data[0][0].total_episodes }}</p>
+                                    <p><b>Episodes per Season</b>: {{ eps["{}".format(data[0][0].id)]|join(', ') }}</p>
                                     {% if media_list != "animelist" %}
                                     <p><b>Origin country</b>: {{ data[0][0].origin_country }}</p>
                                     {% endif %}
@@ -409,7 +413,6 @@
                     </div>
                 </div>
                 {% endif %}
-
             {% endfor %}
         </div>
     </div>

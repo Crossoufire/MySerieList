@@ -11,16 +11,16 @@
     <img src="{{ data['profile_picture'] }}"/>
     <div class="header-data">
         <h2><b>{{ data['username'] }}</b>
-                <img height='50' width='50' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}"
-                 src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
-                {% if user_id != current_user.get_id() %}
-                    {% if data["isfollowing"] %}
-                    <button class="btn btn-sm btn-dark follow_button" onclick="unfollow('{{ data['id'] }}')">Unfollow</button>
-                    {% else %}
-                    <button class="btn btn-sm btn-primary follow_button" onclick="follow('{{ data['id'] }}')">Follow</button>
-                    {% endif %}
+            <img height='50' width='50' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}"
+             src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
+            {% if user_id != current_user.get_id() %}
+                {% if data["isfollowing"] %}
+                <button class="btn btn-sm btn-dark follow_button" onclick="unfollow('{{ data['id'] }}')">Unfollow</button>
+                {% else %}
+                <button class="btn btn-sm btn-primary follow_button" onclick="follow('{{ data['id'] }}')">Follow</button>
                 {% endif %}
-            </h2>
+            {% endif %}
+        </h2>
         <p class="p-0 m-0">
             <b>Joined: {{ joined }}</b><br>
             <b>Followers: {{ followers }}</b>

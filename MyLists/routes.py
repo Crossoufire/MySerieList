@@ -782,7 +782,7 @@ def mymedialist(media_list, user_name):
         element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
                                         func.group_concat(SeriesNetwork.network.distinct()),
                                         func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(SeriesEpisodesPerSeason.episodes),
+                                        func.group_concat(SeriesEpisodesPerSeason.episodes.distinct()),
                                         func.group_concat(SeriesActors.name.distinct())).\
                                         join(SeriesList, SeriesList.series_id == Series.id). \
                                         join(SeriesGenre, SeriesGenre.series_id == Series.id). \
