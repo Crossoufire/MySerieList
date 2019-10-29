@@ -782,13 +782,13 @@ def mymedialist(media_list, user_name):
         element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
                                         func.group_concat(SeriesNetwork.network.distinct()),
                                         func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(SeriesEpisodesPerSeason.episodes.distinct()),
-                                        func.group_concat(SeriesActors.name.distinct())).\
+                                        func.group_concat(SeriesActors.name.distinct()),
+                                        func.group_concat(SeriesEpisodesPerSeason.episodes)). \
                                         join(SeriesList, SeriesList.series_id == Series.id). \
                                         join(SeriesGenre, SeriesGenre.series_id == Series.id). \
                                         join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
-                                        join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
                                         join(SeriesActors, SeriesActors.series_id == Series.id). \
+                                        join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
                                         filter(SeriesList.user_id == user.id).group_by(Series.id).\
                                         order_by(Series.name.asc())
         covers_path = url_for('static', filename='covers/series_covers/')
@@ -798,13 +798,13 @@ def mymedialist(media_list, user_name):
         element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
                                         func.group_concat(AnimeNetwork.network.distinct()),
                                         func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(AnimeEpisodesPerSeason.episodes),
-                                        func.group_concat(AnimeActors.name.distinct())). \
+                                        func.group_concat(AnimeActors.name.distinct()),
+                                        func.group_concat(AnimeEpisodesPerSeason.episodes)). \
                                         join(AnimeList, AnimeList.anime_id == Anime.id). \
                                         join(AnimeGenre, AnimeGenre.anime_id == Anime.id). \
                                         join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
-                                        join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
                                         join(AnimeActors, AnimeActors.anime_id == Anime.id). \
+                                        join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
                                         filter(AnimeList.user_id == user.id).group_by(Anime.id).\
                                         order_by(Anime.name.asc())
         covers_path = url_for('static', filename='covers/anime_covers/')
@@ -2056,7 +2056,7 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
 
             # Get episodes per season
             nb_season = len(element[4].split(","))
-            eps["{}".format(element[0].id)] = element[5].split(",")[:nb_season]
+            eps["{}".format(element[0].id)] = element[6].split(",")[:nb_season]
             # Convert all element to int
             eps["{}".format(element[0].id)] = [int(x) for x in eps["{}".format(element[0].id)]]
 
@@ -2078,7 +2078,7 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
 
             # Get actors
             try:
-                tmp = element[6]
+                tmp = element[5]
                 tmp_actors = tmp.replace(',', ', ')
                 actors["{}".format(element[0].id)] = tmp_actors
             except:
