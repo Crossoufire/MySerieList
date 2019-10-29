@@ -12,11 +12,9 @@ Account:
 
 
 Medialists:
-	Add: Regroup movies saga by collection from TMDb
+	Add: Regroup movies saga by collection from TMDb - Hard to do
 	Add: Episodes per season in the metadata modal
 	Add: A "more results" to the autocomplete
-	Add: Possibility to edit metadata
-    Enhance: When adding media from other list, better response for the user
 	Enhance: Change the autocomplete style (50% done)
 	Enhance: Year in the autocomplete (50% done)
 	Enhance: Change the category modal style

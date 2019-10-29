@@ -792,7 +792,7 @@ def mymedialist(media_list, user_name):
                                         filter(SeriesList.user_id == user.id).group_by(Series.id).\
                                         order_by(Series.name.asc())
         covers_path = url_for('static', filename='covers/series_covers/')
-        media_all_data = get_all_media_data(element_data, ListType.SERIES, covers_path)
+        media_all_data = get_all_media_data(element_data, ListType.SERIES, covers_path, user.id)
     elif media_list == "animelist":
         # Get anime data
         element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
@@ -808,7 +808,7 @@ def mymedialist(media_list, user_name):
                                         filter(AnimeList.user_id == user.id).group_by(Anime.id).\
                                         order_by(Anime.name.asc())
         covers_path = url_for('static', filename='covers/anime_covers/')
-        media_all_data = get_all_media_data(element_data, ListType.ANIME, covers_path)
+        media_all_data = get_all_media_data(element_data, ListType.ANIME, covers_path, user.id)
     elif media_list == "movieslist":
         # Get movies data
         element_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre.distinct()),
@@ -821,7 +821,7 @@ def mymedialist(media_list, user_name):
                                         filter(MoviesList.user_id == user.id).group_by(Movies.id).\
                                         order_by(Movies.name.asc())
         covers_path = url_for('static', filename='covers/movies_covers/')
-        media_all_data = get_all_media_data(element_data, ListType.MOVIES, covers_path)
+        media_all_data = get_all_media_data(element_data, ListType.MOVIES, covers_path, user.id)
     else:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
@@ -1153,7 +1153,6 @@ def add_to_medialist():
         add_category = json_data['add_cat']
         element_id = int(json_data['element_id'])
         element_type = json_data['media_type']
-        media_name = json_data['media_name']
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1176,7 +1175,7 @@ def add_to_medialist():
         element = MoviesList.query.filter_by(movies_id=element_id, user_id=current_user.get_id()).first()
         list_type = ListType.MOVIES
     if element is not None:
-        flash("This media: '{}' is already in your list".format(media_name), "warning")
+        flash("This media is already in your list", "warning")
     else:
         add_element_to_user(element_id, int(current_user.get_id()), list_type, add_category)
 
@@ -1985,7 +1984,26 @@ def get_achievements(user_id, list_type):
     return achievements_data
 
 
-def get_all_media_data(element_data, list_type, covers_path):
+def get_all_media_data(element_data, list_type, covers_path, user_id):
+    if user_id != current_user.get_id():
+        if list_type == ListType.SERIES:
+            tmp_current_list = SeriesList.query.filter_by(user_id=current_user.get_id()).all()
+        elif list_type == ListType.ANIME:
+            tmp_current_list = AnimeList.query.filter_by(user_id=current_user.get_id()).all()
+        elif list_type == ListType.MOVIES:
+            tmp_current_list = MoviesList.query.filter_by(user_id=current_user.get_id()).all()
+
+        current_list = []
+        for i in range(0, len(tmp_current_list)):
+            if list_type == ListType.SERIES:
+                current_list.append(tmp_current_list[i].series_id)
+            elif list_type == ListType.ANIME:
+                current_list.append(tmp_current_list[i].anime_id)
+            elif list_type == ListType.MOVIES:
+                current_list.append(tmp_current_list[i].movies_id)
+    else:
+        current_list = []
+
     if list_type != ListType.MOVIES:
         watching_list = []
         completed_list = []
@@ -2006,17 +2024,35 @@ def get_all_media_data(element_data, list_type, covers_path):
             element[0].image_cover = "{}{}".format(covers_path, element[0].image_cover)
 
             if element[1].status == Status.WATCHING:
-                watching_list.append(element)
+                if element[0].id in current_list:
+                    watching_list.append([element, "yes"])
+                else:
+                    watching_list.append([element, "no"])
             elif element[1].status == Status.COMPLETED:
-                completed_list.append(element)
+                if element[0].id in current_list:
+                    completed_list.append([element, "yes"])
+                else:
+                    completed_list.append([element, "no"])
             elif element[1].status == Status.ON_HOLD:
-                onhold_list.append(element)
+                if element[0].id in current_list:
+                    onhold_list.append([element, "yes"])
+                else:
+                    onhold_list.append([element, "no"])
             elif element[1].status == Status.RANDOM:
-                random_list.append(element)
+                if element[0].id in current_list:
+                    random_list.append([element, "yes"])
+                else:
+                    random_list.append([element, "no"])
             elif element[1].status == Status.DROPPED:
-                dropped_list.append(element)
+                if element[0].id in current_list:
+                    dropped_list.append([element, "yes"])
+                else:
+                    dropped_list.append([element, "no"])
             elif element[1].status == Status.PLAN_TO_WATCH:
-                plantowatch_list.append(element)
+                if element[0].id in current_list:
+                    plantowatch_list.append([element, "yes"])
+                else:
+                    plantowatch_list.append([element, "no"])
 
             # Get episodes per season
             nb_season = len(element[4].split(","))
@@ -2098,11 +2134,20 @@ def get_all_media_data(element_data, list_type, covers_path):
             element[0].image_cover = "{}{}".format(covers_path, element[0].image_cover)
 
             if element[1].status == Status.COMPLETED:
-                completed_list.append(element)
+                if element[0].id in current_list:
+                    completed_list.append([element, "yes"])
+                else:
+                    completed_list.append([element, "no"])
             elif element[1].status == Status.COMPLETED_ANIMATION:
-                completed_list_animation.append(element)
+                if element[0].id in current_list:
+                    completed_list_animation.append([element, "yes"])
+                else:
+                    completed_list_animation.append([element, "no"])
             elif element[1].status == Status.PLAN_TO_WATCH:
-                plantowatch_list.append(element)
+                if element[0].id in current_list:
+                    plantowatch_list.append([element, "yes"])
+                else:
+                    plantowatch_list.append([element, "no"])
 
             # Change release date format
             try:
