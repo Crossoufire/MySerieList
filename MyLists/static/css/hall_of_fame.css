@@ -46,6 +46,7 @@ table.table a {
 .profile_picture {
     width: 60px;
     height: 60px;
+    border-radius: 50%;
 }
 
 .grade_picture {
