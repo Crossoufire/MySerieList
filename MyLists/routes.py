@@ -45,6 +45,36 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
         add_achievements_to_db()
+    if User.query.filter_by(id='2').first() is None:
+        user = User(username='bbb',
+                     email='bbb@bbb.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(user)
+    if User.query.filter_by(id='3').first() is None:
+        user = User(username='ccc',
+                    email='ccc@ccc.com',
+                    password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                    image_file='default.jpg',
+                    active=True,
+                    private=False,
+                    registered_on=datetime.utcnow(),
+                    activated_on=datetime.utcnow())
+        db.session.add(user)
+    if User.query.filter_by(id='4').first() is None:
+        user = User(username='ddd',
+                    email='ddd@ddd.com',
+                    password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                    image_file='default.jpg',
+                    active=True,
+                    private=False,
+                    registered_on=datetime.utcnow(),
+                    activated_on=datetime.utcnow())
+        db.session.add(user)
     refresh_db_achievements()
     db.session.commit()
 
@@ -156,8 +186,8 @@ def reset_token(token):
     if user is None:
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('reset_password'))
-    form = ResetPasswordForm()
 
+    form = ResetPasswordForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user.password = hashed_password
@@ -175,7 +205,7 @@ def register_token(token):
         return redirect(url_for('home'))
 
     user = User.verify_reset_token(token)
-    if user is None:
+    if user is None or user.active:
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('reset_password'))
 
@@ -222,12 +252,11 @@ def account(user_name):
         return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
 
     # Check if the account is private or in the follow list
-    if current_user.id != user.id and current_user.id != 1:
-        follow = Follow.query.filter_by(user_id=current_user.get_id(), follow_id=user.id).first()
-        if user.private:
-            if follow is None:
-                image_anonymous = url_for('static', filename='img/anonymous.jpg')
-                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
+    follow = Follow.query.filter_by(user_id=current_user.get_id(), follow_id=user.id).first()
+    if current_user.id == user.id or current_user.id == 1:
+        pass
+    elif user.private and follow is None:
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
     # Form to add follows
     follow_form = AddFollowForm()
@@ -341,7 +370,8 @@ def account(user_name):
         follow_data = {"username": follow[0].username,
                        "user_id" : follow[0].id,
                        "picture" : follow[0].image_file}
-        follows_list_data.append(follow_data)
+        if Follow.query.filter_by(user_id=current_user.get_id(), follow_id=follow[0].id).first() is not None or current_user.id == 1:
+            follows_list_data.append(follow_data)
 
     account_data             = {}
     account_data["series"]   = {}
@@ -386,12 +416,6 @@ def account(user_name):
     account_data["series"]["plantowatch_count"] = series_count["plantowatch"]
     account_data["series"]["total_count"]       = series_count["total"]
 
-    movies_count = get_list_count(user.id, ListType.MOVIES)
-    account_data["movies"]["completed_count"]           = movies_count["completed"]
-    account_data["movies"]["completed_animation_count"] = movies_count["completed_animation"]
-    account_data["movies"]["plantowatch_count"]         = movies_count["plantowatch"]
-    account_data["movies"]["total_count"]               = movies_count["total"]
-
     anime_count = get_list_count(user.id, ListType.ANIME)
     account_data["anime"]["watching_count"]     = anime_count["watching"]
     account_data["anime"]["completed_count"]    = anime_count["completed"]
@@ -400,6 +424,12 @@ def account(user_name):
     account_data["anime"]["dropped_count"]      = anime_count["dropped"]
     account_data["anime"]["plantowatch_count"]  = anime_count["plantowatch"]
     account_data["anime"]["total_count"]        = anime_count["total"]
+
+    movies_count = get_list_count(user.id, ListType.MOVIES)
+    account_data["movies"]["completed_count"]           = movies_count["completed"]
+    account_data["movies"]["completed_animation_count"] = movies_count["completed_animation"]
+    account_data["movies"]["plantowatch_count"]         = movies_count["plantowatch"]
+    account_data["movies"]["total_count"]               = movies_count["total"]
 
     # Count the total number of seen episodes for the series
     all_series_data = db.session.query(SeriesList, SeriesEpisodesPerSeason,
@@ -444,13 +474,7 @@ def account(user_name):
             (float(account_data["series"]["random_count"]/account_data["series"]["total_count"]))*100,
             (float(account_data["series"]["dropped_count"]/account_data["series"]["total_count"]))*100,
             (float(account_data["series"]["plantowatch_count"]/account_data["series"]["total_count"]))*100]
-    if account_data["movies"]["total_count"] == 0:
-        account_data["movies"]["element_percentage"] = [0.0, 0.0, 0.0]
-    else:
-        account_data["movies"]["element_percentage"] = [
-            (float(account_data["movies"]["completed_count"]/account_data["movies"]["total_count"]))*100,
-            (float(account_data["movies"]["completed_animation_count"]/account_data["movies"]["total_count"]))*100,
-            (float(account_data["movies"]["plantowatch_count"]/account_data["movies"]["total_count"]))*100]
+
     if account_data["anime"]["nb_ep_watched"] == 0:
         account_data["anime"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     else:
@@ -462,6 +486,14 @@ def account(user_name):
             (float(account_data["anime"]["dropped_count"]/account_data["anime"]["total_count"]))*100,
             (float(account_data["anime"]["plantowatch_count"]/account_data["anime"]["total_count"]))*100]
 
+    if account_data["movies"]["total_count"] == 0:
+        account_data["movies"]["element_percentage"] = [0.0, 0.0, 0.0]
+    else:
+        account_data["movies"]["element_percentage"] = [
+            (float(account_data["movies"]["completed_count"]/account_data["movies"]["total_count"]))*100,
+            (float(account_data["movies"]["completed_animation_count"]/account_data["movies"]["total_count"]))*100,
+            (float(account_data["movies"]["plantowatch_count"]/account_data["movies"]["total_count"]))*100]
+
     # Grades and levels for each media
     series_level = get_level_and_grade(user.time_spent_series)
     account_data["series_level"]       = series_level["level"]
@@ -469,26 +501,26 @@ def account(user_name):
     account_data["series_grade_id"]    = series_level["grade_id"]
     account_data["series_grade_title"] = series_level["grade_title"]
 
-    movies_level = get_level_and_grade(user.time_spent_movies)
-    account_data["movies_level"]       = movies_level["level"]
-    account_data["movies_percent"]     = movies_level["level_percent"]
-    account_data["movies_grade_id"]    = movies_level["grade_id"]
-    account_data["movies_grade_title"] = movies_level["grade_title"]
-
     anime_level = get_level_and_grade(user.time_spent_anime)
     account_data["anime_level"]       = anime_level["level"]
     account_data["anime_percent"]     = anime_level["level_percent"]
     account_data["anime_grade_id"]    = anime_level["grade_id"]
     account_data["anime_grade_title"] = anime_level["grade_title"]
 
-    knowledge_level = int(series_level["level"] + movies_level["level"] + anime_level["level"])
+    movies_level = get_level_and_grade(user.time_spent_movies)
+    account_data["movies_level"]       = movies_level["level"]
+    account_data["movies_percent"]     = movies_level["level_percent"]
+    account_data["movies_grade_id"]    = movies_level["grade_id"]
+    account_data["movies_grade_title"] = movies_level["grade_title"]
+
+    knowledge_level = int(series_level["level"] + anime_level["level"] + movies_level["level"])
     knowledge_grade = get_knowledge_grade(knowledge_level)
     account_data["knowledge_grade_id"]    = knowledge_grade["grade_id"]
     account_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
 
     # Recover the badges/achievements
-    user_achievements_anime  = get_achievements(user.id, ListType.ANIME)
     user_achievements_series = get_achievements(user.id, ListType.SERIES)
+    user_achievements_anime  = get_achievements(user.id, ListType.ANIME)
     user_achievements_movies = get_achievements(user.id, ListType.MOVIES)
 
     # Add the activated/registered date
@@ -502,19 +534,19 @@ def account(user_name):
     followers = Follow.query.filter_by(follow_id=user.id).all()
 
     return render_template('account.html',
-                           title="{}'s account".format(user.username),
-                           data=account_data,
-                           joined=joined_date,
-                           user_id=str(user.id),
-                           user_name=user_name,
-                           follow_form=follow_form,
-                           followers=len(followers),
-                           settings_form=settings_form,
-                           password_form=password_form,
-                           user_biography=user.biography,
-                           anime_achiev=user_achievements_anime,
-                           series_achiev=user_achievements_series,
-                           movies_achiev=user_achievements_movies)
+                           title            = "{}'s account".format(user.username),
+                           data             = account_data,
+                           joined           = joined_date,
+                           user_id          = str(user.id),
+                           user_name        = user_name,
+                           follow_form      = follow_form,
+                           followers        = len(followers),
+                           settings_form    = settings_form,
+                           password_form    = password_form,
+                           user_biography   = user.biography,
+                           anime_achiev     = user_achievements_anime,
+                           series_achiev    = user_achievements_series,
+                           movies_achiev    = user_achievements_movies)
 
 
 @app.route("/level_grade_data", methods=['GET'])
@@ -622,28 +654,28 @@ def hall_of_fame():
         user_data["profile_picture"] = user.image_file
 
         series_level = get_level_and_grade(user.time_spent_series)
-        user_data["series_level"] = series_level["level"]
-        user_data["series_percent"] = series_level["level_percent"]
-        user_data["series_grade_id"] = series_level["grade_id"]
+        user_data["series_level"]       = series_level["level"]
+        user_data["series_percent"]     = series_level["level_percent"]
+        user_data["series_grade_id"]    = series_level["grade_id"]
         user_data["series_grade_title"] = series_level["grade_title"]
 
+        anime_level = get_level_and_grade(user.time_spent_anime)
+        user_data["anime_level"]        = anime_level["level"]
+        user_data["anime_percent"]      = anime_level["level_percent"]
+        user_data["anime_grade_id"]     = anime_level["grade_id"]
+        user_data["anime_grade_title"]  = anime_level["grade_title"]
+
         movies_level = get_level_and_grade(user.time_spent_movies)
-        user_data["movies_level"] = movies_level["level"]
-        user_data["movies_percent"] = movies_level["level_percent"]
-        user_data["movies_grade_id"] = movies_level["grade_id"]
+        user_data["movies_level"]       = movies_level["level"]
+        user_data["movies_percent"]     = movies_level["level_percent"]
+        user_data["movies_grade_id"]    = movies_level["grade_id"]
         user_data["movies_grade_title"] = movies_level["grade_title"]
 
-        anime_level = get_level_and_grade(user.time_spent_anime)
-        user_data["anime_level"] = anime_level["level"]
-        user_data["anime_percent"] = anime_level["level_percent"]
-        user_data["anime_grade_id"] = anime_level["grade_id"]
-        user_data["anime_grade_title"] = anime_level["grade_title"]
-
-        knowledge_level = int(series_level["level"] + movies_level["level"] + anime_level["level"])
+        knowledge_level = int(series_level["level"] + anime_level["level"] + movies_level["level"])
         knowledge_grade = get_knowledge_grade(knowledge_level)
-        user_data["knowledge_level"] = knowledge_level
-        user_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
-        user_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
+        user_data["knowledge_level"]        = knowledge_level
+        user_data["knowledge_grade_id"]     = knowledge_grade["grade_id"]
+        user_data["knowledge_grade_title"]  = knowledge_grade["grade_title"]
 
         if user.id in follows_list:
             user_data["isfollowing"] = True
@@ -662,49 +694,41 @@ def hall_of_fame():
     return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
 
 
-@app.route("/statistics/<user_name>", methods=['GET'])
-@login_required
-def statistics(user_name):
-    image_error = url_for('static', filename='img/error.jpg')
-    user = User.query.filter_by(username=user_name).first()
-
-    # No account with this username
-    if user is None:
-        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
-
-    # Protect admin account
-    if user.id == 1 and current_user.id != 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
-
-    # Check if the account is private / in the follow list
-    if current_user.id != user.id and current_user.id != 1:
-        follow = Follow.query.filter_by(user_id=current_user.get_id(), follow_id=user.id).first()
-        if user.private:
-            if current_user.get_id() == "1":
-                pass
-            elif follow is None:
-                image_anonymous = url_for('static', filename='img/anonymous.jpg')
-                return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
-
-    # Get the statistics
-    stats = get_statistics(user.id, ListType.SERIES)
-
-    return render_template("statistics.html",
-                           title="{}'s statistics".format(user_name),
-                           user_id=str(user.id),
-                           user_name=user_name,
-                           x_abs=stats[0],
-                           y_abs=stats[1],
-                           y_abs_2=stats[2],
-                           y_abs_3=stats[3])
-
-
-@app.route("/anonymous", methods=['GET'])
-@login_required
-def anonymous():
-    image_anonymous = url_for('static', filename='img/anonymous.jpg')
-
-    return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
+# @app.route("/statistics/<user_name>", methods=['GET'])
+# @login_required
+# def statistics(user_name):
+#     image_error = url_for('static', filename='img/error.jpg')
+#     user = User.query.filter_by(username=user_name).first()
+#
+#     # No account with this username
+#     if user is None:
+#         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+#
+#     # Protect admin account
+#     if user.id == 1 and current_user.id != 1:
+#         return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+#
+#     # Check if the account is private / in the follow list
+#     if current_user.id != user.id and current_user.id != 1:
+#         follow = Follow.query.filter_by(user_id=current_user.get_id(), follow_id=user.id).first()
+#         if user.private:
+#             if current_user.get_id() == "1":
+#                 pass
+#             elif follow is None:
+#                 image_anonymous = url_for('static', filename='img/anonymous.jpg')
+#                 return render_template("anonymous.html", title="Anonymous", image_anonymous=image_anonymous)
+#
+#     # Get the statistics
+#     stats = get_statistics(user.id, ListType.SERIES)
+#
+#     return render_template("statistics.html",
+#                            title="{}'s statistics".format(user_name),
+#                            user_id=str(user.id),
+#                            user_name=user_name,
+#                            x_abs=stats[0],
+#                            y_abs=stats[1],
+#                            y_abs_2=stats[2],
+#                            y_abs_3=stats[3])
 
 
 @app.route("/follow", methods=['POST'])
@@ -748,7 +772,7 @@ def unfollow():
     # Unfollow
     Follow.query.filter_by(user_id=current_user.get_id(), follow_id=follow_id).delete()
     db.session.commit()
-    app.logger.info('[{}] Follow with ID {} Unfollowed'.format(current_user.get_id(), follow_id))
+    app.logger.info('[{}] Follow with ID {} unfollowed'.format(current_user.get_id(), follow_id))
 
     return '', 204
 
@@ -3592,7 +3616,7 @@ def new_refresh_element_data(api_id, list_type):
             # Update the number of seasons and episodes
             for season_data in seasons_data:
                 if list_type == ListType.SERIES:
-                    season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id,
+                    season = SeriesEpisodesPerSeason.query.filter_by(series_id=element,
                                                                      season=season_data["season_number"]).first()
                     if season is None:
                         season = SeriesEpisodesPerSeason(series_id=element.id,
@@ -3602,7 +3626,7 @@ def new_refresh_element_data(api_id, list_type):
                     else:
                         season.episodes = season_data["episode_count"]
                 elif list_type == ListType.ANIME:
-                    season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id,
+                    season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element,
                                                                     season=season_data["season_number"]).first()
                     if season is None:
                         season = AnimeEpisodesPerSeason(anime_id=element.id,
