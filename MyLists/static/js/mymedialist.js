@@ -254,3 +254,23 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
             console.log("ok"); }
     });
 }
+
+// ------------------- test -------------------
+function show_metadata(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) {
+    console.log(a);
+    $('#orginal_name').html("<b>Original Name</b>: " +a);
+    $('#actors').html("<b>Actors</b>: " +b);
+    $('#genres').html("<b>Genres</b>: " +c);
+    $('#first_air_date').html("<b>First Air Date</b>: " +d);
+    $('#last_air_date').html("<b>Last Air Date</b>: " +e);
+    $('#networks').html("<b>Networks</b>: " +f);
+    $('#created_by').html("<b>Created By</b>: " +g);
+    $('#episode_duration').html("<b>Episode Duration</b>: " +h+ " min");
+    $('#total_seasons').html("<b>Total Seasons</b>: " +i);
+    $('#total_episodes').html("<b>Total Episodes</b>: " +j);
+    $('#episodes_per_season').html("<b>Episodes Per Season</b>: " +k);
+    $('#origin_country').html("<b>Origin Country</b>: " +l);
+    $('#tmdb_score').html("<b>TMDb Score</b>: " +m+ "/10");
+    $('#status').html("<b>Status</b>: " +n);
+    $('#synopsis').html("<b>Synopsis</b>: " +o);
+}

@@ -91,16 +91,7 @@
                 <div id="card_{{ data[0][0].id }}" class="card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20">
                     <div class="view overlay">
                         <img class="card-img-top" width="200" height="300" src="{{ data[0][0].image_cover }}" alt="{{ data[0][0].name }}">
-                        {#<div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_metadata"
-                        onclick="show_metadata('{{ data[0][0].original_name }}', '{{ actors['{}'.format(data[0][0].id)] }}',
-                        '{{ genres['{}'.format(data[0][0].id)] }}', '{{ first_air_date['{}'.format(data[0][0].id)] }}',
-                        '{{ last_air_date['{}'.format(data[0][0].id)] }}', '{{ networks['{}'.format(data[0][0].id)] }}',
-                        '{{ data[0][0].created_by }}', '{{ data[0][0].episode_duration }}', '{{ data[0][0].total_seasons }}',
-                        '{{ data[0][0].total_episodes }}', '{{ eps['{}'.format(data[0][0].id)]|join(', ') }}',
-                        '{{ data[0][0].origin_country }}', '{{ data[0][0].vote_average }}', '{{ data[0][0].status }}',
-                        '{{ data[0][0].synopsis|tojson }}')">#}
-                        <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_metadata"
-                        onclick="show_metadata({{ data[0][0].synopsis|tojson }})">
+                        <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_{{ data[0][0].id }}">
                             <span class="font-mask text-center text-light">{{ data[0][0].name }}</span>
                             <span class="original_title" style="display: none;">{{ data[0][0].original_name }}</span>
                             <span class="actors_yes" style="display: none;">{{ actors["{}".format(data[0][0].id)] }}</span>
@@ -308,9 +299,9 @@
                     </div>
                 </div>
                 <!----------- Element metadata Modal ----------->
-                <div class="modal fade" id="modal_metadata" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+                <div class="modal fade" id="modal_{{ data[0][0].id }}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content" style="border-style: solid; border-width: 1px; border-color: white; background: #131418;">
+                        <div class="modal-content">
                             <div class="modal-body">
                                 <div class="modal-header">
                                     <h4 class="modal-title">{{ data[0][0].name }}</h4>
@@ -319,22 +310,30 @@
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <p id="orginal_name"></p>
-                                    <p id="actors"></p>
-                                    <p id="genres"></p>
-                                    <p id="first_air_date"></p>
-                                    <p id="last_air_date"></p>
-                                    <p id="networks"></p>
-                                    <p id="created_by"></p>
-                                    <p id="episode_duration"></p>
-                                    <p id="total_seasons"></p>
-                                    <p id="total_episodes"></p>
-                                    <p id="episodes_per_season"></p>
-                                    <p id="origin_country"></p>
-                                    <p id="tmdb_score"></p>
-                                    <p id="status"></p>
+                                    {% if data[0][0].original_name != data[0][0].name %}
+                                    <p><b>Original Name</b>: {{ data[0][0].original_name }}</p>
+                                    {% endif %}
+                                    <p><b>Actors</b>: {{ actors["{}".format(data[0][0].id)] }}</p>
+                                    <p><b>Genres</b>: {{ genres["{}".format(data[0][0].id)] }}</p>
+                                    <p><b>First air date</b>: {{ first_air_date["{}".format(data[0][0].id)] }}</p>
+                                    <p><b>Last air date</b>: {{ last_air_date["{}".format(data[0][0].id)] }}</p>
+                                    <p><b>Networks</b>: {{ networks["{}".format(data[0][0].id)] }}</p>
+                                    <p><b>Created by</b>: {{ data[0][0].created_by }}</p>
+                                    {% if data[0][0].episode_duration == 0 %}
+                                    <p><b>Episode duration</b>: Unknown</p>
+                                    {% else %}
+                                    <p><b>Episode duration</b>: {{ data[0][0].episode_duration }} min</p>
+                                    {% endif %}
+                                    <p><b>Total seasons</b>: {{ data[0][0].total_seasons }}</p>
+                                    <p><b>Total episodes</b>: {{ data[0][0].total_episodes }}</p>
+                                    <p><b>Episodes per Season</b>: {{ eps["{}".format(data[0][0].id)]|join(', ') }}</p>
+                                    {% if media_list != "animelist" %}
+                                    <p><b>Origin country</b>: {{ data[0][0].origin_country }}</p>
+                                    {% endif %}
+                                    <p><b>TMDb score</b>: {{ data[0][0].vote_average }}/10</p>
+                                    <p><b>Status</b>: {{ data[0][0].status }}</p>
                                     <hr class="m-b-10 m-t-10">
-                                    <p  id="synopsis" class="m-b-0 text-justify"></p>
+                                    <p class="m-b-0 text-justify"><b>Synopsis</b>: {{ data[0][0].synopsis }}</p>
                                 </div>
                             </div>
                         </div>
