@@ -85,6 +85,7 @@ function show_metadata(z, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) {
 // ------------------- Create the category list ---------------------
 function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, media_list) {
     remove_cat();
+    console.log($('#'+card_id).parent());
 
     if ($('#'+card_id).parent().hasClass('WATCHING')) {
         var display_watching = "none;";
