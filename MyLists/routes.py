@@ -1731,11 +1731,13 @@ def get_achievements(user_id, list_type):
             if element_runtime >= 150:
                 element_count_long += 1
                 element_name_long.append(element[0].name)
-            air_date = element[0].release_date.split('-')[0]
-            if (int(air_date) <= 1980) and (element[1].status == Status.COMPLETED or
-                                            element[1].status == Status.COMPLETED_ANIMATION):
-                element_count_old += 1
-                element_name_old.append(element[0].name)
+            try:
+                air_date = element[0].release_date.split('-')[0]
+                if (int(air_date) <= 1980) and (element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION):
+                    element_count_old += 1
+                    element_name_old.append(element[0].name)
+            except:
+                pass
             if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
                 all_air_date_years.append(element[0].release_date.split('-')[0])
 
