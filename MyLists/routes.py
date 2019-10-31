@@ -1717,11 +1717,14 @@ def get_achievements(user_id, list_type):
             if element[1].status == Status.COMPLETED:
                 all_air_date_years.append(element[0].first_air_date.split('-')[0])
         elif list_type == ListType.MOVIES:
-            release_date = int(element[0].release_date.split('-')[0])
-            if 1990 <= release_date <= 2000 and element[1].status != Status.PLAN_TO_WATCH:
-                element_count_classic += 1
-                element_time_classic += element[0].runtime
-                element_name_classic.append(element[0].name)
+            try:
+                release_date = int(element[0].release_date.split('-')[0])
+                if 1990 <= release_date <= 2000 and element[1].status != Status.PLAN_TO_WATCH:
+                    element_count_classic += 1
+                    element_time_classic += element[0].runtime
+                    element_name_classic.append(element[0].name)
+            except:
+                pass
             if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
                 element_count_finished += 1
             element_runtime = element[0].runtime
