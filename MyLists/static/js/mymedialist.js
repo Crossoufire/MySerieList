@@ -219,16 +219,3 @@ function changeCategory(new_category, element_id, card_id, seas_drop_id, ep_drop
         }
     });
 }
-
-
-// -------------------- Remove the category list --------------------
-function remove_cat() {
-    $('.cat_buttons').remove();
-    $('.btn_right_2').remove();
-    $('.btn_left').attr('style', 'display: block;');
-    $('.btn_right').attr('style', 'display: block;');
-    $('.btn_bottom_left').attr('style', 'display: block;');
-    $('.card-img-top').attr('style', 'filter: brightness(100%);');
-    $('.mask').show();
-}
-

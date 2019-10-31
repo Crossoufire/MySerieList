@@ -1175,7 +1175,7 @@ def change_element_category():
 
     return '', 204
 
-##### ---USED ?--- #####
+
 @app.route('/add_to_medialist', methods=['POST'])
 @login_required
 def add_to_medialist():
@@ -1244,37 +1244,6 @@ def refresh_single_element():
         time_delta = datetime.utcnow() - last_update
         if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
             refresh_element_data(element_id, ListType.SERIES)
-
-    return '', 204
-
-
-##### ---USED ?--- #####
-@app.route('/refresh_all_element', methods=['POST'])
-@login_required
-def refresh_all_element():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data = request.get_json()
-        element_type = json_data['element_type']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    if element_type == "animelist":
-        animes = AnimeList.query.filter_by(user_id=current_user.get_id()).all()
-        for anime in animes:
-            # Check if there is more than 30 min since the last update
-            last_update = Anime.query.filter_by(id=anime.anime_id).first().last_update
-            time_delta = datetime.utcnow() - last_update
-            if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
-                refresh_element_data(anime.anime_id, ListType.ANIME)
-    elif element_type == "serieslist":
-        series = SeriesList.query.filter_by(user_id=current_user.get_id()).all()
-        for single_serie in series:
-            # Check if there is more than 30 min since the last update
-            last_update = Series.query.filter_by(id=single_serie.series_id).first().last_update
-            time_delta = datetime.utcnow() - last_update
-            if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
-                refresh_element_data(single_serie.series_id, ListType.SERIES)
 
     return '', 204
 

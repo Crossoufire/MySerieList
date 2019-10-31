@@ -100,6 +100,18 @@ function add_score(new_score, edit_id, element_id, media_list) {
 }
 
 
+// -------------------- Remove the category list --------------------
+function remove_cat() {
+    $('.cat_buttons').remove();
+    $('.btn_right_2').remove();
+    $('.btn_left').attr('style', 'display: block;');
+    $('.btn_right').attr('style', 'display: block;');
+    $('.btn_bottom_left').attr('style', 'display: block;');
+    $('.card-img-top').attr('style', 'filter: brightness(100%);');
+    $('.mask').show();
+}
+
+
 // --------------- Tooltip ------------------
 $('.tooltip').tooltip();
 $(function () {

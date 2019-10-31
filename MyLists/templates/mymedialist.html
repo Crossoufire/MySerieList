@@ -60,7 +60,7 @@
     <button class="btn btn-sm btn-light text-dark" data-filter=".categories.RANDOM">Random</button>
     <button class="btn btn-sm btn-light text-dark" data-filter=".categories.DROPPED">Dropped</button>
     <button class="btn btn-sm btn-light text-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
-    {% elif media_list == 'movieslist' %}
+    {% else %}
     <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
     <button class="btn btn-sm btn-light text-dark" data-filter=".categories.COMPLETED.C">Completed</button>
     <button class="btn btn-sm btn-light text-dark" data-filter=".categories.ANIMATION">Completed Animation</button>
@@ -87,23 +87,25 @@
                 <div id="card_{{ data[0][0].id }}" class="card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20">
                     <div class="view overlay">
                         <img class="card-img-top" width="200" height="300" src="{{ data[0][0].image_cover }}" alt="{{ data[0][0].name }}">
-                        <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_metadata"
-                        onclick="show_metadata('{{ data[0][0].name }}', '{{ data[0][0].original_name }}', '{{ actors['{}'.format(data[0][0].id)] }}',
-                        '{{ genres['{}'.format(data[0][0].id)] }}', '{{ first_air_date['{}'.format(data[0][0].id)] }}',
-                        '{{ last_air_date['{}'.format(data[0][0].id)] }}', '{{ networks['{}'.format(data[0][0].id)] }}',
-                        '{{ data[0][0].created_by }}', '{{ data[0][0].episode_duration }}', '{{ data[0][0].total_seasons }}',
-                        '{{ data[0][0].total_episodes }}', '{{ eps['{}'.format(data[0][0].id)]|join(', ') }}',
-                        '{{ data[0][0].origin_country }}', '{{ data[0][0].vote_average }}', '{{ data[0][0].status }}')">
+                        <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_metadata()">
                             <span class="font-mask text-center text-light">{{ data[0][0].name }}</span>
                             <span style="display: none;" class="original_title">{{ data[0][0].original_name }}</span>
                             <span style="display: none;" class="actors_yes">{{ actors["{}".format(data[0][0].id)] }}</span>
                         </div>
                         {% if target_user_id == current_user.get_id() %}
-                        <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="charge_cat('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', 'S_{{ data[0][0].id }}', 'E_{{ data[0][0].id }}', '{{ eps['{}'.format(data[0][0].id)] }}', '{{ media_list }}')"></a>
+                            {% if media_list != 'movieslist' %}
+                            <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="charge_cat('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', 'S_{{ data[0][0].id }}', 'E_{{ data[0][0].id }}', '{{ eps['{}'.format(data[0][0].id)] }}', '{{ media_list }}')"></a>
+                            {% else %}
+                            <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="changeCategory('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ genres['{}'.format(data[0][0].id)] }}', '{{ media_list }}')"></a>
+                            {% endif %}
                         <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0][0].id }}', 'card_{{ data[0][0].id }}', '{{ media_list }}')"></a>
                         {% else %}
                             {% if data[1] == "no" %}
-                            <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ media_list }}')"></a>
+                                {% if media_list != 'movieslist' %}
+                                <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ media_list }}')"></a>
+                                {% else %}
+                                <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user_movies('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ media_list }}')"></a>
+                                {% endif %}
                             {% else %}
                                 <div class="ribbon"></div>
                             {% endif %}
