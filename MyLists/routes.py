@@ -3925,28 +3925,6 @@ def automatic_media_refresh():
         pass
 
 
-def add_achievements_to_db():
-    list_all_achievements = []
-    path = os.path.join(app.root_path, 'static/achievements_csv/achievements.csv')
-    with open(path, "r") as fp:
-        for line in fp:
-            list_all_achievements.append(line.split(";"))
-
-    for i in range(1, len(list_all_achievements)):
-        try:
-            genre = int(list_all_achievements[i][6])
-        except:
-            genre = None
-        achievement = Achievements(media=list_all_achievements[i][0],
-                                   threshold=int(list_all_achievements[i][1]),
-                                   image_id=list_all_achievements[i][2],
-                                   level=list_all_achievements[i][4],
-                                   title=list_all_achievements[i][3],
-                                   type=list_all_achievements[i][5],
-                                   genre=genre)
-        db.session.add(achievement)
-
-
 def refresh_db_achievements():
     list_all_achievements = []
     path = os.path.join(app.root_path, 'static/achievements_csv/achievements.csv')
@@ -3979,6 +3957,27 @@ def refresh_db_achievements():
 # # Shut down the scheduler when exiting the app
 # atexit.register(lambda: scheduler.shutdown())
 
+
+def add_achievements_to_db():
+    list_all_achievements = []
+    path = os.path.join(app.root_path, 'static/achievements_csv/achievements.csv')
+    with open(path, "r") as fp:
+        for line in fp:
+            list_all_achievements.append(line.split(";"))
+
+    for i in range(1, len(list_all_achievements)):
+        try:
+            genre = int(list_all_achievements[i][6])
+        except:
+            genre = None
+        achievement = Achievements(media=list_all_achievements[i][0],
+                                   threshold=int(list_all_achievements[i][1]),
+                                   image_id=list_all_achievements[i][2],
+                                   level=list_all_achievements[i][4],
+                                   title=list_all_achievements[i][3],
+                                   type=list_all_achievements[i][5],
+                                   genre=genre)
+        db.session.add(achievement)
 
 def add_actors_movies():
     all_movies = Movies.query.all()
@@ -4078,3 +4077,4 @@ def add_actors_anime():
                 db.session.add(actors)
 
         db.session.commit()
+
