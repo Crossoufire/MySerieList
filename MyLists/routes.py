@@ -817,7 +817,6 @@ def mymedialist(media_list, user_name):
                                         order_by(Series.name.asc())
         covers_path = url_for('static', filename='covers/series_covers/')
         media_all_data = get_all_media_data(element_data, ListType.SERIES, covers_path, user.id)
-
     elif media_list == "animelist":
         # Get anime data
         element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
@@ -834,7 +833,6 @@ def mymedialist(media_list, user_name):
                                         order_by(Anime.name.asc())
         covers_path = url_for('static', filename='covers/anime_covers/')
         media_all_data = get_all_media_data(element_data, ListType.ANIME, covers_path, user.id)
-
     elif media_list == "movieslist":
         # Get movies data
         element_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre.distinct()),
@@ -854,26 +852,14 @@ def mymedialist(media_list, user_name):
     if media_list == "serieslist" or media_list == "animelist":
         return render_template('mymedialist.html',
                                title            = "{}'s {}".format(user_name, media_list),
-                               eps              = media_all_data["episodes"],
-                               genres           = media_all_data["genres"],
-                               actors           = media_all_data["actors"],
-                               networks         = media_all_data["networks"],
                                all_data         = media_all_data["all_data"],
-                               can_update       = media_all_data["can_update"],
-                               last_air_date    = media_all_data["last_air_date"],
-                               first_air_date   = media_all_data["first_air_date"],
                                media_list       = media_list,
                                target_user_name = user_name,
                                target_user_id   = str(user.id))
-
     elif media_list == "movieslist":
         return render_template('mymedialist.html',
                                title            = "{}'s {}".format(user_name, media_list),
                                all_data         = media_all_data["all_data"],
-                               genres           = media_all_data["genres"],
-                               actors           = media_all_data["actors"],
-                               release_date     = media_all_data["release_date"],
-                               prod_companies   = media_all_data["prod_companies"],
                                media_list       = media_list,
                                target_user_name = user_name,
                                target_user_id   = str(user.id))
@@ -2014,112 +2000,109 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
         dropped_list = []
         plantowatch_list = []
 
-        eps = {}
-        genres = {}
-        actors = {}
-        networks = {}
-        can_update = {}
-        last_air_date = {}
-        first_air_date = {}
         for element in element_data:
-            # Change the cover path
-            element[0].image_cover = "{}{}".format(covers_path, element[0].image_cover)
-
-            if element[1].status == Status.WATCHING:
-                if element[0].id in current_list:
-                    watching_list.append([element, "yes"])
-                else:
-                    watching_list.append([element, "no"])
-            elif element[1].status == Status.COMPLETED:
-                if element[0].id in current_list:
-                    completed_list.append([element, "yes"])
-                else:
-                    completed_list.append([element, "no"])
-            elif element[1].status == Status.ON_HOLD:
-                if element[0].id in current_list:
-                    onhold_list.append([element, "yes"])
-                else:
-                    onhold_list.append([element, "no"])
-            elif element[1].status == Status.RANDOM:
-                if element[0].id in current_list:
-                    random_list.append([element, "yes"])
-                else:
-                    random_list.append([element, "no"])
-            elif element[1].status == Status.DROPPED:
-                if element[0].id in current_list:
-                    dropped_list.append([element, "yes"])
-                else:
-                    dropped_list.append([element, "no"])
-            elif element[1].status == Status.PLAN_TO_WATCH:
-                if element[0].id in current_list:
-                    plantowatch_list.append([element, "yes"])
-                else:
-                    plantowatch_list.append([element, "no"])
-
             # Get episodes per season
             nb_season = len(element[4].split(","))
-            eps["{}".format(element[0].id)] = element[6].split(",")[:nb_season]
-            # Convert all element to int
-            eps["{}".format(element[0].id)] = [int(x) for x in eps["{}".format(element[0].id)]]
+            eps_per_season = element[6].split(",")[:nb_season]
+            # change str to int
+            eps_per_season = [int(i) for i in eps_per_season]
 
             # Change first air time format
             try:
                 tmp = element[0].first_air_date.split('-')
-                tmp_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
-                first_air_date["{}".format(element[0].id)] = tmp_air_date
+                first_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
             except:
-                first_air_date["{}".format(element[0].id)] = "Unknown"
+                first_air_date = "Unknown"
 
             # Change last air time format
             try:
                 tmp = element[0].last_air_date.split('-')
-                tmp_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
-                last_air_date["{}".format(element[0].id)] = tmp_air_date
+                last_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
             except:
-                last_air_date["{}".format(element[0].id)] = "Unknown"
+                last_air_date = "Unknown"
 
             # Get actors
             try:
                 tmp = element[5]
-                tmp_actors = tmp.replace(',', ', ')
-                actors["{}".format(element[0].id)] = tmp_actors
+                actors = tmp.replace(',', ', ')
             except:
-                actors["{}".format(element[0].id)] = "Unknown"
+                actors = "Unknown"
 
             # Get genres
             try:
                 tmp = element[2]
-                tmp_genres = tmp.replace(',', ', ')
-                genres["{}".format(element[0].id)] = tmp_genres
+                genres = tmp.replace(',', ', ')
             except:
-                genres["{}".format(element[0].id)] = "Unknown"
+                genres = "Unknown"
 
             # Get networks
             try:
                 tmp = element[3]
-                tmp_networks = tmp.replace(',', ', ')
-                networks["{}".format(element[0].id)] = tmp_networks
+                networks = tmp.replace(',', ', ')
             except:
-                networks["{}".format(element[0].id)] = "Unknown"
+                networks = "Unknown"
 
-            # Can update
-            time_delta = datetime.utcnow() - element[0].last_update
-            if time_delta.days > 0 or (time_delta.seconds / 1800 > 1):  # 30 min
-                can_update["{}".format(element[0].id)] = True
-            else:
-                can_update["{}".format(element[0].id)] = False
+            element_info = {"id": element[0].id,
+                            "cover": "{}{}".format(covers_path, element[0].image_cover),
+                            "name": element[0].name,
+                            "original_name": element[0].original_name,
+                            "first_air_date": first_air_date,
+                            "last_air_date": last_air_date,
+                            "created_by": element[0].created_by,
+                            "episode_duration": element[0].episode_duration,
+                            "homepage": element[0].homepage,
+                            "in_production": element[0].in_production,
+                            "origin_country": element[0].origin_country,
+                            "total_seasons": element[0].total_seasons,
+                            "total_episodes": element[0].total_episodes,
+                            "status": element[0].status,
+                            "vote_average": element[0].vote_average,
+                            "vote_count": element[0].vote_count,
+                            "synopsis": element[0].synopsis,
+                            "popularity": element[0].popularity,
+                            "last_episode_watched": element[1].last_episode_watched,
+                            "eps_per_season": eps_per_season,
+                            "current_season": element[1].current_season,
+                            "score": element[1].score,
+                            "actors": actors,
+                            "genres": genres,
+                            "networks": networks}
+
+            if element[1].status == Status.WATCHING:
+                if element[0].id in current_list:
+                    watching_list.append([element_info, "yes"])
+                else:
+                    watching_list.append([element_info, "no"])
+            elif element[1].status == Status.COMPLETED:
+                if element[0].id in current_list:
+                    completed_list.append([element_info, "yes"])
+                else:
+                    completed_list.append([element_info, "no"])
+            elif element[1].status == Status.ON_HOLD:
+                if element[0].id in current_list:
+                    onhold_list.append([element_info, "yes"])
+                else:
+                    onhold_list.append([element_info, "no"])
+            elif element[1].status == Status.RANDOM:
+                if element[0].id in current_list:
+                    random_list.append([element_info, "yes"])
+                else:
+                    random_list.append([element_info, "no"])
+            elif element[1].status == Status.DROPPED:
+                if element[0].id in current_list:
+                    dropped_list.append([element_info, "yes"])
+                else:
+                    dropped_list.append([element_info, "no"])
+            elif element[1].status == Status.PLAN_TO_WATCH:
+                if element[0].id in current_list:
+                    plantowatch_list.append([element_info, "yes"])
+                else:
+                    plantowatch_list.append([element_info, "no"])
 
         element_all_data = [[watching_list, "WATCHING"], [completed_list, "COMPLETED"], [onhold_list, "ON HOLD"],
                             [random_list, "RANDOM"], [dropped_list, "DROPPED"], [plantowatch_list, "PLAN TO WATCH"]]
 
-        all_data_media = {"episodes": eps,
-                          "genres": genres,
-                          "actors": actors,
-                          "networks": networks,
-                          "can_update": can_update,
-                          "last_air_date": last_air_date,
-                          "first_air_date": first_air_date,
-                          "all_data": element_all_data}
+        all_data_media = {"all_data": element_all_data}
 
         return all_data_media
     elif list_type == ListType.MOVIES:
@@ -2127,70 +2110,75 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
         plantowatch_list = []
         completed_list_animation = []
 
-        genres = {}
-        actors = {}
-        release_date = {}
-        prod_companies = {}
         for element in element_data:
-            # Change the cover path
-            element[0].image_cover = "{}{}".format(covers_path, element[0].image_cover)
-
-            if element[1].status == Status.COMPLETED:
-                if element[0].id in current_list:
-                    completed_list.append([element, "yes"])
-                else:
-                    completed_list.append([element, "no"])
-            elif element[1].status == Status.COMPLETED_ANIMATION:
-                if element[0].id in current_list:
-                    completed_list_animation.append([element, "yes"])
-                else:
-                    completed_list_animation.append([element, "no"])
-            elif element[1].status == Status.PLAN_TO_WATCH:
-                if element[0].id in current_list:
-                    plantowatch_list.append([element, "yes"])
-                else:
-                    plantowatch_list.append([element, "no"])
-
             # Change release date format
             try:
                 tmp = element[0].release_date.split('-')
-                tmp_release = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
-                release_date["{}".format(element[0].id)] = tmp_release
+                release_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
             except:
-                release_date["{}".format(element[0].id)] = "Unknown"
+                release_date = "Unknown"
 
             # Get actors
             try:
                 tmp = element[4]
-                tmp_actors = tmp.replace(',', ', ')
-                actors["{}".format(element[0].id)] = tmp_actors
+                actors = tmp.replace(',', ', ')
             except:
-                actors["{}".format(element[0].id)] = "Unknown"
+                actors = "Unknown"
 
             # Get genres
             try:
                 tmp = element[2]
-                tmp_genres = tmp.replace(',', ', ')
-                genres["{}".format(element[0].id)] = tmp_genres
+                genres = tmp.replace(',', ', ')
             except:
-                genres["{}".format(element[0].id)] = "Unknown"
+                genres = "Unknown"
 
             # Get production companies
             try:
                 tmp = element[3]
-                tmp_prod_companies = tmp.replace(',', ', ')
-                prod_companies["{}".format(element[0].id)] = tmp_prod_companies
+                prod_companies = tmp.replace(',', ', ')
             except:
-                prod_companies["{}".format(element[0].id)] = "Unknown"
+                prod_companies = "Unknown"
+
+            element_info = {"id": element[0].id,
+                            "cover": "{}{}".format(covers_path, element[0].image_cover),
+                            "name": element[0].name,
+                            "original_name": element[0].original_name,
+                            "release_date": release_date,
+                            "homepage": element[0].homepage,
+                            "runtime": element[0].runtime,
+                            "original_language": element[0].original_language,
+                            "synopsis": element[0].synopsis,
+                            "vote_average": element[0].vote_average,
+                            "vote_count": element[0].vote_count,
+                            "popularity": element[0].popularity,
+                            "budget": element[0].budget,
+                            "revenue": element[0].revenue,
+                            "tagline": element[0].tagline,
+                            "score": element[1].score,
+                            "actors": actors,
+                            "genres": genres,
+                            "prod_companies": prod_companies}
+
+            if element[1].status == Status.COMPLETED:
+                if element[0].id in current_list:
+                    completed_list.append([element_info, "yes"])
+                else:
+                    completed_list.append([element_info, "no"])
+            elif element[1].status == Status.COMPLETED_ANIMATION:
+                if element[0].id in current_list:
+                    completed_list_animation.append([element_info, "yes"])
+                else:
+                    completed_list_animation.append([element_info, "no"])
+            elif element[1].status == Status.PLAN_TO_WATCH:
+                if element[0].id in current_list:
+                    plantowatch_list.append([element_info, "yes"])
+                else:
+                    plantowatch_list.append([element_info, "no"])
 
         element_all_data = [[completed_list, "COMPLETED"], [completed_list_animation, "COMPLETED ANIMATION"] ,
                             [plantowatch_list, "PLAN TO WATCH"]]
 
-        all_data_media = {"genres": genres,
-                          "actors": actors,
-                          "release_date": release_date,
-                          "prod_companies": prod_companies,
-                          "all_data": element_all_data}
+        all_data_media = {"all_data": element_all_data}
 
         return all_data_media
 

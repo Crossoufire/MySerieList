@@ -61,24 +61,24 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
 }
 
 
-// ------------------------- Metadata test --------------------------
-function show_metadata(z, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) {
-    $('#modal_title').html(z);
-    $('#orginal_name').html("<b>Original Name</b>: " +a);
-    $('#actors').html("<b>Actors</b>: " +b);
-    $('#genres').html("<b>Genres</b>: " +c);
-    $('#first_air_date').html("<b>First Air Date</b>: " +d);
-    $('#last_air_date').html("<b>Last Air Date</b>: " +e);
-    $('#networks').html("<b>Networks</b>: " +f);
-    $('#created_by').html("<b>Created By</b>: " +g);
-    $('#episode_duration').html("<b>Episode Duration</b>: " +h+ " min");
-    $('#total_seasons').html("<b>Total Seasons</b>: " +i);
-    $('#total_episodes').html("<b>Total Episodes</b>: " +j);
-    $('#episodes_per_season').html("<b>Episodes Per Season</b>: " +k);
-    $('#origin_country').html("<b>Origin Country</b>: " +l);
-    $('#tmdb_score').html("<b>TMDb Score</b>: " +m+ "/10");
-    $('#status').html("<b>Status</b>: " +n);
-    $('#synopsis').html("<b>Synopsis</b>: " +o);
+// ------------------------- Anime/Series metadata test --------------------------
+function show_metadata(data, media_list) {
+    $('#modal_title').html(data.name);
+    $('#original_name').html("<b>Original Name</b>: " +data.original_name);
+    $('#actors').html("<b>Actors</b>: " +data.actors);
+    $('#genres').html("<b>Genres</b>: " +data.genres);
+    $('#first_air_date').html("<b>First Air Date</b>: " +data.first_air_date);
+    $('#last_air_date').html("<b>Last Air Date</b>: " +data.last_air_date);
+    $('#networks').html("<b>Networks</b>: " +data.networks);
+    $('#created_by').html("<b>Created By</b>: " +data.created_by);
+    $('#episode_duration').html("<b>Episode Duration</b>: " +data.episode_duration+ " min");
+    $('#total_seasons').html("<b>Total Seasons</b>: " +data.total_seasons);
+    $('#total_episodes').html("<b>Total Episodes</b>: " +data.total_episodes);
+    $('#episodes_per_season').html("<b>Episodes Per Season</b>: " +data.eps_per_season);
+    $('#origin_country').html("<b>Origin Country</b>: " +data.origin_country);
+    $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10");
+    $('#status').html("<b>Status</b>: " +data.status);
+    $('#synopsis').html("<b>Synopsis</b>: " +data.synopsis);
 }
 
 
