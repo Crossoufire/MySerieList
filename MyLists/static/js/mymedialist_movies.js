@@ -33,3 +33,20 @@ function changeCategory(card_id, element_id, genres, media_list) {
         }
     });
 }
+
+// ------------------------- Movies metadata test --------------------------
+function show_metadata(data) {
+    $('#modal_title').html(data.name);
+    $('#original_name').html("<b>Original Name</b>: " +data.original_name);
+    $('#release_date').html("<b>Release Date</b>: " +data.release_date);
+    $('#actors').html("<b>Actors</b>: " +data.actors);
+    $('#genres').html("<b>Genres</b>: " +data.genres);
+    $('#budget').html("<b>Budget</b>: " +data.budget);
+    $('#revenue').html("<b>Revenue</b>: " +data.revenue);
+    $('#runtime').html("<b>Runtime</b>: " +data.runtime+ " min");
+    $('#original_language').html("<b>Original Language</b>: " +data.original_language);
+    $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10");
+    $('#tagline').html("<b>Tagline</b>: " +data.tagline);
+    $('#prod_companies').html("<b>Prod. Companies</b>: " +data.prod_companies);
+    $('#synopsis').html("<b>Synopsis</b>: " +data.synopsis);
+}

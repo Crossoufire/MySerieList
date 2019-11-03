@@ -61,31 +61,30 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
 }
 
 
-// ------------------------- Metadata test --------------------------
-function show_metadata(z, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) {
-    $('#modal_title').html(z);
-    $('#orginal_name').html("<b>Original Name</b>: " +a);
-    $('#actors').html("<b>Actors</b>: " +b);
-    $('#genres').html("<b>Genres</b>: " +c);
-    $('#first_air_date').html("<b>First Air Date</b>: " +d);
-    $('#last_air_date').html("<b>Last Air Date</b>: " +e);
-    $('#networks').html("<b>Networks</b>: " +f);
-    $('#created_by').html("<b>Created By</b>: " +g);
-    $('#episode_duration').html("<b>Episode Duration</b>: " +h+ " min");
-    $('#total_seasons').html("<b>Total Seasons</b>: " +i);
-    $('#total_episodes').html("<b>Total Episodes</b>: " +j);
-    $('#episodes_per_season').html("<b>Episodes Per Season</b>: " +k);
-    $('#origin_country').html("<b>Origin Country</b>: " +l);
-    $('#tmdb_score').html("<b>TMDb Score</b>: " +m+ "/10");
-    $('#status').html("<b>Status</b>: " +n);
-    $('#synopsis').html("<b>Synopsis</b>: " +o);
+// ------------------------- Anime/Series metadata test --------------------------
+function show_metadata(data, media_list) {
+    $('#modal_title').html(data.name);
+    $('#original_name').html("<b>Original Name</b>: " +data.original_name);
+    $('#actors').html("<b>Actors</b>: " +data.actors);
+    $('#genres').html("<b>Genres</b>: " +data.genres);
+    $('#first_air_date').html("<b>First Air Date</b>: " +data.first_air_date);
+    $('#last_air_date').html("<b>Last Air Date</b>: " +data.last_air_date);
+    $('#networks').html("<b>Networks</b>: " +data.networks);
+    $('#created_by').html("<b>Created By</b>: " +data.created_by);
+    $('#episode_duration').html("<b>Episode Duration</b>: " +data.episode_duration+ " min");
+    $('#total_seasons').html("<b>Total Seasons</b>: " +data.total_seasons);
+    $('#total_episodes').html("<b>Total Episodes</b>: " +data.total_episodes);
+    $('#episodes_per_season').html("<b>Episodes Per Season</b>: " +data.eps_per_season);
+    $('#origin_country').html("<b>Origin Country</b>: " +data.origin_country);
+    $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10");
+    $('#status').html("<b>Status</b>: " +data.status);
+    $('#synopsis').html("<b>Synopsis</b>: " +data.synopsis);
 }
 
 
 // ------------------- Create the category list ---------------------
 function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, media_list) {
     remove_cat();
-    console.log($('#'+card_id).parent());
 
     if ($('#'+card_id).parent().hasClass('WATCHING')) {
         var display_watching = "none;";
@@ -136,21 +135,21 @@ function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, me
         var display_plan_to_watch = "none;";
     }
 
-    $('#'+card_id).children().prepend(
+    $('#'+card_id).children().first().prepend(
     "<ul class='cat_buttons'>" +
-        "<li style='display: " + display_watching + "' class='btn btn_sm btn-light p-2 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Watching</li>" +
-        "<li style='display: " + display_completed + "' class='btn btn_sm btn-light p-2 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Completed</li>" +
-        "<li style='display: " + display_on_hold + "' class='btn btn_sm btn-light p-2 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>On Hold</li>" +
-        "<li style='display: " + display_random + "' class='btn btn_sm btn-light p-2 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Random</li>" +
-        "<li style='display: " + display_dropped + "' class='btn btn_sm btn-light p-2 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Dropped</li>" +
-        "<li style='display: " + display_plan_to_watch + "' class='btn btn_sm btn-light p-2 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</li>" +
+        "<li style='display: " + display_watching + "' class='btn btn_sm btn-light p-1 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Watching</li>" +
+        "<li style='display: " + display_completed + "' class='btn btn_sm btn-light p-1 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Completed</li>" +
+        "<li style='display: " + display_on_hold + "' class='btn btn_sm btn-light p-1 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>On Hold</li>" +
+        "<li style='display: " + display_random + "' class='btn btn_sm btn-light p-1 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Random</li>" +
+        "<li style='display: " + display_dropped + "' class='btn btn_sm btn-light p-1 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Dropped</li>" +
+        "<li style='display: " + display_plan_to_watch + "' class='btn btn_sm btn-light p-1 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</li>" +
     "</ul>");
 
     $('#'+card_id).children().children('.btn_left').attr('style', 'display: none;');
     $('#'+card_id).children().children('.btn_right').attr('style', 'display: none;');
     $('#'+card_id).children().children('.btn_bottom_left').attr('style', 'display: none;');
     $('#'+card_id).children().children('.mask').hide();
-    $('#'+card_id).children().prepend("<a class='btn_right_2 fas fa-times' onclick='remove_cat()')></a>");
+    $('#'+card_id).children().first().prepend("<a class='btn_right_2 fas fa-times' onclick='remove_cat()')></a>");
     $('#'+card_id).children().children('.card-img-top').attr('style', 'filter: brightness(0%);');
 }
 
