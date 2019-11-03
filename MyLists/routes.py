@@ -249,7 +249,7 @@ def account(user_name):
 
     # Protect the admin account
     if user.id == 1 and current_user.id != 1:
-        return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
     # Check if the account is private or in the follow list
     follow = Follow.query.filter_by(user_id=current_user.get_id(), follow_id=user.id).first()
@@ -433,10 +433,10 @@ def account(user_name):
 
     # Count the total number of seen episodes for the series
     all_series_data = db.session.query(SeriesList, SeriesEpisodesPerSeason,
-                   func.group_concat(SeriesEpisodesPerSeason.episodes)). \
-                   join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
-                   filter(SeriesList.user_id == user.id). \
-                   group_by(SeriesList.series_id)
+                      func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                      join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
+                      filter(SeriesList.user_id == user.id). \
+                      group_by(SeriesList.series_id)
 
     nb_episodes_watched = 0
     for element in all_series_data:
@@ -745,6 +745,10 @@ def follow():
     if User.query.filter_by(id=follow_id).first() is None:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
+    # Check if the follow already exists
+    if Follow.query.filter_by(user_id=current_user.get_id(), follow_id=follow_id).first() is not None:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
     # Add the new follow to the current user
     new_follow = Follow(user_id=current_user.get_id(),
                         follow_id=follow_id)
@@ -765,7 +769,7 @@ def unfollow():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    # Check if the unfollow is in the follow list
+    # Check if the user to unfollow is in the follow list
     if Follow.query.filter_by(user_id=current_user.get_id(), follow_id=follow_id).first() is None:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -794,10 +798,9 @@ def mymedialist(media_list, user_name):
     if current_user.id != user.id and current_user.id != 1:
         follow = Follow.query.filter_by(user_id=current_user.get_id(), follow_id=user.id).first()
         if user.id == 1:
-            return render_template('error.html', error_code=403, title='Error', image_error=image_error), 403
+            return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
         if user.private:
             if follow is None:
-                image_anonymous = url_for('static', filename='img/anonymous.jpg')
                 return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
     # Check the route
@@ -1061,25 +1064,6 @@ def delete_element():
         db.session.commit()
         app.logger.info('[{}] Movie with ID {} deleted'.format(current_user.get_id(), element_id))
 
-    # Compute the new total time spent
-    if element_type == "animelist":
-        data = db.session.query(AnimeList, Anime,
-                                func.group_concat(AnimeEpisodesPerSeason.episodes)). \
-                                join(Anime, Anime.id == AnimeList.anime_id). \
-                                join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
-                                filter(AnimeList.user_id == current_user.id). \
-                                group_by(AnimeList.anime_id).all()
-    elif element_type == "serieslist":
-        data = db.session.query(SeriesList, Series,
-                                func.group_concat(SeriesEpisodesPerSeason.episodes)). \
-                                join(Series, Series.id == SeriesList.series_id). \
-                                join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
-                                filter(SeriesList.user_id == current_user.id). \
-                                group_by(SeriesList.series_id).all()
-    elif element_type == "movieslist":
-        data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id).\
-            filter(MoviesList.user_id == current_user.id).group_by(MoviesList.movies_id).all()
-
     # Compute total time spent
     if element_type == "animelist":
         compute_media_time_spent(ListType.ANIME)
@@ -1103,16 +1087,15 @@ def change_element_category():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    valid_element_type = ["animelist", "serieslist", "movieslist"]
-    if element_type not in valid_element_type:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
-    if (element_type == "animelist" or element_type == "serieslist") and element_new_category not in category_list:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    category_list = ["Completed", "Completed Animation", "Plan to Watch"]
-    if element_type == "movieslist" and element_new_category not in category_list:
+    if element_type == "animelist" or element_type == "serieslist":
+        category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
+        if element_new_category not in category_list:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    elif element_type == "movieslist":
+        category_list = ["Completed", "Completed Animation", "Plan to Watch"]
+        if element_new_category not in category_list:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element is in the user's list
@@ -1188,13 +1171,16 @@ def add_to_medialist():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
-    if add_category not in category_list:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    valid_element_type = ["animelist", "serieslist", "movieslist"]
-    if element_type not in valid_element_type:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    if element_type == "animelist" or element_type == "serieslist":
+        category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
+        if add_category not in category_list:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    elif element_type == "movieslist":
+        category_list = ["Completed", "Plan to Watch"]
+        if add_category not in category_list:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    else:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element is in the current user's list
     if element_type == "animelist":
@@ -1260,15 +1246,20 @@ def add_element():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
-    if element_cat not in category_list:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
     if element_type == "animelist":
+        category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
+        if element_cat not in category_list:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
         add_element(element_id, ListType.ANIME, element_cat)
     elif element_type == "serieslist":
+        category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
+        if element_cat not in category_list:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
         add_element(element_id, ListType.SERIES, element_cat)
     elif element_type == "movieslist":
+        category_list = ["Completed", "Plan to Watch"]
+        if element_cat not in category_list:
+            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
         add_element(element_id, ListType.MOVIES, element_cat)
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
@@ -1298,6 +1289,8 @@ def add_score_element():
     elif element_type == "movieslist":
         if Movies.query.filter_by(id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    else:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element is in the current user's list
     if element_type == "animelist":
@@ -1309,6 +1302,8 @@ def add_score_element():
     elif element_type == "movieslist":
         if MoviesList.query.filter_by(user_id=current_user.get_id(), movies_id=element_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+    else:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the score is between 0 and 10:
     if score_value > 10 or score_value < 0:
@@ -1988,30 +1983,30 @@ def get_achievements(user_id, list_type):
 
 def get_all_media_data(element_data, list_type, covers_path, user_id):
     if user_id != current_user.get_id():
-        if list_type == ListType.SERIES:
-            tmp_current_list = SeriesList.query.filter_by(user_id=current_user.get_id()).all()
-        elif list_type == ListType.ANIME:
+        if list_type == ListType.ANIME:
             tmp_current_list = AnimeList.query.filter_by(user_id=current_user.get_id()).all()
+        elif list_type == ListType.SERIES:
+            tmp_current_list = SeriesList.query.filter_by(user_id=current_user.get_id()).all()
         elif list_type == ListType.MOVIES:
             tmp_current_list = MoviesList.query.filter_by(user_id=current_user.get_id()).all()
 
         current_list = []
         for i in range(0, len(tmp_current_list)):
-            if list_type == ListType.SERIES:
-                current_list.append(tmp_current_list[i].series_id)
-            elif list_type == ListType.ANIME:
+            if list_type == ListType.ANIME:
                 current_list.append(tmp_current_list[i].anime_id)
+            elif list_type == ListType.SERIES:
+                current_list.append(tmp_current_list[i].series_id)
             elif list_type == ListType.MOVIES:
                 current_list.append(tmp_current_list[i].movies_id)
     else:
         current_list = []
 
-    if list_type != ListType.MOVIES:
-        watching_list = []
-        completed_list = []
-        onhold_list = []
-        random_list = []
-        dropped_list = []
+    if list_type == ListType.ANIME or list_type == ListType.SERIES:
+        watching_list    = []
+        completed_list   = []
+        onhold_list      = []
+        random_list      = []
+        dropped_list     = []
         plantowatch_list = []
 
         eps = {}
@@ -2122,10 +2117,11 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
                           "all_data": element_all_data}
 
         return all_data_media
+
     elif list_type == ListType.MOVIES:
-        completed_list = []
-        plantowatch_list = []
+        completed_list           = []
         completed_list_animation = []
+        plantowatch_list         = []
 
         genres = {}
         actors = {}
@@ -2204,9 +2200,7 @@ def compute_media_time_spent(list_type):
                                 join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
                                 filter(AnimeList.user_id == current_user.id). \
                                 group_by(AnimeList.anime_id)
-    elif list_type == ListType.MOVIES:
-        element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id).\
-                                        filter(MoviesList.user_id == current_user.id).group_by(MoviesList.movies_id)
+
     elif list_type == ListType.SERIES:
         element_data = db.session.query(SeriesList, Series,
                                 func.group_concat(SeriesEpisodesPerSeason.episodes)). \
@@ -2215,7 +2209,11 @@ def compute_media_time_spent(list_type):
                                 filter(SeriesList.user_id == current_user.id). \
                                 group_by(SeriesList.series_id)
 
-    if list_type != ListType.MOVIES:
+    elif list_type == ListType.MOVIES:
+        element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id).\
+                                        filter(MoviesList.user_id == current_user.id).group_by(MoviesList.movies_id)
+
+    if list_type == ListType.ANIME or list_type == ListType.SERIES:
         total_time = 0
         for element in element_data:
             if element[0].status == Status.COMPLETED:
@@ -2232,6 +2230,7 @@ def compute_media_time_spent(list_type):
                     total_time += element[0].last_episode_watched * element[1].episode_duration
                 except:
                     pass
+
     elif list_type == ListType.MOVIES:
         total_time = 0
         for element in element_data:
@@ -2287,17 +2286,7 @@ def get_statistics(user_id, list_type):
     scores = ["0 - 1", "1 - 2", "2 - 3", "3 - 4", "4 - 5", "5 - 6", "6 - 7", "7 - 8", "8 - 9", "9 - 10"]
 
     # Recover the time spent watching element per score
-    if list_type == ListType.SERIES:
-        element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
-                                        func.group_concat(SeriesNetwork.network.distinct()),
-                                        func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(SeriesEpisodesPerSeason.episodes)). \
-                                        join(SeriesList, SeriesList.series_id == Series.id). \
-                                        join(SeriesGenre, SeriesGenre.series_id == Series.id). \
-                                        join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
-                                        join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
-                                        filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
-    elif list_type == ListType.ANIME:
+    if list_type == ListType.ANIME:
         element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
                                         func.group_concat(AnimeNetwork.network.distinct()),
                                         func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
@@ -2308,15 +2297,26 @@ def get_statistics(user_id, list_type):
                                         join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
                                         filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
 
+    elif list_type == ListType.SERIES:
+        element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
+                                        func.group_concat(SeriesNetwork.network.distinct()),
+                                        func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
+                                        func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                                        join(SeriesList, SeriesList.series_id == Series.id). \
+                                        join(SeriesGenre, SeriesGenre.series_id == Series.id). \
+                                        join(SeriesNetwork, SeriesNetwork.series_id == Series.id). \
+                                        join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id). \
+                                        filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc())
+
     all_data = []
     for i in range(0, len(elements_per_score)):
         episodes_count_per_score = 0
         element_time_per_score = 0
         for j in range(0, len(elements_per_score[i])):
-            if list_type == ListType.SERIES:
-                element_id = elements_per_score[i][j].series_id
-            elif list_type == ListType.ANIME:
+            if list_type == ListType.ANIME:
                 element_id = elements_per_score[i][j].anime_id
+            elif list_type == ListType.SERIES:
+                element_id = elements_per_score[i][j].series_id
 
             element_time = 0
             for element in element_data:
@@ -2427,6 +2427,7 @@ def autocomplete_search_element(element_name, list_type):
             i = i+1
 
         return tmdb_results
+
     elif list_type == ListType.ANIME:
         while True:
             try:
@@ -2532,20 +2533,8 @@ def autocomplete_search_element(element_name, list_type):
         tmdb_results = []
         i = 0
         while i < data["total_results"] and i < 20 and len(tmdb_results) < 6:
-            # genre_ids : list
-            if "genre_ids" in data["results"][i]:
-                genre_ids = data["results"][i]["genre_ids"]
-            else:
-                genre_ids = ["Unknown"]
-
-            # original_language : string
-            if "original_language" in data["results"][i]:
-                original_language = data["results"][i]["original_language"]
-            else:
-                original_language = "Unknown"
-
-            movies_data = {"tmdb_id":  data["results"][i]["id"],
-                           "name":  data["results"][i]["title"]}
+            movies_data = {"tmdb_id": data["results"][i]["id"],
+                           "name": data["results"][i]["title"]}
 
             if data["results"][i]["poster_path"] is not None:
                 movies_data["poster_path"] = "{0}{1}".format("http://image.tmdb.org/t/p/w300", data["results"][i]["poster_path"])
