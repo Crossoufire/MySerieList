@@ -4,9 +4,9 @@ import platform
 import secrets
 import sys
 import urllib
-import time
 import requests
-import re
+import time
+import atexit
 
 from datetime import datetime
 from PIL import Image
@@ -14,6 +14,7 @@ from flask import render_template, url_for, flash, redirect, request, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from sqlalchemy import func
+from apscheduler.schedulers.background import BackgroundScheduler
 from MyLists import app, db, bcrypt, mail, config
 from MyLists.admin_views import User
 from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, ChangePasswordForm, AddFollowForm, \
@@ -3909,6 +3910,13 @@ def automatic_media_refresh():
     print("oui")
 
 
+def print_date_time():
+    print(time.strftime("%A, %d. %B %Y %I:%M:%S %p"))
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=print_date_time, trigger="cron", hour=3)
+scheduler.start()
+
 def refresh_db_achievements():
     list_all_achievements = []
     path = os.path.join(app.root_path, 'static/achievements_csv/achievements.csv')
@@ -3929,8 +3937,6 @@ def refresh_db_achievements():
         achievements[i-1].title       = list_all_achievements[i][3]
         achievements[i-1].type        = list_all_achievements[i][5]
         achievements[i-1].genre       = genre
-
-
 
 
 def add_achievements_to_db():
@@ -4052,3 +4058,6 @@ def add_actors_anime():
                 db.session.add(actors)
 
         db.session.commit()
+
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
