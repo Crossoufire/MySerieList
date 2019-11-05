@@ -2103,7 +2103,6 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
         all_data_media = {"all_data": element_all_data}
 
         return all_data_media
-
     elif list_type == ListType.MOVIES:
         completed_list           = []
         completed_list_animation = []

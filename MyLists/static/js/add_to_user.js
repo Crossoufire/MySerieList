@@ -24,7 +24,6 @@ function add_user(card_id, element_id, media_type) {
 
 function add_to_user(cat, card_id, element_id, media_type) {
     var add_cat = cat.childNodes[0].data
-    console.log(add_cat);
 
     $body = $("body");
     $.ajax ({

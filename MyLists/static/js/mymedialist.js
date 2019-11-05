@@ -65,8 +65,6 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
 function show_metadata(data, media_list) {
     $('#original_name').text('');
     $('#modal_title').html(data.name);
-    console.log(data.name);
-    console.log(data.original_name);
     if (data.name != data.original_name) {
         $('#original_name').html("<b>Original Name</b>: " +data.original_name);
     }
@@ -83,7 +81,7 @@ function show_metadata(data, media_list) {
     if (media_list == "serieslist") {
         $('#origin_country').html("<b>Origin Country</b>: " +data.origin_country);
     }
-    $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10");
+    $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10 &nbsp;(" +data.vote_count+ " votes)");
     $('#status').html("<b>Status</b>: " +data.status);
     $('#synopsis').html("<b>Synopsis</b>: " +data.synopsis);
 }
