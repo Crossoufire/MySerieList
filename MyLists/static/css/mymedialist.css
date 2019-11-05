@@ -389,3 +389,14 @@ body.loading .modal_loading {
     opacity: 0.8;
     z-index: 999;
 }
+
+@media (max-width: 767.98px) {
+    .cat_buttons {
+        padding-left: 20px;
+        font-size: 10px;
+    }
+
+    .cat_buttons_pos {
+        font-size: 10px;
+    }
+}

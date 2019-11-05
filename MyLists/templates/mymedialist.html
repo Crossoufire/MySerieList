@@ -239,7 +239,7 @@
             </div>
             {% else %}
             <div class="modal-body">
-                <p id="orginal_name"></p>
+                <p id="original_name"></p>
                 <p id="release_date"></p>
                 <p id="actors"></p>
                 <p id="genres"></p>
@@ -267,6 +267,14 @@
 {% block script %}
 <!------------------ Isotope ------------------->
 <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
+<!------------------ Metadata for the modal ------------------->
+<script type="text/javascript">
+{% for category in all_data %}
+    {% for data in category[0] %}
+        var metadata_{{ data[0]["id"] }} = {{ data[0]|tojson }};
+    {% endfor %}
+{% endfor %}
+</script>
 
 <!------------------ Main scripts ------------------->
 <script src="{{ url_for('static', filename='js/mymedialist_common.js') }}"></script>
@@ -280,12 +288,6 @@
 <!------------ Jquery Autocomplete ------------->
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
-{% for category in all_data %}
-    {% for data in category[0] %}
-        var metadata_{{ data[0]["id"] }} = {{ data[0]|tojson }};
-    {% endfor %}
-{% endfor %}
-
 $('.add_element').val('');
 $('#list_select').prop('selectedIndex', 0);
 

@@ -34,10 +34,14 @@ function changeCategory(card_id, element_id, genres, media_list) {
     });
 }
 
+
 // ------------------------- Movies metadata test --------------------------
 function show_metadata(data) {
+    $('#original_name').text('');
     $('#modal_title').html(data.name);
-    $('#original_name').html("<b>Original Name</b>: " +data.original_name);
+    if (data.name != data.original_name) {
+        $('#original_name').html("<b>Original Name</b>: " +data.original_name);
+    }
     $('#release_date').html("<b>Release Date</b>: " +data.release_date);
     $('#actors').html("<b>Actors</b>: " +data.actors);
     $('#genres').html("<b>Genres</b>: " +data.genres);

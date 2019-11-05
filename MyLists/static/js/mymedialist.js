@@ -63,8 +63,13 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
 
 // ------------------------- Anime/Series metadata test --------------------------
 function show_metadata(data, media_list) {
+    $('#original_name').text('');
     $('#modal_title').html(data.name);
-    $('#original_name').html("<b>Original Name</b>: " +data.original_name);
+    console.log(data.name);
+    console.log(data.original_name);
+    if (data.name != data.original_name) {
+        $('#original_name').html("<b>Original Name</b>: " +data.original_name);
+    }
     $('#actors').html("<b>Actors</b>: " +data.actors);
     $('#genres').html("<b>Genres</b>: " +data.genres);
     $('#first_air_date').html("<b>First Air Date</b>: " +data.first_air_date);
@@ -75,7 +80,9 @@ function show_metadata(data, media_list) {
     $('#total_seasons').html("<b>Total Seasons</b>: " +data.total_seasons);
     $('#total_episodes').html("<b>Total Episodes</b>: " +data.total_episodes);
     $('#episodes_per_season').html("<b>Episodes Per Season</b>: " +data.eps_per_season);
-    $('#origin_country').html("<b>Origin Country</b>: " +data.origin_country);
+    if (media_list == "serieslist") {
+        $('#origin_country').html("<b>Origin Country</b>: " +data.origin_country);
+    }
     $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10");
     $('#status').html("<b>Status</b>: " +data.status);
     $('#synopsis').html("<b>Synopsis</b>: " +data.synopsis);
