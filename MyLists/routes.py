@@ -397,9 +397,9 @@ def account(user_name):
     account_data["anime"]["time_spent_hour"]  = round(user.time_spent_anime/60)
 
     # Time spent in days
-    account_data["series"]["time_spent_day"] = round(user.time_spent_series/1440, 1)
-    account_data["movies"]["time_spent_day"] = round(user.time_spent_movies/1440, 1)
-    account_data["anime"]["time_spent_day"]  = round(user.time_spent_anime/1440, 1)
+    account_data["series"]["time_spent_day"] = round(user.time_spent_series/1440, 2)
+    account_data["movies"]["time_spent_day"] = round(user.time_spent_movies/1440, 2)
+    account_data["anime"]["time_spent_day"]  = round(user.time_spent_anime/1440, 2)
 
     # Mean score
     account_data["series"]["mean_score"] = get_mean_score(user.id, ListType.SERIES)
@@ -1347,6 +1347,7 @@ def get_list_count(user_id, list_type):
         dropped     = SeriesList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
         plantowatch = SeriesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
         total       = SeriesList.query.filter_by(user_id=user_id).count()
+        total = total - plantowatch
     elif list_type is ListType.ANIME:
         watching    = AnimeList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
         completed   = AnimeList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
@@ -1355,11 +1356,13 @@ def get_list_count(user_id, list_type):
         dropped     = AnimeList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
         plantowatch = AnimeList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
         total       = AnimeList.query.filter_by(user_id=user_id).count()
+        total = total - plantowatch
     elif list_type is ListType.MOVIES:
         completed           = MoviesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
         completed_animation = MoviesList.query.filter_by(user_id=user_id, status=Status.COMPLETED_ANIMATION).count()
         plantowatch         = MoviesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
         total               = MoviesList.query.filter_by(user_id=user_id).count()
+        total = total - plantowatch
 
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
         list_count = {"watching": watching,
@@ -3808,98 +3811,103 @@ def send_email_update_email(user):
 
 
 def automatic_media_refresh():
-    # Recover all the data
-    all_movies = Movies.query.all()
-    all_series = Series.query.all()
-    all_anime = Anime.query.all()
-
-    # Create a list containing all the TMDb ID for the Movies
-    all_movies_tmdb_id_list = []
-    for i in range(0, len(all_movies)):
-        all_movies_tmdb_id_list.append(all_movies[i].themoviedb_id)
-
-    # Create a list containing all the TMDb ID for the Series
-    all_series_tmdb_id_list = []
-    for i in range(0, len(all_series)):
-        all_series_tmdb_id_list.append(all_series[i].themoviedb_id)
-
-        # Create a list containing all the TMDb ID for the Anime
-    all_anime_tmdb_id_list = []
-    for i in range(0, len(all_anime)):
-        all_anime_tmdb_id_list.append(all_anime[i].themoviedb_id)
-
-    # Recover from API all the changed Movies ID
-    while True:
-        try:
-            response = requests.get("https://api.themoviedb.org/3/movie/changes?api_key={0}".format(themoviedb_api_key))
-        except:
-            return None
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-            return None
-        try:
-            app.logger.info('[SYSTEM] N° requests available: {}'.format(response.headers["X-RateLimit-Remaining"]))
-        except:
-            return None
-        if response.headers["X-RateLimit-Remaining"] == "0":
-            app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-            time.sleep(3)
-        else:
-            break
-    all_id_movies_changes = json.loads(response.text)
-
-    # Recover from API all the changed TV ID
-    while True:
-        try:
-            response = requests.get("https://api.themoviedb.org/3/TV/changes?api_key={0}".format(themoviedb_api_key))
-        except:
-            return None
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-            return None
-        try:
-            app.logger.info('[SYSTEM] N° requests available: {}'.format(response.headers["X-RateLimit-Remaining"]))
-        except:
-            return None
-        if response.headers["X-RateLimit-Remaining"] == "0":
-            app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-            time.sleep(3)
-        else:
-            break
-    all_id_TV_changes = json.loads(response.text)
-
-    # Funtion to refresh the movies
-    try:
-        for i in range(0, len(all_id_movies_changes["results"])):
-            try:
-                if all_id_movies_changes["results"][i]["id"] in all_movies_tmdb_id_list:
-                    new_refresh_element_data(all_id_movies_changes["results"][i]["id"], ListType.MOVIES)
-            except:
-                pass
-    except:
-        pass
-
-    # Funtion to refresh the series
-    try:
-        for i in range(0, len(all_id_TV_changes["results"])):
-            try:
-                if all_id_TV_changes["results"][i]["id"] in all_series_tmdb_id_list:
-                    new_refresh_element_data(all_id_TV_changes["results"][i]["id"], ListType.SERIES)
-            except:
-                pass
-    except:
-        pass
-
-    # Funtion to refresh the anime
-    try:
-        for i in range(0, len(all_id_TV_changes["results"])):
-            try:
-                if all_id_TV_changes["results"][i]["id"] in all_anime_tmdb_id_list:
-                    new_refresh_element_data(all_id_movies_changes["results"][i]["id"], ListType.ANIME)
-            except:
-                pass
-    except:
-        pass
+    # # Recover all the data
+    # all_movies = Movies.query.all()
+    # all_series = Series.query.all()
+    # all_anime = Anime.query.all()
+    #
+    # # Create a list containing all the TMDb ID for the Movies
+    # all_movies_tmdb_id_list = []
+    # for i in range(0, len(all_movies)):
+    #     all_movies_tmdb_id_list.append(all_movies[i].themoviedb_id)
+    #
+    # # Create a list containing all the TMDb ID for the Series
+    # all_series_tmdb_id_list = []
+    # for i in range(0, len(all_series)):
+    #     all_series_tmdb_id_list.append(all_series[i].themoviedb_id)
+    #
+    #     # Create a list containing all the TMDb ID for the Anime
+    # all_anime_tmdb_id_list = []
+    # for i in range(0, len(all_anime)):
+    #     all_anime_tmdb_id_list.append(all_anime[i].themoviedb_id)
+    #
+    # # Recover from API all the changed Movies ID
+    # while True:
+    #     try:
+    #         response = requests.get("https://api.themoviedb.org/3/movie/changes?api_key={0}".format(themoviedb_api_key))
+    #     except:
+    #         return None
+    #     if response.status_code == 401:
+    #         app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+    #         return None
+    #     try:
+    #         app.logger.info('[SYSTEM] N° requests available: {}'.format(response.headers["X-RateLimit-Remaining"]))
+    #     except:
+    #         return None
+    #     if response.headers["X-RateLimit-Remaining"] == "0":
+    #         app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+    #         time.sleep(3)
+    #     else:
+    #         break
+    # all_id_movies_changes = json.loads(response.text)
+    #
+    # print(all_id_movies_changes)
+    #
+    # # Recover from API all the changed TV ID
+    # while True:
+    #     try:
+    #         response = requests.get("https://api.themoviedb.org/3/TV/changes?api_key={0}".format(themoviedb_api_key))
+    #     except:
+    #         return None
+    #     if response.status_code == 401:
+    #         app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+    #         return None
+    #     try:
+    #         app.logger.info('[SYSTEM] N° requests available: {}'.format(response.headers["X-RateLimit-Remaining"]))
+    #     except:
+    #         return None
+    #     if response.headers["X-RateLimit-Remaining"] == "0":
+    #         app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
+    #         time.sleep(3)
+    #     else:
+    #         break
+    # all_id_TV_changes = json.loads(response.text)
+    #
+    # print(all_id_TV_changes)
+    #
+    # # Funtion to refresh the movies
+    # try:
+    #     for i in range(0, len(all_id_movies_changes["results"])):
+    #         try:
+    #             if all_id_movies_changes["results"][i]["id"] in all_movies_tmdb_id_list:
+    #                 new_refresh_element_data(all_id_movies_changes["results"][i]["id"], ListType.MOVIES)
+    #         except:
+    #             pass
+    # except:
+    #     pass
+    #
+    # # Funtion to refresh the series
+    # try:
+    #     for i in range(0, len(all_id_TV_changes["results"])):
+    #         try:
+    #             if all_id_TV_changes["results"][i]["id"] in all_series_tmdb_id_list:
+    #                 new_refresh_element_data(all_id_TV_changes["results"][i]["id"], ListType.SERIES)
+    #         except:
+    #             pass
+    # except:
+    #     pass
+    #
+    # # Funtion to refresh the anime
+    # try:
+    #     for i in range(0, len(all_id_TV_changes["results"])):
+    #         try:
+    #             if all_id_TV_changes["results"][i]["id"] in all_anime_tmdb_id_list:
+    #                 new_refresh_element_data(all_id_movies_changes["results"][i]["id"], ListType.ANIME)
+    #         except:
+    #             pass
+    # except:
+    #     pass
+    print("oui")
 
 
 def refresh_db_achievements():
@@ -3924,15 +3932,6 @@ def refresh_db_achievements():
         achievements[i-1].genre       = genre
 
 
-# import atexit
-# from apscheduler.schedulers.background import BackgroundScheduler
-#
-# scheduler = BackgroundScheduler()
-# scheduler.add_job(func=automatic_media_refresh, trigger="interval", seconds=86400)
-# scheduler.start()
-#
-# # Shut down the scheduler when exiting the app
-# atexit.register(lambda: scheduler.shutdown())
 
 
 def add_achievements_to_db():
@@ -4054,4 +4053,3 @@ def add_actors_anime():
                 db.session.add(actors)
 
         db.session.commit()
-

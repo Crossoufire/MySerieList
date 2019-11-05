@@ -290,10 +290,10 @@
                                             <span class="stat_text">{{ data['series']['onhold_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Total Series:</span>
+                                            <span class="stat_text" data-toggle="tooltip" title="Without plan to watch">Total Series:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text">{{ data['series']['total_count'] }}</span>
+                                            <span class="stat_text" data-toggle="tooltip" title="Without plan to watch">{{ data['series']['total_count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -392,10 +392,10 @@
                                             <span class="stat_text">{{ data['anime']['onhold_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Total Anime:</span>
+                                            <span class="stat_text" data-toggle="tooltip" title="Without plan to watch">Total Anime:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text">{{ data['anime']['total_count'] }}</span>
+                                            <span class="stat_text" data-toggle="tooltip" title="Without plan to watch">{{ data['anime']['total_count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -471,10 +471,10 @@
                                             <span class="stat_text">{{ data['movies']['completed_animation_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Total movies:</span>
+                                            <span class="stat_text" data-toggle="tooltip" title="Without plan to watch">Total movies:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text">{{ data['movies']['total_count'] }}</span>
+                                            <span class="stat_text" data-toggle="tooltip" title="Without plan to watch">{{ data['movies']['total_count'] }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -505,7 +505,7 @@
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        {{ series_achiev['unlocked_badges'] }}/13
+                                        {{ "{:02d}".format(series_achiev['unlocked_badges']) }}/13
                                     </div>
                                 </div>
                             <div class="row">
@@ -515,10 +515,11 @@
                                     <div class="col achiev-bar">
                                         <span class="block_achiev series">
                                             <span id="{{ ((series_achiev['unlocked_levels'])/51)*100 }}%" class="value"></span>
+                                            <span id="4%" class="value"></span>
                                         </span>
                                     </div>
                                     <div class="col-auto">
-                                        {{ series_achiev['unlocked_levels'] }}/51
+                                        {{ "{:02d}".format(series_achiev['unlocked_levels']) }}/51
                                     </div>
                                 </div>
                         </div>
@@ -535,7 +536,7 @@
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        {{ anime_achiev['unlocked_badges'] }}/17
+                                        {{ "{:02d}".format(anime_achiev['unlocked_badges']) }}/17
                                     </div>
                                 </div>
                             <div class="row">
@@ -548,7 +549,7 @@
                                         </span>
                                     </div>
                                     <div class="col-auto">
-                                        {{ anime_achiev['unlocked_levels'] }}/67
+                                        {{ "{:02d}".format(anime_achiev['unlocked_levels']) }}/67
                                     </div>
                                 </div>
                         </div>
@@ -565,7 +566,7 @@
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        {{ movies_achiev['unlocked_badges'] }}/17
+                                        {{ "{:02d}".format(movies_achiev['unlocked_badges']) }}/17
                                     </div>
                                 </div>
                             <div class="row">
@@ -578,7 +579,7 @@
                                         </span>
                                     </div>
                                     <div class="col-auto">
-                                        {{ movies_achiev['unlocked_levels'] }}/67
+                                        {{ "{:02d}".format(movies_achiev['unlocked_levels']) }}/67
                                     </div>
                                 </div>
                         </div>
