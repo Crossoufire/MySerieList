@@ -13,7 +13,7 @@ Account:
 
 Medialists:
 	Add: Regroup movies by TMDb's collections - Hard to do
-	Add: "More results" to the autocomplete
+	Add: Button "More results" to the autocomplete
 	Add: Movie director in metadata modal
 	Enhance: Possibility to show or not the shared triangle ?
 	Enhance: Year in the autocomplete (50% done)

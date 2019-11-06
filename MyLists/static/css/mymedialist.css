@@ -334,7 +334,7 @@ body.loading .modal_loading {
 
 #list_select {
     text-align: center!important;
-    margin-top: 5px;
+    margin-top: 7px;
     margin-left: 40px;
 }
 
@@ -368,4 +368,35 @@ body.loading .modal_loading {
 
 .categories {
     width: 100%;
+}
+
+.cat_buttons {
+    position: absolute;
+    top: 15%;
+    opacity: 1;
+    z-index: 999;
+}
+
+.cat_buttons_pos {
+    position: relative;
+    z-index: 999;
+}
+
+.btn_right_2 {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    opacity: 0.8;
+    z-index: 999;
+}
+
+@media (max-width: 767.98px) {
+    .cat_buttons {
+        padding-left: 20px;
+        font-size: 10px;
+    }
+
+    .cat_buttons_pos {
+        font-size: 10px;
+    }
 }

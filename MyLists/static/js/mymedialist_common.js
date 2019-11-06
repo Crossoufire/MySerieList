@@ -1,5 +1,6 @@
 
-// ------------- Delete element -------------
+
+// ----------------------------- Delete element -----------------------------
 function delete_element(element_id, card_id, media_list) {
     if (!confirm("Are you sure you want to delete this from your list?")) {
         return false;
@@ -22,7 +23,7 @@ function delete_element(element_id, card_id, media_list) {
 }
 
 
-// ---------- Show/hide all score -----------
+// -------------------------- Show/hide all score ---------------------------
 function all_scores() {
     if ($('#all_scores').text() == 'Show scores') {
         $('div[id^="footer_"]').attr('class', 'card-footer text-muted text-center p-0');
@@ -36,7 +37,7 @@ function all_scores() {
 }
 
 
-// --------------- Edit score ---------------
+// ------------------------------- Edit score -------------------------------
 function edit_score(edit_id, new_id) {
     var edit = document.getElementById(edit_id);
 
@@ -51,7 +52,7 @@ function edit_score(edit_id, new_id) {
 }
 
 
-// -------------- Show score ----------------
+// ------------------------------ Show score --------------------------------
 function show_score(footer_id, card_id) {
     var score = document.getElementById(footer_id);
 
@@ -65,7 +66,7 @@ function show_score(footer_id, card_id) {
 }
 
 
-// ---------------- Add score ---------------
+// -------------------------------- Add score -------------------------------
 function add_score(new_score, edit_id, element_id, media_list) {
     var new_sc = document.getElementById(new_score);
     var edit_score_value = document.getElementById(edit_id).value;
@@ -100,14 +101,51 @@ function add_score(new_score, edit_id, element_id, media_list) {
 }
 
 
-// --------------- Tooltip ------------------
+// ---------------------- Remove the category list --------------------------
+function remove_cat() {
+    $('.cat_buttons').remove();
+    $('.btn_right_2').remove();
+    $('.btn_left').attr('style', 'display: block;');
+    $('.btn_right').attr('style', 'display: block;');
+    $('.btn_bottom_left').attr('style', 'display: block;');
+    $('.card-img-top').attr('style', 'filter: brightness(100%);');
+    $('.mask').show();
+}
+
+
+// ----------------------- Search by Title or Actor -------------------------
+function searchElement() {
+    var input, filter, cards, cardContainer, title, i;
+    input = document.getElementById("myElementFilter");
+    filter = input.value.toUpperCase();
+    cardContainer = document.getElementById("categories-iso");
+    cards = cardContainer.getElementsByClassName("card");
+    for (i = 0; i < cards.length; i++) {
+        title = cards[i].querySelector(".font-mask");
+        original_title = cards[i].querySelector(".original_title");
+        actors = cards[i].querySelector(".actors_yes");
+        if (title.innerText.toUpperCase().indexOf(filter) > -1) {
+            cards[i].style.display = "";
+        } else if (original_title.innerText.toUpperCase().indexOf(filter) > -1) {
+            cards[i].style.display = "";
+        } else if (actors.innerText.toUpperCase().indexOf(filter) > -1) {
+            cards[i].style.display = "";
+        } else {
+            cards[i].style.display = "none";
+        }
+    }
+    $categories.isotope('layout');
+}
+
+
+// ------------------------------- Tooltip ----------------------------------
 $('.tooltip').tooltip();
 $(function () {
     $('[data-toggle="tooltip"]').tooltip()
 })
 
 
-// --------------- Isotope categories ------------------
+// ------------------------- Isotope categories -----------------------------
 var $categories = $('.categories-iso').isotope({
     itemSelector: '.categories',
     layoutMode: 'vertical'
@@ -129,6 +167,11 @@ $('.filters-button-group').each(function(i, buttonGroup) {
         $(this).removeClass('btn-light');
     });
 });
+
+$categories.isotope('layout');
+
+
+
 
 
 //// -------- Isotope elements (movies/series/anime) -----------
@@ -174,35 +217,4 @@ $('.filters-button-group').each(function(i, buttonGroup) {
 //        console.log("test");
 //    }
 //}
-
-
-$categories.isotope('layout');
-
-
-function searchElement() {
-    var input, filter, cards, cardContainer, title, i;
-    input = document.getElementById("myElementFilter");
-    filter = input.value.toUpperCase();
-    cardContainer = document.getElementById("categories-iso");
-    cards = cardContainer.getElementsByClassName("card");
-    for (i = 0; i < cards.length; i++) {
-        title = cards[i].querySelector(".font-mask");
-        original_title = cards[i].querySelector(".original_title");
-        actors = cards[i].querySelector(".actors_yes");
-        if (title.innerText.toUpperCase().indexOf(filter) > -1) {
-            cards[i].style.display = "";
-        } else if (original_title.innerText.toUpperCase().indexOf(filter) > -1) {
-            cards[i].style.display = "";
-        } else if (actors.innerText.toUpperCase().indexOf(filter) > -1) {
-            cards[i].style.display = "";
-        } else {
-            cards[i].style.display = "none";
-        }
-    }
-    $categories.isotope('layout');
-}
-
-
-
-
 

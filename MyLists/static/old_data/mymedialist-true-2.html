@@ -84,36 +84,36 @@
             {% endif %}
                 {% for data in category[0] %}
                 <!------------------- Card -------------------->
-                <div id="card_{{ data[0]['id'] }}" class="card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20">
+                <div id="card_{{ data[0][0].id }}" class="card bg-transparent m-l-10 m-r-10 m-b-40 m-t-20">
                     <div class="view overlay">
-                        <img class="card-img-top" width="200" height="300" src="{{ data[0]['cover'] }}" alt="{{ data[0]['name'] }}">
-                        <div class="mask flex-center rgba-black-strong" onclick="show_metadata(metadata_{{ data[0]['id'] }}, '{{ media_list }}')" data-toggle="modal" data-target="#modal_metadata">
-                            <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
-                            <span style="display: none;" class="original_title">{{ data[0]['original_name'] }}</span>
-                            <span style="display: none;" class="actors_yes">{{ data[0]['actors'] }}</span>
+                        <img class="card-img-top" width="200" height="300" src="{{ data[0][0].image_cover }}" alt="{{ data[0][0].name }}">
+                        <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_metadata()">
+                            <span class="font-mask text-center text-light">{{ data[0][0].name }}</span>
+                            <span style="display: none;" class="original_title">{{ data[0][0].original_name }}</span>
+                            <span style="display: none;" class="actors_yes">{{ actors["{}".format(data[0][0].id)] }}</span>
                         </div>
                         {% if target_user_id == current_user.get_id() %}
                             {% if media_list != 'movieslist' %}
-                            <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="charge_cat('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', 'S_{{ data[0]['id'] }}', 'E_{{ data[0]['id'] }}', '{{ data[0]['eps_per_season'] }}', '{{ media_list }}')"></a>
+                            <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="charge_cat('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', 'S_{{ data[0][0].id }}', 'E_{{ data[0][0].id }}', '{{ eps['{}'.format(data[0][0].id)] }}', '{{ media_list }}')"></a>
                             {% else %}
-                            <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="changeCategory('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ data[0]['genres'] }}', '{{ media_list }}')"></a>
+                            <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="changeCategory('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ genres['{}'.format(data[0][0].id)] }}', '{{ media_list }}')"></a>
                             {% endif %}
-                        <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0]['id'] }}', 'card_{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                        <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0][0].id }}', 'card_{{ data[0][0].id }}', '{{ media_list }}')"></a>
                         {% else %}
                             {% if data[1] == "no" %}
                                 {% if media_list != 'movieslist' %}
-                                <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                                <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ media_list }}')"></a>
                                 {% else %}
-                                <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user_movies('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                                <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user_movies('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ media_list }}')"></a>
                                 {% endif %}
                             {% else %}
                                 <div class="ribbon"></div>
                             {% endif %}
                         {% endif %}
                         {% if category[1] != 'PLAN TO WATCH' %}
-                        <a class="btn_bottom_left fas fa-caret-square-down" data-toggle="tooltip" title="Score" onclick="show_score('footer_{{ data[0]['id'] }}', card_{{ data[0]['id'] }})" style="z-index: 10;"></a>
+                        <a class="btn_bottom_left fas fa-caret-square-down" data-toggle="tooltip" title="Score" onclick="show_score('footer_{{ data[0][0].id }}', card_{{ data[0][0].id }})" style="z-index: 10;"></a>
                         {% else %}
-                        <a class="btn_bottom_left fas fa-caret-square-down" data-toggle="tooltip" title="Score" onclick="show_score('footer_{{ data[0]['id'] }}', card_{{ data[0]['id'] }})" style="display: none;"></a>
+                        <a class="btn_bottom_left fas fa-caret-square-down" data-toggle="tooltip" title="Score" onclick="show_score('footer_{{ data[0][0].id }}', card_{{ data[0][0].id }})" style="display: none;"></a>
                         {% endif %}
                     </div>
 
@@ -124,12 +124,12 @@
                             <div class="row p-0 m-0">
                                 <div class="col p-0">
                                     {% if target_user_id == current_user.get_id() %}
-                                    <select id="S_{{ data[0]['id'] }}" class="scrollable-menu text-center form-control p-0 seasons" onchange="updateSeason('{{ data[0]['id'] }}', this, '{{ data[0]['eps_per_season'] }}', 'E_{{ data[0]['id'] }}', '{{ media_list }}')">
+                                    <select id="S_{{ data[0][0].id }}" class="scrollable-menu text-center form-control p-0 seasons" onchange="updateSeason('{{ data[0][0].id }}', this, '{{ eps['{}'.format(data[0][0].id)] }}', 'E_{{ data[0][0].id }}', '{{ media_list }}')">
                                     {% else %}
-                                    <select id="S_{{ data[0]['id'] }}" class="disabled scrollable-menu text-center form-control p-0 seasons">
+                                    <select id="S_{{ data[0][0].id }}" class="disabled scrollable-menu text-center form-control p-0 seasons">
                                     {% endif %}
-                                        {% for i in range(data[0]['eps_per_season']|length) %}
-                                            {% if i+1 == data[0]['current_season'] %}
+                                        {% for i in range(eps["{}".format(data[0][0].id)]|length) %}
+                                            {% if i+1 == data[0][1].current_season %}
                                             <option selected="selected">Season {{ i+1 }}</option>
                                             {% else %}
                                             <option>Season {{ i+1 }}</option>
@@ -139,12 +139,12 @@
                                 </div>
                                 <div class="col p-0">
                                     {% if target_user_id == current_user.get_id() %}
-                                    <select id="E_{{ data[0]['id'] }}" class="scrollable-menu text-center form-control p-0 episodes" onchange="updateEpisode('{{ data[0]['id'] }}', this, '{{ media_list }}')">
+                                    <select id="E_{{ data[0][0].id }}" class="scrollable-menu text-center form-control p-0 episodes" onchange="updateEpisode('{{ data[0][0].id }}', this, '{{ media_list }}')">
                                     {% else %}
-                                    <select id="E_{{ data[0]['id'] }}" class="disabled scrollable-menu text-center form-control p-0 episodes">
+                                    <select id="E_{{ data[0][0].id }}" class="disabled scrollable-menu text-center form-control p-0 episodes">
                                     {% endif %}
-                                        {% for i in range(data[0]['eps_per_season'][data[0]['current_season']-1]) %}
-                                            {% if i+1 == data[0]['last_episode_watched'] %}
+                                        {% for i in range(eps["{}".format(data[0][0].id)][data[0][1].current_season-1]) %}
+                                            {% if i+1 == data[0][1].last_episode_watched %}
                                             <option selected="selected">Episode {{ i+1 }}</option>
                                             {% else %}
                                             <option>Episode {{ i+1 }}</option>
@@ -161,12 +161,12 @@
                             <div class="row p-0 m-0">
                                 <div class="col p-0">
                                     {% if target_user_id == current_user.get_id() %}
-                                    <select id="S_{{ data[0]['id'] }}" class="scrollable-menu text-center form-control p-0 seasons" onchange="updateSeason('{{ data[0]['id'] }}', this, '{{ data[0]['eps_per_season'] }}', 'E_{{ data[0]['id'] }}', '{{ media_list }}')">
+                                    <select id="S_{{ data[0][0].id }}" class="scrollable-menu text-center form-control p-0 seasons" onchange="updateSeason('{{ data[0][0].id }}', this, '{{ eps['{}'.format(data[0][0].id)] }}', 'E_{{ data[0][0].id }}', '{{ media_list }}')">
                                     {% else %}
-                                    <select id="S_{{ data[0]['id'] }}" class="disabled scrollable-menu text-center form-control p-0 seasons">
+                                    <select id="S_{{ data[0][0].id }}" class="disabled scrollable-menu text-center form-control p-0 seasons">
                                     {% endif %}
-                                        {% for i in range(data[0]['eps_per_season']|length) %}
-                                            {% if i+1 == data[0]['current_season'] %}
+                                        {% for i in range(eps["{}".format(data[0][0].id)]|length) %}
+                                            {% if i+1 == data[0][1].current_season %}
                                             <option selected="selected">Season {{ i+1 }}</option>
                                             {% else %}
                                             <option>Season {{ i+1 }}</option>
@@ -176,12 +176,12 @@
                                 </div>
                                 <div class="col p-0">
                                     {% if target_user_id == current_user.get_id() %}
-                                    <select id="E_{{ data[0]['id'] }}" class="scrollable-menu text-center form-control p-0 episodes" onchange="updateEpisode('{{ data[0]['id'] }}', this, '{{ media_list }}')">
+                                    <select id="E_{{ data[0][0].id }}" class="scrollable-menu text-center form-control p-0 episodes" onchange="updateEpisode('{{ data[0][0].id }}', this, '{{ media_list }}')">
                                     {% else %}
-                                    <select id="E_{{ data[0]['id'] }}" class="disabled scrollable-menu text-center form-control p-0 episodes">
+                                    <select id="E_{{ data[0][0].id }}" class="disabled scrollable-menu text-center form-control p-0 episodes">
                                     {% endif %}
-                                        {% for i in range(data[0]['eps_per_season'][data[0]['current_season']-1]) %}
-                                            {% if i+1 == data[0]['last_episode_watched'] %}
+                                        {% for i in range(eps["{}".format(data[0][0].id)][data[0][1].current_season-1]) %}
+                                            {% if i+1 == data[0][1].last_episode_watched %}
                                             <option selected="selected">Episode {{ i+1 }}</option>
                                             {% else %}
                                             <option>Episode {{ i+1 }}</option>
@@ -194,13 +194,13 @@
                     </div>
                         {% endif %}
                     {% endif %}
-                    <div id="footer_{{ data[0]['id'] }}" class="d-none footer_score">
+                    <div id="footer_{{ data[0][0].id }}" class="d-none footer_score">
                         {% if target_user_id == current_user.get_id() %}
-                        <span class="score_size"> Score: </span><a class="score_size" id="new_{{ data[0]['id'] }}" onclick="edit_score('edit_{{ data[0]['id'] }}', 'new_{{ data[0]['id'] }}')">{{  data[0]['score'] }}</a>
+                        <span class="score_size"> Score: </span><a class="score_size" id="new_{{ data[0][0].id }}" onclick="edit_score('edit_{{ data[0][0].id }}', 'new_{{ data[0][0].id }}')">{{ data[0][1].score }}</a>
                         {% else %}
-                        <span class="score_size"> Score: </span><a class="disabled score_size" id="new_{{ data[0]['id'] }}" onclick="edit_score('edit_{{ data[0]['id'] }}', 'new_{{ data[0]['id'] }}')">{{  data[0]['score'] }}</a>
+                        <span class="score_size"> Score: </span><a class="disabled score_size" id="new_{{ data[0][0].id }}" onclick="edit_score('edit_{{ data[0][0].id }}', 'new_{{ data[0][0].id }}')">{{ data[0][1].score }}</a>
                         {% endif %}
-                        <input id="edit_{{ data[0]['id'] }}" class="d-none" type="text" style="max-width: 30px; max-height: 20px; background-color: black; color: white; border: solid; border-color: black;" onkeydown="add_score('new_{{ data[0]['id'] }}', 'edit_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ media_list }}')">
+                        <input id="edit_{{ data[0][0].id }}" class="d-none" type="text" style="max-width: 30px; max-height: 20px; background-color: black; color: white; border: solid; border-color: black;" onkeydown="add_score('new_{{ data[0][0].id }}', 'edit_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ media_list }}')">
                     </div>
                 </div>
                 {% endfor %}
@@ -220,7 +220,7 @@
             </div>
             {% if media_list != 'movieslist' %}
             <div class="modal-body">
-                <p id="original_name"></p>
+                <p id="orginal_name"></p>
                 <p id="actors"></p>
                 <p id="genres"></p>
                 <p id="first_air_date"></p>
@@ -235,11 +235,11 @@
                 <p id="tmdb_score"></p>
                 <p id="status"></p>
                 <hr class="m-b-10 m-t-10">
-                <p id="synopsis" class="m-b-0 text-justify"></p>
+                <p  id="synopsis" class="m-b-0 text-justify"></p>
             </div>
             {% else %}
             <div class="modal-body">
-                <p id="original_name"></p>
+                <p id="orginal_name"></p>
                 <p id="release_date"></p>
                 <p id="actors"></p>
                 <p id="genres"></p>
@@ -251,7 +251,7 @@
                 <p id="tagline"></p>
                 <p id="prod_companies"></p>
                 <hr class="m-b-10 m-t-10">
-                <p id="synopsis" class="m-b-0 text-justify"></p>
+                <p  id="synopsis" class="m-b-0 text-justify"></p>
             </div>
             {% endif %}
         </div>
@@ -267,14 +267,6 @@
 {% block script %}
 <!------------------ Isotope ------------------->
 <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
-<!------------------ Metadata for the modal ------------------->
-<script type="text/javascript">
-{% for category in all_data %}
-    {% for data in category[0] %}
-        var metadata_{{ data[0]["id"] }} = {{ data[0]|tojson }};
-    {% endfor %}
-{% endfor %}
-</script>
 
 <!------------------ Main scripts ------------------->
 <script src="{{ url_for('static', filename='js/mymedialist_common.js') }}"></script>

@@ -9,4 +9,3 @@ Pillow
 requests
 regex
 apscheduler
-atexit
