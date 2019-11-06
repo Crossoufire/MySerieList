@@ -1,4 +1,5 @@
 
+
 // ----------- Change category --------------
 function changeCategory(card_id, element_id, genres, media_list) {
 

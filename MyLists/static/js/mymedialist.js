@@ -1,20 +1,4 @@
 
-// ---------------- Refresh -----------------
-function refresh(element_id, media_list, user_name) {
-    $body = $("body");
-    $.ajax ({
-        type: "POST",
-        url: "/refresh_single_element",
-        contentType: "application/json",
-        data: JSON.stringify({ element_id: element_id, element_type: media_list }),
-        dataType: "json",
-        beforeSend: function() { $body.addClass("loading"); },
-        success: function(response) {
-            window.location.replace('/' + media_list + '/' + user_name);
-        }
-    });
-}
-
 
 // ------------- Update episode ---------------
 function updateEpisode(element_id, episode, media_list) {
@@ -61,7 +45,7 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
 }
 
 
-// ------------------------- Anime/Series metadata test --------------------------
+// ------------------------- Anime/Series metadata --------------------------
 function show_metadata(data, media_list) {
     $('#original_name').text('');
     $('#modal_title').html(data.name);

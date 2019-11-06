@@ -21,7 +21,7 @@ function add_user(card_id, element_id, media_type) {
     $('#'+card_id).children().children('.card-img-top').attr('style', 'filter: brightness(0%);');
 }
 
-
+// -------------------- Add the category to the user --------------------------
 function add_to_user(cat, card_id, element_id, media_type) {
     var add_cat = cat.childNodes[0].data
 
@@ -42,7 +42,7 @@ function add_to_user(cat, card_id, element_id, media_type) {
 }
 
 
-// -------------- Charge the buttons to choose the category for movies -------------------
+// ---------- Charge the buttons to choose the category for movies ------------
 function add_user_movies(card_id, element_id, media_type) {
     remove_cat();
 

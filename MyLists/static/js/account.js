@@ -1,4 +1,6 @@
 
+
+// -------------------------------- Follow --------------------------------
 function follow(follow_id) {
     $('.follow_button').text('Unfollow');
     $('.follow_button').attr('onclick', 'unfollow('+follow_id+')');
@@ -16,7 +18,7 @@ function follow(follow_id) {
     });
 }
 
-
+// ------------------------------- Unfollow -------------------------------
 function unfollow(follow_id) {
     $('.follow_button').text('Follow');
     $('.follow_button').attr('onclick', 'follow('+follow_id+')');
@@ -35,7 +37,7 @@ function unfollow(follow_id) {
     });
 }
 
-
+// ------------------------------ Change Tab ------------------------------
 function changeTab(tab, nav) {
     $('#'+tab);
     $('#overview').attr('class', 'nav-link');
@@ -44,7 +46,7 @@ function changeTab(tab, nav) {
     $('#'+tab).attr('class', 'tab-pane fade show active');
 }
 
-
+// ---------------------------- Change Badges -----------------------------
 function changeBadges(media) {
     if (media == 'anime') {
         $('#anime_badges').attr('style', 'display: block;');
@@ -62,6 +64,7 @@ function changeBadges(media) {
 }
 
 
+// ---------------- Change the color of Badge button ----------------------
 $('.filters-button-group').each(function(i, buttonGroup) {
     var $buttonGroup = $(buttonGroup);
     $buttonGroup.on('click', 'button', function() {
@@ -73,6 +76,7 @@ $('.filters-button-group').each(function(i, buttonGroup) {
 });
 
 
+// ---------------------- Tooltip and level init --------------------------
 $(document).ready(function() {
     $body = $("body");
     $body.addClass("loading");
