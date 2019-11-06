@@ -46,11 +46,11 @@ function show_metadata(data) {
     $('#release_date').html("<b>Release Date</b>: " +data.release_date);
     $('#actors').html("<b>Actors</b>: " +data.actors);
     $('#genres').html("<b>Genres</b>: " +data.genres);
-    $('#budget').html("<b>Budget</b>: " +data.budget);
-    $('#revenue').html("<b>Revenue</b>: " +data.revenue);
+    $('#budget').html("<b>Budget</b>: " +data.budget.toLocaleString("en")+ " $");
+    $('#revenue').html("<b>Revenue</b>: " +data.revenue.toLocaleString("en")+ " $");
     $('#runtime').html("<b>Runtime</b>: " +data.runtime+ " min");
     $('#original_language').html("<b>Original Language</b>: " +data.original_language);
-    $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10 &nbsp;(" +data.vote_count+ " votes)");
+    $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10 &nbsp;(" +data.vote_count.toLocaleString("en")+ " votes)");
     $('#tagline').html("<b>Tagline</b>: " +data.tagline);
     $('#prod_companies').html("<b>Prod. Companies</b>: " +data.prod_companies);
     $('#synopsis').html("<b>Synopsis</b>: " +data.synopsis);

@@ -65,7 +65,7 @@ function show_metadata(data, media_list) {
     if (media_list == "serieslist") {
         $('#origin_country').html("<b>Origin Country</b>: " +data.origin_country);
     }
-    $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10 &nbsp;(" +data.vote_count+ " votes)");
+    $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10 &nbsp;(" +data.vote_count.toLocaleString("en")+ " votes)");
     $('#status').html("<b>Status</b>: " +data.status);
     $('#synopsis').html("<b>Synopsis</b>: " +data.synopsis);
 }
