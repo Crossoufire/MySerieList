@@ -36,7 +36,9 @@ function add_to_user(cat, card_id, element_id, media_type) {
             console.log("ok");
         }
     });
+
     remove_cat();
+
     $("#"+card_id).children().append("<div class='ribbon'></div>");
     $("#"+card_id).children().children().remove(".btn_left.fas.fa-plus.text-light");
 }

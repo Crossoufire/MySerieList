@@ -650,8 +650,8 @@ def hall_of_fame():
     all_users_data = []
     for user in users:
         user_data = {}
-        user_data["username"] = user.username
-        user_data["id"] = user.id
+        user_data["username"]        = user.username
+        user_data["id"]              = user.id
         user_data["profile_picture"] = user.image_file
 
         series_level = get_level_and_grade(user.time_spent_series)
@@ -2170,6 +2170,7 @@ def compute_media_time_spent(list_type):
     db.session.commit()
 
 
+###### Unused function for now #######
 def get_statistics(user_id, list_type):
     # get the number of element per score
     user = User.query.filter_by(id=user_id).first()
@@ -2216,7 +2217,6 @@ def get_statistics(user_id, list_type):
                                         join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id). \
                                         join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id). \
                                         filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc())
-
     elif list_type == ListType.SERIES:
         element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
                                         func.group_concat(SeriesNetwork.network.distinct()),
@@ -2347,7 +2347,6 @@ def autocomplete_search_element(element_name, list_type):
             i = i+1
 
         return tmdb_results
-
     elif list_type == ListType.ANIME:
         while True:
             try:
@@ -3164,7 +3163,7 @@ def add_element_to_user(element_id, user_id, list_type, element_cat):
 
         db.session.commit()
     elif list_type == ListType.MOVIES:
-        # If contain the animation genre ==> "Completed Animation"
+        # If it contain the "Animation" genre ==> "Completed Animation"
         if selected_cat == Status.COMPLETED:
             genres = MoviesGenre.query.filter_by(movies_id=element_id).all()
             for genre in genres:
@@ -3371,7 +3370,6 @@ def refresh_element_data(api_id, list_type):
             element.last_update = datetime.utcnow()
             db.session.commit()
             app.logger.info("[SYSTEM] Refreshed the series/anime with the ID {}".format(element.id))
-
         elif list_type == ListType.MOVIES:
             try:
                 release_date = element_data["release_date"]
@@ -3484,7 +3482,7 @@ def save_profile_picture(form_picture):
 def add_follow(follow_username):
     follow_to_add = User.query.filter_by(username=follow_username).first()
 
-    if follow_to_add is None or follow_to_add.id == 1:
+    if (follow_to_add is None) or (follow_to_add.id == 1):
         app.logger.info('[{}] Attempt to follow user {}'.format(current_user.get_id(), follow_username))
         return flash('This user does not exist', 'warning')
 
