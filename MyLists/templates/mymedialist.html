@@ -66,9 +66,11 @@
     <button class="btn btn-sm btn-light text-dark" data-filter=".categories.ANIMATION">Completed Animation</button>
     <button class="btn btn-sm btn-light text-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
     {% endif %}
+    <button id="all_scores" class="btn btn-sm btn-primary text-light" onclick="all_scores()">Show scores</button>
 </div>
-    <button id="all_scores" class="btn btn-sm btn-primary text-light show_score_button" onclick="all_scores()">Show scores</button>
-
+{% if target_user_id != current_user.get_id() %}
+<div class="m-t-20 text-center">You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)</div>
+{% endif %}
 <div id="categories-iso" class="categories-iso">
     {% for category in all_data %}
         {% if category[1] == 'COMPLETED' %}

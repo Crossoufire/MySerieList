@@ -821,6 +821,7 @@ def mymedialist(media_list, user_name):
         return render_template('mymedialist.html',
                                title            = "{}'s {}".format(user_name, media_list),
                                all_data         = media_all_data["all_data"],
+                               common_elements  = media_all_data["common_elements"],
                                media_list       = media_list,
                                target_user_name = user_name,
                                target_user_id   = str(user.id))
@@ -828,6 +829,7 @@ def mymedialist(media_list, user_name):
         return render_template('mymedialist.html',
                                title            = "{}'s {}".format(user_name, media_list),
                                all_data         = media_all_data["all_data"],
+                               common_elements=media_all_data["common_elements"],
                                media_list       = media_list,
                                target_user_name = user_name,
                                target_user_id   = str(user.id))
@@ -1921,7 +1923,7 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
     else:
         current_list = []
 
-    if list_type == ListType.ANIME or list_type == ListType.SERIES:
+    if list_type != ListType.MOVIES:
         watching_list    = []
         completed_list   = []
         onhold_list      = []
@@ -1929,6 +1931,7 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
         dropped_list     = []
         plantowatch_list = []
 
+        common_elements = 0
         for element in element_data:
             # Get episodes per season
             nb_season = len(element[4].split(","))
@@ -2000,38 +2003,49 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
             if element[1].status == Status.WATCHING:
                 if element[0].id in current_list:
                     watching_list.append([element_info, "yes"])
+                    common_elements += 1
                 else:
                     watching_list.append([element_info, "no"])
             elif element[1].status == Status.COMPLETED:
                 if element[0].id in current_list:
                     completed_list.append([element_info, "yes"])
+                    common_elements += 1
                 else:
                     completed_list.append([element_info, "no"])
             elif element[1].status == Status.ON_HOLD:
                 if element[0].id in current_list:
                     onhold_list.append([element_info, "yes"])
+                    common_elements += 1
                 else:
                     onhold_list.append([element_info, "no"])
             elif element[1].status == Status.RANDOM:
                 if element[0].id in current_list:
                     random_list.append([element_info, "yes"])
+                    common_elements += 1
                 else:
                     random_list.append([element_info, "no"])
             elif element[1].status == Status.DROPPED:
                 if element[0].id in current_list:
                     dropped_list.append([element_info, "yes"])
+                    common_elements += 1
                 else:
                     dropped_list.append([element_info, "no"])
             elif element[1].status == Status.PLAN_TO_WATCH:
                 if element[0].id in current_list:
                     plantowatch_list.append([element_info, "yes"])
+                    common_elements += 1
                 else:
                     plantowatch_list.append([element_info, "no"])
 
         element_all_data = [[watching_list, "WATCHING"], [completed_list, "COMPLETED"], [onhold_list, "ON HOLD"],
                             [random_list, "RANDOM"], [dropped_list, "DROPPED"], [plantowatch_list, "PLAN TO WATCH"]]
 
-        all_data_media = {"all_data": element_all_data}
+        try:
+            percentage = int(common_elements/element_data.count()*100)
+        except:
+            percentage = 0
+        all_data_media = {"all_data": element_all_data,
+                          "common_elements": [common_elements, element_data.count(), percentage]}
 
         return all_data_media
     elif list_type == ListType.MOVIES:
@@ -2039,6 +2053,7 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
         completed_list_animation = []
         plantowatch_list         = []
 
+        common_elements = 0
         for element in element_data:
             # Change release date format
             try:
@@ -2091,23 +2106,31 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
             if element[1].status == Status.COMPLETED:
                 if element[0].id in current_list:
                     completed_list.append([element_info, "yes"])
+                    common_elements += 1
                 else:
                     completed_list.append([element_info, "no"])
             elif element[1].status == Status.COMPLETED_ANIMATION:
                 if element[0].id in current_list:
                     completed_list_animation.append([element_info, "yes"])
+                    common_elements += 1
                 else:
                     completed_list_animation.append([element_info, "no"])
             elif element[1].status == Status.PLAN_TO_WATCH:
                 if element[0].id in current_list:
                     plantowatch_list.append([element_info, "yes"])
+                    common_elements += 1
                 else:
                     plantowatch_list.append([element_info, "no"])
 
         element_all_data = [[completed_list, "COMPLETED"], [completed_list_animation, "COMPLETED ANIMATION"] ,
                             [plantowatch_list, "PLAN TO WATCH"]]
 
-        all_data_media = {"all_data": element_all_data}
+        try:
+            percentage = int(common_elements/element_data.count()*100)
+        except:
+            percentage = 0
+        all_data_media = {"all_data": element_all_data,
+                          "common_elements": [common_elements, element_data.count(), percentage]}
 
         return all_data_media
 

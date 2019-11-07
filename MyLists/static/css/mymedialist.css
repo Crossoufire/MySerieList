@@ -133,12 +133,6 @@ body.loading .modal_loading {
 
 }
 
-.show_score_button {
-    margin: 0 auto;
-    display: block;
-    margin-top: 10px;
-}
-
 .card {
     border-radius: 5px;
 }
@@ -174,7 +168,6 @@ body.loading .modal_loading {
 
 
 /* --------- Ribbons ---------- */
-
 .ribbon {
     border-style: solid;
     border-width: 0 35px 35px 0;
