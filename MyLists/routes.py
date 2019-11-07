@@ -516,6 +516,7 @@ def account(user_name):
 
     knowledge_level = int(series_level["level"] + anime_level["level"] + movies_level["level"])
     knowledge_grade = get_knowledge_grade(knowledge_level)
+    account_data["knowledge_level"]       = knowledge_level
     account_data["knowledge_grade_id"]    = knowledge_grade["grade_id"]
     account_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
 

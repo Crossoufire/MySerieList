@@ -9,6 +9,7 @@
 {% block content %}
 <div class="header-image">
     <img src="{{ data['profile_picture'] }}"/>
+    <div class="knowledge-level text-center text-dark">{{ data['knowledge_level'] }}</div>
     <div class="header-data">
         <h2><b>{{ data['username'] }}</b>
             <img height='50' width='50' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}"

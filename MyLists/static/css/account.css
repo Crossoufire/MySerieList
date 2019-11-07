@@ -12,7 +12,7 @@ hr {
 
 /* -------------- Tabs ------------- */
 .account_tab {
-    border-bottom: white 1px solid;
+    border-bottom: grey 1px solid;
     background: rgba(44, 57, 70, 1);
 }
 
@@ -42,9 +42,21 @@ hr {
     bottom: -8%;
     z-index: 10;
     border-radius: 50%;
-    border: solid 3px white;
+    border: solid 2px black;
     height: 150px;
     width: 150px;
+}
+
+.header-image > .knowledge-level {
+    position: absolute;
+    background: grey;
+    min-width: 50px;
+    left: 80px;
+    bottom: -10%;
+    z-index: 10;
+    font-weight: 600;
+    border: solid 1px white;
+    border-radius: 25px/50px;
 }
 
 .header-data {
@@ -62,6 +74,9 @@ hr {
     .header-data {
         bottom: 15px;
     }
+    .header-image > .knowledge-level {
+        bottom: 4px;
+    }
 }
 
 /* On screens that are 490px or less */
@@ -76,6 +91,12 @@ hr {
     .header-data {
         left: 135px;
         bottom: 15px;
+    }
+    .header-image > .knowledge-level {
+        left: 44px;
+        bottom: 14px;
+        font-size: 10pt;
+        min-width: 40px;
     }
 }
 /* --------------------------------- */
