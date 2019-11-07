@@ -1,4 +1,61 @@
 
+
+.back-image {
+    background-image: url('https://free4kwallpapers.com/uploads/originals/2019/07/22/wide-minimalistic-landscape-wallpaper.jpg');
+}
+
+.add_element {
+    margin-right: auto;
+}
+
+.search_by {
+    margin-left: auto;
+}
+
+input {
+    background: rgba(220, 220, 220, 0.5);
+    border-radius: 5px;
+    border: none;
+    padding: 5px;
+}
+
+input::placeholder {
+    color: black;
+    opacity: 0.8;
+}
+
+#list_select {
+    text-align: center !important;
+    margin-top: 7px;
+    margin-left: 40px;
+}
+
+.common_media {
+    background: rgba(220, 220, 220, 0.5);
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 5px;
+    padding: 5px;
+    color: black;
+    font-weight: 400;
+}
+
+@media (max-width: 489px) {
+    .add_element {
+        margin-right: 0;
+        margin-left: 0;
+    }
+    .search_by {
+        margin-right: 0;
+        margin-left: 0;
+    }
+}
+
+.filters-button-group {
+    justify-content: center;
+}
+
 #autocomplete.ui-autocomplete-loading {
     background-image: url('/static/img/add_loader.gif');
     background-position: right center;
@@ -24,15 +81,6 @@
 body.loading .modal_loading {
     display: block;
     overflow: hidden;
-}
-
-.add_element {
-    display: inline-block;
-    width: 220px;
-    border-top: 0px;
-    border-left: 0px;
-    border-right: 0px;
-    font-size: 12pt;
 }
 
 .dropdown-menu {
@@ -129,8 +177,6 @@ body.loading .modal_loading {
     .category-title {
         font-size: 1.5rem;
     }
-
-
 }
 
 .card {
@@ -323,40 +369,6 @@ body.loading .modal_loading {
     .score_size {
         font-size: 10pt;
     }
-}
-
-#list_select {
-    text-align: center!important;
-    margin-top: 7px;
-    margin-left: 40px;
-}
-
-.search_by_name {
-    text-align: right!important;
-    margin-right: 15px;
-}
-
-.add_an_element {
-    text-align: left!important;
-    margin-left: 15px;
-}
-
-@media (max-width: 546.98px) {
-    .search_by_name {
-        text-align: center!important;
-        margin-right: 0px;
-    }
-    .add_an_element {
-        text-align: center!important;
-        margin-left: 0px;
-    }
-    #list_select {
-        margin-left: 0px;
-    }
-}
-
-.filters-button-group {
-    justify-content: center;
 }
 
 .categories {

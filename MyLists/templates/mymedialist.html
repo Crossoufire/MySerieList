@@ -11,66 +11,73 @@
 
 
 {% block content %}
-<div class="row m-b-30">
-    {% if target_user_id == current_user.get_id() %}
-    <div class="col m-t-30 add_an_element">
-        {% if media_list == "movieslist" %}
-        <input class="form-control add_element" placeholder="Add a Movie" type="text" id="autocomplete"/>
-        <br>
-        <select id="list_select">
-            <option selected="selected">Completed</option>
-            <option>Plan to Watch</option>
-        </select>
-        {% elif media_list == "animelist" %}
-        <input class="form-control add_element" placeholder="Add an Anime" type="text" id="autocomplete"/>
-        <br>
-        <select id="list_select">
-            <option selected="selected">Watching</option>
-            <option>Completed</option>
-            <option>On Hold</option>
-            <option>Random</option>
-            <option>Dropped</option>
-            <option>Plan to Watch</option>
-        </select>
-        {% elif media_list == "serieslist" %}
-        <input class="form-control add_element" placeholder="Add a Series" type="text" id="autocomplete"/>
-        <br>
-        <select id="list_select">
-            <option selected="selected">Watching</option>
-            <option>Completed</option>
-            <option>On Hold</option>
-            <option>Random</option>
-            <option>Dropped</option>
-            <option>Plan to Watch</option>
-        </select>
+<div class="back-image p-b-50">
+    <div class="d-flex flex-wrap">
+        {% if target_user_id == current_user.get_id() %}
+        <div class="add_element m-l-25 m-t-20">
+            {% if media_list == "movieslist" %}
+            <input type="text" placeholder="Add a Movie" id="autocomplete"/>
+            <br>
+            <select id="list_select">
+                <option selected="selected">Completed</option>
+                <option>Plan to Watch</option>
+            </select>
+            {% elif media_list == "animelist" %}
+            <input type="text" placeholder="Add an Anime" id="autocomplete"/>
+            <br>
+            <select id="list_select">
+                <option selected="selected">Watching</option>
+                <option>Completed</option>
+                <option>On Hold</option>
+                <option>Random</option>
+                <option>Dropped</option>
+                <option>Plan to Watch</option>
+            </select>
+            {% elif media_list == "serieslist" %}
+            <input type="text" placeholder="Add a Series" id="autocomplete"/>
+            <br>
+            <select id="list_select">
+                <option selected="selected">Watching</option>
+                <option>Completed</option>
+                <option>On Hold</option>
+                <option>Random</option>
+                <option>Dropped</option>
+                <option>Plan to Watch</option>
+            </select>
+        </div>
         {% endif %}
         <input type="hidden" id="element_id" value=""/>
+        {% endif %}
+        <div class="search_by m-r-25 m-t-20">
+            <input type="text" id="myElementFilter" onkeyup="searchElement()" placeholder="Search by Title or Actor">
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap filters-button-group m-t-15">
+        {% if media_list != 'movieslist' %}
+        <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.WATCHING">Watching</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.COMPLETED">Completed</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.ON.HOLD">On Hold</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.RANDOM">Random</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.DROPPED">Dropped</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
+        {% else %}
+        <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.COMPLETED.C">Completed</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.ANIMATION">Completed Animation</button>
+        <button class="btn btn-sm btn-light text-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
+        {% endif %}
+        <button id="all_scores" class="btn btn-sm btn-primary text-light" onclick="all_scores()">Show scores</button>
+    </div>
+
+    {% if target_user_id != current_user.get_id() %}
+    <div class="width-100">
+        <div class="m-t-20 text-center common_media">You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)</div>
     </div>
     {% endif %}
-    <div class="col m-t-30 search_by_name">
-        <input type="text" id="myElementFilter" class="form-control add_element" onkeyup="searchElement()" placeholder="Search by title or actor">
-    </div>
 </div>
-<div class="d-flex flex-wrap filters-button-group">
-    {% if media_list != 'movieslist' %}
-    <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
-    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.WATCHING">Watching</button>
-    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.COMPLETED">Completed</button>
-    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.ON.HOLD">On Hold</button>
-    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.RANDOM">Random</button>
-    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.DROPPED">Dropped</button>
-    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
-    {% else %}
-    <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
-    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.COMPLETED.C">Completed</button>
-    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.ANIMATION">Completed Animation</button>
-    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
-    {% endif %}
-    <button id="all_scores" class="btn btn-sm btn-primary text-light" onclick="all_scores()">Show scores</button>
-</div>
-{% if target_user_id != current_user.get_id() %}
-<div class="m-t-20 text-center">You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)</div>
-{% endif %}
+
 <div id="categories-iso" class="categories-iso">
     {% for category in all_data %}
         {% if category[1] == 'COMPLETED' %}
@@ -78,7 +85,7 @@
         {% else %}
         <div class="categories {{ category[1] }}">
         {% endif %}
-        <h2 class="font-weight-light text-center mt-5 mb-0 category-title p-t-10">{{ category[1] }}<hr class="mt-2 pb-3 mb-0"></h2>
+        <h2 class="font-weight-light text-center mt-1 mb-0 category-title p-t-10">{{ category[1] }}<hr class="mt-2 pb-3 mb-0"></h2>
             {% if category[1] == 'COMPLETED ANIMATION' %}
             <div class="d-flex flex-wrap ANIMATION">
             {% else %}
