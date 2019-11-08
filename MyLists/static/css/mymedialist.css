@@ -2,6 +2,7 @@
 
 .back-image {
     background-image: url('https://free4kwallpapers.com/uploads/originals/2019/07/22/wide-minimalistic-landscape-wallpaper.jpg');
+    height: 250px;
 }
 
 .add_element {
@@ -58,7 +59,8 @@ input::placeholder {
 
 #autocomplete.ui-autocomplete-loading {
     background-image: url('/static/img/add_loader.gif');
-    background-position: right center;
+
+    background-position: right 7% bottom 50%;
     background-repeat: no-repeat;
 }
 
