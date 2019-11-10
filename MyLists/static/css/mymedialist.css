@@ -1,7 +1,7 @@
 
 
 .back-image {
-    background-image: url('https://free4kwallpapers.com/uploads/originals/2019/07/22/wide-minimalistic-landscape-wallpaper.jpg');
+    background-image: url('/static/img/profile_background.jpg');
     height: 250px;
 }
 
@@ -15,28 +15,26 @@
 
 input {
     background: rgba(220, 220, 220, 0.5);
-    border-radius: 5px;
     border: none;
     padding: 5px;
 }
 
 input::placeholder {
     color: black;
-    opacity: 0.8;
+    opacity: 1;
 }
 
 #list_select {
     text-align: center !important;
     margin-top: 7px;
-    margin-left: 40px;
+    margin-left: 35px;
 }
 
 .common_media {
     background: rgba(220, 220, 220, 0.5);
-    max-width: 300px;
+    max-width: 280px;
     margin-left: auto;
     margin-right: auto;
-    border-radius: 5px;
     padding: 5px;
     color: black;
     font-weight: 400;
@@ -59,7 +57,6 @@ input::placeholder {
 
 #autocomplete.ui-autocomplete-loading {
     background-image: url('/static/img/add_loader.gif');
-
     background-position: right 7% bottom 50%;
     background-repeat: no-repeat;
 }

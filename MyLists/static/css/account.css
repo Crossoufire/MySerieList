@@ -30,7 +30,7 @@ hr {
 .header-image {
     position: relative;
     height: 300px;
-    background-image: url('https://www.everynation.org/wp-content/uploads/2018/02/Monthly-Website-Header-background.jpg');
+    background-image: url('/static/img/profile_background_2.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -49,14 +49,14 @@ hr {
 
 .header-image > .knowledge-level {
     position: absolute;
-    background: grey;
+    background: #262626;
     min-width: 50px;
     left: 80px;
     bottom: -10%;
     z-index: 10;
-    font-weight: 600;
+    font-weight: 400;
     border: solid 1px white;
-    border-radius: 25px/50px;
+    border-radius: 8px;
 }
 
 .header-data {

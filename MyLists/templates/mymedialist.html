@@ -44,8 +44,8 @@
                 <option>Dropped</option>
                 <option>Plan to Watch</option>
             </select>
+            {% endif %}
         </div>
-        {% endif %}
         <input type="hidden" id="element_id" value=""/>
         {% endif %}
         <div class="search_by m-r-25 m-t-20">
@@ -68,6 +68,9 @@
         <button class="btn btn-sm btn-light text-dark" data-filter=".categories.ANIMATION">Completed Animation</button>
         <button class="btn btn-sm btn-light text-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
         {% endif %}
+    </div>
+
+    <div class="d-flex flex-wrap" style="justify-content: center;">
         <button id="all_scores" class="btn btn-sm btn-primary text-light" onclick="all_scores()">Show scores</button>
     </div>
 
