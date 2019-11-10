@@ -21,7 +21,7 @@ from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, Change
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
     Follow, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, Achievements, Movies, \
-    MoviesGenre, MoviesList, MoviesProd, MoviesActors, SeriesActors, AnimeActors
+    MoviesGenre, MoviesList, MoviesProd, MoviesActors, SeriesActors, AnimeActors, UserLastUpdate
 
 
 config.read('config.ini')
@@ -218,6 +218,9 @@ def register_token(token):
 
     return redirect(url_for('home'))
 
+@app.route("/test")
+def test():
+    return "none"
 
 ################################################# Authenticated routes #################################################
 
@@ -847,7 +850,7 @@ def update_element_season():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    # Check if the element exists
+    # Check if the list type is correct
     valide_types = ["animelist", "serieslist"]
     if element_type not in valide_types:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
@@ -876,10 +879,13 @@ def update_element_season():
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
         update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
+        old_season = update.current_season
+        old_episode = update.last_episode_watched
         update.current_season = season + 1
         update.last_episode_watched = 1
         db.session.commit()
         app.logger.info('[{}] Season of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, season+1))
+        set_last_update(media_id=element_id, media_type=ListType.ANIME, old_season=old_season, new_season=update.current_season, old_episode=old_episode, new_episode=1)
 
     elif element_type == "serieslist":
         last_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).order_by(
@@ -888,10 +894,13 @@ def update_element_season():
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
         update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
+        old_season = update.current_season
+        old_episode = update.last_episode_watched
         update.current_season = season + 1
         update.last_episode_watched = 1
         db.session.commit()
         app.logger.info('[{}] Season of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, season+1))
+        set_last_update(media_id=element_id, media_type=ListType.SERIES, old_season=old_season, new_season=update.current_season, old_episode=old_episode, new_episode=1)
 
     # Compute total time spent
     if element_type == "animelist":
@@ -942,9 +951,11 @@ def update_element_episode():
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
         update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
+        old_episode = update.last_episode_watched
         update.last_episode_watched = episode + 1
         db.session.commit()
         app.logger.info('[{}] Episode of the anime with ID {} updated to {}'.format(current_user.get_id(), element_id, episode+1))
+        set_last_update(media_id=element_id, media_type=ListType.ANIME, old_season=update.current_season, new_season=update.current_season, old_episode=old_episode, new_episode=update.last_episode_watched)
 
     elif element_type == "serieslist":
         current_season = SeriesList.query.filter_by(user_id=current_user.get_id(),series_id=element_id).first().current_season
@@ -953,9 +964,11 @@ def update_element_episode():
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
         update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
+        old_episode = update.last_episode_watched
         update.last_episode_watched = episode + 1
         db.session.commit()
         app.logger.info('[{}] Episode of the series with ID {} updated to {}'.format(current_user.get_id(), element_id, episode+1))
+        set_last_update(media_id=element_id, media_type=ListType.SERIES, old_season=update.current_season, new_season=update.current_season, old_episode=old_episode, new_episode=update.last_episode_watched)
 
     # Compute total time spent
     if element_type == "animelist":
@@ -1054,13 +1067,17 @@ def change_element_category():
     # Check if the element is in the user's list
     if element_type == "animelist":
         element = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.get_id()).first()
+        media_type = ListType.ANIME
     elif element_type == "serieslist":
         element = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.get_id()).first()
+        media_type = ListType.SERIES
     elif element_type == "movieslist":
         element = MoviesList.query.filter_by(movies_id=element_id, user_id=current_user.get_id()).first()
+        media_type = ListType.MOVIES
     if element is None:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
+    old_status = element.status
     if element_new_category == 'Watching':
         element.status = Status.WATCHING
     elif element_new_category == 'Completed':
@@ -1101,6 +1118,8 @@ def change_element_category():
                                                                                         element_id,
                                                                                         element_type,
                                                                                         element_new_category))
+    set_last_update(media_id=element_id, media_type=media_type, old_status=old_status, new_status=element.status)
+
     # Compute total time spent
     if element_type == "animelist":
         compute_media_time_spent(ListType.ANIME)
@@ -2194,6 +2213,27 @@ def compute_media_time_spent(list_type):
     db.session.commit()
 
 
+def set_last_update(media_id, media_type, old_status=None, new_status=None, old_season=None, new_season=None, old_episode=None, new_episode=None):
+    user = User.query.filter_by(id=current_user.get_id()).first()
+    element = UserLastUpdate.query.filter_by(user_id=user.id).all()
+    if len(element) >= 6:
+        oldest_id = UserLastUpdate.query.filter_by(user_id=current_user.get_id()).order_by(UserLastUpdate.date.asc()).first().id
+        UserLastUpdate.query.filter_by(id=oldest_id).delete()
+        db.session.commit()
+
+    update = UserLastUpdate(user_id=user.id,
+                            media_id=media_id,
+                            media_type=media_type,
+                            old_status=old_status,
+                            new_status=new_status,
+                            old_season=old_season,
+                            new_season=new_season,
+                            old_episode=old_episode,
+                            new_episode=new_episode,
+                            date=datetime.utcnow())
+    db.session.add(update)
+    db.session.commit()
+
 ###### Unused function for now #######
 def get_statistics(user_id, list_type):
     # get the number of element per score
@@ -3140,8 +3180,7 @@ def add_element_to_user(element_id, user_id, list_type, element_cat):
         # Set season/episode to max if the "completed" category is selected
         if selected_cat == Status.COMPLETED:
             number_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).count()
-            number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id,
-                                                                     season=number_season).first().episodes
+            number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=number_season).first().episodes
 
             user_list = SeriesList(user_id=user_id,
                                    series_id=element_id,
@@ -3155,18 +3194,15 @@ def add_element_to_user(element_id, user_id, list_type, element_cat):
                                    last_episode_watched=1,
                                    status=selected_cat)
 
-        app.logger.info('[{}] Added a series with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
-
-        compute_media_time_spent(list_type)
-
         db.session.commit()
+        app.logger.info('[{}] Added a series with the ID {}'.format(user_id, element_id))
+
     elif list_type == ListType.ANIME:
         # Set season/episode to max if the "completed" category is selected
         if selected_cat == Status.COMPLETED:
             number_season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).count()
-            number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id,
-                                                                    season=number_season).first().episodes
+            number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=number_season).first().episodes
 
             user_list = AnimeList(user_id=user_id,
                                   anime_id=element_id,
@@ -3180,12 +3216,10 @@ def add_element_to_user(element_id, user_id, list_type, element_cat):
                                   last_episode_watched=1,
                                   status=selected_cat)
 
-        app.logger.info('[{}] Added an anime with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
-
-        compute_media_time_spent(list_type)
-
         db.session.commit()
+        app.logger.info('[{}] Added an anime with the ID {}'.format(user_id, element_id))
+
     elif list_type == ListType.MOVIES:
         # If it contain the "Animation" genre ==> "Completed Animation"
         if selected_cat == Status.COMPLETED:
@@ -3201,12 +3235,12 @@ def add_element_to_user(element_id, user_id, list_type, element_cat):
                                movies_id=element_id,
                                status=selected_cat)
 
-        app.logger.info('[{}] Added movie with the ID {}'.format(user_id, element_id))
         db.session.add(user_list)
-
-        compute_media_time_spent(list_type)
-
         db.session.commit()
+        app.logger.info('[{}] Added movie with the ID {}'.format(user_id, element_id))
+
+    set_last_update(media_id=element_id, media_type=list_type, new_status=selected_cat)
+    compute_media_time_spent(list_type)
 
 
 def refresh_element_data(api_id, list_type):
