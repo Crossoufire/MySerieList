@@ -1613,25 +1613,40 @@ def get_achievements(user_id, list_type):
                     pass
 
         if list_type != ListType.MOVIES:
-            first_year = int(element[0].first_air_date.split('-')[0])
-            if 1990 <= first_year <= 2000 and element[1].status != Status.PLAN_TO_WATCH:
-                element_count_classic += 1
-                element_episodes_classic += get_episodes_and_time(element)[0]
-                element_time_classic += get_episodes_and_time(element)[1]
-                element_name_classic.append(element[0].name)
-            status = element[0].status
-            if (status == "Ended" or status == "Canceled") and element[1].status == Status.COMPLETED:
-                element_count_finished += 1
-            element_episodes = get_episodes_and_time(element)[0]
-            if int(element_episodes) >= 100:
-                element_count_long += 1
-                element_name_long.append(element[0].name)
-            year_last_air_date = element[0].last_air_date.split('-')[0]
-            if (int(year_last_air_date) <= 1980) and (element[1].status == Status.COMPLETED):
-                element_count_old += 1
-                element_name_old.append(element[0].name)
-            if element[1].status == Status.COMPLETED:
-                all_air_date_years.append(element[0].first_air_date.split('-')[0])
+            try:
+                first_year = int(element[0].first_air_date.split('-')[0])
+                if 1990 <= first_year <= 2000 and element[1].status != Status.PLAN_TO_WATCH:
+                    element_count_classic += 1
+                    element_episodes_classic += get_episodes_and_time(element)[0]
+                    element_time_classic += get_episodes_and_time(element)[1]
+                    element_name_classic.append(element[0].name)
+            except:
+                pass
+
+            try:
+                status = element[0].status
+                if (status == "Ended" or status == "Canceled") and element[1].status == Status.COMPLETED:
+                    element_count_finished += 1
+            except:
+                pass
+
+            try:
+                element_episodes = get_episodes_and_time(element)[0]
+                if int(element_episodes) >= 100:
+                    element_count_long += 1
+                    element_name_long.append(element[0].name)
+            except:
+                pass
+
+            try:
+                year_last_air_date = element[0].last_air_date.split('-')[0]
+                if (int(year_last_air_date) <= 1980) and (element[1].status == Status.COMPLETED):
+                    element_count_old += 1
+                    element_name_old.append(element[0].name)
+                if element[1].status == Status.COMPLETED:
+                    all_air_date_years.append(element[0].first_air_date.split('-')[0])
+            except:
+                pass
         elif list_type == ListType.MOVIES:
             try:
                 release_date = int(element[0].release_date.split('-')[0])
@@ -1641,12 +1656,17 @@ def get_achievements(user_id, list_type):
                     element_name_classic.append(element[0].name)
             except:
                 pass
-            if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
-                element_count_finished += 1
-            element_runtime = element[0].runtime
-            if element_runtime >= 150:
-                element_count_long += 1
-                element_name_long.append(element[0].name)
+
+            try:
+                if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
+                    element_count_finished += 1
+                element_runtime = element[0].runtime
+                if element_runtime >= 150:
+                    element_count_long += 1
+                    element_name_long.append(element[0].name)
+            except:
+                 pass
+
             try:
                 air_date = element[0].release_date.split('-')[0]
                 if (int(air_date) <= 1980) and (element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION):
@@ -1654,8 +1674,12 @@ def get_achievements(user_id, list_type):
                     element_name_old.append(element[0].name)
             except:
                 pass
-            if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
-                all_air_date_years.append(element[0].release_date.split('-')[0])
+
+            try:
+                if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
+                    all_air_date_years.append(element[0].release_date.split('-')[0])
+            except:
+                pass
 
     if list_type == ListType.ANIME:
         time_spent = int(user.time_spent_anime/1440)
@@ -1663,7 +1687,6 @@ def get_achievements(user_id, list_type):
         time_spent = int(user.time_spent_series/1440)
     elif list_type == ListType.MOVIES:
         time_spent = int(user.time_spent_movies/1440)
-
 
     ####################################################################################################################
     # Genres achievements
@@ -1715,7 +1738,6 @@ def get_achievements(user_id, list_type):
 
         all_badges.append(achievement_data)
 
-
     ####################################################################################################################
     # source/airing_date achievements
     achievements = Achievements.query.filter_by(media=media, type="classic").all()
@@ -1755,7 +1777,6 @@ def get_achievements(user_id, list_type):
                 break
     all_badges.append(achievement_data)
 
-
     ####################################################################################################################
     # Finished achievements
     achievements = Achievements.query.filter_by(media=media, type="finished").all()
@@ -1789,7 +1810,6 @@ def get_achievements(user_id, list_type):
                 break
     all_badges.append(achievement_data)
 
-
     ####################################################################################################################
     # Time achievements
     achievements = Achievements.query.filter_by(media=media, type="time").all()
@@ -1822,7 +1842,6 @@ def get_achievements(user_id, list_type):
                                     "element_percentage": round((time_spent*100)/(achievement.threshold), 2)}
                 break
     all_badges.append(achievement_data)
-
 
     ####################################################################################################################
     # Miscellaneous: Long runner
@@ -1897,7 +1916,6 @@ def get_achievements(user_id, list_type):
     all_badges.append(achievement_data)
 
     ####################################################################################################################
-
     achievements_data = {"all_badges": all_badges,
                          "unlocked_badges": unlocked_badges,
                          "unlocked_levels": unlocked_levels}
