@@ -1,3 +1,22 @@
+
+
+.card-wrapper {
+    margin: 2% 0;
+}
+
+.custom-circle-image {
+    width: 6vw;
+    height: 6vw;
+}
+
+.custom-circle-image img {
+    object-fit: cover;
+}
+
+.card-title {
+    letter-spacing: 1.1px;
+}
+
 /* ------------ Main CSS ----------- */
 ul {
     list-style: none;

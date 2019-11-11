@@ -626,16 +626,45 @@
                     </div>
                 </form>
                 {% endif %}
-                <div class="row m-t-30">
+                <div class="row">
                     {% for follow in data["follows"] %}
-                    <div class="col-xl-auto col-lg-auto col-sm-auto col m-b-30">
+                    <div class="col-sm-3 card-wrapper">
+                        <div class="card p-t-10 border-0 bg-danger">
+                            <div class="position-relative rounded-circle overflow-hidden mx-auto custom-circle-image">
+                                <img class="w-100 h-100" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}">
+                            </div>
+                            <div class="card-body p-b-0 p-t-0 text-center bg-primary mt-1">
+                                <h4 class="text-uppercase card-title">{{ follow['username'] }}</h4>
+                                <h4 class="text-left p-0 m-0">Series</h4>
+                                <hr class="p-b-5 m-0">
+                                <ul class="p-l-20 text-left" style="list-style-type: disc;">
+                                    <li>Breaking bad: S01.E02 => S02.E04</li>
+                                    <li>Malcolm: S04.E02 => S02.E08</li>
+                                </ul>
+                                <h4 class="text-left p-0 m-0">Anime</h4>
+                                <hr class="p-b-5 m-0">
+                                <ul class="p-l-20 text-left" style="list-style-type: disc;">
+                                    <li>Breaking bad: S01.E02 => S02.E04</li>
+                                    <li>Malcolm: S04.E02 => S02.E08</li>
+                                </ul>
+                                <h4 class="text-left p-0 m-0">Movies</h4>
+                                <hr class="p-b-5 m-0">
+                                <ul class="p-l-20 text-left" style="list-style-type: disc;">
+                                    <li>Breaking bad: S01.E02 => S02.E04</li>
+                                    <li>Malcolm: S04.E02 => S02.E08</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# <div class="col-xl-auto col-lg-auto col-sm-auto col m-b-30">
                         <a href="/account/{{ follow['username'] }}">
                             <div class="text-center">
                                 <img style="border-radius: 50%;" height="90" width="90" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}"/><br>
                                 <div style="color: white;" id="{{ follow['user_id'] }}">{{ follow['username'] }}</div>
                             </div>
                         </a>
-                    </div>
+                        </div> #}
                     {% endfor %}
                 </div>
             </div>
