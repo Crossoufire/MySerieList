@@ -79,7 +79,7 @@ class User(db.Model, UserMixin):
 class UserLastUpdate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    media_id = db.Column(db.Integer, nullable=False)
+    media_name = db.Column(db.String(50), nullable=False)
     media_type = db.Column(db.Enum(ListType), nullable=False)
     old_status = db.Column(db.Enum(Status))
     new_status = db.Column(db.Enum(Status))
