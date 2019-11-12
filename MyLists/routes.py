@@ -451,11 +451,12 @@ def account(user_name):
 
     nb_episodes_watched = 0
     for element in all_series_data:
-        episodes = element[2].split(",")
-        episodes = [int(x) for x in episodes]
-        for i in range(1, element[0].current_season):
-            nb_episodes_watched += episodes[i-1]
-        nb_episodes_watched += element[0].last_episode_watched
+        if element[0].status != Status.PLAN_TO_WATCH:
+            episodes = element[2].split(",")
+            episodes = [int(x) for x in episodes]
+            for i in range(1, element[0].current_season):
+                nb_episodes_watched += episodes[i-1]
+            nb_episodes_watched += element[0].last_episode_watched
     account_data["series"]["nb_ep_watched"] = nb_episodes_watched
 
     # Count the total number of seen episodes for the anime
@@ -467,11 +468,12 @@ def account(user_name):
 
     nb_episodes_watched = 0
     for element in all_anime_data:
-        episodes = element[2].split(",")
-        episodes = [int(x) for x in episodes]
-        for i in range(1, element[0].current_season):
-            nb_episodes_watched += episodes[i-1]
-        nb_episodes_watched += element[0].last_episode_watched
+        if element[0].status != Status.PLAN_TO_WATCH:
+            episodes = element[2].split(",")
+            episodes = [int(x) for x in episodes]
+            for i in range(1, element[0].current_season):
+                nb_episodes_watched += episodes[i-1]
+            nb_episodes_watched += element[0].last_episode_watched
     account_data["anime"]["nb_ep_watched"] = nb_episodes_watched
 
     # Media percentages
@@ -2274,7 +2276,7 @@ def get_last_update(user_id):
         element_data = {}
         element_data["name"] = element[2].media_name
 
-        if element[2].old_status == None and element[2].new_status == None:
+        if element[2].old_status is None and element[2].new_status is None:
             # Season or episode update
             element_data["update"] = "S{}E{} -> S{}E{}".format(element[2].old_season, element[2].old_episode, element[2].new_season, element[2].new_episode)
         elif element[2].old_status is not None and element[2].new_status is not None:
