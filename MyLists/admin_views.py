@@ -42,7 +42,7 @@ class SeriesAdminView(ModelView):
     column_searchable_list = ['name']
     column_sortable_list = ('id', 'name', 'original_name', 'in_production', 'created_by', 'origin_country', 'status',
                             'episode_duration', 'total_seasons', 'total_episodes', 'vote_average', 'vote_count',
-                            'popularity', 'first_air_date', 'last_air_date')
+                            'popularity', 'first_air_date', 'last_air_date', 'last_update')
     list_template = 'admin/series.html'
 
 
@@ -114,7 +114,7 @@ class AnimeAdminView(ModelView):
     column_searchable_list = ['name']
     column_sortable_list = ('id', 'name', 'original_name', 'in_production', 'created_by', 'origin_country', 'status',
                             'episode_duration', 'total_seasons', 'total_episodes', 'vote_average', 'vote_count',
-                            'popularity', 'first_air_date', 'last_air_date')
+                            'popularity', 'first_air_date', 'last_air_date', 'last_update')
     list_template = 'admin/anime.html'
 
 
