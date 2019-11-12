@@ -547,6 +547,9 @@ def account(user_name):
     # Recover the number of followers
     followers = Follow.query.filter_by(follow_id=user.id).all()
 
+    last_updates = get_last_update(user.id)
+    print(last_updates)
+
     return render_template('account.html',
                            title            = "{}'s account".format(user.username),
                            data             = account_data,
@@ -555,6 +558,7 @@ def account(user_name):
                            user_name        = user_name,
                            follow_form      = follow_form,
                            followers        = len(followers),
+                           last_updates     = last_updates,
                            settings_form    = settings_form,
                            password_form    = password_form,
                            user_biography   = user.biography,
@@ -2269,6 +2273,7 @@ def get_last_update(user_id):
             tmp = element[1].username
             follow_data = {}
             follow_data["username"] = element[1].username
+            follow_data["picture"] = element[1].image_file
             follow_data["series"] = []
             follow_data["anime"] = []
             follow_data["movies"] = []

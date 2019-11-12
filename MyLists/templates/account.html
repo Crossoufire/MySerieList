@@ -629,12 +629,13 @@
                 <div class="row">
                     {% for follow in data["follows"] %}
                     <div class="col-sm-3 card-wrapper">
+                        {% for i in range(0, last_updates|length) %}
                         <div class="card p-t-10 border-0 bg-danger">
                             <div class="position-relative rounded-circle overflow-hidden mx-auto custom-circle-image">
-                                <img class="w-100 h-100" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}">
+                                <img class="w-100 h-100" src="{{ url_for('static', filename='profile_pics/') }}{{ last_updates[i]['picture'] }}">
                             </div>
                             <div class="card-body p-b-0 p-t-0 text-center bg-primary mt-1">
-                                <h4 class="text-uppercase card-title">{{ follow['username'] }}</h4>
+                                <h4 class="text-uppercase card-title">{{ flast_updates[i]['username'] }}</h4>
                                 <h4 class="text-left p-0 m-0">Series</h4>
                                 <hr class="p-b-5 m-0">
                                 <ul class="p-l-20 text-left" style="list-style-type: disc;">
@@ -655,16 +656,9 @@
                                 </ul>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
 
-                    {# <div class="col-xl-auto col-lg-auto col-sm-auto col m-b-30">
-                        <a href="/account/{{ follow['username'] }}">
-                            <div class="text-center">
-                                <img style="border-radius: 50%;" height="90" width="90" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}"/><br>
-                                <div style="color: white;" id="{{ follow['user_id'] }}">{{ follow['username'] }}</div>
-                            </div>
-                        </a>
-                        </div> #}
                     {% endfor %}
                 </div>
             </div>
