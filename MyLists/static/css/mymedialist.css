@@ -2,6 +2,7 @@
 
 .back-image {
     background-image: url('/static/img/profile_background.jpg');
+    background-size: cover;
     height: 250px;
 }
 
@@ -48,6 +49,18 @@ input::placeholder {
     .search_by {
         margin-right: 0;
         margin-left: 0;
+    }
+}
+
+@media (max-width: 428px) {
+    .back-image {
+        height: 300px;
+    }
+}
+
+@media (max-width: 419px) {
+    .back-image {
+        height: 350px;
     }
 }
 

@@ -2259,7 +2259,7 @@ def set_last_update(media_name, media_type, old_status=None, new_status=None, ol
 
 def get_last_update(user_id):
     follows_update = db.session.query(Follow, User, UserLastUpdate)\
-                                    .join(Follow, Follow.follow_id == User.id)\
+                                    .join(User, Follow.follow_id == User.id)\
                                     .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
                                     .filter(Follow.user_id == user_id)\
                                     .order_by(User.username, UserLastUpdate.date.desc()).all()
