@@ -216,11 +216,11 @@ hr {
 }
 
 .card-wrapper {
-    margin: 20px 0;
+    margin: 25px 0;
 }
 
 .card-image-top {
-    background-image: linear-gradient(#131418 40%, #2c3946 40%);
+    background: linear-gradient(#131418 30%, 30%, #310202);
 }
 
 .custom-circle-image {

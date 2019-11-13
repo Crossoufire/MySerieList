@@ -46,36 +46,6 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
         add_achievements_to_db()
-    if User.query.filter_by(id='2').first() is None:
-        user = User(username='bbb',
-                     email='bbb@bbb.com',
-                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(user)
-    if User.query.filter_by(id='3').first() is None:
-        user = User(username='ccc',
-                    email='ccc@ccc.com',
-                    password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                    image_file='default.jpg',
-                    active=True,
-                    private=False,
-                    registered_on=datetime.utcnow(),
-                    activated_on=datetime.utcnow())
-        db.session.add(user)
-    if User.query.filter_by(id='4').first() is None:
-        user = User(username='ddd',
-                    email='ddd@ddd.com',
-                    password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-                    image_file='default.jpg',
-                    active=True,
-                    private=False,
-                    registered_on=datetime.utcnow(),
-                    activated_on=datetime.utcnow())
-        db.session.add(user)
     refresh_db_achievements()
     db.session.commit()
 
@@ -2233,8 +2203,8 @@ def compute_media_time_spent(list_type):
     db.session.commit()
 
 
-def set_last_update(media_name, media_type, old_status=None, new_status=None, old_season=None, new_season=None,
-                    old_episode=None, new_episode=None):
+def set_last_update(media_name, media_type, old_status=None, new_status=None, old_season=None,
+                    new_season=None, old_episode=None, new_episode=None):
     user = User.query.filter_by(id=current_user.get_id()).first()
     element = UserLastUpdate.query.filter_by(user_id=user.id).all()
     if len(element) >= 6:
@@ -2259,7 +2229,7 @@ def set_last_update(media_name, media_type, old_status=None, new_status=None, ol
 
 def get_last_update(user_id):
     follows_update = db.session.query(Follow, User, UserLastUpdate)\
-                                    .join(Follow, Follow.follow_id == User.id)\
+                                    .join(User, Follow.follow_id == User.id)\
                                     .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
                                     .filter(Follow.user_id == user_id)\
                                     .order_by(User.username, UserLastUpdate.date.desc()).all()
@@ -2287,17 +2257,17 @@ def get_last_update(user_id):
         elif element[2].old_status is not None and element[2].new_status is not None:
             element_data["update"] = "{} -> {}".format(element[2].old_status.value, element[2].new_status.value)
             if "Watching" in element_data["update"]:
-                element_data["update"] = element_data["update"].replace("Watching", "Watch.")
+                element_data["update"] = element_data["update"].replace("Watching", "Watch")
             if "Completed" in element_data["update"]:
-                element_data["update"] = element_data["update"].replace("Completed", "Compl.")
+                element_data["update"] = element_data["update"].replace("Completed", "Compl")
             if "On Hold" in element_data["update"]:
-                element_data["update"] = element_data["update"].replace("On Hold", "On H.")
+                element_data["update"] = element_data["update"].replace("On Hold", "On H")
             if "Random" in element_data["update"]:
-                element_data["update"] = element_data["update"].replace("Random", "Rand.")
+                element_data["update"] = element_data["update"].replace("Random", "Rand")
             if "Dropped" in element_data["update"]:
-                element_data["update"] = element_data["update"].replace("Dropped", "Drop.")
+                element_data["update"] = element_data["update"].replace("Dropped", "Drop")
             if "Plan to Watch" in element_data["update"]:
-                element_data["update"] = element_data["update"].replace("Plan to Watch", "PtW.")
+                element_data["update"] = element_data["update"].replace("Plan to Watch", "PtW")
         # Media newly added
         elif element[2].old_status is None and element[2].new_status is not None:
             element_data["update"] = "{}".format(element[2].new_status.value)
@@ -2307,8 +2277,8 @@ def get_last_update(user_id):
 
         # Truncate the media name if bigger than the follow card (max 29)
         total_length = len(element[2].media_name) + len(element_data["update"])
-        if total_length > 29:
-            truncation = len(element[2].media_name)-(total_length-28)
+        if total_length > 35:
+            truncation = len(element[2].media_name)-(total_length-35)
             truncated_name = element[2].media_name[:truncation] + (element[2].media_name[:truncation] and '..')
             element_data["tronc_name"] = truncated_name
             element_data["name"] = element[2].media_name

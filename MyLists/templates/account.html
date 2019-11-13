@@ -31,22 +31,22 @@
 
 <ul class="nav account_tab">
     <li class="nav-item ml-auto">
-        <a id="overview" class="nav-link active" data-toggle="tab" href="#overview_tab" style="font-size: 0.9rem;">Overview</a>
+        <a id="overview" class="nav-link active" data-toggle="tab" href="#overview_tab" style="font-size: 1rem;">Overview</a>
     </li>
     <li class="nav-item">
-        <a id="follows" class="nav-link" data-toggle="tab" href="#follows_tab" style="font-size: 0.9rem;">Follows</a>
+        <a id="follows" class="nav-link" data-toggle="tab" href="#follows_tab" style="font-size: 1rem;">Follows</a>
     </li>
     {% if user_id != current_user.get_id() %}
     <li class="nav-item mr-auto">
     {% else %}
     <li class="nav-item">
     {% endif %}
-        <a id="achievements" class="nav-link" data-toggle="tab" href="#badges_tab" style="font-size: 0.9rem;">Badges</a>
+        <a id="achievements" class="nav-link" data-toggle="tab" href="#badges_tab" style="font-size: 1rem;">Badges</a>
     </li>
 
     {% if user_id == current_user.get_id() %}
     <li class="nav-item mr-auto">
-        <a id="settings" class="nav-link" data-toggle="tab" href="#settings_tab" style="font-size: 0.9rem;">Settings</a>
+        <a id="settings" class="nav-link" data-toggle="tab" href="#settings_tab" style="font-size: 1rem;">Settings</a>
     </li>
     {% endif %}
     {#<li class="nav-item">
@@ -628,8 +628,8 @@
                 {% endif %}
                 <div class="row">
                     {% for follow in data["follows"] %}
-                    <div class="col card-wrapper" style="min-width: 320px; max-width: 320px;">
-                        <div class="card border-0">
+                    <div class="col d-flex flex-wrap card-wrapper" style="justify-content: center;">
+                        <div class="card border-0" style="min-width: 345px; max-width: 345px;">
                             <div class="card-image-top">
                                 <div class="position-relative rounded-circle overflow-hidden mx-auto custom-circle-image">
                                     <img class="w-100 h-100" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}">
@@ -637,17 +637,16 @@
                                 <h4 class="text-uppercase card-title text-center m-t-10 m-b-10">{{ follow['username'] }}</h4>
                             </div>
                             {% for i in range(0, last_updates|length) %}
+                                <div class="card-body p-b-10 p-t-0 m-t-1 text-center" style="min-height: 289px; max-height: 289px;">
                                 {% if last_updates[i]["username"] == follow["username"] %}
-                                <div class="card-body p-b-10 p-t-0 mt-1 text-center">
                                     {% if last_updates[i]["series"] != [] %}
                                     <h4 class="text-left p-t-5 m-0">Series</h4>
                                     <hr class="p-b-5 m-0">
-                                    <ul class="p-0 m-b-5 text-left">
+                                    <ul class="p-0 m-b-5">
                                         {% for last_update in last_updates[i]["series"] %}
                                         <li style="justify-content: space-between; display: flex;">
                                             <div data-toggle="tooltip" title="{{ last_update['name'] }}">{{ last_update["tronc_name"] }}:</div>
                                             <div>{{ last_update["update"] }}</div>
-                                            {#<div style="color: grey;"><i>{{ last_update["date"] }}</i></div>#}
                                         </li>
                                         {% endfor %}
                                     </ul>
@@ -676,8 +675,8 @@
                                         {% endfor %}
                                     </ul>
                                     {% endif %}
-                                </div>
                                 {% endif %}
+                                </div>
                             {% endfor %}
                         </div>
                     </div>
