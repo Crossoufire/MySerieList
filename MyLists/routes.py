@@ -2277,28 +2277,44 @@ def get_last_update(user_id):
             follow_data["movies"] = []
 
         element_data = {}
-        if len(element[2].media_name) > 10:
-            truncated_name = element[2].media_name[:10] + (element[2].media_name[:10] and '..')
+        # Season or episode update
+        if element[2].old_status is None and element[2].new_status is None:
+            element_data["update"] = "S{:02d}.E{:02d} -> S{:02d}.E{:02d}".format(element[2].old_season,
+                                                                                  element[2].old_episode,
+                                                                                  element[2].new_season,
+                                                                                  element[2].new_episode)
+        # Category update
+        elif element[2].old_status is not None and element[2].new_status is not None:
+            element_data["update"] = "{} -> {}".format(element[2].old_status.value, element[2].new_status.value)
+            if "Watching" in element_data["update"]:
+                element_data["update"] = element_data["update"].replace("Watching", "Watch.")
+            if "Completed" in element_data["update"]:
+                element_data["update"] = element_data["update"].replace("Completed", "Compl.")
+            if "On Hold" in element_data["update"]:
+                element_data["update"] = element_data["update"].replace("On Hold", "On H.")
+            if "Random" in element_data["update"]:
+                element_data["update"] = element_data["update"].replace("Random", "Rand.")
+            if "Dropped" in element_data["update"]:
+                element_data["update"] = element_data["update"].replace("Dropped", "Drop.")
+            if "Plan to Watch" in element_data["update"]:
+                element_data["update"] = element_data["update"].replace("Plan to Watch", "PtW.")
+        # Media newly added
+        elif element[2].old_status is None and element[2].new_status is not None:
+            element_data["update"] = "{}".format(element[2].new_status.value)
+
+        # Add the update date
+        element_data["date"] = element[2].date
+
+        # Truncate the media name if bigger than the follow card (max 29)
+        total_length = len(element[2].media_name) + len(element_data["update"])
+        if total_length > 29:
+            truncation = len(element[2].media_name)-(total_length-28)
+            truncated_name = element[2].media_name[:truncation] + (element[2].media_name[:truncation] and '..')
             element_data["tronc_name"] = truncated_name
             element_data["name"] = element[2].media_name
         else:
             element_data["tronc_name"] = element[2].media_name
             element_data["name"] = ""
-
-        if element[2].old_status is None and element[2].new_status is None:
-            # Season or episode update
-            element_data["update"] = "S{:02d}.E{:02d} --> S{:02d}.E{:02d}".format(element[2].old_season,
-                                                                                  element[2].old_episode,
-                                                                                  element[2].new_season,
-                                                                                  element[2].new_episode)
-        elif element[2].old_status is not None and element[2].new_status is not None:
-            # Category update
-            element_data["update"] = "{} --> {}".format(element[2].old_status.value, element[2].new_status.value)
-        elif element[2].old_status is None and element[2].new_status is not None:
-            # newly added
-            element_data["update"] = "{}".format(element[2].new_status.value)
-
-        element_data["date"] = element[2].date
 
         if element[2].media_type == ListType.SERIES:
             follow_data["series"].append(element_data)

@@ -628,7 +628,7 @@
                 {% endif %}
                 <div class="row">
                     {% for follow in data["follows"] %}
-                    <div class="col-lg-3 col-md-3 col-sm-3 card-wrapper">
+                    <div class="col card-wrapper" style="min-width: 320px; max-width: 320px;">
                         <div class="card border-0">
                             <div class="card-image-top">
                                 <div class="position-relative rounded-circle overflow-hidden mx-auto custom-circle-image">
@@ -642,11 +642,12 @@
                                     {% if last_updates[i]["series"] != [] %}
                                     <h4 class="text-left p-t-5 m-0">Series</h4>
                                     <hr class="p-b-5 m-0">
-                                    <ul class="p-0 m-b-5">
+                                    <ul class="p-0 m-b-5 text-left">
                                         {% for last_update in last_updates[i]["series"] %}
                                         <li style="justify-content: space-between; display: flex;">
                                             <div data-toggle="tooltip" title="{{ last_update['name'] }}">{{ last_update["tronc_name"] }}:</div>
                                             <div>{{ last_update["update"] }}</div>
+                                            {#<div style="color: grey;"><i>{{ last_update["date"] }}</i></div>#}
                                         </li>
                                         {% endfor %}
                                     </ul>

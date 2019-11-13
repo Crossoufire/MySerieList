@@ -1,30 +1,5 @@
 
 
-.card-image-top {
-    background-image: linear-gradient(#131418 40%, #2c3946 40%);
-}
-
-.card-wrapper {
-    margin: 2% 0;
-}
-
-.custom-circle-image {
-    width: 7vw;
-    height: 7vw;
-}
-
-.custom-circle-image img {
-    object-fit: cover;
-}
-
-.card-title {
-    letter-spacing: 1.1px;
-}
-
-.card-body {
-    background-image: url('/static/img/profile_background_2.jpg');
-}
-
 /* ------------ Main CSS ----------- */
 ul {
     list-style: none;
@@ -239,6 +214,33 @@ hr {
     box-shadow: 0 0 0 0rem;
     color: #fff;
 }
+
+.card-wrapper {
+    margin: 20px 0;
+}
+
+.card-image-top {
+    background-image: linear-gradient(#131418 40%, #2c3946 40%);
+}
+
+.custom-circle-image {
+    width: 110px;
+    height: 110px;
+}
+
+.custom-circle-image img {
+    object-fit: cover;
+}
+
+.card-title {
+    letter-spacing: 1.1px;
+}
+
+.card-body {
+    background-image: url('/static/img/profile_background_2.jpg');
+}
+/* --------------------------------- */
+
 
 /* ------------ Levels ------------ */
 .account-bar-wrapper {
