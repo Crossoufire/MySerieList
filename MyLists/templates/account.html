@@ -628,37 +628,58 @@
                 {% endif %}
                 <div class="row">
                     {% for follow in data["follows"] %}
-                    <div class="col-sm-3 card-wrapper">
-                        {% for i in range(0, last_updates|length) %}
-                        <div class="card p-t-10 border-0 bg-danger">
-                            <div class="position-relative rounded-circle overflow-hidden mx-auto custom-circle-image">
-                                <img class="w-100 h-100" src="{{ url_for('static', filename='profile_pics/') }}{{ last_updates[i]['picture'] }}">
+                    <div class="col-lg-3 col-md-3 col-sm-3 card-wrapper">
+                        <div class="card border-0">
+                            <div class="card-image-top">
+                                <div class="position-relative rounded-circle overflow-hidden mx-auto custom-circle-image">
+                                    <img class="w-100 h-100" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}">
+                                </div>
+                                <h4 class="text-uppercase card-title text-center m-t-10 m-b-10">{{ follow['username'] }}</h4>
                             </div>
-                            <div class="card-body p-b-0 p-t-0 text-center bg-primary mt-1">
-                                <h4 class="text-uppercase card-title">{{ flast_updates[i]['username'] }}</h4>
-                                <h4 class="text-left p-0 m-0">Series</h4>
-                                <hr class="p-b-5 m-0">
-                                <ul class="p-l-20 text-left" style="list-style-type: disc;">
-                                    <li>Breaking bad: S01.E02 => S02.E04</li>
-                                    <li>Malcolm: S04.E02 => S02.E08</li>
-                                </ul>
-                                <h4 class="text-left p-0 m-0">Anime</h4>
-                                <hr class="p-b-5 m-0">
-                                <ul class="p-l-20 text-left" style="list-style-type: disc;">
-                                    <li>Breaking bad: S01.E02 => S02.E04</li>
-                                    <li>Malcolm: S04.E02 => S02.E08</li>
-                                </ul>
-                                <h4 class="text-left p-0 m-0">Movies</h4>
-                                <hr class="p-b-5 m-0">
-                                <ul class="p-l-20 text-left" style="list-style-type: disc;">
-                                    <li>Breaking bad: S01.E02 => S02.E04</li>
-                                    <li>Malcolm: S04.E02 => S02.E08</li>
-                                </ul>
-                            </div>
+                            {% for i in range(0, last_updates|length) %}
+                                {% if last_updates[i]["username"] == follow["username"] %}
+                                <div class="card-body p-b-10 p-t-0 mt-1 text-center">
+                                    {% if last_updates[i]["series"] != [] %}
+                                    <h4 class="text-left p-t-5 m-0">Series</h4>
+                                    <hr class="p-b-5 m-0">
+                                    <ul class="p-0 m-b-5">
+                                        {% for last_update in last_updates[i]["series"] %}
+                                        <li style="justify-content: space-between; display: flex;">
+                                            <div data-toggle="tooltip" title="{{ last_update['name'] }}">{{ last_update["tronc_name"] }}:</div>
+                                            <div>{{ last_update["update"] }}</div>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                    {% if last_updates[i]["anime"] != [] %}
+                                    <h4 class="text-left p-t-5 m-0">Anime</h4>
+                                    <hr class="p-b-5 m-0">
+                                    <ul class="p-0 m-b-5">
+                                        {% for last_update in last_updates[i]["anime"] %}
+                                        <li style="justify-content: space-between; display: flex;">
+                                            <div data-toggle="tooltip" title="{{ last_update['name'] }}">{{ last_update["tronc_name"] }}:</div>
+                                            <div>{{ last_update["update"] }}</div>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                    {% if last_updates[i]["movies"] != [] %}
+                                    <h4 class="text-left p-t-5 m-0">Movies</h4>
+                                    <hr class="p-b-5 m-0">
+                                    <ul class="p-0 m-b-5">
+                                        {% for last_update in last_updates[i]["movies"] %}
+                                        <li style="justify-content: space-between; display: flex;">
+                                            <div data-toggle="tooltip" title="{{ last_update['name'] }}">{{ last_update["tronc_name"] }}:</div>
+                                            <div>{{ last_update["update"] }}</div>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
-                        {% endfor %}
                     </div>
-
                     {% endfor %}
                 </div>
             </div>

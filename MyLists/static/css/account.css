@@ -1,12 +1,16 @@
 
 
+.card-image-top {
+    background-image: linear-gradient(#131418 40%, #2c3946 40%);
+}
+
 .card-wrapper {
     margin: 2% 0;
 }
 
 .custom-circle-image {
-    width: 6vw;
-    height: 6vw;
+    width: 7vw;
+    height: 7vw;
 }
 
 .custom-circle-image img {
@@ -15,6 +19,10 @@
 
 .card-title {
     letter-spacing: 1.1px;
+}
+
+.card-body {
+    background-image: url('/static/img/profile_background_2.jpg');
 }
 
 /* ------------ Main CSS ----------- */

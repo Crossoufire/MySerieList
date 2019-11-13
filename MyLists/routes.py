@@ -548,7 +548,6 @@ def account(user_name):
     followers = Follow.query.filter_by(follow_id=user.id).all()
 
     last_updates = get_last_update(user.id)
-    print(last_updates)
 
     return render_template('account.html',
                            title            = "{}'s account".format(user.username),
@@ -2259,7 +2258,6 @@ def set_last_update(media_name, media_type, old_status=None, new_status=None, ol
 
 
 def get_last_update(user_id):
-    follows_data = []
     follows_update = db.session.query(Follow, User, UserLastUpdate)\
                                     .join(Follow, Follow.follow_id == User.id)\
                                     .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
@@ -2267,26 +2265,35 @@ def get_last_update(user_id):
                                     .order_by(User.username, UserLastUpdate.date.desc()).all()
 
     tmp = ""
-    for i in range(len(follows_update)):
+    follows_data = []
+    for i in range(0, len(follows_update)):
         element = follows_update[i]
         if element[1].username != tmp:
             tmp = element[1].username
             follow_data = {}
             follow_data["username"] = element[1].username
-            follow_data["picture"] = element[1].image_file
             follow_data["series"] = []
             follow_data["anime"] = []
             follow_data["movies"] = []
 
         element_data = {}
-        element_data["name"] = element[2].media_name
+        if len(element[2].media_name) > 10:
+            truncated_name = element[2].media_name[:10] + (element[2].media_name[:10] and '..')
+            element_data["tronc_name"] = truncated_name
+            element_data["name"] = element[2].media_name
+        else:
+            element_data["tronc_name"] = element[2].media_name
+            element_data["name"] = ""
 
         if element[2].old_status is None and element[2].new_status is None:
             # Season or episode update
-            element_data["update"] = "S{}E{} -> S{}E{}".format(element[2].old_season, element[2].old_episode, element[2].new_season, element[2].new_episode)
+            element_data["update"] = "S{:02d}.E{:02d} --> S{:02d}.E{:02d}".format(element[2].old_season,
+                                                                                  element[2].old_episode,
+                                                                                  element[2].new_season,
+                                                                                  element[2].new_episode)
         elif element[2].old_status is not None and element[2].new_status is not None:
             # Category update
-            element_data["update"] = "{} -> {}".format(element[2].old_status.value, element[2].new_status.value)
+            element_data["update"] = "{} --> {}".format(element[2].old_status.value, element[2].new_status.value)
         elif element[2].old_status is None and element[2].new_status is not None:
             # newly added
             element_data["update"] = "{}".format(element[2].new_status.value)
