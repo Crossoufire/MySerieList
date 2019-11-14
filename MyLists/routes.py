@@ -2256,29 +2256,36 @@ def get_last_update(user_id):
         # Category update
         elif element[2].old_status is not None and element[2].new_status is not None:
             element_data["update"] = "{} -> {}".format(element[2].old_status.value, element[2].new_status.value)
-            if "Watching" in element_data["update"]:
-                element_data["update"] = element_data["update"].replace("Watching", "Watch")
-            if "Completed" in element_data["update"]:
-                element_data["update"] = element_data["update"].replace("Completed", "Compl")
-            if "On Hold" in element_data["update"]:
-                element_data["update"] = element_data["update"].replace("On Hold", "On H")
-            if "Random" in element_data["update"]:
-                element_data["update"] = element_data["update"].replace("Random", "Rand")
-            if "Dropped" in element_data["update"]:
-                element_data["update"] = element_data["update"].replace("Dropped", "Drop")
-            if "Plan to Watch" in element_data["update"]:
-                element_data["update"] = element_data["update"].replace("Plan to Watch", "PtW")
+            # if "Watching" in element_data["update"]:
+            #     element_data["update"] = element_data["update"].replace("Watching", "Watch")
+            # if "Completed" in element_data["update"]:
+            #     element_data["update"] = element_data["update"].replace("Completed", "Compl")
+            # if "On Hold" in element_data["update"]:
+            #     element_data["update"] = element_data["update"].replace("On Hold", "On H")
+            # if "Random" in element_data["update"]:
+            #     element_data["update"] = element_data["update"].replace("Random", "Rand")
+            # if "Dropped" in element_data["update"]:
+            #     element_data["update"] = element_data["update"].replace("Dropped", "Drop")
+            # if "Plan to Watch" in element_data["update"]:
+            #     element_data["update"] = element_data["update"].replace("Plan to Watch", "PtW")
         # Media newly added
         elif element[2].old_status is None and element[2].new_status is not None:
             element_data["update"] = "{}".format(element[2].new_status.value)
 
         # Add the update date
-        element_data["date"] = element[2].date
+        tmp_date = str(element[2].date).split()
+        update_date = tmp_date[0]
+        update_time = tmp_date[1]
+        update_date = update_date.split('-')
+        update_date = "{}/{}".format(update_date[2], update_date[1])
+        update_time = update_time.split(':')
+        update_time = "{}:{}".format(update_time[0], update_time[1])
+        element_data["date"] = [update_date, update_time]
 
-        # Truncate the media name if bigger than the follow card (max 29)
+        # Truncate the media name if bigger than the follow card (max 30)
         total_length = len(element[2].media_name) + len(element_data["update"])
-        if total_length > 35:
-            truncation = len(element[2].media_name)-(total_length-35)
+        if total_length > 32:
+            truncation = len(element[2].media_name)-(total_length-32)
             truncated_name = element[2].media_name[:truncation] + (element[2].media_name[:truncation] and '..')
             element_data["tronc_name"] = truncated_name
             element_data["name"] = element[2].media_name
