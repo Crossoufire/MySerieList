@@ -242,6 +242,10 @@ hr {
     margin-bottom: 20px;
 }
 
+.follow_wrapper {
+    justify-content: space-evenly;
+}
+
 .card-body {
     background-image: url('/static/img/profile_background1.jpg');
 }

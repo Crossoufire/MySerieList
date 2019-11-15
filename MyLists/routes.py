@@ -2274,8 +2274,10 @@ def get_last_update(user_id):
             element_data["update"] = "{}".format(element[2].new_status.value)
 
         # Add the date of the update
+        date_in_str = element[2].date
+        date_in_str = date_in_str.strftime("%b")
         tmp_date = str(element[2].date).split()[0]
-        update_date = "{}/{}".format(tmp_date.split('-')[2], tmp_date.split('-')[1])
+        update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
         # Add the time of the update
         tmp_time = str(element[2].date).split()[1]
         update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
