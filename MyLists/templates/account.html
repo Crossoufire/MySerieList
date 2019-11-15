@@ -31,22 +31,22 @@
 
 <ul class="nav account_tab">
     <li class="nav-item ml-auto">
-        <a id="overview" class="nav-link active" data-toggle="tab" href="#overview_tab" style="font-size: 1rem;">Overview</a>
+        <a id="overview" class="nav-link active" data-toggle="tab" href="#overview_tab" style="font-size: 0.9rem;">Overview</a>
     </li>
     <li class="nav-item">
-        <a id="follows" class="nav-link" data-toggle="tab" href="#follows_tab" style="font-size: 1rem;">Follows</a>
+        <a id="follows" class="nav-link" data-toggle="tab" href="#follows_tab" style="font-size: 0.9rem;">Follows</a>
     </li>
     {% if user_id != current_user.get_id() %}
     <li class="nav-item mr-auto">
     {% else %}
     <li class="nav-item">
     {% endif %}
-        <a id="achievements" class="nav-link" data-toggle="tab" href="#badges_tab" style="font-size: 1rem;">Badges</a>
+        <a id="achievements" class="nav-link" data-toggle="tab" href="#badges_tab" style="font-size: 0.9rem;">Badges</a>
     </li>
 
     {% if user_id == current_user.get_id() %}
     <li class="nav-item mr-auto">
-        <a id="settings" class="nav-link" data-toggle="tab" href="#settings_tab" style="font-size: 1rem;">Settings</a>
+        <a id="settings" class="nav-link" data-toggle="tab" href="#settings_tab" style="font-size: 0.9rem;">Settings</a>
     </li>
     {% endif %}
     {#<li class="nav-item">
@@ -175,7 +175,7 @@
                         <div>
                             <h4>
                                 <i class="fas fa-bell text-light"></i>
-                                &nbsp&nbspLast Follows' Updates
+                                &nbsp&nbspFollows' Last Updates
                             </h4>
                         </div>
                         <hr>
@@ -622,7 +622,7 @@
                                     {% for last_update in last_updates[i]["series"] %}
                                     <div>
                                         <div style="float: left;" data-toggle="tooltip" title="{{ last_update['name'] }}">
-                                            <span class="m-r-15"><b>S</b></span>
+                                            <i class="m-r-15"><b>S</b></i>
                                             {{ last_update["trunc_name"] }}
                                         </div>
                                         <div style="float: right;">
@@ -660,7 +660,7 @@
                                     {% for last_update in last_updates[i]["movies"] %}
                                     <div>
                                         <div style="float: left;" data-toggle="tooltip" title="{{ last_update['name'] }}">
-                                            <span class="m-r-15"><b>M</b></span>
+                                            <span class="m-r-11"><b>M</b></span>
                                             {{ last_update["trunc_name"] }}
                                         </div>
                                         <div style="float: right;">
