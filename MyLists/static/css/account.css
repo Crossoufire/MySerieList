@@ -219,15 +219,38 @@ hr {
     background: linear-gradient(#131418 35%, 35%, #310202);
 }
 
+.follow_card {
+    min-width: 345px;
+    max-width: 345px;
+}
+
+.follow_card_body {
+    min-height: 295px;
+    max-height: 295px;
+}
+
+.follow_date {
+    color: #b3b3b3;
+    font-size: 11pt;
+}
+
 .follow_picture {
     width: 100px;
     height: 100px;
     border-radius: 50%;
-
+    margin-left: 20px;
+    margin-bottom: 20px;
 }
 
 .card-body {
     background-image: url('/static/img/profile_background_2.jpg');
+}
+
+/* On screens that are 990px or less */
+@media (max-width: 990px) {
+    .follow_wrapper {
+        justify-content: center;
+    }
 }
 /* --------------------------------- */
 

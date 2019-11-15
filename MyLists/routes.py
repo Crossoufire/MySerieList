@@ -188,9 +188,11 @@ def register_token(token):
 
     return redirect(url_for('home'))
 
+
 @app.route("/test")
 def test():
     return "none"
+
 
 ################################################# Authenticated routes #################################################
 
@@ -232,7 +234,7 @@ def account(user_name):
     elif user.private and follow is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    # Form to add follows
+    # Add follows form
     follow_form = AddFollowForm()
     if follow_form.submit_follow.data and follow_form.validate():
         add_follow(follow_form.follow_to_add.data)
@@ -372,22 +374,22 @@ def account(user_name):
         profile_picture = url_for('static', filename='profile_pics/default.jpg')
     account_data["profile_picture"] = profile_picture
 
-    # Time spent in hours
+    # Time spent in hours for all media
     account_data["series"]["time_spent_hour"] = round(user.time_spent_series/60)
     account_data["movies"]["time_spent_hour"] = round(user.time_spent_movies/60)
     account_data["anime"]["time_spent_hour"]  = round(user.time_spent_anime/60)
 
-    # Time spent in days
+    # Time spent in days for all media
     account_data["series"]["time_spent_day"] = round(user.time_spent_series/1440, 2)
     account_data["movies"]["time_spent_day"] = round(user.time_spent_movies/1440, 2)
     account_data["anime"]["time_spent_day"]  = round(user.time_spent_anime/1440, 2)
 
-    # Mean score
+    # Media mean score
     account_data["series"]["mean_score"] = get_mean_score(user.id, ListType.SERIES)
     account_data["movies"]["mean_score"] = get_mean_score(user.id, ListType.MOVIES)
     account_data["anime"]["mean_score"]  = get_mean_score(user.id, ListType.ANIME)
 
-    # Count elements of each category
+    # Count media elements of each category
     series_count = get_list_count(user.id, ListType.SERIES)
     account_data["series"]["watching_count"]    = series_count["watching"]
     account_data["series"]["completed_count"]   = series_count["completed"]
@@ -457,7 +459,6 @@ def account(user_name):
             (float(account_data["series"]["random_count"]/account_data["series"]["total_count"]))*100,
             (float(account_data["series"]["dropped_count"]/account_data["series"]["total_count"]))*100,
             (float(account_data["series"]["plantowatch_count"]/account_data["series"]["total_count"]))*100]
-
     if account_data["anime"]["nb_ep_watched"] == 0:
         account_data["anime"]["element_percentage"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     else:
@@ -468,7 +469,6 @@ def account(user_name):
             (float(account_data["anime"]["random_count"]/account_data["anime"]["total_count"]))*100,
             (float(account_data["anime"]["dropped_count"]/account_data["anime"]["total_count"]))*100,
             (float(account_data["anime"]["plantowatch_count"]/account_data["anime"]["total_count"]))*100]
-
     if account_data["movies"]["total_count"] == 0:
         account_data["movies"]["element_percentage"] = [0.0, 0.0, 0.0]
     else:
@@ -507,16 +507,17 @@ def account(user_name):
     user_achievements_anime  = get_achievements(user.id, ListType.ANIME)
     user_achievements_movies = get_achievements(user.id, ListType.MOVIES)
 
-    # Add the activated/registered date
+    # Recover the activated/registered date
     joined_tmp = user.activated_on
     if joined_tmp is None:
         joined_tmp = user.registered_on
     joined_tmp = str(joined_tmp.date()).split('-')
     joined_date = "{0}-{1}-{2}".format(joined_tmp[2], joined_tmp[1], joined_tmp[0])
 
-    # Recover the number of followers
+    # Recover the number of user that follows you
     followers = Follow.query.filter_by(follow_id=user.id).all()
 
+    # Recover the last updates of your follows
     last_updates = get_last_update(user.id)
 
     return render_template('account.html',
@@ -2272,25 +2273,23 @@ def get_last_update(user_id):
         elif element[2].old_status is None and element[2].new_status is not None:
             element_data["update"] = "{}".format(element[2].new_status.value)
 
-        # Add the update date
-        tmp_date = str(element[2].date).split()
-        update_date = tmp_date[0]
-        update_time = tmp_date[1]
-        update_date = update_date.split('-')
-        update_date = "{}/{}".format(update_date[2], update_date[1])
-        update_time = update_time.split(':')
-        update_time = "{}:{}".format(update_time[0], update_time[1])
+        # Add the date of the update
+        tmp_date = str(element[2].date).split()[0]
+        update_date = "{}/{}".format(tmp_date.split('-')[2], tmp_date.split('-')[1])
+        # Add the time of the update
+        tmp_time = str(element[2].date).split()[1]
+        update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
         element_data["date"] = [update_date, update_time]
 
         # Truncate the media name if bigger than the follow card (max 30)
-        total_length = len(element[2].media_name) + len(element_data["update"])
-        if total_length > 32:
-            truncation = len(element[2].media_name)-(total_length-32)
-            truncated_name = element[2].media_name[:truncation] + (element[2].media_name[:truncation] and '..')
-            element_data["tronc_name"] = truncated_name
+        total_length = len(element[2].media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
+        if total_length > 36:
+            trunc = len(element[2].media_name)-(total_length-34)
+            truncated_name = element[2].media_name[:trunc] + (element[2].media_name[:trunc] and '..')
+            element_data["trunc_name"] = truncated_name
             element_data["name"] = element[2].media_name
         else:
-            element_data["tronc_name"] = element[2].media_name
+            element_data["trunc_name"] = element[2].media_name
             element_data["name"] = ""
 
         if element[2].media_type == ListType.SERIES:

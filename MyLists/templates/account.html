@@ -102,10 +102,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                    {% if data['series_level'] | int + 1 < 10 %}
-                                    <div class='account-bar-next-level'>&nbsp0{{ data['series_level'] | int + 1 }}</div>
+                                    {% if data['series_level']|int+1 < 10 %}
+                                    <div class='account-bar-next-level'>&nbsp0{{ data['series_level']|int+1 }}</div>
                                     {% else %}
-                                    <div class='account-bar-next-level'>&nbsp{{ data['series_level'] | int + 1 }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ data['series_level']|int+1 }}</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -132,10 +132,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                    {% if data['movies_level'] | int + 1 < 10 %}
-                                    <div class='account-bar-next-level'>&nbsp0{{ data['movies_level'] | int + 1 }}</div>
+                                    {% if data['movies_level']|int+1 < 10 %}
+                                    <div class='account-bar-next-level'>&nbsp0{{ data['movies_level']|int+1 }}</div>
                                     {% else %}
-                                    <div class='account-bar-next-level'>&nbsp{{ data['movies_level'] | int + 1 }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ data['movies_level']|int+1 }}</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -162,10 +162,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                    {% if data['anime_level'] | int + 1 < 10 %}
-                                    <div class='account-bar-next-level'>&nbsp0{{ data['anime_level'] | int + 1 }}</div>
+                                    {% if data['anime_level']|int+1 < 10 %}
+                                    <div class='account-bar-next-level'>&nbsp0{{ data['anime_level']|int+1 }}</div>
                                     {% else %}
-                                    <div class='account-bar-next-level'>&nbsp{{ data['anime_level'] | int + 1 }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ data['anime_level']|int+1 }}</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -173,45 +173,21 @@
                     </li>
                     <li class="m-b-20">
                         <div>
-                            <h4 class="float-left">
-                                <i class="fas fa-rss"></i>
-                                &nbsp&nbspLast Follows
+                            <h4>
+                                <i class="fas fa-bell text-light"></i>
+                                &nbsp&nbspLast Follows' Updates
                             </h4>
-                            <h4 class="float-right"><a onclick="changeTab('follows_tab', 'follows')">({{ data["follows"]|length }})</a></h4>
-                            <div style="clear: both;"></div>
                         </div>
                         <hr>
-                        <div class="row">
-                            {% for i in range(0, data["follows"]|length) %}
-                                {% if i > 2 %}
-                                {% else %}
-                                <div class="col-auto">
-                                    <a href="/account/{{ data['follows'][i]['username'] }}">
-                                        <img style="border-radius: 50%;" height="60" width="60" src="{{ url_for('static', filename='profile_pics/') }}{{ data['follows'][i]['picture'] }}"/><br>
-                                        <div style="color: white;" class="text-center" id="{{ data['follows'][i]['user_id'] }}">{{ data['follows'][i]['username'] }}</div>
-                                    </a>
-                                </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
+
                     </li>
-                    {#<li class="m-b-20">
-                        <h4><i class="fas fa-newspaper"></i>&nbsp&nbsp Last follows update</h4>
-                        <hr>
-                        <div class="m-b-10">Psy - series<br>Added Breaking Bad</div>
-                        <div class="m-b-10">Psy - series<br>Breaking Bad<br>S01.E02 <i class="fas fa-arrow-right"></i> S01.E04</div>
-                        <div>Psy - anime<br>Shingeki no kyojin<br>S02.E04 <i class="fas fa-arrow-right"></i> S02.E08</div>
-                    </li>#}
                 </ul>
             </div>
             <div class="vertical_line"></div>
             <div class="col-xl col-lg-5 col-md-12">
                 <ul class="p-l-0">
                     <li>
-                        <h4>
-                            <i class="fas fa-chart-pie"></i>
-                            &nbsp&nbspStatistics
-                        </h4>
+                        <h4><i class="fas fa-chart-pie"></i>&nbsp&nbspStatistics</h4>
                         <hr>
                         <!------------------------ Series statistics --------------------------->
                         <div class="stats-size">
@@ -625,20 +601,20 @@
                     </div>
                 </form>
                 {% endif %}
-                <div class="d-flex flex-wrap m-t-30">
+                <div class="d-flex flex-wrap m-t-30 follow_wrapper">
                     {% for follow in data["follows"] %}
-                    <div class="card border-0 m-3" style="min-width: 345px; max-width: 345px;">
+                    <div class="card border-0 m-3 follow_card">
                         <div class="card-img-top">
                             <div class="row">
                                 <div class="col-4">
-                                    <img class="follow_picture m-l-30 m-b-20" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}">
+                                    <img class="follow_picture" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}">
                                 </div>
-                                <div class="col m-l-20 m-t-50">
-                                    <h4>{{ follow['username'] }}</h4>
+                                <div class="col m-l-15 m-t-50">
+                                    <h3>{{ follow['username'] }}</h3>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body p-2 p-b-10 p-t-0 m-t-1" style="min-height: 305px; max-height: 305px;">
+                        <div class="card-body p-2 p-b-10 p-t-0 m-t-1 follow_card_body">
                         {% for i in range(0, last_updates|length) %}
                             {% if last_updates[i]["username"] == follow["username"] %}
 
@@ -647,16 +623,16 @@
                                     <div>
                                         <div style="float: left;" data-toggle="tooltip" title="{{ last_update['name'] }}">
                                             <span class="m-r-15"><b>S</b></span>
-                                            {{ last_update["tronc_name"] }}
+                                            {{ last_update["trunc_name"] }}
                                         </div>
                                         <div style="float: right;">
-                                            <i style="color: #b3b3b3; font-size: 11pt;">
+                                            <i class="follow_date">
                                                 {{ last_update["date"][0] }}, {{ last_update["date"][1] }}
                                             </i>
                                         </div>
                                     </div>
                                     <div style="clear: both;"></div>
-                                    <div class="m-l-28">{{ last_update["update"] }}</div>
+                                    <div class="m-l-30" style="font-size: 11pt;">{{ last_update["update"] }}</div>
                                     <hr class="p-0 m-0">
                                     {% endfor %}
                                 {% endif %}
@@ -666,16 +642,16 @@
                                     <div>
                                         <div style="float: left;" data-toggle="tooltip" title="{{ last_update['name'] }}">
                                             <span class="m-r-15"><b>A</b></span>
-                                            {{ last_update["tronc_name"] }}
+                                            {{ last_update["trunc_name"] }}
                                         </div>
                                         <div style="float: right;">
-                                            <i style="color: #b3b3b3; font-size: 11pt;">
+                                            <i class="follow_date">
                                                 {{ last_update["date"][0] }}, {{ last_update["date"][1] }}
                                             </i>
                                         </div>
                                     </div>
                                     <div style="clear: both;"></div>
-                                    <div class="m-l-28">{{ last_update["update"] }}</div>
+                                    <div class="m-l-30" style="font-size: 11pt;">{{ last_update["update"] }}</div>
                                     <hr class="p-0 m-0">
                                     {% endfor %}
                                 {% endif %}
@@ -685,16 +661,16 @@
                                     <div>
                                         <div style="float: left;" data-toggle="tooltip" title="{{ last_update['name'] }}">
                                             <span class="m-r-15"><b>M</b></span>
-                                            {{ last_update["tronc_name"] }}
+                                            {{ last_update["trunc_name"] }}
                                         </div>
                                         <div style="float: right;">
-                                            <i class="media_type" style="color: #b3b3b3; font-size: 11pt;">
+                                            <i class="follow_date">
                                                 {{ last_update["date"][0] }}, {{ last_update["date"][1] }}
                                             </i>
                                         </div>
                                     </div>
                                     <div style="clear: both;"></div>
-                                    <div class="m-l-28">{{ last_update["update"] }}</div>
+                                    <div class="m-l-30" style="font-size: 11pt;">{{ last_update["update"] }}</div>
                                     <hr class="p-0 m-0">
                                     {% endfor %}
                                 {% endif %}
