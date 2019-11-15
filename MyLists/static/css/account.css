@@ -225,8 +225,9 @@ hr {
 }
 
 .follow_card_body {
-    min-height: 295px;
-    max-height: 295px;
+    min-height: 340px;
+    max-height: 340px;
+    background-image: url('/static/img/profile_background1.jpg');
 }
 
 .follow_date {
@@ -244,10 +245,6 @@ hr {
 
 .follow_wrapper {
     justify-content: space-evenly;
-}
-
-.card-body {
-    background-image: url('/static/img/profile_background1.jpg');
 }
 
 /* On screens that are 990px or less */
@@ -302,7 +299,7 @@ hr {
 .xp-bar {
     height: 10px;
     width: 60%;
-    background: #035;
+    background: grey;
     margin: 0px 0px 0px 5px;
     display: inline-block;
     vertical-align: middle;
@@ -311,7 +308,7 @@ hr {
 #xp-bar-fill-series {
     height: 100%;
     width: 0.1%;
-    background: #4d0000;
+    background: #216e7d;
     font-size: 12px;
     line-height: 10px;
     text-align: right;
@@ -320,7 +317,7 @@ hr {
 #xp-bar-fill-movies {
     height: 100%;
     width: 0.1%;
-    background: #cccccc;
+    background: #8c7821;
     font-size: 12px;
     line-height: 10px;
     text-align: right;
@@ -329,7 +326,7 @@ hr {
 #xp-bar-fill-anime {
     height: 100%;
     width: 0.1%;
-    background: #0068b3;
+    background: #945141;
     font-size: 12px;
     line-height: 10px;
     text-align: right;
@@ -396,15 +393,15 @@ hr {
 }
 
 .block_achiev.series {
-    background-color: #4d0000;
+    background-color: #216e7d;
 }
 
 .block_achiev.anime {
-    background-color: #0068b3;
+    background-color: #945141;
 }
 
 .block_achiev.movies {
-    background-color: white;
+    background-color: #8c7821;
 }
 
 .achiev-name {
