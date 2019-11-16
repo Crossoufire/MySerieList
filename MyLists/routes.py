@@ -191,8 +191,7 @@ def register_token(token):
 
 @app.route("/test")
 def test():
-    print(get_follows_last_update(2))
-    return "none"
+    return ""
 
 
 ################################################# Authenticated routes #################################################
