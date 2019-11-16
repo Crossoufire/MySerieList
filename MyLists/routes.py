@@ -191,6 +191,7 @@ def register_token(token):
 
 @app.route("/test")
 def test():
+    get_last_update(2)
     return "none"
 
 
@@ -2230,10 +2231,10 @@ def set_last_update(media_name, media_type, old_status=None, new_status=None, ol
 
 def get_last_update(user_id):
     follows_update = db.session.query(Follow, User, UserLastUpdate)\
-                                    .join(User, Follow.follow_id == User.id)\
-                                    .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
-                                    .filter(Follow.user_id == user_id)\
-                                    .order_by(User.username, UserLastUpdate.date.desc()).all()
+                               .join(User, Follow.follow_id == User.id)\
+                               .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
+                               .filter(Follow.user_id == user_id)\
+                               .order_by(User.username, UserLastUpdate.date.desc()).all()
 
     tmp = ""
     follows_data = []
@@ -2243,42 +2244,28 @@ def get_last_update(user_id):
             tmp = element[1].username
             follow_data = {}
             follow_data["username"] = element[1].username
-            follow_data["series"] = []
-            follow_data["anime"] = []
-            follow_data["movies"] = []
+            follow_data["update"] = []
 
         element_data = {}
         # Season or episode update
         if element[2].old_status is None and element[2].new_status is None:
-            element_data["update"] = "S{:02d}.E{:02d} -> S{:02d}.E{:02d}".format(element[2].old_season,
-                                                                                  element[2].old_episode,
-                                                                                  element[2].new_season,
-                                                                                  element[2].new_episode)
+            element_data["update"] = ["S{:02d}.E{:02d}".format(element[2].old_season, element[2].old_episode),
+                                      "S{:02d}.E{:02d}".format(element[2].new_season, element[2].new_episode)]
+
         # Category update
         elif element[2].old_status is not None and element[2].new_status is not None:
-            element_data["update"] = "{} -> {}".format(element[2].old_status.value, element[2].new_status.value)
-            # if "Watching" in element_data["update"]:
-            #     element_data["update"] = element_data["update"].replace("Watching", "Watch")
-            # if "Completed" in element_data["update"]:
-            #     element_data["update"] = element_data["update"].replace("Completed", "Compl")
-            # if "On Hold" in element_data["update"]:
-            #     element_data["update"] = element_data["update"].replace("On Hold", "On H")
-            # if "Random" in element_data["update"]:
-            #     element_data["update"] = element_data["update"].replace("Random", "Rand")
-            # if "Dropped" in element_data["update"]:
-            #     element_data["update"] = element_data["update"].replace("Dropped", "Drop")
-            # if "Plan to Watch" in element_data["update"]:
-            #     element_data["update"] = element_data["update"].replace("Plan to Watch", "PtW")
+            element_data["update"] = ["{}".format(element[2].old_status.value), "{}".format(element[2].new_status.value)]
+
         # Media newly added
         elif element[2].old_status is None and element[2].new_status is not None:
-            element_data["update"] = "{}".format(element[2].new_status.value)
+            element_data["update"] = ["{}".format(element[2].new_status.value)]
 
-        # Add the date of the update
-        date_in_str = element[2].date
-        date_in_str = date_in_str.strftime("%b")
+        # Update date
+        date_in_str = element[2].date.strftime("%b")
         tmp_date = str(element[2].date).split()[0]
         update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
-        # Add the time of the update
+
+        # Update time
         tmp_time = str(element[2].date).split()[1]
         update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
         element_data["date"] = [update_date, update_time]
@@ -2288,18 +2275,20 @@ def get_last_update(user_id):
         if total_length > 36:
             trunc = len(element[2].media_name)-(total_length-34)
             truncated_name = element[2].media_name[:trunc] + (element[2].media_name[:trunc] and '..')
-            element_data["trunc_name"] = truncated_name
-            element_data["name"] = element[2].media_name
+            element_data["truncated_media_name"] = truncated_name
+            element_data["media_name"] = element[2].media_name
         else:
-            element_data["trunc_name"] = element[2].media_name
-            element_data["name"] = ""
+            element_data["truncated_media_name"] = element[2].media_name
+            element_data["media_name"] = ""
 
         if element[2].media_type == ListType.SERIES:
-            follow_data["series"].append(element_data)
+            element_data["category"] = "series"
         elif element[2].media_type == ListType.ANIME:
-            follow_data["anime"].append(element_data)
+            element_data["category"] = "anime"
         elif element[2].media_type == ListType.MOVIES:
-            follow_data["movies"].append(element_data)
+            element_data["category"] = "movie"
+
+        follow_data["update"].append(element_data)
 
         try:
             if element[1].username != follows_update[i+1][1].username:
