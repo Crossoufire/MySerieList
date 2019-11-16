@@ -175,7 +175,11 @@
                         <div>
                             <h4>
                                 <i class="fas fa-bell text-light"></i>
+                                {% if user_id == current_user.get_id() %}
                                 &nbsp&nbspFollows' Last Updates
+                                {% else %}
+                                &nbsp&nbspLast Updates
+                                {% endif %}
                             </h4>
                         </div>
                         <hr>
@@ -183,7 +187,7 @@
                             {% if update['category'] == 'anime' %}
                             <div class="p-2 m-b-10" style="border-bottom: solid 1px #945141;">
                                 <div style="font-size: 12pt;" data-toggle="tooltip" title="{{ update['media_name'] }}">
-                                    <i style="color: #945141;" class="fas fa-torii-gate m-r-10"></i>
+                                    <i style="color: #945141;" class="fas fa-torii-gate m-r-14"></i>
                             {% elif update['category'] == 'series' %}
                             <div class="p-2 m-b-10" style="border-bottom: solid 1px #216e7d;">
                                 <div style="font-size: 12pt;" data-toggle="tooltip" title="{{ update['media_name'] }}">
@@ -191,12 +195,12 @@
                             {% elif update['category'] == 'movie' %}
                             <div class="p-2 m-b-10" style="border-bottom: solid 1px #8c7821;">
                                 <div style="font-size: 12pt;" data-toggle="tooltip" title="{{ update['media_name'] }}">
-                                    <i style="color: #8c7821;" class="far fa-star m-r-10"></i>
+                                    <i style="color: #8c7821;" class="far fa-star m-r-12"></i>
                             {% endif %}
                                     {{ update['truncated_media_name'] }}
                                 </div>
 
-                                <div style="font-size: 11pt;">
+                                <div class="m-l-35" style="font-size: 11pt;">
                                     {% if update['update']|length == 2 %}
                                         {{ update['update'][0] }}
                                         <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
@@ -207,14 +211,14 @@
                                 </div>
 
                                 {% if user_id == current_user.get_id() %}
-                                <span style="color: #b3b3b3; font-size: 10pt;">
+                                <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
                                     {{ update['date'][0] }} at {{ update['date'][1] }} by
                                 </span>
                                 <a href="{{ update['username'] }}" style="color: #359aff; font-size: 11pt;">
                                     {{ update['username'] }}
                                 </a>
                                 {% else %}
-                                <span style="color: #b3b3b3; font-size: 10pt;">
+                                <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
                                     {{ update['date'][0] }} at {{ update['date'][1] }}
                                 </span>
                                 {% endif %}
