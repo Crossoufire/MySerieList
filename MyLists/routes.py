@@ -2300,8 +2300,9 @@ def get_follows_full_last_update(user_id):
         update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
 
         # Update time
+        #TODO : change time according to the location
         tmp_time = str(element[2].date).split()[1]
-        update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
+        update_time = "{}:{}".format(int(tmp_time.split(':')[0])+1, tmp_time.split(':')[1])
         element_data["date"] = [update_date, update_time]
 
         # Truncate the media name if bigger than the follow card (max 36)
@@ -2358,8 +2359,9 @@ def get_user_last_update(user_id):
         update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
 
         # Update time
+        #TODO : change time according to the location
         tmp_time = str(element.date).split()[1]
-        update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
+        update_time = "{}:{}".format(int(tmp_time.split(':')[0])+1, tmp_time.split(':')[1])
         element_data["date"] = [update_date, update_time]
 
         # Truncate the media name if bigger than the follow card (max 30)
@@ -2415,8 +2417,9 @@ def get_follows_last_update(user_id):
         update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
 
         # Update time
+        #TODO : change time according to the location
         tmp_time = str(element[2].date).split()[1]
-        update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
+        update_time = "{}:{}".format(int(tmp_time.split(':')[0])+1, tmp_time.split(':')[1])
         element_data["date"] = [update_date, update_time]
 
         # Truncate the media name if bigger than the follow card (max 30)

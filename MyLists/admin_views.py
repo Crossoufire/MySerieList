@@ -1,7 +1,7 @@
 from flask_admin import expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from MyLists.models import User, Follow, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, SeriesNetwork, \
-    Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork, Movies, MoviesGenre, MoviesList, MoviesProd
+    Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork, Movies, MoviesGenre, MoviesList, MoviesProd, UserLastUpdate
 from MyLists import db, app
 from flask_login import current_user
 from flask_admin import Admin
@@ -28,6 +28,16 @@ class FollowAdminView(ModelView):
     column_sortable_list = ('user_id', 'follow_id')
     list_template = 'admin/follow.html'
 
+
+class LastUpdateAdminView(ModelView):
+
+    def is_accessible(self):
+        return current_user.get_id() == '1'
+
+    column_list = ('user_id', 'media_name', 'media_type', 'old_status', 'new_status', 'old_season', 'new_season', 'old_episode', 'new_episode', 'date')
+    column_searchable_list = ('user_id', 'media_name')
+    column_sortable_list = ('user_id', 'media_name', 'date')
+    list_template = 'admin/last_update.html'
 
 ######################################################## SERIES ########################################################
 
@@ -316,3 +326,8 @@ admin.add_view(MoviesProdAdminView(model=MoviesProd,
                                    session=db.session,
                                    name="Movies production network",
                                    endpoint='movies_prod'))
+
+admin.add_view(LastUpdateAdminView(model=UserLastUpdate,
+                                   session=db.session,
+                                   name="User Last Update",
+                                   endpoint='user_last_update'))
