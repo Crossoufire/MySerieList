@@ -2270,7 +2270,7 @@ def get_follows_full_last_update(user_id):
         update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
         element_data["date"] = [update_date, update_time]
 
-        # Truncate the media name if bigger than the follow card (max 30)
+        # Truncate the media name if bigger than the follow card (max 36)
         total_length = len(element[2].media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
         if total_length > 36:
             trunc = len(element[2].media_name)-(total_length-34)
