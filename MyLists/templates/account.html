@@ -9,6 +9,7 @@
 {% block content %}
 <div class="header-image">
     <img src="{{ data['profile_picture'] }}"/>
+    <div class="knowledge-level text-center">{{ data['knowledge_level'] }}</div>
     <div class="header-data">
         <h2><b>{{ data['username'] }}</b>
             <img height='50' width='50' data-toggle="tooltip" title="{{ data['knowledge_grade_title'] }}"
@@ -101,40 +102,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                    {% if data['series_level'] | int + 1 < 10 %}
-                                    <div class='account-bar-next-level'>&nbsp0{{ data['series_level'] | int + 1 }}</div>
+                                    {% if data['series_level']|int+1 < 10 %}
+                                    <div class='account-bar-next-level'>&nbsp0{{ data['series_level']|int+1 }}</div>
                                     {% else %}
-                                    <div class='account-bar-next-level'>&nbsp{{ data['series_level'] | int + 1 }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex">
-                            <div class='account-bar-wrapper'>
-                                <div class='account-bar'>
-                                    <img class="float-left m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
-                                    <span class='account-bar-name'>Movies</span>
-                                    {% if data['movies_level'] < 10 %}
-                                    <div id="movies_level" class='account-bar-level'>Level 0{{ data['movies_level'] }}</div>
-                                    {% else %}
-                                    <div id="movies_level" class='account-bar-level'>Level {{ data['movies_level'] }}</div>
-                                    {% endif %}
-                                    <div class='xp-bar' data-toggle="tooltip" title="{{ data['movies_percent'] }}%">
-                                        <div id='xp-bar-fill-movies'>
-                                            <div class='xp-increase-fx'>
-                                                <div class='xp-increase-fx-flicker'>
-                                                    <div class='xp-increase-glow1'></div>
-                                                    <div class='xp-increase-glow2'></div>
-                                                    <div class='xp-increase-glow3'></div>
-                                                </div>
-                                                <div class='xp-increase-glow2'></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {% if data['movies_level'] | int + 1 < 10 %}
-                                    <div class='account-bar-next-level'>&nbsp0{{ data['movies_level'] | int + 1 }}</div>
-                                    {% else %}
-                                    <div class='account-bar-next-level'>&nbsp{{ data['movies_level'] | int + 1 }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ data['series_level']|int+1 }}</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -161,10 +132,40 @@
                                             </div>
                                         </div>
                                     </div>
-                                    {% if data['anime_level'] | int + 1 < 10 %}
-                                    <div class='account-bar-next-level'>&nbsp0{{ data['anime_level'] | int + 1 }}</div>
+                                    {% if data['anime_level']|int+1 < 10 %}
+                                    <div class='account-bar-next-level'>&nbsp0{{ data['anime_level']|int+1 }}</div>
                                     {% else %}
-                                    <div class='account-bar-next-level'>&nbsp{{ data['anime_level'] | int + 1 }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ data['anime_level']|int+1 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <div class='account-bar-wrapper'>
+                                <div class='account-bar'>
+                                    <img class="float-left m-r-10" height='40' width='40' data-toggle="tooltip" title="{{ data['movies_grade_title'] }}" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data['movies_grade_id'] }}.png"/>
+                                    <span class='account-bar-name'>Movies</span>
+                                    {% if data['movies_level'] < 10 %}
+                                    <div id="movies_level" class='account-bar-level'>Level 0{{ data['movies_level'] }}</div>
+                                    {% else %}
+                                    <div id="movies_level" class='account-bar-level'>Level {{ data['movies_level'] }}</div>
+                                    {% endif %}
+                                    <div class='xp-bar' data-toggle="tooltip" title="{{ data['movies_percent'] }}%">
+                                        <div id='xp-bar-fill-movies'>
+                                            <div class='xp-increase-fx'>
+                                                <div class='xp-increase-fx-flicker'>
+                                                    <div class='xp-increase-glow1'></div>
+                                                    <div class='xp-increase-glow2'></div>
+                                                    <div class='xp-increase-glow3'></div>
+                                                </div>
+                                                <div class='xp-increase-glow2'></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if data['movies_level']|int+1 < 10 %}
+                                    <div class='account-bar-next-level'>&nbsp0{{ data['movies_level']|int+1 }}</div>
+                                    {% else %}
+                                    <div class='account-bar-next-level'>&nbsp{{ data['movies_level']|int+1 }}</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -172,45 +173,65 @@
                     </li>
                     <li class="m-b-20">
                         <div>
-                            <h4 class="float-left">
-                                <i class="fas fa-rss"></i>
-                                &nbsp&nbspLast Follows
-                            </h4>
-                            <h4 class="float-right"><a onclick="changeTab('follows_tab', 'follows')">({{ data["follows"]|length }})</a></h4>
-                            <div style="clear: both;"></div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            {% for i in range(0, data["follows"]|length) %}
-                                {% if i > 2 %}
+                            <h4>
+                                <i class="fas fa-bell text-light"></i>
+                                {% if user_id == current_user.get_id() %}
+                                &nbsp&nbspFollows' Last Updates
                                 {% else %}
-                                <div class="col-auto">
-                                    <a href="/account/{{ data['follows'][i]['username'] }}">
-                                        <img style="border-radius: 50%;" height="60" width="60" src="{{ url_for('static', filename='profile_pics/') }}{{ data['follows'][i]['picture'] }}"/><br>
-                                        <div style="color: white;" class="text-center" id="{{ data['follows'][i]['user_id'] }}">{{ data['follows'][i]['username'] }}</div>
-                                    </a>
-                                </div>
+                                &nbsp&nbspLast Updates
                                 {% endif %}
-                            {% endfor %}
+                            </h4>
                         </div>
-                    </li>
-                    {#<li class="m-b-20">
-                        <h4><i class="fas fa-newspaper"></i>&nbsp&nbsp Last follows update</h4>
                         <hr>
-                        <div class="m-b-10">Psy - series<br>Added Breaking Bad</div>
-                        <div class="m-b-10">Psy - series<br>Breaking Bad<br>S01.E02 <i class="fas fa-arrow-right"></i> S01.E04</div>
-                        <div>Psy - anime<br>Shingeki no kyojin<br>S02.E04 <i class="fas fa-arrow-right"></i> S02.E08</div>
-                    </li>#}
+                        {% for update in overview_updates %}
+                            {% if update['category'] == 'anime' %}
+                            <div class="p-2 m-b-10" style="border-bottom: solid 1px #945141;">
+                                <div style="font-size: 12pt;" data-toggle="tooltip" title="{{ update['media_name'] }}">
+                                    <i style="color: #945141;" class="fas fa-torii-gate m-r-14"></i>
+                            {% elif update['category'] == 'series' %}
+                            <div class="p-2 m-b-10" style="border-bottom: solid 1px #216e7d;">
+                                <div style="font-size: 12pt;" data-toggle="tooltip" title="{{ update['media_name'] }}">
+                                    <i style="color: #216e7d;" class="fas fa-tv m-r-10"></i>
+                            {% elif update['category'] == 'movie' %}
+                            <div class="p-2 m-b-10" style="border-bottom: solid 1px #8c7821;">
+                                <div style="font-size: 12pt;" data-toggle="tooltip" title="{{ update['media_name'] }}">
+                                    <i style="color: #8c7821;" class="far fa-star m-r-12"></i>
+                            {% endif %}
+                                    {{ update['truncated_media_name'] }}
+                                </div>
+
+                                <div class="m-l-35" style="font-size: 11pt;">
+                                    {% if update['update']|length == 2 %}
+                                        {{ update['update'][0] }}
+                                        <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
+                                        {{ update['update'][1] }}
+                                    {% else %}
+                                         {{ update['update'][0] }}
+                                    {% endif %}
+                                </div>
+
+                                {% if user_id == current_user.get_id() %}
+                                <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
+                                    {{ update['date'][0] }} at {{ update['date'][1] }} by
+                                </span>
+                                <a href="{{ update['username'] }}" style="color: #359aff; font-size: 11pt;">
+                                    {{ update['username'] }}
+                                </a>
+                                {% else %}
+                                <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
+                                    {{ update['date'][0] }} at {{ update['date'][1] }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </li>
                 </ul>
             </div>
             <div class="vertical_line"></div>
             <div class="col-xl col-lg-5 col-md-12">
                 <ul class="p-l-0">
                     <li>
-                        <h4>
-                            <i class="fas fa-chart-pie"></i>
-                            &nbsp&nbspStatistics
-                        </h4>
+                        <h4><i class="fas fa-chart-pie"></i>&nbsp&nbspStatistics</h4>
                         <hr>
                         <!------------------------ Series statistics --------------------------->
                         <div class="stats-size">
@@ -624,15 +645,67 @@
                     </div>
                 </form>
                 {% endif %}
-                <div class="row m-t-30">
+                <div class="d-flex flex-wrap m-t-30 follow_wrapper">
                     {% for follow in data["follows"] %}
-                    <div class="col-xl-auto col-lg-auto col-sm-auto col m-b-30">
-                        <a href="/account/{{ follow['username'] }}">
-                            <div class="text-center">
-                                <img style="border-radius: 50%;" height="90" width="90" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}"/><br>
-                                <div style="color: white;" id="{{ follow['user_id'] }}">{{ follow['username'] }}</div>
+                    <div class="card border-0 m-l-20 m-r-20 m-t-60 m-b-40 follow_card">
+                        <div class="card-img-top">
+                            <div class="row">
+                                <div class="col-4">
+                                    <a href="{{ follow['username'] }}">
+                                        <img class="follow_picture" src="{{ url_for('static', filename='profile_pics/') }}{{ follow['picture'] }}">
+                                    </a>
+                                </div>
+                                <div class="col m-l-10 m-t-15">
+                                    <h3>{{ follow['username'] }}</h3>
+                                </div>
                             </div>
-                        </a>
+                        </div>
+                        <div class="card-body p-2 p-b-10 p-t-0 m-t-1 follow_card_body">
+                        {% for last_update in last_updates %}
+                            {% if last_update["username"] == follow["username"] %}
+                                {% for update in last_update["update"] %}
+                                <div>
+                                    <div style="float: left;" data-toggle="tooltip" title="{{ update['media_name'] }}">
+                                        {% if update["category"] == "anime" %}
+                                        <i style="color: #945141;" class="fas fa-torii-gate m-r-14"></i>
+                                        {% elif update["category"] == "series" %}
+                                        <i style="color: #216e7d;" class="fas fa-tv m-r-10"></i>
+                                        {% else %}
+                                        <i style="color: #8c7821;" class="far fa-star m-r-12"></i>
+                                        {% endif %}
+                                        {{ update["truncated_media_name"] }}
+                                    </div>
+                                    <div style="float: right;">
+                                        <i class="follow_date">
+                                            {{ update["date"][0] }}, {{ update["date"][1] }}
+                                        </i>
+                                    </div>
+                                </div>
+                                    <div style="clear: both;"></div>
+                                    {% if update["update"]|length == 2 %}
+                                    <div class="m-l-35" style="font-size: 11pt;">
+                                        {{ update["update"][0] }}
+                                        <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
+                                        {{ update["update"][1] }}
+                                    </div>
+                                    {% else %}
+                                    <div class="m-l-35" style="font-size: 11pt;">
+                                        {{ update["update"][0] }}
+                                    </div>
+                                    {% endif %}
+                                    {% if not loop.last %}
+                                    {% if update["category"] == "anime" %}
+                                    <hr style="border-color: #945141;" class="p-0 m-t-4 m-b-4">
+                                    {% elif update["category"] == "series" %}
+                                    <hr style="border-color: #216e7d;" class="p-0 m-t-4 m-b-4">
+                                    {% else %}
+                                    <hr style="border-color: #8c7821;" class="p-0 m-t-4 m-b-4">
+                                    {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                        </div>
                     </div>
                     {% endfor %}
                 </div>

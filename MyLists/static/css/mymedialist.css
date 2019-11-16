@@ -1,7 +1,76 @@
 
+
+.back-image {
+    background-image: url('/static/img/profile_background.jpg');
+    background-size: cover;
+    height: 250px;
+}
+
+.add_element {
+    margin-right: auto;
+}
+
+.search_by {
+    margin-left: auto;
+}
+
+input {
+    background: rgba(220, 220, 220, 0.5);
+    border: none;
+    padding: 5px;
+}
+
+input::placeholder {
+    color: black;
+    opacity: 1;
+}
+
+#list_select {
+    text-align: center !important;
+    margin-top: 7px;
+    margin-left: 35px;
+}
+
+.common_media {
+    background: rgba(220, 220, 220, 0.5);
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px;
+    color: black;
+    font-weight: 400;
+}
+
+@media (max-width: 489px) {
+    .add_element {
+        margin-right: 0;
+        margin-left: 0;
+    }
+    .search_by {
+        margin-right: 0;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 428px) {
+    .back-image {
+        height: 300px;
+    }
+}
+
+@media (max-width: 419px) {
+    .back-image {
+        height: 350px;
+    }
+}
+
+.filters-button-group {
+    justify-content: center;
+}
+
 #autocomplete.ui-autocomplete-loading {
     background-image: url('/static/img/add_loader.gif');
-    background-position: right center;
+    background-position: right 7% bottom 50%;
     background-repeat: no-repeat;
 }
 
@@ -24,15 +93,6 @@
 body.loading .modal_loading {
     display: block;
     overflow: hidden;
-}
-
-.add_element {
-    display: inline-block;
-    width: 220px;
-    border-top: 0px;
-    border-left: 0px;
-    border-right: 0px;
-    font-size: 12pt;
 }
 
 .dropdown-menu {
@@ -129,14 +189,6 @@ body.loading .modal_loading {
     .category-title {
         font-size: 1.5rem;
     }
-
-
-}
-
-.show_score_button {
-    margin: 0 auto;
-    display: block;
-    margin-top: 10px;
 }
 
 .card {
@@ -174,7 +226,6 @@ body.loading .modal_loading {
 
 
 /* --------- Ribbons ---------- */
-
 .ribbon {
     border-style: solid;
     border-width: 0 35px 35px 0;
@@ -330,40 +381,6 @@ body.loading .modal_loading {
     .score_size {
         font-size: 10pt;
     }
-}
-
-#list_select {
-    text-align: center!important;
-    margin-top: 7px;
-    margin-left: 40px;
-}
-
-.search_by_name {
-    text-align: right!important;
-    margin-right: 15px;
-}
-
-.add_an_element {
-    text-align: left!important;
-    margin-left: 15px;
-}
-
-@media (max-width: 546.98px) {
-    .search_by_name {
-        text-align: center!important;
-        margin-right: 0px;
-    }
-    .add_an_element {
-        text-align: center!important;
-        margin-left: 0px;
-    }
-    #list_select {
-        margin-left: 0px;
-    }
-}
-
-.filters-button-group {
-    justify-content: center;
 }
 
 .categories {

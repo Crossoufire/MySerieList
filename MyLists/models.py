@@ -76,6 +76,20 @@ class User(db.Model, UserMixin):
             return user
 
 
+class UserLastUpdate(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    media_name = db.Column(db.String(50), nullable=False)
+    media_type = db.Column(db.Enum(ListType), nullable=False)
+    old_status = db.Column(db.Enum(Status))
+    new_status = db.Column(db.Enum(Status))
+    old_season = db.Column(db.Integer)
+    new_season = db.Column(db.Integer)
+    old_episode = db.Column(db.Integer)
+    new_episode = db.Column(db.Integer)
+    date = db.Column(db.DateTime, nullable=False)
+
+
 class Follow(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
