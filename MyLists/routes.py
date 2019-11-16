@@ -517,8 +517,14 @@ def account(user_name):
     # Recover the number of user that follows you
     followers = Follow.query.filter_by(follow_id=user.id).all()
 
-    # Recover the last updates of your follows
+    # Recover the last updates of your follows for the follow TAB
     last_updates = get_follows_full_last_update(user.id)
+
+    # Recover the last updates of the follows for the overview TAB
+    if user.id == current_user.id:
+        overview_updates = get_follows_last_update(user.id)
+    else:
+        overview_updates = get_user_last_update(user.id)
 
     return render_template('account.html',
                            title            = "{}'s account".format(user.username),
@@ -529,6 +535,7 @@ def account(user_name):
                            follow_form      = follow_form,
                            followers        = len(followers),
                            last_updates     = last_updates,
+                           overview_updates = overview_updates,
                            settings_form    = settings_form,
                            password_form    = password_form,
                            user_biography   = user.biography,
@@ -2329,8 +2336,8 @@ def get_user_last_update(user_id):
 
         # Truncate the media name if bigger than the follow card (max 30)
         total_length = len(element.media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
-        if total_length > 36:
-            trunc = len(element.media_name) - (total_length - 34)
+        if total_length > 42:
+            trunc = len(element.media_name) - (total_length - 42)
             truncated_name = element.media_name[:trunc] + (element.media_name[:trunc] and '..')
             element_data["truncated_media_name"] = truncated_name
             element_data["media_name"] = element.media_name
@@ -2386,8 +2393,8 @@ def get_follows_last_update(user_id):
 
         # Truncate the media name if bigger than the follow card (max 30)
         total_length = len(element[2].media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
-        if total_length > 36:
-            trunc = len(element[2].media_name) - (total_length - 34)
+        if total_length > 42:
+            trunc = len(element[2].media_name) - (total_length - 42)
             truncated_name = element[2].media_name[:trunc] + (element[2].media_name[:trunc] and '..')
             element_data["truncated_media_name"] = truncated_name
             element_data["media_name"] = element[2].media_name
