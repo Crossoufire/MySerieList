@@ -646,66 +646,48 @@
                             </div>
                         </div>
                         <div class="card-body p-2 p-b-10 p-t-0 m-t-1 follow_card_body">
-                        {% for i in range(0, last_updates|length) %}
-                            {% if last_updates[i]["username"] == follow["username"] %}
-
-                                {% if last_updates[i]["series"] != [] %}
-                                    {% for last_update in last_updates[i]["series"] %}
-                                    <div>
-                                        <div style="float: left;" data-toggle="tooltip" title="{{ last_update['name'] }}">
-                                            <i style="color: #216e7d;" class="fas fa-tv m-r-12"></i>
-                                            {{ last_update["trunc_name"] }}
-                                        </div>
-                                        <div style="float: right;">
-                                            <i class="follow_date">
-                                                {{ last_update["date"][0] }}, {{ last_update["date"][1] }}
-                                            </i>
-                                        </div>
+                        {% for last_update in last_updates %}
+                            {% if last_update["username"] == follow["username"] %}
+                                {% for update in last_update["update"] %}
+                                <div>
+                                    <div style="float: left;" data-toggle="tooltip" title="{{ update['media_name'] }}">
+                                        {% if update["category"] == "anime" %}
+                                        <i style="color: #945141;" class="fas fa-torii-gate m-r-15"></i>
+                                        {% elif update["category"] == "series" %}
+                                        <i style="color: #216e7d;" class="fas fa-tv m-r-12"></i>
+                                        {% else %}
+                                        <i style="color: #8c7821;" class="far fa-star m-r-12"></i>
+                                        {% endif %}
+                                        {{ update["truncated_media_name"] }}
                                     </div>
-                                    <div style="clear: both;"></div>
-                                    <div class="m-l-35" style="font-size: 11pt;">{{ last_update["update"] }}</div>
-                                    <hr style="border-color: #216e7d;" class="p-0 m-t-4 m-b-4">
-                                    {% endfor %}
-                                {% endif %}
-
-                                {% if last_updates[i]["anime"] != [] %}
-                                    {% for last_update in last_updates[i]["anime"] %}
-                                    <div>
-                                        <div style="float: left;" data-toggle="tooltip" title="{{ last_update['name'] }}">
-                                            <i style="color: #945141;" class="fas fa-torii-gate m-r-15"></i>
-                                            {{ last_update["trunc_name"] }}
-                                        </div>
-                                        <div style="float: right;">
-                                            <i class="follow_date">
-                                                {{ last_update["date"][0] }}, {{ last_update["date"][1] }}
-                                            </i>
-                                        </div>
+                                    <div style="float: right;">
+                                        <i class="follow_date">
+                                            {{ update["date"][0] }}, {{ update["date"][1] }}
+                                        </i>
                                     </div>
+                                </div>
                                     <div style="clear: both;"></div>
-                                    <div class="m-l-35" style="font-size: 11pt;">{{ last_update["update"] }}</div>
+                                    {% if update["update"]|length == 2 %}
+                                    <div class="m-l-35" style="font-size: 11pt;">
+                                        {{ update["update"][0] }}
+                                        <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
+                                        {{ update["update"][1] }}
+                                    </div>
+                                    {% else %}
+                                    <div class="m-l-35" style="font-size: 11pt;">
+                                        {{ update["update"][0] }}
+                                    </div>
+                                    {% endif %}
+                                    {% if not loop.last %}
+                                    {% if update["category"] == "anime" %}
                                     <hr style="border-color: #945141;" class="p-0 m-t-4 m-b-4">
-                                    {% endfor %}
-                                {% endif %}
-
-                                {% if last_updates[i]["movies"] != [] %}
-                                    {% for last_update in last_updates[i]["movies"] %}
-                                    <div>
-                                        <div style="float: left;" data-toggle="tooltip" title="{{ last_update['name'] }}">
-                                            <i style="color: #8c7821;" class="far fa-star m-r-12"></i>
-                                            {{ last_update["trunc_name"] }}
-                                        </div>
-                                        <div style="float: right;">
-                                            <i class="follow_date">
-                                                {{ last_update["date"][0] }}, {{ last_update["date"][1] }}
-                                            </i>
-                                        </div>
-                                    </div>
-                                    <div style="clear: both;"></div>
-                                    <div class="m-l-35" style="font-size: 11pt;">{{ last_update["update"] }}</div>
+                                    {% elif update["category"] == "series" %}
+                                    <hr style="border-color: #216e7d;" class="p-0 m-t-4 m-b-4">
+                                    {% else %}
                                     <hr style="border-color: #8c7821;" class="p-0 m-t-4 m-b-4">
-                                    {% endfor %}
-                                {% endif %}
-
+                                    {% endif %}
+                                    {% endif %}
+                                {% endfor %}
                             {% endif %}
                         {% endfor %}
                         </div>
