@@ -344,10 +344,6 @@ def account(user_name):
     follows_list_data = []
     for follow in follows_list:
         picture_url = url_for('static', filename='profile_pics/{}'.format(follow[0].image_file))
-        if os.path.isfile(picture_url) is False:
-            picture_url = 'default.jpg'
-        else:
-            picture_url = follow[0].image_file
         follow_data = {"username": follow[0].username,
                        "user_id" : follow[0].id,
                        "picture" : picture_url}
@@ -375,8 +371,6 @@ def account(user_name):
 
     # Recover the profile picture
     profile_picture = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
-    if os.path.isfile(profile_picture) is False:
-        profile_picture = url_for('static', filename='profile_pics/default.jpg')
     account_data["profile_picture"] = profile_picture
 
     # Time spent in hours for all media
