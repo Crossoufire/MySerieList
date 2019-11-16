@@ -216,7 +216,9 @@ hr {
 }
 
 .card-img-top {
-    background: linear-gradient(#131418 35%, 35%, #310202);
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    min-height: 70px;
+    max-height: 70px;
 }
 
 .follow_card {
@@ -236,11 +238,13 @@ hr {
 }
 
 .follow_picture {
+    position: absolute;
+    top: -50px;
+    left: 35px;
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    margin-left: 20px;
-    margin-bottom: 20px;
+    border: solid 2px black;
 }
 
 .follow_wrapper {

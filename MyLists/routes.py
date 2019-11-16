@@ -351,7 +351,12 @@ def account(user_name):
         follow_data = {"username": follow[0].username,
                        "user_id" : follow[0].id,
                        "picture" : picture_url}
-        if Follow.query.filter_by(user_id=current_user.get_id(), follow_id=follow[0].id).first() is not None or current_user.id == 1:
+
+        if User.query.filter_by(id=follow[0].id).first().private:
+            if Follow.query.filter_by(user_id=current_user.get_id(),
+                                      follow_id=follow[0].id).first() is not None or current_user.id == 1:
+                follows_list_data.append(follow_data)
+        else:
             follows_list_data.append(follow_data)
 
     account_data             = {}
