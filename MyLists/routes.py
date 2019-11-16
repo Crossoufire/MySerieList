@@ -191,8 +191,7 @@ def register_token(token):
 
 @app.route("/test")
 def test():
-    get_last_update(2)
-    return "none"
+    return ""
 
 
 ################################################# Authenticated routes #################################################
@@ -519,7 +518,7 @@ def account(user_name):
     followers = Follow.query.filter_by(follow_id=user.id).all()
 
     # Recover the last updates of your follows
-    last_updates = get_last_update(user.id)
+    last_updates = get_follows_full_last_update(user.id)
 
     return render_template('account.html',
                            title            = "{}'s account".format(user.username),
@@ -2229,7 +2228,7 @@ def set_last_update(media_name, media_type, old_status=None, new_status=None, ol
     db.session.commit()
 
 
-def get_last_update(user_id):
+def get_follows_full_last_update(user_id):
     follows_update = db.session.query(Follow, User, UserLastUpdate)\
                                .join(User, Follow.follow_id == User.id)\
                                .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
@@ -2298,6 +2297,116 @@ def get_last_update(user_id):
 
     return follows_data
 
+
+def get_user_last_update(user_id):
+    last_update = UserLastUpdate.query.filter_by(user_id=user_id).order_by(UserLastUpdate.date.desc()).limit(4)
+    update = []
+    for element in last_update:
+        element_data = {}
+        # Season or episode update
+        if element.old_status is None and element.new_status is None:
+            element_data["update"] = ["S{:02d}.E{:02d}".format(element.old_season, element.old_episode),
+                                      "S{:02d}.E{:02d}".format(element.new_season, element.new_episode)]
+
+        # Category update
+        elif element.old_status is not None and element.new_status is not None:
+            element_data["update"] = ["{}".format(element.old_status.value),
+                                      "{}".format(element.new_status.value)]
+
+        # Newly added media
+        elif element.old_status is None and element.new_status is not None:
+            element_data["update"] = ["{}".format(element.new_status.value)]
+
+        # Update date
+        date_in_str = element.date.strftime("%b")
+        tmp_date = str(element.date).split()[0]
+        update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
+
+        # Update time
+        tmp_time = str(element.date).split()[1]
+        update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
+        element_data["date"] = [update_date, update_time]
+
+        # Truncate the media name if bigger than the follow card (max 30)
+        total_length = len(element.media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
+        if total_length > 36:
+            trunc = len(element.media_name) - (total_length - 34)
+            truncated_name = element.media_name[:trunc] + (element.media_name[:trunc] and '..')
+            element_data["truncated_media_name"] = truncated_name
+            element_data["media_name"] = element.media_name
+        else:
+            element_data["truncated_media_name"] = element.media_name
+            element_data["media_name"] = ""
+
+        if element.media_type == ListType.SERIES:
+            element_data["category"] = "series"
+        elif element.media_type == ListType.ANIME:
+            element_data["category"] = "anime"
+        elif element.media_type == ListType.MOVIES:
+            element_data["category"] = "movie"
+
+        update.append(element_data)
+
+    return update
+
+
+def get_follows_last_update(user_id):
+    follows_update = db.session.query(Follow, User, UserLastUpdate)\
+                               .join(User, Follow.follow_id == User.id)\
+                               .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
+                               .filter(Follow.user_id == user_id)\
+                               .order_by(UserLastUpdate.date.desc()).limit(4)
+
+    update = []
+    for element in follows_update:
+        element_data = {}
+        # Season or episode update
+        if element[2].old_status is None and element[2].new_status is None:
+            element_data["update"] = ["S{:02d}.E{:02d}".format(element[2].old_season, element[2].old_episode),
+                                      "S{:02d}.E{:02d}".format(element[2].new_season, element[2].new_episode)]
+
+        # Category update
+        elif element[2].old_status is not None and element[2].new_status is not None:
+            element_data["update"] = ["{}".format(element[2].old_status.value),
+                                      "{}".format(element[2].new_status.value)]
+
+        # Newly added media
+        elif element[2].old_status is None and element[2].new_status is not None:
+            element_data["update"] = ["{}".format(element[2].new_status.value)]
+
+        # Update date
+        date_in_str = element[2].date.strftime("%b")
+        tmp_date = str(element[2].date).split()[0]
+        update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
+
+        # Update time
+        tmp_time = str(element[2].date).split()[1]
+        update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
+        element_data["date"] = [update_date, update_time]
+
+        # Truncate the media name if bigger than the follow card (max 30)
+        total_length = len(element[2].media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
+        if total_length > 36:
+            trunc = len(element[2].media_name) - (total_length - 34)
+            truncated_name = element[2].media_name[:trunc] + (element[2].media_name[:trunc] and '..')
+            element_data["truncated_media_name"] = truncated_name
+            element_data["media_name"] = element[2].media_name
+        else:
+            element_data["truncated_media_name"] = element[2].media_name
+            element_data["media_name"] = ""
+
+        if element[2].media_type == ListType.SERIES:
+            element_data["category"] = "series"
+        elif element[2].media_type == ListType.ANIME:
+            element_data["category"] = "anime"
+        elif element[2].media_type == ListType.MOVIES:
+            element_data["category"] = "movie"
+
+        element_data["username"] = element[1].username
+
+        update.append(element_data)
+
+    return update
 
 ###### Unused function for now #######
 def get_statistics(user_id, list_type):
