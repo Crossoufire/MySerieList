@@ -233,14 +233,14 @@ hr {
 }
 
 .card-img-top {
-    background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
     min-height: 70px;
     max-height: 70px;
 }
 
 .follow_card {
-    min-width: 320px;
-    max-width: 320px;
+    min-width: 310px;
+    max-width: 310px;
 }
 
 .follow_card_body {
@@ -265,14 +265,7 @@ hr {
 }
 
 .follow_wrapper {
-    justify-content: space-evenly;
-}
-
-/* On screens that are 990px or less */
-@media (max-width: 990px) {
-    .follow_wrapper {
-        justify-content: center;
-    }
+    justify-content: space-evenly
 }
 /* --------------------------------- */
 
