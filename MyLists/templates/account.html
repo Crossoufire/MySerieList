@@ -31,26 +31,26 @@
 
 <ul class="nav account_tab">
     <li class="nav-item ml-auto">
-        <a id="overview" class="nav-link active" data-toggle="tab" href="#overview_tab" style="font-size: 0.9rem;">Overview</a>
+        <a id="overview" class="nav-link active navbar_account" data-toggle="tab" href="#overview_tab">Overview</a>
     </li>
     <li class="nav-item">
-        <a id="follows" class="nav-link" data-toggle="tab" href="#follows_tab" style="font-size: 0.9rem;">Follows</a>
+        <a id="follows" class="nav-link navbar_account" data-toggle="tab" href="#follows_tab">Follows</a>
     </li>
     {% if user_id != current_user.get_id() %}
     <li class="nav-item mr-auto">
     {% else %}
     <li class="nav-item">
     {% endif %}
-        <a id="achievements" class="nav-link" data-toggle="tab" href="#badges_tab" style="font-size: 0.9rem;">Badges</a>
+        <a id="achievements" class="nav-link navbar_account" data-toggle="tab" href="#badges_tab">Badges</a>
     </li>
 
     {% if user_id == current_user.get_id() %}
     <li class="nav-item mr-auto">
-        <a id="settings" class="nav-link" data-toggle="tab" href="#settings_tab" style="font-size: 0.9rem;">Settings</a>
+        <a id="settings" class="nav-link navbar_account" data-toggle="tab" href="#settings_tab">Settings</a>
     </li>
     {% endif %}
     {#<li class="nav-item">
-        <a id="stats" class="nav-link" href="#">Adv stats <i class="fas fa-sm fa-external-link-square-alt" style="font-size: 0.9rem;"></i></a>
+        <a id="stats" class="nav-link navbar_account" href="#">Adv stats <i class="fas fa-sm fa-external-link-square-alt"></i></a>
     </li>#}
 </ul>
 

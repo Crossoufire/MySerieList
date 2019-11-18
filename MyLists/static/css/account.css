@@ -25,6 +25,23 @@ hr {
 .account_tab > li > a {
     color: white;
 }
+
+@media (max-width: 363px) {
+    .navbar_account {
+        font-size: 0.8rem;
+    }
+}
+
+@media (min-width: 364px) and (max-width: 385px) {
+    .navbar_account {
+        font-size: 0.9rem;
+    }
+}
+@media (min-width: 386px) {
+    .navbar_account {
+        font-size: 1rem;
+    }
+}
 /* --------------------------------- */
 
 
@@ -222,8 +239,8 @@ hr {
 }
 
 .follow_card {
-    min-width: 345px;
-    max-width: 345px;
+    min-width: 320px;
+    max-width: 320px;
 }
 
 .follow_card_body {
