@@ -314,6 +314,14 @@ def account(user_name):
     elif user.private and follow is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
+    # View count of the profile
+    if user.id != current_user.id:
+        user.profile_views = user.profile_views + 1
+        view_count = user.profile_views
+        db.session.commit()
+    else:
+        view_count = user.profile_views
+
     # Add follows form
     follow_form = AddFollowForm()
     if follow_form.submit_follow.data and follow_form.validate():
@@ -609,6 +617,7 @@ def account(user_name):
                            title            = "{}'s account".format(user.username),
                            data             = account_data,
                            joined           = joined_date,
+                           view_count       = view_count,
                            user_id          = str(user.id),
                            user_name        = user_name,
                            follow_form      = follow_form,

@@ -46,6 +46,7 @@ class User(db.Model, UserMixin):
     time_spent_anime = db.Column(db.Integer, nullable=False, default=0)
     private = db.Column(db.Boolean, nullable=False, default=False)
     active = db.Column(db.Boolean, nullable=False, default=False)
+    profile_views = db.Column(db.Integer, nullable=False, default=0)
     biography = db.Column(db.Text)
     transition_email = db.Column(db.String(120))
     activated_on = db.Column(db.DateTime)
