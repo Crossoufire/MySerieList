@@ -46,86 +46,86 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
         add_achievements_to_db()
-    # if User.query.filter_by(id='6').first() is None:
-    #     a = User(username='ttt',
-    #                  email='ttt@ttt.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(a)
-    # if User.query.filter_by(id='7').first() is None:
-    #     b = User(username='uuu',
-    #                  email='uuu@uuu.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(b)
-    # if User.query.filter_by(id='8').first() is None:
-    #     c = User(username='iii',
-    #                  email='iii@iii.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(c)
-    # if User.query.filter_by(id='9').first() is None:
-    #     d = User(username='ooo',
-    #                  email='ooo@ooo.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(d)
-    # if User.query.filter_by(id='10').first() is None:
-    #     d = User(username='jjj',
-    #                  email='jjj@jjj.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(d)
-    # if User.query.filter_by(id='11').first() is None:
-    #     d = User(username='vvv',
-    #                  email='vvv@vvv.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(d)
-    # if User.query.filter_by(id='12').first() is None:
-    #     d = User(username='aaa',
-    #                  email='aaa@aaa.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(d)
-    # if User.query.filter_by(id='13').first() is None:
-    #     d = User(username='bbb',
-    #                  email='bbb@bbb.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(d)
+    if User.query.filter_by(id='2').first() is None:
+        a = User(username='ttt',
+                     email='ttt@ttt.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(a)
+    if User.query.filter_by(id='3').first() is None:
+        b = User(username='uuu',
+                     email='uuu@uuu.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(b)
+    if User.query.filter_by(id='4').first() is None:
+        c = User(username='iii',
+                     email='iii@iii.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=True,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(c)
+    if User.query.filter_by(id='5').first() is None:
+        d = User(username='ooo',
+                     email='ooo@ooo.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(d)
+    if User.query.filter_by(id='6').first() is None:
+        d = User(username='jjj',
+                     email='jjj@jjj.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=True,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(d)
+    if User.query.filter_by(id='7').first() is None:
+        d = User(username='vvv',
+                     email='vvv@vvv.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(d)
+    if User.query.filter_by(id='8').first() is None:
+        d = User(username='aaa',
+                     email='aaa@aaa.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(d)
+    if User.query.filter_by(id='9').first() is None:
+        d = User(username='bbb',
+                     email='bbb@bbb.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(d)
     refresh_db_achievements()
     db.session.commit()
 
@@ -2378,18 +2378,20 @@ def get_follows_full_last_update(user_id):
             element_data["update"] = ["{}".format(element[2].new_status.value)]
 
         # Update date
-        date_in_str = element[2].date.strftime("%b")
-        tmp_date = str(element[2].date).split()[0]
-        update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
+        # date_in_str = element[2].date.strftime("%b")
+        # tmp_date = str(element[2].date).split()[0]
+        # update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
 
         # Update time
-        #TODO : change time according to the location
-        tmp_time = str(element[2].date).split()[1]
-        update_time = "{}:{}".format(int(tmp_time.split(':')[0])+1, tmp_time.split(':')[1])
-        element_data["date"] = [update_date, update_time]
+        # #TODO : change time according to the location
+        # tmp_time = str(element[2].date).split()[1]
+        # update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
+        # element_data["date"] = [update_date, update_time]
+        element_data["date"] = element[2].date.isoformat()
 
-        # Truncate the media name if bigger than the follow card (max 36)
-        total_length = len(element[2].media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
+        # Truncate the media name if bigger than the follow card (max 30)
+        # total_length = len(element[2].media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
+        total_length = len(element[2].media_name)
         if total_length > 30:
             trunc = len(element[2].media_name)-(total_length-30)
             truncated_name = element[2].media_name[:trunc] + (element[2].media_name[:trunc] and '..')
@@ -2437,19 +2439,21 @@ def get_user_last_update(user_id):
             element_data["update"] = ["{}".format(element.new_status.value)]
 
         # Update date
-        date_in_str = element.date.strftime("%b")
-        tmp_date = str(element.date).split()[0]
-        update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
-
-        # Update time
-        #TODO : change time according to the location
-        tmp_time = str(element.date).split()[1]
-        update_time = "{}:{}".format(int(tmp_time.split(':')[0])+1, tmp_time.split(':')[1])
-        element_data["date"] = [update_date, update_time]
+        # date_in_str = element.date.strftime("%b")
+        # tmp_date = str(element.date).split()[0]
+        # update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
+        #
+        # # Update time
+        # #TODO : change time according to the location
+        # tmp_time = str(element.date).split()[1]
+        # update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
+        # element_data["date"] = [update_date, update_time]
+        element_data["date"] = element.date.isoformat()
 
         # Truncate the media name if bigger than the follow card (max 30)
-        total_length = len(element.media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
-        if total_length > 42:
+        # total_length = len(element.media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
+        total_length = len(element.media_name)
+        if total_length > 30:
             trunc = len(element.media_name) - (total_length - 42)
             truncated_name = element.media_name[:trunc] + (element.media_name[:trunc] and '..')
             element_data["truncated_media_name"] = truncated_name
@@ -2495,19 +2499,21 @@ def get_follows_last_update(user_id):
             element_data["update"] = ["{}".format(element[2].new_status.value)]
 
         # Update date
-        date_in_str = element[2].date.strftime("%b")
-        tmp_date = str(element[2].date).split()[0]
-        update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
-
-        # Update time
-        #TODO : change time according to the location
-        tmp_time = str(element[2].date).split()[1]
-        update_time = "{}:{}".format(int(tmp_time.split(':')[0])+1, tmp_time.split(':')[1])
-        element_data["date"] = [update_date, update_time]
+        # date_in_str = element[2].date.strftime("%b")
+        # tmp_date = str(element[2].date).split()[0]
+        # update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
+        #
+        # # Update time
+        # #TODO : change time according to the location
+        # tmp_time = str(element[2].date).split()[1]
+        # update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
+        # element_data["date"] = [update_date, update_time]
+        element_data["date"] = element[2].date.isoformat()
 
         # Truncate the media name if bigger than the follow card (max 30)
-        total_length = len(element[2].media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
-        if total_length > 42:
+        # total_length = len(element[2].media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
+        total_length = len(element[2].media_name)
+        if total_length > 30:
             trunc = len(element[2].media_name) - (total_length - 42)
             truncated_name = element[2].media_name[:trunc] + (element[2].media_name[:trunc] and '..')
             element_data["truncated_media_name"] = truncated_name
