@@ -212,14 +212,14 @@
 
                                 {% if user_id == current_user.get_id() %}
                                 <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
-                                    {{ update['date'][0] }} at {{ update['date'][1] }} by
+                                    {{ update['date'] }} by
                                 </span>
                                 <a href="{{ update['username'] }}" style="color: #359aff; font-size: 11pt;">
                                     {{ update['username'] }}
                                 </a>
                                 {% else %}
                                 <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
-                                    {{ update['date'][0] }} at {{ update['date'][1] }}
+                                    {{ update['date'] }}
                                 </span>
                                 {% endif %}
                             </div>
@@ -718,7 +718,7 @@
                                     </div>
                                     <div style="float: right;">
                                         <i class="follow_date">
-                                            {{ update["date"][0] }}, {{ update["date"][1] }}
+                                            {{ update["date"] }}
                                         </i>
                                     </div>
                                 </div>

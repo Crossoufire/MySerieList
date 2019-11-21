@@ -12,7 +12,7 @@ def load_user(user_id):
 class Status(enum.Enum):
     WATCHING = "Watching"
     COMPLETED = "Completed"
-    COMPLETED_ANIMATION = "Completed Animation"
+    COMPLETED_ANIMATION = "Completed"
     ON_HOLD = "On Hold"
     RANDOM = "Random"
     DROPPED = "Dropped"
