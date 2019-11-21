@@ -612,8 +612,46 @@
                         <hr>
                         <ul class="text-left" style="list-style-type: disc; font-size: 13pt;">
                             <li class="m-b-10">
-                                    Profile views count: {{ view_count }}
+                                <div class="row">
+                                    <div  class="col-9">
+                                        Profile views:
+                                    </div>
+                                    <div  class="col-2">
+                                        {{ view_count["profile"] }}
+                                    </div>
+                                </div>
                             </li>
+                            <li class="m-b-10">
+                                <div class="row">
+                                    <div  class="col-9">
+                                        SeriesList views:
+                                    </div>
+                                    <div  class="col-2">
+                                        {{ view_count["series"] }}
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="m-b-10">
+                                <div class="row">
+                                    <div  class="col-9">
+                                        AnimeList views:
+                                    </div>
+                                    <div  class="col-2">
+                                        {{ view_count["anime"] }}
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="m-b-10">
+                                <div class="row">
+                                    <div  class="col-9">
+                                        MoviesList views:
+                                    </div>
+                                    <div  class="col-2">
+                                        {{ view_count["movies"] }}
+                                    </div>
+                                </div>
+                            </li>
+
                             <li class="m-b-10">
                                 <a class="text-light" href="{{ url_for('level_grade_data') }}" target="_blank">
                                     Grades and levels data

@@ -314,13 +314,18 @@ def account(user_name):
     elif user.private and follow is None:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    # View count of the profile
+    # View count of the profile and media lists
     if user.id != current_user.id:
         user.profile_views = user.profile_views + 1
-        view_count = user.profile_views
+        profile_view_count = user.profile_views
         db.session.commit()
     else:
-        view_count = user.profile_views
+        profile_view_count = user.profile_views
+
+    view_count = {"profile" : profile_view_count,
+                  "series"  : user.series_views,
+                  "anime"   : user.anime_views,
+                  "movies"  : user.movies_views}
 
     # Add follows form
     follow_form = AddFollowForm()
@@ -343,22 +348,21 @@ def account(user_name):
             old_picture_file = user.image_file
             user.image_file = picture_file
             db.session.commit()
-            app.logger.info(
-                '[{}] Settings updated : old picture file = {}, new picture file = {}'.format(user.id, old_picture_file,
-                                                                                              user.image_file))
+            app.logger.info('[{}] Settings updated : old picture file = {}, new picture file = {}'
+                            .format(user.id, old_picture_file, user.image_file))
         if settings_form.username.data != user.username:
             old_username = user.username
             user.username = settings_form.username.data
             db.session.commit()
-            app.logger.info('[{}] Settings updated : old username = {}, new username = {}'.format(user.id, old_username,
-                                                                                                  user.username))
+            app.logger.info('[{}] Settings updated : old username = {}, new username = {}'
+                            .format(user.id, old_username, user.username))
         if settings_form.isprivate.data != user.private:
             old_value = user.private
             user.private = settings_form.isprivate.data
             db.session.commit()
-            app.logger.info('[{}] Settings updated : old private mode = {}, new private mode = {}'.format(user.id,
-                                                                                                          old_value,
-                                                                                                          settings_form.isprivate.data))
+            app.logger.info('[{}] Settings updated : old private mode = {}, new private mode = {}'
+                            .format(user.id, old_value, settings_form.isprivate.data))
+
         old_value = user.homepage
         if settings_form.homepage.data == "msl":
             user.homepage = HomePage.MYSERIESLIST
@@ -370,18 +374,17 @@ def account(user_name):
             user.homepage = HomePage.ACCOUNT
         elif settings_form.homepage.data == "hof":
             user.homepage = HomePage.HALL_OF_FAME
-
         db.session.commit()
-        app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'.format(user.id,
-                                                                                              old_value,
-                                                                                              settings_form.homepage.data))
+        app.logger.info('[{}] Settings updated : old homepage = {}, new homepage = {}'
+                        .format(user.id, old_value, settings_form.homepage.data))
+
         email_changed = False
         if settings_form.email.data != user.email:
             old_email = user.email
             user.transition_email = settings_form.email.data
             db.session.commit()
-            app.logger.info('[{}] Settings updated : old email = {}, new email = {}'.format(user.id, old_email,
-                                                                                            user.transition_email))
+            app.logger.info('[{}] Settings updated : old email = {}, new email = {}'
+                            .format(user.id, old_email, user.transition_email))
             email_changed = True
             if send_email_update_email(user):
                 success = True
@@ -442,6 +445,18 @@ def account(user_name):
                 follows_list_data.append(follow_data)
         else:
             follows_list_data.append(follow_data)
+
+    # Recover the number of user that follows you
+    followers = Follow.query.filter_by(follow_id=user.id).all()
+
+    # Recover the last updates of your follows for the follow TAB
+    last_updates = get_follows_full_last_update(user.id)
+
+    # Recover the last updates of the follows for the overview TAB
+    if user.id == current_user.id:
+        overview_updates = get_follows_last_update(user.id)
+    else:
+        overview_updates = get_user_last_update(user.id)
 
     account_data             = {}
     account_data["series"]   = {}
@@ -594,29 +609,15 @@ def account(user_name):
     user_achievements_anime  = get_achievements(user.id, ListType.ANIME)
     user_achievements_movies = get_achievements(user.id, ListType.MOVIES)
 
-    # Recover the activated/registered date
-    joined_tmp = user.activated_on
-    if joined_tmp is None:
-        joined_tmp = user.registered_on
-    joined_tmp = str(joined_tmp.date()).split('-')
-    joined_date = "{0}-{1}-{2}".format(joined_tmp[2], joined_tmp[1], joined_tmp[0])
-
-    # Recover the number of user that follows you
-    followers = Follow.query.filter_by(follow_id=user.id).all()
-
-    # Recover the last updates of your follows for the follow TAB
-    last_updates = get_follows_full_last_update(user.id)
-
-    # Recover the last updates of the follows for the overview TAB
-    if user.id == current_user.id:
-        overview_updates = get_follows_last_update(user.id)
-    else:
-        overview_updates = get_user_last_update(user.id)
+    # Recover the registered date
+    registered_tmp = user.registered_on
+    registered_tmp = str(registered_tmp.date()).split('-')
+    registered_date = "{0}-{1}-{2}".format(registered_tmp[2], registered_tmp[1], registered_tmp[0])
 
     return render_template('account.html',
                            title            = "{}'s account".format(user.username),
                            data             = account_data,
-                           joined           = joined_date,
+                           joined           = registered_date,
                            view_count       = view_count,
                            user_id          = str(user.id),
                            user_name        = user_name,
@@ -897,6 +898,16 @@ def mymedialist(media_list, user_name):
         media_all_data = get_all_media_data(element_data, ListType.MOVIES, covers_path, user.id)
     else:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
+    # View count of the media_list
+    if user.id != current_user.id:
+        if media_list == "serieslist":
+            user.series_views = user.series_views + 1
+        elif media_list == "animelist":
+            user.anime_views = user.anime_views + 1
+        elif media_list == "movieslist":
+            user.movies_views = user.movies_views + 1
+        db.session.commit()
 
     if media_list == "serieslist" or media_list == "animelist":
         return render_template('mymedialist.html',
@@ -2528,6 +2539,7 @@ def get_follows_last_update(user_id):
         update.append(element_data)
 
     return update
+
 
 ###### Unused function for now #######
 def get_statistics(user_id, list_type):
