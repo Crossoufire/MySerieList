@@ -197,7 +197,7 @@
                                 <div style="font-size: 12pt;" data-toggle="tooltip" title="{{ update['media_name'] }}">
                                     <i style="color: #8c7821;" class="far fa-star m-r-12"></i>
                             {% endif %}
-                                    {{ update['truncated_media_name'] }}
+                                    {{ update['media_name'] }}
                                 </div>
 
                                 <div class="m-l-35" style="font-size: 11pt;">
@@ -212,14 +212,56 @@
 
                                 {% if user_id == current_user.get_id() %}
                                 <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
-                                    {{ update['date'] }} by
+                                    <script>
+                                        var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+                                        var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB", {timeZone: tz});
+                                        var d = new Date("{{ update['date'] }}")
+                                        var month = new Array();
+                                        month[0] = "Jan";
+                                        month[1] = "Feb";
+                                        month[2] = "Mar";
+                                        month[3] = "Apr";
+                                        month[4] = "May";
+                                        month[5] = "Jun";
+                                        month[6] = "Jul";
+                                        month[7] = "Aug";
+                                        month[8] = "Sep";
+                                        month[9] = "Oct";
+                                        month[10] = "Nov";
+                                        month[11] = "Dec";
+                                        var date_month = month[d.getMonth()];
+                                        var date_day = localdate.slice(0,2);
+                                        var date_time = localdate.slice(11,17)
+                                        document.write(date_day + " " + date_month + " at " + date_time)
+                                    </script> by
                                 </span>
                                 <a href="{{ update['username'] }}" style="color: #359aff; font-size: 11pt;">
                                     {{ update['username'] }}
                                 </a>
                                 {% else %}
                                 <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
-                                    {{ update['date'] }}
+                                    <script>
+                                        var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+                                        var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB", {timeZone: tz});
+                                        var d = new Date("{{ update['date'] }}")
+                                        var month = new Array();
+                                        month[0] = "Jan";
+                                        month[1] = "Feb";
+                                        month[2] = "Mar";
+                                        month[3] = "Apr";
+                                        month[4] = "May";
+                                        month[5] = "Jun";
+                                        month[6] = "Jul";
+                                        month[7] = "Aug";
+                                        month[8] = "Sep";
+                                        month[9] = "Oct";
+                                        month[10] = "Nov";
+                                        month[11] = "Dec";
+                                        var date_month = month[d.getMonth()];
+                                        var date_day = localdate.slice(0,2);
+                                        var date_time = localdate.slice(11,17)
+                                        document.write(date_day + " " + date_month + " at " + date_time)
+                                    </script>
                                 </span>
                                 {% endif %}
                             </div>
@@ -706,7 +748,7 @@
                             {% if last_update["username"] == follow["username"] %}
                                 {% for update in last_update["update"] %}
                                 <div>
-                                    <div style="float: left;" data-toggle="tooltip" title="{{ update['media_name'] }}">
+                                    <div id="media_name_div" style="float: left; width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" data-toggle="tooltip" title="{{ update['media_name'] }}">
                                         {% if update["category"] == "anime" %}
                                         <i style="color: #945141;" class="fas fa-torii-gate m-r-14"></i>
                                         {% elif update["category"] == "series" %}
@@ -714,11 +756,32 @@
                                         {% else %}
                                         <i style="color: #8c7821;" class="far fa-star m-r-12"></i>
                                         {% endif %}
-                                        {{ update["truncated_media_name"] }}
+                                        {{ update["media_name"] }}
                                     </div>
                                     <div style="float: right;">
                                         <i class="follow_date">
-                                            {{ update["date"] }}
+                                            <script>
+                                                var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+                                                var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB", {timeZone: tz});
+                                                var d = new Date("{{ update['date'] }}")
+                                                var month = new Array();
+                                                month[0] = "Jan";
+                                                month[1] = "Feb";
+                                                month[2] = "Mar";
+                                                month[3] = "Apr";
+                                                month[4] = "May";
+                                                month[5] = "Jun";
+                                                month[6] = "Jul";
+                                                month[7] = "Aug";
+                                                month[8] = "Sep";
+                                                month[9] = "Oct";
+                                                month[10] = "Nov";
+                                                month[11] = "Dec";
+                                                var date_month = month[d.getMonth()];
+                                                var date_day = localdate.slice(0,2);
+                                                var date_time = localdate.slice(11,17)
+                                                document.write(date_day + " " + date_month + ", " + date_time)
+                                            </script>
                                         </i>
                                     </div>
                                 </div>

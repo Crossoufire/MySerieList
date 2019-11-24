@@ -8,7 +8,7 @@ import requests
 import time
 import atexit
 
-from datetime import datetime
+from datetime import datetime, tzinfo, timedelta
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
@@ -30,6 +30,13 @@ try:
 except:
     print("Config file error. Please read the README to configure the config.ini file properly. Exit.")
     sys.exit()
+
+
+class simple_utc(tzinfo):
+    def tzname(self,**kwargs):
+        return "UTC"
+    def utcoffset(self, dt):
+        return timedelta(0)
 
 
 @app.before_first_request
@@ -2388,29 +2395,9 @@ def get_follows_full_last_update(user_id):
         elif element[2].old_status is None and element[2].new_status is not None:
             element_data["update"] = ["{}".format(element[2].new_status.value)]
 
-        # Update date
-        # date_in_str = element[2].date.strftime("%b")
-        # tmp_date = str(element[2].date).split()[0]
-        # update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
+        element_data["date"] = element[2].date.replace(tzinfo=simple_utc()).isoformat()
 
-        # Update time
-        # #TODO : change time according to the location
-        # tmp_time = str(element[2].date).split()[1]
-        # update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
-        # element_data["date"] = [update_date, update_time]
-        element_data["date"] = element[2].date.isoformat()
-
-        # Truncate the media name if bigger than the follow card (max 30)
-        # total_length = len(element[2].media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
-        total_length = len(element[2].media_name)
-        if total_length > 30:
-            trunc = len(element[2].media_name)-(total_length-30)
-            truncated_name = element[2].media_name[:trunc] + (element[2].media_name[:trunc] and '..')
-            element_data["truncated_media_name"] = truncated_name
-            element_data["media_name"] = element[2].media_name
-        else:
-            element_data["truncated_media_name"] = element[2].media_name
-            element_data["media_name"] = ""
+        element_data["media_name"] = element[2].media_name
 
         if element[2].media_type == ListType.SERIES:
             element_data["category"] = "series"
@@ -2450,28 +2437,9 @@ def get_user_last_update(user_id):
             element_data["update"] = ["{}".format(element.new_status.value)]
 
         # Update date
-        # date_in_str = element.date.strftime("%b")
-        # tmp_date = str(element.date).split()[0]
-        # update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
-        #
-        # # Update time
-        # #TODO : change time according to the location
-        # tmp_time = str(element.date).split()[1]
-        # update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
-        # element_data["date"] = [update_date, update_time]
-        element_data["date"] = element.date.isoformat()
+        element_data["date"] = element.date.replace(tzinfo=simple_utc()).isoformat()
 
-        # Truncate the media name if bigger than the follow card (max 30)
-        # total_length = len(element.media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
-        total_length = len(element.media_name)
-        if total_length > 30:
-            trunc = len(element.media_name) - (total_length - 42)
-            truncated_name = element.media_name[:trunc] + (element.media_name[:trunc] and '..')
-            element_data["truncated_media_name"] = truncated_name
-            element_data["media_name"] = element.media_name
-        else:
-            element_data["truncated_media_name"] = element.media_name
-            element_data["media_name"] = ""
+        element_data["media_name"] = element.media_name
 
         if element.media_type == ListType.SERIES:
             element_data["category"] = "series"
@@ -2510,28 +2478,9 @@ def get_follows_last_update(user_id):
             element_data["update"] = ["{}".format(element[2].new_status.value)]
 
         # Update date
-        # date_in_str = element[2].date.strftime("%b")
-        # tmp_date = str(element[2].date).split()[0]
-        # update_date = "{} {}".format(tmp_date.split('-')[2], date_in_str)
-        #
-        # # Update time
-        # #TODO : change time according to the location
-        # tmp_time = str(element[2].date).split()[1]
-        # update_time = "{}:{}".format(tmp_time.split(':')[0], tmp_time.split(':')[1])
-        # element_data["date"] = [update_date, update_time]
-        element_data["date"] = element[2].date.isoformat()
+        element_data["date"] = element[2].date.replace(tzinfo=simple_utc()).isoformat()
 
-        # Truncate the media name if bigger than the follow card (max 30)
-        # total_length = len(element[2].media_name) + len(element_data["date"][0]) + len(element_data["date"][1])
-        total_length = len(element[2].media_name)
-        if total_length > 30:
-            trunc = len(element[2].media_name) - (total_length - 42)
-            truncated_name = element[2].media_name[:trunc] + (element[2].media_name[:trunc] and '..')
-            element_data["truncated_media_name"] = truncated_name
-            element_data["media_name"] = element[2].media_name
-        else:
-            element_data["truncated_media_name"] = element[2].media_name
-            element_data["media_name"] = ""
+        element_data["media_name"] = element[2].media_name
 
         if element[2].media_type == ListType.SERIES:
             element_data["category"] = "series"
