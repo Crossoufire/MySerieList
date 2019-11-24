@@ -2309,7 +2309,8 @@ def get_follows_full_last_update(user_id):
 
         # Category update
         elif element[2].old_status is not None and element[2].new_status is not None:
-            element_data["update"] = ["{}".format(element[2].old_status.value), "{}".format(element[2].new_status.value)]
+            element_data["update"] = ["{}".format(element[2].old_status.value).replace("Animation", "Anime"),
+                                      "{}".format(element[2].new_status.value).replace("Animation", "Anime")]
 
         # Media newly added
         elif element[2].old_status is None and element[2].new_status is not None:
@@ -2349,8 +2350,8 @@ def get_user_last_update(user_id):
 
         # Category update
         elif element.old_status is not None and element.new_status is not None:
-            element_data["update"] = ["{}".format(element.old_status.value),
-                                      "{}".format(element.new_status.value)]
+            element_data["update"] = ["{}".format(element.old_status.value).replace("Animation", "Anime"),
+                                      "{}".format(element.new_status.value).replace("Animation", "Anime")]
 
         # Newly added media
         elif element.old_status is None and element.new_status is not None:
@@ -2390,8 +2391,8 @@ def get_follows_last_update(user_id):
 
         # Category update
         elif element[2].old_status is not None and element[2].new_status is not None:
-            element_data["update"] = ["{}".format(element[2].old_status.value),
-                                      "{}".format(element[2].new_status.value)]
+            element_data["update"] = ["{}".format(element[2].old_status.value).replace("Animation", "Anime"),
+                                      "{}".format(element[2].new_status.value).replace("Animation", "Anime")]
 
         # Newly added media
         elif element[2].old_status is None and element[2].new_status is not None:
