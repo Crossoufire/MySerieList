@@ -4,10 +4,8 @@ TODO ------------------------------------------------
 Account:
     Add: Possibility to change the background image
 	Add: Display/hide all scores by default
-	Enhance: Get pixel size of media name in follow updates to truncate if necessary
 	Enhance: Bio, profile and back pictures changes without the settings form
 	Enhance: Code of "get_achievements()" method (50% done)
-	Enhance: From UTC to Local time for the follow updates
     Enhance: Settings tab CSS/HTML style
     Enhance: Change the badges display
 
