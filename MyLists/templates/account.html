@@ -8,7 +8,8 @@
 
 {% block content %}
 <div class="header-image">
-    <img src="{{ data['profile_picture'] }}"/>
+    <img class="edit_img" src="{{ data['profile_picture'] }}"/>
+    {#<a class="edit_img fas fa-pen"></a>#}
     <div class="knowledge-level text-center">{{ data['knowledge_level'] }}</div>
     <div class="header-data">
         <h2><b>{{ data['username'] }}</b>

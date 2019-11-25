@@ -658,6 +658,9 @@ def hall_of_fame():
         follows_list.append(follow.follow_id)
 
     all_users_data = []
+    series_total_time = 0
+    anime_total_time = 0
+    movies_total_time = 0
     for user in users:
         user_data = {}
         user_data["username"]        = user.username
@@ -688,6 +691,10 @@ def hall_of_fame():
         user_data["knowledge_grade_id"]     = knowledge_grade["grade_id"]
         user_data["knowledge_grade_title"]  = knowledge_grade["grade_title"]
 
+        series_total_time += user.time_spent_series
+        anime_total_time += user.time_spent_anime
+        movies_total_time += user.time_spent_movies
+
         if user.id in follows_list:
             user_data["isfollowing"] = True
         else:
@@ -702,7 +709,14 @@ def hall_of_fame():
 
         all_users_data.append(user_data)
 
-    return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
+    total_time = {"series": series_total_time/60,
+                  "anime" : anime_total_time/60,
+                  "movies": movies_total_time/60}
+
+    return render_template("hall_of_fame.html",
+                           title='Hall of Fame',
+                           all_data=all_users_data,
+                           total_time=total_time)
 
 
 @app.route("/follow", methods=['POST'])
@@ -826,7 +840,7 @@ def mymedialist(media_list, user_name):
     else:
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    # View count of the media_list
+    # View count of the media lists
     if user.id != current_user.id:
         if media_list == "serieslist":
             user.series_views = user.series_views + 1

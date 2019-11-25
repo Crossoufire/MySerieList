@@ -66,6 +66,23 @@ hr {
     width: 150px;
 }
 
+.header-image > a {
+    position: absolute;
+    left: 98px;
+    color: black !important;
+    bottom: 105px;
+    z-index: 10;
+    opacity: 0;
+}
+
+.edit_img:hover~.edit_img {
+    opacity: 1;
+}
+
+.edit_img:hover {
+    opacity: 1;
+}
+
 .header-image > .knowledge-level {
     position: absolute;
     background: #262626;

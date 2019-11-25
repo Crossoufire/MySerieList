@@ -9,7 +9,8 @@
 
 
 {% block content %}
-<div class="overflow m-t-30">
+<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">HALL OF FAME<hr class="mt-2 mb-0"></h2>
+<div class="overflow m-t-20">
     <table id="hall_of_fame" class="table table-sm table-responsive-xl text-light">
         <thead>
             <tr>
@@ -173,6 +174,17 @@
         {% endfor %}
         </tbody>
     </table>
+</div>
+<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">GLOBAL STATISTICS<hr class="mt-2 pb-3 mb-0"></h2>
+<div class="m-t-30">
+    Total Watching Time:
+    <br>
+    Series: {{ total_time["series"] }} hours
+    <br>
+    Anime:  {{ total_time["anime"] }} hours
+    <br>
+    Movies: {{ total_time["movies"] }} hours
+    <br>
 </div>
 {% endblock content %}
 
