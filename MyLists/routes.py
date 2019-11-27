@@ -31,13 +31,11 @@ except:
     print("Config file error. Please read the README to configure the config.ini file properly. Exit.")
     sys.exit()
 
-
 class simple_utc(tzinfo):
     def tzname(self,**kwargs):
         return "UTC"
     def utcoffset(self, dt):
         return timedelta(0)
-
 
 @app.before_first_request
 def create_user():

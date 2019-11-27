@@ -179,7 +179,7 @@
 <h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">GLOBAL STATISTICS<hr class="mt-2 pb-3 mb-0"></h2>
 <div class="row m-t-30">
     <div class="col">
-        <h4 class="text-center">Total Watching Time: {{ total_time["total"] }} hours</h4>
+        <h4 class="text-center">Total Watching Time: {{ total_time["total"]|int }} hours</h4>
         <div class="chart-container">
             <canvas id="media-time"></canvas>
         </div>
@@ -410,7 +410,7 @@ var config = {
     type: 'pie',
     data: {
         datasets: [{
-            data: [14523, 8248, 4251],
+            data: [{{ total_time['series']|int }}, {{ total_time['anime']|int }}, {{ total_time['movies']|int }}],
             backgroundColor: ['#216e7d', '#945141', '#8c7821'],
             borderColor: 'black',
             borderWidth: 1,
