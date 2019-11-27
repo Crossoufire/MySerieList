@@ -180,39 +180,46 @@
 <div class="row m-t-30">
     <div class="col">
         <h4 class="text-center">Total Watching Time: {{ total_time["total"] }} hours</h4>
-        <canvas id="media-time"></canvas>
+        <div class="chart-container">
+            <canvas id="media-time"></canvas>
+        </div>
     </div>
-    <div class="col d-flex text-center">
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;" class="text-center">N°</th>
-                    <th style="width: 175px;" class="text-center">Series</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center">52</td>
-                    <td class="text-center">How I met</td>
-                </tr>
-                <tr>
-                    <td class="text-center">25</td>
-                    <td class="text-center">Malcolm</td>
-                </tr>
-                <tr>
-                    <td class="text-center">12</td>
-                    <td class="text-center">Breaking Bad</td>
-                </tr>
-            </tbody>
-        </table>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;" class="text-center">N°</th>
-                    <th style="width: 175px;" class="text-center">Anime</th>
-                </tr>
-            </thead>
-            <tbody>
+    <div class="col">
+        <div style="font-size: 14pt;" class="text-center m-b-5">Media the most presents in users' lists:</div>
+        <div class="row">
+            <div class="col">
+                <table style="background: #216e7d;" class="table table-sm text-light">
+                    <thead>
+                        <tr>
+                            <th class="text-center">N°</th>
+                            <th class="text-center">Series</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">52</td>
+                            <td class="text-center">How I met</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">25</td>
+                            <td class="text-center">Malcolm</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">12</td>
+                            <td class="text-center">Breaking Bad</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <table style="background: #945141;" class="table table-sm text-light">
+                    <thead>
+                        <tr>
+                            <th class="text-center">N°</th>
+                            <th class="text-center">Anime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                 <tr>
                     <td class="text-center">52</td>
                     <td class="text-center">Death note</td>
@@ -226,175 +233,167 @@
                     <td class="text-center">Naruto</td>
                 </tr>
             </tbody>
-        </table>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;" class="text-center">#</th>
-                    <th style="width: 175px;" class="text-center">Movies</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center">52</td>
-                    <td class="text-center">Independance Day</td>
-                </tr>
-                <tr>
-                    <td class="text-center">25</td>
-                    <td class="text-center">Ratatouille</td>
-                </tr>
-                <tr>
-                    <td class="text-center">12</td>
-                    <td class="text-center">Avengers</td>
-                </tr>
-            </tbody>
-        </table>
+                </table>
+            </div>
+            <div class="col">
+                <table style="background: #8c7821;" class="table table-sm text-light">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th class="text-center">Movies</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">52</td>
+                            <td class="text-center">Independance Day</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">25</td>
+                            <td class="text-center">Ratatouille</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">12</td>
+                            <td class="text-center">Avengers</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div style="font-size: 14pt;" class="text-center m-b-5">Actors the most presents in users' lists:</div>
+        <div class="row">
+            <div class="col">
+                <table style="background: #216e7d;" class="table table-sm text-light">
+                    <thead>
+                        <tr>
+                            <th class="text-center">N°</th>
+                            <th class="text-center">Series</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">14</td>
+                            <td class="text-center">Tom Ellis</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">8</td>
+                            <td class="text-center">Simon Baker</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">5</td>
+                            <td class="text-center">Megan Boone</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <table style="background: #945141;" class="table table-sm text-light">
+                    <thead>
+                        <tr>
+                            <th class="text-center">N°</th>
+                            <th class="text-center">Anime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">23</td>
+                            <td class="text-center">Yuzuki Mahoto</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">14</td>
+                            <td class="text-center">Matoï Batho</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">6</td>
+                            <td class="text-center">Mariko Huna</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <table style="background: #8c7821;" class="table table-sm text-light">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th class="text-center">Movies</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">52</td>
+                            <td class="text-center">Will Smith</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">25</td>
+                            <td class="text-center">Daniel Radcliff</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">12</td>
+                            <td class="text-center">Scarlett Johanson</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div style="font-size: 14pt;" class="text-center m-b-5">Anime and Series the most dropped in users' lists:</div>
+        <div class="row">
+            <div class="col">
+                <table style="background: #216e7d;" class="table table-sm text-light">
+                    <thead>
+                        <tr>
+                            <th class="text-center">N°</th>
+                            <th class="text-center">Series</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">52</td>
+                            <td class="text-center">How to get away</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">25</td>
+                            <td class="text-center">Arrow</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">12</td>
+                            <td class="text-center">Glee</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <table style="background: #945141;" class="table table-sm text-light">
+                    <thead>
+                        <tr>
+                            <th class="text-center">N°</th>
+                            <th class="text-center">Anime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">52</td>
+                            <td class="text-center">Aldnoah Zero</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">25</td>
+                            <td class="text-center">Tokyo Ghoul</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">12</td>
+                            <td class="text-center">Monster</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
-<div class="row m-t-50">
+<div class="row m-t-30">
     <div class="col">
         <canvas id="total-seasons"></canvas>
     </div>
-    <div class="col d-flex text-center">
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;" class="text-center">N°</th>
-                    <th style="width: 175px;" class="text-center">Series</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center">52</td>
-                    <td class="text-center">How I met</td>
-                </tr>
-                <tr>
-                    <td class="text-center">25</td>
-                    <td class="text-center">Malcolm</td>
-                </tr>
-                <tr>
-                    <td class="text-center">12</td>
-                    <td class="text-center">Breaking Bad</td>
-                </tr>
-            </tbody>
-        </table>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;" class="text-center">N°</th>
-                    <th style="width: 175px;" class="text-center">Anime</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center">52</td>
-                    <td class="text-center">Death note</td>
-                </tr>
-                <tr>
-                    <td class="text-center">25</td>
-                    <td class="text-center">Dragon Ball Z</td>
-                </tr>
-                <tr>
-                    <td class="text-center">12</td>
-                    <td class="text-center">Naruto</td>
-                </tr>
-            </tbody>
-        </table>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;" class="text-center">#</th>
-                    <th style="width: 175px;" class="text-center">Movies</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center">52</td>
-                    <td class="text-center">Independance Day</td>
-                </tr>
-                <tr>
-                    <td class="text-center">25</td>
-                    <td class="text-center">Ratatouille</td>
-                </tr>
-                <tr>
-                    <td class="text-center">12</td>
-                    <td class="text-center">Avengers</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-<div class="row m-t-50">
     <div class="col">
         <canvas id="total-episodes"></canvas>
-    </div>
-    <div class="col d-flex text-center">
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;" class="text-center">N°</th>
-                    <th style="width: 175px;" class="text-center">Series</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center">52</td>
-                    <td class="text-center">How I met</td>
-                </tr>
-                <tr>
-                    <td class="text-center">25</td>
-                    <td class="text-center">Malcolm</td>
-                </tr>
-                <tr>
-                    <td class="text-center">12</td>
-                    <td class="text-center">Breaking Bad</td>
-                </tr>
-            </tbody>
-        </table>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;" class="text-center">N°</th>
-                    <th style="width: 175px;" class="text-center">Anime</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center">52</td>
-                    <td class="text-center">Death note</td>
-                </tr>
-                <tr>
-                    <td class="text-center">25</td>
-                    <td class="text-center">Dragon Ball Z</td>
-                </tr>
-                <tr>
-                    <td class="text-center">12</td>
-                    <td class="text-center">Naruto</td>
-                </tr>
-            </tbody>
-        </table>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;" class="text-center">#</th>
-                    <th style="width: 175px;" class="text-center">Movies</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center">52</td>
-                    <td class="text-center">Independance Day</td>
-                </tr>
-                <tr>
-                    <td class="text-center">25</td>
-                    <td class="text-center">Ratatouille</td>
-                </tr>
-                <tr>
-                    <td class="text-center">12</td>
-                    <td class="text-center">Avengers</td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </div>
 {% endblock content %}
@@ -421,6 +420,7 @@ var config = {
     },
     options: {
         legend: {
+            position: 'bottom',
             labels: {
                 fontColor: '#e2e2e2',
                 fontSize: 14,
@@ -434,7 +434,6 @@ var config = {
             fontSize: 18,
             fontStyle: 'normal',
         },
-        responsive: true
     }
 };
 
@@ -448,7 +447,7 @@ var config = {
         datasets: [{
             data: [6524, 5241],
             backgroundColor: ['#216e7d', '#945141'],
-            borderColor: 'grey',
+            borderColor: 'black',
             borderWidth: 1
         }],
         labels: ['Series', 'Anime']
@@ -497,7 +496,7 @@ var config = {
         datasets: [{
             data: [26524, 35241],
             backgroundColor: ['#216e7d', '#945141'],
-            borderColor: 'grey',
+            borderColor: 'black',
             borderWidth: 1
         }],
         labels: ['Series', 'Anime']
