@@ -23,10 +23,8 @@
 	<link href="{{ url_for('static', filename='css/mylists.css') }}" rel="stylesheet">
 	<link href="{{ url_for('static', filename='css/util.css') }}" rel="stylesheet">
 
-
     {% block css %}
     {% endblock %}
-
 
 	{% if title %}
     <title>MyLists - {{ title }}</title>
@@ -80,7 +78,6 @@
             </div>
         </nav>
 
-
         <div class="container">
             <div class="content">
                 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -98,7 +95,6 @@
             </div>
         </div>
 
-
         {% block home_header %}
         {% endblock %}
     </header>
@@ -111,14 +107,11 @@
         </div>
     </main>
 
-
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.2/js/mdb.min.js"></script>
-
-
     {% block script %}
     {% endblock %}
 

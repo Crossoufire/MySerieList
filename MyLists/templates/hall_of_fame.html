@@ -175,16 +175,227 @@
         </tbody>
     </table>
 </div>
+
 <h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">GLOBAL STATISTICS<hr class="mt-2 pb-3 mb-0"></h2>
-<div class="m-t-30">
-    Total Watching Time:
-    <br>
-    Series: {{ total_time["series"] }} hours
-    <br>
-    Anime:  {{ total_time["anime"] }} hours
-    <br>
-    Movies: {{ total_time["movies"] }} hours
-    <br>
+<div class="row m-t-30">
+    <div class="col">
+        <h4 class="text-center">Total Watching Time: {{ total_time["total"] }} hours</h4>
+        <canvas id="media-time"></canvas>
+    </div>
+    <div class="col d-flex text-center">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;" class="text-center">N°</th>
+                    <th style="width: 175px;" class="text-center">Series</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">52</td>
+                    <td class="text-center">How I met</td>
+                </tr>
+                <tr>
+                    <td class="text-center">25</td>
+                    <td class="text-center">Malcolm</td>
+                </tr>
+                <tr>
+                    <td class="text-center">12</td>
+                    <td class="text-center">Breaking Bad</td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;" class="text-center">N°</th>
+                    <th style="width: 175px;" class="text-center">Anime</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">52</td>
+                    <td class="text-center">Death note</td>
+                </tr>
+                <tr>
+                    <td class="text-center">25</td>
+                    <td class="text-center">Dragon Ball Z</td>
+                </tr>
+                <tr>
+                    <td class="text-center">12</td>
+                    <td class="text-center">Naruto</td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;" class="text-center">#</th>
+                    <th style="width: 175px;" class="text-center">Movies</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">52</td>
+                    <td class="text-center">Independance Day</td>
+                </tr>
+                <tr>
+                    <td class="text-center">25</td>
+                    <td class="text-center">Ratatouille</td>
+                </tr>
+                <tr>
+                    <td class="text-center">12</td>
+                    <td class="text-center">Avengers</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row m-t-50">
+    <div class="col">
+        <canvas id="total-seasons"></canvas>
+    </div>
+    <div class="col d-flex text-center">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;" class="text-center">N°</th>
+                    <th style="width: 175px;" class="text-center">Series</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">52</td>
+                    <td class="text-center">How I met</td>
+                </tr>
+                <tr>
+                    <td class="text-center">25</td>
+                    <td class="text-center">Malcolm</td>
+                </tr>
+                <tr>
+                    <td class="text-center">12</td>
+                    <td class="text-center">Breaking Bad</td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;" class="text-center">N°</th>
+                    <th style="width: 175px;" class="text-center">Anime</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">52</td>
+                    <td class="text-center">Death note</td>
+                </tr>
+                <tr>
+                    <td class="text-center">25</td>
+                    <td class="text-center">Dragon Ball Z</td>
+                </tr>
+                <tr>
+                    <td class="text-center">12</td>
+                    <td class="text-center">Naruto</td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;" class="text-center">#</th>
+                    <th style="width: 175px;" class="text-center">Movies</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">52</td>
+                    <td class="text-center">Independance Day</td>
+                </tr>
+                <tr>
+                    <td class="text-center">25</td>
+                    <td class="text-center">Ratatouille</td>
+                </tr>
+                <tr>
+                    <td class="text-center">12</td>
+                    <td class="text-center">Avengers</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row m-t-50">
+    <div class="col">
+        <canvas id="total-episodes"></canvas>
+    </div>
+    <div class="col d-flex text-center">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;" class="text-center">N°</th>
+                    <th style="width: 175px;" class="text-center">Series</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">52</td>
+                    <td class="text-center">How I met</td>
+                </tr>
+                <tr>
+                    <td class="text-center">25</td>
+                    <td class="text-center">Malcolm</td>
+                </tr>
+                <tr>
+                    <td class="text-center">12</td>
+                    <td class="text-center">Breaking Bad</td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;" class="text-center">N°</th>
+                    <th style="width: 175px;" class="text-center">Anime</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">52</td>
+                    <td class="text-center">Death note</td>
+                </tr>
+                <tr>
+                    <td class="text-center">25</td>
+                    <td class="text-center">Dragon Ball Z</td>
+                </tr>
+                <tr>
+                    <td class="text-center">12</td>
+                    <td class="text-center">Naruto</td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;" class="text-center">#</th>
+                    <th style="width: 175px;" class="text-center">Movies</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">52</td>
+                    <td class="text-center">Independance Day</td>
+                </tr>
+                <tr>
+                    <td class="text-center">25</td>
+                    <td class="text-center">Ratatouille</td>
+                </tr>
+                <tr>
+                    <td class="text-center">12</td>
+                    <td class="text-center">Avengers</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock content %}
 
@@ -193,5 +404,140 @@
 <!--------- CDN Datatables ----------->
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/hall_of_fame.js') }}"></script>
+
+<!--------- Chart.js data ----------->
+<script data="Watching time">
+var config = {
+    type: 'pie',
+    data: {
+        datasets: [{
+            data: [14523, 8248, 4251],
+            backgroundColor: ['#216e7d', '#945141', '#8c7821'],
+            borderColor: 'black',
+            borderWidth: 1,
+            label: 'by_media'
+        }],
+        labels: ['Series', 'Anime', 'Movies']
+    },
+    options: {
+        legend: {
+            labels: {
+                fontColor: '#e2e2e2',
+                fontSize: 14,
+            }
+        },
+        title: {
+            display: true,
+            text: 'Watched time by media in hours:',
+            position: 'top',
+            fontColor: '#e2e2e2',
+            fontSize: 18,
+            fontStyle: 'normal',
+        },
+        responsive: true
+    }
+};
+
+var ctx = document.getElementById('media-time').getContext('2d');
+var myPie = new Chart(ctx, config);
+</script>
+<script data="Total seasons watched">
+var config = {
+    type: 'bar',
+    data: {
+        datasets: [{
+            data: [6524, 5241],
+            backgroundColor: ['#216e7d', '#945141'],
+            borderColor: 'grey',
+            borderWidth: 1
+        }],
+        labels: ['Series', 'Anime']
+    },
+    options: {
+        legend: {
+            display: false
+        },
+        scales: {
+            yAxes: [{
+                gridLines: {
+                    color: 'grey',
+                },
+                ticks: {
+                    fontColor: '#e2e2e2',
+                    fontSize: 14,
+                    beginAtZero: true
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    fontColor: '#e2e2e2',
+                    fontSize: 14,
+                }
+            }]
+        },
+        title: {
+            display: true,
+            text: 'Number of seasons watched:',
+            position: 'top',
+            fontColor: '#e2e2e2',
+            fontSize: 18,
+            fontStyle: 'normal'
+        },
+        responsive: true
+    }
+};
+
+var ctx = document.getElementById('total-seasons').getContext('2d');
+var mybar = new Chart(ctx, config);
+</script>
+<script data="Total episodes watched">
+var config = {
+    type: 'bar',
+    data: {
+        datasets: [{
+            data: [26524, 35241],
+            backgroundColor: ['#216e7d', '#945141'],
+            borderColor: 'grey',
+            borderWidth: 1
+        }],
+        labels: ['Series', 'Anime']
+    },
+    options: {
+        legend: {
+            display: false
+        },
+        scales: {
+            yAxes: [{
+                gridLines: {
+                    color: 'grey',
+                },
+                ticks: {
+                    fontColor: '#e2e2e2',
+                    fontSize: 14,
+                    beginAtZero: true
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    fontColor: '#e2e2e2',
+                    fontSize: 14,
+                }
+            }]
+        },
+        title: {
+            display: true,
+            text: 'Number of episodes watched:',
+            position: 'top',
+            fontColor: '#e2e2e2',
+            fontSize: 18,
+            fontStyle: 'normal'
+        },
+        responsive: true
+    }
+};
+
+var ctx = document.getElementById('total-episodes').getContext('2d');
+var mybar = new Chart(ctx, config);
+</script>
 {% endblock script %}
 

@@ -709,9 +709,45 @@ def hall_of_fame():
 
         all_users_data.append(user_data)
 
-    total_time = {"series": series_total_time/60,
+    total_time = {"total" : (series_total_time/60)+(anime_total_time/60)+(movies_total_time/60),
+                  "series": series_total_time/60,
                   "anime" : anime_total_time/60,
                   "movies": movies_total_time/60}
+
+    # # TODO:
+    # """ NEED to Add the media name in the query with a media join + the actors for each media with another join.
+    # For now we recover [(1,4), (2, 1), (3, 15)] means the media with ID = 1 is present 4 times, the media with ID = 2
+    # is present 1 time etc... Knowinf that the media 1 is "independance day" and the actors are: Will Smith etc...
+    # Allow us to do the selection by the media the most presents and the actors the most present with one query. """
+    # # Recover the series the most present in all the users' lists
+    # series_most = db.session.query(SeriesList.series_id, func.count()).group_by(SeriesList.series_id).all()
+    # # Recover the anime the most present in all the users' lists
+    # anime_most = db.session.query(AnimeList.anime_id, func.count()).group_by(AnimeList.anime_id).all()
+    # # Recover the movies the most present in all the users' lists
+    # movies_most = db.session.query(MoviesList.movies_id, func.count()).group_by(MoviesList.movies_id).all()
+    #
+    # # TODO:
+    # """ Another query to recover the series, anime and movies/TOP 3 the most completed/completed-anime and dropped.
+    # Need a join with media to recover the name. """
+    # # Recover the series the most present in all the users' lists
+    # series_cmplted_drped = db.session.query(SeriesList.series_id, func.count()).group_by(SeriesList.series_id).all()
+    # # Recover the anime the most present in all the users' lists
+    # anime_most = db.session.query(AnimeList.anime_id, func.count()).group_by(AnimeList.anime_id).all()
+    # # Recover the movies the most present in all the users' lists
+    # movies_most = db.session.query(MoviesList.movies_id, func.count()).group_by(MoviesList.movies_id).all()
+    #
+    # # TODO:
+    # """ Total watched seasons and episodes. Need to recover the last episode of the occuring season of the series/anime
+    # to be sure that the season is completed. For now even if you are season 4 episode 1 or season 4 last episode it is
+    # counted, or for completed seasons the last episode has to be watched. Need to join the media with episode per
+    # season and check if the last episode was watched by the user. We surely can use this SQL query to recover the total
+    # number of episodes watched. """
+    # # Recover the total number of seasons and episodes watched for the series for all users
+    # total_seasons_and_episodes_series = db.session.query(func.sum(SeriesList.current_season)).scalar()
+    # # Recover the total number of seasons and episodes watched for the anime for all users
+    # total_seasons_and_episodes_anime= db.session.query(func.sum(SeriesList.current_season)).scalar()
+    #
+    # """ TOTAL QUERIES: 8 """
 
     return render_template("hall_of_fame.html",
                            title='Hall of Fame',
