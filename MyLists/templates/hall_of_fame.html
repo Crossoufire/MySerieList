@@ -177,16 +177,20 @@
 </div>
 
 <h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">GLOBAL STATISTICS<hr class="mt-2 pb-3 mb-0"></h2>
+<h4 class="text-center m-t-10">
+    Total watched time: <b>{{ total_time["total"] }} hours</b> -
+     <b>{{ (total_time["total"]/24)|round(2) }} days</b> -
+       <b>{{ (total_time["total"]/24/365)|round(2) }} years</b>
+</h4>
 <div class="row m-t-30">
     <div class="col">
-        <h4 class="text-center">Total Watching Time: {{ total_time["total"] }} hours</h4>
-        <div class="chart-container">
+        <div>
             <canvas id="media-time"></canvas>
         </div>
     </div>
     <div class="col">
         <div style="font-size: 14pt;" class="text-center m-b-5">Media the most presents in users' lists:</div>
-        <div class="row">
+        <div class="row d-flex flex-wrap">
             <div class="col">
                 <table style="background: #216e7d;" class="table table-sm text-light">
                     <thead>
@@ -340,13 +344,11 @@
         </div>
     </div>
 </div>
-<div class="row m-t-30">
+<div class="row">
     <div class="col">
         <canvas id="total-seasons"></canvas>
     </div>
-    <div class="col">
-        <canvas id="total-episodes"></canvas>
-    </div>
+    <div class="col"></div>
 </div>
 {% endblock content %}
 
@@ -371,6 +373,43 @@ var config = {
         labels: ['Series', 'Anime', 'Movies']
     },
     options: {
+        events: false,
+        animation: {
+            duration: 500,
+            easing: "easeOutQuart",
+            onComplete: function () {
+                var ctx = this.chart.ctx;
+                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);                ctx.textAlign = 'center';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+
+                this.data.datasets.forEach(function (dataset) {
+                    for (var i = 0; i < dataset.data.length; i++) {
+                        var model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model,
+                        total = dataset._meta[Object.keys(dataset._meta)[0]].total,
+                        mid_radius = model.innerRadius + (model.outerRadius - model.innerRadius)/2,
+                        start_angle = model.startAngle,
+                        end_angle = model.endAngle,
+                        mid_angle = start_angle + (end_angle - start_angle)/2;
+
+                        var x = mid_radius * Math.cos(mid_angle);
+                        var y = mid_radius * Math.sin(mid_angle);
+
+                        ctx.fillStyle = '#fff';
+                        if (i == 3){ // Darker text color for lighter background
+                            ctx.fillStyle = '#444';
+                        }
+                        var percent = String(Math.round(dataset.data[i]/total*100)) + "%";
+                        //Don't Display If Legend is hide or value is 0
+                        if(dataset.data[i] != 0 && dataset._meta[0].data[i].hidden != true) {
+                            ctx.fillText(dataset.data[i]+ " h", model.x + x, model.y + y);
+                            // Display percent in another line, line break doesn't work for fillText
+                            ctx.fillText(percent, model.x + x, model.y + y + 15);
+                        }
+                    }
+                });
+            }
+        },
         legend: {
             position: 'bottom',
             labels: {
@@ -392,7 +431,7 @@ var config = {
 var ctx = document.getElementById('media-time').getContext('2d');
 var myPie = new Chart(ctx, config);
 </script>
-<script data="Total seasons watched">
+<script data="Total eps/seasons watched">
 var config = {
     type: 'bar',
     data: {
@@ -400,16 +439,73 @@ var config = {
             data: [{{ total_seasons_media["series"] }}, {{ total_seasons_media["anime"] }}],
             backgroundColor: ['#216e7d', '#945141'],
             borderColor: 'black',
-            borderWidth: 1
+            yAxisID: 'y-axis-1'
+        },
+        {
+            data: [{{ total_episodes_media["series"] }}, {{ total_episodes_media["anime"] }}],
+            backgroundColor: ['#216e7d', '#945141'],
+            borderColor: 'black',
+            yAxisID: 'y-axis-2'
         }],
         labels: ['Series', 'Anime']
     },
     options: {
+        events: false,
+        tooltips: {
+            enabled: false
+        },
+        hover: {
+            animationDuration: 0
+        },
+        animation: {
+            duration: 1,
+            onComplete: function () {
+                var chartInstance = this.chart,
+                ctx = chartInstance.ctx;
+                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+
+                this.data.datasets.forEach(function (dataset, i) {
+                    var meta = chartInstance.controller.getDatasetMeta(i);
+                    meta.data.forEach(function (bar, index) {
+                        var data = dataset.data[index];
+                        console.log(bar._datasetIndex);
+                        if (index == 0 || index == 1 && bar._datasetIndex == 0) {
+                            var test = " seas";
+                            ctx.fillText(data + test, bar._model.x, bar._model.y - 5);
+                        } else if (index == 0 || index == 1 && bar._datasetIndex == 1) {
+                            var test = " eps";
+                            ctx.fillText(data + test, bar._model.x, bar._model.y - 5);
+                        }
+
+                    });
+                });
+            }
+        },
         legend: {
             display: false
         },
         scales: {
             yAxes: [{
+                type: 'linear',
+                display: true,
+                position: 'left',
+                id: 'y-axis-1',
+                ticks: {
+                    fontColor: '#e2e2e2',
+                    fontSize: 14,
+                    beginAtZero: true
+                },
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Seasons completed'
+                }
+            },
+            {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                id: 'y-axis-2',
                 gridLines: {
                     color: 'grey',
                 },
@@ -417,6 +513,10 @@ var config = {
                     fontColor: '#e2e2e2',
                     fontSize: 14,
                     beginAtZero: true
+                },
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Episodes watched'
                 }
             }],
             xAxes: [{
@@ -428,8 +528,9 @@ var config = {
         },
         title: {
             display: true,
-            text: 'Number of completed seasons watched:',
+            text: 'Number of Seasons/Episodes by media:',
             position: 'top',
+            padding: 30,
             fontColor: '#e2e2e2',
             fontSize: 18,
             fontStyle: 'normal'
@@ -439,55 +540,6 @@ var config = {
 };
 
 var ctx = document.getElementById('total-seasons').getContext('2d');
-var mybar = new Chart(ctx, config);
-</script>
-<script data="Total episodes watched">
-var config = {
-    type: 'bar',
-    data: {
-        datasets: [{
-            data: [{{ total_episodes_media["series"] }}, {{ total_episodes_media["anime"] }}],
-            backgroundColor: ['#216e7d', '#945141'],
-            borderColor: 'black',
-            borderWidth: 1
-        }],
-        labels: ['Series', 'Anime']
-    },
-    options: {
-        legend: {
-            display: false
-        },
-        scales: {
-            yAxes: [{
-                gridLines: {
-                    color: 'grey',
-                },
-                ticks: {
-                    fontColor: '#e2e2e2',
-                    fontSize: 14,
-                    beginAtZero: true
-                }
-            }],
-            xAxes: [{
-                ticks: {
-                    fontColor: '#e2e2e2',
-                    fontSize: 14,
-                }
-            }]
-        },
-        title: {
-            display: true,
-            text: 'Number of episodes watched:',
-            position: 'top',
-            fontColor: '#e2e2e2',
-            fontSize: 18,
-            fontStyle: 'normal'
-        },
-        responsive: true
-    }
-};
-
-var ctx = document.getElementById('total-episodes').getContext('2d');
 var mybar = new Chart(ctx, config);
 </script>
 {% endblock script %}
