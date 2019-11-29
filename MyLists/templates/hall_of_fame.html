@@ -397,7 +397,7 @@ var config = {
     type: 'bar',
     data: {
         datasets: [{
-            data: [6524, 5241],
+            data: [{{ total_seasons_media["series"] }}, {{ total_seasons_media["anime"] }}],
             backgroundColor: ['#216e7d', '#945141'],
             borderColor: 'black',
             borderWidth: 1
@@ -428,7 +428,7 @@ var config = {
         },
         title: {
             display: true,
-            text: 'Number of seasons watched:',
+            text: 'Number of completed seasons watched:',
             position: 'top',
             fontColor: '#e2e2e2',
             fontSize: 18,
@@ -446,7 +446,7 @@ var config = {
     type: 'bar',
     data: {
         datasets: [{
-            data: [26524, 35241],
+            data: [{{ total_episodes_media["series"] }}, {{ total_episodes_media["anime"] }}],
             backgroundColor: ['#216e7d', '#945141'],
             borderColor: 'black',
             borderWidth: 1

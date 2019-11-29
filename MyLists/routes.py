@@ -834,7 +834,51 @@ def hall_of_fame():
     top_dropped_media = {"series": top_series_dropped,
                          "anime": top_anime_dropped}
 
-    
+    # Count the total number of seasons/episodes watched for the series
+    total_series_eps_seasons = db.session.query(SeriesList, SeriesEpisodesPerSeason,
+                               func.group_concat(SeriesEpisodesPerSeason.episodes)). \
+                               join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id).\
+                               group_by(SeriesList.id).all()
+
+    total_series_seasons_watched = 0
+    total_series_episodes_watched = 0
+    for element in total_series_eps_seasons:
+        if element[0].status != Status.PLAN_TO_WATCH:
+            episodes = element[2].split(",")
+            episodes = [int(x) for x in episodes]
+            if episodes[int(element[0].current_season)-1] == int(element[0].last_episode_watched):
+                total_series_seasons_watched += int(element[0].current_season)
+            else:
+                total_series_seasons_watched += int(element[0].current_season)-1
+            for i in range(1, element[0].current_season):
+                total_series_episodes_watched += episodes[i-1]
+            total_series_episodes_watched += element[0].last_episode_watched
+
+    # Count the total number of seasons/episodes watched for the anime
+    total_anime_eps_seasons = db.session.query(AnimeList, AnimeEpisodesPerSeason,
+                              func.group_concat(AnimeEpisodesPerSeason.episodes)).\
+                              join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id).\
+                              group_by(AnimeList.id).all()
+
+    total_anime_seasons_watched = 0
+    total_anime_episodes_watched = 0
+    for element in total_anime_eps_seasons:
+        if element[0].status != Status.PLAN_TO_WATCH:
+            episodes = element[2].split(",")
+            episodes = [int(x) for x in episodes]
+            if episodes[int(element[0].current_season)-1] == int(element[0].last_episode_watched):
+                total_anime_seasons_watched += int(element[0].current_season)
+            else:
+                total_anime_seasons_watched += int(element[0].current_season)-1
+            for i in range(1, element[0].current_season):
+                total_anime_episodes_watched += episodes[i-1]
+            total_anime_episodes_watched += element[0].last_episode_watched
+
+    total_seasons_media = {"series": total_series_seasons_watched,
+                           "anime" : total_anime_seasons_watched}
+
+    total_episodes_media = {"series": total_series_episodes_watched,
+                            "anime" : total_anime_episodes_watched}
 
     return render_template("hall_of_fame.html",
                            title='Hall of Fame',
@@ -842,7 +886,9 @@ def hall_of_fame():
                            total_time=total_time,
                            most_present_media=most_present_media,
                            most_actors_media=most_actors_media,
-                           top_dropped_media=top_dropped_media)
+                           top_dropped_media=top_dropped_media,
+                           total_seasons_media=total_seasons_media,
+                           total_episodes_media=total_episodes_media)
 
 
 @app.route("/follow", methods=['POST'])
