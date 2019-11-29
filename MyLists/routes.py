@@ -721,10 +721,16 @@ def hall_of_fame():
     movies_most = db.session.query(Movies, MoviesList, func.count()).join(MoviesList, MoviesList.movies_id == Movies.id).\
         filter(MoviesList.movies_id == Movies.id).group_by(MoviesList.movies_id).all()
 
+    # function to sort (reversed or not) the tuples from a sub list
+    def Sort(sub_list, index=2, reverse=True):
+        return (sorted(sub_list, key=lambda x: x[index], reverse=reverse))
+
     # Sort by the most represented to the least
-    series_most = sorted(series_most, key=lambda x: x[2], reverse=True)
-    anime_most = sorted(anime_most, key=lambda x: x[2], reverse=True)
-    movies_most = sorted(movies_most, key=lambda x: x[2], reverse=True)
+    series_most = Sort(series_most)
+    anime_most = Sort(anime_most)
+    movies_most = Sort(movies_most)
+
+    # Recover the TOP 3
     all_series_most = []
     all_anime_most = []
     all_movies_most = []
@@ -733,20 +739,20 @@ def hall_of_fame():
             series_most_data = {"name": series_most[i][0].name,
                                 "quantity": series_most[i][2]}
         except:
-            series_most_data = {"name": "Undefined",
-                                "quantity": 0}
+            series_most_data = {"name": "-",
+                                "quantity": "-"}
         try:
             anime_most_data = {"name": anime_most[i][0].name,
-                                "quantity": anime_most[i][2]}
+                               "quantity": anime_most[i][2]}
         except:
-            anime_most_data = {"name": "Undefined",
-                                "quantity": 0}
+            anime_most_data = {"name": "-",
+                               "quantity": "-"}
         try:
             movies_most_data = {"name": movies_most[i][0].name,
                                 "quantity": movies_most[i][2]}
         except:
-            movies_most_data = {"name": "Undefined",
-                                "quantity": 0}
+            movies_most_data = {"name": "-",
+                                "quantity": "-"}
         all_series_most.append(series_most_data)
         all_anime_most.append(anime_most_data)
         all_movies_most.append(movies_most_data)
@@ -755,11 +761,88 @@ def hall_of_fame():
                           "anime" : all_anime_most,
                           "movies": all_movies_most}
 
+    # Recover the actors the most present in all the users' lists
+    series_actors = db.session.query(SeriesActors, func.count()).group_by(SeriesActors.name).all()
+    anime_actors = db.session.query(AnimeActors, func.count()).group_by(AnimeActors.name).all()
+    movies_actors = db.session.query(MoviesActors, func.count()).group_by(MoviesActors.name).all()
+
+    # Sort by the most represented to the least
+    series_actors = Sort(series_actors, index=1)
+    anime_actors = Sort(anime_actors, index=1)
+    movies_actors = Sort(movies_actors, index=1)
+
+    # Recover the TOP 3
+    all_series_actors = []
+    all_anime_actors = []
+    all_movies_actors = []
+    for i in range(3):
+        try:
+            series_actors_data = {"name": series_actors[i][0].name,
+                                  "quantity": series_actors[i][1]}
+        except:
+            series_actors_data = {"name": "-",
+                                  "quantity": "-"}
+        try:
+            anime_actors_data = {"name": anime_actors[i][0].name,
+                                 "quantity": anime_actors[i][1]}
+        except:
+            anime_actors_data = {"name": "-",
+                                 "quantity": "-"}
+        try:
+            movies_actors_data = {"name": movies_actors[i][0].name,
+                                  "quantity": movies_actors[i][1]}
+        except:
+            movies_actors_data = {"name": "-",
+                                  "quantity": "-"}
+        all_series_actors.append(series_actors_data)
+        all_anime_actors.append(anime_actors_data)
+        all_movies_actors.append(movies_actors_data)
+
+    most_actors_media = {"series": all_series_actors,
+                         "anime": all_anime_actors,
+                         "movies": all_movies_actors}
+
+    # Recover the most dropped media in all the users' lists
+    series_dropped = db.session.query(Series, SeriesList, func.count()).join(SeriesList, SeriesList.series_id == Series.id). \
+        filter(SeriesList.series_id == Series.id).filter_by(status=Status.DROPPED).group_by(SeriesList.series_id).all()
+    anime_dropped = db.session.query(Anime, AnimeList, func.count()).join(AnimeList, AnimeList.anime_id == Anime.id).\
+        filter(AnimeList.anime_id == Anime.id).filter_by(status=Status.DROPPED).group_by(AnimeList.anime_id).all()
+
+    # Sort by the most represented to the least
+    series_dropped = Sort(series_dropped)
+    anime_dropped = Sort(anime_dropped)
+
+    # Recover the TOP 3
+    top_series_dropped = []
+    top_anime_dropped = []
+    for i in range(3):
+        try:
+            series_dropped_data = {"name": series_dropped[i][0].name,
+                                   "quantity": series_dropped[i][2]}
+        except:
+            series_dropped_data = {"name": "-",
+                                   "quantity": "-"}
+        try:
+            anime_dropped_data = {"name": anime_dropped[i][0].name,
+                                  "quantity": anime_dropped[i][2]}
+        except:
+            anime_dropped_data = {"name": "-",
+                                  "quantity": "-"}
+        top_series_dropped.append(series_dropped_data)
+        top_anime_dropped.append(anime_dropped_data)
+
+    top_dropped_media = {"series": top_series_dropped,
+                         "anime": top_anime_dropped}
+
+    
+
     return render_template("hall_of_fame.html",
                            title='Hall of Fame',
                            all_data=all_users_data,
                            total_time=total_time,
-                           most_present_media=most_present_media)
+                           most_present_media=most_present_media,
+                           most_actors_media=most_actors_media,
+                           top_dropped_media=top_dropped_media)
 
 
 @app.route("/follow", methods=['POST'])

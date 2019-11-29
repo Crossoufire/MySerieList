@@ -253,18 +253,12 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for series in most_actors_media["series"] %}
                         <tr>
-                            <td class="text-center">14</td>
-                            <td class="text-center">Tom Ellis</td>
+                            <td class="text-center">{{ series['quantity'] }}</td>
+                            <td class="text-center">{{ series['name'] }}</td>
                         </tr>
-                        <tr>
-                            <td class="text-center">8</td>
-                            <td class="text-center">Simon Baker</td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">5</td>
-                            <td class="text-center">Megan Boone</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -277,18 +271,12 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for anime in most_actors_media["anime"] %}
                         <tr>
-                            <td class="text-center">23</td>
-                            <td class="text-center">Yuzuki Mahoto</td>
+                            <td class="text-center">{{ anime['quantity'] }}</td>
+                            <td class="text-center">{{ anime['name'] }}</td>
                         </tr>
-                        <tr>
-                            <td class="text-center">14</td>
-                            <td class="text-center">Matoï Batho</td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">6</td>
-                            <td class="text-center">Mariko Huna</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -301,18 +289,12 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for movies in most_actors_media["movies"] %}
                         <tr>
-                            <td class="text-center">52</td>
-                            <td class="text-center">Will Smith</td>
+                            <td class="text-center">{{ movies['quantity'] }}</td>
+                            <td class="text-center">{{ movies['name'] }}</td>
                         </tr>
-                        <tr>
-                            <td class="text-center">25</td>
-                            <td class="text-center">Daniel Radcliff</td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">12</td>
-                            <td class="text-center">Scarlett Johanson</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -328,18 +310,12 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for series in top_dropped_media["series"] %}
                         <tr>
-                            <td class="text-center">52</td>
-                            <td class="text-center">How to get away</td>
+                            <td class="text-center">{{ series['quantity'] }}</td>
+                            <td class="text-center">{{ series['name'] }}</td>
                         </tr>
-                        <tr>
-                            <td class="text-center">25</td>
-                            <td class="text-center">Arrow</td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">12</td>
-                            <td class="text-center">Glee</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -352,18 +328,12 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for anime in top_dropped_media["anime"] %}
                         <tr>
-                            <td class="text-center">52</td>
-                            <td class="text-center">Aldnoah Zero</td>
+                            <td class="text-center">{{ anime['quantity'] }}</td>
+                            <td class="text-center">{{ anime['name'] }}</td>
                         </tr>
-                        <tr>
-                            <td class="text-center">25</td>
-                            <td class="text-center">Tokyo Ghoul</td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">12</td>
-                            <td class="text-center">Monster</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
