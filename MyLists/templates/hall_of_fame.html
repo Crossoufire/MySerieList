@@ -179,7 +179,7 @@
 <h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">GLOBAL STATISTICS<hr class="mt-2 pb-3 mb-0"></h2>
 <div class="row m-t-30">
     <div class="col">
-        <h4 class="text-center">Total Watching Time: {{ total_time["total"]|int }} hours</h4>
+        <h4 class="text-center">Total Watching Time: {{ total_time["total"] }} hours</h4>
         <div class="chart-container">
             <canvas id="media-time"></canvas>
         </div>
@@ -196,18 +196,12 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for series in most_present_media["series"] %}
                         <tr>
-                            <td class="text-center">52</td>
-                            <td class="text-center">How I met</td>
+                            <td class="text-center">{{ series['quantity'] }}</td>
+                            <td class="text-center">{{ series['name'] }}</td>
                         </tr>
-                        <tr>
-                            <td class="text-center">25</td>
-                            <td class="text-center">Malcolm</td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">12</td>
-                            <td class="text-center">Breaking Bad</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -220,19 +214,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                <tr>
-                    <td class="text-center">52</td>
-                    <td class="text-center">Death note</td>
-                </tr>
-                <tr>
-                    <td class="text-center">25</td>
-                    <td class="text-center">Dragon Ball Z</td>
-                </tr>
-                <tr>
-                    <td class="text-center">12</td>
-                    <td class="text-center">Naruto</td>
-                </tr>
-            </tbody>
+                        {% for anime in most_present_media["anime"] %}
+                        <tr>
+                            <td class="text-center">{{ anime['quantity'] }}</td>
+                            <td class="text-center">{{ anime['name'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
             </div>
             <div class="col">
@@ -244,18 +232,12 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for movies in most_present_media["movies"] %}
                         <tr>
-                            <td class="text-center">52</td>
-                            <td class="text-center">Independance Day</td>
+                            <td class="text-center">{{ movies['quantity'] }}</td>
+                            <td class="text-center">{{ movies['name'] }}</td>
                         </tr>
-                        <tr>
-                            <td class="text-center">25</td>
-                            <td class="text-center">Ratatouille</td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">12</td>
-                            <td class="text-center">Avengers</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -410,7 +392,7 @@ var config = {
     type: 'pie',
     data: {
         datasets: [{
-            data: [{{ total_time['series']|int }}, {{ total_time['anime']|int }}, {{ total_time['movies']|int }}],
+            data: [{{ total_time['series'] }}, {{ total_time['anime'] }}, {{ total_time['movies'] }}],
             backgroundColor: ['#216e7d', '#945141', '#8c7821'],
             borderColor: 'black',
             borderWidth: 1,

@@ -707,50 +707,59 @@ def hall_of_fame():
 
         all_users_data.append(user_data)
 
-    total_time = {"total" : (series_total_time/60)+(anime_total_time/60)+(movies_total_time/60),
-                  "series": series_total_time/60,
-                  "anime" : anime_total_time/60,
-                  "movies": movies_total_time/60}
+    # Recover the media total watched time
+    total_time = {"total" : int((series_total_time/60)+(anime_total_time/60)+(movies_total_time/60)),
+                  "series": int(series_total_time/60),
+                  "anime" : int(anime_total_time/60),
+                  "movies": int(movies_total_time/60)}
 
-    # # TODO:
-    # """ NEED to Add the media name in the query with a media join + the actors for each media with another join.
-    # For now we recover [(1,4), (2, 1), (3, 15)] means the media with ID = 1 is present 4 times, the media with ID = 2
-    # is present 1 time etc... Knowinf that the media 1 is "independance day" and the actors are: Will Smith etc...
-    # Allow us to do the selection by the media the most presents and the actors the most present with one query. """
-    # # Recover the series the most present in all the users' lists
-    # series_most = db.session.query(SeriesList.series_id, func.count()).group_by(SeriesList.series_id).all()
-    # # Recover the anime the most present in all the users' lists
-    # anime_most = db.session.query(AnimeList.anime_id, func.count()).group_by(AnimeList.anime_id).all()
-    # # Recover the movies the most present in all the users' lists
-    # movies_most = db.session.query(MoviesList.movies_id, func.count()).group_by(MoviesList.movies_id).all()
-    #
-    # # TODO:
-    # """ Another query to recover the series, anime and movies/TOP 3 the most completed/completed-anime and dropped.
-    # Need a join with media to recover the name. """
-    # # Recover the series the most present in all the users' lists
-    # series_cmplted_drped = db.session.query(SeriesList.series_id, func.count()).group_by(SeriesList.series_id).all()
-    # # Recover the anime the most present in all the users' lists
-    # anime_most = db.session.query(AnimeList.anime_id, func.count()).group_by(AnimeList.anime_id).all()
-    # # Recover the movies the most present in all the users' lists
-    # movies_most = db.session.query(MoviesList.movies_id, func.count()).group_by(MoviesList.movies_id).all()
-    #
-    # # TODO:
-    # """ Total watched seasons and episodes. Need to recover the last episode of the occuring season of the series/anime
-    # to be sure that the season is completed. For now even if you are season 4 episode 1 or season 4 last episode it is
-    # counted, or for completed seasons the last episode has to be watched. Need to join the media with episode per
-    # season and check if the last episode was watched by the user. We surely can use this SQL query to recover the total
-    # number of episodes watched. """
-    # # Recover the total number of seasons and episodes watched for the series for all users
-    # total_seasons_and_episodes_series = db.session.query(func.sum(SeriesList.current_season)).scalar()
-    # # Recover the total number of seasons and episodes watched for the anime for all users
-    # total_seasons_and_episodes_anime= db.session.query(func.sum(SeriesList.current_season)).scalar()
-    #
-    # """ TOTAL QUERIES: 8 """
+    # Recover the media the most present in all the users' lists
+    series_most = db.session.query(Series, SeriesList, func.count()).join(SeriesList, SeriesList.series_id == Series.id).\
+        filter(SeriesList.series_id == Series.id).group_by(SeriesList.series_id).all()
+    anime_most = db.session.query(Anime, AnimeList, func.count()).join(AnimeList, AnimeList.anime_id == Anime.id).\
+        filter(AnimeList.anime_id == Anime.id).group_by(AnimeList.anime_id).all()
+    movies_most = db.session.query(Movies, MoviesList, func.count()).join(MoviesList, MoviesList.movies_id == Movies.id).\
+        filter(MoviesList.movies_id == Movies.id).group_by(MoviesList.movies_id).all()
+
+    # Sort by the most represented to the least
+    series_most = sorted(series_most, key=lambda x: x[2], reverse=True)
+    anime_most = sorted(anime_most, key=lambda x: x[2], reverse=True)
+    movies_most = sorted(movies_most, key=lambda x: x[2], reverse=True)
+    all_series_most = []
+    all_anime_most = []
+    all_movies_most = []
+    for i in range(3):
+        try:
+            series_most_data = {"name": series_most[i][0].name,
+                                "quantity": series_most[i][2]}
+        except:
+            series_most_data = {"name": "Undefined",
+                                "quantity": 0}
+        try:
+            anime_most_data = {"name": anime_most[i][0].name,
+                                "quantity": anime_most[i][2]}
+        except:
+            anime_most_data = {"name": "Undefined",
+                                "quantity": 0}
+        try:
+            movies_most_data = {"name": movies_most[i][0].name,
+                                "quantity": movies_most[i][2]}
+        except:
+            movies_most_data = {"name": "Undefined",
+                                "quantity": 0}
+        all_series_most.append(series_most_data)
+        all_anime_most.append(anime_most_data)
+        all_movies_most.append(movies_most_data)
+
+    most_present_media = {"series": all_series_most,
+                          "anime" : all_anime_most,
+                          "movies": all_movies_most}
 
     return render_template("hall_of_fame.html",
                            title='Hall of Fame',
                            all_data=all_users_data,
-                           total_time=total_time)
+                           total_time=total_time,
+                           most_present_media=most_present_media)
 
 
 @app.route("/follow", methods=['POST'])
