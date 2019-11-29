@@ -46,3 +46,10 @@ function unfollow(follow_id, button_id) {
             console.log("ok"); }
     });
 }
+
+
+// ------------------------------- Tooltip ----------------------------------
+$('.tooltip').tooltip();
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})

@@ -762,9 +762,9 @@ def hall_of_fame():
                           "movies": all_movies_most}
 
     # Recover the actors the most present in all the users' lists
-    series_actors = db.session.query(SeriesActors, func.count()).group_by(SeriesActors.name).all()
-    anime_actors = db.session.query(AnimeActors, func.count()).group_by(AnimeActors.name).all()
-    movies_actors = db.session.query(MoviesActors, func.count()).group_by(MoviesActors.name).all()
+    series_actors = db.session.query(SeriesActors, func.count()).group_by(SeriesActors.name).filter(SeriesActors.name != "Unknown").all()
+    anime_actors = db.session.query(AnimeActors, func.count()).group_by(AnimeActors.name).filter(AnimeActors.name != "Unknown").all()
+    movies_actors = db.session.query(MoviesActors, func.count()).group_by(MoviesActors.name).filter(MoviesActors.name != "Unknown").all()
 
     # Sort by the most represented to the least
     series_actors = Sort(series_actors, index=1)
