@@ -187,18 +187,18 @@
                         {% for update in overview_updates %}
                             {% if update['category'] == 'anime' %}
                             <div class="p-2 m-b-10" style="border-bottom: solid 1px #945141;">
-                                <div style="font-size: 12pt;" data-toggle="tooltip" title="{{ update['media_name'] }}">
-                                    <i style="color: #945141;" class="fas fa-torii-gate m-r-14"></i>
+                                <div style="font-size: 12pt;">
+                                    <i style="color: #945141;" class="fas fa-torii-gate m-r-14" data-toggle="tooltip" title="Anime"></i>
                             {% elif update['category'] == 'series' %}
                             <div class="p-2 m-b-10" style="border-bottom: solid 1px #216e7d;">
-                                <div style="font-size: 12pt;" data-toggle="tooltip" title="{{ update['media_name'] }}">
-                                    <i style="color: #216e7d;" class="fas fa-tv m-r-10"></i>
+                                <div style="font-size: 12pt;">
+                                    <i style="color: #216e7d;" class="fas fa-tv m-r-10" data-toggle="tooltip" title="Series"></i>
                             {% elif update['category'] == 'movie' %}
                             <div class="p-2 m-b-10" style="border-bottom: solid 1px #8c7821;">
-                                <div style="font-size: 12pt;" data-toggle="tooltip" title="{{ update['media_name'] }}">
-                                    <i style="color: #8c7821;" class="far fa-star m-r-12"></i>
+                                <div style="font-size: 12pt;">
+                                    <i style="color: #8c7821;" class="far fa-star m-r-12" data-toggle="tooltip" title="Movie"></i>
                             {% endif %}
-                                    {{ update['media_name'] }}
+                                    <span data-toggle="tooltip" title="{{ update['media_name'] }}">{{ update['media_name'] }}</span>
                                 </div>
 
                                 <div class="m-l-35" style="font-size: 11pt;">
@@ -749,15 +749,15 @@
                             {% if last_update["username"] == follow["username"] %}
                                 {% for update in last_update["update"] %}
                                 <div>
-                                    <div id="media_name_div" style="float: left; width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" data-toggle="tooltip" title="{{ update['media_name'] }}">
+                                    <div style="float: left; width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                         {% if update["category"] == "anime" %}
-                                        <i style="color: #945141;" class="fas fa-torii-gate m-r-14"></i>
+                                        <i style="color: #945141;" class="fas fa-torii-gate m-r-14" data-toggle="tooltip" title="Anime"></i>
                                         {% elif update["category"] == "series" %}
-                                        <i style="color: #216e7d;" class="fas fa-tv m-r-10"></i>
+                                        <i style="color: #216e7d;" class="fas fa-tv m-r-10" data-toggle="tooltip" title="Series"></i>
                                         {% else %}
-                                        <i style="color: #8c7821;" class="far fa-star m-r-12"></i>
+                                        <i style="color: #8c7821;" class="far fa-star m-r-12" data-toggle="tooltip" title="Movie"></i>
                                         {% endif %}
-                                        {{ update["media_name"] }}
+                                        <span data-toggle="tooltip" title="{{ update['media_name'] }}">{{ update["media_name"] }}</span>
                                     </div>
                                     <div style="float: right;">
                                         <i class="follow_date">
