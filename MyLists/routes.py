@@ -656,9 +656,6 @@ def hall_of_fame():
         follows_list.append(follow.follow_id)
 
     all_users_data = []
-    series_total_time = 0
-    anime_total_time = 0
-    movies_total_time = 0
     for user in users:
         user_data = {}
         user_data["username"]        = user.username
@@ -689,10 +686,6 @@ def hall_of_fame():
         user_data["knowledge_grade_id"]     = knowledge_grade["grade_id"]
         user_data["knowledge_grade_title"]  = knowledge_grade["grade_title"]
 
-        series_total_time += user.time_spent_series
-        anime_total_time += user.time_spent_anime
-        movies_total_time += user.time_spent_movies
-
         if user.id in follows_list:
             user_data["isfollowing"] = True
         else:
@@ -707,18 +700,36 @@ def hall_of_fame():
 
         all_users_data.append(user_data)
 
-    # Recover the media total watched time
-    total_time = {"total" : int((series_total_time/60)+(anime_total_time/60)+(movies_total_time/60)),
+    return render_template("hall_of_fame.html",
+                           title='Hall of Fame',
+                           all_data=all_users_data)
+
+
+@app.route("/global_stats", methods=['GET'])
+@login_required
+def global_stats():
+    users = User.query.filter(User.id >= "2").filter_by(active=True).order_by(User.username.asc()).all()
+
+    series_total_time = 0
+    anime_total_time = 0
+    movies_total_time = 0
+    for user in users:
+        series_total_time += user.time_spent_series
+        anime_total_time += user.time_spent_anime
+        movies_total_time += user.time_spent_movies
+
+    # Recover the total watched time
+    total_time = {"total": int((series_total_time/60)+(anime_total_time/60)+(movies_total_time/60)),
                   "series": int(series_total_time/60),
-                  "anime" : int(anime_total_time/60),
+                  "anime": int(anime_total_time/60),
                   "movies": int(movies_total_time/60)}
 
     # Recover the media the most present in all the users' lists
-    series_most = db.session.query(Series, SeriesList, func.count()).join(SeriesList, SeriesList.series_id == Series.id).\
+    series_most = db.session.query(Series, SeriesList, func.count()).join(SeriesList, SeriesList.series_id == Series.id). \
         filter(SeriesList.series_id == Series.id).group_by(SeriesList.series_id).all()
-    anime_most = db.session.query(Anime, AnimeList, func.count()).join(AnimeList, AnimeList.anime_id == Anime.id).\
+    anime_most = db.session.query(Anime, AnimeList, func.count()).join(AnimeList, AnimeList.anime_id == Anime.id). \
         filter(AnimeList.anime_id == Anime.id).group_by(AnimeList.anime_id).all()
-    movies_most = db.session.query(Movies, MoviesList, func.count()).join(MoviesList, MoviesList.movies_id == Movies.id).\
+    movies_most = db.session.query(Movies, MoviesList, func.count()).join(MoviesList, MoviesList.movies_id == Movies.id). \
         filter(MoviesList.movies_id == Movies.id).group_by(MoviesList.movies_id).all()
 
     # function to sort (reversed or not) the tuples from a sub list
@@ -758,13 +769,16 @@ def hall_of_fame():
         all_movies_most.append(movies_most_data)
 
     most_present_media = {"series": all_series_most,
-                          "anime" : all_anime_most,
+                          "anime": all_anime_most,
                           "movies": all_movies_most}
 
     # Recover the actors the most present in all the users' lists
-    series_actors = db.session.query(SeriesActors, func.count()).group_by(SeriesActors.name).filter(SeriesActors.name != "Unknown").all()
-    anime_actors = db.session.query(AnimeActors, func.count()).group_by(AnimeActors.name).filter(AnimeActors.name != "Unknown").all()
-    movies_actors = db.session.query(MoviesActors, func.count()).group_by(MoviesActors.name).filter(MoviesActors.name != "Unknown").all()
+    series_actors = db.session.query(SeriesActors, func.count()).group_by(SeriesActors.name).\
+        filter(SeriesActors.name != "Unknown").all()
+    anime_actors = db.session.query(AnimeActors, func.count()).group_by(AnimeActors.name).\
+        filter(AnimeActors.name != "Unknown").all()
+    movies_actors = db.session.query(MoviesActors, func.count()).group_by(MoviesActors.name).\
+        filter(MoviesActors.name != "Unknown").all()
 
     # Sort by the most represented to the least
     series_actors = Sort(series_actors, index=1)
@@ -805,7 +819,7 @@ def hall_of_fame():
     # Recover the most dropped media in all the users' lists
     series_dropped = db.session.query(Series, SeriesList, func.count()).join(SeriesList, SeriesList.series_id == Series.id). \
         filter(SeriesList.series_id == Series.id).filter_by(status=Status.DROPPED).group_by(SeriesList.series_id).all()
-    anime_dropped = db.session.query(Anime, AnimeList, func.count()).join(AnimeList, AnimeList.anime_id == Anime.id).\
+    anime_dropped = db.session.query(Anime, AnimeList, func.count()).join(AnimeList, AnimeList.anime_id == Anime.id). \
         filter(AnimeList.anime_id == Anime.id).filter_by(status=Status.DROPPED).group_by(AnimeList.anime_id).all()
 
     # Sort by the most represented to the least
@@ -836,9 +850,9 @@ def hall_of_fame():
 
     # Count the total number of seasons/episodes watched for the series
     total_series_eps_seasons = db.session.query(SeriesList, SeriesEpisodesPerSeason,
-                               func.group_concat(SeriesEpisodesPerSeason.episodes)). \
-                               join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id).\
-                               group_by(SeriesList.id).all()
+        func.group_concat(SeriesEpisodesPerSeason.episodes)).\
+        join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
+        group_by(SeriesList.id).all()
 
     total_series_seasons_watched = 0
     total_series_episodes_watched = 0
@@ -846,19 +860,19 @@ def hall_of_fame():
         if element[0].status != Status.PLAN_TO_WATCH:
             episodes = element[2].split(",")
             episodes = [int(x) for x in episodes]
-            if episodes[int(element[0].current_season)-1] == int(element[0].last_episode_watched):
+            if episodes[int(element[0].current_season) - 1] == int(element[0].last_episode_watched):
                 total_series_seasons_watched += int(element[0].current_season)
             else:
-                total_series_seasons_watched += int(element[0].current_season)-1
+                total_series_seasons_watched += int(element[0].current_season) - 1
             for i in range(1, element[0].current_season):
-                total_series_episodes_watched += episodes[i-1]
+                total_series_episodes_watched += episodes[i - 1]
             total_series_episodes_watched += element[0].last_episode_watched
 
     # Count the total number of seasons/episodes watched for the anime
     total_anime_eps_seasons = db.session.query(AnimeList, AnimeEpisodesPerSeason,
-                              func.group_concat(AnimeEpisodesPerSeason.episodes)).\
-                              join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id).\
-                              group_by(AnimeList.id).all()
+        func.group_concat(AnimeEpisodesPerSeason.episodes)). \
+        join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
+        group_by(AnimeList.id).all()
 
     total_anime_seasons_watched = 0
     total_anime_episodes_watched = 0
@@ -866,23 +880,22 @@ def hall_of_fame():
         if element[0].status != Status.PLAN_TO_WATCH:
             episodes = element[2].split(",")
             episodes = [int(x) for x in episodes]
-            if episodes[int(element[0].current_season)-1] == int(element[0].last_episode_watched):
+            if episodes[int(element[0].current_season) - 1] == int(element[0].last_episode_watched):
                 total_anime_seasons_watched += int(element[0].current_season)
             else:
-                total_anime_seasons_watched += int(element[0].current_season)-1
+                total_anime_seasons_watched += int(element[0].current_season) - 1
             for i in range(1, element[0].current_season):
-                total_anime_episodes_watched += episodes[i-1]
+                total_anime_episodes_watched += episodes[i - 1]
             total_anime_episodes_watched += element[0].last_episode_watched
 
     total_seasons_media = {"series": total_series_seasons_watched,
-                           "anime" : total_anime_seasons_watched}
+                           "anime": total_anime_seasons_watched}
 
     total_episodes_media = {"series": total_series_episodes_watched,
-                            "anime" : total_anime_episodes_watched}
+                            "anime": total_anime_episodes_watched}
 
-    return render_template("hall_of_fame.html",
-                           title='Hall of Fame',
-                           all_data=all_users_data,
+    return render_template("global_stats.html",
+                           title='Global Stats',
                            total_time=total_time,
                            most_present_media=most_present_media,
                            most_actors_media=most_actors_media,

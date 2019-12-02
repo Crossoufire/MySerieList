@@ -18,13 +18,6 @@ Medialists:
 	Enhance: Autocomplete style (50% done)
 
 
-Hall of Fame:
-    Add: Global website statistics below the table:
-           - How many media watched
-           - Total time & mean score from all users
-           - Most watched media
-
-
 Advanced Statistics:
 	Add:  Personal advanced statistics for media
 
