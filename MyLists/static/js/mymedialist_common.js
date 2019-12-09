@@ -124,11 +124,14 @@ function searchElement() {
         title = cards[i].querySelector(".font-mask");
         original_title = cards[i].querySelector(".original_title");
         actors = cards[i].querySelector(".actors_yes");
+        genres = cards[i].querySelector(".genre_yes");
         if (title.innerText.toUpperCase().indexOf(filter) > -1) {
             cards[i].style.display = "";
         } else if (original_title.innerText.toUpperCase().indexOf(filter) > -1) {
             cards[i].style.display = "";
         } else if (actors.innerText.toUpperCase().indexOf(filter) > -1) {
+            cards[i].style.display = "";
+        } else if (genres.innerText.toUpperCase().indexOf(filter) > -1) {
             cards[i].style.display = "";
         } else {
             cards[i].style.display = "none";

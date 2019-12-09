@@ -724,6 +724,54 @@ def global_stats():
                   "anime": int(anime_total_time/60),
                   "movies": int(movies_total_time/60)}
 
+    # function to sort (reversed or not) the tuples from a sub list
+    def Sort(sub_list, index=2, reverse=True):
+        return (sorted(sub_list, key=lambda x: x[index], reverse=reverse))
+
+    # Recover the most represented genres
+    series_genres = db.session.query(SeriesGenre, func.count()).group_by(SeriesGenre.genre).\
+        filter(SeriesGenre.genre != "Unknown").all()
+    anime_genres = db.session.query(AnimeGenre, func.count()).group_by(AnimeGenre.genre). \
+        filter(AnimeGenre.genre != "Unknown").all()
+    movies_genres = db.session.query(MoviesGenre, func.count()).group_by(MoviesGenre.genre). \
+        filter(MoviesGenre.genre != "Unknown").all()
+
+    # Sort by the most represented to the least
+    series_genres = Sort(series_genres, index=1)
+    anime_genres = Sort(anime_genres, index=1)
+    movies_genres = Sort(movies_genres, index=1)
+
+    # Recover the TOP 3
+    all_series_genres = []
+    all_anime_genres = []
+    all_movies_genres = []
+    for i in range(3):
+        try:
+            series_genre_data = {"genre": series_genres[i][0].genre,
+                                 "quantity": series_genres[i][1]}
+        except:
+            series_genre_data = {"genre": "-",
+                                 "quantity": "-"}
+        try:
+            anime_genre_data = {"genre": anime_genres[i][0].genre,
+                                "quantity": anime_genres[i][1]}
+        except:
+            anime_genre_data = {"genre": "-",
+                                "quantity": "-"}
+        try:
+            movies_genre_data = {"genre": movies_genres[i][0].genre,
+                                 "quantity": movies_genres[i][1]}
+        except:
+            movies_genre_data = {"genre": "-",
+                                 "quantity": "-"}
+        all_series_genres.append(series_genre_data)
+        all_anime_genres.append(anime_genre_data)
+        all_movies_genres.append(movies_genre_data)
+
+    most_genres_media = {"series": all_series_genres,
+                         "anime": all_anime_genres,
+                         "movies": all_movies_genres}
+
     # Recover the media the most present in all the users' lists
     series_most = db.session.query(Series, SeriesList, func.count()).join(SeriesList, SeriesList.series_id == Series.id). \
         filter(SeriesList.series_id == Series.id).group_by(SeriesList.series_id).all()
@@ -731,10 +779,6 @@ def global_stats():
         filter(AnimeList.anime_id == Anime.id).group_by(AnimeList.anime_id).all()
     movies_most = db.session.query(Movies, MoviesList, func.count()).join(MoviesList, MoviesList.movies_id == Movies.id). \
         filter(MoviesList.movies_id == Movies.id).group_by(MoviesList.movies_id).all()
-
-    # function to sort (reversed or not) the tuples from a sub list
-    def Sort(sub_list, index=2, reverse=True):
-        return (sorted(sub_list, key=lambda x: x[index], reverse=reverse))
 
     # Sort by the most represented to the least
     series_most = Sort(series_most)
@@ -901,7 +945,8 @@ def global_stats():
                            most_actors_media=most_actors_media,
                            top_dropped_media=top_dropped_media,
                            total_seasons_media=total_seasons_media,
-                           total_episodes_media=total_episodes_media)
+                           total_episodes_media=total_episodes_media,
+                           most_genres_media=most_genres_media)
 
 
 @app.route("/follow", methods=['POST'])
@@ -1047,7 +1092,7 @@ def mymedialist(media_list, user_name):
         return render_template('mymedialist.html',
                                title            = "{}'s {}".format(user_name, media_list),
                                all_data         = media_all_data["all_data"],
-                               common_elements=media_all_data["common_elements"],
+                               common_elements  = media_all_data["common_elements"],
                                media_list       = media_list,
                                target_user_name = user_name,
                                target_user_id   = str(user.id))

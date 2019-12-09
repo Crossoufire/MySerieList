@@ -103,6 +103,7 @@
                             <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
                             <span style="display: none;" class="original_title">{{ data[0]['original_name'] }}</span>
                             <span style="display: none;" class="actors_yes">{{ data[0]['actors'] }}</span>
+                            <span style="display: none;" class="genre_yes">{{ data[0]['genres'] }}</span>
                         </div>
                         {% if target_user_id == current_user.get_id() %}
                             {% if media_list != 'movieslist' %}

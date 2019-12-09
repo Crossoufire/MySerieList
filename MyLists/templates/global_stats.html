@@ -20,6 +20,63 @@
         <div>
             <canvas id="media-time"></canvas>
         </div>
+        <div style="font-size: 14pt;" class="text-center m-b-5 m-t-37"><b>Genres the most presents in users' lists:</b></div>
+        <div class="row d-flex flex-wrap">
+            <div class="col">
+                <table style="background: #216e7d;" class="table table-sm text-light">
+                    <thead>
+                        <tr>
+                            <th class="text-center">N°</th>
+                            <th class="text-center">Series</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for series in most_genres_media["series"] %}
+                        <tr>
+                            <td class="text-center">{{ series['quantity'] }}</td>
+                            <td style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" class="text-center" data-toggle="tooltip" title="{{ series['genre'] }}">{{ series['genre'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <table style="background: #945141;" class="table table-sm text-light">
+                    <thead>
+                        <tr>
+                            <th class="text-center">N°</th>
+                            <th class="text-center">Anime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for anime in most_genres_media["anime"] %}
+                        <tr>
+                            <td class="text-center">{{ anime['quantity'] }}</td>
+                            <td style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" class="text-center" data-toggle="tooltip" title="{{ anime['genre'] }}">{{ anime['genre'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <table style="background: #8c7821;" class="table table-sm text-light">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th class="text-center">Movies</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for movies in most_genres_media["movies"] %}
+                        <tr>
+                            <td class="text-center">{{ movies['quantity'] }}</td>
+                            <td style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" class="text-center" data-toggle="tooltip" title="{{ movies['genre'] }}">{{ movies['genre'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     <div class="col">
         <div style="font-size: 14pt;" class="text-center m-b-5"><b>Media the most presents in users' lists:</b></div>
