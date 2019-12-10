@@ -28,7 +28,7 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
 
     for (i = 2; i <= season_data[0][selected_season]; i++) {
         let opt = document.createElement("option");
-        opt.text = "Episode " + i;
+        opt.text = "E" + i;
         episode_drop.appendChild(opt);
     }
 

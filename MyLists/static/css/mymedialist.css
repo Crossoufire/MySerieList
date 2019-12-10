@@ -111,13 +111,8 @@ body.loading .modal_loading {
 
 .form-control {
 	height: 2rem;
-	padding: 5px;
-	background-color: #131418;
 	color: #fff;
-	border-radius: 1px;
 	font-size: 11pt;
-	outline: none;
-	box-shadow: none !important;
 }
 
 .form-control:focus {
@@ -134,28 +129,18 @@ body.loading .modal_loading {
     padding-bottom: 5px;
 }
 
-.scrollable-menu {
-    text-align-last: center;
-}
-
 .episodes {
 	cursor: pointer;
-    border-style: 1px;
-    border-color: black;
-    border-radius: 2px;
-    -moz-appearance:none;
-    -webkit-appearance:none;
-    appearance:none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .seasons {
 	cursor: pointer;
-    border-style: 1px;
-    border-color: black;
-    border-radius: 2px;
-    -moz-appearance:none;
-    -webkit-appearance:none;
-    appearance:none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 @media (max-width: 767.98px) {
@@ -234,38 +219,6 @@ body.loading .modal_loading {
 	right: 1px;
 	top: 1px;
 }
-
-/*
-.ribbon {
-	width: 20px;
-	height: 40px;
-	padding: 0px;
-    -webkit-transform: rotate(0deg) skew(0deg);
-    transform: rotate(0deg) skew(0deg);
-    border-left: 12px solid #2d6f22;
-    border-right: 12px solid #2d6f22;
-    border-bottom: 12px solid transparent;
-	position: absolute;
-	right: 8px;
-	top: 1px;
-}
-*/
-
-/*
-.ribbon {
-    width: 100px;
-    height: 20px;
-    line-height: 20px;
-    position: absolute;
-    top: 15px;
-    right: -30px;
-    z-index: 2;
-    overflow: hidden;
-    -webkit-transform: rotate(45deg);
-    transform: rotate(45deg);
-    background: #2d6f22;
-}
-*/
 /* --------------------------- */
 
 .btn_bottom_left:hover {
@@ -311,7 +264,7 @@ body.loading .modal_loading {
 }
 
 .card {
-    width: 200px;
+    width: 188px;
 }
 
 .font-mask {
