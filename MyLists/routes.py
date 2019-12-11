@@ -1473,67 +1473,6 @@ def add_element():
     return '', 204
 
 
-@app.route('/add_score_element', methods=['POST'])
-@login_required
-def add_score_element():
-    image_error = url_for('static', filename='img/error.jpg')
-    try:
-        json_data = request.get_json()
-        score_value = round(float(json_data['score_val']), 2)
-        element_id = int(json_data['element_id'])
-        element_type = json_data['element_type']
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the element exists
-    if element_type == "animelist":
-        if Anime.query.filter_by(id=element_id).first() is None:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "serieslist":
-        if Series.query.filter_by(id=element_id).first() is None:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "movieslist":
-        if Movies.query.filter_by(id=element_id).first() is None:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    else:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the element is in the current user's list
-    if element_type == "animelist":
-        if AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first() is None:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "serieslist":
-        if SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first() is None:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "movieslist":
-        if MoviesList.query.filter_by(user_id=current_user.get_id(), movies_id=element_id).first() is None:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    else:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    # Check if the score is between 0 and 10:
-    if score_value > 10 or score_value < 0:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-
-    if element_type == "animelist":
-        anime = AnimeList.query.filter_by(user_id=current_user.get_id(), anime_id=element_id).first()
-        anime.score = score_value
-        db.session.commit()
-        app.logger.info('[{}] Anime with ID {} scored {}'.format(current_user.get_id(), element_id, score_value))
-    elif element_type == "serieslist":
-        series = SeriesList.query.filter_by(user_id=current_user.get_id(), series_id=element_id).first()
-        series.score = score_value
-        db.session.commit()
-        app.logger.info('[{}] Series with ID {} scored {}'.format(current_user.get_id(), element_id, score_value))
-    elif element_type == "movieslist":
-        movie = MoviesList.query.filter_by(user_id=current_user.get_id(), movies_id=element_id).first()
-        movie.score = score_value
-        db.session.commit()
-        app.logger.info('[{}] Movie with ID {} scored {}'.format(current_user.get_id(), element_id, score_value))
-
-    return '', 204
-
-
 @app.route('/autocomplete/<media>', methods=['GET'])
 @login_required
 def autocomplete(media):

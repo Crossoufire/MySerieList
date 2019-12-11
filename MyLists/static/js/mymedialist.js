@@ -125,37 +125,36 @@ function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, me
     }
 
     $('#'+card_id).children().first().prepend(
-    "<ul class='cat_buttons'>" +
-        "<li style='display: " + display_watching + "' class='btn btn_sm btn-light p-1 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Watching</li>" +
-        "<li style='display: " + display_completed + "' class='btn btn_sm btn-light p-1 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Completed</li>" +
-        "<li style='display: " + display_on_hold + "' class='btn btn_sm btn-light p-1 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>On Hold</li>" +
-        "<li style='display: " + display_random + "' class='btn btn_sm btn-light p-1 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Random</li>" +
-        "<li style='display: " + display_dropped + "' class='btn btn_sm btn-light p-1 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Dropped</li>" +
-        "<li style='display: " + display_plan_to_watch + "' class='btn btn_sm btn-light p-1 m-1 cat_buttons_pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</li>" +
+    "<ul class='card-cat-buttons'>" +
+        "<li style='display: " + display_watching + "' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Watching</li>" +
+        "<li style='display: " + display_completed + "' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Completed</li>" +
+        "<li style='display: " + display_on_hold + "' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>On Hold</li>" +
+        "<li style='display: " + display_random + "' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Random</li>" +
+        "<li style='display: " + display_dropped + "' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Dropped</li>" +
+        "<li style='display: " + display_plan_to_watch + "' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</li>" +
     "</ul>");
 
-    $('#'+card_id).children().children('.btn_left').attr('style', 'display: none;');
-    $('#'+card_id).children().children('.btn_right').attr('style', 'display: none;');
-    $('#'+card_id).children().children('.btn_bottom_left').attr('style', 'display: none;');
+    $('#'+card_id).children().children('.card-btn-top-left').attr('style', 'display: none;');
+    $('#'+card_id).children().children('.card-btn-top-right').attr('style', 'display: none;');
+    $('#'+card_id).children('.seas-eps-box').attr('style', 'display: none;');
     $('#'+card_id).children().children('.mask').hide();
-    $('#'+card_id).children().first().prepend("<a class='btn_right_2 fas fa-times' onclick='remove_cat()')></a>");
-    $('#'+card_id).children().children('.card-img-top').attr('style', 'filter: brightness(0%);');
+    $('#'+card_id).children().first().prepend("<a class='card-btn-top-right-2 fas fa-times' onclick='remove_cat()')></a>");
+    $('#'+card_id).children().children('.card-img-top').attr('style', 'filter: brightness(20%);');
 }
 
 
 // ------------------------- Change category ------------------------
 function changeCategory(new_category, element_id, card_id, seas_drop_id, ep_drop_id, seas_data, media_list) {
     var new_cat = new_category.childNodes[0].data
+    remove_cat();
 
     if (new_cat == 'Watching') {
         $("#" + card_id).prependTo(".d-flex.flex-wrap.WATCHING");
-        $("#" + card_id).children('.card-body').show();
-        $("#" + card_id).children().children('.btn_bottom_left').show();
+        $('.seas-eps-box').attr('style', 'display: inline-block;');
     }
     else if (new_cat == 'Completed') {
         $("#" + card_id).prependTo(".d-flex.flex-wrap.COMPLETED");
-        $("#" + card_id).children('.card-body').show();
-        $("#" + card_id).children().children('.btn_bottom_left').show();
+        $('.seas-eps-box').attr('style', 'display: inline-block;');
 
         var season_data = JSON.parse("[" + seas_data + "]");
         var episode_drop = document.getElementById(ep_drop_id);
@@ -168,34 +167,29 @@ function changeCategory(new_category, element_id, card_id, seas_drop_id, ep_drop
 
         for (i = 2; i <= season_data[0][seasons_index]; i++) {
             let opt = document.createElement("option");
-            opt.text = "Episode " + i;
+            opt.text = "E" + i;
             episode_drop.appendChild(opt);
         }
         $('#'+ep_drop_id).prop('selectedIndex', season_data[0][seasons_index]-1);
     }
     else if (new_cat == 'On Hold') {
         $("#" + card_id).prependTo(".d-flex.flex-wrap.ON.HOLD");
-        $("#" + card_id).children('.card-body').show();
-        $("#" + card_id).children().children('.btn_bottom_left').show();
+        $('.seas-eps-box').attr('style', 'display: inline-block;');
     }
     else if (new_cat == 'Random') {
         $("#" + card_id).prependTo(".d-flex.flex-wrap.RANDOM");
-        $("#" + card_id).children('.card-body').show();
-        $("#" + card_id).children().children('.btn_bottom_left').show();
+        $('.seas-eps-box').attr('style', 'display: inline-block;');
     }
     else if (new_cat == 'Dropped') {
         $("#" + card_id).prependTo(".d-flex.flex-wrap.DROPPED");
-        $("#" + card_id).children('.card-body').show();
-        $("#" + card_id).children().children('.btn_bottom_left').show();
+        $('.seas-eps-box').attr('style', 'display: inline-block;');
     }
     else {
         $("#" + card_id).prependTo(".d-flex.flex-wrap.PLAN.TO.WATCH");
-        $("#" + card_id).children('.card-body').hide();
-        $("#" + card_id).children().children('.btn_bottom_left').hide();
+        $('.seas-eps-box').attr('style', 'display: none;');
     }
 
     $body = $("body");
-    remove_cat();
     $categories.isotope('layout');
     $.ajax ({
         type: "POST",

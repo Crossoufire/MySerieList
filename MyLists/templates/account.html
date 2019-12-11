@@ -283,13 +283,10 @@
                                     <b>Series </b><i class="fas fa-sm fa-external-link-square-alt"></i>
                                 </a>
                             </h5>
-                            <div id="SERIES" class="m-b-30">
+                            <div id="SERIES" class="m-b-16">
                                 <div class="m-b-5">
                                     <span class="stat_text"><b>Days:</b> {{ data['series']['time_spent_day'] }}</span>
                                     <span class="stat_text float-right"><b>Hours:</b> {{ data['series']['time_spent_hour'] }}</span>
-                                </div>
-                                <div class="m-b-5">
-                                    <span class="stat_text"><b>Mean Score:</b> {{ data['series']['mean_score'] }}</span>
                                 </div>
                                 <figure class="d-flex">
                                     {% if data['series']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
@@ -385,13 +382,10 @@
                                     <b>Anime </b><i class="fas fa-sm fa-external-link-square-alt"></i>
                                 </a>
                             </h5>
-                            <div id="ANIME" class="m-b-30">
+                            <div id="ANIME" class="m-b-16">
                                 <div class="m-b-5">
                                     <span class="stat_text"><b>Days:</b> {{ data['anime']['time_spent_day'] }}</span>
                                     <span class="stat_text float-right"><b>Hours:</b> {{ data['anime']['time_spent_hour'] }}</span>
-                                </div>
-                                <div class="m-b-5">
-                                    <span class="stat_text"><b>Mean Score:</b> {{ data['anime']['mean_score'] }}</span>
                                 </div>
                                 <figure class="d-flex">
                                     {% if data['anime']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
@@ -488,12 +482,9 @@
                                 </a>
                             </h5>
                             <div id="MOVIES">
-                                <div class="m-b-5">
+                                <div class="m-b-16">
                                     <span class="stat_text"><b>Days:</b> {{ data['movies']['time_spent_day'] }}</span>
                                     <span class="stat_text float-right"><b>Hours:</b> {{ data['movies']['time_spent_hour'] }}</span>
-                                </div>
-                                <div class="m-b-5">
-                                    <span class="stat_text"><b>Mean Score:</b> {{ data['movies']['mean_score'] }}</span>
                                 </div>
                                 <figure class="d-flex">
                                     {% if data["movies"]["element_percentage"] == [0.0, 0.0, 0.0] %}
