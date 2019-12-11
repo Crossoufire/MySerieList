@@ -14,18 +14,18 @@
 <div class="back-image p-b-50">
     <div class="d-flex flex-wrap">
         {% if target_user_id == current_user.get_id() %}
-        <div class="add_element m-l-25 m-t-20">
+        <div class="add-element m-l-25 m-t-20">
             {% if media_list == "movieslist" %}
             <input type="text" placeholder="Add a Movie" id="autocomplete"/>
             <br>
-            <select id="list_select">
+            <select class="cat-select">
                 <option selected="selected">Completed</option>
                 <option>Plan to Watch</option>
             </select>
             {% elif media_list == "animelist" %}
             <input type="text" placeholder="Add an Anime" id="autocomplete"/>
             <br>
-            <select id="list_select">
+            <select class="cat-select">
                 <option selected="selected">Watching</option>
                 <option>Completed</option>
                 <option>On Hold</option>
@@ -36,7 +36,7 @@
             {% elif media_list == "serieslist" %}
             <input type="text" placeholder="Add a Series" id="autocomplete"/>
             <br>
-            <select id="list_select">
+            <select class="cat-select">
                 <option selected="selected">Watching</option>
                 <option>Completed</option>
                 <option>On Hold</option>
@@ -49,7 +49,7 @@
         <input type="hidden" id="element_id" value=""/>
         {% endif %}
         <div class="search_by m-r-25 m-t-20">
-            <input type="text" id="myElementFilter" onkeyup="searchElement()" placeholder="Search by Title or Actor">
+            <input type="text" id="myElementFilter" onkeyup="searchElement()" placeholder="Search by titles/actors/genres">
         </div>
     </div>
 
@@ -72,7 +72,7 @@
 
     {% if target_user_id != current_user.get_id() %}
     <div class="width-100">
-        <div class="m-t-20 text-center common_media">You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)</div>
+        <div class="m-t-20 text-center common-media">You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)</div>
     </div>
     {% endif %}
 </div>
@@ -94,29 +94,29 @@
                 <!------------------- Card -------------------->
                 <div id="card_{{ data[0]['id'] }}" class="card bg-transparent">
                     <div class="view overlay">
-                        <img loading="lazy" class="card-img-top" width="190" height="277" src="{{ data[0]['cover'] }}" alt="{{ data[0]['name'] }}">
-                        <div class="mask flex-center rgba-black-strong" onclick="show_metadata(metadata_{{ data[0]['id'] }}, '{{ media_list }}')" data-toggle="modal" data-target="#modal_metadata">
+                        <img class="card-img-top" loading="lazy" width="190" height="277" src="{{ data[0]['cover'] }}" alt="{{ data[0]['name'] }}">
+                        <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_metadata" onclick="show_metadata(metadata_{{ data[0]['id'] }}, '{{ media_list }}')">
                             <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
-                            <span style="display: none;" class="original_title">{{ data[0]['original_name'] }}</span>
-                            <span style="display: none;" class="actors_yes">{{ data[0]['actors'] }}</span>
-                            <span style="display: none;" class="genre_yes">{{ data[0]['genres'] }}</span>
+                            <span class="original_title" style="display: none;" >{{ data[0]['original_name'] }}</span>
+                            <span class="actors_yes" style="display: none;" >{{ data[0]['actors'] }}</span>
+                            <span class="genre_yes" style="display: none;" >{{ data[0]['genres'] }}</span>
                         </div>
                         {% if target_user_id == current_user.get_id() %}
                             {% if media_list != 'movieslist' %}
-                            <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="charge_cat('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', 'S_{{ data[0]['id'] }}', 'E_{{ data[0]['id'] }}', '{{ data[0]['eps_per_season'] }}', '{{ media_list }}')"></a>
+                            <a class="card-btn-top-left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="charge_cat('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', 'S_{{ data[0]['id'] }}', 'E_{{ data[0]['id'] }}', '{{ data[0]['eps_per_season'] }}', '{{ media_list }}')"></a>
                             {% else %}
-                            <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="changeCategory('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ data[0]['genres'] }}', '{{ media_list }}')"></a>
+                            <a class="card-btn-top-left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="changeCategory('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ data[0]['genres'] }}', '{{ media_list }}')"></a>
                             {% endif %}
-                        <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0]['id'] }}', 'card_{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                        <a class="card-btn-top-right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0]['id'] }}', 'card_{{ data[0]['id'] }}', '{{ media_list }}')"></a>
                         {% else %}
                             {% if data[1] == "no" %}
                                 {% if media_list != 'movieslist' %}
-                                <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                                <a class="card-btn-top-left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ media_list }}')"></a>
                                 {% else %}
-                                <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user_movies('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                                <a class="card-btn-top-left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user_movies('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ media_list }}')"></a>
                                 {% endif %}
                             {% else %}
-                                <div class="ribbon"></div>
+                                <div class="card-ribbon"></div>
                             {% endif %}
                         {% endif %}
                     </div>
@@ -126,9 +126,9 @@
                     <div class="p-l-5 p-r-5" style="position: absolute; bottom: 10px; right: 6%; background: #1a1a1a; border-radius: 2px;">
                         <div style="display: inline-block;">
                             {% if target_user_id == current_user.get_id() %}
-                            <select id="S_{{ data[0]['id'] }}" style="background: transparent; border: none;" class="text-light text-center seasons" onchange="updateSeason('{{ data[0]['id'] }}', this, '{{ data[0]['eps_per_season'] }}', 'E_{{ data[0]['id'] }}', '{{ media_list }}')">
+                            <select id="S_{{ data[0]['id'] }}" style="background: transparent; border: none;" class="text-light text-center select-box" onchange="updateSeason('{{ data[0]['id'] }}', this, '{{ data[0]['eps_per_season'] }}', 'E_{{ data[0]['id'] }}', '{{ media_list }}')">
                             {% else %}
-                            <select id="S_{{ data[0]['id'] }}" style="background: transparent; border: none;" class="disabled text-light text-center seasons">
+                            <select id="S_{{ data[0]['id'] }}" style="background: transparent; border: none;" class="disabled text-light text-center select-box">
                             {% endif %}
                                 {% for i in range(data[0]['eps_per_season']|length) %}
                                     {% if i+1 == data[0]['current_season'] %}
@@ -142,9 +142,9 @@
                         <div style="display: inline-block;">|</div>
                         <div style="display: inline-block;">
                             {% if target_user_id == current_user.get_id() %}
-                            <select id="E_{{ data[0]['id'] }}" style="background: transparent; border: none;" class="text-light text-center p-0 episodes" onchange="updateEpisode('{{ data[0]['id'] }}', this, '{{ media_list }}')">
+                            <select id="E_{{ data[0]['id'] }}" style="background: transparent; border: none;" class="text-light text-center p-0 select-box" onchange="updateEpisode('{{ data[0]['id'] }}', this, '{{ media_list }}')">
                             {% else %}
-                            <select id="E_{{ data[0]['id'] }}" style="background: transparent; border: none;" class="disabled text-light text-center p-0 episodes">
+                            <select id="E_{{ data[0]['id'] }}" style="background: transparent; border: none;" class="disabled text-light text-center p-0 select-box">
                             {% endif %}
                                 {% for i in range(data[0]['eps_per_season'][data[0]['current_season']-1]) %}
                                     {% if i+1 == data[0]['last_episode_watched'] %}
@@ -162,9 +162,9 @@
                             <div class="row p-0 m-0">
                                 <div class="col p-0">
                                     {% if target_user_id == current_user.get_id() %}
-                                    <select id="S_{{ data[0]['id'] }}" class="text-center p-0 seasons" onchange="updateSeason('{{ data[0]['id'] }}', this, '{{ data[0]['eps_per_season'] }}', 'E_{{ data[0]['id'] }}', '{{ media_list }}')">
+                                    <select id="S_{{ data[0]['id'] }}" class="text-center p-0 select-box" onchange="updateSeason('{{ data[0]['id'] }}', this, '{{ data[0]['eps_per_season'] }}', 'E_{{ data[0]['id'] }}', '{{ media_list }}')">
                                     {% else %}
-                                    <select id="S_{{ data[0]['id'] }}" class="disabled text-center p-0 seasons">
+                                    <select id="S_{{ data[0]['id'] }}" class="disabled text-center p-0 select-box">
                                     {% endif %}
                                         {% for i in range(data[0]['eps_per_season']|length) %}
                                             {% if i+1 == data[0]['current_season'] %}
@@ -177,9 +177,9 @@
                                 </div>
                                 <div class="col p-0">
                                     {% if target_user_id == current_user.get_id() %}
-                                    <select id="E_{{ data[0]['id'] }}" class="scrollable-menu text-center form-control p-0 episodes" onchange="updateEpisode('{{ data[0]['id'] }}', this, '{{ media_list }}')">
+                                    <select id="E_{{ data[0]['id'] }}" class=" text-center p-0 select-box" onchange="updateEpisode('{{ data[0]['id'] }}', this, '{{ media_list }}')">
                                     {% else %}
-                                    <select id="E_{{ data[0]['id'] }}" class="disabled scrollable-menu text-center form-control p-0 episodes">
+                                    <select id="E_{{ data[0]['id'] }}" class="disabled text-center p-0 select-box">
                                     {% endif %}
                                         {% for i in range(data[0]['eps_per_season'][data[0]['current_season']-1]) %}
                                             {% if i+1 == data[0]['last_episode_watched'] %}
@@ -200,6 +200,7 @@
             </div>
     </div>
     {% endfor %}
+
     <!----------- Element metadata Modal ----------->
     <div class="modal fade" id="modal_metadata" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -252,7 +253,6 @@
     </div>
     </div>
 </div>
-
 <div class="modal_loading"></div>
 {% endblock content %}
 
@@ -260,7 +260,7 @@
 {% block script %}
 <!------------------ Isotope ------------------->
 <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
-<!------------------ Metadata for the modal ------------------->
+<!----------- Metadata for the modal ------------>
 <script type="text/javascript">
 {% for category in all_data %}
     {% for data in category[0] %}
