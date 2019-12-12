@@ -1,6 +1,6 @@
 
 
-// ------------- Update episode ---------------
+// ----------------------------- Update episode -------------------------------
 function updateEpisode(element_id, episode, media_list) {
     var selected_episode = episode.selectedIndex
 
@@ -17,7 +17,7 @@ function updateEpisode(element_id, episode, media_list) {
 }
 
 
-// -------------- Update season ---------------
+// ------------------------------ Update season -------------------------------
 function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
     var selected_season = value.selectedIndex;
     var episode_drop = document.getElementById(ep_drop_id);
@@ -28,7 +28,12 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
 
     for (i = 2; i <= season_data[0][selected_season]; i++) {
         let opt = document.createElement("option");
-        opt.text = "E" + i;
+        opt.className = "card-opt-box";
+        if (i <= 9) {
+                opt.text = "E0" + i;
+            } else {
+                opt.text = "E" + i;
+            }
         episode_drop.appendChild(opt);
     }
 
@@ -45,7 +50,7 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
 }
 
 
-// ------------------------- Anime/Series metadata --------------------------
+// -------------------------- Anime/Series metadata ---------------------------
 function show_metadata(data, media_list) {
     $('#original_name').text('');
     $('#modal_title').html(data.name);
@@ -71,7 +76,7 @@ function show_metadata(data, media_list) {
 }
 
 
-// ------------------- Create the category list ---------------------
+// ------------------------- Create the category list -------------------------
 function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, media_list) {
     remove_cat();
 
@@ -126,12 +131,12 @@ function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, me
 
     $('#'+card_id).children().first().prepend(
     "<ul class='card-cat-buttons'>" +
-        "<li style='display: " + display_watching + "' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Watching</li>" +
-        "<li style='display: " + display_completed + "' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Completed</li>" +
-        "<li style='display: " + display_on_hold + "' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>On Hold</li>" +
-        "<li style='display: " + display_random + "' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Random</li>" +
-        "<li style='display: " + display_dropped + "' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Dropped</li>" +
-        "<li style='display: " + display_plan_to_watch + "' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</li>" +
+        "<li style='display: " + display_watching + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Watching</li>" +
+        "<li style='display: " + display_completed + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Completed</li>" +
+        "<li style='display: " + display_on_hold + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>On Hold</li>" +
+        "<li style='display: " + display_random + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Random</li>" +
+        "<li style='display: " + display_dropped + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Dropped</li>" +
+        "<li style='display: " + display_plan_to_watch + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</li>" +
     "</ul>");
 
     $('#'+card_id).children().children('.card-btn-top-left').attr('style', 'display: none;');
@@ -143,7 +148,7 @@ function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, me
 }
 
 
-// ------------------------- Change category ------------------------
+// --------------------------- Change the category ----------------------------
 function changeCategory(new_category, element_id, card_id, seas_drop_id, ep_drop_id, seas_data, media_list) {
     var new_cat = new_category.childNodes[0].data
     remove_cat();
@@ -167,7 +172,12 @@ function changeCategory(new_category, element_id, card_id, seas_drop_id, ep_drop
 
         for (i = 2; i <= season_data[0][seasons_index]; i++) {
             let opt = document.createElement("option");
-            opt.text = "E" + i;
+            opt.className = "card-opt-box";
+            if (i <= 9) {
+                opt.text = "E0" + i;
+            } else {
+                opt.text = "E" + i;
+            }
             episode_drop.appendChild(opt);
         }
         $('#'+ep_drop_id).prop('selectedIndex', season_data[0][seasons_index]-1);

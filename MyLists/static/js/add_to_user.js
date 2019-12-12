@@ -6,12 +6,12 @@ function add_user(card_id, element_id, media_type) {
 
     $('#'+card_id).children().first().prepend(
     "<ul class='card-cat-buttons'>" +
-        "<li style='display: block;' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")'>Watching</li>" +
-        "<li style='display: block;' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Completed</li>" +
-        "<li style='display: block;' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>On Hold</li>" +
-        "<li style='display: block;' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Random</li>" +
-        "<li style='display: block;' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Dropped</li>" +
-        "<li style='display: block;' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Plan to Watch</li>" +
+        "<li style='display: block;' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")'>Watching</li>" +
+        "<li style='display: block;' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Completed</li>" +
+        "<li style='display: block;' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>On Hold</li>" +
+        "<li style='display: block;' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Random</li>" +
+        "<li style='display: block;' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Dropped</li>" +
+        "<li style='display: block;' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Plan to Watch</li>" +
     "</ul>");
 
     $('#'+card_id).children().children('.card-btn-top-left').attr('style', 'display: none;');
@@ -20,6 +20,7 @@ function add_user(card_id, element_id, media_type) {
     $('#'+card_id).children().first().prepend("<a class='card-btn-top-right-2 fas fa-times' onclick='remove_cat()')></a>");
     $('#'+card_id).children().children('.card-img-top').attr('style', 'filter: brightness(20%);');
 }
+
 
 // -------------------- Add the category to the user --------------------------
 function add_to_user(cat, card_id, element_id, media_type) {
@@ -49,8 +50,8 @@ function add_user_movies(card_id, element_id, media_type) {
 
     $('#'+card_id).children().first().prepend(
     "<ul class='card-cat-buttons'>" +
-        "<li style='display: block;' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Completed</li>" +
-        "<li style='display: block;' class='btn btn_sm btn-light p-1 m-1 card-cat-buttons-pos' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Plan to Watch</li>" +
+        "<li style='display: block;' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Completed</li>" +
+        "<li style='display: block;' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='add_to_user(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Plan to Watch</li>" +
     "</ul>");
 
     $('#'+card_id).children().children('.card-btn-top-left').attr('style', 'display: none;');

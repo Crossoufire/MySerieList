@@ -86,9 +86,9 @@
         {% endif %}
         <h2 class="text-center mt-1 mb-0 category-title p-t-10">{{ category[1] }}<hr class="mt-2 pb-3 mb-0"></h2>
             {% if category[1] == 'COMPLETED ANIMATION' %}
-            <div class="d-flex flex-wrap ANIMATION">
+            <div class="card-wrapper d-flex flex-wrap ANIMATION">
             {% else %}
-            <div class="d-flex flex-wrap {{ category[1] }}">
+            <div class="card-wrapper d-flex flex-wrap {{ category[1] }}">
             {% endif %}
                 {% for data in category[0] %}
                 <!------------------- Card -------------------->
@@ -132,9 +132,9 @@
                             {% endif %}
                                 {% for i in range(data[0]['eps_per_season']|length) %}
                                     {% if i+1 == data[0]['current_season'] %}
-                                    <option style="background: black;" selected="selected">S0{{ i+1 }}</option>
+                                    <option class="card-opt-box" selected="selected">{{ "S{:02}".format(i+1) }}</option>
                                     {% else %}
-                                    <option style="background: black;">S0{{ i+1 }}</option>
+                                    <option class="card-opt-box">{{ "S{:02}".format(i+1) }}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -148,9 +148,9 @@
                             {% endif %}
                                 {% for i in range(data[0]['eps_per_season'][data[0]['current_season']-1]) %}
                                     {% if i+1 == data[0]['last_episode_watched'] %}
-                                    <option  style="background: black;" selected="selected">E{{ i+1 }}</option>
+                                    <option class="card-opt-box" selected="selected">{{ "E{:02}".format(i+1) }}</option>
                                     {% else %}
-                                    <option  style="background: black;">E{{ i+1 }}</option>
+                                    <option class="card-opt-box">{{ "E{:02}".format(i+1) }}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -166,9 +166,9 @@
                             {% endif %}
                                 {% for i in range(data[0]['eps_per_season']|length) %}
                                     {% if i+1 == data[0]['current_season'] %}
-                                    <option style="background: black;" selected="selected">S0{{ i+1 }}</option>
+                                    <option class="card-opt-box" selected="selected">{{ "S{:02}".format(i+1) }}</option>
                                     {% else %}
-                                    <option style="background: black;">S0{{ i+1 }}</option>
+                                    <option class="card-opt-box">{{ "S{:02}".format(i+1) }}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -182,9 +182,9 @@
                             {% endif %}
                                 {% for i in range(data[0]['eps_per_season'][data[0]['current_season']-1]) %}
                                     {% if i+1 == data[0]['last_episode_watched'] %}
-                                    <option  style="background: black;" selected="selected">E{{ i+1 }}</option>
+                                    <option class="card-opt-box" selected="selected">{{ "E{:02}".format(i+1) }}</option>
                                     {% else %}
-                                    <option  style="background: black;">E{{ i+1 }}</option>
+                                    <option class="card-opt-box">{{ "E{:02}".format(i+1) }}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
