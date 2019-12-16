@@ -61,8 +61,8 @@ input::placeholder {
 /* -------------- CARD CSS --------------- */
 .card {
     border-radius: 5px;
-    width: 188px;
-    margin: 15px;
+    margin: 11px;
+    width: 198px;
 }
 
 .card-img-top {
@@ -119,6 +119,14 @@ input::placeholder {
     font-size: 17pt;
 }
 
+.seas-eps-box {
+    position: absolute;
+    bottom: 10px;
+    right: 6%;
+    background: #1a1a1a;
+    border-radius: 2px;
+}
+
 .select-box {
 	cursor: pointer;
     -moz-appearance: none;
@@ -128,16 +136,19 @@ input::placeholder {
     border: none;
 }
 
-.card-cat-buttons {
-    position: absolute;
-    top: 15%;
-    opacity: 1;
-    z-index: 999;
+.card-opt-box {
+    background: black;
 }
 
-.card-cat-buttons-pos {
-    position: relative;
-    z-index: 999;
+.card-cat-buttons {
+    position: absolute;
+    padding: 0px;
+    -webkit-transform: translate(-50%, -50%);
+    margin-right: -50%;
+    top: 50%;
+    left: 50%;
+    opacity: 1;
+    z-index: 100;
 }
 
 .card-btn-top-right-2 {
@@ -145,15 +156,7 @@ input::placeholder {
     top: 10px;
     right: 10px;
     opacity: 0.8;
-    z-index: 999;
-}
-
-.seas-eps-box {
-    position: absolute;
-    bottom: 10px;
-    right: 6%;
-    background: #1a1a1a;
-    border-radius: 2px;
+    z-index: 100;
 }
 /* ------------------------------------------ */
 
@@ -180,6 +183,19 @@ body.loading .modal-loading {
 }
 /* ------------------------------------------ */
 
+
+@media (max-width: 1025px) {
+    .card {
+        width: 18vw;
+        margin: 7px;
+    }
+}
+@media (max-width: 900px) {
+    .card {
+        width: 22vw;
+        margin: 7px;
+    }
+}
 @media (max-width: 767.98px) {
     .container {
         padding: 5px;
@@ -187,26 +203,14 @@ body.loading .modal-loading {
     .category-title {
         font-size: 1.5rem;
     }
-    .card-img-top {
-        border-style: solid;
-        border-width: 1px;
-        border-color: black;
-        border-radius: 3px;
-    }
     .card {
         width: 32vw;
         margin: 0px;
     }
     .card-btn-top-right {
-        position: absolute;
-        top: 10px;
-        right: 10px;
         opacity: 0.8;
     }
     .card-btn-top-left {
-        position: absolute;
-        top: 10px;
-        left: 10px;
         opacity: 0.8;
     }
     .font-mask {
@@ -225,14 +229,8 @@ body.loading .modal-loading {
     .justify-mobile {
         justify-content: center;
     }
-    .card-cat-buttons {
-        padding-left: 10px;
-        top: 20%;
-    }
-    .card-cat-buttons-pos {
-        font-size: 10px;
-    }
-    .btn_sm {
+    .card-btn-mobile {
+        font-size: 9px;
         padding: 2px !important;
     }
 }
