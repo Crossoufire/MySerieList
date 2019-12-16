@@ -2777,7 +2777,10 @@ def autocomplete_search_element(element_name, list_type):
                 app.logger.info('[SYSTEM] N° requests available : {}'
                                 .format(response.headers["X-RateLimit-Remaining"]))
             except:
-                return [{"nb_results": 0}]
+                if response.status_code == 200:
+                    break
+                else:
+                    return [{"nb_results": 0}]
             if response.headers["X-RateLimit-Remaining"] == "0":
                 app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
                 time.sleep(3)
@@ -2852,7 +2855,10 @@ def autocomplete_search_element(element_name, list_type):
                 app.logger.info('[SYSTEM] N° requests available : {}'
                                 .format(response.headers["X-RateLimit-Remaining"]))
             except:
-                return [{"nb_results": 0}]
+                if response.status_code == 200:
+                    break
+                else:
+                    return [{"nb_results": 0}]
             if response.headers["X-RateLimit-Remaining"] == "0":
                 app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
                 time.sleep(3)
@@ -2925,7 +2931,10 @@ def autocomplete_search_element(element_name, list_type):
                 app.logger.info('[SYSTEM] N° requests available : {}'
                                 .format(response.headers["X-RateLimit-Remaining"]))
             except:
-                return [{"nb_results": 0}]
+                if response.status_code == 200:
+                    break
+                else:
+                    return [{"nb_results": 0}]
             if response.headers["X-RateLimit-Remaining"] == "0":
                 app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
                 time.sleep(3)
