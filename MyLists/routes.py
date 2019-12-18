@@ -3033,7 +3033,10 @@ def get_element_data_from_api(api_id, list_type):
                 app.logger.info('[SYSTEM] N° requests available : {}'
                                 .format(response.headers["X-RateLimit-Remaining"]))
             except:
-                return None
+                if response.status_code == 200:
+                    break
+                else:
+                    return None
             if response.headers["X-RateLimit-Remaining"] == "0":
                 app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
                 time.sleep(3)
@@ -3053,7 +3056,10 @@ def get_element_data_from_api(api_id, list_type):
                 app.logger.info('[SYSTEM] N° requests available : {}'
                                 .format(response.headers["X-RateLimit-Remaining"]))
             except:
-                return None
+                if response.status_code == 200:
+                    break
+                else:
+                    return None
             if response.headers["X-RateLimit-Remaining"] == "0":
                 app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
                 time.sleep(3)
