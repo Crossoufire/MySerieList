@@ -3,7 +3,6 @@ TODO ------------------------------------------------
 
 Account:
     Add: Possibility to change the background image
-	Add: Display/hide all scores by default
 	Enhance: Bio, profile and back pictures changes without the settings form
 	Enhance: Code of "get_achievements()" method (50% done)
     Enhance: Settings tab CSS/HTML style
