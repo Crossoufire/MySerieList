@@ -3,7 +3,8 @@
 
 {% block css %}
 <!------ CDN Datatables ------->
-<link href="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.css" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/datatables.min.css') }}" rel="stylesheet">
+<!--<link href="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.css" rel="stylesheet">-->
 <link href="{{ url_for('static', filename='css/hall_of_fame.css') }}" rel="stylesheet">
 {% endblock css %}
 
@@ -14,13 +15,13 @@
     <table id="hall_of_fame" class="table table-sm table-responsive-xl text-light">
         <thead>
             <tr>
-                <th class="picture text-center"></th>
+                <th class="text-center picture"></th>
                 <th class="text-center">Username</th>
                 <th class="text-center">Series levels</th>
                 <th class="text-center">Anime levels</th>
                 <th class="text-center">Movies levels</th>
                 <th class="text-center">Knowledge levels</th>
-                <th class="follow text-center"></th>
+                <th class="text-center follow"></th>
             </tr>
         </thead>
         <tbody>
@@ -41,15 +42,11 @@
                     </a>
                 </td>
                 <td>
-                </td>
-                <td>
                     <a class="text-light" href="/animelist/{{ user['username'] }}">
                         <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
                         <br>
                         {{ user['anime_level'] }} ({{ user['anime_percent'] }}%)
                     </a>
-                </td>
-                <td>
                 </td>
                 <td>
                     <a class="text-light" href="/movieslist/{{ user['username'] }}">
@@ -180,7 +177,8 @@
 
 {% block script %}
 <!--------- CDN Datatables ----------->
-<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
+<!--<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>-->
 <script type="text/javascript" src="{{ url_for('static', filename='js/hall_of_fame.js') }}"></script>
 {% endblock script %}
 

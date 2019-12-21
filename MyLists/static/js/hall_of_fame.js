@@ -1,15 +1,15 @@
 
-
 $(document).ready(function () {
     $('#hall_of_fame').DataTable({
-        "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
         "order": [[ 5, "desc" ], [ 1, "asc" ]],
-        columnDefs: [{orderable: false, targets: 0},
-                     {orderable: false, targets: 6}],
+        columnDefs: [
+            {orderable: false, targets: 0},
+            {orderable: false, targets: 6}
+        ],
+        "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
     });
     $('.dataTables_length').addClass('bs-select');
 });
-
 
 function follow(follow_id, button_id) {
     $('#'+button_id).text('Unfollow');
