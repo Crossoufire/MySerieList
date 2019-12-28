@@ -7,9 +7,9 @@
 
 
 {% block content %}
-<h3 class="font-weight-light text-center mb-4 m-t-15">Levels and grade data</h3>
+<h2 class="font-weight-light text-center mt-1 m-b-20 p-t-20">GRADES AND LEVELS</h2>
 
-<div class="details d-flex flex-wrap p-l-10 p-t-10">
+<div class="details d-flex flex-wrap p-l-10 p-t-18">
     <p>
         <i class="fas fa-xs fa-circle text-justify"></i>&nbsp &nbsp All these grades are taken from the video game Halo Reach.<br>
         <i class="fas fa-xs fa-circle text-justify"></i>&nbsp &nbsp There are 49 different grades and 147 levels.<br>
@@ -20,51 +20,48 @@
     </p>
 </div>
 
-<legend class="font-weight-light text-center mt-4 mb-4">
-    Each grade in hierarchical order
-    <hr class="mt-2 mb-3">
-</legend>
-
-<div class="container-stats">
-    <table class="table table-sm table-responsive-auto text-light">
-        <thead style="border-bottom: solid 2px grey;">
-            <th style="min-width: 100px;" class="text-center">Grade</th>
-            <th style="min-width: 200px;" class="text-center">Title</th>
-            <th style="min-width: 100px;" class="text-center">Levels</th>
-            <th style="min-width: 200px;" class="text-center">XP</th>
-            <th style="min-width: 200px;" class="text-center">Equivalent hours</th>
+<div class="table-responsive-sm m-t-30" style="max-width: 800px; margin-left: auto; margin-right: auto;">
+    <table id="level-grade-and-data" class="table text-light">
+        <thead>
+            <tr>
+                <th class="text-center">Grade</th>
+                <th class="text-center">Title</th>
+                <th class="text-center">Levels</th>
+                <th class="text-center">XP</th>
+                <th class="text-center">Equivalent hours</th>
+            </tr>
         </thead>
         <tbody>
         {% for i in range(0, data|length) %}
-        <tr>
-            <td class="text-center">
-                <img height='40' width="40" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data[i][0] }}.png" alt="">
-            </td>
-            <td>
-                <strong>{{ data[i][1] }}</strong>
-            </td>
-            <td>
-                {% if i == data|length - 1 %}
-                <strong>{{ data[i][2][0] }}{{ data[i][2][1] }}</strong>
-                {% else %}
-                <strong>{{ data[i][2][0] }} - {{ data[i][2][1] }}</strong>
-                {% endif %}
-            </td>
-            <td>
-                {% if i == data|length - 1 %}
-                <strong>{{ data[i][3][0] }}{{ data[i][3][1] }}</strong>
-                {% else %}
-                <strong>{{ data[i][3][0] }} - {{ data[i][3][1] }}</strong>
-                {% endif %}
-            </td>
-            <td>
-                {% if i == data|length - 1 %}
-                <strong>{{ data[i][4][0] }}{{ data[i][4][1] }}</strong>
-                {% else %}
-                <strong>{{ data[i][4][0] }} - {{ data[i][4][1] }}</strong>
-                {% endif %}
-            </td>
-        </tr>
+            <tr>
+                <td class="text-center">
+                    <img height='40' width="40" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data[i][0] }}.png" alt="">
+                </td>
+                <td class="text-center" style="vertical-align: middle;">
+                    <strong>{{ data[i][1] }}</strong>
+                </td>
+                <td class="text-center" style="vertical-align: middle;">
+                    {% if i == data|length - 1 %}
+                    <strong>{{ data[i][2][0] }}{{ data[i][2][1] }}</strong>
+                    {% else %}
+                    <strong>{{ data[i][2][0] }} - {{ data[i][2][1] }}</strong>
+                    {% endif %}
+                </td>
+                <td class="text-center" style="vertical-align: middle;">
+                    {% if i == data|length - 1 %}
+                    <strong>{{ data[i][3][0] }}{{ data[i][3][1] }}</strong>
+                    {% else %}
+                    <strong>{{ data[i][3][0] }} - {{ data[i][3][1] }}</strong>
+                    {% endif %}
+                </td>
+                <td class="text-center" style="vertical-align: middle;">
+                    {% if i == data|length - 1 %}
+                    <strong>{{ data[i][4][0] }}{{ data[i][4][1] }}</strong>
+                    {% else %}
+                    <strong>{{ data[i][4][0] }} - {{ data[i][4][1] }}</strong>
+                    {% endif %}
+                </td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
