@@ -25,7 +25,7 @@ legend {
 }
 
 .details {
-    border: black solid 2px;
-    border-radius: 10px;
-    background-color: #47476b;
+    border: black solid 1px;
+    border-radius: 3px;
+    background-color: #2f4b67;
 }

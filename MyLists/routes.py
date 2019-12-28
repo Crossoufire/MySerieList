@@ -51,36 +51,36 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
         add_achievements_to_db()
-    # if User.query.filter_by(id='2').first() is None:
-    #     admin = User(username='aaa',
-    #                  email='aaa@aaa.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(admin)
-    # if User.query.filter_by(id='3').first() is None:
-    #     admin = User(username='bbb',
-    #                  email='bbb@bbb.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(admin)
-    # if User.query.filter_by(id='4').first() is None:
-    #     admin = User(username='ccc',
-    #                  email='ccc@ccc.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(admin)
+    if User.query.filter_by(id='2').first() is None:
+        admin = User(username='aaa',
+                     email='aaa@aaa.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+    if User.query.filter_by(id='3').first() is None:
+        admin = User(username='bbb',
+                     email='bbb@bbb.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
+    if User.query.filter_by(id='4').first() is None:
+        admin = User(username='ccc',
+                     email='ccc@ccc.com',
+                     password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
     refresh_db_achievements()
     db.session.commit()
 
