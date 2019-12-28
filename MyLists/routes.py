@@ -758,24 +758,24 @@ def global_stats():
     def Sort(sub_list, index=2, reverse=True):
         return (sorted(sub_list, key=lambda x: x[index], reverse=reverse))
 
-    # Recover the most represented genres
-    series_genres = db.session.query(SeriesGenre, func.count()).group_by(SeriesGenre.genre).\
-        filter(SeriesGenre.genre != "Unknown").all()
-    anime_genres = db.session.query(AnimeGenre, func.count()).group_by(AnimeGenre.genre). \
-        filter(AnimeGenre.genre != "Unknown").all()
-    movies_genres = db.session.query(MoviesGenre, func.count()).group_by(MoviesGenre.genre). \
-        filter(MoviesGenre.genre != "Unknown").all()
+    # Recover the most represented genres in users' lists
+    series_genres = db.session.query(SeriesGenre, func.count()).group_by(SeriesGenre.genre)\
+        .filter(SeriesGenre.genre != "Unknown").all()
+    anime_genres = db.session.query(AnimeGenre, func.count()).group_by(AnimeGenre.genre)\
+        .filter(AnimeGenre.genre != "Unknown").all()
+    movies_genres = db.session.query(MoviesGenre, func.count()).group_by(MoviesGenre.genre)\
+        .filter(MoviesGenre.genre != "Unknown").all()
 
     # Sort by the most represented to the least
     series_genres = Sort(series_genres, index=1)
     anime_genres = Sort(anime_genres, index=1)
     movies_genres = Sort(movies_genres, index=1)
 
-    # Recover the TOP 3
+    # Recover the TOP 5
     all_series_genres = []
     all_anime_genres = []
     all_movies_genres = []
-    for i in range(3):
+    for i in range(5):
         try:
             series_genre_data = {"genre": series_genres[i][0].genre,
                                  "quantity": series_genres[i][1]}
@@ -802,24 +802,27 @@ def global_stats():
                          "anime": all_anime_genres,
                          "movies": all_movies_genres}
 
-    # Recover the media the most present in all the users' lists
-    series_most = db.session.query(Series, SeriesList, func.count()).join(SeriesList, SeriesList.series_id == Series.id). \
-        filter(SeriesList.series_id == Series.id).group_by(SeriesList.series_id).all()
-    anime_most = db.session.query(Anime, AnimeList, func.count()).join(AnimeList, AnimeList.anime_id == Anime.id). \
-        filter(AnimeList.anime_id == Anime.id).group_by(AnimeList.anime_id).all()
-    movies_most = db.session.query(Movies, MoviesList, func.count()).join(MoviesList, MoviesList.movies_id == Movies.id). \
-        filter(MoviesList.movies_id == Movies.id).group_by(MoviesList.movies_id).all()
+    # Recover the media the most present in the users' lists
+    series_most = db.session.query(Series, SeriesList, func.count())\
+        .join(SeriesList, SeriesList.series_id == Series.id)\
+        .filter(SeriesList.series_id == Series.id).group_by(SeriesList.series_id).all()
+    anime_most = db.session.query(Anime, AnimeList, func.count())\
+        .join(AnimeList, AnimeList.anime_id == Anime.id)\
+        .filter(AnimeList.anime_id == Anime.id).group_by(AnimeList.anime_id).all()
+    movies_most = db.session.query(Movies, MoviesList, func.count())\
+        .join(MoviesList, MoviesList.movies_id == Movies.id)\
+        .filter(MoviesList.movies_id == Movies.id).group_by(MoviesList.movies_id).all()
 
     # Sort by the most represented to the least
     series_most = Sort(series_most)
     anime_most = Sort(anime_most)
     movies_most = Sort(movies_most)
 
-    # Recover the TOP 3
+    # Recover the TOP 5
     all_series_most = []
     all_anime_most = []
     all_movies_most = []
-    for i in range(3):
+    for i in range(5):
         try:
             series_most_data = {"name": series_most[i][0].name,
                                 "quantity": series_most[i][2]}
@@ -847,23 +850,25 @@ def global_stats():
                           "movies": all_movies_most}
 
     # Recover the actors the most present in all the users' lists
-    series_actors = db.session.query(SeriesActors, func.count()).group_by(SeriesActors.name).\
-        filter(SeriesActors.name != "Unknown").all()
-    anime_actors = db.session.query(AnimeActors, func.count()).group_by(AnimeActors.name).\
-        filter(AnimeActors.name != "Unknown").all()
-    movies_actors = db.session.query(MoviesActors, func.count()).group_by(MoviesActors.name).\
-        filter(MoviesActors.name != "Unknown").all()
+    series_actors = db.session.query(SeriesActors, func.count()).group_by(SeriesActors.name)\
+        .filter(SeriesActors.name != "Unknown").all()
+    anime_actors = db.session.query(AnimeActors, func.count()).group_by(AnimeActors.name)\
+        .filter(AnimeActors.name != "Unknown").all()
+    movies_actors = db.session.query(MoviesActors, func.count()).group_by(MoviesActors.name)\
+        .filter(MoviesActors.name != "Unknown").all()
+
+    print(movies_actors)
 
     # Sort by the most represented to the least
     series_actors = Sort(series_actors, index=1)
     anime_actors = Sort(anime_actors, index=1)
     movies_actors = Sort(movies_actors, index=1)
 
-    # Recover the TOP 3
+    # Recover the TOP 5
     all_series_actors = []
     all_anime_actors = []
     all_movies_actors = []
-    for i in range(3):
+    for i in range(5):
         try:
             series_actors_data = {"name": series_actors[i][0].name,
                                   "quantity": series_actors[i][1]}
@@ -891,19 +896,21 @@ def global_stats():
                          "movies": all_movies_actors}
 
     # Recover the most dropped media in all the users' lists
-    series_dropped = db.session.query(Series, SeriesList, func.count()).join(SeriesList, SeriesList.series_id == Series.id). \
-        filter(SeriesList.series_id == Series.id).filter_by(status=Status.DROPPED).group_by(SeriesList.series_id).all()
-    anime_dropped = db.session.query(Anime, AnimeList, func.count()).join(AnimeList, AnimeList.anime_id == Anime.id). \
-        filter(AnimeList.anime_id == Anime.id).filter_by(status=Status.DROPPED).group_by(AnimeList.anime_id).all()
+    series_dropped = db.session.query(Series, SeriesList, func.count())\
+        .join(SeriesList, SeriesList.series_id == Series.id).filter(SeriesList.series_id == Series.id)\
+        .filter_by(status=Status.DROPPED).group_by(SeriesList.series_id).all()
+    anime_dropped = db.session.query(Anime, AnimeList, func.count())\
+        .join(AnimeList, AnimeList.anime_id == Anime.id).filter(AnimeList.anime_id == Anime.id)\
+        .filter_by(status=Status.DROPPED).group_by(AnimeList.anime_id).all()
 
     # Sort by the most represented to the least
     series_dropped = Sort(series_dropped)
     anime_dropped = Sort(anime_dropped)
 
-    # Recover the TOP 3
+    # Recover the TOP 5
     top_series_dropped = []
     top_anime_dropped = []
-    for i in range(3):
+    for i in range(5):
         try:
             series_dropped_data = {"name": series_dropped[i][0].name,
                                    "quantity": series_dropped[i][2]}
@@ -924,9 +931,9 @@ def global_stats():
 
     # Count the total number of seasons/episodes watched for the series
     total_series_eps_seasons = db.session.query(SeriesList, SeriesEpisodesPerSeason,
-        func.group_concat(SeriesEpisodesPerSeason.episodes)).\
-        join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id). \
-        group_by(SeriesList.id).all()
+        func.group_concat(SeriesEpisodesPerSeason.episodes))\
+        .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id)\
+        .group_by(SeriesList.id).all()
 
     total_series_seasons_watched = 0
     total_series_episodes_watched = 0
@@ -944,9 +951,9 @@ def global_stats():
 
     # Count the total number of seasons/episodes watched for the anime
     total_anime_eps_seasons = db.session.query(AnimeList, AnimeEpisodesPerSeason,
-        func.group_concat(AnimeEpisodesPerSeason.episodes)). \
-        join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id). \
-        group_by(AnimeList.id).all()
+        func.group_concat(AnimeEpisodesPerSeason.episodes))\
+        .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id)\
+        .group_by(AnimeList.id).all()
 
     total_anime_seasons_watched = 0
     total_anime_episodes_watched = 0

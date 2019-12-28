@@ -17,6 +17,18 @@
     height: 250px;
 }
 
+input {
+    background: rgba(220, 220, 220, 0.5);
+    border: none;
+    padding: 5px;
+    min-width: 220px;
+}
+
+input::placeholder {
+    color: black;
+    opacity: 1;
+}
+
 .add-element {
     margin-right: auto;
 }
@@ -25,21 +37,10 @@
     margin-left: auto;
 }
 
-input {
-    background: rgba(220, 220, 220, 0.5);
-    border: none;
-    padding: 5px;
-}
-
-input::placeholder {
-    color: black;
-    opacity: 1;
-}
-
 .cat-select {
     text-align: center !important;
     margin-top: 7px;
-    margin-left: 32px;
+    margin-left: 45px;
 }
 
 .filters-button-group {
@@ -117,6 +118,10 @@ input::placeholder {
 
 .font-mask {
     font-size: 17pt;
+}
+
+.fas {
+    text-shadow: 0 0 3px #000;
 }
 
 .seas-eps-box {

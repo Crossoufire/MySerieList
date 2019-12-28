@@ -49,7 +49,7 @@
         <input type="hidden" id="element_id" value=""/>
         {% endif %}
         <div class="search-by m-r-25 m-t-20">
-            <input type="text" id="myElementFilter" onkeyup="searchElement()" placeholder="Search by titles/actors">
+            <input type="text" id="myElementFilter" onkeyup="searchElement()" placeholder="Search titles/actors/genres">
         </div>
     </div>
 
@@ -94,7 +94,7 @@
                 <!------------------- Card -------------------->
                 <div id="card_{{ data[0]['id'] }}" class="card bg-transparent">
                     <div class="view overlay">
-                        <img class="card-img-top" loading="lazy" src="{{ data[0]['cover'] }}" alt="{{ data[0]['name'] }}">
+                        <img class="card-img-top lazy" data-src="{{ data[0]['cover'] }}" alt="{{ data[0]['name'] }}">
                         <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_metadata" onclick="show_metadata(metadata_{{ data[0]['id'] }}, '{{ media_list }}')">
                             <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
                             <span class="original-title" style="display: none;" >{{ data[0]['original_name'] }}</span>
@@ -255,6 +255,13 @@
 
 
 {% block script %}
+<!------------------ LazyLoading ------------------->
+<script type="text/javascript">
+    var lazyLoadInstance = new LazyLoad({
+    elements_selector: ".lazy"
+    // ... more custom settings?
+});
+</script>
 <!------------------ Isotope ------------------->
 <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
 <!----------- Metadata for the modal ------------>
@@ -280,6 +287,7 @@
 <script type="text/javascript">
 $('.add_element').val('');
 $('.cat-select').prop('selectedIndex', 0);
+$categories.isotope('layout');
 
 $.widget("custom.catcomplete", $.ui.autocomplete, {
     _create: function() {
@@ -294,19 +302,29 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
 
             if (item.nb_results === 0) {
                 var a = "No results found."
-                ul.append("<li class='disabled'>" + a + "</li>");
+                ul.append("<li class='disabled bg-dark text-light'>" + a + "</li>");
             } else {
                 li = that._renderItemData(ul, item);
             }
         });
     },
     _renderItem: function(ul, item) {
-        var $li = $('<li class="list-group">'),
-            $img = $('<img>');
 
-        $img.attr({ src: item.poster_path, alt: item.name, style: "width: 40px; height: 60px;"});
-        $li.append('<a class="list-group-item bg-dark text-light">');
-        $li.find('a').append($img).append(" "+ item.name + " (" + item.first_air_date + ")");
+        var $li = $('<li class="bg-dark p-t-2 p-b-2" style="border-bottom: solid black 1px;">');
+
+        $li.append(
+            "<div class='row'>" +
+                "<div class='col' style='min-width: 60px; max-width: 60px;'>" +
+                    "<img src="+item.poster_path+" alt="+item.name+" style='width: 50px; height: 75px;'>" +
+                "</div>" +
+                "<div class='col'>" +
+                    "<a class='text-light'>" +
+                        " "+item.name+" " +
+                        "<br>" +
+                        "<span style='font-size: 10pt;'>("+item.first_air_date+")</span>" +
+                    "</a>" +
+                "</div>" +
+           "</div>");
 
         return $li.appendTo(ul);
     }
@@ -316,7 +334,7 @@ $(function() {
     $("#autocomplete").catcomplete({
         delay: 500,
         source: function(request, response) {
-                $.getJSON("{{url_for('autocomplete', media=media_list)}}",{
+                $.getJSON("{{url_for('autocomplete', media=media_list)}}", {
                     q: request.term,
                 },
                     function(data) {

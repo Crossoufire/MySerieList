@@ -9,18 +9,23 @@
 
 
 {% block content %}
-<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">GLOBAL STATISTICS<hr class="mt-2 pb-3 mb-0"></h2>
+<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">
+    GLOBAL STATISTICS
+    <hr class="mt-2 pb-3 mb-0">
+</h2>
+
 <h4 class="text-center m-t-10">
     Total watched time: <b>{{ total_time["total"] }} hours</b> -
      <b>{{ (total_time["total"]/24)|int }} days</b> -
        <b>{{ (total_time["total"]/24/365)|round(2) }} years</b>
 </h4>
+
 <div class="row m-t-30">
     <div class="col">
         <div>
             <canvas id="media-time"></canvas>
         </div>
-        <div style="font-size: 14pt;" class="text-center m-b-5 m-t-37"><b>Genres the most presents in users' lists:</b></div>
+        <div style="font-size: 14pt;" class="text-center m-b-5 m-t-37"><b>Genres the most present in users' lists:</b></div>
         <div class="row d-flex flex-wrap">
             <div class="col">
                 <table style="background: #216e7d;" class="table table-sm text-light">
@@ -79,7 +84,7 @@
         </div>
     </div>
     <div class="col">
-        <div style="font-size: 14pt;" class="text-center m-b-5"><b>Media the most presents in users' lists:</b></div>
+        <div style="font-size: 14pt;" class="text-center m-b-5"><b>Media the most present in users' lists:</b></div>
         <div class="row d-flex flex-wrap">
             <div class="col">
                 <table style="background: #216e7d;" class="table table-sm text-light">
@@ -136,7 +141,7 @@
                 </table>
             </div>
         </div>
-        <div style="font-size: 14pt;" class="text-center m-b-5"><b>Actors the most presents in users' lists:</b></div>
+        <div style="font-size: 14pt;" class="text-center m-b-5"><b>Actors the most present in users' lists:</b></div>
         <div class="row">
             <div class="col">
                 <table style="background: #216e7d;" class="table table-sm text-light">

@@ -38,6 +38,7 @@ function changeCategory(card_id, element_id, genres, media_list) {
 
 // ------------------------- Movies metadata test --------------------------
 function show_metadata(data) {
+    $categories.isotope('layout');
     $('#original_name').text('');
     $('#modal_title').html(data.name);
     if (data.name != data.original_name) {

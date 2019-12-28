@@ -1,9 +1,4 @@
 
-#hierarchical {
-    width: 100%;
-    height: 100%;
-}
-
 table {
     margin: 0 auto;
 }
@@ -20,12 +15,23 @@ td {
     text-align: center;
 }
 
-legend {
-    font-size: 12pt;
-}
-
 .details {
     border: black solid 1px;
     border-radius: 3px;
     background-color: #2f4b67;
+    max-width: 660px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.table-style {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.table-style-2 {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }

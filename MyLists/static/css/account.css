@@ -1,5 +1,4 @@
 
-
 /* ------------ Main CSS ----------- */
 ul {
     list-style: none;
@@ -281,9 +280,6 @@ hr {
     border: solid 2px black;
 }
 
-.follow_wrapper {
-    justify-content: space-evenly
-}
 /* --------------------------------- */
 
 

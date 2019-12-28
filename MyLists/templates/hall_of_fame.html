@@ -4,29 +4,32 @@
 {% block css %}
 <!------ CDN Datatables ------->
 <link href="{{ url_for('static', filename='css/datatables.min.css') }}" rel="stylesheet">
-<!--<link href="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.css" rel="stylesheet">-->
 <link href="{{ url_for('static', filename='css/hall_of_fame.css') }}" rel="stylesheet">
 {% endblock css %}
 
 
 {% block content %}
-<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">HALL OF FAME<hr class="mt-2 mb-0"></h2>
-<div class="overflow m-t-20">
-    <table id="hall_of_fame" class="table table-sm table-responsive-xl text-light">
+<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">
+    HALL OF FAME
+    <hr class="mt-2 mb-0">
+</h2>
+
+<div class="table-responsive-sm m-t-30 table-style">
+    <table id="hall_of_fame" class="table text-light">
         <thead>
             <tr>
-                <th class="text-center picture"></th>
+                <th class="text-center"></th>
                 <th class="text-center">Username</th>
                 <th class="text-center">Series levels</th>
                 <th class="text-center">Anime levels</th>
                 <th class="text-center">Movies levels</th>
                 <th class="text-center">Knowledge levels</th>
-                <th class="text-center follow"></th>
+                <th class="text-center"></th>
             </tr>
         </thead>
         <tbody>
         {% for user in all_data %}
-            <tr>
+            <tr class="text-center align-middle mt-auto mb-auto">
             {% if current_user.get_id() == '1' %}
                 <td>
                     <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">

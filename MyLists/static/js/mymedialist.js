@@ -5,6 +5,7 @@ function updateEpisode(element_id, episode, media_list) {
     var selected_episode = episode.selectedIndex
 
     $body = $("body");
+    $categories.isotope('layout');
     $.ajax ({
         type: "POST",
         url: "/update_element_episode",
@@ -38,6 +39,7 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
     }
 
     $body = $("body");
+    $categories.isotope('layout');
     $.ajax ({
         type: "POST",
         url: "/update_element_season",
@@ -52,6 +54,7 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
 
 // -------------------------- Anime/Series metadata ---------------------------
 function show_metadata(data, media_list) {
+    $categories.isotope('layout');
     $('#original_name').text('');
     $('#modal_title').html(data.name);
     if (data.name != data.original_name) {
@@ -79,6 +82,7 @@ function show_metadata(data, media_list) {
 // ------------------------- Create the category list -------------------------
 function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, media_list) {
     remove_cat();
+    $categories.isotope('layout');
 
     if ($('#'+card_id).parent().hasClass('WATCHING')) {
         var display_watching = "none;";
@@ -152,6 +156,7 @@ function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, me
 function changeCategory(new_category, element_id, card_id, seas_drop_id, ep_drop_id, seas_data, media_list) {
     var new_cat = new_category.childNodes[0].data
     remove_cat();
+    $categories.isotope('layout');
 
     if (new_cat == 'Watching') {
         $("#" + card_id).prependTo(".d-flex.flex-wrap.WATCHING");

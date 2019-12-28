@@ -11,16 +11,8 @@ table.dataTable thead .sorting_desc_disabled:before {
     bottom: .5em;
 }
 
-table.table-sm td, table.table-sm th {
-    padding: 5px;
-}
-
 table.table th {
     font-size: 12pt;
-}
-
-div.col-sm-12 {
-    margin-top: 15px;
 }
 
 table.table a {
@@ -33,10 +25,10 @@ table.table a {
     vertical-align: middle;
 }
 
-
 .table td {
     text-align: center;
     vertical-align: middle;
+    padding: 10px !important;
 }
 
 .current_user {
@@ -59,10 +51,8 @@ table.table a {
     height: 40px;
 }
 
-.picture {
-    max-width: 60px;
-}
-
-.follow {
-    max-width: 50px;
+.table-style {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1100px;
 }

@@ -32,6 +32,7 @@ function remove_cat() {
     $('.seas-eps-box').attr('style', 'display: inline-block;');
     $('.card-img-top').attr('style', 'filter: brightness(100%);');
     $('.mask').show();
+    $categories.isotope('layout');
 }
 
 
