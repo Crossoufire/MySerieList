@@ -37,3 +37,27 @@ table.table a {
     text-align: center;
     vertical-align: middle;
 }
+
+.seasons-eps-container {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    height: 450px;
+    width: 700px;
+}
+
+.media-container {
+    position: relative;
+    height: 449px;
+}
+
+@media (max-width: 767.97px) {
+    .chart-container {
+        height: 25vh;
+        width: 98vw;
+    }
+    .media-container {
+        position: relative;
+        height: 300px;
+    }
+}

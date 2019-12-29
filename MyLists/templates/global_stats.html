@@ -21,8 +21,8 @@
 </h4>
 
 <div class="row m-t-30">
-    <div class="col">
-        <div>
+    <div class="col col-lg-5 col-md-4">
+        <div class="media-container">
             <canvas id="media-time"></canvas>
         </div>
         <div style="font-size: 14pt;" class="text-center m-b-5 m-t-37"><b>Genres the most present in users' lists:</b></div>
@@ -83,7 +83,7 @@
             </div>
         </div>
     </div>
-    <div class="col">
+    <div class="col col-lg-7 col-md-8">
         <div style="font-size: 14pt;" class="text-center m-b-5"><b>Media the most present in users' lists:</b></div>
         <div class="row d-flex flex-wrap">
             <div class="col">
@@ -240,10 +240,9 @@
     </div>
 </div>
 <div class="row">
-    <div class="col">
+    <div class="seasons-eps-container">
         <canvas id="total-seasons"></canvas>
     </div>
-    <div class="col"></div>
 </div>
 {% endblock content %}
 
@@ -274,6 +273,8 @@ var config = {
     },
     options: {
         events: false,
+        responsive: true,
+        maintainAspectRatio: false,
         animation: {
             duration: 500,
             easing: "easeOutQuart",
@@ -352,6 +353,8 @@ var config = {
     },
     options: {
         events: false,
+        responsive: true,
+        maintainAspectRatio: false,
         tooltips: {
             enabled: false
         },
