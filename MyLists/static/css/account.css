@@ -45,7 +45,7 @@ hr {
 
 
 /* ------------ Header ------------- */
-.header-image {
+.header-container {
     position: relative;
     height: 300px;
     background-image: url('/static/img/profile_background_2.jpg');
@@ -54,80 +54,69 @@ hr {
     background-repeat: no-repeat;
 }
 
-.header-image > img {
+.header-profile-img {
     position: absolute;
     left: 30px;
     bottom: -8%;
-    z-index: 10;
     border-radius: 50%;
     border: solid 2px black;
     height: 150px;
     width: 150px;
 }
 
-.header-image > a {
-    position: absolute;
-    left: 98px;
-    color: black !important;
-    bottom: 105px;
-    z-index: 10;
-    opacity: 0;
-}
-
-.edit_img:hover~.edit_img {
-    opacity: 1;
-}
-
-.edit_img:hover {
-    opacity: 1;
-}
-
-.header-image > .knowledge-level {
+.header-knowledge-level {
     position: absolute;
     background: #262626;
     min-width: 50px;
     left: 80px;
     bottom: -10%;
-    z-index: 10;
     font-weight: 400;
     border: solid 1px white;
     border-radius: 8px;
 }
 
-.header-data {
+.header-profile-data {
     position: absolute;
     left: 200px;
     bottom: 3px;
-    z-index: 10;
 }
 
 /* On screens that are 790px or less */
 @media (max-width: 790px) {
-    .header-image > img {
+    .header-profile-img {
         bottom: 10px;
     }
-    .header-data {
+    .header-edit-profile-img {
+        bottom: 10px;
+    }
+    .header-profile-data {
         bottom: 15px;
     }
-    .header-image > .knowledge-level {
+    .header-knowledge-level {
         bottom: 4px;
     }
 }
 
 /* On screens that are 490px or less */
 @media (max-width: 490px) {
-    .header-image > img {
+    .header-profile-img {
         left: 10px;
         bottom: 20px;
         height: 110px;
         width: 110px;
-        width: 110px;
     }
-    .header-data {
+    .header-edit-profile-img {
+        left: 10px;
+        bottom: 20px;
+        height: 110px;
+        width: 110px;
+        padding-top: 40px;
+    }
+    .header-profile-data {
         left: 135px;
         bottom: 15px;
     }
-    .header-image > .knowledge-level {
+    .header-knowledge-level {
         left: 44px;
         bottom: 14px;
         font-size: 10pt;

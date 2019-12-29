@@ -2,24 +2,15 @@
 TODO ------------------------------------------------
 
 Account:
-    Add: Possibility to change the background image
-	Enhance: Bio, profile and back pictures changes without the settings form
 	Enhance: Code of "get_achievements()" method (50% done)
-    Enhance: Settings tab CSS/HTML style
     Enhance: Change the badges display
 
-
 Medialists:
-	Add: Regroup movies by TMDb's collections - If possible
 	Add: Button "More results" to the autocomplete
 	Add: Movie director in metadata modal
-	Enhance: Year in the autocomplete (50% done)
-	Enhance: Autocomplete style (50% done)
-
 
 Advanced Statistics:
 	Add:  Personal advanced statistics for media
-
 
 Homepage :
     Fix: Update the pictures
