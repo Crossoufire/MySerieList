@@ -35,10 +35,10 @@
             <td class="text-center">
                 <img height='50' width="50" src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data[i][0] }}.png" alt="">
             </td>
-            <td>
+            <td style="vertical-align: middle;">
                 <strong class="text-center align-middle">{{ data[i][1] }}</strong>
             </td>
-            <td>
+            <td style="vertical-align: middle;">
                 {% if i == data|length - 1 %}
                 <strong class="text-center align-middle">{{ data[i][2][0] }}{{ data[i][2][1] }}</strong>
                 {% else %}
