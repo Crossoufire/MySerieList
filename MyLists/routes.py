@@ -739,7 +739,6 @@ def hall_of_fame():
 @login_required
 def global_stats():
 
-    start = (time.time())
     # Recover the toal time spent for each media
     times_spent = db.session.query(User, func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
                              func.sum(User.time_spent_movies)).filter(User.id >= '2', User.active==True).all()
@@ -748,8 +747,6 @@ def global_stats():
                   "series": int(times_spent[0][1]/60),
                   "anime": int(times_spent[0][2]/60),
                   "movies": int(times_spent[0][3]/60)}
-    end = (time.time())
-    print(end-start)
 
     # Recover the top media in users' lists
     top_series = db.session.query(Series, SeriesList, func.count(SeriesList.series_id==Series.id).label("count"))\
