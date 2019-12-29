@@ -280,7 +280,9 @@ var config = {
             easing: "easeOutQuart",
             onComplete: function () {
                 var ctx = this.chart.ctx;
-                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);                ctx.textAlign = 'center';
+                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontStyle,
+                Chart.defaults.global.defaultFontFamily);
+                ctx.textAlign = 'center';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
 
@@ -305,7 +307,7 @@ var config = {
                         if(dataset.data[i] != 0 && dataset._meta[0].data[i].hidden != true) {
                             ctx.fillText(dataset.data[i]+ " h", model.x + x, model.y + y);
                             // Display percent in another line, line break doesn't work for fillText
-                            ctx.fillText(percent, model.x + x, model.y + y + 15);
+                            ctx.fillText(percent, model.x + x, model.y + y + 23);
                         }
                     }
                 });

@@ -11,6 +11,7 @@ $(document).ready(function () {
     $('.dataTables_length').addClass('bs-select');
 });
 
+
 function follow(follow_id, button_id) {
     $('#'+button_id).text('Unfollow');
     $('#'+button_id).attr('onclick', "unfollow(\"" + follow_id + "\", \"" + button_id + "\")");

@@ -71,6 +71,23 @@ $(function () {
 })
 
 
+// ------------------------------- Slider ----------------------------------
+var slider = document.getElementById("myRange");
+var output = document.getElementsByClassName("card");
+
+function resetRange() {
+    $(output).attr('style', 'width: 198px;');
+    slider.value = 198;
+    $categories.isotope('layout');
+}
+
+// Update the current slider value (each time you drag the slider handle)
+slider.oninput = function() {
+    $(output).attr('style', 'width: ' +slider.value+ 'px;');
+    $categories.isotope('layout');
+}
+
+
 // ------------------------- Isotope categories -----------------------------
 var $categories = $('.categories-iso').isotope({
     itemSelector: '.categories',

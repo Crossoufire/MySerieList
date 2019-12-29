@@ -70,9 +70,20 @@
         {% endif %}
     </div>
 
+    <div class="d-flex flex-wrap">
+        <div class="slidecontainer">
+            <input id="myRange" class="slider" type="range" min="142" value="198" max="240">
+            &nbsp;
+            <a class="fas fa-undo" onclick="resetRange()"></a>
+        </div>
+    </div>
+
+
     {% if target_user_id != current_user.get_id() %}
     <div class="width-100">
-        <div class="m-t-20 text-center common-media">You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)</div>
+        <div class="m-t-20 text-center common-media">
+            You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)
+        </div>
     </div>
     {% endif %}
 </div>
@@ -84,7 +95,9 @@
         {% else %}
         <div class="categories {{ category[1] }}">
         {% endif %}
-        <h2 class="text-center mt-1 mb-0 category-title p-t-10">{{ category[1] }}<hr class="mt-2 pb-3 mb-0"></h2>
+        <h2 class="text-center mt-1 mb-0 category-title p-t-10">
+            {{ category[1] }}
+            <hr class="mt-2 pb-3 mb-0"></h2>
             {% if category[1] == 'COMPLETED ANIMATION' %}
             <div class="card-wrapper d-flex flex-wrap ANIMATION">
             {% else %}
@@ -94,8 +107,10 @@
                 <!------------------- Card -------------------->
                 <div id="card_{{ data[0]['id'] }}" class="card bg-transparent">
                     <div class="view overlay">
-                        <img class="card-img-top lazy" data-src="{{ data[0]['cover'] }}" alt="{{ data[0]['name'] }}">
-                        <div class="mask flex-center rgba-black-strong" data-toggle="modal" data-target="#modal_metadata" onclick="show_metadata(metadata_{{ data[0]['id'] }}, '{{ media_list }}')">
+                        <img class="card-img-top" loading="lazy" src="{{ data[0]['cover'] }}" alt="{{ data[0]['name'] }}">
+                        <div class="mask flex-center rgba-black-strong" data-toggle="modal"
+                             data-target="#modal_metadata" onclick="show_metadata(metadata_{{ data[0]['id'] }},
+                             '{{ media_list }}')">
                             <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
                             <span class="original-title" style="display: none;" >{{ data[0]['original_name'] }}</span>
                             <span class="actors-yes" style="display: none;" >{{ data[0]['actors'] }}</span>
@@ -103,17 +118,28 @@
                         </div>
                         {% if target_user_id == current_user.get_id() %}
                             {% if media_list != 'movieslist' %}
-                            <a class="card-btn-top-left fas fa-bars text-light" onclick="charge_cat('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', 'S_{{ data[0]['id'] }}', 'E_{{ data[0]['id'] }}', '{{ data[0]['eps_per_season'] }}', '{{ media_list }}')"></a>
+                            <a class="card-btn-top-left fas fa-bars text-light"
+                               onclick="charge_cat('card_{{ data[0]['id'] }}','{{ data[0]['id'] }}',
+                               'S_{{ data[0]['id'] }}', 'E_{{ data[0]['id'] }}', '{{ data[0]['eps_per_season'] }}',
+                               '{{ media_list }}')"></a>
                             {% else %}
-                            <a class="card-btn-top-left fas fa-bars text-light" onclick="changeCategory('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ data[0]['genres'] }}', '{{ media_list }}')"></a>
+                            <a class="card-btn-top-left fas fa-bars text-light"
+                               onclick="changeCategory('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}',
+                               '{{ data[0]['genres'] }}', '{{ media_list }}')"></a>
                             {% endif %}
-                        <a class="card-btn-top-right fas fa-ban text-light" onclick="delete_element('{{ data[0]['id'] }}', 'card_{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                        <a class="card-btn-top-right fas fa-ban text-light"
+                           onclick="delete_element('{{ data[0]['id'] }}', 'card_{{ data[0]['id'] }}',
+                           '{{ media_list }}')"></a>
                         {% else %}
                             {% if data[1] == "no" %}
                                 {% if media_list != 'movieslist' %}
-                                <a class="card-btn-top-left fas fa-plus text-light" onclick="add_user('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                                <a class="card-btn-top-left fas fa-plus text-light"
+                                   onclick="add_user('card_{{ data[0]['id'] }}',
+                                   '{{ data[0]['id'] }}', '{{ media_list }}')"></a>
                                 {% else %}
-                                <a class="card-btn-top-left fas fa-plus text-light" onclick="add_user_movies('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                                <a class="card-btn-top-left fas fa-plus text-light"
+                                   onclick="add_user_movies('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}',
+                                   '{{ media_list }}')"></a>
                                 {% endif %}
                             {% else %}
                                 <div class="card-ribbon"></div>
@@ -126,15 +152,17 @@
                     <div class="seas-eps-box p-l-5 p-r-5">
                         <div style="display: inline-block;">
                             {% if target_user_id == current_user.get_id() %}
-                            <select id="S_{{ data[0]['id'] }}" class="text-light text-center select-box" onchange="updateSeason('{{ data[0]['id'] }}', this, '{{ data[0]['eps_per_season'] }}', 'E_{{ data[0]['id'] }}', '{{ media_list }}')">
+                            <select id="S_{{ data[0]['id'] }}" class="text-light text-center select-box"
+                                    onchange="updateSeason('{{ data[0]['id'] }}', this,
+                                    '{{ data[0]['eps_per_season'] }}', 'E_{{ data[0]['id'] }}', '{{ media_list }}')">
                             {% else %}
                             <select id="S_{{ data[0]['id'] }}" class="disabled text-light text-center select-box">
                             {% endif %}
                                 {% for i in range(data[0]['eps_per_season']|length) %}
                                     {% if i+1 == data[0]['current_season'] %}
-                                    <option class="card-opt-box" selected="selected">{{ "S{:02}".format(i+1) }}</option>
+                                    <option class="card-opt-box" selected="selected">&nbsp{{ "S{:02}".format(i+1) }}&nbsp</option>
                                     {% else %}
-                                    <option class="card-opt-box">{{ "S{:02}".format(i+1) }}</option>
+                                    <option class="card-opt-box">&nbsp{{ "S{:02}".format(i+1) }}&nbsp</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -148,9 +176,9 @@
                             {% endif %}
                                 {% for i in range(data[0]['eps_per_season'][data[0]['current_season']-1]) %}
                                     {% if i+1 == data[0]['last_episode_watched'] %}
-                                    <option class="card-opt-box" selected="selected">{{ "E{:02}".format(i+1) }}</option>
+                                    <option class="card-opt-box" selected="selected">&nbsp{{ "E{:02}".format(i+1) }}&nbsp</option>
                                     {% else %}
-                                    <option class="card-opt-box">{{ "E{:02}".format(i+1) }}</option>
+                                    <option class="card-opt-box">&nbsp{{ "E{:02}".format(i+1) }}&nbsp</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -166,9 +194,9 @@
                             {% endif %}
                                 {% for i in range(data[0]['eps_per_season']|length) %}
                                     {% if i+1 == data[0]['current_season'] %}
-                                    <option class="card-opt-box" selected="selected">{{ "S{:02}".format(i+1) }}</option>
+                                    <option class="card-opt-box" selected="selected">&nbsp{{ "S{:02}".format(i+1) }}&nbsp</option>
                                     {% else %}
-                                    <option class="card-opt-box">{{ "S{:02}".format(i+1) }}</option>
+                                    <option class="card-opt-box">&nbsp{{ "S{:02}".format(i+1) }}&nbsp</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -182,9 +210,9 @@
                             {% endif %}
                                 {% for i in range(data[0]['eps_per_season'][data[0]['current_season']-1]) %}
                                     {% if i+1 == data[0]['last_episode_watched'] %}
-                                    <option class="card-opt-box" selected="selected">{{ "E{:02}".format(i+1) }}</option>
+                                    <option class="card-opt-box" selected="selected">&nbsp{{ "E{:02}".format(i+1) }}&nbsp</option>
                                     {% else %}
-                                    <option class="card-opt-box">{{ "E{:02}".format(i+1) }}</option>
+                                    <option class="card-opt-box">&nbsp{{ "E{:02}".format(i+1) }}&nbsp</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -255,13 +283,6 @@
 
 
 {% block script %}
-<!------------------ LazyLoading ------------------->
-<script type="text/javascript">
-    var lazyLoadInstance = new LazyLoad({
-    elements_selector: ".lazy"
-    // ... more custom settings?
-});
-</script>
 <!------------------ Isotope ------------------->
 <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
 <!----------- Metadata for the modal ------------>
