@@ -286,3 +286,13 @@ class Achievements(db.Model):
     title = db.Column(db.String(100), nullable=False)
     type = db.Column(db.String(100), nullable=False)
     genre = db.Column(db.String(100))
+
+
+class Badges(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    threshold = db.Column(db.Integer, nullable=False)
+    image_id = db.Column(db.String(100), nullable=False)
+    level = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    type = db.Column(db.String(100), nullable=False)
+    genres_id = db.Column(db.String(100))

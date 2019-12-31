@@ -1,10 +1,6 @@
 
 TODO ------------------------------------------------
 
-Account:
-	Enhance: Code of "get_achievements()" method (50% done)
-    Enhance: Change the badges display
-
 Medialists:
 	Add: Button "More results" to the autocomplete
 	Add: Movie director in metadata modal
@@ -14,3 +10,6 @@ Advanced Statistics:
 
 Homepage :
     Fix: Update the pictures
+
+General:
+    Add: Contact form

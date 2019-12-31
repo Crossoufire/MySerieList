@@ -55,6 +55,7 @@
 </ul>
 
 <div class="tab-content" id="account_tab_content">
+
     <div id="overview_tab" class="tab-pane fade show active">
         <div class="row m-t-30">
             <div class="col-xl-3 col-lg col-md-12">
@@ -540,27 +541,107 @@
             <div class="col-xl-3 col-lg col-md-12">
                 <ul class="p-l-0 p-r-0">
                     <li class="m-b-20">
-                        <h4><i class="fas fa-chart-pie"></i>&nbsp&nbspBadges</h4><hr>
+                        <h4>
+                            <i class="fas fa-chart-pie"></i>
+                            &nbsp&nbspBadges
+                        </h4>
+                        <hr>
+                        <!------------------------ Series achievements --------------------------->
                         <div class="stats-size m-b-20">
-                            <h5 class="text-left m-b-10"><b>Completed</b></h5>
+                            <h5 class="text-left m-b-10"><b>Series</b></h5>
                             <div class="row">
-                                <div class="col-auto achiev-name">
-                                    Badges
-                                </div>
-                                <div class="col achiev-bar">
-                                    <div class="block_achiev series" data-toggle="tooltip"
-                                         title="{{ ((user_badges_done/19)*100)|round|int }}%">
-                                        <span id="{{ (user_badges_done/19)*100 }}%" class="value"></span>
+                                    <div class="col-auto achiev-name">
+                                        Badges
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <div class="block_achiev series">
+                                            <span id="{{ ((series_achiev['unlocked_badges'])/13)*100 }}%" class="value"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        {{ "{:02d}".format(series_achiev['unlocked_badges']) }}/13
                                     </div>
                                 </div>
-                                <div class="col-auto">
-                                    {{ "{:02d}".format(user_badges_done) }}/19
+                            <div class="row">
+                                    <div class="col-auto achiev-name">
+                                        Levels
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev series">
+                                            <span id="{{ ((series_achiev['unlocked_levels'])/51)*100 }}%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col-auto">
+                                        {{ "{:02d}".format(series_achiev['unlocked_levels']) }}/51
+                                    </div>
                                 </div>
-                            </div>
+                        </div>
+                        <!------------------------ Anime achievements --------------------------->
+                        <div class="stats-size m-b-20">
+                            <h5 class="text-left m-b-10"><b>Anime</b></h5>
+                            <div class="row">
+                                    <div class="col-auto achiev-name">
+                                        Badges
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <div class="block_achiev anime">
+                                            <span id="{{ ((anime_achiev['unlocked_badges'])/17)*100 }}%" class="value"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        {{ "{:02d}".format(anime_achiev['unlocked_badges']) }}/17
+                                    </div>
+                                </div>
+                            <div class="row">
+                                    <div class="col-auto achiev-name">
+                                        Levels
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev anime">
+                                            <span id="{{ ((anime_achiev['unlocked_levels'])/67)*100 }}%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col-auto">
+                                        {{ "{:02d}".format(anime_achiev['unlocked_levels']) }}/67
+                                    </div>
+                                </div>
+                        </div>
+                        <!------------------------ Movies achievements --------------------------->
+                        <div class="stats-size m-b-20">
+                            <h5 class="text-left m-b-10"><b>Movies</b></h5>
+                            <div class="row">
+                                    <div class="col-auto achiev-name">
+                                        Badges
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <div class="block_achiev movies">
+                                            <span id="{{ ((movies_achiev['unlocked_badges'])/17)*100 }}%" class="value"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        {{ "{:02d}".format(movies_achiev['unlocked_badges']) }}/17
+                                    </div>
+                                </div>
+                            <div class="row">
+                                    <div class="col-auto achiev-name">
+                                        Levels
+                                    </div>
+                                    <div class="col achiev-bar">
+                                        <span class="block_achiev movies">
+                                            <span id="{{ ((movies_achiev['unlocked_levels'])/67)*100 }}%" class="value"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col-auto">
+                                        {{ "{:02d}".format(movies_achiev['unlocked_levels']) }}/67
+                                    </div>
+                                </div>
                         </div>
                     </li>
                     <li>
-                        <h4><i class="fas fa-sm fa-info-circle"></i>&nbsp&nbspInformation</h4>
+                        <h4>
+                            <i class="fas fa-sm fa-info-circle"></i>
+                            &nbsp&nbspInformation
+                        </h4>
                         <hr>
                         <ul class="text-left" style="list-style-type: disc; font-size: 13pt;">
                             <li class="m-b-10">
@@ -603,7 +684,7 @@
                                     </div>
                                 </div>
                             </li>
-                            {% if user_id == current_user.get_id() %}
+
                             <li class="m-b-10">
                                 <a class="text-light" href="{{ url_for('level_grade_data') }}" target="_blank">
                                     Grades and levels data
@@ -616,7 +697,6 @@
                                     <i class="text-light fas fa-sm fa-external-link-square-alt"></i>
                                 </a>
                             </li>
-                            {% endif %}
                         </ul>
                     </li>
                 </ul>
@@ -729,125 +809,226 @@
     </div>
 
     <div id="badges_tab" class="tab-pane fade">
-        <h4 class="text-center m-t-40"><i class="fas fa-star"></i>&nbsp&nbsp BADGES COMPLETED</h4><hr>
-        <div class="row m-t-20">
-            {% for badge in user_badges %}
-                {% if badge['obtain'] == True %}
-                <div class="col-xl-2 col-lg-3 col-md-4 m-b-40 align-middle text-center">
-                    <h4 class="text-center">{{ badge['title'] }}</h4>
-                    <img width="70" height="70" src="/static/img/media_badges/{{ badge['image_id'] }}.png"/>
-                    <br>
-                    <i class="fas fa-sm fa-star"></i>
-                    <i class="fas fa-sm fa-star"></i>
-                    <i class="fas fa-sm fa-star"></i>
-                    <i class="fas fa-sm fa-star"></i>
-                    <div class="col-auto p-0 m-l-5 mt-auto mb-auto">
-                        {% if badge['type'] == 'genre' %}
-                            Watched: {{ badge['value'] }} hours of {{ badge['image_id'] }}.
-                        {% elif badge['type'] == 'classic' %}
-                            Watched: {{ badge['value'] }} hours of media aired before 1990.
-                        {% elif badge['type'] == 'completed' %}
-                            Completed: {{ badge['value'] }} media.
-                        {% elif badge['type'] == 'total-time' %}
-                            Watched: {{ badge['value'] }} days of media.
-                        {% elif badge['type'] == 'longshows' %}
-                            Watched: {{ badge['value'] }} shows with 100 or more episodes.
-                        {% elif badge['type'] == 'longmovies' %}
-                            Watched: {{ badge['value'] }} movies lasting > 2h30.
-                        {% endif %}
-                    </div>
-                </div>
-                {% endif %}
-            {% endfor %}
+        <div class="d-flex flex-wrap filters-button-group m-t-30" style="justify-content: center;">
+            <button class="btn btn-sm btn-warning text-dark" onclick="changeBadges('anime')">Anime</button>
+            <button class="btn btn-sm btn-light text-dark" onclick="changeBadges('series')">Series</button>
+            <button class="btn btn-sm btn-light text-dark" onclick="changeBadges('movies')">Movies</button>
         </div>
-
-        <h4 class="text-center m-t-30"><i class="fas fa-spinner"></i>&nbsp&nbsp BADGES IN PROGRESS</h4><hr>
-        <div class="row m-t-20">
-            {% for badge in user_badges %}
-                {% if badge['obtain'] == False %}
-                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 m-b-40">
-                    <h4>{{ badge['title'] }}</h4>
-                    <div class="row">
-                        <div class="col-auto">
-                            <img width="70" height="70" src="/static/img/media_badges/{{ badge['image_id'] }}.png"/>
+        <div id="anime_badges" class="row m-t-30" style="display: block;">
+            <div class="col">
+                <div class="row">
+                    {% for i in range(0, anime_achiev['all_badges']|length) %}
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
+                        <h4>{{ anime_achiev['all_badges'][i]['title'] }}</h4>
+                        <div class="row">
+                            <div class="col-auto">
+                                <img width="70" height="70" src="{{ url_for('static', filename='img/media_badges') }}/{{ anime_achiev['all_badges'][i]['image_id'] }}.png"/>
+                            </div>
+                            <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
+                                {% if anime_achiev['all_badges'][i]['type'] == 'genre' %}
+                                    Badge earned when watching<br>{{ anime_achiev['all_badges'][i]['title'] }} genre anime.
+                                {% elif anime_achiev['all_badges'][i]['type'] == 'classic' %}
+                                    Badge earned when watching<br>anime aired from 1990-2000.
+                                {% elif anime_achiev['all_badges'][i]['type'] == 'finished' %}
+                                    Badge earned when finishing<br>anime with the status ended.
+                                {% elif anime_achiev['all_badges'][i]['type'] == 'time' %}
+                                    Badge earned when watching<br>numerous anime.
+                                {% elif anime_achiev['all_badges'][i]['type'] == 'long' %}
+                                    Badge earned when watching {{ anime_achiev['all_badges'][i]['threshold'] }}<br>anime with 100 or more episodes.
+                                {% elif anime_achiev['all_badges'][i]['type'] == 'old' %}
+                                    Badge earned when watching {{ anime_achiev['all_badges'][i]['threshold'] }}<br>anime aired before 1980.
+                                {% elif anime_achiev['all_badges'][i]['type'] == 'year' %}
+                                    Badge earned when watching<br> anime from {{ anime_achiev['all_badges'][i]['threshold'] }} different aired years.
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="col-auto p-0 m-l-5 mt-auto mb-auto">
-                            {% if badge['type'] == 'genre' %}
-                                Watched:<br>{{ badge['value'] }} h of {{ badge['image_id'] }}.
-                            {% elif badge['type'] == 'classic' %}
-                                Watched:<br>{{ badge['value'] }} h of media aired < 1990.
-                            {% elif badge['type'] == 'completed' %}
-                                Completed:<br>{{ badge['value'] }} media.
-                            {% elif badge['type'] == 'total-time' %}
-                                Watched:<br>{{ badge['value'] }} days of media.
-                            {% elif badge['type'] == 'longshows' %}
-                                Watched:<br>{{ badge['value'] }} shows with 100+ eps.
-                            {% elif badge['type'] == 'longmovies' %}
-                                Watched:<br>{{ badge['value'] }} movies lasting > 2h30.
+                        <div class="row">
+                            <div class="col-auto achiev-name text-center">
+                                {{ anime_achiev['all_badges'][i]['level'] }}
+                            </div>
+                            {% if anime_achiev['all_badges'][i]['type'] == 'genre' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['all_badges'][i]['element_time'] }} hours">
+                            {% elif anime_achiev['all_badges'][i]['type'] == 'classic' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['all_badges'][i]['element_time'] }} hours">
+                            {% elif anime_achiev['all_badges'][i]['type'] == 'finished' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['all_badges'][i]['element_count'] }} anime">
+                            {% elif anime_achiev['all_badges'][i]['type'] == 'time' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['all_badges'][i]['element_time'] }} days">
+                            {% elif anime_achiev['all_badges'][i]['type'] == 'long' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['all_badges'][i]['element_count'] }} anime">
+                            {% elif anime_achiev['all_badges'][i]['type'] == 'old' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['all_badges'][i]['element_count'] }} anime">
+                            {% elif anime_achiev['all_badges'][i]['type'] == 'year' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ anime_achiev['all_badges'][i]['element_count'] }} anime">
                             {% endif %}
+                                    <span class="block_achiev">
+                                        {% if anime_achiev['all_badges'][i]['element_percentage'] > 100 %}
+                                        <span id="100%" class="value"></span>
+                                        {% else %}
+                                        <span id="{{ anime_achiev['all_badges'][i]['element_percentage'] }}%" class="value"></span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            <div class="col-auto">
+                                {% if anime_achiev['all_badges'][i]['element_percentage'] > 100 %}
+                                    {% if anime_achiev['all_badges'][i]['element_time'] %}
+                                        {{ anime_achiev['all_badges'][i]['element_time'] }}
+                                    {% else %}
+                                        {{ anime_achiev['all_badges'][i]['element_count'] }}
+                                    {% endif %}
+                                {% else %}
+                                    {{ anime_achiev['all_badges'][i]['threshold'] }}
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-auto achiev-name text-center">
-                            {% if badge['level'] == 'Level 0' %}
-                                <i class="far fa-sm fa-star"></i>
-                                <i class="far fa-sm fa-star"></i>
-                                <i class="far fa-sm fa-star"></i>
-                                <i class="far fa-sm fa-star"></i>
-                            {% elif badge['level'] == 'Level 1' %}
-                                <i class="fas fa-sm fa-star"></i>
-                                <i class="far fa-sm fa-star"></i>
-                                <i class="far fa-sm fa-star"></i>
-                                <i class="far fa-sm fa-star"></i>
-                            {% elif badge['level'] == 'Level 2' %}
-                                <i class="fas fa-sm fa-star"></i>
-                                <i class="fas fa-sm fa-star"></i>
-                                <i class="far fa-sm fa-star"></i>
-                                <i class="far fa-sm fa-star"></i>
-                            {% elif badge['level'] == 'Level 3' %}
-                                <i class="fas fa-sm fa-star"></i>
-                                <i class="fas fa-sm fa-star"></i>
-                                <i class="fas fa-sm fa-star"></i>
-                                <i class="far fa-sm fa-star"></i>
-                            {% endif %}
-                        </div>
-
-                        {% if badge['type'] == 'genre' or badge['type'] == 'classic' %}
-                        <div class="col achiev-bar" data-toggle="tooltip"
-                             title="{{ badge['value'] }} hours">
-                            {% if badge['percentage'] %}
-                            <span class="block_achiev">
-                                <span id="{{ badge['percentage'] }}%" class="value"></span>
-                            </span>
-                            {% endif %}
-                        </div>
-                        {% elif badge['type'] == 'completed' or badge['type'] == 'longshows' or badge['type'] == 'longmovies' %}
-                        <div class="col achiev-bar" data-toggle="tooltip"
-                             title="{{ badge['value'] }} media">
-                            {% if badge['percentage'] %}
-                            <span class="block_achiev">
-                                <span id="{{ badge['percentage'] }}%" class="value"></span>
-                            </span>
-                            {% endif %}
-                        </div>
-                        {% elif badge['type'] == 'total-time' %}
-                        <div class="col achiev-bar" data-toggle="tooltip"
-                             title="{{ badge['value'] }} days">
-                            {% if badge['percentage'] %}
-                            <span class="block_achiev">
-                                <span id="{{ badge['percentage'] }}%" class="value"></span>
-                            </span>
-                            {% endif %}
-                        </div>
-                        {% endif %}
-
-                        <div class="col-auto">
-                            {{ badge['threshold'] }}
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
-                {% endif %}
-            {% endfor %}
+            </div>
+        </div>
+        <div id="series_badges" class="row m-t-30" style="display: none;">
+            <div class="col">
+                <div class="row">
+                    {% for i in range(0, series_achiev['all_badges']|length) %}
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
+                        <h4>{{ series_achiev['all_badges'][i]['title'] }}</h4>
+                        <div class="row">
+                            <div class="col-auto">
+                                <img width="70" height="70" src="{{ url_for('static', filename='img/media_badges') }}/{{ series_achiev['all_badges'][i]['image_id'] }}.png"/>
+                            </div>
+                            <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
+                                {% if series_achiev['all_badges'][i]['type'] == 'genre' %}
+                                    Badge earned when watching<br>{{ series_achiev['all_badges'][i]['title'] }} genre series.
+                                {% elif series_achiev['all_badges'][i]['type'] == 'classic' %}
+                                    Badge earned when watching<br>series aired from 1990-2000.
+                                {% elif series_achiev['all_badges'][i]['type'] == 'finished' %}
+                                    Badge earned when finishing<br>series with the status ended.
+                                {% elif series_achiev['all_badges'][i]['type'] == 'time' %}
+                                    Badge earned when watching<br>numerous series.
+                                {% elif series_achiev['all_badges'][i]['type'] == 'long' %}
+                                    Badge earned when watching {{ series_achiev['all_badges'][i]['threshold'] }}<br>series with 100 or more episodes.
+                                {% elif series_achiev['all_badges'][i]['type'] == 'old' %}
+                                    Badge earned when watching {{ series_achiev['all_badges'][i]['threshold'] }}<br>series aired before 1980.
+                                {% elif series_achiev['all_badges'][i]['type'] == 'year' %}
+                                    Badge earned when watching<br> series from {{ series_achiev['all_badges'][i]['threshold'] }} different aired years.
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-auto achiev-name text-center">
+                                {{ series_achiev['all_badges'][i]['level'] }}
+                            </div>
+                            {% if series_achiev['all_badges'][i]['type'] == 'genre' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ series_achiev['all_badges'][i]['element_time'] }} hours">
+                            {% elif series_achiev['all_badges'][i]['type'] == 'classic' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ series_achiev['all_badges'][i]['element_time'] }} hours">
+                            {% elif series_achiev['all_badges'][i]['type'] == 'finished' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ series_achiev['all_badges'][i]['element_count'] }} series">
+                            {% elif series_achiev['all_badges'][i]['type'] == 'time' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ series_achiev['all_badges'][i]['element_time'] }} days">
+                            {% elif series_achiev['all_badges'][i]['type'] == 'long' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ series_achiev['all_badges'][i]['element_count'] }} series">
+                            {% elif series_achiev['all_badges'][i]['type'] == 'old' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ series_achiev['all_badges'][i]['element_count'] }} series">
+                            {% elif series_achiev['all_badges'][i]['type'] == 'year' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ series_achiev['all_badges'][i]['element_count'] }} series">
+                            {% endif %}
+                                    <span class="block_achiev">
+                                        {% if series_achiev['all_badges'][i]['element_percentage'] > 100 %}
+                                        <span id="100%" class="value"></span>
+                                        {% else %}
+                                        <span id="{{ series_achiev['all_badges'][i]['element_percentage'] }}%" class="value"></span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            <div class="col-auto">
+                                {% if series_achiev['all_badges'][i]['element_percentage'] > 100 %}
+                                    {% if series_achiev['all_badges'][i]['element_time'] %}
+                                        {{ series_achiev['all_badges'][i]['element_time'] }}
+                                    {% else %}
+                                        {{ series_achiev['all_badges'][i]['element_count'] }}
+                                    {% endif %}
+                                {% else %}
+                                    {{ series_achiev['all_badges'][i]['threshold'] }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div id="movies_badges" class="row m-t-30" style="display: none;">
+            <div class="col">
+                <div class="row">
+                    {% for i in range(0, movies_achiev['all_badges']|length) %}
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 m-b-40">
+                        <h4>{{ movies_achiev['all_badges'][i]['title'] }}</h4>
+                        <div class="row">
+                            <div class="col-auto">
+                                <img width="70" height="70" src="{{ url_for('static', filename='img/media_badges') }}/{{ movies_achiev['all_badges'][i]['image_id'] }}.png"/>
+                            </div>
+                            <div class="col-auto p-0" style="margin-top: auto; margin-bottom: auto;">
+                                {% if movies_achiev['all_badges'][i]['type'] == 'genre' %}
+                                    Badge earned when watching<br>{{ movies_achiev['all_badges'][i]['title'] }} genre movies.
+                                {% elif movies_achiev['all_badges'][i]['type'] == 'classic' %}
+                                    Badge earned when watching<br>movies aired from 1990-2000.
+                                {% elif movies_achiev['all_badges'][i]['type'] == 'finished' %}
+                                    Badge earned when finishing<br>movies.
+                                {% elif movies_achiev['all_badges'][i]['type'] == 'time' %}
+                                    Badge earned when watching<br>numerous movies.
+                                {% elif movies_achiev['all_badges'][i]['type'] == 'long' %}
+                                    Badge earned when watching {{ movies_achiev['all_badges'][i]['threshold'] }}<br>movies 2h30 or more.
+                                {% elif movies_achiev['all_badges'][i]['type'] == 'old' %}
+                                    Badge earned when watching {{ movies_achiev['all_badges'][i]['threshold'] }}<br>movies aired before 1980.
+                                {% elif movies_achiev['all_badges'][i]['type'] == 'year' %}
+                                    Badge earned when watching movies<br>from {{ movies_achiev['all_badges'][i]['threshold'] }} different aired years.
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-auto achiev-name text-center">
+                                {{ movies_achiev['all_badges'][i]['level'] }}
+                            </div>
+                            {% if movies_achiev['all_badges'][i]['type'] == 'genre' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ movies_achiev['all_badges'][i]['element_time'] }} hours">
+                            {% elif movies_achiev['all_badges'][i]['type'] == 'classic' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ movies_achiev['all_badges'][i]['element_time'] }} hours">
+                            {% elif movies_achiev['all_badges'][i]['type'] == 'finished' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ movies_achiev['all_badges'][i]['element_count'] }} movies">
+                            {% elif movies_achiev['all_badges'][i]['type'] == 'time' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ movies_achiev['all_badges'][i]['element_time'] }} days">
+                            {% elif movies_achiev['all_badges'][i]['type'] == 'long' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ movies_achiev['all_badges'][i]['element_count'] }} movies">
+                            {% elif movies_achiev['all_badges'][i]['type'] == 'old' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ movies_achiev['all_badges'][i]['element_count'] }} movies">
+                            {% elif movies_achiev['all_badges'][i]['type'] == 'year' %}
+                                <div class="col achiev-bar" data-toggle="tooltip" title="{{ movies_achiev['all_badges'][i]['element_count'] }} movies">
+                            {% endif %}
+                                    <span class="block_achiev">
+                                        {% if movies_achiev['all_badges'][i]['element_percentage'] > 100 %}
+                                        <span id="100%" class="value"></span>
+                                        {% else %}
+                                        <span id="{{ movies_achiev['all_badges'][i]['element_percentage'] }}%" class="value"></span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            <div class="col-auto">
+                                {% if movies_achiev['all_badges'][i]['element_percentage'] > 100 %}
+                                    {% if movies_achiev['all_badges'][i]['element_time'] %}
+                                        {{ movies_achiev['all_badges'][i]['element_time'] }}
+                                    {% else %}
+                                        {{ movies_achiev['all_badges'][i]['element_count'] }}
+                                    {% endif %}
+                                {% else %}
+                                    {{ movies_achiev['all_badges'][i]['threshold'] }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 
