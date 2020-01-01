@@ -14,8 +14,8 @@
     <hr class="mt-2 mb-0">
 </h2>
 
-<div class="table-responsive-sm m-t-30 table-style">
-    <table id="hall_of_fame" class="table text-light">
+<div class="m-t-30">
+    <table id="hall_of_fame" class="table table-responsive-sm text-light">
         <thead>
             <tr>
                 <th class="text-center"></th>
@@ -24,6 +24,7 @@
                 <th class="text-center">Anime levels</th>
                 <th class="text-center">Movies levels</th>
                 <th class="text-center">Knowledge levels</th>
+                <th class="text-center">Badges</th>
                 <th class="text-center"></th>
             </tr>
         </thead>
@@ -63,6 +64,9 @@
                     <br>
                     {{ user['knowledge_level'] }}
                 </td>
+                <td>
+                    <a class="btn btn-sm btn-test" href="{{ url_for('badges', user_name=user['username']) }}">Badges</a>
+                </td>
                 <td></td>
 
             {% elif user["iscurrentuser"] %}
@@ -98,6 +102,9 @@
                     <br>
                     {{ user['knowledge_level'] }}
                 </td>
+                <td class="current_user">
+                    <a class="btn btn-sm btn-test" href="{{ url_for('badges', user_name=user['username']) }}">Badges</a>
+                </td>
                 <td class="current_user"></td>
 
             {% elif user["isprivate"] and not user["isfollowing"] %}
@@ -127,6 +134,7 @@
                     <br>
                     {{ user['knowledge_level'] }}
                 </td>
+                <td></td>
                 <td></td>
 
             {% else %}
@@ -161,6 +169,9 @@
                     <img class="k_grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
                     <br>
                     {{ user['knowledge_level'] }}
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-test" href="{{ url_for('badges', user_name=user['username']) }}">Badges</a>
                 </td>
                 <td>
                     {% if user["isfollowing"] %}

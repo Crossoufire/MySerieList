@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+{% endblock css %}
+
+
+{% block content %}
+<h4 class="text-center m-t-40"><i class="fas fa-star"></i>&nbsp&nbsp BADGES</h4><hr>
+<div class="row m-t-20">
+    {% for badge in user_badges %}
+        <div class="col-xl-2 col-lg-3 col-md-4 m-b-20 align-middle text-center">
+            <div class="text-center" style="font-size: 15pt;"><b>{{ badge['title'] }}</b></div>
+            <img width="70" height="70" src="/static/img/media_badges/{{ badge['image_id'] }}.png"/>
+            <br>
+            {% if badge['unlocked'] == 0 %}
+            <a class="disabled fas fa-sm fa-lock"></a>
+            {% else %}
+            <a class="disabled fas fa-sm fa-lock-open"></a>
+            <span style="font-weight: 600;">&#x2716; {{ badge['unlocked'] }}</span>
+            {% endif %}
+            <div class="col-auto p-0 m-l-5 mt-auto mb-auto">
+                {% if badge['type'] == 'genre' %}
+                    {{ badge['value'] }} hours of {{ badge['image_id'] }}
+                {% elif badge['type'] == 'classic' %}
+                    {{ badge['value'] }} hours of media aired before 1990
+                {% elif badge['type'] == 'completed' %}
+                    {{ badge['value'] }} media
+                {% elif badge['type'] == 'total-time' %}
+                    {{ badge['value'] }} days of media
+                {% elif badge['type'] == 'longshows' %}
+                    {{ badge['value'] }} shows with 100 or more episodes
+                {% elif badge['type'] == 'longmovies' %}
+                    {{badge['value'] }} movies lasting > 2h30
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock content %}
+
+
+{% block script %}
+{% endblock script %}
+

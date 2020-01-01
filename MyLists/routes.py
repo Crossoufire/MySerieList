@@ -407,9 +407,7 @@ def account(user_name):
                   "movies"  : user.movies_views}
 
     # Recover the user's badges
-    badges_data = get_badges(user.id)
-    user_badges = badges_data[0]
-    user_badges_done = badges_data[1]
+    badges_unlocked = get_badges(user.id)[1]
 
     # Recover the registered date
     registered_date = user.registered_on.strftime("%d %b %Y")
@@ -428,8 +426,17 @@ def account(user_name):
                            settings_form    = settings_form,
                            password_form    = password_form,
                            user_biography   = user.biography,
-                           user_badges      = user_badges,
-                           user_badges_done = user_badges_done)
+                           badges_unlocked  = badges_unlocked)
+
+
+@app.route("/badges/<user_name>", methods=['GET', 'POST'])
+@login_required
+def badges(user_name):
+    user = User.query.filter_by(username=user_name).first()
+    badges = get_badges(user.id)[0]
+    return render_template('badges.html',
+                           title       ="{}'s badges".format(user_name),
+                           user_badges = badges)
 
 
 @app.route("/level_grade_data", methods=['GET'])
@@ -437,9 +444,9 @@ def account(user_name):
 def level_grade_data():
     all_ranks_list = []
     if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\\img\\levels_ranks\\levels_ranks.csv")
+        path = os.path.join(app.root_path, "static\\csv_data\\levels_ranks.csv")
     else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/img/levels_ranks/levels_ranks.csv")
+        path = os.path.join(app.root_path, "static/csv_data/levels_ranks.csv")
     with open(path, "r") as fp:
         for line in fp:
             all_ranks_list.append(line.split(";"))
@@ -473,9 +480,9 @@ def level_grade_data():
 def knowledge_grade_data():
     all_knowledge_ranks_list = []
     if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\\img\\knowledge_ranks\\knowledge_ranks.csv")
+        path = os.path.join(app.root_path, "static\\csv_data\\knowledge_ranks.csv")
     else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/img/knowledge_ranks/knowledge_ranks.csv")
+        path = os.path.join(app.root_path, "static/csv_data/knowledge_ranks.csv")
     with open(path, "r") as fp:
         for line in fp:
             all_knowledge_ranks_list.append(line.split(";"))
@@ -902,7 +909,7 @@ def mymedialist(media_list, user_name):
         db.session.commit()
 
     if media_list == "serieslist" or media_list == "animelist":
-        return render_template('mymedialist.html',
+        return render_template('mymedialist/series_anime_list.html',
                                title            = "{}'s {}".format(user_name, media_list),
                                all_data         = media_all_data["all_data"],
                                common_elements  = media_all_data["common_elements"],
@@ -910,7 +917,7 @@ def mymedialist(media_list, user_name):
                                target_user_name = user_name,
                                target_user_id   = str(user.id))
     elif media_list == "movieslist":
-        return render_template('mymedialist.html',
+        return render_template('mymedialist/movieslist.html',
                                title            = "{}'s {}".format(user_name, media_list),
                                all_data         = media_all_data["all_data"],
                                common_elements  = media_all_data["common_elements"],
@@ -1250,7 +1257,7 @@ def add_to_medialist():
         if add_category not in category_list:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
     else:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element is in the current user's list
     if element_type == "animelist":
@@ -1515,14 +1522,12 @@ def get_level_and_grade(total_time_min):
     element_level = element_level_tmp.split('.')
     element_level[0] = int(element_level[0])
 
-    print(element_level[0])
-
     # Level and grade calculation
     list_all_levels_ranks = []
     if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\\img\\levels_ranks\\levels_ranks.csv")
+        path = os.path.join(app.root_path, "static\\csv_data\\levels_ranks.csv")
     else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/img/levels_ranks/levels_ranks.csv")
+        path = os.path.join(app.root_path, "static/csv_data/levels_ranks.csv")
     with open(path, 'r') as fp:
         for line in fp:
             list_all_levels_ranks.append(line.split(";"))
@@ -1548,9 +1553,9 @@ def get_knowledge_grade(knowledge_level):
     # Recover knowledge ranks
     list_all_knowledge_ranks = []
     if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\\img\\knowledge_ranks\\knowledge_ranks.csv")
+        path = os.path.join(app.root_path, "static\\csv_data\\knowledge_ranks.csv")
     else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/img/knowledge_ranks/knowledge_ranks.csv")
+        path = os.path.join(app.root_path, "static/csv_data/knowledge_ranks.csv")
     with open(path, 'r') as fp:
         for line in fp:
             list_all_knowledge_ranks.append(line.split(";"))
@@ -1569,8 +1574,6 @@ def get_knowledge_grade(knowledge_level):
 
 def get_badges(user_id):
     user = User.query.filter_by(id=user_id).first()
-    global obtain
-    obtain = 0
 
     def get_queries():
         series_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
@@ -1636,31 +1639,18 @@ def get_badges(user_id):
         else:
             return [0, 0]
 
-    def create_badge_dict(badges, level, time=None, count=None):
-        global obtain
-
+    def create_badge_dict(badge, unlocked, time=None, count=None):
         if time is not None:
-            value = time/60
+            value = int(time/60)
         else:
             value = count
 
         badge_data = {}
-        badge_data["type"] = badges[0].type
-        badge_data["image_id"] = badges[0].image_id
-        badge_data["level"] = "Level {}".format(level)
-        badge_data["title"] = badges[0].title
-        badge_data["value"] = int(value)
-        try:
-            badge_data["threshold"] = badges[level].threshold
-            badge_data["obtain"] = False
-        except:
-            badge_data["threshold"] = None
-            badge_data["obtain"] = True
-            obtain += 1
-        try:
-            badge_data["percentage"] = (value*100)/(badges[level].threshold)
-        except:
-            badge_data["percentage"] = None
+        badge_data["type"] = badge.type
+        badge_data["image_id"] = badge.image_id
+        badge_data["title"] = badge.title
+        badge_data["unlocked"] = unlocked
+        badge_data["value"] = value
 
         return badge_data
 
@@ -1772,72 +1762,51 @@ def get_badges(user_id):
     genres_values = ["Mystery", "Historical", "Horror", "Music", "Romance", "Sports", "Slice of Life", "Comedy",
                      "Crime", "Documentary", "Science Fiction", "Animation", "Fantasy", "Thriller"]
     for i in range(0, len(genres_values)):
-        badges = db.session.query(Badges).filter_by(title=genres_values[i]).all()
-        level = 0
+        badge = db.session.query(Badges).filter_by(title=genres_values[i]).first()
         try:
             genre_time_data = time_by_genre[genres_values[i]]
         except:
             genre_time_data = 0
-        for badge in badges:
-            if int(genre_time_data/60) > badge.threshold:
-                level += 1
-            else:
-                break
-        badge_data = create_badge_dict(badges, level, time=genre_time_data)
+        count_unlocked = int((genre_time_data/60)/100)
+        badge_data = create_badge_dict(badge, count_unlocked, time=genre_time_data)
         all_badges.append(badge_data)
 
     # Classic badges
-    badges = db.session.query(Badges).filter_by(type="classic").all()
-    level = 0
-    for badge in badges:
-        if float(time_classic/60) > int(badge.threshold):
-            level += 1
-        else:
-            break
-    badge_data = create_badge_dict(badges, level, time=time_classic)
+    badge = db.session.query(Badges).filter_by(type="classic").first()
+    count_unlocked = int((time_classic/60)/100)
+    badge_data = create_badge_dict(badge, count_unlocked, time=time_classic)
     all_badges.append(badge_data)
 
     # Completed badges
-    badges = db.session.query(Badges).filter_by(type="completed").all()
-    level = 0
-    for badge in badges:
-        if int(count_completed) > int(badge.threshold):
-            level += 1
-        else:
-            break
-    badge_data = create_badge_dict(badges, level, count=count_completed)
+    badge = db.session.query(Badges).filter_by(type="completed").first()
+    count_unlocked = int(count_completed/100)
+    badge_data = create_badge_dict(badge, count_unlocked, count=count_completed)
     all_badges.append(badge_data)
 
     # Time badges
-    badges = db.session.query(Badges).filter_by(type="total-time").all()
-    level = 0
-    for badge in badges:
-        if (time_spent/1440) > int(badge.threshold):
-            level += 1
-        else:
-            break
-    badge_data = create_badge_dict(badges, level, time=(time_spent/24))
+    badge = db.session.query(Badges).filter_by(type="total-time").first()
+    count_unlocked = int((time_spent/1440)/50)
+    badge_data = create_badge_dict(badge, count_unlocked, time=(time_spent/24))
     all_badges.append(badge_data)
 
     # Long shows badges
-    badges = db.session.query(Badges).filter_by(type="longshows").all()
-    level = 0
-    if long_media_shows > int(badges[0].threshold):
-        level += 1
-    badge_data = create_badge_dict(badges, level, count=long_media_shows)
+    badge = db.session.query(Badges).filter_by(type="longshows").first()
+    count_unlocked = int(long_media_shows/15)
+    badge_data = create_badge_dict(badge, count_unlocked, count=long_media_shows)
     all_badges.append(badge_data)
 
     # Long movies badges
-    badges = db.session.query(Badges).filter_by(type="longmovies").all()
-    level = 0
-    if long_media_movies > int(badges[0].threshold):
-        level += 1
-    badge_data = create_badge_dict(badges, level, count=long_media_movies)
+    badge = db.session.query(Badges).filter_by(type="longmovies").first()
+    count_unlocked = int(long_media_movies/15)
+    badge_data = create_badge_dict(badge, count_unlocked, count=long_media_movies)
     all_badges.append(badge_data)
 
-    all_badges.sort(key=lambda x: (x['level'].split()[1], x['value']), reverse=True)
+    all_badges.sort(key=lambda x: (x['unlocked'], x['value']), reverse=True)
+    total_unlocked = 0
+    for item in all_badges:
+        total_unlocked += item["unlocked"]
 
-    return [all_badges, obtain]
+    return [all_badges, total_unlocked]
 
 
 def get_all_media_data(element_data, list_type, covers_path, user_id):
@@ -1939,40 +1908,40 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
 
             if element[1].status == Status.WATCHING:
                 if element[0].id in current_list:
-                    watching_list.append([element_info, "yes"])
+                    watching_list.append([element_info, True])
                     common_elements += 1
                 else:
-                    watching_list.append([element_info, "no"])
+                    watching_list.append([element_info, False])
             elif element[1].status == Status.COMPLETED:
                 if element[0].id in current_list:
-                    completed_list.append([element_info, "yes"])
+                    completed_list.append([element_info, True])
                     common_elements += 1
                 else:
-                    completed_list.append([element_info, "no"])
+                    completed_list.append([element_info, False])
             elif element[1].status == Status.ON_HOLD:
                 if element[0].id in current_list:
-                    onhold_list.append([element_info, "yes"])
+                    onhold_list.append([element_info, True])
                     common_elements += 1
                 else:
-                    onhold_list.append([element_info, "no"])
+                    onhold_list.append([element_info, False])
             elif element[1].status == Status.RANDOM:
                 if element[0].id in current_list:
-                    random_list.append([element_info, "yes"])
+                    random_list.append([element_info, True])
                     common_elements += 1
                 else:
-                    random_list.append([element_info, "no"])
+                    random_list.append([element_info, False])
             elif element[1].status == Status.DROPPED:
                 if element[0].id in current_list:
-                    dropped_list.append([element_info, "yes"])
+                    dropped_list.append([element_info, True])
                     common_elements += 1
                 else:
-                    dropped_list.append([element_info, "no"])
+                    dropped_list.append([element_info, False])
             elif element[1].status == Status.PLAN_TO_WATCH:
                 if element[0].id in current_list:
-                    plantowatch_list.append([element_info, "yes"])
+                    plantowatch_list.append([element_info, True])
                     common_elements += 1
                 else:
-                    plantowatch_list.append([element_info, "no"])
+                    plantowatch_list.append([element_info, False])
 
         element_all_data = [[watching_list, "WATCHING"], [completed_list, "COMPLETED"], [onhold_list, "ON HOLD"],
                             [random_list, "RANDOM"], [dropped_list, "DROPPED"], [plantowatch_list, "PLAN TO WATCH"]]
@@ -2042,32 +2011,32 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
 
             if element[1].status == Status.COMPLETED:
                 if element[0].id in current_list:
-                    completed_list.append([element_info, "yes"])
+                    completed_list.append([element_info, True])
                     common_elements += 1
                 else:
-                    completed_list.append([element_info, "no"])
+                    completed_list.append([element_info, False])
             elif element[1].status == Status.COMPLETED_ANIMATION:
                 if element[0].id in current_list:
-                    completed_list_animation.append([element_info, "yes"])
+                    completed_list_animation.append([element_info, True])
                     common_elements += 1
                 else:
-                    completed_list_animation.append([element_info, "no"])
+                    completed_list_animation.append([element_info, False])
             elif element[1].status == Status.PLAN_TO_WATCH:
                 if element[0].id in current_list:
-                    plantowatch_list.append([element_info, "yes"])
+                    plantowatch_list.append([element_info, True])
                     common_elements += 1
                 else:
-                    plantowatch_list.append([element_info, "no"])
+                    plantowatch_list.append([element_info, False])
 
-        element_all_data = [[completed_list, "COMPLETED"], [completed_list_animation, "COMPLETED ANIMATION"] ,
+        element_all_data = [[completed_list, "COMPLETED"], [completed_list_animation, "ANIMATION"] ,
                             [plantowatch_list, "PLAN TO WATCH"]]
 
         try:
-            percentage = int(common_elements/element_data.count()*100)
+            percentage = int(common_elements/len(element_data)*100)
         except:
             percentage = 0
         all_data_media = {"all_data": element_all_data,
-                          "common_elements": [common_elements, element_data.count(), percentage]}
+                          "common_elements": [common_elements, len(element_data), percentage]}
 
         return all_data_media
 
@@ -3695,7 +3664,7 @@ def automatic_media_refresh():
 
 def refresh_db_badges():
     list_all_badges = []
-    path = os.path.join(app.root_path, 'static/achievements_csv/badges.csv')
+    path = os.path.join(app.root_path, 'static/csv_data/badges.csv')
     with open(path, "r") as fp:
         for line in fp:
             list_all_badges.append(line.split(";"))
@@ -3719,7 +3688,7 @@ def refresh_db_badges():
 
 def add_badges_to_db():
     list_all_badges = []
-    path = os.path.join(app.root_path, 'static/achievements_csv/badges.csv')
+    path = os.path.join(app.root_path, 'static/csv_data/badges.csv')
     with open(path, "r") as fp:
         for line in fp:
             list_all_badges.append(line.split(";"))
@@ -4494,7 +4463,7 @@ def get_achievements(user_id, list_type):
     return achievements_data
 def add_achievements_to_db():
     list_all_achievements = []
-    path = os.path.join(app.root_path, 'static/achievements_csv/achievements.csv')
+    path = os.path.join(app.root_path, '')
     with open(path, "r") as fp:
         for line in fp:
             list_all_achievements.append(line.split(";"))
@@ -4514,7 +4483,7 @@ def add_achievements_to_db():
         db.session.add(achievement)
 def refresh_db_achievements():
     list_all_achievements = []
-    path = os.path.join(app.root_path, 'static/achievements_csv/achievements.csv')
+    path = os.path.join(app.root_path, '')
     with open(path, "r") as fp:
         for line in fp:
             list_all_achievements.append(line.split(";"))

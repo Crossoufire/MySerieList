@@ -49,18 +49,11 @@ input::placeholder {
 
 .common-media {
     background: rgba(220, 220, 220, 0.5);
-    max-width: 280px;
-    margin-left: auto;
-    margin-right: auto;
+    min-width: 280px;
+    border: none;
     padding: 5px;
     color: black;
     font-weight: 400;
-}
-
-.slidecontainer {
-    margin-left: auto;
-    margin-right: 25px;
-    margin-top: 50px;
 }
 
 .slider {
@@ -210,7 +203,12 @@ input::placeholder {
 /* ------------------------------------------ */
 
 
-/* --------- CATEGORIES AND LOADING --------- */
+/* ----- CATEGORIES, MODAL AND LOADING ------ */
+.modal-style {
+    border: solid white 1px !important;
+    background: #131418;
+}
+
 .categories {
     width: 100%;
 }

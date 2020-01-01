@@ -81,7 +81,7 @@ function resetRange() {
     $categories.isotope('layout');
 }
 
-// Update the current slider value (each time you drag the slider handle)
+// Update the current slider value
 slider.oninput = function() {
     $(output).attr('style', 'width: ' +slider.value+ 'px;');
     $categories.isotope('layout');

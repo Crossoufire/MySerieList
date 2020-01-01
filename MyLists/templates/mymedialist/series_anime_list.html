@@ -1,0 +1,101 @@
+{% extends 'mymedialist/base_medialist.html' %}
+
+
+{% block add %}
+    <select class="cat-select">
+        <option selected="selected">Watching</option>
+        <option>Completed</option>
+        <option>On Hold</option>
+        <option>Random</option>
+        <option>Dropped</option>
+        <option>Plan to Watch</option>
+    </select>
+{% endblock add %}
+
+
+{% block cat_button %}
+    <button class="btn btn-sm btn-warning text-dark" data-filter="*">Show all</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.WATCHING">Watching</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.COMPLETED">Completed</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.ON.HOLD">On Hold</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.RANDOM">Random</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.DROPPED">Dropped</button>
+    <button class="btn btn-sm btn-light text-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
+{% endblock cat_button %}
+
+
+{% block card_top_left_1 %}
+    <a class="card-btn-top-left fas fa-bars text-light" onclick="charge_cat('card_{{ data[0]['id'] }}',
+    '{{ data[0]['id'] }}', 'S_{{ data[0]['id'] }}', 'E_{{ data[0]['id'] }}', '{{ data[0]['eps_per_season'] }}',
+    '{{ media_list }}')"></a>
+{% endblock card_top_left_1 %}
+
+
+{% block card_top_left_2 %}
+    <a class="card-btn-top-left fas fa-plus text-light" onclick="add_user('card_{{ data[0]['id'] }}',
+    '{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+{% endblock card_top_left_2 %}
+
+
+{% block select_box %}
+    <div class="seas-eps-box p-l-5 p-r-5" {% if category[1] == 'PLAN TO WATCH' %}style="display: none;"{% endif %}>
+        <div style="display: inline-block;">
+            {% if target_user_id == current_user.get_id() %}
+            <select id="S_{{ data[0]['id'] }}" class="text-light text-center select-box"
+                    onchange="updateSeason('{{ data[0]['id'] }}', this, '{{ data[0]['eps_per_season'] }}',
+                    'E_{{ data[0]['id'] }}', '{{ media_list }}')">
+            {% else %}
+            <select id="S_{{ data[0]['id'] }}" class="disabled text-light text-center select-box">
+            {% endif %}
+                {% for i in range(data[0]['eps_per_season']|length) %}
+                    {% if i+1 == data[0]['current_season'] %}
+                    <option class="card-opt-box" selected="selected">&nbsp{{ "S{:02}".format(i+1) }}&nbsp</option>
+                    {% else %}
+                    <option class="card-opt-box">&nbsp{{ "S{:02}".format(i+1) }}&nbsp</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div style="display: inline-block;">|</div>
+        <div style="display: inline-block;">
+            {% if target_user_id == current_user.get_id() %}
+            <select id="E_{{ data[0]['id'] }}" class="text-light text-center p-0 select-box"
+                    onchange="updateEpisode('{{ data[0]['id'] }}', this, '{{ media_list }}')">
+            {% else %}
+            <select id="E_{{ data[0]['id'] }}" class="disabled text-light text-center p-0 select-box">
+            {% endif %}
+                {% for i in range(data[0]['eps_per_season'][data[0]['current_season']-1]) %}
+                    {% if i+1 == data[0]['last_episode_watched'] %}
+                    <option class="card-opt-box" selected="selected">&nbsp{{ "E{:02}".format(i+1) }}&nbsp</option>
+                    {% else %}
+                    <option class="card-opt-box">&nbsp{{ "E{:02}".format(i+1) }}&nbsp</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+{% endblock select_box %}
+
+
+{% block modal %}
+    <p id="original_name"></p>
+    <p id="actors"></p>
+    <p id="genres"></p>
+    <p id="first_air_date"></p>
+    <p id="last_air_date"></p>
+    <p id="networks"></p>
+    <p id="created_by"></p>
+    <p id="episode_duration"></p>
+    <p id="total_seasons"></p>
+    <p id="total_episodes"></p>
+    <p id="episodes_per_season"></p>
+    <p id="origin_country"></p>
+    <p id="tmdb_score"></p>
+    <p id="status"></p>
+    <hr class="m-b-10 m-t-10">
+    <p id="synopsis" class="m-b-0 text-justify"></p>
+{% endblock modal %}
+
+{% block javascript %}
+    <script src="{{ url_for('static', filename='js/mymedialist.js') }}"></script>
+{% endblock javascript %}

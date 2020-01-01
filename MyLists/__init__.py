@@ -2,9 +2,10 @@ import configparser
 import sys
 
 from flask import Flask
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager
 from flask_mail import Mail
+from flask_bcrypt import Bcrypt
+from flask_compress import Compress
+from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -24,6 +25,7 @@ except:
 
 
 app = Flask(__name__)
+Compress(app)
 
 app.config["SECRET_KEY"] = flask_secret
 

@@ -4,7 +4,8 @@ $(document).ready(function () {
         "order": [[ 5, "desc" ], [ 1, "asc" ]],
         columnDefs: [
             {orderable: false, targets: 0},
-            {orderable: false, targets: 6}
+            {orderable: false, targets: 6},
+            {orderable: false, targets: 7}
         ],
         "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
     });

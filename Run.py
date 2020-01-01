@@ -1,8 +1,9 @@
+from logging.handlers import RotatingFileHandler
 from MyLists import app
+import logging
 import os
 import sys
-import logging
-from logging.handlers import RotatingFileHandler
+
 
 formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s")
 handler = RotatingFileHandler("MyLists/log/mylists.log", maxBytes=10000000, backupCount=5)

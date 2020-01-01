@@ -11,6 +11,11 @@ table.dataTable thead .sorting_desc_disabled:before {
     bottom: .5em;
 }
 
+.btn-test {
+    background-color: #4d0000;
+    color: white !important;
+}
+
 table.table th {
     font-size: 12pt;
 }
@@ -49,10 +54,4 @@ table.table a {
 .k_grade_picture {
     width: 40px;
     height: 40px;
-}
-
-.table-style {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 1100px;
 }

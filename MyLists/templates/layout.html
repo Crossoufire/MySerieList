@@ -10,21 +10,22 @@
         gtag('js', new Date());
         gtag('config', 'UA-146580264-1');
     </script>
+
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="Create your TV shows/anime/movies list, see how much time you spent and gain levels and badges." />
 
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/css/mdb.min.css" rel="stylesheet">
+    <link media rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link media rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <link media rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/css/mdb.min.css">
 
-    <link href="{{ url_for('static', filename='img/favicon.ico') }}" rel='icon' type='image/gif'>
-	<link href="{{ url_for('static', filename='css/mylists.css') }}" rel="stylesheet">
-	<link href="{{ url_for('static', filename='css/util.css') }}" rel="stylesheet">
+    <link rel='icon' type='image/gif' href="{{ url_for('static', filename='img/favicon.ico') }}">
+	<link media rel="stylesheet" href="{{ url_for('static', filename='css/mylists.css') }}">
+	<link media rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
 
     {% block css %}
-    {% endblock %}
+    {% endblock css %}
 
 	{% if title %}
     <title>MyLists - {{ title }}</title>
@@ -62,11 +63,13 @@
                     <div class="navbar-nav">
                     {% if current_user.is_authenticated %}
                         {% if current_user.get_id() == '1' %}
-                        <a class="nav-item nav-link text-light" href="{{ url_for('account', user_name=current_user.username) }}">{{ current_user.username }}</a>
+                        <a class="nav-item nav-link text-light" href="{{ url_for('badges', user_name=current_user.username) }}">Badges</a>
+                        <a class="nav-item nav-link text-light" href="{{ url_for('account', user_name=current_user.username) }}">Profile</a>
                         <a class="nav-item nav-link text-light" href="{{ url_for('admin') }}">Administration</a>
                         <a class="nav-item nav-link text-light" href="{{ url_for('logout') }}">Logout</a>
                         {% else %}
-                        <a class="nav-item nav-link text-light" href="{{ url_for('account', user_name=current_user.username) }}">{{ current_user.username }}</a>
+                        <a class="nav-item nav-link text-light" href="{{ url_for('badges', user_name=current_user.username) }}">Badges</a>
+                        <a class="nav-item nav-link text-light" href="{{ url_for('account', user_name=current_user.username) }}">Profile</a>
                         <a class="nav-item nav-link text-light" href="{{ url_for('logout') }}">Logout</a>
                         {% endif %}
                     {% else %}
@@ -96,24 +99,24 @@
         </div>
 
         {% block home_header %}
-        {% endblock %}
+        {% endblock home_header %}
     </header>
 
 
     <main role="main" class="container">
         <div class="content">
             {% block content %}
-            {% endblock %}
+            {% endblock content %}
         </div>
     </main>
 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/js/mdb.min.js"></script>
     {% block script %}
-    {% endblock %}
+    {% endblock script %}
 
 
 <footer class="page-footer font-small pt-4">
