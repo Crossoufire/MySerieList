@@ -365,7 +365,7 @@ def account(user_name):
         overview_updates = get_user_last_update(user.id)
 
     # Recover the view count of the account and the media lists
-    if user.id != current_user.id:
+    if current_user.id != 1 and user.id != current_user.id:
         user.profile_views = user.profile_views + 1
         profile_view_count = user.profile_views
         db.session.commit()
@@ -561,13 +561,19 @@ def hall_of_fame():
 @login_required
 def global_stats():
     # Recover the total time spent for each media
-    times_spent = db.session.query(User, func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
-                             func.sum(User.time_spent_movies)).filter(User.id >= '2', User.active==True).all()
+    if db.session.query(User).count() == 1:
+        total_time = {"total": 0,
+                      "series": 0,
+                      "anime": 0,
+                      "movies": 0}
+    else:
+        times_spent = db.session.query(User, func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
+                                 func.sum(User.time_spent_movies)).filter(User.id >= '2', User.active==True).all()
 
-    total_time = {"total": int((times_spent[0][1]/60)+(times_spent[0][2]/60)+(times_spent[0][3]/60)),
-                  "series": int(times_spent[0][1]/60),
-                  "anime": int(times_spent[0][2]/60),
-                  "movies": int(times_spent[0][3]/60)}
+        total_time = {"total": int((times_spent[0][1]/60)+(times_spent[0][2]/60)+(times_spent[0][3]/60)),
+                      "series": int(times_spent[0][1]/60),
+                      "anime": int(times_spent[0][2]/60),
+                      "movies": int(times_spent[0][3]/60)}
 
     # Recover the top media in users' lists
     top_series = db.session.query(Series, SeriesList, func.count(SeriesList.series_id==Series.id).label("count"))\
@@ -869,7 +875,7 @@ def mymedialist(media_list, user_name):
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
     # View count of the media lists
-    if user.id != current_user.id:
+    if current_user.id != 1 and user.id != current_user.id:
         if media_list == "serieslist":
             user.series_views = user.series_views + 1
         elif media_list == "animelist":
@@ -2068,11 +2074,11 @@ def set_last_update(media_name, media_type, old_status=None, new_status=None, ol
                     new_season=None, old_episode=None, new_episode=None):
     user = User.query.filter_by(id=current_user.id).first()
     element = UserLastUpdate.query.filter_by(user_id=user.id).all()
-    if len(element) >= 6:
-        oldest_id = UserLastUpdate.query.filter_by(user_id=current_user.id)\
-            .order_by(UserLastUpdate.date.asc()).first().id
-        UserLastUpdate.query.filter_by(id=oldest_id).delete()
-        db.session.commit()
+    # if len(element) >= 6:
+    #     oldest_id = UserLastUpdate.query.filter_by(user_id=current_user.id)\
+    #         .order_by(UserLastUpdate.date.asc()).first().id
+    #     UserLastUpdate.query.filter_by(id=oldest_id).delete()
+    #     db.session.commit()
 
     update = UserLastUpdate(user_id=user.id, media_name=media_name, media_type=media_type, old_status=old_status,
                             new_status=new_status, old_season=old_season, new_season=new_season,
@@ -2086,7 +2092,7 @@ def get_follows_full_last_update(user_id):
                                .join(User, Follow.follow_id == User.id)\
                                .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
                                .filter(Follow.user_id == user_id)\
-                               .order_by(User.username, UserLastUpdate.date.desc()).all()
+                               .order_by(User.username, UserLastUpdate.date.desc()).limit(6).all()
 
     tmp = ""
     follows_data = []
@@ -2128,6 +2134,8 @@ def get_follows_full_last_update(user_id):
         try:
             if element[1].username != follows_update[i+1][1].username:
                 follows_data.append(follow_data)
+            else:
+                pass
         except:
             follows_data.append(follow_data)
 
