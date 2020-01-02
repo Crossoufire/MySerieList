@@ -20,8 +20,8 @@ from MyLists.admin_views import User
 from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, ChangePasswordForm, AddFollowForm, \
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
-    Follow, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, Achievements, Movies, \
-    MoviesGenre, MoviesList, MoviesProd, MoviesActors, SeriesActors, AnimeActors, UserLastUpdate, Badges
+    Follow, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, Movies, MoviesGenre, \
+    MoviesList, MoviesProd, MoviesActors, SeriesActors, AnimeActors, UserLastUpdate, Badges
 
 
 config.read('config.ini')
@@ -52,36 +52,6 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
         add_badges_to_db()
-    # if User.query.filter_by(id='2').first() is None:
-    #     admin = User(username='aaa',
-    #                  email='aaa@aaa.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(admin)
-    # if User.query.filter_by(id='3').first() is None:
-    #     admin = User(username='bbb',
-    #                  email='bbb@bbb.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(admin)
-    # if User.query.filter_by(id='4').first() is None:
-    #     admin = User(username='ccc',
-    #                  email='ccc@ccc.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(admin)
     refresh_db_badges()
     db.session.commit()
 
@@ -1767,37 +1737,37 @@ def get_badges(user_id):
             genre_time_data = time_by_genre[genres_values[i]]
         except:
             genre_time_data = 0
-        count_unlocked = int((genre_time_data/60)/100)
+        count_unlocked = int((genre_time_data/60)/badge.threshold)
         badge_data = create_badge_dict(badge, count_unlocked, time=genre_time_data)
         all_badges.append(badge_data)
 
     # Classic badges
     badge = db.session.query(Badges).filter_by(type="classic").first()
-    count_unlocked = int((time_classic/60)/100)
+    count_unlocked = int((time_classic/60)/badge.threshold)
     badge_data = create_badge_dict(badge, count_unlocked, time=time_classic)
     all_badges.append(badge_data)
 
     # Completed badges
     badge = db.session.query(Badges).filter_by(type="completed").first()
-    count_unlocked = int(count_completed/100)
+    count_unlocked = int(count_completed/badge.threshold)
     badge_data = create_badge_dict(badge, count_unlocked, count=count_completed)
     all_badges.append(badge_data)
 
     # Time badges
     badge = db.session.query(Badges).filter_by(type="total-time").first()
-    count_unlocked = int((time_spent/1440)/50)
+    count_unlocked = int((time_spent/1440)/badge.threshold)
     badge_data = create_badge_dict(badge, count_unlocked, time=(time_spent/24))
     all_badges.append(badge_data)
 
     # Long shows badges
     badge = db.session.query(Badges).filter_by(type="longshows").first()
-    count_unlocked = int(long_media_shows/15)
+    count_unlocked = int(long_media_shows/badge.threshold)
     badge_data = create_badge_dict(badge, count_unlocked, count=long_media_shows)
     all_badges.append(badge_data)
 
     # Long movies badges
     badge = db.session.query(Badges).filter_by(type="longmovies").first()
-    count_unlocked = int(long_media_movies/15)
+    count_unlocked = int(long_media_movies/badge.threshold)
     badge_data = create_badge_dict(badge, count_unlocked, count=long_media_movies)
     all_badges.append(badge_data)
 
@@ -3672,14 +3642,13 @@ def refresh_db_badges():
     badges = Badges.query.order_by(Badges.id).all()
     for i in range(1, len(list_all_badges)):
         try:
-            genre_id = str(list_all_badges[i][5])
+            genre_id = str(list_all_badges[i][4])
         except:
             genre_id = None
         badges[i-1].threshold  = int(list_all_badges[i][0])
         badges[i-1].image_id   = list_all_badges[i][1]
-        badges[i-1].level      = list_all_badges[i][3]
         badges[i-1].title      = list_all_badges[i][2]
-        badges[i-1].type       = list_all_badges[i][4]
+        badges[i-1].type       = list_all_badges[i][3]
         badges[i-1].genres_id  = genre_id
 
 
@@ -3695,14 +3664,13 @@ def add_badges_to_db():
 
     for i in range(1, len(list_all_badges)):
         try:
-            genre_id = str(list_all_badges[i][5])
+            genre_id = str(list_all_badges[i][4])
         except:
             genre_id = None
         badge = Badges(threshold=int(list_all_badges[i][0]),
                        image_id=list_all_badges[i][1],
-                       level=list_all_badges[i][3],
                        title=list_all_badges[i][2],
-                       type=list_all_badges[i][4],
+                       type=list_all_badges[i][3],
                        genres_id=genre_id)
         db.session.add(badge)
 
