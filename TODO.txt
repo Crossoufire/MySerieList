@@ -1,15 +1,23 @@
-
-TODO ------------------------------------------------
-
 Medialists:
 	Add: Button "More results" to the autocomplete
 	Add: Movie director in metadata modal
+	Add: In the modal add "Also in the list of" kind of info based on followed people
+	Fix: header size for tablet/mobile view
+	Fix: Keep new or old dropdown for season/episode ? -> Fix isotope
+	Enhance: Change "Category" button to 2 buttons (Completed / PtW) in MoviesList
 
 Advanced Statistics:
-	Add:  Personal advanced statistics for media
+	Add: Personal advanced statistics for media
 
-Homepage :
-    Fix: Update the pictures
+Homepage:
+    Fix: Update pictures
+
+Account:
+    Fix: When adding follower, refresh the page to "Follows" tab
+    Fix: When updating account, refresh the page to "Settings" tab
+    Enhance: "Settings" tab CSS
 
 General:
     Add: Contact form
+    Add: Page with current trends (popular movie, best rated movie of year X, etc) based on https://www.themoviedb.org/documentation/api/discover
+    Fix: Remove admin account stats in global stats
