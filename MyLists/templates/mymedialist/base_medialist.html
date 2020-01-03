@@ -23,7 +23,7 @@
         </div>
         <input type="hidden" id="element_id" value=""/>
         <div class="search-by m-r-25 m-t-20">
-            <input type="text" id="myElementFilter" onkeyup="searchElement()" placeholder="Search titles/actors/genres">
+            <input id="searchInput" placeholder="Search titles/actors/genres" onkeyup="searchElement()">
         </div>
     </div>
 
@@ -122,6 +122,8 @@
     {% endfor %}
 {% endfor %}
 </script>
+<!----------------- List search --------------------->
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 <!-------------------- Isotope ---------------------->
 <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
 <!------------------ Main scripts ------------------->

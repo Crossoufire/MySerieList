@@ -38,12 +38,13 @@ function remove_cat() {
 
 // ----------------------- Search by Title or Actor -------------------------
 function searchElement() {
-    var input, filter, cards, cardContainer, title, i;
-    input = document.getElementById("myElementFilter");
+    var input, filter, cards, cardContainer, title, i, l;
+    input = document.getElementById("searchInput");
     filter = input.value.toUpperCase();
     cardContainer = document.getElementById("categories-iso");
     cards = cardContainer.getElementsByClassName("card");
-    for (i = 0; i < cards.length; i++) {
+    l = cards.length;
+    for (i = 0; i < l; i++) {
         title = cards[i].querySelector(".font-mask");
         original_title = cards[i].querySelector(".original-title");
         actors = cards[i].querySelector(".actors-yes");
