@@ -2004,7 +2004,7 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
                 else:
                     plantowatch_list.append([element_info, False])
 
-        element_all_data = [[completed_list, "COMPLETED"], [completed_list_animation, "ANIMATION"] ,
+        element_all_data = [[completed_list, "COMPLETED"], [completed_list_animation, "COMPLETED ANIMATION"] ,
                             [plantowatch_list, "PLAN TO WATCH"]]
 
         try:
@@ -2223,28 +2223,15 @@ def get_follows_last_update(user_id):
 
 def autocomplete_search_element(element_name, list_type):
     if list_type == ListType.SERIES:
-        while True:
-            try:
-                response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
-                                        .format(themoviedb_api_key, element_name))
-            except:
-                return [{"nb_results": 0}]
-            if response.status_code == 401:
-                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-                return [{"nb_results": 0}]
-            try:
-                app.logger.info('[SYSTEM] N° requests available : {}'
-                                .format(response.headers["X-RateLimit-Remaining"]))
-            except:
-                if response.status_code == 200:
-                    break
-                else:
-                    return [{"nb_results": 0}]
-            if response.headers["X-RateLimit-Remaining"] == "0":
-                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-                time.sleep(3)
-            else:
-                break
+        try:
+            response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
+                                    .format(themoviedb_api_key, element_name))
+        except:
+            return [{"nb_results": 0}]
+
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            return [{"nb_results": 0}]
 
         data = json.loads(response.text)
 
@@ -2302,28 +2289,14 @@ def autocomplete_search_element(element_name, list_type):
 
         return tmdb_results
     elif list_type == ListType.ANIME:
-        while True:
-            try:
-                response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
-                                        .format(themoviedb_api_key, element_name))
-            except:
-                return [{"nb_results": 0}]
-            if response.status_code == 401:
-                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-                return [{"nb_results": 0}]
-            try:
-                app.logger.info('[SYSTEM] N° requests available : {}'
-                                .format(response.headers["X-RateLimit-Remaining"]))
-            except:
-                if response.status_code == 200:
-                    break
-                else:
-                    return [{"nb_results": 0}]
-            if response.headers["X-RateLimit-Remaining"] == "0":
-                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-                time.sleep(3)
-            else:
-                break
+        try:
+            response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
+                                    .format(themoviedb_api_key, element_name))
+        except:
+            return [{"nb_results": 0}]
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            return [{"nb_results": 0}]
 
         data = json.loads(response.text)
         try:
@@ -2379,28 +2352,15 @@ def autocomplete_search_element(element_name, list_type):
 
         return tmdb_results
     elif list_type == ListType.MOVIES:
-        while True:
-            try:
-                response = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
-                                        .format(themoviedb_api_key, element_name))
-            except:
-                return [{"nb_results": 0}]
-            if response.status_code == 401:
-                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-                return [{"nb_results": 0}]
-            try:
-                app.logger.info('[SYSTEM] N° requests available : {}'
-                                .format(response.headers["X-RateLimit-Remaining"]))
-            except:
-                if response.status_code == 200:
-                    break
-                else:
-                    return [{"nb_results": 0}]
-            if response.headers["X-RateLimit-Remaining"] == "0":
-                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-                time.sleep(3)
-            else:
-                break
+        try:
+            response = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
+                                    .format(themoviedb_api_key, element_name))
+        except:
+            return [{"nb_results": 0}]
+
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            return [{"nb_results": 0}]
 
         data = json.loads(response.text)
         try:
@@ -2484,45 +2444,27 @@ def add_element(element_id, list_type, element_cat):
 
 def get_element_data_from_api(api_id, list_type):
     if list_type != ListType.MOVIES:
-        while True:
-            try:
-                response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}"
-                                        .format(api_id, themoviedb_api_key))
-            except:
-                return None
-            if response.status_code == 401:
-                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-                return None
-            try:
-                app.logger.info('[SYSTEM] N° requests available : {}'
-                                .format(response.headers["X-RateLimit-Remaining"]))
-            except:
-                return None
-            if response.headers["X-RateLimit-Remaining"] == "0":
-                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-                time.sleep(3)
-            else:
-                break
+        try:
+            response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}"
+                                    .format(api_id, themoviedb_api_key))
+        except:
+            return None
+
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            return None
+
     elif list_type == ListType.MOVIES:
-        while True:
-            try:
-                response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
-                                        .format(api_id, themoviedb_api_key))
-            except:
-                return None
-            if response.status_code == 401:
-                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-                return None
-            try:
-                app.logger.info('[SYSTEM] N° requests available : {}'
-                                .format(response.headers["X-RateLimit-Remaining"]))
-            except:
-                return None
-            if response.headers["X-RateLimit-Remaining"] == "0":
-                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-                time.sleep(3)
-            else:
-                break
+        try:
+            response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
+                                    .format(api_id, themoviedb_api_key))
+        except:
+            return None
+
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            return None
+
     else:
         return None
 
@@ -2531,45 +2473,25 @@ def get_element_data_from_api(api_id, list_type):
 
 def get_element_actors_from_api(api_id, list_type):
     if list_type != ListType.MOVIES:
-        while True:
-            try:
-                response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
-                                        .format(api_id, themoviedb_api_key))
-            except:
-                return None
-            if response.status_code == 401:
-                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-                return None
-            try:
-                app.logger.info('[SYSTEM] N° requests available : {}'
-                                .format(response.headers["X-RateLimit-Remaining"]))
-            except:
-                return None
-            if response.headers["X-RateLimit-Remaining"] == "0":
-                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-                time.sleep(3)
-            else:
-                break
+        try:
+            response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
+                                    .format(api_id, themoviedb_api_key))
+        except:
+            return None
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            return None
+
     elif list_type == ListType.MOVIES:
-        while True:
-            try:
-                response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
-                                        .format(api_id, themoviedb_api_key))
-            except:
-                return None
-            if response.status_code == 401:
-                app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-                return None
-            try:
-                app.logger.info('[SYSTEM] N° requests available : {}'
-                                .format(response.headers["X-RateLimit-Remaining"]))
-            except:
-                return None
-            if response.headers["X-RateLimit-Remaining"] == "0":
-                app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-                time.sleep(3)
-            else:
-                break
+        try:
+            response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
+                                    .format(api_id, themoviedb_api_key))
+        except:
+            return None
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+            return None
+
     else:
         return None
 
@@ -3571,25 +3493,15 @@ def automatic_media_refresh():
         all_anime_tmdb_id_list.append(all_anime[i].themoviedb_id)
 
     # Recover from API all the changed Movies ID
-    while True:
-        try:
-            response = requests.get("https://api.themoviedb.org/3/movie/changes?api_key={0}"
-                                    .format(themoviedb_api_key))
-        except Exception as e:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : {}'.format(e))
-            return
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-            return
-        try:
-            app.logger.info('[SYSTEM] N° requests available: {}'.format(response.headers["X-RateLimit-Remaining"]))
-        except:
-            return
-        if response.headers["X-RateLimit-Remaining"] == "0":
-            app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-            time.sleep(3)
-        else:
-            break
+    try:
+        response = requests.get("https://api.themoviedb.org/3/movie/changes?api_key={0}"
+                                .format(themoviedb_api_key))
+    except Exception as e:
+        app.logger.error('[SYSTEM] Error requesting themoviedb API : {}'.format(e))
+        return
+    if response.status_code == 401:
+        app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+        return
 
     try:
         all_id_movies_changes = json.loads(response.text)
@@ -3597,25 +3509,15 @@ def automatic_media_refresh():
         return
 
     # Recover from API all the changed series/anime ID
-    while True:
-        try:
-            response = requests.get("https://api.themoviedb.org/3/tv/changes?api_key={0}"
-                                    .format(themoviedb_api_key))
-        except Exception as e:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : {}'.format(e))
-            return
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-            return
-        try:
-            app.logger.info('[SYSTEM] N° requests available: {}'.format(response.headers["X-RateLimit-Remaining"]))
-        except:
-            return
-        if response.headers["X-RateLimit-Remaining"] == "0":
-            app.logger.info('[SYSTEM] themoviedb maximum rate limit reached')
-            time.sleep(3)
-        else:
-            break
+    try:
+        response = requests.get("https://api.themoviedb.org/3/tv/changes?api_key={0}"
+                                .format(themoviedb_api_key))
+    except Exception as e:
+        app.logger.error('[SYSTEM] Error requesting themoviedb API : {}'.format(e))
+        return
+    if response.status_code == 401:
+        app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+        return
 
     try:
         all_id_TV_changes = json.loads(response.text)
