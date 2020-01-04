@@ -62,8 +62,7 @@ function show_metadata(data, media_list) {
     }
     $('#actors').html("<b>Actors</b>: " +data.actors);
     $('#genres').html("<b>Genres</b>: " +data.genres);
-    $('#first_air_date').html("<b>First Air Date</b>: " +data.first_air_date);
-    $('#last_air_date').html("<b>Last Air Date</b>: " +data.last_air_date);
+    $('#air_dates').html("<b>Air Dates</b>: " +data.first_air_date+" - "+data.last_air_date);
     $('#networks').html("<b>Networks</b>: " +data.networks);
     $('#created_by').html("<b>Created By</b>: " +data.created_by);
     $('#episode_duration').html("<b>Episode Duration</b>: " +data.episode_duration+ " min");

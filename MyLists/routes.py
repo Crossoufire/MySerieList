@@ -1818,15 +1818,15 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
 
             # Change first air time format
             try:
-                tmp = element[0].first_air_date.split('-')
-                first_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
+                tmp_date = datetime.strptime(element[0].first_air_date, '%Y-%m-%d')
+                first_air_date = tmp_date.strftime("%d %b %Y")
             except:
                 first_air_date = "Unknown"
 
             # Change last air time format
             try:
-                tmp = element[0].last_air_date.split('-')
-                last_air_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
+                tmp_date = datetime.strptime(element[0].last_air_date, '%Y-%m-%d')
+                last_air_date = tmp_date.strftime("%d %b %Y")
             except:
                 last_air_date = "Unknown"
 
@@ -1934,8 +1934,8 @@ def get_all_media_data(element_data, list_type, covers_path, user_id):
         for element in element_data:
             # Change release date format
             try:
-                tmp = element[0].release_date.split('-')
-                release_date = "{0}-{1}-{2}".format(tmp[2], tmp[1], tmp[0])
+                tmp_date = datetime.strptime(element[0].release_date, '%Y-%m-%d')
+                release_date = tmp_date.strftime("%d %b %Y")
             except:
                 release_date = "Unknown"
 
