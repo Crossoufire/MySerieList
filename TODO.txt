@@ -3,8 +3,6 @@ Medialists:
 	Add: Movie director in metadata modal
 	Add: In modal add "Also in the list of" kind of info of followed people
 	Fix: Header size for tablet/mobile view
-	Fix: Keep new or old dropdown for season/episode ? -> Fix isotope
-	Enhance: Change "Category" button to 2 buttons (Completed / PtW) in MoviesList
 
 Advanced Statistics:
 	Add: Personal advanced statistics for media
@@ -14,8 +12,6 @@ Homepage:
 
 Account:
     Add: Change background image
-    Fix: When adding follower, refresh the page to "Follows" tab
-    Fix: When updating account, refresh the page to "Settings" tab
     Enhance: "Settings" tab CSS
     Enhance: Change profile picture
 
@@ -23,5 +19,4 @@ General:
     Add: Contact form
     Add: Page with full personal history
     Add: Page with current trends (popular movie, best rated movie of year X, etc) based on https://www.themoviedb.org/documentation/api/discover
-    Fix: Remove admin account stats in global stats
     Enhance: By default create one admin user that only has admin view (HoF, Global Stats, Administration and Account settings) and one standard user
