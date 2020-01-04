@@ -24,3 +24,4 @@ General:
     Add: Page with full personal history
     Add: Page with current trends (popular movie, best rated movie of year X, etc) based on https://www.themoviedb.org/documentation/api/discover
     Fix: Remove admin account stats in global stats
+    Enhance: By default create one admin user that only has admin view (HoF, Global Stats, Administration and Account settings) and one standard user
