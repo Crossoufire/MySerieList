@@ -24,7 +24,6 @@
                 <th class="text-center">Anime levels</th>
                 <th class="text-center">Movies levels</th>
                 <th class="text-center">Knowledge levels</th>
-                <th class="text-center">Badges</th>
                 <th class="text-center"></th>
             </tr>
         </thead>
@@ -67,7 +66,6 @@
                 <td>
                     <a class="btn btn-sm btn-test" href="{{ url_for('badges', user_name=user['username']) }}">Badges</a>
                 </td>
-                <td></td>
 
             {% elif user["iscurrentuser"] %}
                 <td class="current_user">
@@ -105,7 +103,6 @@
                 <td class="current_user">
                     <a class="btn btn-sm btn-test" href="{{ url_for('badges', user_name=user['username']) }}">Badges</a>
                 </td>
-                <td class="current_user"></td>
 
             {% elif user["isprivate"] and not user["isfollowing"] %}
                 <td>
@@ -134,7 +131,6 @@
                     <br>
                     {{ user['knowledge_level'] }}
                 </td>
-                <td></td>
                 <td></td>
 
             {% else %}
@@ -172,12 +168,10 @@
                 </td>
                 <td>
                     <a class="btn btn-sm btn-test" href="{{ url_for('badges', user_name=user['username']) }}">Badges</a>
-                </td>
-                <td>
                     {% if user["isfollowing"] %}
-                        <button id="button_{{ user['id'] }}" class="btn btn-sm btn-dark" onclick="unfollow('{{ user['id'] }}', 'button_{{ user['id'] }}')">Unfollow</button>
+                    <button class="btn btn-sm btn-dark" onclick="follow_status('{{ user['id'] }}', this)">Unfollow</button>
                     {% else %}
-                        <button id="button_{{ user['id'] }}" class="btn btn-sm btn-primary" onclick="follow('{{ user['id'] }}', 'button_{{ user['id'] }}')">Follow</button>
+                    <button class="btn btn-sm btn-primary" onclick="follow_status('{{ user['id'] }}', this)">Follow</button>
                     {% endif %}
                 </td>
             {% endif %}
@@ -190,9 +184,7 @@
 
 
 {% block script %}
-<!--------- CDN Datatables ----------->
 <script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
-<!--<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>-->
 <script type="text/javascript" src="{{ url_for('static', filename='js/hall_of_fame.js') }}"></script>
 {% endblock script %}
 

@@ -23,17 +23,15 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
     var selected_season = value.selectedIndex;
     var episode_drop = document.getElementById(ep_drop_id);
     var season_data = JSON.parse("[" + seas_data + "]");
-    console.log(season_data);
 
     episode_drop.length = 1;
-
     for (i = 2; i <= season_data[0][selected_season]; i++) {
         let opt = document.createElement("option");
         opt.className = "card-opt-box";
         if (i <= 9) {
-                opt.text = "E0" + i;
+                opt.text = "E0"+i;
             } else {
-                opt.text = "E" + i;
+                opt.text = "E"+i;
             }
         episode_drop.appendChild(opt);
     }
@@ -55,8 +53,10 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
 // -------------------------- Anime/Series metadata ---------------------------
 function show_metadata(data, media_list) {
     $categories.isotope('layout');
+    var data = JSON.parse($('#'+data).text());
+
     $('#original_name').text('');
-    $('#modal_title').html(data.name);
+    $('#modal-title').html(data.name);
     if (data.name != data.original_name) {
         $('#original_name').html("<b>Original Name</b>: " +data.original_name);
     }
@@ -80,11 +80,10 @@ function show_metadata(data, media_list) {
 
 
 // ------------------------- Create the category list -------------------------
-function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, media_list) {
+function charge_cat(card, element_id, seas_drop_id, ep_drop_id, seas_data, media_list) {
     remove_cat();
-    $categories.isotope('layout');
 
-    if ($('#'+card_id).parent().hasClass('WATCHING')) {
+    if ($('#'+card.id).parent().hasClass('category-WATCHING')) {
         var display_watching = "none;";
         var display_completed = "block;";
         var display_on_hold = "block;";
@@ -92,7 +91,7 @@ function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, me
         var display_dropped = "block;";
         var display_plan_to_watch = "block;";
     }
-    else if ($('#'+card_id).parent().hasClass('COMPLETED')) {
+    else if ($('#'+card.id).parent().hasClass('category-COMPLETED')) {
         var display_watching = "block;";
         var display_completed = "none;";
         var display_on_hold = "block;";
@@ -100,7 +99,7 @@ function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, me
         var display_dropped = "block;";
         var display_plan_to_watch = "block;";
     }
-    else if ($('#'+card_id).parent().hasClass('ON.HOLD')) {
+    else if ($('#'+card.id).parent().hasClass('category-ON.HOLD')) {
         var display_watching = "block;";
         var display_completed = "block;";
         var display_on_hold = "none;";
@@ -108,7 +107,7 @@ function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, me
         var display_dropped = "block;";
         var display_plan_to_watch = "block;";
     }
-    else if ($('#'+card_id).parent().hasClass('RANDOM')) {
+    else if ($('#'+card.id).parent().hasClass('category-RANDOM')) {
         var display_watching = "block;";
         var display_completed = "block;";
         var display_on_hold = "block;";
@@ -116,7 +115,7 @@ function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, me
         var display_dropped = "block;";
         var display_plan_to_watch = "block;";
     }
-    else if ($('#'+card_id).parent().hasClass('DROPPED')) {
+    else if ($('#'+card.id).parent().hasClass('category-DROPPED')) {
         var display_watching = "block;";
         var display_completed = "block;";
         var display_on_hold = "block;";
@@ -133,38 +132,34 @@ function charge_cat(card_id, element_id, seas_drop_id, ep_drop_id, seas_data, me
         var display_plan_to_watch = "none;";
     }
 
-    $('#'+card_id).children().first().prepend(
+    $(card).find('.view.overlay').prepend (
     "<ul class='card-cat-buttons'>" +
-        "<li style='display: " + display_watching + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Watching</li>" +
-        "<li style='display: " + display_completed + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Completed</li>" +
-        "<li style='display: " + display_on_hold + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>On Hold</li>" +
-        "<li style='display: " + display_random + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Random</li>" +
-        "<li style='display: " + display_dropped + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Dropped</li>" +
-        "<li style='display: " + display_plan_to_watch + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card_id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</li>" +
+        "<li style='display: " + display_watching + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card.id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Watching</li>" +
+        "<li style='display: " + display_completed + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card.id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Completed</li>" +
+        "<li style='display: " + display_on_hold + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card.id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>On Hold</li>" +
+        "<li style='display: " + display_random + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card.id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Random</li>" +
+        "<li style='display: " + display_dropped + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card.id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Dropped</li>" +
+        "<li style='display: " + display_plan_to_watch + "' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='changeCategory(this, \"" + element_id + "\", \"" + card.id + "\", \"" + seas_drop_id + "\", \"" + ep_drop_id + "\", \"" + seas_data + "\", \"" + media_list + "\")'>Plan to Watch</li>" +
     "</ul>");
 
-    $('#'+card_id).children().children('.card-btn-top-left').attr('style', 'display: none;');
-    $('#'+card_id).children().children('.card-btn-top-right').attr('style', 'display: none;');
-    $('#'+card_id).children('.seas-eps-box').attr('style', 'display: none;');
-    $('#'+card_id).children().children('.mask').hide();
-    $('#'+card_id).children().first().prepend("<a class='card-btn-top-right-2 fas fa-times' onclick='remove_cat()')></a>");
-    $('#'+card_id).children().children('.card-img-top').attr('style', 'filter: brightness(20%);');
+    $(card).find('.card-btn-top-left').attr('style', 'display: none;');
+    $(card).find('.card-btn-top-right').attr('style', 'display: none;');
+    $(card).find('.seas-eps-box').attr('style', 'display: none;');
+    $(card).find('.mask').hide();
+    $(card).find('.view.overlay').prepend("<a class='card-btn-top-right-2 fas fa-times' onclick='remove_cat()')></a>");
+    $(card).find('.card-img-top').attr('style', 'filter: brightness(20%);');
 }
 
 
 // --------------------------- Change the category ----------------------------
 function changeCategory(new_category, element_id, card_id, seas_drop_id, ep_drop_id, seas_data, media_list) {
     var new_cat = new_category.childNodes[0].data
-    remove_cat();
-    $categories.isotope('layout');
 
     if (new_cat == 'Watching') {
-        $("#" + card_id).prependTo(".d-flex.flex-wrap.WATCHING");
-        $('.seas-eps-box').attr('style', 'display: inline-block;');
+        $("#"+card_id).prependTo(".category-WATCHING");
     }
     else if (new_cat == 'Completed') {
-        $("#" + card_id).prependTo(".d-flex.flex-wrap.COMPLETED");
-        $('.seas-eps-box').attr('style', 'display: inline-block;');
+        $("#"+card_id).prependTo(".category-COMPLETED");
 
         var season_data = JSON.parse("[" + seas_data + "]");
         var episode_drop = document.getElementById(ep_drop_id);
@@ -179,33 +174,31 @@ function changeCategory(new_category, element_id, card_id, seas_drop_id, ep_drop
             let opt = document.createElement("option");
             opt.className = "card-opt-box";
             if (i <= 9) {
-                opt.text = "E0" + i;
+                opt.text = "E0"+i;
             } else {
-                opt.text = "E" + i;
+                opt.text = "E"+i;
             }
             episode_drop.appendChild(opt);
         }
         $('#'+ep_drop_id).prop('selectedIndex', season_data[0][seasons_index]-1);
     }
     else if (new_cat == 'On Hold') {
-        $("#" + card_id).prependTo(".d-flex.flex-wrap.ON.HOLD");
-        $('.seas-eps-box').attr('style', 'display: inline-block;');
+        $("#"+card_id).prependTo(".category-ON.HOLD");
     }
     else if (new_cat == 'Random') {
-        $("#" + card_id).prependTo(".d-flex.flex-wrap.RANDOM");
-        $('.seas-eps-box').attr('style', 'display: inline-block;');
+        $("#"+card_id).prependTo(".category-RANDOM");
     }
     else if (new_cat == 'Dropped') {
-        $("#" + card_id).prependTo(".d-flex.flex-wrap.DROPPED");
-        $('.seas-eps-box').attr('style', 'display: inline-block;');
+        $("#"+card_id).prependTo(".category-DROPPED");
     }
     else {
-        $("#" + card_id).prependTo(".d-flex.flex-wrap.PLAN.TO.WATCH");
-        $('.seas-eps-box').attr('style', 'display: none;');
+        $("#"+card_id).prependTo(".category-PLAN.TO.WATCH");
     }
 
-    $body = $("body");
+    remove_cat();
     $categories.isotope('layout');
+
+    $body = $("body");
     $.ajax ({
         type: "POST",
         url: "/change_element_category",

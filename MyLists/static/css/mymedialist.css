@@ -1,5 +1,5 @@
 
-/* -------------- BACK IMAGE CSS --------------- */
+/* -------------- HEADER CSS --------------- */
 #autocomplete.ui-autocomplete-loading {
     background-image: url('/static/img/add_loader.gif');
     background-position: right 7% bottom 50%;
@@ -56,49 +56,36 @@ input::placeholder {
     font-weight: 400;
 }
 
-.slider {
-    -webkit-appearance: none;
-    appearance: none;
-    min-width: 185px;
-    max-width: 185px;
-    height: 4px;
-    padding: 0px;
-    background: #d3d3d3;
-    outline: none;
-    opacity: 0.7;
+@media (max-width: 489px) {
+    .add-element {
+        margin-right: 0;
+        margin-left: 0;
+    }
+    .search-by {
+        margin-right: 0;
+        margin-left: 0;
+    }
+    .justify-mobile {
+        justify-content: center;
+    }
 }
-
-.slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background: #fb3;
-    cursor: pointer;
+@media (max-width: 428px) {
+    .back-image {
+        height: 300px;
+    }
 }
-
-.slider::-moz-range-thumb {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background: #fb3;
-    cursor: pointer;
-}
-
-@media (max-width: 1026px) {
-    .slidecontainer {
-        display: none;
+@media (max-width: 419px) {
+    .back-image {
+        height: 350px;
     }
 }
 /* ---------------------------------------------- */
 
 
-/* -------------- CARD CSS --------------- */
+/* ---------------- CARD CSS -------------------- */
 .card {
     border-radius: 5px;
-    margin: 11px;
-    width: 198px;
+    margin-bottom: 20px;
 }
 
 .card-img-top {
@@ -200,6 +187,27 @@ input::placeholder {
     opacity: 0.8;
     z-index: 100;
 }
+
+@media (max-width: 1025px) {
+    .card {
+        margin-bottom: 0px;
+    }
+    .card-btn-top-right {
+        opacity: 0.8;
+    }
+    .card-btn-top-left {
+        opacity: 0.8;
+    }
+    .font-mask {
+        font-size: 13pt;
+    }
+}
+@media (max-width: 991px) {
+    .card-btn-mobile {
+        font-size: 9px;
+        padding: 2px !important;
+    }
+}
 /* ------------------------------------------ */
 
 
@@ -229,66 +237,3 @@ body.loading .modal-loading {
     overflow: hidden;
 }
 /* ------------------------------------------ */
-
-
-@media (max-width: 1025px) {
-    .card {
-        width: 18vw;
-        margin: 7px;
-    }
-}
-@media (max-width: 900px) {
-    .card {
-        width: 22vw;
-        margin: 7px;
-    }
-}
-@media (max-width: 767.98px) {
-    .container {
-        padding: 5px;
-    }
-    .category-title {
-        font-size: 1.5rem;
-    }
-    .card {
-        width: 32vw;
-        margin: 0px;
-    }
-    .card-btn-top-right {
-        opacity: 0.8;
-    }
-    .card-btn-top-left {
-        opacity: 0.8;
-    }
-    .font-mask {
-        font-size: 12pt;
-    }
-}
-@media (max-width: 489px) {
-    .add-element {
-        margin-right: 0;
-        margin-left: 0;
-    }
-    .search-by {
-        margin-right: 0;
-        margin-left: 0;
-    }
-    .justify-mobile {
-        justify-content: center;
-    }
-    .card-btn-mobile {
-        font-size: 9px;
-        padding: 2px !important;
-    }
-}
-@media (max-width: 428px) {
-    .back-image {
-        height: 300px;
-    }
-}
-@media (max-width: 419px) {
-    .back-image {
-        height: 350px;
-    }
-}
-

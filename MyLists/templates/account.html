@@ -16,9 +16,9 @@
              src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data['knowledge_grade_id'] }}.png"/>
             {% if user_id != current_user.get_id() %}
                 {% if data["isfollowing"] %}
-                <button class="btn btn-sm btn-dark follow_button" onclick="unfollow('{{ data['id'] }}')">Unfollow</button>
+                <button class="btn btn-sm btn-dark follow-btn" onclick="follow_status('{{ data['id'] }}')">Unfollow</button>
                 {% else %}
-                <button class="btn btn-sm btn-primary follow_button" onclick="follow('{{ data['id'] }}')">Follow</button>
+                <button class="btn btn-sm btn-primary follow-btn" onclick="follow_status('{{ data['id'] }}')">Follow</button>
                 {% endif %}
             {% endif %}
         </h2>
@@ -29,35 +29,37 @@
     </div>
 </div>
 
-<ul class="nav account_tab">
+<ul class="nav account-tab">
     <li class="nav-item ml-auto">
-        <a id="overview" class="nav-link active navbar_account" data-toggle="tab" href="#overview_tab">Overview</a>
+        <a id="overview" class="nav-link navbar-account {% if message_tab == 'overview' %} active {% endif %}"
+           data-toggle="tab" href="#overview-tab">Overview</a>
     </li>
     {% if user_id == current_user.get_id() %}
     <li class="nav-item">
-        <a id="follows" class="nav-link navbar_account" data-toggle="tab" href="#follows_tab">Follows</a>
+        <a class="nav-link navbar-account {% if message_tab == 'follows' %} active {% endif %}"
+           data-toggle="tab" href="#follows-tab">Follows</a>
     </li>
     <li class="nav-item mr-auto">
-        <a id="settings" class="nav-link navbar_account" data-toggle="tab" href="#settings_tab">Settings</a>
+        <a id="settings" class="nav-link navbar-account {% if message_tab == 'settings' %} active {% endif %}"
+           data-toggle="tab" href="#settings-tab">Settings</a>
     </li>
     {% else %}
     <li class="nav-item mr-auto">
-        <a id="follows" class="nav-link navbar_account" data-toggle="tab" href="#follows_tab">Follows</a>
+        <a class="nav-link navbar-account  {% if message_tab == 'settings' %} active {% endif %}"
+           data-toggle="tab" href="#follows-tab">Follows</a>
     </li>
     {% endif %}
 </ul>
 
 <div class="tab-content" id="account_tab_content">
-    <div id="overview_tab" class="tab-pane fade show active">
+    <div id="overview-tab" class="tab-pane fade {% if message_tab == 'overview' %} show active {% endif %}">
         <div class="row m-t-30">
             <div class="col-xl-3 col-lg col-md-12">
                 <ul class="p-l-0">
                     <li class="m-b-20">
-                        <h4>
-                            <i class="fas fa-user"></i>
-                            &nbsp&nbspBiography
+                        <h4><i class="fas fa-user"></i>&nbsp&nbspBiography
                             {% if user_id == current_user.get_id() %}
-                            <a class="fas fa-sm fa-pen p-r-10" onclick="changeTab('settings_tab', 'settings')" style="float: right;"></a>
+                            <a class="fas fa-sm fa-pen p-r-10" onclick="changeTab()" style="float: right;"></a>
                             {% endif %}
                         </h4>
                         <hr>
@@ -83,7 +85,7 @@
                                     <div id="series_level" class='account-bar-level'>Level {{ data['series_level'] }}</div>
                                     {% endif %}
                                     <div class='xp-bar' data-toggle="tooltip" title="{{ data['series_percent'] }}%">
-                                        <div id='xp-bar-fill-series'>
+                                        <div id='xp-bar-fill-series' data-percentage="{{ data['series_percent'] }}">
                                             <div class='xp-increase-fx'>
                                                 <div class='xp-increase-fx-flicker'>
                                                     <div class='xp-increase-glow1'></div>
@@ -113,7 +115,7 @@
                                     <div id="anime_level" class='account-bar-level'>Level {{ data['anime_level'] }}</div>
                                     {% endif %}
                                     <div class='xp-bar' data-toggle="tooltip" title="{{ data['anime_percent'] }}%">
-                                        <div id='xp-bar-fill-anime'>
+                                        <div id='xp-bar-fill-anime' data-percentage="{{ data['anime_percent'] }}">
                                             <div class='xp-increase-fx'>
                                                 <div class='xp-increase-fx-flicker'>
                                                     <div class='xp-increase-glow1'></div>
@@ -143,7 +145,7 @@
                                     <div id="movies_level" class='account-bar-level'>Level {{ data['movies_level'] }}</div>
                                     {% endif %}
                                     <div class='xp-bar' data-toggle="tooltip" title="{{ data['movies_percent'] }}%">
-                                        <div id='xp-bar-fill-movies'>
+                                        <div id='xp-bar-fill-movies' data-percentage="{{ data['movies_percent'] }}">
                                             <div class='xp-increase-fx'>
                                                 <div class='xp-increase-fx-flicker'>
                                                     <div class='xp-increase-glow1'></div>
@@ -276,90 +278,90 @@
                             </h5>
                             <div id="SERIES" class="m-b-16">
                                 <div class="m-b-5">
-                                    <span class="stat_text"><b>Days:</b> {{ data['series']['time_spent_day'] }}</span>
-                                    <span class="stat_text float-right"><b>Hours:</b> {{ data['series']['time_spent_hour'] }}</span>
+                                    <span class="stat-text"><b>Days:</b> {{ data['series']['time_spent_day'] }}</span>
+                                    <span class="stat-text float-right"><b>Hours:</b> {{ data['series']['time_spent_hour'] }}</span>
                                 </div>
                                 <figure class="d-flex">
                                     {% if data['series']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
-                                    <span class="block_no_data" title="No data">
-                                <span id="100%" class="value"></span>
-                            </span>
+                                    <span class="block-no-data" data-toggle="tooltip" title="No data">
+                                        <span id="100%" class="value"></span>
+                                    </span>
                                     {% else %}
-                                    <span class="block" title="Watching">
-                                <span id="{{ data['series']['element_percentage'][0] }}%" class="value"></span>
-                            </span>
-                                    <span class="block" title="Completed">
-                                <span id="{{ data['series']['element_percentage'][1] }}%" class="value"></span>
-                            </span>
-                                    <span class="block" title="On Hold">
-                                <span id="{{ data['series']['element_percentage'][2] }}%" class="value"></span>
-                            </span>
-                                    <span class="block" title="Random">
-                                <span id="{{ data['series']['element_percentage'][3] }}%" class="value"></span>
-                            </span>
-                                    <span class="block" title="Dropped">
-                                <span id="{{ data['series']['element_percentage'][4] }}%" class="value"></span>
-                            </span>
-                                    <span class="block" title="Plan to Watch">
-                                <span id="{{ data['series']['element_percentage'][5] }}%" class="value"></span>
-                            </span>
+                                    <span class="block" data-toggle="tooltip" title="Watching">
+                                        <span id="{{ data['series']['element_percentage'][0] }}%" class="value"></span>
+                                    </span>
+                                    <span class="block" data-toggle="tooltip" title="Completed">
+                                        <span id="{{ data['series']['element_percentage'][1] }}%" class="value"></span>
+                                    </span>
+                                    <span class="block" data-toggle="tooltip" title="On Hold">
+                                        <span id="{{ data['series']['element_percentage'][2] }}%" class="value"></span>
+                                    </span>
+                                    <span class="block" data-toggle="tooltip" title="Random">
+                                        <span id="{{ data['series']['element_percentage'][3] }}%" class="value"></span>
+                                    </span>
+                                    <span class="block" data-toggle="tooltip" title="Dropped">
+                                        <span id="{{ data['series']['element_percentage'][4] }}%" class="value"></span>
+                                    </span>
+                                    <span class="block" data-toggle="tooltip" title="Plan to Watch">
+                                        <span id="{{ data['series']['element_percentage'][5] }}%" class="value"></span>
+                                    </span>
                                     {% endif %}
                                 </figure>
                                 <div class="m-t-10">
                                     <div class="row">
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Watching:</span>
+                                            <span class="stat-text">Watching:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat_text">{{ data['series']['watching_count'] }}</span>
+                                            <span class="stat-text">{{ data['series']['watching_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Dropped:</span>
+                                            <span class="stat-text">Dropped:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text">{{ data['series']['dropped_count'] }}</span>
+                                            <span class="stat-text">{{ data['series']['dropped_count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Completed:</span>
+                                            <span class="stat-text">Completed:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat_text">{{ data['series']['completed_count'] }}</span>
+                                            <span class="stat-text">{{ data['series']['completed_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Plan to Watch:</span>
+                                            <span class="stat-text">Plan to Watch:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text">{{ data['series']['plantowatch_count'] }}</span>
+                                            <span class="stat-text">{{ data['series']['plantowatch_count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">On Hold:</span>
+                                            <span class="stat-text">On Hold:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat_text">{{ data['series']['onhold_count'] }}</span>
+                                            <span class="stat-text">{{ data['series']['onhold_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text" data-toggle="tooltip" title="Without plan to watch">Total Series:</span>
+                                            <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">Total Series:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text" data-toggle="tooltip" title="Without plan to watch">{{ data['series']['total_count'] }}</span>
+                                            <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">{{ data['series']['total_count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Random:</span>
+                                            <span class="stat-text">Random:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat_text">{{ data['series']['random_count'] }}</span>
+                                            <span class="stat-text">{{ data['series']['random_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Episodes:</span>
+                                            <span class="stat-text">Episodes:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text">{{ data['series']['nb_ep_watched'] }}</span>
+                                            <span class="stat-text">{{ data['series']['nb_ep_watched'] }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -375,31 +377,31 @@
                             </h5>
                             <div id="ANIME" class="m-b-16">
                                 <div class="m-b-5">
-                                    <span class="stat_text"><b>Days:</b> {{ data['anime']['time_spent_day'] }}</span>
-                                    <span class="stat_text float-right"><b>Hours:</b> {{ data['anime']['time_spent_hour'] }}</span>
+                                    <span class="stat-text"><b>Days:</b> {{ data['anime']['time_spent_day'] }}</span>
+                                    <span class="stat-text float-right"><b>Hours:</b> {{ data['anime']['time_spent_hour'] }}</span>
                                 </div>
                                 <figure class="d-flex">
                                     {% if data['anime']['element_percentage'] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] %}
-                                    <span class="block_no_data" title="No data">
+                                    <span class="block-no-data" data-toggle="tooltip" title="No data">
                                 <span id="100%" class="value"></span>
                             </span>
                                     {% else %}
-                                    <span class="block" title="Watching">
+                                    <span class="block" data-toggle="tooltip" title="Watching">
                                 <span id="{{ data['anime']['element_percentage'][0] }}%" class="value"></span>
                             </span>
-                                    <span class="block" title="Completed">
+                                    <span class="block" data-toggle="tooltip" title="Completed">
                                 <span id="{{ data['anime']['element_percentage'][1] }}%" class="value"></span>
                             </span>
-                                    <span class="block" title="On Hold">
+                                    <span class="block" data-toggle="tooltip" title="On Hold">
                                 <span id="{{ data['anime']['element_percentage'][2] }}%" class="value"></span>
                             </span>
-                                    <span class="block" title="Random">
+                                    <span class="block" data-toggle="tooltip" title="Random">
                                 <span id="{{ data['anime']['element_percentage'][3] }}%" class="value"></span>
                             </span>
-                                    <span class="block" title="Dropped">
+                                    <span class="block" data-toggle="tooltip" title="Dropped">
                                 <span id="{{ data['anime']['element_percentage'][4] }}%" class="value"></span>
                             </span>
-                                    <span class="block" title="Plan to Watch">
+                                    <span class="block" data-toggle="tooltip" title="Plan to Watch">
                                 <span id="{{ data['anime']['element_percentage'][5] }}%" class="value"></span>
                             </span>
                                     {% endif %}
@@ -407,58 +409,58 @@
                                 <div class="m-t-10">
                                     <div class="row">
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Watching:</span>
+                                            <span class="stat-text">Watching:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat_text">{{ data['anime']['watching_count'] }}</span>
+                                            <span class="stat-text">{{ data['anime']['watching_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Dropped:</span>
+                                            <span class="stat-text">Dropped:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text">{{ data['anime']['dropped_count'] }}</span>
+                                            <span class="stat-text">{{ data['anime']['dropped_count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Completed:</span>
+                                            <span class="stat-text">Completed:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat_text">{{ data['anime']['completed_count'] }}</span>
+                                            <span class="stat-text">{{ data['anime']['completed_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Plan to Watch:</span>
+                                            <span class="stat-text">Plan to Watch:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text">{{ data['anime']['plantowatch_count'] }}</span>
+                                            <span class="stat-text">{{ data['anime']['plantowatch_count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">On Hold:</span>
+                                            <span class="stat-text">On Hold:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat_text">{{ data['anime']['onhold_count'] }}</span>
+                                            <span class="stat-text">{{ data['anime']['onhold_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text" data-toggle="tooltip" title="Without plan to watch">Total Anime:</span>
+                                            <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">Total Anime:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text" data-toggle="tooltip" title="Without plan to watch">{{ data['anime']['total_count'] }}</span>
+                                            <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">{{ data['anime']['total_count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Random:</span>
+                                            <span class="stat-text">Random:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat_text">{{ data['anime']['random_count'] }}</span>
+                                            <span class="stat-text">{{ data['anime']['random_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Episodes:</span>
+                                            <span class="stat-text">Episodes:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text">{{ data['anime']['nb_ep_watched'] }}</span>
+                                            <span class="stat-text">{{ data['anime']['nb_ep_watched'] }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -474,22 +476,22 @@
                             </h5>
                             <div id="MOVIES">
                                 <div class="m-b-16">
-                                    <span class="stat_text"><b>Days:</b> {{ data['movies']['time_spent_day'] }}</span>
-                                    <span class="stat_text float-right"><b>Hours:</b> {{ data['movies']['time_spent_hour'] }}</span>
+                                    <span class="stat-text"><b>Days:</b> {{ data['movies']['time_spent_day'] }}</span>
+                                    <span class="stat-text float-right"><b>Hours:</b> {{ data['movies']['time_spent_hour'] }}</span>
                                 </div>
                                 <figure class="d-flex">
                                     {% if data["movies"]["element_percentage"] == [0.0, 0.0, 0.0] %}
-                                    <span class="block_no_data" title="No data">
+                                    <span class="block-no-data" title="No data">
                                         <span id="100%" class="value"></span>
                                     </span>
                                     {% else %}
-                                    <span class="block" title="Completed">
+                                    <span class="block" data-toggle="tooltip" title="Completed">
                                         <span id="{{ data['movies']['element_percentage'][0] }}%" class="value"></span>
                                     </span>
-                                    <span class="block" title="Completed Animation">
+                                    <span class="block" data-toggle="tooltip" title="Completed Animation">
                                         <span id="{{ data['movies']['element_percentage'][1] }}%" class="value"></span>
                                     </span>
-                                    <span class="block" title="Plan to Watch">
+                                    <span class="block" data-toggle="tooltip" title="Plan to Watch">
                                         <span id="{{ data['movies']['element_percentage'][2] }}%" class="value"></span>
                                     </span>
                                     {% endif %}
@@ -497,30 +499,30 @@
                                 <div class="m-t-10">
                                     <div class="row">
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Completed:</span>
+                                            <span class="stat-text">Completed:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat_text">{{ data['movies']['completed_count'] }}</span>
+                                            <span class="stat-text">{{ data['movies']['completed_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Plan to Watch:</span>
+                                            <span class="stat-text">Plan to Watch:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text">{{ data['movies']['plantowatch_count'] }}</span>
+                                            <span class="stat-text">{{ data['movies']['plantowatch_count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text">Completed Anime:</span>
+                                            <span class="stat-text">Completed Anime:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat_text">{{ data['movies']['completed_animation_count'] }}</span>
+                                            <span class="stat-text">{{ data['movies']['completed_animation_count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat_text" data-toggle="tooltip" title="Without plan to watch">Total movies:</span>
+                                            <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">Total movies:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat_text" data-toggle="tooltip" title="Without plan to watch">{{ data['movies']['total_count'] }}</span>
+                                            <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">{{ data['movies']['total_count'] }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -608,29 +610,29 @@
         </div>
     </div>
 
-    <div id="follows_tab" class="tab-pane fade">
+    <div id="follows-tab" class="tab-pane fade {% if message_tab == 'follows' %} show active {% endif %}">
         <div class="row m-t-30">
             <div class="col">
                 {% if user_id == current_user.get_id() %}
                 <form method="POST" action="" enctype="multipart/form-data">
                     {{ follow_form.hidden_tag() }}
                     <div class="d-flex flex-wrap">
-                        {{ follow_form.follow_to_add(style="max-width: 200px;", class='form-control', placeholder='Username') }}
+                        {{ follow_form.follow_to_add(style="max-width: 180px;", class='form-control', placeholder='Username to add') }}
                         {% for error in follow_form.follow_to_add.errors %}
                             <div class="m-l-10 mt-auto mb-auto" style="color: red;">{{ error }}</div>
                         {% endfor %}
-                        {{ follow_form.submit_follow(class="btn btn-outline-info m-t-0 m-l-20 p-r-12 p-l-12") }}
+                        {{ follow_form.submit_follow(class="btn btn-outline-info m-t-0 m-l-20 p-2") }}
                     </div>
                 </form>
                 {% endif %}
                 <div class="d-flex flex-wrap m-t-30 follow_wrapper">
                     {% for follow in data["follows"] %}
-                    <div class="card border-0 m-l-10 m-r-10 m-t-60 m-b-40 follow_card">
+                    <div class="card border-0 m-l-10 m-r-10 m-t-60 m-b-40 follow-card">
                         <div class="card-img-top">
                             <div class="row">
                                 <div class="col-4">
                                     <a href="{{ follow['username'] }}">
-                                        <img class="follow_picture" src="{{ follow['picture'] }}">
+                                        <img class="follow-picture" src="{{ follow['picture'] }}">
                                     </a>
                                 </div>
                                 <div class="col m-l-20 m-t-15">
@@ -638,7 +640,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body p-2 p-b-10 p-t-0 m-t-1 follow_card_body">
+                        <div class="card-body p-2 p-b-10 p-t-0 m-t-1 follow-card-body">
                         {% for last_update in last_updates %}
                             {% if last_update["username"] == follow["username"] %}
                                 {% for update in last_update["update"] %}
@@ -654,7 +656,7 @@
                                         <span data-toggle="tooltip" title="{{ update['media_name'] }}">{{ update["media_name"] }}</span>
                                     </div>
                                     <div style="float: right;">
-                                        <i class="follow_date">
+                                        <i class="follow-date">
                                             <script>
                                                 var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
                                                 var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB", {timeZone: tz});
@@ -713,7 +715,7 @@
     </div>
 
     {% if user_id == current_user.get_id() %}
-    <div id="settings_tab" class="tab-pane fade">
+    <div id="settings-tab" class="tab-pane fade {% if message_tab == 'settings' %} show active {% endif %}">
         <div class="row text-center m-t-50">
             <div class="col">
                 <h4><i class="fas fa-sliders-h"></i>&nbsp&nbsp General settings</h4>
@@ -761,7 +763,7 @@
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
-                        {{ settings_form.submit_account(class="btn btn-outline-info custom-btn-size p-r-6 p-l-6 m-b-40") }}
+                        {{ settings_form.submit_account(class="btn btn-outline-info p-2 m-b-40") }}
                     </div>
                 </form>
             </div>
@@ -793,7 +795,7 @@
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
-                        {{ password_form.submit_password(class="btn btn-outline-info custom-btn-size p-r-6 p-l-6") }}
+                        {{ password_form.submit_password(class="btn btn-outline-info p-2") }}
                     </div>
                 </form>
             </div>
@@ -808,39 +810,4 @@
 
 {% block script %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/account.js') }}" ></script>
-<!------- Lists levels animations --------->
-<script type="text/javascript">
-$(".xp-increase-fx-flicker").css("opacity", "1");
-$(".xp-increase-fx-flicker").animate({"opacity":Math.random()}, 100);
-$(".xp-increase-fx").css("display", "inline-block");
-
-$("#xp-bar-fill-series").css("box-shadow", "-5px 0px 10px #fff inset");
-setTimeout(function() {
-    $("#xp-bar-fill-series").css("-webkit-transition", "all 2s ease");
-    $("#xp-bar-fill-series").css("width", "{{ data['series_percent'] }}%");
-}, 100);
-setTimeout(function(){
-    $(".xp-increase-fx").fadeOut(500);
-    $("#xp-bar-fill-series").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-}, 2000);
-
-$("#xp-bar-fill-movies").css("box-shadow", "-5px 0px 10px #fff inset");
-setTimeout(function() {
-    $("#xp-bar-fill-movies").css("-webkit-transition", "all 2s ease");
-    $("#xp-bar-fill-movies").css("width", "{{ data['movies_percent'] }}%");
-}, 100);
-setTimeout(function(){
-    $(".xp-increase-fx").fadeOut(500);
-    $("#xp-bar-fill-movies").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-}, 2000);
-
-$("#xp-bar-fill-anime").css("box-shadow", "-5px 0px 10px #fff inset");
-setTimeout(function() {
-    $("#xp-bar-fill-anime").css("-webkit-transition", "all 2s ease");
-    $("#xp-bar-fill-anime").css("width", "{{ data['anime_percent'] }}%");
-}, 100);
-setTimeout(function() {
-    $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-anime").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-}, 2000);
-</script>
-{% endblock %}
+{% endblock script %}

@@ -12,32 +12,31 @@ hr {
 
 
 /* -------------- Tabs ------------- */
-.account_tab {
+.account-tab {
     border-bottom: grey 1px solid;
     background: rgba(44, 57, 70, 1);
 }
 
-.account_tab > li > .active {
+.account-tab > li > .active {
     background: rgba(24, 37, 50, 1) !important;
 }
 
-.account_tab > li > a {
+.account-tab > li > a {
     color: white;
 }
 
 @media (max-width: 363px) {
-    .navbar_account {
+    .navbar-account {
         font-size: 0.8rem;
     }
 }
-
 @media (min-width: 364px) and (max-width: 385px) {
-    .navbar_account {
+    .navbar-account {
         font-size: 0.9rem;
     }
 }
 @media (min-width: 386px) {
-    .navbar_account {
+    .navbar-account {
         font-size: 1rem;
     }
 }
@@ -81,7 +80,6 @@ hr {
     bottom: 3px;
 }
 
-/* On screens that are 790px or less */
 @media (max-width: 790px) {
     .header-profile-img {
         bottom: 10px;
@@ -96,8 +94,6 @@ hr {
         bottom: 4px;
     }
 }
-
-/* On screens that are 490px or less */
 @media (max-width: 490px) {
     .header-profile-img {
         left: 10px;
@@ -140,7 +136,7 @@ hr {
     background-color: #334D5C;
 }
 
-.block_no_data {
+.block-no-data {
     height: 30px;
     color: white;
     float: left;
@@ -167,12 +163,7 @@ hr {
 	opacity: 0.75;
 }
 
-.col-centered{
-    float: none;
-    margin: 0 auto;
-}
-
-.stat_text {
+.stat-text {
     font-size: 12pt;
 }
 
@@ -182,26 +173,23 @@ hr {
 
 /* On screens that are 990px or less */
 @media (max-width: 990px) {
-    #overview_tab {
+    #overview-tab {
         padding-left: 100px;
         padding-right: 100px;
     }
 }
-
 /* On screens that are 650px or less */
 @media (max-width: 650px) {
-    #overview_tab {
+    #overview-tab {
         padding-left: 0px;
         padding-right: 0px;
     }
 }
-
 /* On screens that are 490px or less */
 @media (max-width: 490px) {
-    .stat_text {
+    .stat-text {
         font-size: 10pt;
     }
-
     .mini {
         min-width: 100px;
     }
@@ -243,23 +231,23 @@ hr {
     max-height: 70px;
 }
 
-.follow_card {
+.follow-card {
     min-width: 310px;
     max-width: 310px;
 }
 
-.follow_card_body {
+.follow-card-body {
     min-height: 335px;
     max-height: 335px;
     background-image: url('/static/img/profile_background1.jpg');
 }
 
-.follow_date {
+.follow-date {
     color: #b3b3b3;
     font-size: 11pt;
 }
 
-.follow_picture {
+.follow-picture {
     position: absolute;
     top: -50px;
     left: 35px;
@@ -268,7 +256,6 @@ hr {
     border-radius: 50%;
     border: solid 2px black;
 }
-
 /* --------------------------------- */
 
 
@@ -392,32 +379,5 @@ hr {
 /* --------------------------------- */
 
 
-/* ------------ Badges ------------- */
-.achiev-bar {
-    background-color: grey;
-    padding: 0px;
-    margin-top: 6px;
-    height: 12px;
-}
-
-.block_achiev {
-    display: inline-block;
-    margin-bottom: 10px;
-    height: 12px;
-    width: 50%;
-    background-color: #4d0000;
-}
-
-.block_achiev.series {
-    background-color: #00995c;
-}
-
-.achiev-name {
-    width: 105px;
-}
-/* --------------------------------- */
-
-
 /* ----------- Settings ------------ */
-
 /* --------------------------------- */

@@ -33,19 +33,12 @@
     </div>
 
     <div class="justify-mobile d-flex flex-wrap">
-        <div class="add-element m-l-25 m-t-75">
+        <div class="ml-auto mr-auto m-t-50">
             {% if target_user_id != current_user.get_id() %}
             <div class="text-center common-media">
                 You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)
             </div>
             {% endif %}
-        </div>
-        <div class="search-by m-r-25 m-t-65">
-            <div class="slidecontainer">
-                <input id="myRange" class="slider" type="range" min="142" value="198" max="240">
-                &nbsp;
-                <a class="fas fa-undo" onclick="resetRange()"></a>
-            </div>
         </div>
     </div>
 </div>
@@ -54,35 +47,37 @@
     {% for category in all_data %}
     <div class="categories {{ category[1] }}">
         <h2 class="text-center m-t-20 mb-0">{{ category[1] }}<hr class="mt-2 pb-3 mb-0"></h2>
-        <div class="card-wrapper d-flex flex-wrap {{ category[1] }}">
+    <div class="row category-{% if category[1] == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ category[1] }}{% endif %}">
             {% for data in category[0] %}
-            <div id="card_{{ data[0]['id'] }}" class="card bg-transparent">
-                <div class="view overlay">
-                    <img class="card-img-top" loading="lazy" src="{{ data[0]['cover'] }}">
-                    <div class="mask flex-center rgba-black-strong" data-toggle="modal"
-                         data-target="#modal_metadata" onclick="show_metadata(metadata_{{ data[0]['id'] }},
-                         '{{ media_list }}')">
-                        <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
-                        <span class="original-title" style="display: none;" >{{ data[0]['original_name'] }}</span>
-                        <span class="actors-yes" style="display: none;" >{{ data[0]['actors'] }}</span>
-                        <span class="genre-yes" style="display: none;" >{{ data[0]['genres'] }}</span>
+            <div id="card_{{ data[0]['id'] }}" class="col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+                <div class="card bg-transparent">
+                    <div class="view overlay">
+                        <img class="card-img-top" loading="lazy" src="{{ data[0]['cover'] }}">
+                        <div class="mask flex-center rgba-black-strong" data-toggle="modal"
+                             data-target="#modal_metadata" onclick="show_metadata('metadata_{{ data[0]['id'] }}',
+                             '{{ media_list }}')">
+                            <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
+                            <span class="original-title" style="display: none;" >{{ data[0]['original_name'] }}</span>
+                            <span class="actors-yes" style="display: none;" >{{ data[0]['actors'] }}</span>
+                            <span class="genre-yes" style="display: none;" >{{ data[0]['genres'] }}</span>
+                        </div>
+                        {% if target_user_id == current_user.get_id() %}
+                            {% block card_top_left_1 scoped %}
+                            {% endblock card_top_left_1 %}
+                            <a class="card-btn-top-right fas fa-ban text-light" onclick="delete_element(
+                            '{{ data[0]['id'] }}', 'card_{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                        {% else %}
+                            {% if data[1] %}
+                                <div class="card-ribbon"></div>
+                            {% else %}
+                                {% block card_top_left_2 scoped %}
+                                {% endblock card_top_left_2 %}
+                            {% endif %}
+                        {% endif %}
                     </div>
-                    {% if target_user_id == current_user.get_id() %}
-                    {% block card_top_left_1 scoped %}
-                    {% endblock card_top_left_1 %}
-                    <a class="card-btn-top-right fas fa-ban text-light" onclick="delete_element(
-                    '{{ data[0]['id'] }}', 'card_{{ data[0]['id'] }}', '{{ media_list }}')"></a>
-                    {% else %}
-                    {% if data[1] %}
-                    <div class="card-ribbon"></div>
-                    {% else %}
-                    {% block card_top_left_2 scoped %}
-                    {% endblock card_top_left_2 %}
-                    {% endif %}
-                    {% endif %}
+                    {% block select_box scoped %}
+                    {% endblock select_box %}
                 </div>
-                {% block select_box scoped %}
-                {% endblock select_box %}
             </div>
             {% endfor %}
         </div>
@@ -94,7 +89,7 @@
             <div class="modal-content modal-style">
                 <div class="modal-body">
                     <div class="modal-header">
-                        <h4 id="modal_title" class="modal-title"></h4>
+                        <h4 id="modal-title" class="modal-title"></h4>
                         <button type="button" class="close text-light" data-dismiss="modal">
                             <span>&times;</span>
                         </button>
@@ -109,21 +104,18 @@
     </div>
 </div>
 
+<div style="display: none;">
+{% for category in all_data %}
+    {% for data in category[0] %}
+        <span id="metadata_{{ data[0]['id'] }}">{{ data[0]|tojson }}</span>
+    {% endfor %}
+{% endfor %}
+</div>
 <div class="modal-loading"></div>
 {% endblock content %}
 
 
 {% block script %}
-<!------------- Metadata for the modal -------------->
-<script type="text/javascript">
-{% for category in all_data %}
-    {% for data in category[0] %}
-        var metadata_{{ data[0]["id"] }} = {{ data[0]|tojson }};
-    {% endfor %}
-{% endfor %}
-</script>
-<!----------------- List search --------------------->
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 <!-------------------- Isotope ---------------------->
 <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
 <!------------------ Main scripts ------------------->
@@ -132,13 +124,9 @@
 {% endblock javascript %}
 
 {% if target_user_id == current_user.get_id() %}
-<!------------ Jquery Autocomplete ------------->
+<!--------------- Jquery Autocomplete --------------->
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
-$('.add_element').val('');
-$('.cat-select').prop('selectedIndex', 0);
-$categories.isotope('layout');
-
 $.widget("custom.catcomplete", $.ui.autocomplete, {
     _create: function() {
         this._super();
