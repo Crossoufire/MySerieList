@@ -10,7 +10,3 @@ apscheduler
 requests
 Pillow
 regex
-
-
-
-
