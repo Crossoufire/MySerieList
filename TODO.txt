@@ -2,7 +2,6 @@ Medialists:
 	Add: Button "More results" to the autocomplete
 	Add: Movie director in metadata modal
 	Add: In modal add "Also in the list of" kind of info of followed people
-	Fix: Header size for tablet/mobile view
 
 Advanced Statistics:
 	Add: Personal advanced statistics for media

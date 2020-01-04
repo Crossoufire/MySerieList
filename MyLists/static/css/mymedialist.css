@@ -56,7 +56,7 @@ input::placeholder {
     font-weight: 400;
 }
 
-@media (max-width: 489px) {
+@media (max-width: 537px) {
     .add-element {
         margin-right: 0;
         margin-left: 0;
@@ -69,14 +69,14 @@ input::placeholder {
         justify-content: center;
     }
 }
-@media (max-width: 428px) {
+@media (max-width: 469px) {
     .back-image {
-        height: 300px;
+        height: 280px;
     }
 }
-@media (max-width: 419px) {
+@media (max-width: 403px) {
     .back-image {
-        height: 350px;
+        height: 320px;
     }
 }
 /* ---------------------------------------------- */
