@@ -2294,7 +2294,6 @@ def autocomplete_search_element(element_name, list_type):
                                     .format(themoviedb_api_key, element_name))
         except:
             return [{"nb_results": 0}]
-
         if response.status_code == 401:
             app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
             return [{"nb_results": 0}]
@@ -2465,6 +2464,7 @@ def get_element_data_from_api(api_id, list_type):
         if response.status_code == 401:
             app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
             return None
+
     else:
         return None
 
