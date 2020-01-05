@@ -7,6 +7,7 @@ from flask_bcrypt import Bcrypt
 from flask_compress import Compress
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_apscheduler import APScheduler
 
 
 config = configparser.ConfigParser()
@@ -29,7 +30,7 @@ Compress(app)
 
 app.config["SECRET_KEY"] = flask_secret
 
-app.config["SESSION_COOKIE_SECURE"] = False
+app.config["SESSION_COOKIE_SECURE"] = True
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -38,7 +39,7 @@ app.config['RECAPTCHA_PUBLIC_KEY'] = captcha_public
 app.config['RECAPTCHA_PRIVATE_KEY'] = captcha_private
 app.config['RECAPTCHA_DATA_ATTRS'] = {'theme': 'dark', 'size': 'small'}
 
-app.config['TESTING'] = True
+app.config['TESTING'] = False
 
 app.config['MAIL_SERVER'] = server
 app.config['MAIL_PORT'] = port
@@ -53,6 +54,9 @@ app.config['MAX_CONTENT_LENGTH'] = 8*1024*1024
 mail = Mail(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
 login_manager = LoginManager(app)
 login_manager.login_view = 'home'
 login_manager.login_message_category = 'info'

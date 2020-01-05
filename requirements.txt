@@ -6,6 +6,7 @@ flask-admin
 flask-login
 flask-mail
 flask-wtf
+Flask-APScheduler
 apscheduler
 requests
 Pillow

@@ -14,7 +14,6 @@ from MyLists.admin_views import User
 from sqlalchemy import func, text, or_
 from datetime import datetime, tzinfo, timedelta
 from MyLists import app, db, bcrypt, mail, config
-from apscheduler.schedulers.background import BackgroundScheduler
 from flask_login import login_user, current_user, logout_user, login_required
 from flask import render_template, url_for, flash, redirect, request, jsonify, session
 from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, ChangePasswordForm, AddFollowForm, \
@@ -3189,28 +3188,28 @@ def refresh_element_data(api_id, list_type):
                         pass
 
             # Refresh the cover
-            # if list_type == ListType.SERIES:
-            #     if platform.system() == "Windows":
-            #         local_covers_path = os.path.join(app.root_path, "static\\covers\\series_covers\\")
-            #     else:  # Linux & macOS
-            #         local_covers_path = os.path.join(app.root_path, "static/covers/series_covers/")
-            # elif list_type == ListType.ANIME:
-            #     if platform.system() == "Windows":
-            #         local_covers_path = os.path.join(app.root_path, "static\\covers\\anime_covers\\")
-            #     else:  # Linux & macOS
-            #         local_covers_path = os.path.join(app.root_path, "static/covers/anime_covers/")
-            #
-            # try:
-            #     if poster_path != "":
-            #         urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(poster_path),
-            #                                    "{}{}".format(local_covers_path, element.image_cover))
-            #
-            #         img = Image.open(local_covers_path + element.image_cover)
-            #         img = img.resize((300, 450), Image.ANTIALIAS)
-            #         img.save(local_covers_path + element.image_cover, quality=90)
-            # except:
-            #     app.logger.info("Error while refreshing the cover of ID {}".format(element.id))
-            #     pass
+            if list_type == ListType.SERIES:
+                if platform.system() == "Windows":
+                    local_covers_path = os.path.join(app.root_path, "static\\covers\\series_covers\\")
+                else:  # Linux & macOS
+                    local_covers_path = os.path.join(app.root_path, "static/covers/series_covers/")
+            elif list_type == ListType.ANIME:
+                if platform.system() == "Windows":
+                    local_covers_path = os.path.join(app.root_path, "static\\covers\\anime_covers\\")
+                else:  # Linux & macOS
+                    local_covers_path = os.path.join(app.root_path, "static/covers/anime_covers/")
+
+            try:
+                if poster_path != "":
+                    urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(poster_path),
+                                               "{}{}".format(local_covers_path, element.image_cover))
+
+                    img = Image.open(local_covers_path + element.image_cover)
+                    img = img.resize((300, 450), Image.ANTIALIAS)
+                    img.save(local_covers_path + element.image_cover, quality=90)
+            except:
+                app.logger.info("Error while refreshing the cover of ID {}".format(element.id))
+                pass
 
             # Refresh the data for Anime/Series
             element.name                = name
@@ -3690,17 +3689,9 @@ def add_actors_anime():
 
 ############################################# TMDb API Update Scheduler ################################################
 
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=automatic_media_refresh, trigger="cron", hour=3)
-scheduler.start()
-
-# Shut down the scheduler when exiting the app
-atexit.register(lambda: scheduler.shutdown())
-
+app.apscheduler.add_job(func=automatic_media_refresh, trigger='cron', hour=3, id="{}".format(secrets.token_hex(8)))
 
 ################################################## UNUSED FUNCTIONS ####################################################
-
 
 # Personal statistics
 def get_statistics(user_id, list_type):
