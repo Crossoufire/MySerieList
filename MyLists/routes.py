@@ -411,6 +411,12 @@ def account(user_name):
 @login_required
 def badges(user_name):
     user = User.query.filter_by(username=user_name).first()
+
+    # Check if the user exists
+    if user is None:
+        image_error = url_for('static', filename='img/error.jpg')
+        return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
+
     badges = get_badges(user.id)[0]
     return render_template('badges.html',
                            title       ="{}'s badges".format(user_name),
