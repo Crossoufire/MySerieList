@@ -85,8 +85,15 @@ $(document).ready(function() {
 // // ------------------------- Isotopes ------------------------------------
 var $categories = $('.categories-iso').isotope({
     itemSelector: '.categories',
-    layoutMode: 'vertical'
+    layoutMode: 'vertical',
+    onLayout: function() {
+        $window.trigger("scroll");
+    }
 });
+$("img.lazyload").lazyload({
+    failure_limit : Math.max($("img.lazyload").length-1, 0)
+});
+
 $('.filters-button-group').on('click', 'button', function() {
     var filterValue = $(this).attr('data-filter');
     $categories.isotope({ filter: filterValue });
