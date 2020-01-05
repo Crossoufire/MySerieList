@@ -377,7 +377,7 @@ def account(user_name):
                   "movies"  : user.movies_views}
 
     # Recover the user's badges
-    badges_unlocked = get_badges(user.id)[1]
+    # badges_unlocked = get_badges(user.id)[1]
 
     # Recover the registered date
     registered_date = user.registered_on.strftime("%d %b %Y")
@@ -403,7 +403,7 @@ def account(user_name):
                            settings_form    = settings_form,
                            password_form    = password_form,
                            user_biography   = user.biography,
-                           badges_unlocked  = badges_unlocked)
+                           badges_unlocked  = "")
 
 
 @app.route("/badges/<user_name>", methods=['GET', 'POST'])
