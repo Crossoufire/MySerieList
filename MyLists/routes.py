@@ -2092,7 +2092,7 @@ def get_follows_full_last_update(user_id):
                                .join(User, Follow.follow_id == User.id)\
                                .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
                                .filter(Follow.user_id == user_id)\
-                               .order_by(User.username, UserLastUpdate.date.desc()).limit(6).all()
+                               .order_by(User.username, UserLastUpdate.date.desc()).all()
 
     tmp = ""
     follows_data = []
@@ -2129,7 +2129,9 @@ def get_follows_full_last_update(user_id):
         elif element[2].media_type == ListType.MOVIES:
             element_data["category"] = "movie"
 
-        follow_data["update"].append(element_data)
+        # TODO: TEMP FIX
+        if len(follow_data["update"]) <= 5:
+            follow_data["update"].append(element_data)
 
         try:
             if element[1].username != follows_update[i+1][1].username:
