@@ -52,7 +52,7 @@
             <div id="card_{{ data[0]['id'] }}" class="col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
                 <div class="card bg-transparent">
                     <div class="view overlay">
-                        <img class="card-img-top" loading="lazy" src="{{ data[0]['cover'] }}">
+                        <img class="card-img-top lazyload" data-src="{{ data[0]['cover'] }}" height="300" width="200" style="height: auto;">
                         <div class="mask flex-center rgba-black-strong" data-toggle="modal"
                              data-target="#modal_metadata" onclick="show_metadata('metadata_{{ data[0]['id'] }}',
                              '{{ media_list }}')">
