@@ -418,7 +418,7 @@ def badges(user_name):
 
     badges = get_badges(user.id)[0]
     return render_template('badges.html',
-                           title       ="{}'s badges".format(user_name),
+                           title       = "{}'s badges".format(user_name),
                            user_badges = badges)
 
 
@@ -767,6 +767,53 @@ def global_stats():
                            total_seasons_media=total_seasons_media,
                            total_episodes_media=total_episodes_media,
                            most_genres_media=most_genres_media)
+
+
+@app.route("/current_trends", methods=['GET'])
+@login_required
+def current_trends():
+
+    # MOVIES TRENDS
+    response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
+                            .format(themoviedb_api_key))
+
+    popularity_data = json.loads(response.text)
+    popular_movies = []
+    for data in popularity_data["results"]:
+        movies = {}
+        movies["title"] = data["title"]
+        movies["poster_path"] = "http://image.tmdb.org/t/p/w300{0}".format(data["poster_path"])
+        movies["release_date"] = datetime.strptime(data["release_date"], '%Y-%m-%d').strftime("%d %b %Y")
+        if len(data["overview"]) > 100:
+            movies["overview"] = data["overview"][:100]
+        else:
+            movies["overview"] = data["overview"]
+
+        popular_movies.append(movies)
+
+    # TV SHOWS TRENDS
+    response = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
+                            .format(themoviedb_api_key))
+
+    popularity_data = json.loads(response.text)
+
+    popular_series = []
+    for data in popularity_data["results"]:
+        series = {}
+        series["title"] = data["name"]
+        series["poster_path"] = "http://image.tmdb.org/t/p/w300{0}".format(data["poster_path"])
+        series["first_air_date"] = datetime.strptime(data["first_air_date"], '%Y-%m-%d').strftime("%d %b %Y")
+        if len(data["overview"]) > 100:
+            series["overview"] = data["overview"][:100]
+        else:
+            series["overview"] = data["overview"]
+
+        popular_series.append(series)
+
+    return render_template('current_trends.html',
+                           title          = 'Current Trends',
+                           popular_movies = popular_movies,
+                           popular_series = popular_series)
 
 
 @app.route("/follow_status", methods=['POST'])
