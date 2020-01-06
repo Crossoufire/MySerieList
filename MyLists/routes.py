@@ -53,56 +53,6 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
         add_badges_to_db()
-    # if User.query.filter_by(id='2').first() is None:
-    #     admin = User(username='aaa',
-    #                  email='aaa@aaa.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(admin)
-    # if User.query.filter_by(id='3').first() is None:
-    #     admin = User(username='bbb',
-    #                  email='bbb@bbb.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(admin)
-    # if User.query.filter_by(id='4').first() is None:
-    #     admin = User(username='ccc',
-    #                  email='ccc@ccc.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(admin)
-    # if User.query.filter_by(id='5').first() is None:
-    #     admin = User(username='ddd',
-    #                  email='ddd@ddd.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(admin)
-    # if User.query.filter_by(id='6').first() is None:
-    #     admin = User(username='eee',
-    #                  email='eee@eee.com',
-    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
-    #                  image_file='default.jpg',
-    #                  active=True,
-    #                  private=False,
-    #                  registered_on=datetime.utcnow(),
-    #                  activated_on=datetime.utcnow())
-    #     db.session.add(admin)
     refresh_db_badges()
     db.session.commit()
 
@@ -145,10 +95,10 @@ def home():
             flash('Login Failed. Please check Username and Password', 'warning')
     if register_form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(register_form.register_password.data).decode('utf-8')
-        user = User(username=register_form.register_username.data,
-                    email=register_form.register_email.data,
-                    password=hashed_password,
-                    registered_on=datetime.utcnow())
+        user = User(username      = register_form.register_username.data,
+                    email         = register_form.register_email.data,
+                    password      = hashed_password,
+                    registered_on = datetime.utcnow())
         db.session.add(user)
         db.session.commit()
         app.logger.info('[{}] New account registration : username = {}, email = {}'
@@ -825,22 +775,32 @@ def global_stats():
 @login_required
 def current_trends():
     # Trending movies
-    movies_response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
-    	.format(themoviedb_api_key))
-
+    try:
+        movies_response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
+            .format(themoviedb_api_key))
+    except:
+        movies_response = None
     movies_trends = current_trends(movies_response, ListType.MOVIES)
 
     # Trending series
-    series_response = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
-    	.format(themoviedb_api_key))
-
+    try:
+        series_response = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
+            .format(themoviedb_api_key))
+    except:
+        series_response = None
     series_trends = current_trends(series_response, ListType.SERIES)
 
     # Trending anime
-    jikan = Jikan()
-    anime_response = jikan.season(year=2020, season='winter')
-
+    try:
+        jikan = Jikan()
+        anime_response = jikan.season(year=2020, season='winter')
+    except:
+        anime_response = None
     anime_trends = current_trends(anime_response, ListType.ANIME)
+
+    if (movies_trends == None) or (series_trends  == None) or (anime_trends == None):
+        flash('Current trends are not available right now, try again later', 'warning')
+        return redirect(url_for('account', user_name=current_user.username))
 
     return render_template("current_trends.html",
                            title         = "Current trends",
@@ -1391,6 +1351,9 @@ def autocomplete(media):
 
 
 def current_trends(response, list_type):
+    if response is None:
+        return None
+
     trending_list = []
     if list_type == ListType.MOVIES:
         global_poster_path = "http://image.tmdb.org/t/p/w300"
@@ -1400,6 +1363,7 @@ def current_trends(response, list_type):
         except:
             return None
 
+        i = 0
         for data in trending_data["results"]:
             movies = {}
             try:
@@ -1424,9 +1388,10 @@ def current_trends(response, list_type):
 
             movies["tmdb_link"] = "https://www.themoviedb.org/movie/{}".format(data["id"])
             trending_list.append(movies)
+            i += 1
+            if i > 11: break
 
         return trending_list
-
     elif list_type == ListType.SERIES:
         global_poster_path = "http://image.tmdb.org/t/p/w300"
         try:
@@ -1435,6 +1400,7 @@ def current_trends(response, list_type):
         except:
             return None
 
+        i = 0
         for data in trending_data["results"]:
             series = {}
             try:
@@ -1459,9 +1425,10 @@ def current_trends(response, list_type):
 
             series["tmdb_link"] = "https://www.themoviedb.org/tv/{}".format(data["id"])
             trending_list.append(series)
+            i += 1
+            if i > 11: break
 
         return trending_list
-
     elif list_type == ListType.ANIME:
         try:
             trending_data = response
@@ -1469,6 +1436,7 @@ def current_trends(response, list_type):
         except:
             return None
 
+        i = 0
         for data in trending_data["anime"]:
             anime = {}
             try:
@@ -1493,9 +1461,10 @@ def current_trends(response, list_type):
 
             anime["tmdb_link"] = data["url"]
             trending_list.append(anime)
+            i += 1
+            if i > 11: break
 
         return trending_list
-
     else:
         return None
 
