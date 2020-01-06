@@ -2061,7 +2061,7 @@
 /* --------------- [ TEXT ] ----------------- */
 .text-white {color: white;}
 .text-black {color: black;}
-.text-grey {color: grey;}
+.text-grey {color: #d1cfcf;}
 
 .text-hov-white:hover {color: white;}
 
