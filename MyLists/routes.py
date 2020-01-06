@@ -7,8 +7,10 @@ import urllib
 import requests
 import time
 import atexit
+import dateutil
 
 from PIL import Image
+from jikanpy import Jikan
 from flask_mail import Message
 from MyLists.admin_views import User
 from sqlalchemy import func, text, or_
@@ -51,6 +53,56 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
         add_badges_to_db()
+    # if User.query.filter_by(id='2').first() is None:
+    #     admin = User(username='aaa',
+    #                  email='aaa@aaa.com',
+    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+    #                  image_file='default.jpg',
+    #                  active=True,
+    #                  private=False,
+    #                  registered_on=datetime.utcnow(),
+    #                  activated_on=datetime.utcnow())
+    #     db.session.add(admin)
+    # if User.query.filter_by(id='3').first() is None:
+    #     admin = User(username='bbb',
+    #                  email='bbb@bbb.com',
+    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+    #                  image_file='default.jpg',
+    #                  active=True,
+    #                  private=False,
+    #                  registered_on=datetime.utcnow(),
+    #                  activated_on=datetime.utcnow())
+    #     db.session.add(admin)
+    # if User.query.filter_by(id='4').first() is None:
+    #     admin = User(username='ccc',
+    #                  email='ccc@ccc.com',
+    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+    #                  image_file='default.jpg',
+    #                  active=True,
+    #                  private=False,
+    #                  registered_on=datetime.utcnow(),
+    #                  activated_on=datetime.utcnow())
+    #     db.session.add(admin)
+    # if User.query.filter_by(id='5').first() is None:
+    #     admin = User(username='ddd',
+    #                  email='ddd@ddd.com',
+    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+    #                  image_file='default.jpg',
+    #                  active=True,
+    #                  private=False,
+    #                  registered_on=datetime.utcnow(),
+    #                  activated_on=datetime.utcnow())
+    #     db.session.add(admin)
+    # if User.query.filter_by(id='6').first() is None:
+    #     admin = User(username='eee',
+    #                  email='eee@eee.com',
+    #                  password=bcrypt.generate_password_hash("azerty").decode('utf-8'),
+    #                  image_file='default.jpg',
+    #                  active=True,
+    #                  private=False,
+    #                  registered_on=datetime.utcnow(),
+    #                  activated_on=datetime.utcnow())
+    #     db.session.add(admin)
     refresh_db_badges()
     db.session.commit()
 
@@ -772,48 +824,29 @@ def global_stats():
 @app.route("/current_trends", methods=['GET'])
 @login_required
 def current_trends():
+    # Trending movies
+    movies_response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
+    	.format(themoviedb_api_key))
 
-    # MOVIES TRENDS
-    response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
-                            .format(themoviedb_api_key))
+    movies_trends = current_trends(movies_response, ListType.MOVIES)
 
-    popularity_data = json.loads(response.text)
-    popular_movies = []
-    for data in popularity_data["results"]:
-        movies = {}
-        movies["title"] = data["title"]
-        movies["poster_path"] = "http://image.tmdb.org/t/p/w300{0}".format(data["poster_path"])
-        movies["release_date"] = datetime.strptime(data["release_date"], '%Y-%m-%d').strftime("%d %b %Y")
-        if len(data["overview"]) > 100:
-            movies["overview"] = data["overview"][:100]
-        else:
-            movies["overview"] = data["overview"]
+    # Trending series
+    series_response = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
+    	.format(themoviedb_api_key))
 
-        popular_movies.append(movies)
+    series_trends = current_trends(series_response, ListType.SERIES)
 
-    # TV SHOWS TRENDS
-    response = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
-                            .format(themoviedb_api_key))
+    # Trending anime
+    jikan = Jikan()
+    anime_response = jikan.season(year=2020, season='winter')
 
-    popularity_data = json.loads(response.text)
+    anime_trends = current_trends(anime_response, ListType.ANIME)
 
-    popular_series = []
-    for data in popularity_data["results"]:
-        series = {}
-        series["title"] = data["name"]
-        series["poster_path"] = "http://image.tmdb.org/t/p/w300{0}".format(data["poster_path"])
-        series["first_air_date"] = datetime.strptime(data["first_air_date"], '%Y-%m-%d').strftime("%d %b %Y")
-        if len(data["overview"]) > 100:
-            series["overview"] = data["overview"][:100]
-        else:
-            series["overview"] = data["overview"]
-
-        popular_series.append(series)
-
-    return render_template('current_trends.html',
-                           title          = 'Current Trends',
-                           popular_movies = popular_movies,
-                           popular_series = popular_series)
+    return render_template("current_trends.html",
+                           title         = "Current trends",
+                           movies_trends = movies_trends,
+                           series_trends = series_trends,
+                           anime_trends  = anime_trends)
 
 
 @app.route("/follow_status", methods=['POST'])
@@ -1355,6 +1388,116 @@ def autocomplete(media):
 
 
 ###################################################### Functions #######################################################
+
+
+def current_trends(response, list_type):
+    trending_list = []
+    if list_type == ListType.MOVIES:
+        global_poster_path = "http://image.tmdb.org/t/p/w300"
+        try:
+            trending_data = json.loads(response.text)
+            tmp = trending_data["results"]
+        except:
+            return None
+
+        for data in trending_data["results"]:
+            movies = {}
+            try:
+                movies["title"] = data["title"]
+            except:
+                movies["title"] = "Unknown"
+
+            try:
+                movies["poster_path"] = global_poster_path + data["poster_path"]
+            except:
+                movies["poster_path"] = "static/covers/movies_covers/default.jpg"
+
+            try:
+                movies["release_date"] = datetime.strptime(data["release_date"], '%Y-%m-%d').strftime("%d %b %Y")
+            except:
+                movies["release_date"] = "Unknown"
+
+            try:
+                movies["overview"] = data["overview"]
+            except:
+                movies["overview"] = "No overview available for this movie."
+
+            movies["tmdb_link"] = "https://www.themoviedb.org/movie/{}".format(data["id"])
+            trending_list.append(movies)
+
+        return trending_list
+
+    elif list_type == ListType.SERIES:
+        global_poster_path = "http://image.tmdb.org/t/p/w300"
+        try:
+            trending_data = json.loads(response.text)
+            tmp = trending_data["results"]
+        except:
+            return None
+
+        for data in trending_data["results"]:
+            series = {}
+            try:
+                series["title"] = data["name"]
+            except:
+                series["title"] = "Unknown"
+
+            try:
+                series["poster_path"] = global_poster_path + data["poster_path"]
+            except:
+                series["poster_path"] = "static/covers/movies_covers/default.jpg"
+
+            try:
+                series["first_air_date"] = datetime.strptime(data["first_air_date"], '%Y-%m-%d').strftime("%d %b %Y")
+            except:
+                series["first_air_date"] = "Unknown"
+
+            try:
+                series["overview"] = data["overview"]
+            except:
+                series["overview"] = "No overview available for this series."
+
+            series["tmdb_link"] = "https://www.themoviedb.org/tv/{}".format(data["id"])
+            trending_list.append(series)
+
+        return trending_list
+
+    elif list_type == ListType.ANIME:
+        try:
+            trending_data = response
+            tmp = trending_data["anime"]
+        except:
+            return None
+
+        for data in trending_data["anime"]:
+            anime = {}
+            try:
+                anime["title"] = data["title"]
+            except:
+                anime["title"] = "Unknown"
+
+            try:
+                anime["poster_path"] = data["image_url"]
+            except:
+                anime["poster_path"] = "static/covers/movies_covers/default.jpg"
+
+            try:
+                anime["first_air_date"] = dateutil.parser.parse(data["airing_start"]).strftime('%d %b %Y')
+            except:
+                anime["first_air_date"] = "Unknown"
+
+            try:
+                anime["overview"] = data["synopsis"]
+            except:
+                anime["overview"] = "No overview available for this anime."
+
+            anime["tmdb_link"] = data["url"]
+            trending_list.append(anime)
+
+        return trending_list
+
+    else:
+        return None
 
 
 def get_account_data(user, user_name, follows_list_data):
