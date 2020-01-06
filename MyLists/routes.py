@@ -148,11 +148,11 @@ def reset_password():
             flash("There was an error while sending the reset password email. Please try again later.")
             return redirect(url_for('home'))
 
-    return render_template('reset_request.html', title='Reset Password', form=form)
+    return render_template('reset_password.html', title='Reset Password', form=form)
 
 
 @app.route("/reset_password/<token>", methods=['GET', 'POST'])
-def reset_token(token):
+def reset_passord_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('home'))
 
@@ -170,11 +170,11 @@ def reset_token(token):
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('home'))
 
-    return render_template('reset_token.html', title='Reset Password', form=form)
+    return render_template('reset_passord_token.html', title='Reset Password', form=form)
 
 
 @app.route("/register_account/<token>", methods=['GET'])
-def register_token(token):
+def register_account_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('home'))
 
@@ -3480,7 +3480,7 @@ def send_register_email(user):
         path = os.path.join(app.root_path, "static/emails/register.html")
 
     email_template = open(path, 'r').read().replace("{1}", user.username)
-    email_template = email_template.replace("{2}", url_for('register_token', token=token, _external=True))
+    email_template = email_template.replace("{2}", url_for('register_account_token', token=token, _external=True))
     msg.html = email_template
 
     try:
