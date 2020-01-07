@@ -171,27 +171,28 @@ hr {
     min-width: 105px;
 }
 
-/* On screens that are 990px or less */
 @media (max-width: 990px) {
     #overview-tab {
         padding-left: 100px;
         padding-right: 100px;
     }
 }
-/* On screens that are 650px or less */
 @media (max-width: 650px) {
     #overview-tab {
         padding-left: 0px;
         padding-right: 0px;
     }
 }
-/* On screens that are 490px or less */
 @media (max-width: 490px) {
     .stat-text {
         font-size: 10pt;
     }
     .mini {
         min-width: 100px;
+    }
+    .tab-content {
+        padding-left: 10px;
+        padding-right: 10px;
     }
 }
 /* --------------------------------- */
@@ -266,6 +267,16 @@ hr {
    -webkit-line-clamp: 1; /* number of lines to show */
    line-height: X;        /* fallback */
    max-height: X*N;       /* fallback */
+}
+
+@media (max-width: 700px) {
+    .follow_wrapper {
+        justify-content: space-evenly;
+    }
+    .mobile-follow-add {
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
 /* --------------------------------- */
 

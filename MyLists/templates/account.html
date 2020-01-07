@@ -609,7 +609,7 @@
     </div>
 
     <div id="follows-tab" class="tab-pane fade {% if message_tab == 'follows' %} show active {% endif %}">
-        <div class="row m-t-30">
+        <div class="row m-t-30 mobile-follow-add">
             <div class="col">
                 {% if user_id == current_user.get_id() %}
                 <form method="POST" action="" enctype="multipart/form-data">
@@ -617,7 +617,7 @@
                     <div class="d-flex flex-wrap">
                         {{ follow_form.follow_to_add(style="max-width: 180px;", class='form-control', placeholder='Username to add') }}
                         {% for error in follow_form.follow_to_add.errors %}
-                            <div class="m-l-10 mt-auto mb-auto" style="color: red;">{{ error }}</div>
+                        <div class="m-l-10 mt-auto mb-auto" style="color: red;">{{ error }}</div>
                         {% endfor %}
                         {{ follow_form.submit_follow(class="btn btn-outline-info m-t-0 m-l-20 p-2") }}
                     </div>

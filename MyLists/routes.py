@@ -793,7 +793,7 @@ def current_trends():
     # Trending anime
     try:
         jikan = Jikan()
-        anime_response = jikan.season(year=2020, season='winter')
+        anime_response = jikan.top(type='anime', page=1, subtype='airing')
     except:
         anime_response = None
     anime_trends = current_trends(anime_response, ListType.ANIME)
@@ -1432,12 +1432,12 @@ def current_trends(response, list_type):
     elif list_type == ListType.ANIME:
         try:
             trending_data = response
-            tmp = trending_data["anime"]
+            tmp = trending_data["top"]
         except:
             return None
 
         i = 0
-        for data in trending_data["anime"]:
+        for data in trending_data["top"]:
             anime = {}
             try:
                 anime["title"] = data["title"]
@@ -1450,14 +1450,15 @@ def current_trends(response, list_type):
                 anime["poster_path"] = "static/covers/movies_covers/default.jpg"
 
             try:
-                anime["first_air_date"] = dateutil.parser.parse(data["airing_start"]).strftime('%d %b %Y')
+                anime["first_air_date"] = dateutil.parser.parse(data["start_date"]).strftime('%d %b %Y')
             except:
                 anime["first_air_date"] = "Unknown"
 
             try:
                 anime["overview"] = data["synopsis"]
             except:
-                anime["overview"] = "No overview available for this anime."
+                anime["overview"] = "There is no overview from this API. " \
+                                    "You can check on MyAnimeList by clicking on the title"
 
             anime["tmdb_link"] = data["url"]
             trending_list.append(anime)

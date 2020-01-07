@@ -12,7 +12,7 @@ body {
     justify-content: space-between;
     min-height: calc(100vh - 60px);
     background: #131418;
-    margin-top: 65px;
+    margin-top: 56px;
     color: #e2e2e2;
 }
 
@@ -37,6 +37,15 @@ hr {
     padding-left: 15px;
     padding-right: 15px;
 }
+
+@media (max-width: 490px) {
+    .container {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}
+/* ---------------------------------------------------------- */
+
 
 /* ------------------ Navigation bar CSS -------------------- */
 .dropdown_mylist > .nav-item::after {

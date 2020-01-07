@@ -36,7 +36,7 @@ function remove_cat() {
         }
     });
 
-    $('.card-img-top').attr('style', 'filter: brightness(100%);');
+    $('.card-img-top').attr('style', 'filter: brightness(100%); height: auto;');
     $('.mask').show();
 }
 

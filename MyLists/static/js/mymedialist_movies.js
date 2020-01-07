@@ -27,7 +27,7 @@ function charge_cat(card, element_id, genres, media_list) {
     $(card).find('.card-btn-top-right').attr('style', 'display: none;');
     $(card).find('.mask').hide();
     $(card).find('.view.overlay').prepend("<a class='card-btn-top-right-2 fas fa-times' onclick='remove_cat()')></a>");
-    $(card).find('.card-img-top').attr('style', 'filter: brightness(20%);');
+    $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
 }
 
 

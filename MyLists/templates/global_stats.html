@@ -8,15 +8,15 @@
 
 
 {% block content %}
-<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">GLOBAL STATISTICS<hr class="mt-2 pb-3 mb-0"></h2>
+<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50 p-l-10 p-r-10">GLOBAL STATISTICS<hr class="mt-2 pb-3 mb-0"></h2>
 
-<h4 class="text-center m-t-10">
+<h4 class="text-center m-t-10 p-l-10 p-r-10">
     Total watched time: <b>{{ total_time["total"] }} hours</b> -
      <b>{{ (total_time["total"]/24)|int }} days</b> -
        <b>{{ (total_time["total"]/24/365)|round(2) }} years</b>
 </h4>
 
-<div class="row m-t-30">
+<div class="row m-t-30 p-l-10 p-r-10">
     <div class="col col-lg-5 col-md-4">
         <div class="media-container">
             <canvas id="media-time"></canvas>
@@ -236,7 +236,7 @@
         </div>
     </div>
 </div>
-<div class="row">
+<div class="row p-l-10 p-r-10">
     <div class="seasons-eps-container">
         <canvas id="total-seasons"></canvas>
         <span id="seasons-graph-data" values="{{ total_seasons_media['series'] }}, {{ total_seasons_media['anime'] }}"></span>

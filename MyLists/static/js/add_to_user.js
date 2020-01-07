@@ -18,7 +18,7 @@ function add_user(card_id, element_id, media_type) {
     $('#'+card_id).children().children('.seas-eps-box').attr('style', 'display: none;');
     $('#'+card_id).children().children().children('.mask').hide();
     $('#'+card_id).children().children().first().prepend("<a class='card-btn-top-right-2 fas fa-times' onclick='remove_cat()')></a>");
-    $('#'+card_id).children().children().children('.card-img-top').attr('style', 'filter: brightness(20%);');
+    $('#'+card_id).children().children().children('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
 }
 
 
@@ -57,6 +57,6 @@ function add_user_movies(card_id, element_id, media_type) {
     $('#'+card_id).children().children().children('.card-btn-top-left').attr('style', 'display: none;');
     $('#'+card_id).children().children().children('.mask').hide();
     $('#'+card_id).children().children().first().prepend("<a class='card-btn-top-right-2 fas fa-times' onclick='remove_cat()')></a>");
-    $('#'+card_id).children().children().children('.card-img-top').attr('style', 'filter: brightness(0%);');
+    $('#'+card_id).children().children().children('.card-img-top').attr('style', 'filter: brightness(0%); height: auto;');
 }
 
