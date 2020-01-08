@@ -121,24 +121,25 @@ def home():
             return redirect(url_for('account', user_name=current_user.username))
         elif user.homepage == HomePage.HALL_OF_FAME:
             return redirect(url_for('hall_of_fame'))
-    else:
-        home_header = url_for('static', filename='img/home_header.jpg')
-        home_img_1 = url_for('static', filename='img/home_img1.jpg')
-        home_img_2 = url_for('static', filename='img/home_img2.jpg')
-        return render_template('home.html',
-                               login_form    = login_form,
-                               register_form = register_form,
-                               image_header  = home_header,
-                               home_img_1    = home_img_1,
-                               home_img_2    = home_img_2)
+
+    home_header = url_for('static', filename='img/home_header.jpg')
+    home_img_1 = url_for('static', filename='img/home_img1.jpg')
+    home_img_2 = url_for('static', filename='img/home_img2.jpg')
+    return render_template('home.html',
+                           login_form    = login_form,
+                           register_form = register_form,
+                           image_header  = home_header,
+                           home_img_1    = home_img_1,
+                           home_img_2    = home_img_2)
 
 
 @app.route("/reset_password", methods=['GET', 'POST'])
 def reset_password():
+    form = ResetPasswordRequestForm()
+
     if current_user.is_authenticated:
         return redirect(url_for('home'))
 
-    form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if send_reset_email(user):
@@ -219,6 +220,11 @@ def account(user_name):
     image_error = url_for('static', filename='img/error.jpg')
     user = User.query.filter_by(username=user_name).first()
 
+    # Add forms
+    follow_form = AddFollowForm()
+    settings_form = UpdateAccountForm()
+    password_form = ChangePasswordForm()
+
     # No account with this username and protection of the admin account
     if (user is None) or (user.id == 1 and current_user.id != 1):
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
@@ -227,17 +233,15 @@ def account(user_name):
     follow = Follow.query.filter_by(user_id=current_user.id, follow_id=user.id).first()
     if current_user.id == user.id or current_user.id == 1:
         pass
-    elif user.private and follow is None:
+    elif (user.private) and (follow is None):
         return render_template('error.html', error_code=404, title='Error', image_error=image_error), 404
 
-    # Add follows form
-    follow_form = AddFollowForm()
+    # Follows form
     if follow_form.submit_follow.data and follow_form.validate():
         add_follow(follow_form.follow_to_add.data)
         return redirect(url_for('account', user_name=user_name, message="follows"))
 
-    # Add account settings form
-    settings_form = UpdateAccountForm()
+    # Account settings form
     if settings_form.submit_account.data and settings_form.validate():
         if settings_form.biography.data:
             user.biography = settings_form.biography.data
@@ -278,6 +282,7 @@ def account(user_name):
             user.homepage = HomePage.ACCOUNT
         elif settings_form.homepage.data == "hof":
             user.homepage = HomePage.HALL_OF_FAME
+
         db.session.commit()
         app.logger.info('[{}] Settings updated: old homepage = {}, new homepage = {}'
                         .format(user.id, old_value, settings_form.homepage.data))
@@ -321,8 +326,7 @@ def account(user_name):
         elif current_user.homepage == HomePage.HALL_OF_FAME:
             settings_form.homepage.data = "hof"
 
-    # Add password change form
-    password_form = ChangePasswordForm()
+    # Password change form
     if password_form.submit_password.data and password_form.validate():
         hashed_password = bcrypt.generate_password_hash(password_form.confirm_new_password.data).decode('utf-8')
         current_user.password = hashed_password
@@ -343,19 +347,19 @@ def account(user_name):
                        "picture" : picture_url}
 
         if follow[0].private:
-            if Follow.query.filter_by(user_id=current_user.id, follow_id=follow[0].id).first() is not None \
-                    or current_user.id == 1:
+            test_private = Follow.query.filter_by(user_id=current_user.id, follow_id=follow[0].id).first()
+            if (test_private is not None) or (current_user.id == 1):
                 follows_list_data.append(follow_data)
             elif current_user.id == follow[0].id:
                 follows_list_data.append(follow_data)
         else:
             follows_list_data.append(follow_data)
 
-    # Recover account data
-    account_data = get_account_data(user, user_name, follows_list_data)
-
     # Recover the number of user that follows you
     followers = Follow.query.filter_by(follow_id=user.id).all()
+
+    # Recover account data
+    account_data = get_account_data(user, user_name, follows_list_data)
 
     # Recover the last updates of your follows for the follow TAB
     last_updates = get_follows_full_last_update(user.id)
@@ -378,16 +382,12 @@ def account(user_name):
                   "anime"   : user.anime_views,
                   "movies"  : user.movies_views}
 
-    # Recover the user's badges
-    # badges_unlocked = get_badges(user.id)[1]
-
     # Recover the registered date
     registered_date = user.registered_on.strftime("%d %b %Y")
 
-    # Reload on the form TAB
-    try:
-        message_tab = request.args['message']
-    except:
+    # Reload on the specified form TAB
+    message_tab = request.args.get("message")
+    if message_tab is None:
         message_tab = 'overview'
 
     return render_template('account.html',
@@ -1498,6 +1498,45 @@ def get_account_data(user, user_name, follows_list_data):
     account_data["movies"]["time_spent_day"] = round(user.time_spent_movies/1440, 2)
     account_data["anime"]["time_spent_day"]  = round(user.time_spent_anime/1440, 2)
 
+    def get_list_count(user_id, list_type):
+        if list_type is ListType.SERIES:
+            media_count = db.session.query(SeriesList, func.count(SeriesList.status)) \
+                .filter_by(user_id=user_id).group_by(SeriesList.status).all()
+        if list_type is ListType.ANIME:
+            media_count = db.session.query(AnimeList, func.count(AnimeList.status)) \
+                .filter_by(user_id=user_id).group_by(AnimeList.status).all()
+        if list_type is ListType.MOVIES:
+            media_count = db.session.query(MoviesList, func.count(MoviesList.status)) \
+                .filter_by(user_id=user_id).group_by(MoviesList.status).all()
+
+        watching, completed, completed_animation, onhold, \
+        random, dropped, plantowatch = [0 for _ in range(7)]
+        for media in media_count:
+            if media[0].status == Status.WATCHING:
+                watching = media[1]
+            if media[0].status == Status.COMPLETED:
+                completed = media[1]
+            if media[0].status == Status.COMPLETED_ANIMATION:
+                completed_animation = media[1]
+            if media[0].status == Status.ON_HOLD:
+                onhold = media[1]
+            if media[0].status == Status.RANDOM:
+                random = media[1]
+            if media[0].status == Status.DROPPED:
+                dropped = media[1]
+            if media[0].status == Status.PLAN_TO_WATCH:
+                plantowatch = media[1]
+        total = sum(tot[1] for tot in media_count)
+
+        return {"watching": watching,
+                "completed": completed,
+                "completed_animation": completed_animation,
+                "onhold": onhold,
+                "random": random,
+                "dropped": dropped,
+                "plantowatch": plantowatch,
+                "total": total - plantowatch}
+
     # Count media elements of each category
     series_count = get_list_count(user.id, ListType.SERIES)
     account_data["series"]["watching_count"]    = series_count["watching"]
@@ -1612,48 +1651,8 @@ def get_account_data(user, user_name, follows_list_data):
     return account_data
 
 
-def get_list_count(user_id, list_type):
-    if list_type is ListType.SERIES:
-        media_count = db.session.query(SeriesList, func.count(SeriesList.status))\
-            .filter_by(user_id=user_id).group_by(SeriesList.status).all()
-    if list_type is ListType.ANIME:
-        media_count = db.session.query(AnimeList, func.count(AnimeList.status))\
-        .filter_by(user_id=user_id).group_by(AnimeList.status).all()
-    if list_type is ListType.MOVIES:
-        media_count = db.session.query(MoviesList, func.count(MoviesList.status))\
-        .filter_by(user_id=user_id).group_by(MoviesList.status).all()
-
-    watching, completed, completed_animation, onhold, \
-    random, dropped, plantowatch = [0 for _ in range(7)]
-    for media in media_count:
-        if media[0].status == Status.WATCHING:
-            watching = media[1]
-        if media[0].status == Status.COMPLETED:
-            completed = media[1]
-        if media[0].status == Status.COMPLETED_ANIMATION:
-            completed_animation = media[1]
-        if media[0].status == Status.ON_HOLD:
-            onhold = media[1]
-        if media[0].status == Status.RANDOM:
-            random = media[1]
-        if media[0].status == Status.DROPPED:
-            dropped = media[1]
-        if media[0].status == Status.PLAN_TO_WATCH:
-            plantowatch = media[1]
-    total = sum(tot[1] for tot in media_count)
-
-    return {"watching": watching,
-            "completed": completed,
-            "completed_animation": completed_animation,
-            "onhold": onhold,
-            "random": random,
-            "dropped": dropped,
-            "plantowatch": plantowatch,
-            "total": total - plantowatch}
-
-
 def get_level_and_grade(total_time_min):
-    # Compute the corresponding level using the quadratic equation
+    # Compute the corresponding level using the equation
     element_level_tmp = "{:.2f}".format(round((((400+80*(total_time_min))**(1/2))-20)/40, 2))
     element_level = element_level_tmp.split('.')
     element_level[0] = int(element_level[0])
@@ -1948,20 +1947,12 @@ def get_badges(user_id):
 def get_all_media_data(element_data, list_type, covers_path, user_id):
     if user_id != current_user.id:
         if list_type == ListType.ANIME:
-            tmp_current_list = AnimeList.query.filter_by(user_id=current_user.id).all()
+            current_list = db.session.query(AnimeList.anime_id).filter_by(user_id=current_user.id).all()
         elif list_type == ListType.SERIES:
-            tmp_current_list = SeriesList.query.filter_by(user_id=current_user.id).all()
+            current_list = db.session.query(SeriesList.series_id).filter_by(user_id=current_user.id).all()
         elif list_type == ListType.MOVIES:
-            tmp_current_list = MoviesList.query.filter_by(user_id=current_user.id).all()
-
-        current_list = []
-        for i in range(0, len(tmp_current_list)):
-            if list_type == ListType.ANIME:
-                current_list.append(tmp_current_list[i].anime_id)
-            elif list_type == ListType.SERIES:
-                current_list.append(tmp_current_list[i].series_id)
-            elif list_type == ListType.MOVIES:
-                current_list.append(tmp_current_list[i].movies_id)
+            current_list = db.session.query(MoviesList.movies_id).filter_by(user_id=current_user.id).all()
+        current_list = [r[0] for r in current_list]
     else:
         current_list = []
 
@@ -2249,10 +2240,10 @@ def set_last_update(media_name, media_type, old_status=None, new_status=None, ol
 
 def get_follows_full_last_update(user_id):
     follows_update = db.session.query(Follow, User, UserLastUpdate)\
-                               .join(User, Follow.follow_id == User.id)\
-                               .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
-                               .filter(Follow.user_id == user_id)\
-                               .order_by(User.username, UserLastUpdate.date.desc()).all()
+        .join(User, Follow.follow_id == User.id)\
+        .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
+        .filter(Follow.user_id == user_id)\
+        .order_by(User.username, UserLastUpdate.date.desc()).all()
 
     tmp = ""
     follows_data = []
@@ -3536,16 +3527,15 @@ def add_follow(follow_username):
 
     if follow_to_add.username is current_user.username:
         return flash("You can't follow yourself", 'warning')
-
     else:
-        follows = Follow.query.filter_by(user_id=current_user.id).all()
+        follow_exists = Follow.query.filter_by(user_id=current_user.id, follow_id=follow_to_add.id).first()
 
-        for follow in follows:
-            if follow_to_add.id == follow.follow_id:
-                return flash('User already in your follow list', 'info')
+        if follow_exists:
+            return flash('User already in your follow list', 'info')
 
-        add_follow = Follow(user_id=current_user.id,
-                            follow_id=follow_to_add.id)
+        add_follow = Follow(user_id   = current_user.id,
+                            follow_id = follow_to_add.id)
+
         db.session.add(add_follow)
         db.session.commit()
 
@@ -3555,11 +3545,11 @@ def add_follow(follow_username):
 
 def send_reset_email(user):
     token = user.get_reset_token()
-    msg = Message(subject='Password Reset Request',
-                  sender=app.config['MAIL_USERNAME'],
-                  recipients=[user.email],
-                  bcc=[app.config['MAIL_USERNAME']],
-                  reply_to=app.config['MAIL_USERNAME'])
+    msg = Message(subject    = 'Password Reset Request',
+                  sender     = app.config['MAIL_USERNAME'],
+                  recipients = [user.email],
+                  bcc        = [app.config['MAIL_USERNAME']],
+                  reply_to   = app.config['MAIL_USERNAME'])
 
     if platform.system() == "Windows":
         path = os.path.join(app.root_path, "static\emails\\password_reset.html")
@@ -3581,11 +3571,11 @@ def send_reset_email(user):
 
 def send_register_email(user):
     token = user.get_register_token()
-    msg = Message(subject='MyLists Register Request',
-                  sender=app.config['MAIL_USERNAME'],
-                  recipients=[user.email],
-                  bcc=[app.config['MAIL_USERNAME']],
-                  reply_to=app.config['MAIL_USERNAME'])
+    msg = Message(subject    = 'MyLists Register Request',
+                  sender     = app.config['MAIL_USERNAME'],
+                  recipients = [user.email],
+                  bcc        = [app.config['MAIL_USERNAME']],
+                  reply_to   = app.config['MAIL_USERNAME'])
 
     if platform.system() == "Windows":
         path = os.path.join(app.root_path, "static\emails\\register.html")
@@ -3607,11 +3597,11 @@ def send_register_email(user):
 
 def send_email_update_email(user):
     token = user.get_email_update_token()
-    msg = Message(subject='MyList Email Update Request',
-                  sender=app.config['MAIL_USERNAME'],
-                  recipients=[user.email],
-                  bcc=[app.config['MAIL_USERNAME']],
-                  reply_to=app.config['MAIL_USERNAME'])
+    msg = Message(subject    = 'MyList Email Update Request',
+                  sender     = app.config['MAIL_USERNAME'],
+                  recipients = [user.email],
+                  bcc        = [app.config['MAIL_USERNAME']],
+                  reply_to   = app.config['MAIL_USERNAME'])
 
     if platform.system() == "Windows":
         path = os.path.join(app.root_path, "static\emails\\email_update.html")
