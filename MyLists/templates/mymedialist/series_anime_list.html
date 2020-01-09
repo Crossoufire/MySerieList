@@ -38,7 +38,7 @@
 
 
 {% block select_box %}
-<div id="box_{{ data[0]['id'] }}" class="seas-eps-box p-l-5 p-r-5" {% if category[1] == 'PLAN TO WATCH' %}style="display: none;"{% endif %}>
+<div class="seas-eps-box" {% if category[1] == 'PLAN TO WATCH' %}style="display: none;"{% endif %}>
     <div style="display: inline-block;">
         {% if target_user_id == current_user.get_id() %}
         <select id="S_{{ data[0]['id'] }}" class="text-light text-center select-box"
@@ -49,9 +49,9 @@
         {% endif %}
             {% for i in range(data[0]['eps_per_season']|length) %}
                 {% if i+1 == data[0]['current_season'] %}
-                <option class="card-opt-box" selected="selected">&nbsp{{ "S{:02}".format(i+1) }}&nbsp</option>
+                <option class="card-opt-box" selected="selected">{{ "Season {:02}".format(i+1) }}</option>
                 {% else %}
-                <option class="card-opt-box">&nbsp{{ "S{:02}".format(i+1) }}&nbsp</option>
+                <option class="card-opt-box">{{ "Season {:02}".format(i+1) }}</option>
                 {% endif %}
             {% endfor %}
         </select>
@@ -66,9 +66,9 @@
         {% endif %}
             {% for i in range(data[0]['eps_per_season'][data[0]['current_season']-1]) %}
                 {% if i+1 == data[0]['last_episode_watched'] %}
-                <option class="card-opt-box" selected="selected">&nbsp{{ "E{:02}".format(i+1) }}&nbsp</option>
+                <option class="card-opt-box" selected="selected">{{ "Episode {:02}".format(i+1) }}</option>
                 {% else %}
-                <option class="card-opt-box">&nbsp{{ "E{:02}".format(i+1) }}&nbsp</option>
+                <option class="card-opt-box">{{ "Episode {:02}".format(i+1) }}</option>
                 {% endif %}
             {% endfor %}
         </select>
