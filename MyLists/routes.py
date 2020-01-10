@@ -1024,7 +1024,7 @@ def update_element_episode():
     image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
-        episode = int(json_data['episode'])
+        episode = int(json_data['episode'])+1
         element_id = int(json_data['element_id'])
         element_type = json_data['element_type']
     except:
@@ -1046,51 +1046,58 @@ def update_element_episode():
 
     # Check if the element is in the current user's list
     if element_type == "animelist":
-        if AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first() is None:
+        anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
+        if anime_list is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
     elif element_type == "serieslist":
-        if SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first() is None:
+        series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
+        if series_list is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the episode number is between 1 and <last_episode>
     if element_type == "animelist":
-        current_season = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first().current_season
-        last_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=current_season)\
+        last_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=anime_list.current_season)\
             .first().episodes
-        if (episode+1 < 1) or (episode+1 > last_episode):
+        if (1 > episode > last_episode):
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-        update = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.id).first()
-        old_episode = update.last_episode_watched
-        update.last_episode_watched = episode + 1
+        old_episode = anime_list.last_episode_watched
+        anime_list.last_episode_watched = episode
         db.session.commit()
-        app.logger.info('[{}] Anime episode with ID {} updated: {}'.format(current_user.id, element_id, episode+1))
-        set_last_update(media_name=anime.name, media_type=ListType.ANIME, old_season=update.current_season,
-                        new_season=update.current_season, old_episode=old_episode,
-                        new_episode=update.last_episode_watched)
+        app.logger.info('[{}] Anime episode with ID {} updated: {}'.format(current_user.id, element_id, episode))
+        set_last_update(media_name=anime.name, media_type=ListType.ANIME, old_season=anime_list.current_season,
+                        new_season=anime_list.current_season, old_episode=old_episode,
+                        new_episode=anime_list.last_episode_watched)
     elif element_type == "serieslist":
-        current_season = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id)\
-            .first().current_season
-        last_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=current_season)\
+        last_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=series_list.current_season)\
             .first().episodes
-        if (episode+1 < 1) or (episode+1 > last_episode):
+        if (1 > episode > last_episode):
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-        update = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.id).first()
-        old_episode = update.last_episode_watched
-        update.last_episode_watched = episode + 1
+        old_episode = series_list.last_episode_watched
+        series_list.last_episode_watched = episode
         db.session.commit()
-        app.logger.info('[{}] Series episode with ID {} updated: {}'
-                        .format(current_user.id, element_id, episode+1))
-        set_last_update(media_name=series.name, media_type=ListType.SERIES, old_season=update.current_season,
-                        new_season=update.current_season, old_episode=old_episode,
-                        new_episode=update.last_episode_watched)
+        app.logger.info('[{}] Series episode with ID {} updated: {}'.format(current_user.id, element_id, episode))
+        set_last_update(media_name=series.name, media_type=ListType.SERIES, old_season=series_list.current_season,
+                        new_season=series_list.current_season, old_episode=old_episode,
+                        new_episode=series_list.last_episode_watched)
 
-    # Compute total time spent and badges
+    # Compute total time spent
     if element_type == "animelist":
         compute_media_time_spent(ListType.ANIME)
     elif element_type == "serieslist":
         compute_media_time_spent(ListType.SERIES)
+
+    ## Compute new time spent
+    # if element_type == "animelist":
+    #     old_time = current_user.time_spent_anime
+    #     print(old_time + (episode-old_episode)*anime.episode_duration)
+    #     current_user.time_spent_anime = old_time + (episode-old_episode)*anime.episode_duration
+    # elif element_type == "serieslist":
+    #     old_time = current_user.time_spent_series
+    #     print(old_time + (episode-old_episode)*series.episode_duration)
+    #     current_user.time_spent_series = old_time + (episode-old_episode)*series.episode_duration
+    # db.session.commit()
 
     return '', 204
 
