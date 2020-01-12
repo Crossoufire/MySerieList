@@ -1,8 +1,8 @@
 from logging.handlers import RotatingFileHandler
 from MyLists import app
 import logging
-import os
 import sys
+import os
 
 
 formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s")
