@@ -11,6 +11,7 @@ import dateutil
 
 from PIL import Image
 from jikanpy import Jikan
+from API_data import API_data
 from flask_mail import Message
 from MyLists.admin_views import User
 from sqlalchemy import func, text, or_
@@ -1349,23 +1350,49 @@ def add_element():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    if element_type == "animelist":
-        category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
-        if element_cat not in category_list:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-        add_element(element_id, ListType.ANIME, element_cat)
-    elif element_type == "serieslist":
-        category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
-        if element_cat not in category_list:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-        add_element(element_id, ListType.SERIES, element_cat)
+    # Check if element_type exists
+    if element_type == "serieslist":
+        element_type = ListType.SERIES
+    elif element_type == "animelist":
+        element_type = ListType.ANIME
     elif element_type == "movieslist":
-        category_list = ["Completed", "Plan to Watch"]
-        if element_cat not in category_list:
-            return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-        add_element(element_id, ListType.MOVIES, element_cat)
+        element_type = ListType.MOVIES
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if element_cat exists
+    if element_type == ListType.SERIES or element_type == ListType.ANIME:
+        category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
+    elif element_type == ListType.MOVIES:
+        category_list = ["Completed", "Plan to Watch"]
+
+    # Check if element_cat is in category_list
+    if element_cat not in category_list:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    # Check if the ID element exist in the database
+    if element_type == ListType.SERIES:
+        element = Series.query.filter_by(themoviedb_id=element_id).first()
+    elif element_type == ListType.ANIME:
+        element = Anime.query.filter_by(themoviedb_id=element_id).first()
+    elif element_type == ListType.MOVIES:
+        element = Movies.query.filter_by(themoviedb_id=element_id).first()
+
+    # If element exists add directly to the user else use the API
+    if element is not None:
+        # Check if the element is already in the current's user list
+        if list_type == ListType.SERIES:
+            if SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first() is not None:
+                return flash("This series is already in your list", "warning")
+        elif list_type == ListType.ANIME:
+            if AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first() is not None:
+                return flash("This anime is already in your list", "warning")
+        elif list_type == ListType.MOVIES:
+            if MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first() is not None:
+                return flash("This movie is already in your list", "warning")
+        add_element_to_user(element_id, current_user.id, element_type, element_cat)
+    else:
+        add_element_in_base(element_id, element_type, element_cat)
 
     return '', 204
 
@@ -1374,17 +1401,16 @@ def add_element():
 @login_required
 def autocomplete(media):
     image_error = url_for('static', filename='img/error.jpg')
-    try:
-        search = request.args.get('q')
-    except:
-        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    search = request.args.get('q')
+    API_call = API_data()
 
     if media == "animelist":
-        results = autocomplete_search_element(search, ListType.ANIME)
+        results = API_call.autocomplete_search(search, ListType.ANIME)
     elif media == "serieslist":
-        results = autocomplete_search_element(search, ListType.SERIES)
+        results = API_call.autocomplete_search(search, ListType.SERIES)
     elif media == "movieslist":
-        results = autocomplete_search_element(search, ListType.MOVIES)
+        results = API_call.autocomplete_search(search, ListType.MOVIES)
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -2533,384 +2559,102 @@ def get_follows_last_update(user_id):
     return update
 
 
-def autocomplete_search_element(element_name, list_type):
-    if list_type == ListType.SERIES:
-        try:
-            response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
-                                    .format(themoviedb_api_key, element_name))
-        except:
-            return [{"nb_results": 0}]
-
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-            return [{"nb_results": 0}]
-
-        data = json.loads(response.text)
-
-        try:
-            if data["total_results"] == 0:
-                return [{"nb_results": 0}]
-        except:
-            return [{"nb_results": 0}]
-
-        # Take only the first 6 results for the autocomplete
-        # If there is an anime in the 6 results, loop until the next one
-        # There are 20 results per page
-        tmdb_results = []
-        i = 0
-        while i < data["total_results"] and i < 20 and len(tmdb_results) < 6:
-            # genre_ids : list
-            if "genre_ids" in data["results"][i]:
-                genre_ids = data["results"][i]["genre_ids"]
-            else:
-                genre_ids = ["Unknown"]
-
-            # origin_country : list
-            if "origin_country" in data["results"][i]:
-                origin_country = data["results"][i]["origin_country"]
-            else:
-                origin_country = ["Unknown"]
-
-            # original_language : string
-            if "original_language" in data["results"][i]:
-                original_language = data["results"][i]["original_language"]
-            else:
-                original_language = "Unknown"
-
-            # To not add anime in the series table, we need to check if it's an anime and if it comes from Japan
-            if (16 in genre_ids and "JP" in origin_country) or (16 in genre_ids and original_language == "ja"):
-                i = i+1
-                continue
-
-            series_data = {"tmdb_id":  data["results"][i]["id"],
-                           "name":  data["results"][i]["name"]}
-
-            if data["results"][i]["poster_path"] is not None:
-                series_data["poster_path"] = "{0}{1}".format("http://image.tmdb.org/t/p/w300",
-                                                             data["results"][i]["poster_path"])
-            else:
-                series_data["poster_path"] = url_for('static', filename="covers/series_covers/default.jpg")
-
-            if "first_air_date" in data["results"][i] and data["results"][i]["first_air_date"].split('-') != ['']:
-                series_data["first_air_date"] = data["results"][i]["first_air_date"].split('-')[0]
-            else:
-                series_data["first_air_date"] = "Unknown"
-
-            tmdb_results.append(series_data)
-            i = i+1
-
-        return tmdb_results
-    elif list_type == ListType.ANIME:
-        try:
-            response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
-                                    .format(themoviedb_api_key, element_name))
-        except:
-            return [{"nb_results": 0}]
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-            return [{"nb_results": 0}]
-
-        data = json.loads(response.text)
-        try:
-            if data["total_results"] == 0:
-                return [{"nb_results": 0}]
-        except:
-            return [{"nb_results": 0}]
-
-        # Take only the first 6 results for the autocomplete
-        # If there is a series in the 6 results, loop until the next one
-        # There are 20 results per page
-        tmdb_results = []
-        i = 0
-        while i < data["total_results"] and i < 20 and len(tmdb_results) < 6:
-            # genre_ids : list
-            if "genre_ids" in data["results"][i]:
-                genre_ids = data["results"][i]["genre_ids"]
-            else:
-                genre_ids = ["Unknown"]
-
-            # origin_country : list
-            if "origin_country" in data["results"][i]:
-                origin_country = data["results"][i]["origin_country"]
-            else:
-                origin_country = ["Unknown"]
-
-            # original_language : string
-            if "original_language" in data["results"][i]:
-                original_language = data["results"][i]["original_language"]
-            else:
-                original_language = "Unknown"
-
-            # To add only anime in the anime table, we need to check if it's an anime and it comes from Japan
-            if (16 in genre_ids and "JP" in origin_country) or (16 in genre_ids and original_language == "ja"):
-                anime_data = {
-                    "tmdb_id": data["results"][i]["id"],
-                    "name": data["results"][i]["name"]
-                }
-
-                if data["results"][i]["poster_path"] is not None:
-                    anime_data["poster_path"] = "{}{}"\
-                        .format("http://image.tmdb.org/t/p/w300", data["results"][i]["poster_path"])
-                else:
-                    anime_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
-
-                if data["results"][i]["first_air_date"].split('-') != ['']:
-                    anime_data["first_air_date"] = data["results"][i]["first_air_date"].split('-')[0]
-                else:
-                    anime_data["first_air_date"] = "Unknown"
-
-                tmdb_results.append(anime_data)
-            i = i+1
-
-        return tmdb_results
-    elif list_type == ListType.MOVIES:
-        try:
-            response = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
-                                    .format(themoviedb_api_key, element_name))
-        except:
-            return [{"nb_results": 0}]
-
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-            return [{"nb_results": 0}]
-
-        data = json.loads(response.text)
-        try:
-            if data["total_results"] == 0:
-                return [{"nb_results": 0}]
-        except:
-            return [{"nb_results": 0}]
-
-        # Take only the first 6 results for the autocomplete. There are 20 results per page
-        tmdb_results = []
-        i = 0
-        while i < data["total_results"] and i < 20 and len(tmdb_results) < 6:
-            movies_data = {"tmdb_id": data["results"][i]["id"],
-                           "name": data["results"][i]["title"]}
-
-            if data["results"][i]["poster_path"] is not None:
-                movies_data["poster_path"] = "{0}{1}"\
-                    .format("http://image.tmdb.org/t/p/w300", data["results"][i]["poster_path"])
-            else:
-                movies_data["poster_path"] = url_for('static', filename="covers/movies_covers/default.jpg")
-
-            if "release_date" in data["results"][i] != ['']:
-                movies_data["first_air_date"] = data["results"][i]["release_date"].split('-')[0]
-            else:
-                movies_data["first_air_date"] = "Unknown"
-
-            tmdb_results.append(movies_data)
-            i = i+1
-
-        return tmdb_results
-
-
-def add_element(element_id, list_type, element_cat):
-    # Check if the ID element exist in the database
-    if list_type == ListType.SERIES:
-        element = Series.query.filter_by(themoviedb_id=element_id).first()
-    elif list_type == ListType.ANIME:
-        element = Anime.query.filter_by(themoviedb_id=element_id).first()
-    elif list_type == ListType.MOVIES:
-        element = Movies.query.filter_by(themoviedb_id=element_id).first()
-
-    # If the ID exist in the database, we add the element to the user's list
-    if element is not None:
-        # Check if the element is already in the current's user list
-        if list_type == ListType.SERIES:
-            if SeriesList.query.filter_by(user_id=current_user.id, series_id=element.id).first() is not None:
-                return flash("This series is already in your list", "warning")
-        elif list_type == ListType.ANIME:
-            if AnimeList.query.filter_by(user_id=current_user.id, anime_id=element.id).first() is not None:
-                return flash("This anime is already in your list", "warning")
-        elif list_type == ListType.MOVIES:
-            if MoviesList.query.filter_by(user_id=current_user.id, movies_id=element.id).first() is not None:
-                return flash("This movie is already in your list", "warning")
-
-        add_element_to_user(element.id, int(current_user.id), list_type, element_cat)
-
-    # Otherwise we recover the data from an API
-    else:
-        element_data = get_element_data_from_api(element_id, list_type)
-        element_actors = get_element_actors_from_api(element_id, list_type)
-
-        if element_data is None:
-            return flash("There was a problem while getting the info from the API."
-                         " Please try again later.", "warning")
-
-        try:
-            element_cover_path = element_data["poster_path"]
-        except:
-            element_cover_path = None
-
-        element_cover_id = save_api_cover(element_cover_path, list_type)
-
-        if element_cover_id is None:
-            element_cover_id = "default.jpg"
-            flash("There was a problem while getting the poster from the API."
-                  " Please try to refresh later.", "warning")
-
-        element_id = add_element_in_base(element_data, element_actors, element_cover_id, list_type)
-        add_element_to_user(element_id, int(current_user.id), list_type, element_cat)
-
-
-def get_element_data_from_api(api_id, list_type):
-    if list_type != ListType.MOVIES:
-        try:
-            response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}"
-                                    .format(api_id, themoviedb_api_key))
-        except:
-            return None
-
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-            return None
-
-    elif list_type == ListType.MOVIES:
-        try:
-            response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
-                                    .format(api_id, themoviedb_api_key))
-        except:
-            return None
-
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-            return None
-
-    else:
-        return None
-
-    return json.loads(response.text)
-
-
-def get_element_actors_from_api(api_id, list_type):
-    if list_type != ListType.MOVIES:
-        try:
-            response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
-                                    .format(api_id, themoviedb_api_key))
-        except:
-            return None
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-            return None
-
-    elif list_type == ListType.MOVIES:
-        try:
-            response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
-                                    .format(api_id, themoviedb_api_key))
-        except:
-            return None
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
-            return None
-
-    else:
-        return None
-
-    return json.loads(response.text)
-
-
-def save_api_cover(element_cover_path, list_type):
-    if element_cover_path is None:
-        return "default.jpg"
-
-    element_cover_id = "{}.jpg".format(secrets.token_hex(8))
+def add_element_to_user(element_id, user_id, list_type, element_cat):
+    if element_cat == "Watching":
+        selected_cat = Status.WATCHING
+    elif element_cat == "Completed":
+        selected_cat = Status.COMPLETED
+    elif element_cat == "On Hold":
+        selected_cat = Status.ON_HOLD
+    elif element_cat == "Random":
+        selected_cat = Status.RANDOM
+    elif element_cat == "Dropped":
+        selected_cat = Status.DROPPED
+    elif element_cat == "Plan to Watch":
+        selected_cat = Status.PLAN_TO_WATCH
 
     if list_type == ListType.SERIES:
-        if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\\covers\\series_covers\\")
-        else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/covers/series_covers/")
+        # Set season/episode to max if the "completed" category is selected
+        if selected_cat == Status.COMPLETED:
+            seasons_eps = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).all()
+            user_list = SeriesList(user_id=user_id,
+                                   series_id=element_id,
+                                   current_season=len(seasons_eps),
+                                   last_episode_watched=seasons_eps[-1].episodes,
+                                   status=selected_cat)
+        else:
+            user_list = SeriesList(user_id=user_id,
+                                   series_id=element_id,
+                                   current_season=1,
+                                   last_episode_watched=1,
+                                   status=selected_cat)
+
+        db.session.add(user_list)
+        db.session.commit()
+        app.logger.info('[{}] Added a series with the ID {}'.format(user_id, element_id))
+        series = Series.query.filter_by(id=element_id).first()
+        set_last_update(media_name=series.name, media_type=list_type, new_status=selected_cat)
     elif list_type == ListType.ANIME:
-        if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\\covers\\anime_covers\\")
-        else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/covers/anime_covers/")
+        # Set season/episode to max if the "completed" category is selected
+        if selected_cat == Status.COMPLETED:
+            seasons_eps = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).all()
+            user_list = AnimeList(user_id=user_id,
+                                  anime_id=element_id,
+                                  current_season=len(seasons_eps),
+                                  last_episode_watched=seasons_eps[-1].episodes,
+                                  status=selected_cat)
+        else:
+            user_list = AnimeList(user_id=user_id,
+                                  anime_id=element_id,
+                                  current_season=1,
+                                  last_episode_watched=1,
+                                  status=selected_cat)
+
+        db.session.add(user_list)
+        db.session.commit()
+        app.logger.info('[{}] Added an anime with the ID {}'.format(user_id, element_id))
+        anime = Anime.query.filter_by(id=element_id).first()
+        set_last_update(media_name=anime.name, media_type=list_type, new_status=selected_cat)
     elif list_type == ListType.MOVIES:
-        if platform.system() == "Windows":
-            local_covers_path = os.path.join(app.root_path, "static\\covers\\movies_covers\\")
-        else:  # Linux & macOS
-            local_covers_path = os.path.join(app.root_path, "static/covers/movies_covers/")
+        # If it contain the "Animation" genre ==> "Completed Animation"
+        if selected_cat == Status.COMPLETED:
+            isAnimation = MoviesGenre.query.filter_by(movies_id=element_id, genre="Animation").first()
+            if isAnimation:
+                selected_cat = Status.COMPLETED_ANIMATION
+            else:
+                selected_cat = Status.COMPLETED
+        user_list = MoviesList(user_id=user_id,
+                               movies_id=element_id,
+                               status=selected_cat)
 
-    try:
-        urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(element_cover_path),
-                                   "{}{}".format(local_covers_path, element_cover_id))
-    except:
-        return None
+        db.session.add(user_list)
+        db.session.commit()
+        app.logger.info('[{}] Added movie with the ID {}'.format(user_id, element_id))
+        movie = Movies.query.filter_by(id=element_id).first()
+        set_last_update(media_name=movie.name, media_type=list_type, new_status=selected_cat)
 
-    img = Image.open("{}{}".format(local_covers_path, element_cover_id))
-    img = img.resize((300, 450), Image.ANTIALIAS)
-    img.save("{0}{1}".format(local_covers_path, element_cover_id), quality=90)
-
-    return element_cover_id
+    compute_media_time_spent(list_type)
 
 
-def add_element_in_base(element_data, element_actors, element_cover_id, list_type):
-    if list_type == ListType.SERIES:
-        element = Series.query.filter_by(themoviedb_id=element_data["id"]).first()
-    elif list_type == ListType.ANIME:
-        element = Anime.query.filter_by(themoviedb_id=element_data["id"]).first()
-    elif list_type == ListType.MOVIES:
-        element = Movies.query.filter_by(themoviedb_id=element_data["id"]).first()
-
-    if element is not None:
-        return element.id
+def add_element_in_base(element_id, list_type, element_cat):
+    """ GET ALL THE API DATA FROM THE API FILE """
+    All_data = API_data().get_api_data(element_id, list_type, element_cat)
 
     if list_type != ListType.MOVIES:
-        try:
-            name = element_data["name"]
-        except:
-            name = "Unknown"
-        try:
-            original_name = element_data["original_name"]
-        except:
-            original_name = "Unknown"
-        try:
-            first_air_date = element_data["first_air_date"]
-        except:
-            first_air_date = "Unknown"
-        try:
-            last_air_date = element_data["last_air_date"]
-        except:
-            last_air_date = "Unknown"
-        try:
-            homepage = element_data["homepage"]
-        except:
-            homepage = "Unknown"
-        try:
-            in_production = element_data["in_production"]
-        except:
-            in_production = "Unknown"
-        try:
-            total_seasons = element_data["number_of_seasons"]
-        except:
-            total_seasons = "Unknown"
-        try:
-            total_episodes = element_data["number_of_episodes"]
-        except:
-            total_episodes = "Unknown"
-        try:
-            status = element_data["status"]
-        except:
-            status = "Unknown"
-        try:
-            vote_average = element_data["vote_average"]
-        except:
-            vote_average = "Unknown"
-        try:
-            vote_count = element_data["vote_count"]
-        except:
-            vote_count = "Unknown"
-        try:
-            synopsis = element_data["overview"]
-        except:
-            synopsis = "Unknown"
-        try:
-            popularity = element_data["popularity"]
-        except:
-            popularity = "Unknown"
-
-        themoviedb_id = element_data["id"]
+        name = element_data.get("name", "Unknown")
+        original_name = element_data.get("original_name", "Unknown")
+        first_air_date = element_data.get("first_air_date", "Unknown")
+        last_air_date = element_data.get("last_air_date", "Unknown")
+        homepage = element_data.get("homepage", "Unknown")
+        in_production = element_data.get("in_production", False)
+        total_seasons = element_data.get("number_of_seasons", 0)
+        total_episodes = element_data.get("number_of_episodes", 0)
+        status = element_data.get("status", "Unknown")
+        vote_average = element_data.get("vote_average", 0)
+        vote_count = element_data.get("vote_count", 0)
+        synopsis = element_data.get("overview", "Unknown")
+        popularity = element_data.get("popularity", 0)
+        themoviedb_id = element_data.get("id")
 
         # Created by
         try:
@@ -3131,56 +2875,19 @@ def add_element_in_base(element_data, element_actors, element_cover_id, list_typ
 
         db.session.commit()
     elif list_type == ListType.MOVIES:
-        try:
-            name = element_data["title"]
-        except:
-            name = "Unknown"
-        try:
-            original_name = element_data["original_title"]
-        except:
-            original_name = "Unknown"
-        try:
-            release_date = element_data["release_date"]
-        except:
-            release_date = "Unknown"
-        try:
-            homepage = element_data["homepage"]
-        except:
-            homepage = "Unknown"
-        try:
-            released = element_data["status"]
-        except:
-            released = "Unknown"
-        try:
-            vote_average = element_data["vote_average"]
-        except:
-            vote_average = "Unknown"
-        try:
-            vote_count = element_data["vote_count"]
-        except:
-            vote_count = "Unknown"
-        try:
-            synopsis = element_data["overview"]
-        except:
-            synopsis = "Unknown"
-        try:
-            popularity = element_data["popularity"]
-        except:
-            popularity = "Unknown"
-        try:
-            budget = element_data["budget"]
-        except:
-            budget = "Unknown"
-        try:
-            revenue = element_data["revenue"]
-        except:
-            revenue = "Unknown"
-        try:
-            tagline = element_data["tagline"]
-        except:
-            tagline = "Unknown"
-
-        themoviedb_id = element_data["id"]
+        name = element_data.get("title", "Unknown")
+        original_name = element_data.get("original_title", "Unknown")
+        release_date = element_data.get("release_date", "Unknown")
+        homepage = element_data.get("homepage", "Unknown")
+        released = element_data.get("status", False)
+        vote_average = element_data.get("vote_average", 0)
+        vote_count = element_data.get("vote_count", 0)
+        synopsis = element_data.get("overview", "Unknown")
+        popularity = element_data.get("popularity", 0)
+        budget = element_data.get("budget", 0)
+        revenue = element_data.get("revenue", 0)
+        tagline = element_data.get("tagline", "Unknown")
+        themoviedb_id = element_data.get("id")
 
         # Runtime
         try:
@@ -3292,95 +2999,6 @@ def add_element_in_base(element_data, element_actors, element_cover_id, list_typ
                 db.session.add(company)
 
         db.session.commit()
-
-    return element.id
-
-
-def add_element_to_user(element_id, user_id, list_type, element_cat):
-    if element_cat == "Watching":
-        selected_cat = Status.WATCHING
-    elif element_cat == "Completed":
-        selected_cat = Status.COMPLETED
-    elif element_cat == "On Hold":
-        selected_cat = Status.ON_HOLD
-    elif element_cat == "Random":
-        selected_cat = Status.RANDOM
-    elif element_cat == "Dropped":
-        selected_cat = Status.DROPPED
-    elif element_cat == "Plan to Watch":
-        selected_cat = Status.PLAN_TO_WATCH
-
-    if list_type == ListType.SERIES:
-        # Set season/episode to max if the "completed" category is selected
-        if selected_cat == Status.COMPLETED:
-            number_season = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).count()
-            number_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=number_season)\
-                .first().episodes
-
-            user_list = SeriesList(user_id=user_id,
-                                   series_id=element_id,
-                                   current_season=number_season,
-                                   last_episode_watched=number_episode,
-                                   status=selected_cat)
-        else:
-            user_list = SeriesList(user_id=user_id,
-                                   series_id=element_id,
-                                   current_season=1,
-                                   last_episode_watched=1,
-                                   status=selected_cat)
-
-        db.session.add(user_list)
-        db.session.commit()
-        app.logger.info('[{}] Added a series with the ID {}'.format(user_id, element_id))
-        series = Series.query.filter_by(id=element_id).first()
-        set_last_update(media_name=series.name, media_type=list_type, new_status=selected_cat)
-    elif list_type == ListType.ANIME:
-        # Set season/episode to max if the "completed" category is selected
-        if selected_cat == Status.COMPLETED:
-            number_season = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).count()
-            number_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id,
-                                                                    season=number_season)\
-                .first().episodes
-
-            user_list = AnimeList(user_id=user_id,
-                                  anime_id=element_id,
-                                  current_season=number_season,
-                                  last_episode_watched=number_episode,
-                                  status=selected_cat)
-        else:
-            user_list = AnimeList(user_id=user_id,
-                                  anime_id=element_id,
-                                  current_season=1,
-                                  last_episode_watched=1,
-                                  status=selected_cat)
-
-        db.session.add(user_list)
-        db.session.commit()
-        app.logger.info('[{}] Added an anime with the ID {}'.format(user_id, element_id))
-        anime = Anime.query.filter_by(id=element_id).first()
-        set_last_update(media_name=anime.name, media_type=list_type, new_status=selected_cat)
-    elif list_type == ListType.MOVIES:
-        # If it contain the "Animation" genre ==> "Completed Animation"
-        if selected_cat == Status.COMPLETED:
-            genres = MoviesGenre.query.filter_by(movies_id=element_id).all()
-            for genre in genres:
-                if (genre.genre_id == 16) or (genre.genre == "Animation"):
-                    selected_cat = Status.COMPLETED_ANIMATION
-                    break
-                else:
-                    selected_cat = Status.COMPLETED
-
-        user_list = MoviesList(user_id=user_id,
-                               movies_id=element_id,
-                               status=selected_cat)
-
-        db.session.add(user_list)
-        db.session.commit()
-        app.logger.info('[{}] Added movie with the ID {}'.format(user_id, element_id))
-        movie = Movies.query.filter_by(id=element_id).first()
-        set_last_update(media_name=movie.name, media_type=list_type, new_status=selected_cat)
-
-    compute_media_time_spent(list_type)
 
 
 def refresh_element_data(api_id, list_type):
