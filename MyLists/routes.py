@@ -1391,18 +1391,18 @@ def add_element():
     elif list_type == ListType.MOVIES:
         media = Movies.query.filter_by(themoviedb_id=element_id).first()
 
-    # If media ID exists (is not None), add to user without API calls
+    # If media ID exists, add to user without API calls
     if media:
         # Check if the element is already in the current's user list
         if list_type == ListType.SERIES:
             if SeriesList.query.filter_by(user_id=current_user.id, series_id=media.id).first():
-                return flash("This series is already in your list", "warning")
+                flash("This series is already in your list", "warning")
         elif list_type == ListType.ANIME:
             if AnimeList.query.filter_by(user_id=current_user.id, anime_id=media.id).first():
-                return flash("This anime is already in your list", "warning")
+                flash("This anime is already in your list", "warning")
         elif list_type == ListType.MOVIES:
             if MoviesList.query.filter_by(user_id=current_user.id, movies_id=media.id).first():
-                return flash("This movie is already in your list", "warning")
+                flash("This movie is already in your list", "warning")
         add_element_to_user(media.id, current_user.id, list_type, element_cat)
     else:
         add_element_in_base(element_id, list_type, element_cat)
@@ -2575,49 +2575,49 @@ def get_follows_last_update(user_id):
 def add_element_to_user(element_id, user_id, list_type, element_cat):
     if list_type == ListType.SERIES:
         # Set season/episode to max if the "completed" category is selected
-        if selected_cat == Status.COMPLETED:
+        if element_cat == Status.COMPLETED:
             seasons_eps = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).all()
             user_list = SeriesList(user_id=user_id,
                                    series_id=element_id,
                                    current_season=len(seasons_eps),
                                    last_episode_watched=seasons_eps[-1].episodes,
-                                   status=selected_cat)
+                                   status=element_cat)
         else:
             user_list = SeriesList(user_id=user_id,
                                    series_id=element_id,
                                    current_season=1,
                                    last_episode_watched=1,
-                                   status=selected_cat)
+                                   status=element_cat)
 
         db.session.add(user_list)
         db.session.commit()
         app.logger.info('[{}] Added a series with the ID {}'.format(user_id, element_id))
         series = Series.query.filter_by(id=element_id).first()
-        set_last_update(media_name=series.name, media_type=list_type, new_status=selected_cat)
+        set_last_update(media_name=series.name, media_type=list_type, new_status=element_cat)
     elif list_type == ListType.ANIME:
         # Set season/episode to max if the "completed" category is selected
-        if selected_cat == Status.COMPLETED:
+        if element_cat == Status.COMPLETED:
             seasons_eps = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).all()
             user_list = AnimeList(user_id=user_id,
                                   anime_id=element_id,
                                   current_season=len(seasons_eps),
                                   last_episode_watched=seasons_eps[-1].episodes,
-                                  status=selected_cat)
+                                  status=element_cat)
         else:
             user_list = AnimeList(user_id=user_id,
                                   anime_id=element_id,
                                   current_season=1,
                                   last_episode_watched=1,
-                                  status=selected_cat)
+                                  status=element_cat)
 
         db.session.add(user_list)
         db.session.commit()
         app.logger.info('[{}] Added an anime with the ID {}'.format(user_id, element_id))
         anime = Anime.query.filter_by(id=element_id).first()
-        set_last_update(media_name=anime.name, media_type=list_type, new_status=selected_cat)
+        set_last_update(media_name=anime.name, media_type=list_type, new_status=element_cat)
     elif list_type == ListType.MOVIES:
         # If it contain the "Animation" genre add to "Completed Animation"
-        if selected_cat == Status.COMPLETED:
+        if element_cat == Status.COMPLETED:
             isAnimation = MoviesGenre.query.filter_by(movies_id=element_id, genre="Animation").first()
             if isAnimation:
                 selected_cat = Status.COMPLETED_ANIMATION
@@ -2625,27 +2625,24 @@ def add_element_to_user(element_id, user_id, list_type, element_cat):
                 selected_cat = Status.COMPLETED
         user_list = MoviesList(user_id=user_id,
                                movies_id=element_id,
-                               status=selected_cat)
+                               status=element_cat)
 
         db.session.add(user_list)
         db.session.commit()
         app.logger.info('[{}] Added movie with the ID {}'.format(user_id, element_id))
         movie = Movies.query.filter_by(id=element_id).first()
-        set_last_update(media_name=movie.name, media_type=list_type, new_status=selected_cat)
+        set_last_update(media_name=movie.name, media_type=list_type, new_status=element_cat)
 
     compute_media_time_spent(list_type)
 
 
 def add_element_in_base(api_id, list_type, element_cat):
-    API_media_data = API_data(API_key=themoviedb_api_key).get_api_data(api_id, list_type)
+    details_data = API_data(API_key=themoviedb_api_key).get_details_data(api_id, list_type)
+    actors_data = API_data(API_key=themoviedb_api_key).get_actors_data(api_id, list_type)
 
     # Check the API response
-    if API_media_data is None:
+    if details_data is None or actors_data is None:
         return flash("There was an error fetching the API data, please try again later", "warning")
-
-    # Get the API data
-    details_data = API_media_data[0]
-    actors_data = API_media_data[1]
 
     # Get the media cover
     media_cover_path = details_data.get("poster_path")
@@ -2673,9 +2670,9 @@ def add_element_in_base(api_id, list_type, element_cat):
         synopsis = details_data.get("overview", "Unknown")
         popularity = details_data.get("popularity", 0)
         themoviedb_id = details_data.get("id")
-        episode_duration = details_data.get("episode_run_time")
-        origin_country = details_data.get("origin_country")
-        created_by = [x.get('name') for x in details_data.get("created_by", {})]
+        episode_duration = details_data.get("episode_run_time")[0]
+        origin_country = details_data.get("origin_country")[0]
+        created_by = ", ".join([x.get('name') for x in details_data.get("created_by", {})])
 
         # Check if a special season exist, if so, ignore it
         seasons_data = []
@@ -2685,13 +2682,6 @@ def add_element_in_base(api_id, list_type, element_cat):
         else:
             for i in range(0, len(details_data["seasons"])):
                 seasons_data.append(details_data["seasons"][i])
-
-        # Actors names
-        actors_names = []
-        for i in range(0, len(actors_data.get("cast", []))):
-            actors_names.append(actors_data["cast"][i]["name"])
-            if i == 4:
-                break
 
         # Genres
         genres_data, genres_id = [], []
@@ -2703,6 +2693,13 @@ def add_element_in_base(api_id, list_type, element_cat):
         networks_data = []
         for i in range(0, len(details_data.get("networks", []))):
             networks_data.append(details_data["networks"][i]["name"])
+            if i == 4:
+                break
+
+        # Actors names
+        actors_names = []
+        for i in range(0, len(actors_data.get("cast", []))):
+            actors_names.append(actors_data["cast"][i]["name"])
             if i == 4:
                 break
 
@@ -3489,6 +3486,32 @@ def add_actors_movies():
                 actors = MoviesActors(movies_id=movies_id,
                                       name=actors_names[k])
                 db.session.add(actors)
+
+        db.session.commit()
+
+
+def add_collections_movies():
+    all_movies = Movies.query.all()
+    for movie in all_movies:
+        tmdb_movies_id = movie.themoviedb_id
+        movies_id = movie.id
+        response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
+                                .format(tmdb_movies_id, themoviedb_api_key))
+        data = json.loads(response.text)
+
+        try:
+            collection_id = data["belongs_to_collection"]["id"]
+            collection_poster = data["belongs_to_collection"]["poster_path"]
+            response_collection = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
+                                    .format(collection_id, themoviedb_api_key))
+            data_collection = json.loads(response.text)
+            collection_name = data_collection["name"]
+            collection_overview = data_collection["overview"]
+            collection_parts = len(data_collection["parts"])
+        except:
+            pass
+
+
 
         db.session.commit()
 

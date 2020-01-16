@@ -245,6 +245,7 @@ class Movies(db.Model):
     tagline = db.Column(db.String(30))
     image_cover = db.Column(db.String(100), nullable=False)
     themoviedb_id = db.Column(db.Integer, nullable=False)
+    collection_id = db.Column(db.Integer)
 
 
 class MoviesList(db.Model):
@@ -272,6 +273,15 @@ class MoviesActors(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     name = db.Column(db.String(150))
+
+
+class MoviesCollections(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    collection_id = db.Column(db.Integer, db.ForeignKey('movies.collection_id'), nullable=False)
+    parts = db.Column(db.Integer)
+    name = db.Column(db.String(100))
+    poster = db.Column(db.String(100))
+    overview = db.Column(db.String(100))
 
 
 ######################################################## ACHIEVEMENTS ##################################################

@@ -29,6 +29,9 @@ class API_data():
             app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
             return [{"nb_results": 0}]
 
+        if response.status_code == 34:
+            return [{"nb_results": 0}]
+
         data = json.loads(response.text)
 
         if data.get("total_results", 0) == 0:
@@ -60,29 +63,26 @@ class API_data():
                     if (16 in genre_ids and "JP" in origin_country) or (16 in genre_ids and original_language == "ja"):
                         pass
                     else:
-                        continue
                         i += 1
+                        continue
                 elif list_type == ListType.SERIES:
                     if (16 in genre_ids and "JP" in origin_country) or (16 in genre_ids and original_language == "ja"):
-                        continue
                         i += 1
+                        continue
                     else:
                         pass
 
                 media_data = {"tmdb_id": data["results"][i]["id"],
                               "name": data["results"][i]["name"]}
+
                 if data["results"][i]["poster_path"]:
                     media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300",
                                                               data["results"][i]["poster_path"])
                 else:
                     media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
 
-                try:
-                    tata = data["results"][i]["first_air_date"]
-                except:
-                    media_data["first_air_date"] = "Unknown"
-
-                if tata:
+                first_air_date = data["results"][i].get("first_air_date")
+                if first_air_date:
                     if data["results"][i]["first_air_date"].split('-') != ['']:
                         media_data["first_air_date"] = data["results"][i]["first_air_date"].split('-')[0]
                 else:
@@ -90,6 +90,7 @@ class API_data():
 
                 tmdb_results.append(media_data)
                 i += 1
+
         elif list_type == ListType.MOVIES:
             # Take only the first 6 results. There are 20 results per page.
             tmdb_results, i = [], 0
@@ -103,48 +104,65 @@ class API_data():
                 else:
                     movies_data["poster_path"] = url_for('static', filename="covers/movies_covers/default.jpg")
 
-                if "release_date" in data["results"][i] != ['']:
-                    movies_data["first_air_date"] = data["results"][i]["release_date"].split('-')[0]
+                release_date = data["results"][i].get("release_date")
+
+                if release_date:
+                    if data["results"][i]["release_date"] != ['']:
+                        movies_data["first_air_date"] = data["results"][i]["release_date"].split('-')[0]
                 else:
                     movies_data["first_air_date"] = "Unknown"
 
                 tmdb_results.append(movies_data)
                 i += 1
-        else: [{"nb_results": 0}]
 
         return tmdb_results
 
-    def get_api_data(self, api_id, list_type):
+    def get_details_data(self, api_id, list_type):
         try:
             if list_type != ListType.MOVIES:
-                details_response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}"
+                response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}"
                                         .format(api_id, self.tmdb_api_key))
-                actors_response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
-                                        .format(api_id, themoviedb_api_key))
             if list_type == ListType.MOVIES:
-                details_response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
+                response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
                                         .format(api_id, self.tmdb_api_key))
-                actors_response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
-                                        .format(api_id, themoviedb_api_key))
         except:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: Could not reach the endpoint')
             return None
 
-        if details_response.status_code == 401 or actors_response.status_code == 401:
+        if response.status_code == 401:
             app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
             return None
 
-        # Recover the details and the actors
-        if details_response.status_code == 34:
+        if response.status_code == 34:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: The ressource could not be found')
             return None
-        else:
-            details_data = json.loads(details_response.text)
 
-        if actors_response.status_code == 34:
-            actors_data = {}
-        else:
-            actors_data = json.loads(actors_response.text)
+        details_data = json.loads(response.text)
 
-        return [details_data, actors_data]
+        return details_data
+
+    def get_actors_data(self, api_id, list_type):
+        try:
+            if list_type != ListType.MOVIES:
+                response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
+                                        .format(api_id, self.tmdb_api_key))
+            if list_type == ListType.MOVIES:
+                response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
+                                        .format(api_id, self.tmdb_api_key))
+        except:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: Could not reach the endpoint')
+            return None
+
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
+            return None
+
+        if response.status_code == 34:
+            details_data = {}
+        else:
+            actors_data = json.loads(response.text)
+
+        return actors_data
 
     def save_api_cover(self, media_cover_path, media_cover_name, list_type):
         if list_type == ListType.SERIES:
