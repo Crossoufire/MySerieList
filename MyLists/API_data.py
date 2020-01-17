@@ -7,6 +7,7 @@ import requests
 from PIL import Image
 from MyLists import app
 from flask import url_for
+from jikanpy import Jikan
 from MyLists.models import ListType
 
 
@@ -192,3 +193,20 @@ class API_data():
         img.save("{0}{1}".format(local_covers_path, media_cover_name), quality=90)
 
         return True
+
+    def get_trending_media(self):
+        # Trending movies
+        try:
+            series_response = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
+                                           .format(self.tmdb_api_key))
+            anime_response = Jikan().top(type='anime', page=1, subtype='airing')
+            movies_response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
+                                           .format(self.tmdb_api_key))
+        except:
+            return None
+
+        series_data = json.loads(series_response.text)
+        anime_data = anime_response
+        movies_data = json.loads(movies_response.text)
+
+        return [series_data, anime_data, movies_data]

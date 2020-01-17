@@ -10,7 +10,6 @@ import atexit
 import dateutil
 
 from PIL import Image
-from jikanpy import Jikan
 from flask_mail import Message
 from MyLists.admin_views import User
 from MyLists.API_data import API_data
@@ -23,7 +22,7 @@ from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, Change
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
     Follow, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, Movies, MoviesGenre, \
-    MoviesList, MoviesProd, MoviesActors, SeriesActors, AnimeActors, UserLastUpdate, Badges
+    MoviesList, MoviesProd, MoviesActors, SeriesActors, AnimeActors, UserLastUpdate, Badges, MoviesCollections
 
 
 config.read('config.ini')
@@ -80,10 +79,10 @@ def home():
             if next_page is None:
                 if user.homepage == HomePage.MYSERIESLIST:
                     return redirect(url_for('mymedialist', media_list='serieslist', user_name=current_user.username))
-                elif user.homepage == HomePage.MYMOVIESLIST:
-                    return redirect(url_for('mymedialist', media_list='movieslist', user_name=current_user.username))
                 elif user.homepage == HomePage.MYANIMELIST:
                     return redirect(url_for('mymedialist', media_list='animelist', user_name=current_user.username))
+                elif user.homepage == HomePage.MYMOVIESLIST:
+                    return redirect(url_for('mymedialist', media_list='movieslist', user_name=current_user.username))
                 elif user.homepage == HomePage.ACCOUNT:
                     return redirect(url_for('account', user_name=current_user.username))
                 elif user.homepage == HomePage.HALL_OF_FAME:
@@ -114,10 +113,10 @@ def home():
         user = User.query.filter_by(id=current_user.id).first()
         if user.homepage == HomePage.MYSERIESLIST:
             return redirect(url_for('mymedialist', media_list='serieslist', user_name=current_user.username))
-        if user.homepage == HomePage.MYMOVIESLIST:
-            return redirect(url_for('mymedialist', media_list='movieslist', user_name=current_user.username))
         elif user.homepage == HomePage.MYANIMELIST:
             return redirect(url_for('mymedialist', media_list='animelist', user_name=current_user.username))
+        elif user.homepage == HomePage.MYMOVIESLIST:
+            return redirect(url_for('mymedialist', media_list='movieslist', user_name=current_user.username))
         elif user.homepage == HomePage.ACCOUNT:
             return redirect(url_for('account', user_name=current_user.username))
         elif user.homepage == HomePage.HALL_OF_FAME:
@@ -568,9 +567,7 @@ def hall_of_fame():
 
         all_users_data.append(user_data)
 
-    return render_template("hall_of_fame.html",
-                           title='Hall of Fame',
-                           all_data=all_users_data)
+    return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
 
 
 @app.route("/global_stats", methods=['GET'])
@@ -775,39 +772,19 @@ def global_stats():
 @app.route("/current_trends", methods=['GET'])
 @login_required
 def current_trends():
-    # Trending movies
-    try:
-        movies_response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
-            .format(themoviedb_api_key))
-    except:
-        movies_response = None
-    movies_trends = current_trends(movies_response, ListType.MOVIES)
+    # Recover the trending media data from the API
+    trending_data = API_data(API_key=themoviedb_api_key).get_trending_media()
 
-    # Trending series
-    try:
-        series_response = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
-            .format(themoviedb_api_key))
-    except:
-        series_response = None
-    series_trends = current_trends(series_response, ListType.SERIES)
-
-    # Trending anime
-    try:
-        jikan = Jikan()
-        anime_response = jikan.top(type='anime', page=1, subtype='airing')
-    except:
-        anime_response = None
-    anime_trends = current_trends(anime_response, ListType.ANIME)
-
-    if (movies_trends == None) or (series_trends  == None) or (anime_trends == None):
-        flash('Current trends are not available right now, try again later', 'warning')
+    if trending_data is None:
+        flash('The current trends are not available right now, please try again later', 'warning')
         return redirect(url_for('account', user_name=current_user.username))
 
-    return render_template("current_trends.html",
-                           title         = "Current trends",
-                           movies_trends = movies_trends,
-                           series_trends = series_trends,
-                           anime_trends  = anime_trends)
+    series_trends = get_trending_data(trending_data[0], ListType.SERIES)
+    anime_trends  = get_trending_data(trending_data[1], ListType.ANIME)
+    movies_trends = get_trending_data(trending_data[2], ListType.MOVIES)
+
+    return render_template("current_trends.html", title="Current trends", series_trends=series_trends,
+                           anime_trends=anime_trends, movies_trends=movies_trends)
 
 
 @app.route("/follow_status", methods=['POST'])
@@ -830,6 +807,7 @@ def follow_status():
         # Check if the follow already exists
         if Follow.query.filter_by(user_id=current_user.id, follow_id=follow_id).first() is not None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
         # Follow the user
         new_follow = Follow(user_id=current_user.id, follow_id=follow_id)
         db.session.add(new_follow)
@@ -839,6 +817,7 @@ def follow_status():
         # Check if the user to unfollow is in the follow list
         if Follow.query.filter_by(user_id=current_user.id, follow_id=follow_id).first() is None:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
         # Unfollow the user
         Follow.query.filter_by(user_id=current_user.id, follow_id=follow_id).delete()
         db.session.commit()
@@ -871,8 +850,7 @@ def mymedialist(media_list, user_name):
 
     # Check the route and retrieve the media data
     if media_list == "serieslist":
-        element_data = db.session.query(Series, SeriesList,
-                                        func.group_concat(SeriesGenre.genre.distinct()),
+        element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
                                         func.group_concat(SeriesNetwork.network.distinct()),
                                         func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
                                         func.group_concat(SeriesActors.name.distinct()),
@@ -886,8 +864,7 @@ def mymedialist(media_list, user_name):
         covers_path = url_for('static', filename='covers/series_covers/')
         media_all_data = get_medialist_data(element_data, ListType.SERIES, covers_path, user.id)
     elif media_list == "animelist":
-        element_data = db.session.query(Anime, AnimeList,
-                                        func.group_concat(AnimeGenre.genre.distinct()),
+        element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
                                         func.group_concat(AnimeNetwork.network.distinct()),
                                         func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
                                         func.group_concat(AnimeActors.name.distinct()),
@@ -901,8 +878,7 @@ def mymedialist(media_list, user_name):
         covers_path = url_for('static', filename='covers/anime_covers/')
         media_all_data = get_medialist_data(element_data, ListType.ANIME, covers_path, user.id)
     elif media_list == "movieslist":
-        element_data = db.session.query(Movies, MoviesList,
-                                        func.group_concat(MoviesGenre.genre.distinct()),
+        element_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre.distinct()),
                                         func.group_concat(MoviesProd.production_company.distinct()),
                                         func.group_concat(MoviesActors.name.distinct()))\
             .join(MoviesList, MoviesList.movies_id == Movies.id)\
@@ -925,7 +901,7 @@ def mymedialist(media_list, user_name):
             user.movies_views = user.movies_views + 1
         db.session.commit()
 
-    if media_list == "serieslist" or media_list == "animelist":
+    if media_list != "movieslist":
         return render_template('mymedialist/series_anime_list.html',
                                title            = "{}'s {}".format(user_name, media_list),
                                all_data         = media_all_data["all_data"],
@@ -1159,11 +1135,17 @@ def delete_element():
 
     # Compute total time spent
     if element_type == "animelist":
-        compute_time_spent(type="delete", old_eps=anime_episode, new_eps=None, old_seas=anime_season, new_seas=None,
-                           all_seas_data=all_animes_seasons, media=anime, list_type=ListType.ANIME)
+        all_anime_seasons = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id)\
+            .order_by(AnimeEpisodesPerSeason.season).all()
+        compute_time_spent(type="delete", old_eps=anime_list.last_episode_watched, new_eps=None,
+                           old_seas=anime_list.current_season, new_seas=None, all_seas_data=all_anime_seasons,
+                           media=anime, list_type=ListType.ANIME)
     elif element_type == "serieslist":
-        compute_time_spent(type="delete", old_eps=series_episode, new_eps=None, old_seas=series_season, new_seas=None,
-                           all_seas_data=all_series_seasons, media=series, list_type=ListType.SERIES)
+        all_series_seasons = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id)\
+            .order_by(SeriesEpisodesPerSeason.season).all()
+        compute_time_spent(type="delete", old_eps=series_list.last_episode_watched, new_eps=None,
+                           old_seas=series_list.current_season, new_seas=None, all_seas_data=all_series_seasons,
+                           media=series, list_type=ListType.SERIES)
     elif element_type == "movieslist":
         compute_time_spent(type="delete", old_eps=None, new_eps=None, old_seas=None, new_seas=None,
                            all_seas_data=None, media=movies, list_type=ListType.MOVIES)
@@ -1309,11 +1291,21 @@ def add_to_medialist():
     except:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
-    if element_type == "animelist" or element_type == "serieslist":
+    # Check if element_type exists
+    if element_type == "serieslist":
+        element_type = ListType.SERIES
+    elif element_type == "animelist":
+        element_type = ListType.ANIME
+    elif element_type == "movieslist":
+        element_type = ListType.MOVIES
+    else:
+        return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+    if element_type == ListType.SERIES or element_type == ListType.ANIME:
         category_list = ["Watching", "Completed", "On Hold", "Random", "Dropped", "Plan to Watch"]
         if add_category not in category_list:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
-    elif element_type == "movieslist":
+    elif element_type == ListType.MOVIES:
         category_list = ["Completed", "Plan to Watch"]
         if add_category not in category_list:
             return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
@@ -1321,19 +1313,16 @@ def add_to_medialist():
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
     # Check if the element is in the current user's list
-    if element_type == "animelist":
+    if element_type == ListType.ANIME:
         element = AnimeList.query.filter_by(anime_id=element_id, user_id=current_user.id).first()
-        list_type = ListType.ANIME
-    elif element_type == "serieslist":
+    elif element_type == ListType.SERIES:
         element = SeriesList.query.filter_by(series_id=element_id, user_id=current_user.id).first()
-        list_type = ListType.SERIES
-    elif element_type == "movieslist":
+    elif element_type == ListType.MOVIES:
         element = MoviesList.query.filter_by(movies_id=element_id, user_id=current_user.id).first()
-        list_type = ListType.MOVIES
     if element is not None:
         flash("This media is already in your list", "warning")
     else:
-        add_element_to_user(element_id, current_user.id, list_type, add_category)
+        add_element_to_user(element_id, current_user.id, element_type, add_category)
 
     return '', 204
 
@@ -1416,14 +1405,13 @@ def autocomplete(media):
     image_error = url_for('static', filename='img/error.jpg')
 
     search = request.args.get('q')
-    API_call = API_data(API_key=themoviedb_api_key)
 
     if media == "animelist":
-        results = API_call.autocomplete_search(search, ListType.ANIME)
+        results = API_data(API_key=themoviedb_api_key).autocomplete_search(search, ListType.ANIME)
     elif media == "serieslist":
-        results = API_call.autocomplete_search(search, ListType.SERIES)
+        results = API_data(API_key=themoviedb_api_key).autocomplete_search(search, ListType.SERIES)
     elif media == "movieslist":
-        results = API_call.autocomplete_search(search, ListType.MOVIES)
+        results = API_data(API_key=themoviedb_api_key).autocomplete_search(search, ListType.MOVIES)
     else:
         return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
 
@@ -1601,124 +1589,64 @@ def compute_media_time_spent(list_type):
     db.session.commit()
 
 
-def current_trends(response, list_type):
-    if response is None:
-        return None
-
+def get_trending_data(trends_data, list_type):
     trending_list = []
-    if list_type == ListType.MOVIES:
-        global_poster_path = "http://image.tmdb.org/t/p/w300"
-        try:
-            trending_data = json.loads(response.text)
-            tmp = trending_data["results"]
-        except:
-            return None
-
-        i = 0
-        for data in trending_data["results"]:
-            movies = {}
-            try:
-                movies["title"] = data["title"]
-            except:
-                movies["title"] = "Unknown"
-
-            try:
-                movies["poster_path"] = global_poster_path + data["poster_path"]
-            except:
-                movies["poster_path"] = "static/covers/movies_covers/default.jpg"
-
-            try:
-                movies["release_date"] = datetime.strptime(data["release_date"], '%Y-%m-%d').strftime("%d %b %Y")
-            except:
-                movies["release_date"] = "Unknown"
-
-            try:
-                movies["overview"] = data["overview"]
-            except:
-                movies["overview"] = "No overview available for this movie."
-
-            movies["tmdb_link"] = "https://www.themoviedb.org/movie/{}".format(data["id"])
-            trending_list.append(movies)
-            i += 1
-            if i > 11: break
-
-        return trending_list
-    elif list_type == ListType.SERIES:
-        global_poster_path = "http://image.tmdb.org/t/p/w300"
-        try:
-            trending_data = json.loads(response.text)
-            tmp = trending_data["results"]
-        except:
-            return None
-
-        i = 0
-        for data in trending_data["results"]:
+    tmdb_posters_path = "http://image.tmdb.org/t/p/w300"
+    i = 0
+    if list_type == ListType.SERIES:
+        for data in trends_data.get("results"):
             series = {}
-            try:
-                series["title"] = data["name"]
-            except:
-                series["title"] = "Unknown"
-
-            try:
-                series["poster_path"] = global_poster_path + data["poster_path"]
-            except:
+            series["title"] = data.get("name", "Unknown")
+            series["poster_path"] = tmdb_posters_path + data.get("poster_path")
+            if series["poster_path"] is None or data.get("poster_path") == "":
                 series["poster_path"] = "static/covers/movies_covers/default.jpg"
-
-            try:
-                series["first_air_date"] = datetime.strptime(data["first_air_date"], '%Y-%m-%d').strftime("%d %b %Y")
-            except:
-                series["first_air_date"] = "Unknown"
-
-            try:
-                series["overview"] = data["overview"]
-            except:
-                series["overview"] = "No overview available for this series."
-
-            series["tmdb_link"] = "https://www.themoviedb.org/tv/{}".format(data["id"])
+            series["first_air_date"] = data.get("first_air_date", "Unknown")
+            if series["first_air_date"] != "Unknown":
+                series["first_air_date"] = datetime.strptime(series["first_air_date"], '%Y-%m-%d').strftime("%d %b %Y")
+            series["overview"] = data.get("overview", "There is no overview for this series.")
+            series["tmdb_link"] = "https://www.themoviedb.org/tv/{}".format(data.get("id"))
             trending_list.append(series)
             i += 1
-            if i > 11: break
+            if i > 11:
+                break
 
         return trending_list
     elif list_type == ListType.ANIME:
-        try:
-            trending_data = response
-            tmp = trending_data["top"]
-        except:
-            return None
-
-        i = 0
-        for data in trending_data["top"]:
+        for data in trends_data.get("top"):
             anime = {}
-            try:
-                anime["title"] = data["title"]
-            except:
-                anime["title"] = "Unknown"
-
-            try:
-                anime["poster_path"] = data["image_url"]
-            except:
-                anime["poster_path"] = "static/covers/movies_covers/default.jpg"
-
-            try:
-                anime["first_air_date"] = dateutil.parser.parse(data["start_date"]).strftime('%d %b %Y')
-            except:
-                anime["first_air_date"] = "Unknown"
-
-            try:
-                anime["overview"] = data["synopsis"]
-            except:
-                anime["overview"] = "There is no overview from this API. " \
-                                    "You can check on MyAnimeList by clicking on the title"
-
-            anime["tmdb_link"] = data["url"]
+            anime["title"] = data.get("title", "Unknown")
+            anime["poster_path"] = data.get("image_url")
+            if anime["poster_path"] is None or data.get("image_url") == "":
+                anime["poster_path"] = "static/covers/anime_covers/default.jpg"
+            anime["first_air_date"] = data.get("start_date")
+            anime["overview"] = "There is no overview from this API. " \
+                                "You can check it on MyAnimeList by clicking on the title"
+            anime["tmdb_link"] = data.get("url")
             trending_list.append(anime)
             i += 1
-            if i > 11: break
+            if i > 11:
+                break
 
         return trending_list
-    else:
-        return None
+    elif list_type == ListType.MOVIES:
+        for data in trends_data.get("results"):
+            movies = {}
+            movies["title"] = data.get("title", "Unknown")
+            movies["poster_path"] = tmdb_posters_path + data.get("poster_path")
+            if movies["poster_path"] is None or data.get("poster_path") == "":
+                movies["poster_path"] = "static/covers/movies_covers/default.jpg"
+            movies["release_date"] = datetime.strptime(data.get("release_date"), '%Y-%m-%d').strftime("%d %b %Y")
+            movies["overview"] = data.get("overview", "No overview available for this movie.")
+            movies["tmdb_link"] = "https://www.themoviedb.org/movie/{}".format(data.get("id"))
+            trending_list.append(movies)
+            i += 1
+            if i > 11:
+                break
+
+        return trending_list
+
+
+
 
 
 def get_account_data(user, user_name, follows_list_data):
@@ -2656,25 +2584,47 @@ def add_element_in_base(api_id, list_type, element_cat):
         media_cover_name = "default.jpg"
 
     if list_type != ListType.MOVIES:
-        name = details_data.get("name", "Unknown")
-        original_name = details_data.get("original_name", "Unknown")
-        first_air_date = details_data.get("first_air_date", "Unknown")
-        last_air_date = details_data.get("last_air_date", "Unknown")
-        homepage = details_data.get("homepage", "Unknown")
-        in_production = details_data.get("in_production", False)
-        total_seasons = details_data.get("number_of_seasons", 0)
-        total_episodes = details_data.get("number_of_episodes", 0)
-        status = details_data.get("status", "Unknown")
-        vote_average = details_data.get("vote_average", 0)
-        vote_count = details_data.get("vote_count", 0)
-        synopsis = details_data.get("overview", "Unknown")
-        popularity = details_data.get("popularity", 0)
+        name = details_data.get("name", "Unknown") or "Unkwown"
+        original_name = details_data.get("original_name", "Unknown") or "Unkwown"
+        first_air_date = details_data.get("first_air_date", "Unknown") or "Unkwown"
+        last_air_date = details_data.get("last_air_date", "Unknown") or "Unkwown"
+        homepage = details_data.get("homepage", "Unknown") or "Unkwown"
+        in_production = details_data.get("in_production", False) or False
+        total_seasons = details_data.get("number_of_seasons", 0) or 0
+        total_episodes = details_data.get("number_of_episodes", 0) or 0
+        status = details_data.get("status", "Unknown") or "Unknown"
+        vote_average = details_data.get("vote_average", 0) or 0
+        vote_count = details_data.get("vote_count", 0) or 0
+        synopsis = details_data.get("overview", "Unknown") or "Unknown"
+        popularity = details_data.get("popularity", 0) or 0
         themoviedb_id = details_data.get("id")
-        episode_duration = details_data.get("episode_run_time")[0]
-        origin_country = details_data.get("origin_country")[0]
-        created_by = ", ".join([x.get('name') for x in details_data.get("created_by", {})])
 
-        # Check if a special season exist, if so, ignore it
+        # Episode duration: list
+        episode_duration = details_data.get("episode_run_time") or None
+        if episode_duration is None:
+            if list_type == ListType.ANIME:
+                episode_duration = 24
+            elif list_type == ListType.SERIES:
+                episode_duration = 45
+        else:
+            episode_duration = episode_duration[0]
+        origin_country = details_data.get("origin_country", "Unknown") or "Unknown"
+        if origin_country != "Unknown":
+            origin_country = origin_country[0]
+
+        # Created by: list
+        created_by = details_data.get("created_by", "Unknown") or "Unknown"
+        if created_by != "Unknown":
+            creators = []
+            for creator in created_by:
+                tmp_created = creator.get("name") or None
+                if tmp_created is not None:
+                    creators.append(tmp_created)
+            created_by = ", ".join(x for x in creators)
+
+        print(details_data)
+
+        # Seasons: list. Check if a special season exist, if so, ignore it
         seasons_data = []
         if details_data["seasons"][0]["season_number"] == 0:
             for i in range(1, len(details_data["seasons"])):
@@ -2683,20 +2633,20 @@ def add_element_in_base(api_id, list_type, element_cat):
             for i in range(0, len(details_data["seasons"])):
                 seasons_data.append(details_data["seasons"][i])
 
-        # Genres
+        # Genres: list
         genres_data, genres_id = [], []
         for i in range(0, len(details_data.get("genres", []))):
             genres_data.append(details_data["genres"][i]["name"])
             genres_id.append(int(details_data["genres"][i]["id"]))
 
-        # Network
+        # Network: list
         networks_data = []
         for i in range(0, len(details_data.get("networks", []))):
             networks_data.append(details_data["networks"][i]["name"])
             if i == 4:
                 break
 
-        # Actors names
+        # Actors names: list
         actors_names = []
         for i in range(0, len(actors_data.get("cast", []))):
             actors_names.append(actors_data["cast"][i]["name"])
@@ -2943,6 +2893,323 @@ def add_element_in_base(api_id, list_type, element_cat):
     add_element_to_user(element.id, current_user.id, list_type, element_cat)
 
 
+def save_profile_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+    try:
+        i = Image.open(form_picture)
+    except:
+        return "default.jpg"
+    i = i.resize((300, 300), Image.ANTIALIAS)
+    i.save(picture_path, quality=90)
+
+    return picture_fn
+
+
+def add_follow(follow_username):
+    follow_to_add = User.query.filter_by(username=follow_username).first()
+
+    if (follow_to_add is None) or (follow_to_add.id == 1):
+        app.logger.info('[{}] Attempt to follow user {}'.format(current_user.id, follow_username))
+        return flash('This user does not exist', 'warning')
+
+    if follow_to_add.username is current_user.username:
+        return flash("You can't follow yourself", 'warning')
+    else:
+        follow_exists = Follow.query.filter_by(user_id=current_user.id, follow_id=follow_to_add.id).first()
+
+        if follow_exists:
+            return flash('User already in your follow list', 'info')
+
+        add_follow = Follow(user_id   = current_user.id,
+                            follow_id = follow_to_add.id)
+
+        db.session.add(add_follow)
+        db.session.commit()
+
+        app.logger.info('[{}] is following the user with ID {}'.format(current_user.id, follow_to_add.id))
+        flash("Follow successfully added.", 'success')
+
+
+def send_reset_email(user):
+    token = user.get_reset_token()
+    msg = Message(subject    = 'Password Reset Request',
+                  sender     = app.config['MAIL_USERNAME'],
+                  recipients = [user.email],
+                  bcc        = [app.config['MAIL_USERNAME']],
+                  reply_to   = app.config['MAIL_USERNAME'])
+
+    if platform.system() == "Windows":
+        path = os.path.join(app.root_path, "static\emails\\password_reset.html")
+    else:  # Linux & macOS
+        path = os.path.join(app.root_path, "static/emails/password_reset.html")
+
+    email_template = open(path, 'r').read().replace("{1}", user.username)
+    email_template = email_template.replace("{2}", url_for('reset_token', token=token, _external=True))
+    msg.html = email_template
+
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        app.logger.error('[SYSTEM] Exception raised when sending reset email to user with the ID {} : {}'
+                         .format(user.id, e))
+        return False
+
+
+def send_register_email(user):
+    token = user.get_register_token()
+    msg = Message(subject    = 'MyLists Register Request',
+                  sender     = app.config['MAIL_USERNAME'],
+                  recipients = [user.email],
+                  bcc        = [app.config['MAIL_USERNAME']],
+                  reply_to   = app.config['MAIL_USERNAME'])
+
+    if platform.system() == "Windows":
+        path = os.path.join(app.root_path, "static\emails\\register.html")
+    else:  # Linux & macOS
+        path = os.path.join(app.root_path, "static/emails/register.html")
+
+    email_template = open(path, 'r').read().replace("{1}", user.username)
+    email_template = email_template.replace("{2}", url_for('register_account_token', token=token, _external=True))
+    msg.html = email_template
+
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        app.logger.error('[SYSTEM] Exception raised when sending register email to user with the ID {} : {}'
+                         .format(user.id, e))
+        return False
+
+
+def send_email_update_email(user):
+    token = user.get_email_update_token()
+    msg = Message(subject    = 'MyList Email Update Request',
+                  sender     = app.config['MAIL_USERNAME'],
+                  recipients = [user.email],
+                  bcc        = [app.config['MAIL_USERNAME']],
+                  reply_to   = app.config['MAIL_USERNAME'])
+
+    if platform.system() == "Windows":
+        path = os.path.join(app.root_path, "static\emails\\email_update.html")
+    else:  # Linux & macOS
+        path = os.path.join(app.root_path, "static/emails/email_update.html")
+
+    email_template = open(path, 'r').read().replace("{1}", user.username)
+    email_template = email_template.replace("{2}", url_for('email_update_token', token=token, _external=True))
+    msg.html = email_template
+
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        app.logger.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'
+                         .format(user.id, e))
+        return False
+
+
+def refresh_db_badges():
+    list_all_badges = []
+    path = os.path.join(app.root_path, 'static/csv_data/badges.csv')
+    with open(path, "r") as fp:
+        for line in fp:
+            list_all_badges.append(line.split(";"))
+
+    badges = Badges.query.order_by(Badges.id).all()
+    for i in range(1, len(list_all_badges)):
+        try:
+            genre_id = str(list_all_badges[i][4])
+        except:
+            genre_id = None
+        badges[i-1].threshold  = int(list_all_badges[i][0])
+        badges[i-1].image_id   = list_all_badges[i][1]
+        badges[i-1].title      = list_all_badges[i][2]
+        badges[i-1].type       = list_all_badges[i][3]
+        badges[i-1].genres_id  = genre_id
+
+
+############################################### Add data Retroactively #################################################
+
+
+def add_badges_to_db():
+    list_all_badges = []
+    path = os.path.join(app.root_path, 'static/csv_data/badges.csv')
+    with open(path, "r") as fp:
+        for line in fp:
+            list_all_badges.append(line.split(";"))
+
+    for i in range(1, len(list_all_badges)):
+        try:
+            genre_id = str(list_all_badges[i][4])
+        except:
+            genre_id = None
+        badge = Badges(threshold=int(list_all_badges[i][0]),
+                       image_id=list_all_badges[i][1],
+                       title=list_all_badges[i][2],
+                       type=list_all_badges[i][3],
+                       genres_id=genre_id)
+        db.session.add(badge)
+
+
+def add_actors_movies():
+    all_movies = Movies.query.all()
+    for i in range(0, len(all_movies)):
+        tmdb_movies_id = all_movies[i].themoviedb_id
+        movies_id = all_movies[i].id
+        response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
+                                .format(tmdb_movies_id, themoviedb_api_key))
+        element_actors = json.loads(response.text)
+
+        try:
+            actors_names = []
+            for j in range(0, len(element_actors["cast"])):
+                try:
+                    actors_names.append(element_actors["cast"][j]["name"])
+                    if j == 3:
+                        break
+                except:
+                    pass
+        except:
+            pass
+
+        if len(actors_names) == 0:
+            actors = MoviesActors(movies_id=movies_id,
+                                  name="Unknown")
+            db.session.add(actors)
+        else:
+            for k in range(0, len(actors_names)):
+                actors = MoviesActors(movies_id=movies_id,
+                                      name=actors_names[k])
+                db.session.add(actors)
+
+        db.session.commit()
+
+
+def add_collections_movies():
+    if platform.system() == "Windows":
+        local_covers_path = os.path.join(app.root_path, "static\\covers\\movies_collections_covers\\")
+    else:  # Linux & macOS
+        local_covers_path = os.path.join(app.root_path, "static/covers/movies_collections_covers/")
+
+    all_movies = Movies.query.all()
+    for movie in all_movies:
+        tmdb_movies_id = movie.themoviedb_id
+        movies_id = movie.id
+        try:
+            response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
+                                    .format(tmdb_movies_id, themoviedb_api_key))
+
+            data = json.loads(response.text)
+
+            collection_id = data["belongs_to_collection"]["id"]
+            collection_poster = data["belongs_to_collection"]["poster_path"]
+
+            response_collection = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
+                                               .format(collection_id, themoviedb_api_key))
+
+            data_collection = json.loads(response_collection.text)
+
+            collection_name = data_collection["name"]
+            collection_overview = data_collection["overview"]
+            collection_parts = len(data_collection["parts"])
+
+            collection_poster_id = "{}.jpg".format(secrets.token_hex(8))
+
+            urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(collection_poster),
+                                       "{}{}".format(local_covers_path, collection_poster_id))
+
+            img = Image.open("{}{}".format(local_covers_path, collection_poster_id))
+            img = img.resize((300, 450), Image.ANTIALIAS)
+            img.save("{0}{1}".format(local_covers_path, collection_poster_id), quality=90)
+        except:
+            continue
+
+        movie.collection_id = collection_id
+
+        add_collection = MoviesCollections(collection_id=collection_id,
+                                           parts=collection_parts,
+                                           name=collection_name,
+                                           poster=collection_poster_id,
+                                           overview=collection_overview)
+
+        db.session.add(add_collection)
+        db.session.commit()
+
+
+def add_actors_series():
+    all_series = Series.query.all()
+    for i in range(0, len(all_series)):
+        tmdb_series_id = all_series[i].themoviedb_id
+        series_id = all_series[i].id
+        response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
+                                .format(tmdb_series_id, themoviedb_api_key))
+        element_actors = json.loads(response.text)
+
+        try:
+            actors_names = []
+            for j in range(0, len(element_actors["cast"])):
+                try:
+                    actors_names.append(element_actors["cast"][j]["name"])
+                    if j == 3:
+                        break
+                except:
+                    pass
+        except:
+            pass
+
+        if len(actors_names) == 0:
+            actors = SeriesActors(series_id=series_id,
+                                  name="Unknown")
+            db.session.add(actors)
+        else:
+            for k in range(0, len(actors_names)):
+                actors = SeriesActors(series_id=series_id,
+                                      name=actors_names[k])
+                db.session.add(actors)
+
+        db.session.commit()
+
+
+def add_actors_anime():
+    all_anime = Anime.query.all()
+    for i in range(0, len(all_anime)):
+        tmdb_anime_id = all_anime[i].themoviedb_id
+        anime_id = all_anime[i].id
+        response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
+                                .format(tmdb_anime_id, themoviedb_api_key))
+        element_actors = json.loads(response.text)
+
+        try:
+            actors_names = []
+            for j in range(0, len(element_actors["cast"])):
+                try:
+                    actors_names.append(element_actors["cast"][j]["name"])
+                    if j == 3:
+                        break
+                except:
+                    pass
+        except:
+            pass
+
+        if len(actors_names) == 0:
+            actors = AnimeActors(anime_id=anime_id,
+                                 name="Unknown")
+            db.session.add(actors)
+        else:
+            for k in range(0, len(actors_names)):
+                actors = AnimeActors(anime_id=anime_id,
+                                     name=actors_names[k])
+                db.session.add(actors)
+
+        db.session.commit()
+
+
+############################################# TMDb API Update Scheduler ################################################
+
+
 def refresh_element_data(api_id, list_type):
     element_data = get_element_data_from_api(api_id, list_type)
 
@@ -3084,22 +3351,22 @@ def refresh_element_data(api_id, list_type):
                 pass
 
             # Refresh the data for Anime/Series
-            element.name                = name
-            element.original_name       = original_name
-            element.first_air_date      = first_air_date
-            element.last_air_date       = last_air_date
-            element.homepage            = homepage
-            element.in_production       = in_production
-            element.created_by          = created_by
-            element.episode_duration    = episode_duration
-            element.total_seasons       = total_seasons
-            element.total_episodes      = total_episodes
-            element.origin_country      = origin_country
-            element.status              = status
-            element.vote_average        = vote_average
-            element.vote_count          = vote_count
-            element.synopsis            = synopsis
-            element.popularity          = popularity
+            element.name = name
+            element.original_name = original_name
+            element.first_air_date = first_air_date
+            element.last_air_date = last_air_date
+            element.homepage = homepage
+            element.in_production = in_production
+            element.created_by = created_by
+            element.episode_duration = episode_duration
+            element.total_seasons = total_seasons
+            element.total_episodes = total_episodes
+            element.origin_country = origin_country
+            element.status = status
+            element.vote_average = vote_average
+            element.vote_count = vote_count
+            element.synopsis = synopsis
+            element.popularity = popularity
 
             # Update the number of seasons and episodes
             for season_data in seasons_data:
@@ -3193,7 +3460,7 @@ def refresh_element_data(api_id, list_type):
                 local_covers_path = os.path.join(app.root_path, "static/covers/movies_covers/")
 
             try:
-               if  poster_path != "":
+                if poster_path != "":
                     urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(poster_path),
                                                "{}{}".format(local_covers_path, element.image_cover))
 
@@ -3205,139 +3472,21 @@ def refresh_element_data(api_id, list_type):
                 pass
 
             # Refresh the movies data
-            element.release_date        = release_date
-            element.homepage            = homepage
-            element.runtime             = runtime
-            element.original_language   = original_language
-            element.vote_average        = vote_average
-            element.vote_count          = vote_count
-            element.synopsis            = synopsis
-            element.popularity          = popularity
-            element.budget              = budget
-            element.revenue             = revenue
-            element.tagline             = tagline
+            element.release_date = release_date
+            element.homepage = homepage
+            element.runtime = runtime
+            element.original_language = original_language
+            element.vote_average = vote_average
+            element.vote_count = vote_count
+            element.synopsis = synopsis
+            element.popularity = popularity
+            element.budget = budget
+            element.revenue = revenue
+            element.tagline = tagline
 
             # TODO: Refresh production companies, genres and actors
             db.session.commit()
             app.logger.info("[SYSTEM] Refreshed the movie with the ID {}".format(element.id))
-
-
-def save_profile_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
-    try:
-        i = Image.open(form_picture)
-    except:
-        return "default.jpg"
-    i = i.resize((300, 300), Image.ANTIALIAS)
-    i.save(picture_path, quality=90)
-
-    return picture_fn
-
-
-def add_follow(follow_username):
-    follow_to_add = User.query.filter_by(username=follow_username).first()
-
-    if (follow_to_add is None) or (follow_to_add.id == 1):
-        app.logger.info('[{}] Attempt to follow user {}'.format(current_user.id, follow_username))
-        return flash('This user does not exist', 'warning')
-
-    if follow_to_add.username is current_user.username:
-        return flash("You can't follow yourself", 'warning')
-    else:
-        follow_exists = Follow.query.filter_by(user_id=current_user.id, follow_id=follow_to_add.id).first()
-
-        if follow_exists:
-            return flash('User already in your follow list', 'info')
-
-        add_follow = Follow(user_id   = current_user.id,
-                            follow_id = follow_to_add.id)
-
-        db.session.add(add_follow)
-        db.session.commit()
-
-        app.logger.info('[{}] is following the user with ID {}'.format(current_user.id, follow_to_add.id))
-        flash("Follow successfully added.", 'success')
-
-
-def send_reset_email(user):
-    token = user.get_reset_token()
-    msg = Message(subject    = 'Password Reset Request',
-                  sender     = app.config['MAIL_USERNAME'],
-                  recipients = [user.email],
-                  bcc        = [app.config['MAIL_USERNAME']],
-                  reply_to   = app.config['MAIL_USERNAME'])
-
-    if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\emails\\password_reset.html")
-    else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/emails/password_reset.html")
-
-    email_template = open(path, 'r').read().replace("{1}", user.username)
-    email_template = email_template.replace("{2}", url_for('reset_token', token=token, _external=True))
-    msg.html = email_template
-
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised when sending reset email to user with the ID {} : {}'
-                         .format(user.id, e))
-        return False
-
-
-def send_register_email(user):
-    token = user.get_register_token()
-    msg = Message(subject    = 'MyLists Register Request',
-                  sender     = app.config['MAIL_USERNAME'],
-                  recipients = [user.email],
-                  bcc        = [app.config['MAIL_USERNAME']],
-                  reply_to   = app.config['MAIL_USERNAME'])
-
-    if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\emails\\register.html")
-    else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/emails/register.html")
-
-    email_template = open(path, 'r').read().replace("{1}", user.username)
-    email_template = email_template.replace("{2}", url_for('register_account_token', token=token, _external=True))
-    msg.html = email_template
-
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised when sending register email to user with the ID {} : {}'
-                         .format(user.id, e))
-        return False
-
-
-def send_email_update_email(user):
-    token = user.get_email_update_token()
-    msg = Message(subject    = 'MyList Email Update Request',
-                  sender     = app.config['MAIL_USERNAME'],
-                  recipients = [user.email],
-                  bcc        = [app.config['MAIL_USERNAME']],
-                  reply_to   = app.config['MAIL_USERNAME'])
-
-    if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\emails\\email_update.html")
-    else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/emails/email_update.html")
-
-    email_template = open(path, 'r').read().replace("{1}", user.username)
-    email_template = email_template.replace("{2}", url_for('email_update_token', token=token, _external=True))
-    msg.html = email_template
-
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised when sending email update email to user with the ID {} : {}'
-                         .format(user.id, e))
-        return False
 
 
 def automatic_media_refresh():
@@ -3346,7 +3495,7 @@ def automatic_media_refresh():
     # Recover all the data
     all_movies = Movies.query.all()
     all_series = Series.query.all()
-    all_anime = Anime.query.all()
+    all_anime  = Anime.query.all()
 
     # Create a list containing all the Movies TMDb ID
     all_movies_tmdb_id_list = []
@@ -3413,182 +3562,11 @@ def automatic_media_refresh():
     app.logger.info('[SYSTEM] Automatic refresh completed')
 
 
-def refresh_db_badges():
-    list_all_badges = []
-    path = os.path.join(app.root_path, 'static/csv_data/badges.csv')
-    with open(path, "r") as fp:
-        for line in fp:
-            list_all_badges.append(line.split(";"))
-
-    badges = Badges.query.order_by(Badges.id).all()
-    for i in range(1, len(list_all_badges)):
-        try:
-            genre_id = str(list_all_badges[i][4])
-        except:
-            genre_id = None
-        badges[i-1].threshold  = int(list_all_badges[i][0])
-        badges[i-1].image_id   = list_all_badges[i][1]
-        badges[i-1].title      = list_all_badges[i][2]
-        badges[i-1].type       = list_all_badges[i][3]
-        badges[i-1].genres_id  = genre_id
-
-
-############################################### Add data Retroactively #################################################
-
-
-def add_badges_to_db():
-    list_all_badges = []
-    path = os.path.join(app.root_path, 'static/csv_data/badges.csv')
-    with open(path, "r") as fp:
-        for line in fp:
-            list_all_badges.append(line.split(";"))
-
-    for i in range(1, len(list_all_badges)):
-        try:
-            genre_id = str(list_all_badges[i][4])
-        except:
-            genre_id = None
-        badge = Badges(threshold=int(list_all_badges[i][0]),
-                       image_id=list_all_badges[i][1],
-                       title=list_all_badges[i][2],
-                       type=list_all_badges[i][3],
-                       genres_id=genre_id)
-        db.session.add(badge)
-
-
-def add_actors_movies():
-    all_movies = Movies.query.all()
-    for i in range(0, len(all_movies)):
-        tmdb_movies_id = all_movies[i].themoviedb_id
-        movies_id = all_movies[i].id
-        response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
-                                .format(tmdb_movies_id, themoviedb_api_key))
-        element_actors = json.loads(response.text)
-
-        try:
-            actors_names = []
-            for j in range(0, len(element_actors["cast"])):
-                try:
-                    actors_names.append(element_actors["cast"][j]["name"])
-                    if j == 3:
-                        break
-                except:
-                    pass
-        except:
-            pass
-
-        if len(actors_names) == 0:
-            actors = MoviesActors(movies_id=movies_id,
-                                  name="Unknown")
-            db.session.add(actors)
-        else:
-            for k in range(0, len(actors_names)):
-                actors = MoviesActors(movies_id=movies_id,
-                                      name=actors_names[k])
-                db.session.add(actors)
-
-        db.session.commit()
-
-
-def add_collections_movies():
-    all_movies = Movies.query.all()
-    for movie in all_movies:
-        tmdb_movies_id = movie.themoviedb_id
-        movies_id = movie.id
-        response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
-                                .format(tmdb_movies_id, themoviedb_api_key))
-        data = json.loads(response.text)
-
-        try:
-            collection_id = data["belongs_to_collection"]["id"]
-            collection_poster = data["belongs_to_collection"]["poster_path"]
-            response_collection = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
-                                    .format(collection_id, themoviedb_api_key))
-            data_collection = json.loads(response.text)
-            collection_name = data_collection["name"]
-            collection_overview = data_collection["overview"]
-            collection_parts = len(data_collection["parts"])
-        except:
-            pass
-
-
-
-        db.session.commit()
-
-
-def add_actors_series():
-    all_series = Series.query.all()
-    for i in range(0, len(all_series)):
-        tmdb_series_id = all_series[i].themoviedb_id
-        series_id = all_series[i].id
-        response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
-                                .format(tmdb_series_id, themoviedb_api_key))
-        element_actors = json.loads(response.text)
-
-        try:
-            actors_names = []
-            for j in range(0, len(element_actors["cast"])):
-                try:
-                    actors_names.append(element_actors["cast"][j]["name"])
-                    if j == 3:
-                        break
-                except:
-                    pass
-        except:
-            pass
-
-        if len(actors_names) == 0:
-            actors = SeriesActors(series_id=series_id,
-                                  name="Unknown")
-            db.session.add(actors)
-        else:
-            for k in range(0, len(actors_names)):
-                actors = SeriesActors(series_id=series_id,
-                                      name=actors_names[k])
-                db.session.add(actors)
-
-        db.session.commit()
-
-
-def add_actors_anime():
-    all_anime = Anime.query.all()
-    for i in range(0, len(all_anime)):
-        tmdb_anime_id = all_anime[i].themoviedb_id
-        anime_id = all_anime[i].id
-        response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
-                                .format(tmdb_anime_id, themoviedb_api_key))
-        element_actors = json.loads(response.text)
-
-        try:
-            actors_names = []
-            for j in range(0, len(element_actors["cast"])):
-                try:
-                    actors_names.append(element_actors["cast"][j]["name"])
-                    if j == 3:
-                        break
-                except:
-                    pass
-        except:
-            pass
-
-        if len(actors_names) == 0:
-            actors = AnimeActors(anime_id=anime_id,
-                                 name="Unknown")
-            db.session.add(actors)
-        else:
-            for k in range(0, len(actors_names)):
-                actors = AnimeActors(anime_id=anime_id,
-                                     name=actors_names[k])
-                db.session.add(actors)
-
-        db.session.commit()
-
-
-############################################# TMDb API Update Scheduler ################################################
-
 app.apscheduler.add_job(func=automatic_media_refresh, trigger='cron', hour=3, id="{}".format(secrets.token_hex(8)))
 
+
 ################################################## UNUSED FUNCTIONS ####################################################
+
 
 # Personal statistics
 def get_statistics(user_id, list_type):

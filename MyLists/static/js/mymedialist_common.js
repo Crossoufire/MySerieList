@@ -123,3 +123,5 @@ $categories.isotope('layout');
     $window.resize(resize).trigger('resize');
     $categories.isotope('layout');
 })(jQuery);
+
+$categories.isotope('layout');
