@@ -2,6 +2,12 @@ from flask import render_template, url_for
 from MyLists import app
 
 
+@app.errorhandler(400)
+def error400(e):
+    image_error = url_for('static', filename='img/error.jpg')
+    return render_template('error.html', error_code=400, title='Error', image_error=image_error), 400
+
+
 @app.errorhandler(403)
 def error403(e):
     image_error = url_for('static', filename='img/error.jpg')

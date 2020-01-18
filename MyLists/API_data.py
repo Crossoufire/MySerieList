@@ -165,7 +165,26 @@ class API_data():
 
         return actors_data
 
-    def save_api_cover(self, media_cover_path, media_cover_name, list_type):
+    def get_collection_data(self, collection_id):
+        try:
+            response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
+                                    .format(collection_id, self.tmdb_api_key))
+        except:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: Could not reach the endpoint')
+            return None
+
+        if response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
+            return None
+
+        if response.status_code == 34:
+            collection_data = {}
+        else:
+            collection_data = json.loads(response.text)
+
+        return collection_data
+
+    def save_api_cover(self, media_cover_path, media_cover_name, list_type, collection=False):
         if list_type == ListType.SERIES:
             if platform.system() == "Windows":
                 local_covers_path = os.path.join(app.root_path, "static\\covers\\series_covers\\")
@@ -177,10 +196,16 @@ class API_data():
             else:  # Linux & macOS
                 local_covers_path = os.path.join(app.root_path, "static/covers/anime_covers/")
         elif list_type == ListType.MOVIES:
-            if platform.system() == "Windows":
-                local_covers_path = os.path.join(app.root_path, "static\\covers\\movies_covers\\")
-            else:  # Linux & macOS
-                local_covers_path = os.path.join(app.root_path, "static/covers/movies_covers/")
+            if collection is True:
+                if platform.system() == "Windows":
+                    local_covers_path = os.path.join(app.root_path, "static\\covers\\movies_collection_covers\\")
+                else:  # Linux & macOS
+                    local_covers_path = os.path.join(app.root_path, "static/covers/movies_collection_covers/")
+            else:
+                if platform.system() == "Windows":
+                    local_covers_path = os.path.join(app.root_path, "static\\covers\\movies_covers\\")
+                else:  # Linux & macOS
+                    local_covers_path = os.path.join(app.root_path, "static/covers/movies_covers/")
 
         try:
             urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(media_cover_path),

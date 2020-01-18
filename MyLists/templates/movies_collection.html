@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+
+
+{% block css %}
+<link href="{{ url_for('static', filename='css/mymedialist.css') }}" rel="stylesheet">
+{% endblock css %}
+
+
+{% block content %}
+<div id="categories-iso" class="row categories-iso">
+
+    <h2 class="text-center m-t-50 mb-0" style="width: 100%">COMPLETED COLLECTIONS ({{ length_completed }})
+        <hr class="mt-2 pb-3 mb-0">
+    </h2>
+    {% for movie in completed_collections %}
+    <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+        <div class="card bg-transparent">
+            <div class="view overlay">
+                <img class="card-img-top" src="{{ movie['poster'] }}" height="300" width="200" style="height: auto;">
+                <div class="mask flex-center rgba-black-strong">
+                    <span class="font-mask text-center text-light">{{ movie['name'] }}</span>
+                </div>
+            </div>
+            <div class="card-body p-0 text-center bg-dark">
+                <span class="font-mask text-center text-light">{{ movie['parts'] }}/{{ movie['total'] }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <h2 class="text-center m-t-20 mb-0" style="width: 100%">ON GOING COLLECTIONS ({{ length_ongoing }})
+        <hr class="mt-2 pb-3 mb-0">
+    </h2>
+    {% for movie in ongoing_collections %}
+    <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+        <div class="card bg-transparent">
+            <div class="view overlay">
+                <img class="card-img-top" src="{{ movie['poster'] }}" height="300" width="200" style="height: auto;">
+                <div class="mask flex-center rgba-black-strong">
+                    <span class="font-mask text-center text-light">{{ movie['name'] }}</span>
+                </div>
+            </div>
+            <div class="card-body p-0 text-center bg-dark">
+                <span class="font-mask text-center text-light">{{ movie['parts'] }}/{{ movie['total'] }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}
+
+
+{% block script %}
+{% endblock script %}

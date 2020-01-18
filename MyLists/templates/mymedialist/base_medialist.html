@@ -190,7 +190,7 @@ $(function() {
                 type: "POST",
                 url: "/add_element",
                 contentType: "application/json",
-                data: JSON.stringify({element_id: ui.item.tmdb_id, element_type: '{{ media_list }}', element_cat: $(".cat-select").val() }),
+                data: JSON.stringify({element_id: ui.item.tmdb_id, element_type: '{{ media_list }}', element_cat: $(".cat-select").val(), from_other_list: false }),
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {

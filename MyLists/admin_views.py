@@ -8,7 +8,6 @@ from flask_admin import Admin
 
 
 class UserAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -19,7 +18,6 @@ class UserAdminView(ModelView):
 
 
 class FollowAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -30,7 +28,6 @@ class FollowAdminView(ModelView):
 
 
 class LastUpdateAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -43,7 +40,6 @@ class LastUpdateAdminView(ModelView):
 
 
 class SeriesAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -57,7 +53,6 @@ class SeriesAdminView(ModelView):
 
 
 class SeriesListAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -68,7 +63,6 @@ class SeriesListAdminView(ModelView):
 
 
 class SeriesEpisodesPerSeasonAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -79,7 +73,6 @@ class SeriesEpisodesPerSeasonAdminView(ModelView):
 
 
 class SeriesGenreAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -90,7 +83,6 @@ class SeriesGenreAdminView(ModelView):
 
 
 class SeriesNetworkAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -101,7 +93,6 @@ class SeriesNetworkAdminView(ModelView):
 
 
 class SeriesEpisodeTimestampAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -115,7 +106,6 @@ class SeriesEpisodeTimestampAdminView(ModelView):
 
 
 class AnimeAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -129,7 +119,6 @@ class AnimeAdminView(ModelView):
 
 
 class AnimeListAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -140,7 +129,6 @@ class AnimeListAdminView(ModelView):
 
 
 class AnimeEpisodesPerSeasonAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -151,7 +139,6 @@ class AnimeEpisodesPerSeasonAdminView(ModelView):
 
 
 class AnimeGenreAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -162,7 +149,6 @@ class AnimeGenreAdminView(ModelView):
 
 
 class AnimeNetworkAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -173,7 +159,6 @@ class AnimeNetworkAdminView(ModelView):
 
 
 class AnimeEpisodeTimestampAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -186,7 +171,6 @@ class AnimeEpisodeTimestampAdminView(ModelView):
 ######################################################## MOVIE #########################################################
 
 class MoviesAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -199,7 +183,6 @@ class MoviesAdminView(ModelView):
 
 
 class MoviesGenreAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -210,7 +193,6 @@ class MoviesGenreAdminView(ModelView):
 
 
 class MoviesListAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
@@ -221,7 +203,6 @@ class MoviesListAdminView(ModelView):
 
 
 class MoviesProdAdminView(ModelView):
-
     def is_accessible(self):
         return current_user.get_id() == '1'
 
