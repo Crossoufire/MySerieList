@@ -1,11 +1,10 @@
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_wtf.file import FileField, FileAllowed
 from flask_wtf import FlaskForm, RecaptchaField
 from flask_login import current_user
-
-from MyLists import bcrypt
 from MyLists.models import User
+from MyLists import bcrypt
 
 
 class RegistrationForm(FlaskForm):

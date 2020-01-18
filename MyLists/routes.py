@@ -1,13 +1,14 @@
-import json
 import os
-import platform
-import secrets
 import sys
-import urllib
-import requests
+import pytz
+import json
 import time
 import atexit
+import urllib
+import secrets
+import requests
 import dateutil
+import platform
 
 from PIL import Image
 from flask_mail import Message
@@ -32,12 +33,6 @@ except:
     print("Config file error. Please read the README to configure the config.ini file properly. Exit.")
     sys.exit()
 
-class simple_utc(tzinfo):
-    def tzname(self, **kwargs):
-        return "UTC"
-    def utcoffset(self, dt):
-        return timedelta(0)
-
 
 @app.before_first_request
 def create_user():
@@ -58,14 +53,6 @@ def create_user():
 
 
 ################################################### Anonymous routes ###################################################
-
-
-@app.errorhandler(400)
-@app.errorhandler(404)
-@app.errorhandler(500)
-def not_found(e):
-    image_error = url_for('static', filename='img/error.jpg')
-    return render_template('error.html', error_code=e, title='Error page', image_error=image_error), e
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -2377,7 +2364,7 @@ def get_follows_full_last_update(user_id):
         elif element[2].old_status is None and element[2].new_status is not None:
             element_data["update"] = ["{}".format(element[2].new_status.value)]
 
-        element_data["date"] = element[2].date.replace(tzinfo=simple_utc()).isoformat()
+        element_data["date"] = element[2].date.replace(tzinfo=pytz.UTC).isoformat()
         element_data["media_name"] = element[2].media_name
 
         if element[2].media_type == ListType.SERIES:
@@ -2422,7 +2409,7 @@ def get_user_last_update(user_id):
             element_data["update"] = ["{}".format(element.new_status.value)]
 
         # Update date
-        element_data["date"] = element.date.replace(tzinfo=simple_utc()).isoformat()
+        element_data["date"] = element.date.replace(tzinfo=pytz.UTC).isoformat()
 
         element_data["media_name"] = element.media_name
 
@@ -2463,7 +2450,7 @@ def get_follows_last_update(user_id):
             element_data["update"] = ["{}".format(element[2].new_status.value)]
 
         # Update date
-        element_data["date"] = element[2].date.replace(tzinfo=simple_utc()).isoformat()
+        element_data["date"] = element[2].date.replace(tzinfo=pytz.UTC).isoformat()
 
         element_data["media_name"] = element[2].media_name
 
@@ -2816,8 +2803,9 @@ def add_element_in_base(api_id, list_type, element_cat):
         if collection_id:
             collection_data = API_data(API_key=themoviedb_api_key).get_collection_data(collection_id)
             collection_parts = len(collection_data.get('parts'))
-            collection_name = collection_data.get('name')
-            collection_overview = collection_data.get('overview')
+            collection_name = collection_data.get('name', "Unknown") or "Unknown"
+            collection_overview = collection_data.get('overview', 'No overview available for this collection') or \
+                                  'No overview available for this collection'
 
             # Get the collection media cover
             collection_cover_path = collection_data.get("poster_path")
