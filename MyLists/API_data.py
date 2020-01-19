@@ -14,6 +14,7 @@ from MyLists.models import ListType
 class API_data():
     def __init__(self, API_key=None):
         self.tmdb_api_key = API_key
+        self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
 
     def autocomplete_search(self, element_name, list_type):
         try:
@@ -24,16 +25,12 @@ class API_data():
                 response = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
                                         .format(self.tmdb_api_key, element_name))
         except:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: Could not reach the endpoint')
             return [{"nb_results": 0}]
 
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
+        data = self.check_response_status(response)
+        if data is False:
             return [{"nb_results": 0}]
-
-        if response.status_code == 34:
-            return [{"nb_results": 0}]
-
-        data = json.loads(response.text)
 
         if data.get("total_results", 0) == 0:
             return [{"nb_results": 0}]
@@ -86,12 +83,13 @@ class API_data():
                 if first_air_date:
                     if data["results"][i]["first_air_date"].split('-') != ['']:
                         media_data["first_air_date"] = data["results"][i]["first_air_date"].split('-')[0]
+                    else:
+                        media_data["first_air_date"] = "Unknown"
                 else:
                     media_data["first_air_date"] = "Unknown"
 
                 tmdb_results.append(media_data)
                 i += 1
-
         elif list_type == ListType.MOVIES:
             # Take only the first 6 results. There are 20 results per page.
             tmdb_results, i = [], 0
@@ -110,6 +108,8 @@ class API_data():
                 if release_date:
                     if data["results"][i]["release_date"] != ['']:
                         movies_data["first_air_date"] = data["results"][i]["release_date"].split('-')[0]
+                    else:
+                        movies_data["first_air_date"] = "Unknown"
                 else:
                     movies_data["first_air_date"] = "Unknown"
 
@@ -118,52 +118,23 @@ class API_data():
 
         return tmdb_results
 
-    def get_details_data(self, api_id, list_type):
+    def get_details_and_credits_data(self, api_id, list_type):
         try:
             if list_type != ListType.MOVIES:
-                response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}"
+                response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}&append_to_response=credits"
                                         .format(api_id, self.tmdb_api_key))
             if list_type == ListType.MOVIES:
-                response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
+                response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}&append_to_response=credits"
                                         .format(api_id, self.tmdb_api_key))
         except:
             app.logger.error('[SYSTEM] Error requesting themoviedb API: Could not reach the endpoint')
             return None
 
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
+        data = self.check_response_status(response)
+        if data is False:
             return None
 
-        if response.status_code == 34:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: The ressource could not be found')
-            return None
-
-        details_data = json.loads(response.text)
-
-        return details_data
-
-    def get_actors_data(self, api_id, list_type):
-        try:
-            if list_type != ListType.MOVIES:
-                response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
-                                        .format(api_id, self.tmdb_api_key))
-            if list_type == ListType.MOVIES:
-                response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
-                                        .format(api_id, self.tmdb_api_key))
-        except:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: Could not reach the endpoint')
-            return None
-
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
-            return None
-
-        if response.status_code == 34:
-            details_data = {}
-        else:
-            actors_data = json.loads(response.text)
-
-        return actors_data
+        return data
 
     def get_collection_data(self, collection_id):
         try:
@@ -173,16 +144,11 @@ class API_data():
             app.logger.error('[SYSTEM] Error requesting themoviedb API: Could not reach the endpoint')
             return None
 
-        if response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
+        data = self.check_response_status(response)
+        if data is False:
             return None
 
-        if response.status_code == 34:
-            collection_data = {}
-        else:
-            collection_data = json.loads(response.text)
-
-        return collection_data
+        return data
 
     def save_api_cover(self, media_cover_path, media_cover_name, list_type, collection=False):
         if list_type == ListType.SERIES:
@@ -208,9 +174,10 @@ class API_data():
                     local_covers_path = os.path.join(app.root_path, "static/covers/movies_covers/")
 
         try:
-            urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(media_cover_path),
-                                       "{}{}".format(local_covers_path, media_cover_name))
+            urllib.request.urlretrieve("{0}{1}".format(self.tmdb_poster_base_url, media_cover_path),
+                                       "{0}{1}".format(local_covers_path, media_cover_name))
         except:
+            app.logger.error('[SYSTEM] Error trying to recover the poster: Could not reach the endpoint')
             return False
 
         img = Image.open("{}{}".format(local_covers_path, media_cover_name))
@@ -220,7 +187,6 @@ class API_data():
         return True
 
     def get_trending_media(self):
-        # Trending movies
         try:
             series_response = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
                                            .format(self.tmdb_api_key))
@@ -228,10 +194,44 @@ class API_data():
             movies_response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
                                            .format(self.tmdb_api_key))
         except:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API or the Jikan API: Could not reach the endpoint')
             return None
 
-        series_data = json.loads(series_response.text)
+        series_data = self.check_response_status(series_response)
+        if series_data is False:
+            return None
+
         anime_data = anime_response
-        movies_data = json.loads(movies_response.text)
+
+        movies_data = self.check_response_status(movies_response)
+        if movies_data is False:
+            return None
 
         return [series_data, anime_data, movies_data]
+
+    def get_anime_genres(self, anime_name):
+        try:
+            response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(anime_name))
+            data_mal = json.loads(response.text)
+            mal_id = data_mal["results"][0]["mal_id"]
+
+            response = requests.get("https://api.jikan.moe/v3/anime/{}".format(mal_id))
+            data_mal = json.loads(response.text)
+            return data_mal["genres"]
+        except:
+            return None
+
+    def check_response_status(self, response):
+        if response.status_code == 200:
+            return json.loads(response.text)
+        elif response.status_code == 401:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
+        elif response.status_code == 404:
+            app.logger.error('[SYSTEM] Invalid id: The pre-requisite id is invalid or not found.')
+        elif response.status_code == 500:
+            app.logger.error('[SYSTEM] 	Internal error: Something went wrong, contact TMDb.')
+        elif response.status_code == 503:
+            app.logger.error('[SYSTEM] Service offline: This service is temporarily offline, try again later.')
+        elif response.status_code == 504:
+            app.logger.error('[SYSTEM] Your request to the backend server timed out. Try again.')
+        return False

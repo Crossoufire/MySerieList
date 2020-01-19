@@ -7,10 +7,7 @@
 
 
 {% block content %}
-<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">
-    TRENDING SERIES
-    <hr class="mt-2 mb-0">
-</h2>
+<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">TRENDING SERIES<hr class="mt-2 mb-0"></h2>
 <div class="row m-t-20">
     {% for series in series_trends %}
         <div class="col-xl-4 col-lg-6 col-md-6 series" {% if loop.index0 > 5 %} style="display: none;" {% endif %}>
@@ -27,10 +24,11 @@
                                 <div class="fs-13 text-grey"><i>{{ series['first_air_date'] }}</i></div>
                             </h5>
                             <p class="card-text text-light giveMeEllipsis">{{ series['overview'] }}</p>
-                            <p class="card-hashtag text-light fs-20">#{{ loop.index0 +1 }}</p>
+
                         </div>
                     </div>
                 </div>
+                <p class="card-hashtag text-light fs-20">#{{ loop.index0 +1 }}</p>
             </div>
         </div>
     {% endfor %}
@@ -39,10 +37,8 @@
     <a id="series-show" class="fs-14" onclick="showmore('series-show', 'series')"><i>Show more...</i></a>
 </div>
 
-<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">
-    TRENDING ANIME
-    <hr class="mt-2 mb-0">
-</h2>
+
+<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">TRENDING ANIME<hr class="mt-2 mb-0"></h2>
 <div class="row m-t-20">
     {% for anime in anime_trends %}
         <div class="col-xl-4 col-lg-6 col-md-6 anime" {% if loop.index0 > 5 %} style="display: none;" {% endif %}>
@@ -63,10 +59,10 @@
                                 <div class="fs-13 text-grey"><i>{{ anime['first_air_date'] }}</i></div>
                             </h5>
                             <p class="card-text text-light giveMeEllipsis">{{ anime['overview'] }}</p>
-                            <p class="card-hashtag text-light fs-20">#{{ loop.index0 +1 }}</p>
                         </div>
                     </div>
                 </div>
+                <p class="card-hashtag text-light fs-20">#{{ loop.index0 +1 }}</p>
             </div>
         </div>
     {% endfor %}
@@ -75,10 +71,8 @@
     <a id="anime-show" class="fs-14" onclick="showmore('anime-show', 'anime')"><i>Show more...</i></a>
 </div>
 
-<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">
-    TRENDING MOVIES
-    <hr class="mt-2 mb-0">
-</h2>
+
+<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">TRENDING MOVIES<hr class="mt-2 mb-0"></h2>
 <div class="row m-t-20">
     {% for movies in movies_trends %}
         <div class="col-xl-4 col-lg-6 col-md-6 movies" {% if loop.index0 > 5 %} style="display: none;" {% endif %}>
@@ -95,10 +89,10 @@
                                 <div class="fs-13 text-grey"><i>{{ movies['release_date'] }}</i></div>
                             </h5>
                             <p class="card-text text-light giveMeEllipsis">{{ movies['overview'] }}</p>
-                            <p class="card-hashtag text-light fs-20">#{{ loop.index0 +1 }}</p>
                         </div>
                     </div>
                 </div>
+                <p class="card-hashtag text-light fs-20">#{{ loop.index0 +1 }}</p>
             </div>
         </div>
     {% endfor %}

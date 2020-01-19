@@ -19,11 +19,12 @@ Account:
 General:
     Add: Contact form
     Add: Page with full personal history
-    Add: Page with current trends (popular movie, best rated movie of year X, etc) based on https://www.themoviedb.org/documentation/api/discover
     Add: Collection Movies to finish (70%)
+    Enhance: Trending media, better responsiveness
 
 Routes:
     Enhance: By default create one admin user that only has admin view (HoF, Global Stats, Administration and Account settings) and one standard user
     Enhance: Redo refresh_element_data() to be in API_data.py
     Fix: Check API_data.py and do some ameliorations
     Fix: Finish the new compute time function
+    Enhance: Change the hamburger display to a vertical panel in mobile

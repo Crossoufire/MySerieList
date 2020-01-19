@@ -4,7 +4,7 @@ from flask_login import current_user
 from flask_admin import expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from MyLists.models import User, Follow, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, SeriesNetwork, \
-    Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork, Movies, MoviesGenre, MoviesList, MoviesProd, UserLastUpdate
+    Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork, Movies, MoviesGenre, MoviesList, UserLastUpdate
 
 
 class UserAdminView(ModelView):
@@ -202,15 +202,6 @@ class MoviesListAdminView(ModelView):
     list_template = 'admin/movies_list.html'
 
 
-class MoviesProdAdminView(ModelView):
-    def is_accessible(self):
-        return current_user.get_id() == '1'
-
-    column_list = ('movies_id', 'production_company')
-    column_searchable_list = ('movies_id', 'production_company')
-    column_sortable_list = ('movies_id', 'production_company')
-    list_template = 'admin/movies_prod.html'
-
 ########################################################################################################################
 
 # Override of the index flask-admin view:
@@ -302,11 +293,6 @@ admin.add_view(MoviesGenreAdminView(model=MoviesGenre,
                                     session=db.session,
                                     name="Movies genre",
                                     endpoint='movies_genre'))
-
-admin.add_view(MoviesProdAdminView(model=MoviesProd,
-                                   session=db.session,
-                                   name="Movies production network",
-                                   endpoint='movies_prod'))
 
 admin.add_view(LastUpdateAdminView(model=UserLastUpdate,
                                    session=db.session,

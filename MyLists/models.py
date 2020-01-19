@@ -263,12 +263,6 @@ class MoviesGenre(db.Model):
     genre_id = db.Column(db.Integer, nullable=False)
 
 
-class MoviesProd(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
-    production_company = db.Column(db.String(150), nullable=False)
-
-
 class MoviesActors(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)

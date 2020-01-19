@@ -1,8 +1,5 @@
 
 /* ---------------- CARD CSS -------------------- */
-.card {
-    border-radius: 2px;
-}
 
 .card-hashtag {
     position: absolute;
@@ -24,7 +21,7 @@
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 4; /* number of lines to show */
+   -webkit-line-clamp: 3; /* number of lines to show */
    line-height: X;        /* fallback */
    max-height: X*N;       /* fallback */
 }
@@ -39,3 +36,32 @@
    max-height: X*N;       /* fallback */
 }
 /* ------------------------------------------ */
+
+.frame {
+    width: 100%;
+    padding: 0;
+}
+
+.slide {
+    margin: 0;
+    padding: 0;
+}
+
+.media {
+    float: left;
+    margin: 0;
+    padding: 0;
+    width: 440px;
+}
+
+@media (max-width: 601px) {
+    .media {
+        width: calc(100vw-15px);
+    }
+}
+
+@media (max-width: 500px) {
+    .media {
+        width: 100vw;
+    }
+}

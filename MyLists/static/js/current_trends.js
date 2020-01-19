@@ -22,5 +22,3 @@ function showless(show, media) {
     $('#'+show).attr("onclick", "showmore(\"" + show + "\", \"" + media + "\")");
 }
 
-
-

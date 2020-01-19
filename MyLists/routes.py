@@ -23,7 +23,7 @@ from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, Change
     ResetPasswordForm, ResetPasswordRequestForm
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
     Follow, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, Movies, MoviesGenre, \
-    MoviesList, MoviesProd, MoviesActors, SeriesActors, AnimeActors, UserLastUpdate, Badges, MoviesCollections
+    MoviesList, MoviesActors, SeriesActors, AnimeActors, UserLastUpdate, Badges, MoviesCollections
 
 
 config.read('config.ini')
@@ -782,7 +782,13 @@ def current_trends():
     anime_trends  = get_trending_data(trending_data[1], ListType.ANIME)
     movies_trends = get_trending_data(trending_data[2], ListType.MOVIES)
 
-    return render_template("current_trends.html",
+    platform = str(request.user_agent.platform)
+    if platform == "iphone" or platform == "android" or platform is None or platform == 'None':
+        template = 'current_trends_mobile.html'
+    else:
+        template = 'current_trends_pc.html'
+
+    return render_template(template,
                            title="Current trends",
                            series_trends=series_trends,
                            anime_trends=anime_trends,
@@ -792,11 +798,12 @@ def current_trends():
 @app.route("/movies_collection", methods=['GET'])
 @login_required
 def movies_collection():
-    collection_movie = db.session.query(Movies, MoviesList, MoviesCollections) \
+    collection_movie = db.session.query(Movies, MoviesList, MoviesCollections,
+                                        func.count(MoviesCollections.collection_id)) \
         .join(MoviesList, MoviesList.movies_id == Movies.id) \
         .join(MoviesCollections, MoviesCollections.collection_id == Movies.collection_id) \
-        .filter(Movies.collection_id != None, MoviesList.user_id == current_user.id)\
-        .group_by(Movies.id).all()
+        .filter(Movies.collection_id != None, MoviesList.user_id == current_user.id,
+                MoviesList.status != Status.PLAN_TO_WATCH).group_by(Movies.collection_id).all()
 
     completed_collections = []
     ongoing_collections = []
@@ -815,7 +822,7 @@ def movies_collection():
             ongoing_collections.append(movie_data)
 
     completed_collections.sort(key=lambda x: (x['parts']), reverse=True)
-    ongoing_collections.sort(key=lambda x: (x['total']), reverse=True)
+    ongoing_collections.sort(key=lambda x: (x['parts'], x['total']), reverse=True)
 
     return render_template('movies_collection.html',
                            title='Movies collection',
@@ -919,11 +926,9 @@ def mymedialist(media_list, user_name):
         media_all_data = get_medialist_data(element_data, ListType.ANIME, covers_path, user.id)
     elif list_type == ListType.MOVIES:
         element_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre.distinct()),
-                                        func.group_concat(MoviesProd.production_company.distinct()),
                                         func.group_concat(MoviesActors.name.distinct()))\
             .join(MoviesList, MoviesList.movies_id == Movies.id)\
             .join(MoviesGenre, MoviesGenre.movies_id == Movies.id)\
-            .join(MoviesProd, MoviesProd.movies_id == Movies.id)\
             .join(MoviesActors, MoviesActors.movies_id == Movies.id)\
             .filter(MoviesList.user_id == user.id).group_by(Movies.id).order_by(Movies.name.asc()).all()
         covers_path = url_for('static', filename='covers/movies_covers/')
@@ -1273,8 +1278,7 @@ def change_element_category():
     elif list_type == ListType.MOVIES:
         movie = Movies.query.filter_by(id=element_id).first()
         set_last_update(media_name=movie.name, media_type=list_type, old_status=old_status, new_status=new_status)
-        compute_time_spent(type="category", old_eps=element.last_episode_watched, old_seas=element.current_season,
-                           media=movie, old_status=old_status, new_status=new_status,
+        compute_time_spent(type="category", media=movie, old_status=old_status, new_status=new_status,
                            list_type=list_type)
 
     return '', 204
@@ -2244,7 +2248,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
 
             # Get actors
             try:
-                tmp = element[4]
+                tmp = element[3]
                 actors = tmp.replace(',', ', ')
             except:
                 actors = "Unknown"
@@ -2255,13 +2259,6 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                 genres = tmp.replace(',', ', ')
             except:
                 genres = "Unknown"
-
-            # Get production companies
-            try:
-                tmp = element[3]
-                prod_companies = tmp.replace(',', ', ')
-            except:
-                prod_companies = "Unknown"
 
             element_info = {"id": element[0].id,
                             "cover": "{}{}".format(covers_path, element[0].image_cover),
@@ -2280,8 +2277,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "tagline": element[0].tagline,
                             "score": element[1].score,
                             "actors": actors,
-                            "genres": genres,
-                            "prod_companies": prod_companies}
+                            "genres": genres}
 
             if element[1].status == Status.COMPLETED:
                 if element[0].id in current_list:
@@ -2533,12 +2529,11 @@ def add_element_to_user(element_id, user_id, list_type, status):
 
 
 def add_element_in_base(api_id, list_type, element_cat):
-    details_data = API_data(API_key=themoviedb_api_key).get_details_data(api_id, list_type)
-    actors_data = API_data(API_key=themoviedb_api_key).get_actors_data(api_id, list_type)
+    details_data = API_data(API_key=themoviedb_api_key).get_details_and_credits_data(api_id, list_type)
 
     # Check the API response
-    if details_data is None or actors_data is None:
-        return flash("There was an error fetching the API data, please try again later", "warning")
+    if details_data is None:
+        return flash("There was an error fetching the API data, please try again later", "error")
 
     # Get the media cover
     media_cover_path = details_data.get("poster_path")
@@ -2569,13 +2564,13 @@ def add_element_in_base(api_id, list_type, element_cat):
 
         # Episode duration: list
         episode_duration = details_data.get("episode_run_time") or None
-        if episode_duration is None:
+        if episode_duration:
+            episode_duration = episode_duration[0]
+        else:
             if list_type == ListType.ANIME:
                 episode_duration = 24
             elif list_type == ListType.SERIES:
                 episode_duration = 45
-        else:
-            episode_duration = episode_duration[0]
 
         # Origin country: list
         origin_country = details_data.get("origin_country", "Unknown") or "Unknown"
@@ -2588,7 +2583,7 @@ def add_element_in_base(api_id, list_type, element_cat):
             creators = []
             for creator in created_by:
                 tmp_created = creator.get("name") or None
-                if tmp_created is not None:
+                if tmp_created:
                     creators.append(tmp_created)
             created_by = ", ".join(x for x in creators)
 
@@ -2607,24 +2602,24 @@ def add_element_in_base(api_id, list_type, element_cat):
         genres = details_data.get('genres') or None
         genres_data = []
         if genres:
-            for i in range(0, len(details_data.get("genres", []))):
+            for i in range(0, len(details_data["genres"])):
                 genres_data.append([details_data["genres"][i]["name"], int(details_data["genres"][i]["id"])])
 
         # Network: list
         networks = details_data.get('networks') or None
         networks_data = []
         if networks:
-            for i in range(0, len(details_data.get("networks", []))):
+            for i in range(0, len(details_data["networks"])):
                 networks_data.append(details_data["networks"][i]["name"])
                 if i == 4:
                     break
 
         # Actors names: list
-        actors = actors_data.get('cast') or None
+        actors = details_data.get('cast') or None
         actors_names = []
         if actors:
-            for i in range(0, len(actors_data.get("cast", []))):
-                actors_names.append(actors_data["cast"][i]["name"])
+            for i in range(0, len(details_data["cast"])):
+                actors_names.append(details_data["cast"][i]["name"])
                 if i == 4:
                     break
 
@@ -2709,25 +2704,18 @@ def add_element_in_base(api_id, list_type, element_cat):
                                         genre_id=genres_data[i][1])
                     db.session.add(genre)
         elif list_type == ListType.ANIME:
-            try:
-                response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(element_data["name"]))
-                data_mal = json.loads(response.text)
-                mal_id = data_mal["results"][0]["mal_id"]
-
-                response = requests.get("https://api.jikan.moe/v3/anime/{}".format(mal_id))
-                data_mal = json.loads(response.text)
-                genres = data_mal["genres"]
-
-                for genre in genres:
+            anime_genres = API_data().get_anime_genres(details_data["name"])
+            if anime_genres:
+                for genre in anime_genres:
                     add_genre = AnimeGenre(anime_id=element.id,
                                            genre=genre["name"],
                                            genre_id=int(genre["mal_id"]))
                     db.session.add(add_genre)
-            except:
+            else:
                 if len(genres_data) == 0:
                     add_genre = AnimeGenre(anime_id=element.id,
-                                            genre="Unknown",
-                                            genre_id=0)
+                                           genre="Unknown",
+                                           genre_id=0)
                     db.session.add(add_genre)
                 else:
                     for i in range(0, len(genres_data)):
@@ -2795,8 +2783,8 @@ def add_element_in_base(api_id, list_type, element_cat):
         revenue = details_data.get("revenue", 0)
         tagline = details_data.get("tagline", "Unknown")
         themoviedb_id = details_data.get("id")
-        runtime = element_data.get("runtime", 0)
-        original_language = element_data.get("original_language", "Unknown")
+        runtime = details_data.get("runtime", 0)
+        original_language = details_data.get("original_language", "Unknown")
         collection_id = details_data.get("belongs_to_collection") or None
 
         # Collection data
@@ -2805,7 +2793,7 @@ def add_element_in_base(api_id, list_type, element_cat):
             collection_parts = len(collection_data.get('parts'))
             collection_name = collection_data.get('name', "Unknown") or "Unknown"
             collection_overview = collection_data.get('overview', 'No overview available for this collection') or \
-                                  'No overview available for this collection'
+                                  'No overview available for this collection.'
 
             # Get the collection media cover
             collection_cover_path = collection_data.get("poster_path")
@@ -2832,7 +2820,7 @@ def add_element_in_base(api_id, list_type, element_cat):
         actors = actors_data.get('cast') or None
         actors_names = []
         if actors:
-            for i in range(0, len(actors_data.get("cast", []))):
+            for i in range(0, len(actors_data["cast"])):
                 actors_name.append(actors_data["cast"][i]["name"])
                 if i == 4:
                     break
@@ -2841,15 +2829,8 @@ def add_element_in_base(api_id, list_type, element_cat):
         genres = details_data.get('genres') or None
         genres_data = []
         if genres:
-            for i in range(0, len(details_data.get("genres", []))):
+            for i in range(0, len(details_data["genres"])):
                 genres_data.append([details_data["genres"][i]["name"],int(details_data["genres"][i]["id"])])
-
-        # Production companies
-        prod = details_data.get('production_companies') or None
-        production_companies = []
-        if prod:
-            for i in range(0, len(details_data.get("production_companies", []))):
-                production_companies.append(details_data["production_companies"][i]["name"])
 
         # Add the element to the database
         element = Movies(name=name,
@@ -2896,17 +2877,6 @@ def add_element_in_base(api_id, list_type, element_cat):
                                     genre=genres_data[i][0],
                                     genre_id=genres_id[i][1])
                 db.session.add(genre)
-
-        # Add production companies
-        if len(production_companies) == 0:
-            company = MoviesProd(movies_id=element.id,
-                                 production_company="Unknown")
-            db.session.add(company)
-        else:
-            for prod_company in production_companies:
-                company = MoviesProd(movies_id=element.id,
-                                     production_company=prod_company)
-                db.session.add(company)
 
         db.session.commit()
 
@@ -3395,8 +3365,8 @@ def refresh_element_data(api_id, list_type):
             budget = details_data.get("budget", 0)
             revenue = details_data.get("revenue", 0)
             tagline = details_data.get("tagline", "Unknown")
-            runtime = element_data.get("runtime", 0)
-            original_language = element_data.get("original_language", "Unknown")
+            runtime = details_data.get("runtime", 0)
+            original_language = details_data.get("original_language", "Unknown")
             collection_id = details_data.get("belongs_to_collection") or None
 
             try:
@@ -3453,7 +3423,7 @@ def refresh_element_data(api_id, list_type):
             element.tagline = tagline
             element.collection_id = collection_id
 
-            # TODO: Refresh production companies, genres and actors
+            # TODO: Refresh genres and actors
             db.session.commit()
             app.logger.info("[SYSTEM] Refreshed the movie with the ID {}".format(element.id))
 
