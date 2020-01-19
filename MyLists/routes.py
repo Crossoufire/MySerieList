@@ -49,6 +49,9 @@ def create_user():
         db.session.add(admin)
         add_badges_to_db()
     refresh_db_badges()
+    compute_media_time_spent(ListType.SERIES)
+    # compute_media_time_spent(ListType.ANIME)
+    # compute_media_time_spent(ListType.MOVIES)
     db.session.commit()
 
 
@@ -967,7 +970,7 @@ def mymedialist(media_list, user_name):
 def update_element_season():
     try:
         json_data  = request.get_json()
-        new_season = int(json_data['season'])+1
+        new_season = int(json_data['season']) + 1
         element_id = int(json_data['element_id'])
         element_type  = json_data['element_type']
     except:
@@ -994,17 +997,23 @@ def update_element_season():
         if (1 > new_season > all_seasons[-1].season):
             abort(400)
 
-        # Set the new data and the last update
+        # Set the new data
         old_season = anime_list.current_season
         old_episode = anime_list.last_episode_watched
         anime_list.current_season = new_season
         anime_list.last_episode_watched = 1
         app.logger.info("[{}] Anime season with ID {} updated: {}".format(current_user.id, element_id, new_season))
-        set_last_update(media_name=anime.name, media_type=ListType.ANIME, old_season=old_season,
-                        new_season=anime_list.current_season, old_episode=old_episode, new_episode=1)
 
         # Commit the changes
         db.session.commit()
+
+        # Set the last update
+        set_last_update(media_name=anime.name, media_type=list_type, old_season=old_season,
+                        new_season=new_season, old_episode=old_episode, new_episode=1)
+
+        # Compute the new time spent
+        compute_time_spent(type="season", old_eps=old_episode, old_seas=old_season, new_seas=new_season,
+                           all_seas_data=all_seasons, media=anime, list_type=list_type)
     elif list_type == ListType.SERIES:
         # Check if the element exists
         series = Series.query.filter_by(id=element_id).first()
@@ -1022,25 +1031,23 @@ def update_element_season():
         if (1 > new_season > all_seasons[-1].season):
             abort(400)
 
-        # Set the new data and the last update
+        # Set the new data
         old_season = series_list.current_season
         old_episode = series_list.last_episode_watched
         series_list.current_season = new_season
         series_list.last_episode_watched = 1
         app.logger.info('[{}] Series season with ID {} updated: {}'.format(current_user.id, element_id, new_season))
-        set_last_update(media_name=series.name, media_type=ListType.SERIES, old_season=old_season,
-                        new_season=series_list.current_season, old_episode=old_episode, new_episode=1)
 
         # Commit the changes
         db.session.commit()
 
-    # Compute total time spent
-    if list_type == ListType.ANIME:
-        compute_time_spent(type="season", old_eps=old_episode, new_eps=None, old_seas=old_season, new_seas=new_season,
-                           all_seas_data=all_seasons, media=anime, list_type=ListType.ANIME)
-    elif list_type == ListType.SERIES:
-        compute_time_spent(type="season", old_eps=old_episode, new_eps=None, old_seas=old_season, new_seas=new_season,
-                           all_seas_data=all_seasons, media=series, list_type=ListType.SERIES)
+        # Set the last updates
+        set_last_update(media_name=series.name, media_type=list_type, old_season=old_season,
+                        new_season=new_season, old_episode=old_episode, new_episode=1)
+
+        # Compute the new time spent
+        compute_time_spent(type="season", old_eps=old_episode, old_seas=old_season, new_seas=new_season,
+                           all_seas_data=all_seasons, media=series, list_type=list_type)
 
     return '', 204
 
@@ -1050,7 +1057,7 @@ def update_element_season():
 def update_element_episode():
     try:
         json_data = request.get_json()
-        new_episode = int(json_data['episode'])+1
+        new_episode = int(json_data['episode']) + 1
         element_id = int(json_data['element_id'])
         element_type = json_data['element_type']
     except:
@@ -1077,16 +1084,22 @@ def update_element_episode():
         if (1 > new_episode > last_episode):
             abort(400)
 
-        # Set the new data and the last update
+        # Set the new data
         old_season = anime_list.current_season
         old_episode = anime_list.last_episode_watched
         anime_list.last_episode_watched = new_episode
         app.logger.info('[{}] Anime episode with ID {} updated: {}'.format(current_user.id, element_id, new_episode))
-        set_last_update(media_name=anime.name, media_type=ListType.ANIME, old_season=old_season, new_season=old_season,
-                        old_episode=old_episode, new_episode=new_episode)
 
         # Commit the changes
         db.session.commit()
+
+        # Set the last update
+        set_last_update(media_name=anime.name, media_type=list_type, old_season=old_season, new_season=old_season,
+                        old_episode=old_episode, new_episode=new_episode)
+
+        # Compute the new time spent
+        compute_time_spent(type='episode', new_eps=new_episode, old_eps=old_episode, media=anime,
+                           list_type=list_type)
     elif list_type == ListType.SERIES:
         # Check if the element exists
         series = Series.query.filter_by(id=element_id).first()
@@ -1104,25 +1117,22 @@ def update_element_episode():
         if (1 > new_episode > last_episode):
             abort(400)
 
-        # Set the new data and last update
+        # Set the new data
         old_season = series_list.current_season
         old_episode = series_list.last_episode_watched
         series_list.last_episode_watched = new_episode
-        db.session.commit()
         app.logger.info('[{}] Series episode with ID {} updated: {}'.format(current_user.id, element_id, new_episode))
-        set_last_update(media_name=series.name, media_type=ListType.SERIES, old_season=old_season,
-                        new_season=old_season, old_episode=old_episode, new_episode=new_episode)
 
         # Commit the changes
         db.session.commit()
 
-    # Compute total time spent
-    if list_type == ListType.ANIME:
-        compute_time_spent(type='episode', new_eps=new_episode, old_eps=old_episode, media=anime,
-                           list_type=ListType.ANIME)
-    elif list_type == ListType.SERIES:
+        # Set the last update
+        set_last_update(media_name=series.name, media_type=list_type, old_season=old_season,
+                        new_season=old_season, old_episode=old_episode, new_episode=new_episode)
+
+        # Compute the new time spent
         compute_time_spent(type='episode', new_eps=new_episode, old_eps=old_episode, media=series,
-                           list_type=ListType.SERIES)
+                           list_type=list_type)
 
     return '', 204
 
@@ -1151,6 +1161,19 @@ def delete_element():
         series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
         if series_list is None:
             abort(400)
+
+        # Compute new time spent
+        old_episode = series_list.last_episode_watched
+        old_season = series_list.current_season
+        all_seasons = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id) \
+            .order_by(SeriesEpisodesPerSeason.season).all()
+        compute_time_spent(type="delete", old_eps=old_episode, old_seas=old_season, all_seas_data=all_seasons,
+                           media=series, list_type=list_type)
+
+        # Delete the media from the user' list
+        SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).delete()
+        db.session.commit()
+        app.logger.info('[{}] Series with ID {} deleted'.format(current_user.id, element_id))
     elif list_type == ListType.ANIME:
         # Check if anime exists in the database
         anime = Anime.query.filter_by(id=element_id).first()
@@ -1161,6 +1184,19 @@ def delete_element():
         anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
         if anime_list is None:
             abort(400)
+
+        # Compute new time spent
+        old_episode = anime_list.last_episode_watched
+        old_season = anime_list.current_season
+        all_seasons = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id) \
+            .order_by(AnimeEpisodesPerSeason.season).all()
+        compute_time_spent(type="delete", old_eps=old_episode, old_seas=old_season, all_seas_data=all_seasons,
+                           media=anime, list_type=list_type)
+
+        # Delete the media from the user' list
+        AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).delete()
+        db.session.commit()
+        app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.id, element_id))
     elif list_type == ListType.MOVIES:
         # Check if movie exists in the database
         movies = Movies.query.filter_by(id=element_id).first()
@@ -1172,30 +1208,10 @@ def delete_element():
         if movies_list is None:
             abort(400)
 
-    # Compute total time spent
-    if list_type == ListType.SERIES:
-        all_series_seasons = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id)\
-            .order_by(SeriesEpisodesPerSeason.season).all()
-        compute_time_spent(type="delete", old_eps=series_list.last_episode_watched, old_seas=series_list.current_season,
-                           all_seas_data=all_series_seasons, media=series, list_type=list_type)
-    elif list_type == ListType.ANIME:
-        all_anime_seasons = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id)\
-            .order_by(AnimeEpisodesPerSeason.season).all()
-        compute_time_spent(type="delete", old_eps=anime_list.last_episode_watched, old_seas=anime_list.current_season,
-                           all_seas_data=all_anime_seasons, media=anime, list_type=list_type)
-    elif list_type == ListType.MOVIES:
+        # Compute the new time spent
         compute_time_spent(type="delete", media=movies, list_type=list_type)
 
-    # Delete the media from the user' list
-    if list_type == ListType.SERIES:
-        SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).delete()
-        db.session.commit()
-        app.logger.info('[{}] Series with ID {} deleted'.format(current_user.id, element_id))
-    elif list_type == ListType.ANIME:
-        AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).delete()
-        db.session.commit()
-        app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.id, element_id))
-    elif list_type == ListType.MOVIES:
+        # Delete the media from the user' list
         MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).delete()
         db.session.commit()
         app.logger.info('[{}] Movie with ID {} deleted'.format(current_user.id, element_id))
@@ -1206,7 +1222,6 @@ def delete_element():
 @app.route('/change_element_category', methods=['POST'])
 @login_required
 def change_element_category():
-    image_error = url_for('static', filename='img/error.jpg')
     try:
         json_data = request.get_json()
         element_new_category = json_data['status']
@@ -1226,8 +1241,10 @@ def change_element_category():
     # Check if the element is in the user's list
     if list_type == ListType.SERIES:
         element = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
+        season_data = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).all()
     elif list_type == ListType.ANIME:
         element = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
+        season_data = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).all()
     elif list_type == ListType.MOVIES:
         element = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
     if element is None:
@@ -1235,6 +1252,10 @@ def change_element_category():
 
     old_status = element.status
     element.status = new_status
+
+    if list_type != ListType.MOVIES:
+        current_season = element.current_season
+        last_episode_watched = element.last_episode_watched
 
     if new_status == Status.COMPLETED:
         # Set to the last seasons and episodes
@@ -1258,28 +1279,26 @@ def change_element_category():
             element.current_season = 1
             element.last_episode_watched = 1
 
-    db.session.commit()
-    app.logger.info('[{}] Category of the element with ID {} ({}) changed to {}'
-                    .format(current_user.id, element_id, list_type, new_status))
-
     # Compute total time spent and set last update
     if list_type == ListType.SERIES:
         series = Series.query.filter_by(id=element_id).first()
         set_last_update(media_name=series.name, media_type=list_type, old_status=old_status, new_status=new_status)
-        compute_time_spent(type="category", old_eps=element.last_episode_watched, old_seas=element.current_season,
-                           media=series, old_status=old_status, new_status=new_status,
-                           list_type=list_type)
+        compute_time_spent(type="category", old_eps=last_episode_watched, old_seas=current_season, media=series,
+                           old_status=old_status, new_status=new_status, list_type=list_type, all_seas_data=season_data)
     elif list_type == ListType.ANIME:
         anime = Anime.query.filter_by(id=element_id).first()
         set_last_update(media_name=anime.name, media_type=list_type, old_status=old_status, new_status=new_status)
-        compute_time_spent(type="category", old_eps=element.last_episode_watched, old_seas=element.current_season,
-                           media=anime, old_status=old_status, new_status=new_status,
-                           list_type=list_type)
+        compute_time_spent(type="category", old_eps=last_episode_watched, old_seas=current_season, media=anime,
+                           old_status=old_status, new_status=new_status, list_type=list_type, all_seas_data=season_data)
     elif list_type == ListType.MOVIES:
         movie = Movies.query.filter_by(id=element_id).first()
         set_last_update(media_name=movie.name, media_type=list_type, old_status=old_status, new_status=new_status)
         compute_time_spent(type="category", media=movie, old_status=old_status, new_status=new_status,
                            list_type=list_type)
+
+    db.session.commit()
+    app.logger.info('[{}] Category of the element with ID {} ({}) changed to {}'
+                    .format(current_user.id, element_id, list_type, new_status))
 
     return '', 204
 
@@ -1398,170 +1417,169 @@ def check_cat_type(list_type, status):
 
 def compute_time_spent(type=None, old_eps=None, new_eps=None, old_seas=None, new_seas=None,
                        all_seas_data=None, media=None, old_status=None, new_status=None, list_type=None):
+    start = time.time()
 
     def eps_watched_seasons(old_season, old_episode, new_season, all_seasons):
         nb_eps_watched = 0
         if new_season - old_season > 0:
             for i in range(old_season, new_season):
                 nb_eps_watched += all_seasons[i-1].episodes
-            nb_eps_watched -= old_episode + 1
+            nb_eps_watched += (1-old_episode)
         else:
             for i in range(new_season, old_season):
-                nb_eps_watched -= all_seasons[i-1].episodes
-            nb_eps_watched -= old_episode - 1
+                nb_eps_watched += all_seasons[i-1].episodes
+            nb_eps_watched += (1-old_episode)
+            nb_eps_watched = - nb_eps_watched
         return nb_eps_watched
 
-    def eps_watched_delete(season, episode, all_seasons):
+    def eps_watched_status(season, episode, all_seasons):
         nb_eps_watched = 0
         for i in range(1, season):
             nb_eps_watched += all_seasons[i-1].episodes
         nb_eps_watched += episode
         return nb_eps_watched
 
-    def eps_watched_completed():
-        pass
-
-    def eps_watched_ptw_random():
-        pass
-
     if type == 'episode':
-        if list_type == ListType.ANIME:
-            old_time = current_user.time_spent_anime
-            current_user.time_spent_anime = old_time + (new_eps - old_eps) * media.episode_duration
-
-        elif list_type == ListType.SERIES:
+        if list_type == ListType.SERIES:
             old_time = current_user.time_spent_series
-            current_user.time_spent_series = old_time + (new_eps - old_eps) * media.episode_duration
+            current_user.time_spent_series = old_time + ((new_eps-old_eps)*media.episode_duration)
+        elif list_type == ListType.ANIME:
+            old_time = current_user.time_spent_anime
+            current_user.time_spent_anime = old_time + ((new_eps-old_eps)*media.episode_duration)
 
     elif type == 'season':
         eps_watched = eps_watched_seasons(old_seas, old_eps, new_seas, all_seas_data)
 
-        if list_type == ListType.ANIME:
-            old_time = current_user.time_spent_anime
-            current_user.time_spent_anime = old_time + (eps_watched * media.episode_duration)
-
-        elif list_type == ListType.SERIES:
+        if list_type == ListType.SERIES:
             old_time = current_user.time_spent_series
-            current_user.time_spent_series = old_time + (eps_watched * media.episode_duration)
+            current_user.time_spent_series = old_time + (eps_watched*media.episode_duration)
+        elif list_type == ListType.ANIME:
+            old_time = current_user.time_spent_anime
+            current_user.time_spent_anime = old_time + (eps_watched*media.episode_duration)
 
     elif type == 'delete':
-        if list_type == ListType.ANIME:
-            eps_watched = eps_watched_delete(old_seas, old_eps, all_seas_data)
-            old_time = current_user.time_spent_anime
-            current_user.time_spent_anime = old_time - (eps_watched * media.episode_duration)
-
-        elif list_type == ListType.SERIES:
-            eps_watched = eps_watched_delete(old_seas, old_eps, all_seas_data)
+        if list_type == ListType.SERIES:
+            eps_watched = eps_watched_status(old_seas, old_eps, all_seas_data)
             old_time = current_user.time_spent_series
-            current_user.time_spent_series = old_time - (eps_watched * media.episode_duration)
-
+            current_user.time_spent_series = old_time - (eps_watched*media.episode_duration)
+        elif list_type == ListType.ANIME:
+            eps_watched = eps_watched_status(old_seas, old_eps, all_seas_data)
+            old_time = current_user.time_spent_anime
+            current_user.time_spent_anime = old_time - (eps_watched*media.episode_duration)
         elif list_type == ListType.MOVIES:
             old_time = current_user.time_spent_movies
             current_user.time_spent_movies = old_time - media.runtime
 
     elif type == 'category':
-        if new_status == 'Watching' or new_status == 'On Hold' or new_status == 'Dropped':
-            if list_type == ListType.ANIME:
-                if old_status == Status.RANDOM or old_status == Status.PLAN_TO_WATCH:
-                    current_user.time_spent_anime = current_user.time_spent_anime + media.episode_duration
-            elif list_type == ListType.SERIES:
-                if old_status == Status.RANDOM or old_status == Status.PLAN_TO_WATCH:
+        if new_status == Status.WATCHING or new_status == Status.ON_HOLD or new_status == Status.DROPPED:
+            if list_type == ListType.SERIES:
+                if old_status == Status.RANDOM or old_status == Status.PLAN_TO_WATCH or old_status is None:
                     current_user.time_spent_series = current_user.time_spent_series + media.episode_duration
-
-        elif new_status == 'Completed' or new_status == 'Completed Animation':
-            if list_type == ListType.ANIME:
-                if old_status == Status.RANDOM or old_status == Status.PLAN_TO_WATCH:
-                    current_user.time_spent_anime = current_user.time_spent_anime + \
-                                                    (media.total_episodes*media.episode_duration)
-                else:
-                    eps_watched = eps_watched_completed()
-                    current_user.time_spent_anime = current_user.time_spent_anime + eps_watched*media.episode_duration
-            elif list_type == ListType.SERIES:
-                if old_status == Status.RANDOM or old_status == Status.PLAN_TO_WATCH:
+            elif list_type == ListType.ANIME:
+                if old_status == Status.RANDOM or old_status == Status.PLAN_TO_WATCH or old_status is None:
+                    current_user.time_spent_anime = current_user.time_spent_anime + media.episode_duration
+        elif new_status == Status.COMPLETED or new_status == Status.COMPLETED_ANIMATION:
+            if list_type == ListType.SERIES:
+                if old_status == Status.RANDOM or old_status == Status.PLAN_TO_WATCH or old_status is None:
                     current_user.time_spent_series = current_user.time_spent_series + \
                                                     (media.total_episodes*media.episode_duration)
                 else:
-                    eps_watched = eps_watched_completed()
-                    current_user.time_spent_series = current_user.time_spent_series + eps_watched*media.episode_duration
+                    eps_watched = eps_watched_status(old_seas, old_eps, all_seas_data)
+                    current_user.time_spent_series = current_user.time_spent_series + \
+                                                    ((media.total_episodes-eps_watched)*media.episode_duration)
+            elif list_type == ListType.ANIME:
+                if old_status == Status.RANDOM or old_status == Status.PLAN_TO_WATCH or old_status is None:
+                    current_user.time_spent_anime = current_user.time_spent_anime + \
+                                                    (media.total_episodes*media.episode_duration)
+                else:
+                    eps_watched = eps_watched_status(old_seas, old_eps, all_seas_data)
+                    current_user.time_spent_anime = current_user.time_spent_anime + \
+                                                    ((media.total_episodes-eps_watched)*media.episode_duration)
             elif list_type == ListType.MOVIES:
                 current_user.time_spent_movies = current_user.time_spent_movies + media.runtime
-
-        elif new_status == 'Random':
-            if list_type == ListType.ANIME:
-                if old_status != Status.PLAN_TO_WATCH:
-                    eps_watched = eps_watched_ptw_random()
-                    current_user.time_spent_anime = current_user.time_spent_anime - eps_watched*media.episode_duration
-            elif list_type == ListType.SERIES:
-                if old_status != Status.PLAN_TO_WATCH:
-                    eps_watched = eps_watched_ptw_random()
+        elif new_status == Status.RANDOM:
+            if list_type == ListType.SERIES:
+                if old_status != Status.PLAN_TO_WATCH or old_status != None:
+                    eps_watched = eps_watched_status(old_seas, old_eps, all_seas_data)
                     current_user.time_spent_series = current_user.time_spent_series - eps_watched*media.episode_duration
-
-        elif new_status == 'Plan to Watch':
-            if list_type == ListType.ANIME:
-                if old_status != Status.RANDOM:
-                    eps_watched = eps_watched_ptw_random()
+            elif list_type == ListType.ANIME:
+                if old_status != Status.PLAN_TO_WATCH or old_status != None:
+                    eps_watched = eps_watched_status(old_seas, old_eps, all_seas_data)
                     current_user.time_spent_anime = current_user.time_spent_anime - eps_watched*media.episode_duration
-            elif list_type == ListType.SERIES:
-                if old_status != Status.RANDOM:
-                    eps_watched = eps_watched_ptw_random()
-                    current_user.time_spent_series = current_user.time_spent_series - eps_watched*media.episode_duration
-            elif list_type == ListType.MOViES:
-                current_user.time_spent_movies = current_user.time_spent_movies - media.runtime
+        elif new_status == Status.PLAN_TO_WATCH:
+            if list_type == ListType.SERIES:
+                if old_status != Status.RANDOM or old_status != None:
+                    eps_watched = eps_watched_status(old_seas, old_eps, all_seas_data)
+                    current_user.time_spent_series = current_user.time_spent_series - (eps_watched*media.episode_duration)
+            elif list_type == ListType.ANIME:
+                if old_status != Status.RANDOM or old_status != None:
+                    eps_watched = eps_watched_status(old_seas, old_eps, all_seas_data)
+                    current_user.time_spent_anime = current_user.time_spent_anime - eps_watched*media.episode_duration
+            elif list_type == ListType.MOVIES:
+                if old_status is not None:
+                    current_user.time_spent_movies = current_user.time_spent_movies - media.runtime
 
     db.session.commit()
+    end = time.time()
+    print(end-start)
 
 
 def compute_media_time_spent(list_type):
-    user = User.query.filter_by(id=current_user.id).first()
+    start = time.time()
 
-    if list_type == ListType.ANIME:
-        element_data = db.session.query(AnimeList, Anime, func.group_concat(AnimeEpisodesPerSeason.episodes))\
-            .join(Anime, Anime.id == AnimeList.anime_id)\
-            .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id)\
-            .filter(AnimeList.user_id == current_user.id).group_by(AnimeList.anime_id)
-    elif list_type == ListType.SERIES:
-        element_data = db.session.query(SeriesList, Series, func.group_concat(SeriesEpisodesPerSeason.episodes))\
-            .join(Series, Series.id == SeriesList.series_id)\
-            .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id)\
-            .filter(SeriesList.user_id == current_user.id).group_by(SeriesList.series_id)
-    elif list_type == ListType.MOVIES:
-        element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id)\
-            .filter(MoviesList.user_id == current_user.id).group_by(MoviesList.movies_id)
+    users = User.query.filter_by(id='4').all()
+    for user in users:
+        if list_type == ListType.ANIME:
+            element_data = db.session.query(AnimeList, Anime, func.group_concat(AnimeEpisodesPerSeason.episodes))\
+                .join(Anime, Anime.id == AnimeList.anime_id)\
+                .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id)\
+                .filter(AnimeList.user_id == current_user.id).group_by(AnimeList.anime_id)
+        elif list_type == ListType.SERIES:
+            element_data = db.session.query(SeriesList, Series, func.group_concat(SeriesEpisodesPerSeason.episodes))\
+                .join(Series, Series.id == SeriesList.series_id)\
+                .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id)\
+                .filter(SeriesList.user_id == current_user.id).group_by(SeriesList.series_id)
+        elif list_type == ListType.MOVIES:
+            element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id)\
+                .filter(MoviesList.user_id == current_user.id).group_by(MoviesList.movies_id)
 
-    if list_type == ListType.ANIME or list_type == ListType.SERIES:
-        total_time = 0
-        for element in element_data:
-            if element[0].status == Status.COMPLETED:
-                try:
-                    total_time += element[1].episode_duration * element[1].total_episodes
-                except:
-                    pass
-            elif element[0].status != Status.PLAN_TO_WATCH:
-                try:
-                    episodes = element[2].split(",")
-                    episodes = [int(x) for x in episodes]
-                    for i in range(1, element[0].current_season):
-                        total_time += element[1].episode_duration * episodes[i - 1]
-                    total_time += element[0].last_episode_watched * element[1].episode_duration
-                except:
-                    pass
-    elif list_type == ListType.MOVIES:
-        total_time = 0
-        for element in element_data:
-            if element[0].status == Status.COMPLETED or element[0].status == Status.COMPLETED_ANIMATION:
-                try:
-                    total_time += element[1].runtime
-                except:
-                    pass
+        if list_type == ListType.ANIME or list_type == ListType.SERIES:
+            total_time = 0
+            for element in element_data:
+                if element[0].status == Status.COMPLETED:
+                    try:
+                        total_time += element[1].episode_duration * element[1].total_episodes
+                    except:
+                        pass
+                elif element[0].status != Status.PLAN_TO_WATCH or element[0].status != Status.RANDOM:
+                    try:
+                        episodes = element[2].split(",")
+                        episodes = [int(x) for x in episodes]
+                        for i in range(1, element[0].current_season):
+                            total_time += element[1].episode_duration*episodes[i-1]
+                        total_time += element[0].last_episode_watched*element[1].episode_duration
+                    except:
+                        pas
+        elif list_type == ListType.MOVIES:
+            total_time = 0
+            for element in element_data:
+                if element[0].status != Status.PLAN_TO_WATCH:
+                    try:
+                        total_time += element[1].runtime
+                    except:
+                        pass
 
-    if list_type == ListType.ANIME:
-        user.time_spent_anime = total_time
-    elif list_type == ListType.SERIES:
-        user.time_spent_series = total_time
-    elif list_type == ListType.MOVIES:
-        user.time_spent_movies = total_time
+        if list_type == ListType.ANIME:
+            user.time_spent_anime = total_time
+        elif list_type == ListType.SERIES:
+            user.time_spent_series = total_time
+        elif list_type == ListType.MOVIES:
+            user.time_spent_movies = total_time
 
-    db.session.commit()
+        db.session.commit()
+
+    end = time.time()
+    print(end - start)
 
 
 def get_trending_data(trends_data, list_type):
@@ -2481,11 +2499,14 @@ def add_element_to_user(element_id, user_id, list_type, status):
                                    last_episode_watched=1,
                                    status=status)
 
+        # Commit the changes
         db.session.add(user_list)
         db.session.commit()
         app.logger.info('[{}] Added a series with the ID {}'.format(user_id, element_id))
-        series = Series.query.filter_by(id=element_id).first()
-        set_last_update(media_name=series.name, media_type=list_type, new_status=status)
+
+        # Set the last update
+        media = Series.query.filter_by(id=element_id).first()
+        set_last_update(media_name=media.name, media_type=list_type, new_status=status)
     elif list_type == ListType.ANIME:
         # Set season/episode to max if the "completed" category is selected
         if status == Status.COMPLETED:
@@ -2502,11 +2523,14 @@ def add_element_to_user(element_id, user_id, list_type, status):
                                   last_episode_watched=1,
                                   status=status)
 
+        # Commit the changes
         db.session.add(user_list)
         db.session.commit()
         app.logger.info('[{}] Added an anime with the ID {}'.format(user_id, element_id))
-        anime = Anime.query.filter_by(id=element_id).first()
-        set_last_update(media_name=anime.name, media_type=list_type, new_status=status)
+
+        # Set the last update
+        media = Anime.query.filter_by(id=element_id).first()
+        set_last_update(media_name=media.name, media_type=list_type, new_status=status)
     elif list_type == ListType.MOVIES:
         # If it contain the "Animation" genre add to "Completed Animation"
         if status == Status.COMPLETED:
@@ -2519,13 +2543,17 @@ def add_element_to_user(element_id, user_id, list_type, status):
                                movies_id=element_id,
                                status=status)
 
+        # Commit the changes
         db.session.add(user_list)
         db.session.commit()
         app.logger.info('[{}] Added movie with the ID {}'.format(user_id, element_id))
-        movie = Movies.query.filter_by(id=element_id).first()
-        set_last_update(media_name=movie.name, media_type=list_type, new_status=status)
 
-    compute_media_time_spent(list_type)
+        # Set the last update
+        media = Movies.query.filter_by(id=element_id).first()
+        set_last_update(media_name=media.name, media_type=list_type, new_status=status)
+
+    # Compute the new time spent
+    compute_time_spent(type="category", media=media, new_status=status, list_type=list_type)
 
 
 def add_element_in_base(api_id, list_type, element_cat):
