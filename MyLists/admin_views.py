@@ -3,8 +3,9 @@ from flask_admin import Admin
 from flask_login import current_user
 from flask_admin import expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
-from MyLists.models import User, Follow, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, SeriesNetwork, \
-    Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork, Movies, MoviesGenre, MoviesList, UserLastUpdate
+from MyLists.models import User, Follow, UserLastUpdate, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, \
+    SeriesNetwork, SeriesActors, Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork, AnimeActors, \
+    Movies, MoviesGenre, MoviesList, MoviesActors
 
 
 class UserAdminView(ModelView):
@@ -35,6 +36,7 @@ class LastUpdateAdminView(ModelView):
     column_searchable_list = ('user_id', 'media_name')
     column_sortable_list = ('user_id', 'media_name', 'date')
     list_template = 'admin/last_update.html'
+
 
 ######################################################## SERIES ########################################################
 
@@ -92,6 +94,16 @@ class SeriesNetworkAdminView(ModelView):
     list_template = 'admin/series_network.html'
 
 
+class SeriesActorsAdminView(ModelView):
+    def is_accessible(self):
+        return current_user.get_id() == '1'
+
+    column_list = ('series_id', 'name')
+    column_searchable_list = ('series_id', 'name')
+    column_sortable_list = ('series_id', 'name')
+    list_template = 'admin/series_actors.html'
+
+
 class SeriesEpisodeTimestampAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
@@ -143,7 +155,7 @@ class AnimeGenreAdminView(ModelView):
         return current_user.get_id() == '1'
 
     column_list = ('anime_id', 'genre')
-    column_searchable_list = ['anime_id']
+    column_searchable_list = ('anime_id', 'genre')
     column_sortable_list = ('anime_id', 'genre')
     list_template = 'admin/anime_genre.html'
 
@@ -156,6 +168,16 @@ class AnimeNetworkAdminView(ModelView):
     column_searchable_list = ('anime_id', 'network')
     column_sortable_list = ('anime_id', 'network')
     list_template = 'admin/anime_network.html'
+
+
+class AnimeActorsAdminView(ModelView):
+    def is_accessible(self):
+        return current_user.get_id() == '1'
+
+    column_list = ('anime_id', 'name')
+    column_searchable_list = ('anime_id', 'name')
+    column_sortable_list = ('anime_id', 'name')
+    list_template = 'admin/anime_actors.html'
 
 
 class AnimeEpisodeTimestampAdminView(ModelView):
@@ -202,7 +224,18 @@ class MoviesListAdminView(ModelView):
     list_template = 'admin/movies_list.html'
 
 
+class MoviesActorsAdminView(ModelView):
+    def is_accessible(self):
+        return current_user.get_id() == '1'
+
+    column_list = ('movies_id', 'name')
+    column_searchable_list = ('movies_id', 'name')
+    column_sortable_list = ('id', 'movies_id', 'name')
+    list_template = 'admin/movies_actors.html'
+
+
 ########################################################################################################################
+
 
 # Override of the index flask-admin view:
 class MyHomeAdminView(AdminIndexView):
@@ -254,6 +287,11 @@ admin.add_view(SeriesNetworkAdminView(model=SeriesNetwork,
                                       name="Series network",
                                       endpoint='series_network'))
 
+admin.add_view(SeriesActorsAdminView(model=SeriesActors,
+                                      session=db.session,
+                                      name="Series actors",
+                                      endpoint='series_actors'))
+
 admin.add_view(AnimeAdminView(model=Anime,
                               session=db.session,
                               name="Anime",
@@ -278,7 +316,12 @@ admin.add_view(AnimeNetworkAdminView(model=AnimeNetwork,
                                      session=db.session,
                                      name="Anime network",
                                      endpoint='anime_network'))
-#####
+
+admin.add_view(AnimeActorsAdminView(model=AnimeActors,
+                                     session=db.session,
+                                     name="Anime actors",
+                                     endpoint='anime_actors'))
+
 admin.add_view(MoviesAdminView(model=Movies,
                                session=db.session,
                                name="Movies",
@@ -293,6 +336,11 @@ admin.add_view(MoviesGenreAdminView(model=MoviesGenre,
                                     session=db.session,
                                     name="Movies genre",
                                     endpoint='movies_genre'))
+
+admin.add_view(MoviesActorsAdminView(model=MoviesActors,
+                                    session=db.session,
+                                    name="Movies actors",
+                                    endpoint='movies_actors'))
 
 admin.add_view(LastUpdateAdminView(model=UserLastUpdate,
                                    session=db.session,

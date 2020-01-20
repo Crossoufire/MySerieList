@@ -3,7 +3,7 @@ Medialists:
 	Add: Button "More results" to the autocomplete
 	Add: Movie director in metadata modal
 	Add: In modal add "Also in the list of" kind of info of followed people
-	Add: If API is down, user can always add a media but check in our database instead of the API
+	Add: If API is down, user can still add a media but check in our database instead of the API
 
 Advanced Statistics:
 	Add: Personal advanced statistics for media
@@ -13,18 +13,18 @@ Homepage:
 
 Account:
     Add: Change background image
-    Enhance: "Settings" tab CSS
+    Enhance: The settings tab CSS
     Enhance: Change profile picture
 
 General:
     Add: Contact form
     Add: Page with full personal history
     Add: Collection Movies to finish (70%)
-    Enhance: Trending media, better responsiveness
 
 Routes:
     Enhance: By default create one admin user that only has admin view (HoF, Global Stats, Administration and Account settings) and one standard user
     Enhance: Redo refresh_element_data() to be in API_data.py
-    Fix: Check API_data.py and do some ameliorations
-    Fix: Finish the new compute time function
     Enhance: Change the hamburger display to a vertical panel in mobile
+    Fix: Check API_data.py and do some ameliorations (if needed)
+    Fix: Finish the new compute time function
+    Add: Send mail when new season/movie is airing

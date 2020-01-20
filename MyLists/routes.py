@@ -48,11 +48,21 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
         add_badges_to_db()
+    if User.query.filter_by(id='2').first() is None:
+        admin = User(username='aaa',
+                     email='aaa@aaa.com',
+                     password=bcrypt.generate_password_hash("a").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow())
+        db.session.add(admin)
     refresh_db_badges()
-    compute_media_time_spent(ListType.SERIES)
+    db.session.commit()
+    # compute_media_time_spent(ListType.SERIES)
     # compute_media_time_spent(ListType.ANIME)
     # compute_media_time_spent(ListType.MOVIES)
-    db.session.commit()
 
 
 ################################################### Anonymous routes ###################################################
@@ -1417,7 +1427,6 @@ def check_cat_type(list_type, status):
 
 def compute_time_spent(type=None, old_eps=None, new_eps=None, old_seas=None, new_seas=None,
                        all_seas_data=None, media=None, old_status=None, new_status=None, list_type=None):
-    start = time.time()
 
     def eps_watched_seasons(old_season, old_episode, new_season, all_seasons):
         nb_eps_watched = 0
@@ -1520,14 +1529,10 @@ def compute_time_spent(type=None, old_eps=None, new_eps=None, old_seas=None, new
                     current_user.time_spent_movies = current_user.time_spent_movies - media.runtime
 
     db.session.commit()
-    end = time.time()
-    print(end-start)
 
 
 def compute_media_time_spent(list_type):
-    start = time.time()
-
-    users = User.query.filter_by(id='4').all()
+    users = User.query.all()
     for user in users:
         if list_type == ListType.ANIME:
             element_data = db.session.query(AnimeList, Anime, func.group_concat(AnimeEpisodesPerSeason.episodes))\
@@ -1577,9 +1582,6 @@ def compute_media_time_spent(list_type):
             user.time_spent_movies = total_time
 
         db.session.commit()
-
-    end = time.time()
-    print(end - start)
 
 
 def get_trending_data(trends_data, list_type):
@@ -2643,11 +2645,11 @@ def add_element_in_base(api_id, list_type, element_cat):
                     break
 
         # Actors names: list
-        actors = details_data.get('cast') or None
+        actors = details_data.get('credits').get('cast') or None
         actors_names = []
         if actors:
-            for i in range(0, len(details_data["cast"])):
-                actors_names.append(details_data["cast"][i]["name"])
+            for i in range(0, len(details_data["credits"]["cast"])):
+                actors_names.append(details_data["credits"]["cast"][i]["name"])
                 if i == 4:
                     break
 
@@ -2813,43 +2815,48 @@ def add_element_in_base(api_id, list_type, element_cat):
         themoviedb_id = details_data.get("id")
         runtime = details_data.get("runtime", 0)
         original_language = details_data.get("original_language", "Unknown")
-        collection_id = details_data.get("belongs_to_collection") or None
+
+        try:
+            collection_id = details_data["belongs_to_collection"]["id"]
+        except:
+            collection_id = None
 
         # Collection data
         if collection_id:
             collection_data = API_data(API_key=themoviedb_api_key).get_collection_data(collection_id)
-            collection_parts = len(collection_data.get('parts'))
-            collection_name = collection_data.get('name', "Unknown") or "Unknown"
-            collection_overview = collection_data.get('overview', 'No overview available for this collection') or \
-                                  'No overview available for this collection.'
+            if collection_data:
+                collection_parts = len(collection_data.get('parts'))
+                collection_name = collection_data.get('name', "Unknown") or "Unknown"
+                collection_overview = collection_data.get('overview', 'No overview available for this collection') or \
+                                      'No overview available for this collection.'
 
-            # Get the collection media cover
-            collection_cover_path = collection_data.get("poster_path")
-            if collection_cover_path:
-                collection_cover_name = "{}.jpg".format(secrets.token_hex(8))
-                isSuccess = API_data().save_api_cover(collection_cover_path, collection_cover_name, ListType.MOVIES,
-                                                      collection=True)
-                if isSuccess is False:
+                # Get the collection media cover
+                collection_cover_path = collection_data.get("poster_path")
+                if collection_cover_path:
+                    collection_cover_name = "{}.jpg".format(secrets.token_hex(8))
+                    isSuccess = API_data().save_api_cover(collection_cover_path, collection_cover_name, ListType.MOVIES,
+                                                          collection=True)
+                    if isSuccess is False:
+                        collection_cover_name = "default.jpg"
+                else:
                     collection_cover_name = "default.jpg"
-            else:
-                collection_cover_name = "default.jpg"
 
-            # Add the element to the database
-            add_collection = MoviesCollections(collection_id=collection_id,
-                                               parts=collection_parts,
-                                               name=collection_name,
-                                               poster=collection_cover_name,
-                                               overview=collection_overview)
+                # Add the element to the database
+                add_collection = MoviesCollections(collection_id=collection_id,
+                                                   parts=collection_parts,
+                                                   name=collection_name,
+                                                   poster=collection_cover_name,
+                                                   overview=collection_overview)
 
-            db.session.add(add_collection)
-            db.session.commit()
+                db.session.add(add_collection)
+                db.session.commit()
 
         # Actors names
-        actors = actors_data.get('cast') or None
+        actors = details_data["credits"]["cast"]
         actors_names = []
         if actors:
-            for i in range(0, len(actors_data["cast"])):
-                actors_name.append(actors_data["cast"][i]["name"])
+            for i in range(0, len(details_data["credits"]["cast"])):
+                actors_name.append(details_data["credits"]["cast"][i]["name"])
                 if i == 4:
                     break
 
@@ -2903,7 +2910,7 @@ def add_element_in_base(api_id, list_type, element_cat):
             for i in range(0, len(genres_data)):
                 genre = MoviesGenre(movies_id=element.id,
                                     genre=genres_data[i][0],
-                                    genre_id=genres_id[i][1])
+                                    genre_id=genres_data[i][1])
                 db.session.add(genre)
 
         db.session.commit()
