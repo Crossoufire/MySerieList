@@ -60,9 +60,10 @@ def create_user():
         db.session.add(admin)
     refresh_db_badges()
     db.session.commit()
-    # compute_media_time_spent(ListType.SERIES)
-    # compute_media_time_spent(ListType.ANIME)
-    # compute_media_time_spent(ListType.MOVIES)
+    add_collections_movies()
+    compute_media_time_spent(ListType.SERIES)
+    compute_media_time_spent(ListType.ANIME)
+    compute_media_time_spent(ListType.MOVIES)
 
 
 ################################################### Anonymous routes ###################################################
@@ -782,11 +783,12 @@ def movies_collection():
     ongoing_collections = []
     for movie in collection_movie:
         movie_data = {}
-        movie_data["name"] = movie[2].name
-        movie_data["total"] = movie[2].parts
-        movie_data["parts"] = movie[3]
+        movie_data["name"]     = movie[2].name
+        movie_data["total"]    = movie[2].parts
+        movie_data["parts"]    = movie[3]
         movie_data["overview"] = movie[2].overview
-        movie_data["poster"] = '/static/covers/movies_collection_covers/' + movie[2].poster
+        movie_data["poster"]   = '/static/covers/movies_collection_covers/' + movie[2].poster
+
         if movie_data["total"] == movie_data["parts"]:
             movie_data["completed"] = True
             completed_collections.append(movie_data)
@@ -1493,20 +1495,21 @@ def compute_time_spent(type=None, old_eps=None, new_eps=None, old_seas=None, new
 
 def compute_media_time_spent(list_type):
     users = User.query.all()
+
     for user in users:
         if list_type == ListType.ANIME:
             element_data = db.session.query(AnimeList, Anime, func.group_concat(AnimeEpisodesPerSeason.episodes))\
                 .join(Anime, Anime.id == AnimeList.anime_id)\
                 .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id)\
-                .filter(AnimeList.user_id == current_user.id).group_by(AnimeList.anime_id)
+                .filter(AnimeList.user_id == user.id).group_by(AnimeList.anime_id)
         elif list_type == ListType.SERIES:
             element_data = db.session.query(SeriesList, Series, func.group_concat(SeriesEpisodesPerSeason.episodes))\
                 .join(Series, Series.id == SeriesList.series_id)\
                 .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id)\
-                .filter(SeriesList.user_id == current_user.id).group_by(SeriesList.series_id)
+                .filter(SeriesList.user_id == user.id).group_by(SeriesList.series_id)
         elif list_type == ListType.MOVIES:
             element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id)\
-                .filter(MoviesList.user_id == current_user.id).group_by(MoviesList.movies_id)
+                .filter(MoviesList.user_id == user.id).group_by(MoviesList.movies_id)
 
         if list_type != ListType.MOVIES:
             total_time = 0
@@ -1557,7 +1560,7 @@ def get_trending_data(trends_data, list_type):
         for data in trends_data:
             series = {}
             series["title"] = data.get("name", "Unknown") or "Unknown"
-            media_cover_path = details_data.get("poster_path") or None
+            media_cover_path = data.get("poster_path") or None
             if media_cover_path:
                 series["poster_path"] = tmdb_posters_path + media_cover_path
             else:
@@ -1605,7 +1608,7 @@ def get_trending_data(trends_data, list_type):
         for data in trends_data:
             movies = {}
             movies["title"] = data.get("title", "Unknown") or "Unknown"
-            media_cover_path = details_data.get("poster_path") or None
+            media_cover_path = data.get("poster_path") or None
             if media_cover_path:
                 movies["poster_path"] = tmdb_posters_path + media_cover_path
             else:
@@ -2164,12 +2167,12 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
 
             # Change first air time format
             first_air_date = element[0].first_air_date
-            if first_air_date != 'Unknown':
+            if 'Unknown' not in first_air_date:
                 first_air_date = datetime.strptime(first_air_date, '%Y-%m-%d').strftime("%d %b %Y")
 
             # Change last air time format
             last_air_date = element[0].last_air_date
-            if last_air_date != 'Unknown':
+            if 'Unknown' not in last_air_date:
                 last_air_date = datetime.strptime(last_air_date, '%Y-%m-%d').strftime("%d %b %Y")
 
             actors = element[5].replace(',', ', ')
@@ -2257,7 +2260,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
         for element in element_data:
             # Change release date format
             release_date = element[0].release_date
-            if release_date != "Unknown":
+            if 'Unknown' not in release_date:
                 release_date = datetime.strptime(release_date, '%Y-%m-%d').strftime("%d %b %Y")
 
             actors = element[3].replace(',', ', ')
@@ -2570,7 +2573,7 @@ def add_element_in_base(api_id, list_type, element_cat):
         tv_data['status']         = details_data.get("status", "Unknown") or "Unknown"
         tv_data['vote_average']   = details_data.get("vote_average", 0) or 0
         tv_data['vote_count']     = details_data.get("vote_count", 0) or 0
-        tv_data['synopsis']       = details_data.get("overview", "No overview avalaible") or "No overview avalaible"
+        tv_data['synopsis']       = details_data.get("overview", "No overview avalaible.") or "No overview avalaible."
         tv_data['popularity']     = details_data.get("popularity", 0) or 0
         tv_data['themoviedb_id']  = details_data.get("id")
         tv_data['image_cover']    = media_cover_name
@@ -2768,7 +2771,7 @@ def add_element_in_base(api_id, list_type, element_cat):
         movie_data['popularity']        = details_data.get("popularity", 0) or 0
         movie_data['budget']            = details_data.get("budget", 0) or 0
         movie_data['revenue']           = details_data.get("revenue", 0) or 0
-        movie_data['tagline']           = details_data.get("tagline", "Unknown") or 'Unknown'
+        movie_data['tagline']           = details_data.get("tagline", "-") or '-'
         movie_data['runtime']           = details_data.get("runtime", 0) or 0
         movie_data['original_language'] = details_data.get("original_language", "Unknown") or 'Unknown'
         movie_data['collection_id']     = details_data.get("belongs_to_collection", {}).get("id") or None
@@ -2827,9 +2830,8 @@ def add_element_in_base(api_id, list_type, element_cat):
             if collection_data:
                 collection_parts = len(collection_data.get('parts', []) or [])
                 collection_name = collection_data.get('name', "Unknown") or "Unknown"
-                collection_overview = collection_data.get('overview',
-                                                          'No overview available for this collection') or \
-                                      'No overview available for this collection.'
+                collection_overview = collection_data.get('overview', 'No overview available.') or \
+                                      'No overview available.'
 
                 # Get the collection media cover
                 collection_cover_path = collection_data.get("poster_path")
@@ -3056,7 +3058,7 @@ def add_collections_movies():
     else: # Linux & macOS
         local_covers_path = os.path.join(app.root_path, "static/covers/movies_collection_covers/")
 
-    all_movies = Movies.query.all()
+    all_movies = Movies.query.filter_by(themoviedb_id=9799).all()
     for movie in all_movies:
         tmdb_movies_id = movie.themoviedb_id
         try:
@@ -3075,7 +3077,20 @@ def add_collections_movies():
 
             collection_name = data_collection["name"]
             collection_overview = data_collection["overview"]
-            collection_parts = len(data_collection["parts"])
+
+            remove = 0
+            utc_now = datetime.utcnow()
+            for part in data_collection["parts"]:
+                part_date = part['release_date']
+                try:
+                    part_date_datetime = datetime.strptime(part_date, '%Y-%m-%d')
+                    difference = (utc_now-part_date_datetime).total_seconds()
+                    if float(difference) < 0:
+                        remove += 1
+                except:
+                    pass
+
+            collection_parts = len(data_collection["parts"]) - remove
 
             collection_poster_id = "{}.jpg".format(secrets.token_hex(8))
 
@@ -3085,24 +3100,24 @@ def add_collections_movies():
             img = Image.open("{}{}".format(local_covers_path, collection_poster_id))
             img = img.resize((300, 450), Image.ANTIALIAS)
             img.save("{0}{1}".format(local_covers_path, collection_poster_id), quality=90)
+
+            movie.collection_id = collection_id
+
+            # Test if collection already in MoviesCollection
+            if MoviesCollections.query.filter_by(collection_id=collection_id).first() is not None:
+                db.session.commit()
+                continue
+
+            add_collection = MoviesCollections(collection_id=collection_id,
+                                               parts=collection_parts,
+                                               name=collection_name,
+                                               poster=collection_poster_id,
+                                               overview=collection_overview)
+
+            db.session.add(add_collection)
+            db.session.commit()
         except:
             continue
-
-        movie.collection_id = collection_id
-
-        # Test if collection already in MoviesCollection
-        if MoviesCollections.query.filter_by(collection_id=collection_id).first() is not None:
-            db.session.commit()
-            continue
-
-        add_collection = MoviesCollections(collection_id=collection_id,
-                                           parts=collection_parts,
-                                           name=collection_name,
-                                           poster=collection_poster_id,
-                                           overview=collection_overview)
-
-        db.session.add(add_collection)
-        db.session.commit()
 
 
 def add_actors_series():
@@ -3201,43 +3216,36 @@ def refresh_element_data(api_id, list_type):
             status = details_data.get("status", "Unknown") or "Unknown"
             vote_average = details_data.get("vote_average", 0) or 0
             vote_count = details_data.get("vote_count", 0) or 0
-            synopsis = details_data.get("overview", "Unknown") or "Unknown"
+            synopsis = details_data.get("overview", "No overview available.") or "No overview available."
             popularity = details_data.get("popularity", 0) or 0
+            poster_path = details_data.get("poster_path", "") or ""
 
-            try:
-                poster_path = details_data["poster_path"]
-            except:
-                poster_path = ""
+            # Refresh Created by: list
+            created_by = details_data.get("created_by") or None
+            if created_by:
+                creators = []
+                for creator in created_by:
+                    tmp_created = creator.get("name") or None
+                    if tmp_created:
+                        creators.append(tmp_created)
+                created_by = ", ".join(x for x in creators)
+            else:
+                created_by = 'Unknown'
 
-            # Refresh Created by
-            try:
-                created_by = ', '.join(x['name'] for x in details_data['created_by'])
-                if created_by == "":
-                    created_by = "Unknown"
-            except:
-                created_by = "Unknown"
-
-            # Refresh Episode duration
-            try:
-                episode_duration = details_data["episode_run_time"][0]
-                if episode_duration == "":
-                    if list_type == ListType.ANIME:
-                        episode_duration = 24
-                    else:
-                        episode_duration = 45
-            except:
+            # Refresh Episode duration: list
+            episode_duration = details_data.get("episode_run_time") or None
+            if episode_duration:
+                episode_duration = episode_duration[0]
+            else:
                 if list_type == ListType.ANIME:
                     episode_duration = 24
-                else:
+                elif list_type == ListType.SERIES:
                     episode_duration = 45
 
-            # Refresh Origin country
-            try:
-                origin_country = ", ".join(details_data["origin_country"])
-                if origin_country == "":
-                    origin_country = "Unknown"
-            except:
-                origin_country = "Unknown"
+            # Refresh Origin country: list
+            origin_country = details_data.get("origin_country", "Unknown") or "Unknown"
+            if "Unknown" not in origin_country:
+                origin_country = origin_country[0]
 
             # Refresh if a special season exist, we do not want to take it into account
             seasons_data = []
@@ -3269,6 +3277,7 @@ def refresh_element_data(api_id, list_type):
                 else:  # Linux & macOS
                     local_covers_path = os.path.join(app.root_path, "static/covers/anime_covers/")
 
+            # Refresh the cover
             try:
                 if poster_path != "":
                     urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(poster_path),
@@ -3323,44 +3332,25 @@ def refresh_element_data(api_id, list_type):
                         season.episodes = season_data["episode_count"]
 
             # TODO: Refresh networks, genres and actors
+
             element.last_update = datetime.utcnow()
             db.session.commit()
             app.logger.info("[SYSTEM] Refreshed the series/anime with the ID {}".format(element.id))
         elif list_type == ListType.MOVIES:
-            release_date = details_data.get("release_date", "Unknown")
-            homepage = details_data.get("homepage", "Unknown")
-            released = details_data.get("status", False)
-            vote_average = details_data.get("vote_average", 0)
-            vote_count = details_data.get("vote_count", 0)
-            synopsis = details_data.get("overview", "Unknown")
-            popularity = details_data.get("popularity", 0)
-            budget = details_data.get("budget", 0)
-            revenue = details_data.get("revenue", 0)
-            tagline = details_data.get("tagline", "Unknown")
-            runtime = details_data.get("runtime", 0)
-            original_language = details_data.get("original_language", "Unknown")
+            release_date = details_data.get("release_date", "Unknown") or "Unknown"
+            homepage = details_data.get("homepage", "Unknown") or "Unknown"
+            released = details_data.get("status", False) or False
+            vote_average = details_data.get("vote_average", 0) or 0
+            vote_count = details_data.get("vote_count", 0) or 0
+            synopsis = details_data.get("overview", "No overview available.") or "No overview available."
+            popularity = details_data.get("popularity", 0) or 0
+            budget = details_data.get("budget", 0) or 0
+            revenue = details_data.get("revenue", 0) or 0
+            tagline = details_data.get("tagline", "-") or '-'
+            runtime = details_data.get("runtime", 90) or 90
+            original_language = details_data.get("original_language", "Unknown") or "Unknown"
             collection_id = details_data.get("belongs_to_collection") or None
-
-            try:
-                poster_path = details_data["poster_path"]
-            except:
-                poster_path = ""
-
-            # Refresh runtime
-            try:
-                runtime = details_data["runtime"]
-                if runtime == None or runtime == "":
-                    runtime = 90
-            except:
-                runtime = 90
-
-            # Refresh original language
-            try:
-                original_language = details_data["original_language"]
-                if original_language == "":
-                    original_language = "Unknown"
-            except:
-                original_language = "Unknown"
+            poster_path = details_data.get("poster_path") or None
 
             # Refresh the cover
             if platform.system() == "Windows":
@@ -3368,6 +3358,7 @@ def refresh_element_data(api_id, list_type):
             else:  # Linux & macOS
                 local_covers_path = os.path.join(app.root_path, "static/covers/movies_covers/")
 
+            # Refresh the cover
             try:
                 if poster_path != "":
                     urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{0}".format(poster_path),
@@ -3396,6 +3387,7 @@ def refresh_element_data(api_id, list_type):
             element.collection_id = collection_id
 
             # TODO: Refresh genres and actors
+
             db.session.commit()
             app.logger.info("[SYSTEM] Refreshed the movie with the ID {}".format(element.id))
 
