@@ -23,8 +23,8 @@
             {% endif %}
         </h2>
         <p class="p-0 m-0">
-            <b>Joined: {{ joined }}</b><br>
-            <b>Followers: {{ followers }}</b>
+            <b>Joined: {{ data['register'] }}</b><br>
+            <b>Followers: {{ data['followers'] }}</b>
         </p>
     </div>
 </div>
@@ -553,7 +553,7 @@
                                         Profile views:
                                     </div>
                                     <div  class="col-2">
-                                        {{ view_count["profile"] }}
+                                        {{ data['view_count']["profile"] }}
                                     </div>
                                 </div>
                             </li>
@@ -563,7 +563,7 @@
                                         SeriesList views:
                                     </div>
                                     <div  class="col-2">
-                                        {{ view_count["series"] }}
+                                        {{ data['view_count']["series"] }}
                                     </div>
                                 </div>
                             </li>
@@ -573,7 +573,7 @@
                                         AnimeList views:
                                     </div>
                                     <div  class="col-2">
-                                        {{ view_count["anime"] }}
+                                        {{ data['view_count']["anime"] }}
                                     </div>
                                 </div>
                             </li>
@@ -583,7 +583,7 @@
                                         MoviesList views:
                                     </div>
                                     <div  class="col-2">
-                                        {{ view_count["movies"] }}
+                                        {{ data['view_count']["movies"] }}
                                     </div>
                                 </div>
                             </li>

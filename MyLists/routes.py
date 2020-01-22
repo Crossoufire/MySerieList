@@ -227,7 +227,7 @@ def account(user_name):
     user = User.query.filter_by(username=user_name).first()
 
     # Add forms
-    follow_form = AddFollowForm()
+    follow_form   = AddFollowForm()
     settings_form = UpdateAccountForm()
     password_form = ChangePasswordForm()
 
@@ -239,10 +239,10 @@ def account(user_name):
     follow = Follow.query.filter_by(user_id=current_user.id, follow_id=user.id).first()
     if current_user.id == user.id or current_user.id == 1:
         pass
-    elif (user.private) and (follow is None):
+    elif user.private and follow is None:
         abort(404)
 
-    # Follows form
+    # Add follows form
     if follow_form.submit_follow.data and follow_form.validate():
         add_follow(follow_form.follow_to_add.data)
         return redirect(url_for('account', user_name=user_name, message='follows'))
@@ -341,31 +341,8 @@ def account(user_name):
         flash('Your password has been successfully updated!', 'success')
         return redirect(url_for('account', user_name=current_user.username, message="settings"))
 
-    # Recover the follows list
-    follows_list = db.session.query(User, Follow).join(Follow, Follow.follow_id == User.id)\
-        .filter(Follow.user_id == user.id).group_by(Follow.follow_id).order_by(User.username).all()
-
-    follows_list_data = []
-    for follow in follows_list:
-        picture_url = url_for('static', filename='profile_pics/{}'.format(follow[0].image_file))
-        follow_data = {"username": follow[0].username,
-                       "user_id" : follow[0].id,
-                       "picture" : picture_url}
-
-        if follow[0].private:
-            test_private = Follow.query.filter_by(user_id=current_user.id, follow_id=follow[0].id).first()
-            if (test_private is not None) or (current_user.id == 1):
-                follows_list_data.append(follow_data)
-            elif current_user.id == follow[0].id:
-                follows_list_data.append(follow_data)
-        else:
-            follows_list_data.append(follow_data)
-
-    # Recover the number of user that follows you
-    followers = Follow.query.filter_by(follow_id=user.id).all()
-
     # Recover account data
-    account_data = get_account_data(user, user_name, follows_list_data)
+    account_data = get_account_data(user, user_name)
 
     # Recover the last updates of your follows for the follow TAB
     last_updates = get_follows_full_last_update(user.id)
@@ -376,21 +353,6 @@ def account(user_name):
     else:
         overview_updates = get_user_last_update(user.id)
 
-    # Recover the view count of the account and the media lists
-    if current_user.id != 1 and user.id != current_user.id:
-        user.profile_views = user.profile_views + 1
-        profile_view_count = user.profile_views
-        db.session.commit()
-    else:
-        profile_view_count = user.profile_views
-    view_count = {"profile" : profile_view_count,
-                  "series"  : user.series_views,
-                  "anime"   : user.anime_views,
-                  "movies"  : user.movies_views}
-
-    # Recover the registered date
-    registered_date = user.registered_on.strftime("%d %b %Y")
-
     # Reload on the specified form TAB
     message_tab = request.args.get("message")
     if message_tab is None:
@@ -399,19 +361,15 @@ def account(user_name):
     return render_template('account.html',
                            title            = "{}'s account".format(user.username),
                            data             = account_data,
-                           joined           = registered_date,
-                           view_count       = view_count,
+                           follow_form      = follow_form,
+                           settings_form    = settings_form,
+                           password_form    = password_form,
                            user_id          = str(user.id),
                            user_name        = user_name,
                            message_tab      = message_tab,
-                           follow_form      = follow_form,
-                           followers        = len(followers),
                            last_updates     = last_updates,
                            overview_updates = overview_updates,
-                           settings_form    = settings_form,
-                           password_form    = password_form,
-                           user_biography   = user.biography,
-                           badges_unlocked  = "")
+                           user_biography   = user.biography)
 
 
 @app.route("/badges/<user_name>", methods=['GET', 'POST'])
@@ -431,9 +389,7 @@ def badges(user_name):
         abort(404)
 
     badges = get_badges(user.id)[0]
-    return render_template('badges.html',
-                           title       = "{}'s badges".format(user_name),
-                           user_badges = badges)
+    return render_template('badges.html', title="{}'s badges".format(user_name), user_badges=badges)
 
 
 @app.route("/level_grade_data", methods=['GET'])
@@ -795,6 +751,10 @@ def current_trends():
     anime_trends  = get_trending_data(trending_data[1], ListType.ANIME)
     movies_trends = get_trending_data(trending_data[2], ListType.MOVIES)
 
+    if series_trends is None or anime_trends is None or movies_trends is None:
+        flash('The current trends are not available right now, please try again later', 'warning')
+        return redirect(url_for('account', user_name=current_user.username))
+
     platform = str(request.user_agent.platform)
     if platform == "iphone" or platform == "android" or platform is None or platform == 'None':
         template = 'current_trends_mobile.html'
@@ -860,7 +820,7 @@ def follow_status():
         abort(400)
 
     # Check the status
-    if status:
+    if status is True:
         # Check if the follow already exists
         if Follow.query.filter_by(user_id=current_user.id, follow_id=follow_id).first() is not None:
             abort(400)
@@ -1548,7 +1508,7 @@ def compute_media_time_spent(list_type):
             element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id)\
                 .filter(MoviesList.user_id == current_user.id).group_by(MoviesList.movies_id)
 
-        if list_type == ListType.ANIME or list_type == ListType.SERIES:
+        if list_type != ListType.MOVIES:
             total_time = 0
             for element in element_data:
                 if element[0].status == Status.COMPLETED:
@@ -1561,10 +1521,10 @@ def compute_media_time_spent(list_type):
                         episodes = element[2].split(",")
                         episodes = [int(x) for x in episodes]
                         for i in range(1, element[0].current_season):
-                            total_time += element[1].episode_duration*episodes[i-1]
-                        total_time += element[0].last_episode_watched*element[1].episode_duration
+                            total_time += element[1].episode_duration * episodes[i-1]
+                        total_time += element[0].last_episode_watched * element[1].episode_duration
                     except:
-                        pas
+                        pass
         elif list_type == ListType.MOVIES:
             total_time = 0
             for element in element_data:
@@ -1587,18 +1547,26 @@ def compute_media_time_spent(list_type):
 def get_trending_data(trends_data, list_type):
     trending_list = []
     tmdb_posters_path = "http://image.tmdb.org/t/p/w300"
+
     i = 0
     if list_type == ListType.SERIES:
-        for data in trends_data.get("results"):
+        trends_data = trends_data.get("results")
+        if trends_data is None:
+            return None
+
+        for data in trends_data:
             series = {}
-            series["title"] = data.get("name", "Unknown")
-            series["poster_path"] = tmdb_posters_path + data.get("poster_path")
-            if series["poster_path"] is None or data.get("poster_path") == "":
-                series["poster_path"] = "static/covers/movies_covers/default.jpg"
-            series["first_air_date"] = data.get("first_air_date", "Unknown")
+            series["title"] = data.get("name", "Unknown") or "Unknown"
+            media_cover_path = details_data.get("poster_path") or None
+            if media_cover_path:
+                series["poster_path"] = tmdb_posters_path + media_cover_path
+            else:
+                series["poster_path"] = url_for('static', filename='covers/series_covers/default.jpg')
+            series["first_air_date"] = data.get("first_air_date", "Unknown") or "Unknown"
             if series["first_air_date"] != "Unknown":
                 series["first_air_date"] = datetime.strptime(series["first_air_date"], '%Y-%m-%d').strftime("%d %b %Y")
-            series["overview"] = data.get("overview", "There is no overview for this series.")
+            series["overview"] = data.get("overview", "There is no overview for this series.") \
+                                 or "There is no overview for this series."
             series["tmdb_link"] = "https://www.themoviedb.org/tv/{}".format(data.get("id"))
             trending_list.append(series)
             i += 1
@@ -1607,13 +1575,19 @@ def get_trending_data(trends_data, list_type):
 
         return trending_list
     elif list_type == ListType.ANIME:
-        for data in trends_data.get("top"):
+        trends_data = trends_data.get("top")
+        if trends_data is None:
+            return None
+
+        for data in trends_data:
             anime = {}
-            anime["title"] = data.get("title", "Unknown")
-            anime["poster_path"] = data.get("image_url")
-            if anime["poster_path"] is None or data.get("image_url") == "":
-                anime["poster_path"] = "static/covers/anime_covers/default.jpg"
-            anime["first_air_date"] = data.get("start_date")
+            anime["title"] = data.get("title", "Unknown") or "Unknown"
+            media_cover_path = data.get("image_url") or None
+            if media_cover_path:
+                anime["poster_path"] = media_cover_path
+            else:
+                anime["poster_path"] = url_for('static', filename='covers/anime_covers/default.jpg')
+            anime["first_air_date"] = data.get("start_date", 'Unknown') or "Unknown"
             anime["overview"] = "There is no overview from this API. " \
                                 "You can check it on MyAnimeList by clicking on the title"
             anime["tmdb_link"] = data.get("url")
@@ -1624,14 +1598,23 @@ def get_trending_data(trends_data, list_type):
 
         return trending_list
     elif list_type == ListType.MOVIES:
-        for data in trends_data.get("results"):
+        trends_data = trends_data.get("results")
+        if trends_data is None:
+            return None
+
+        for data in trends_data:
             movies = {}
-            movies["title"] = data.get("title", "Unknown")
-            movies["poster_path"] = tmdb_posters_path + data.get("poster_path")
-            if movies["poster_path"] is None or data.get("poster_path") == "":
-                movies["poster_path"] = "static/covers/movies_covers/default.jpg"
-            movies["release_date"] = datetime.strptime(data.get("release_date"), '%Y-%m-%d').strftime("%d %b %Y")
-            movies["overview"] = data.get("overview", "No overview available for this movie.")
+            movies["title"] = data.get("title", "Unknown") or "Unknown"
+            media_cover_path = details_data.get("poster_path") or None
+            if media_cover_path:
+                movies["poster_path"] = tmdb_posters_path + media_cover_path
+            else:
+                movies["poster_path"] = url_for('static', filename='covers/movies_covers/default.jpg')
+            movies["release_date"] = data.get("release_date", "Unknown") or "Unknown"
+            if movies["release_date"] != "Unknown":
+                movies["release_date"] = datetime.strptime(movies["release_date"], '%Y-%m-%d').strftime("%d %b %Y")
+            movies["overview"] = data.get("overview", "No overview available for this movie.") or \
+                                 'No overview available for this movie.'
             movies["tmdb_link"] = "https://www.themoviedb.org/movie/{}".format(data.get("id"))
             trending_list.append(movies)
             i += 1
@@ -1641,14 +1624,52 @@ def get_trending_data(trends_data, list_type):
         return trending_list
 
 
-def get_account_data(user, user_name, follows_list_data):
-    account_data             = {}
-    account_data["series"]   = {}
-    account_data["movies"]   = {}
-    account_data["anime"]    = {}
-    account_data["id"]       = user.id
-    account_data["username"] = user_name
-    account_data["follows"]  = follows_list_data
+def get_account_data(user, user_name):
+    # Recover the follows list
+    follows_list = db.session.query(User, Follow).join(Follow, Follow.follow_id == User.id)\
+        .filter(Follow.user_id == user.id).group_by(Follow.follow_id).order_by(User.username).all()
+
+    follows_list_data = []
+    for follow in follows_list:
+        picture_url = url_for('static', filename='profile_pics/{}'.format(follow[0].image_file))
+        follow_data = {"username": follow[0].username,
+                       "user_id" : follow[0].id,
+                       "picture" : picture_url}
+
+        if follow[0].private:
+            isPrivate = Follow.query.filter_by(user_id=current_user.id, follow_id=follow[0].id).first()
+            if isPrivate is not None or current_user.id == 1:
+                follows_list_data.append(follow_data)
+            elif current_user.id == follow[0].id:
+                follows_list_data.append(follow_data)
+        else:
+            follows_list_data.append(follow_data)
+
+    # Recover the number of user that follows you
+    followers = Follow.query.filter_by(follow_id=user.id).all()
+
+    # Recover the view count of the account and the media lists
+    if current_user.id != 1 and user.id != current_user.id:
+        user.profile_views = user.profile_views + 1
+        profile_view_count = user.profile_views
+        db.session.commit()
+    else:
+        profile_view_count = user.profile_views
+    view_count = {"profile" : profile_view_count,
+                  "series"  : user.series_views,
+                  "anime"   : user.anime_views,
+                  "movies"  : user.movies_views}
+
+    account_data               = {}
+    account_data["series"]     = {}
+    account_data["movies"]     = {}
+    account_data["anime"]      = {}
+    account_data["id"]         = user.id
+    account_data["username"]   = user_name
+    account_data["follows"]    = follows_list_data
+    account_data["followers"]  = len(followers)
+    account_data["view_count"] = view_count
+    account_data["register"]   = user.registered_on.strftime("%d %b %Y")
 
     if user.id != current_user.id:
         if Follow.query.filter_by(user_id=current_user.id, follow_id=user.id).first() is None:
@@ -1685,17 +1706,17 @@ def get_account_data(user, user_name, follows_list_data):
         for media in media_count:
             if media[0].status == Status.WATCHING:
                 watching = media[1]
-            if media[0].status == Status.COMPLETED:
+            elif media[0].status == Status.COMPLETED:
                 completed = media[1]
-            if media[0].status == Status.COMPLETED_ANIMATION:
+            elif media[0].status == Status.COMPLETED_ANIMATION:
                 completed_animation = media[1]
-            if media[0].status == Status.ON_HOLD:
+            elif media[0].status == Status.ON_HOLD:
                 onhold = media[1]
-            if media[0].status == Status.RANDOM:
+            elif media[0].status == Status.RANDOM:
                 random = media[1]
-            if media[0].status == Status.DROPPED:
+            elif media[0].status == Status.DROPPED:
                 dropped = media[1]
-            if media[0].status == Status.PLAN_TO_WATCH:
+            elif media[0].status == Status.PLAN_TO_WATCH:
                 plantowatch = media[1]
         total = sum(tot[1] for tot in media_count)
 
@@ -1952,11 +1973,11 @@ def get_badges(user_id):
             value = count
 
         badge_data = {}
-        badge_data["type"] = badge.type
+        badge_data["type"]     = badge.type
         badge_data["image_id"] = badge.image_id
-        badge_data["title"] = badge.title
+        badge_data["title"]    = badge.title
         badge_data["unlocked"] = unlocked
-        badge_data["value"] = value
+        badge_data["value"]    = value
 
         return badge_data
 
