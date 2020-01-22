@@ -68,7 +68,7 @@ function show_metadata(data, media_list) {
     $('#episode_duration').html("<b>Episode Duration</b>: " +data.episode_duration+ " min");
     $('#total_seasons').html("<b>Total Seasons</b>: " +data.total_seasons);
     $('#total_episodes').html("<b>Total Episodes</b>: " +data.total_episodes);
-    $('#episodes_per_season').html("<b>Episodes Per Season</b>: " +data.eps_per_season);
+    $('#episodes_per_season').html("<b>Episodes Per Season</b>: " +data.eps_per_season.toString().replace(/,/g, ", "));
     if (media_list == "serieslist") {
         $('#origin_country').html("<b>Origin Country</b>: " +data.origin_country);
     }

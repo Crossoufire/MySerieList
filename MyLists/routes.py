@@ -2163,39 +2163,18 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             eps_per_season = [int(i) for i in eps_per_season]
 
             # Change first air time format
-            try:
-                tmp_date = datetime.strptime(element[0].first_air_date, '%Y-%m-%d')
-                first_air_date = tmp_date.strftime("%d %b %Y")
-            except:
-                first_air_date = "Unknown"
+            first_air_date = element[0].first_air_date
+            if first_air_date != 'Unknown':
+                first_air_date = datetime.strptime(first_air_date, '%Y-%m-%d').strftime("%d %b %Y")
 
             # Change last air time format
-            try:
-                tmp_date = datetime.strptime(element[0].last_air_date, '%Y-%m-%d')
-                last_air_date = tmp_date.strftime("%d %b %Y")
-            except:
-                last_air_date = "Unknown"
+            last_air_date = element[0].last_air_date
+            if last_air_date != 'Unknown':
+                last_air_date = datetime.strptime(last_air_date, '%Y-%m-%d').strftime("%d %b %Y")
 
-            # Get actors
-            try:
-                tmp = element[5]
-                actors = tmp.replace(',', ', ')
-            except:
-                actors = "Unknown"
-
-            # Get genres
-            try:
-                tmp = element[2]
-                genres = tmp.replace(',', ', ')
-            except:
-                genres = "Unknown"
-
-            # Get networks
-            try:
-                tmp = element[3]
-                networks = tmp.replace(',', ', ')
-            except:
-                networks = "Unknown"
+            actors = element[5].replace(',', ', ')
+            genres = element[2].replace(',', ', ')
+            networks = element[3].replace(',', ', ')
 
             element_info = {"id": element[0].id,
                             "cover": "{}{}".format(covers_path, element[0].image_cover),
@@ -2263,10 +2242,8 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
         element_all_data = [[watching_list, "WATCHING"], [completed_list, "COMPLETED"], [onhold_list, "ON HOLD"],
                             [random_list, "RANDOM"], [dropped_list, "DROPPED"], [plantowatch_list, "PLAN TO WATCH"]]
 
-        try:
-            percentage = int(common_elements/len(element_data)*100)
-        except:
-            percentage = 0
+        try: percentage = int((common_elements/len(element_data))*100)
+        except ZeroDivisionError: percentage = 0
         all_data_media = {"all_data": element_all_data,
                           "common_elements": [common_elements, len(element_data), percentage]}
 
@@ -2279,25 +2256,12 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
         common_elements = 0
         for element in element_data:
             # Change release date format
-            try:
-                tmp_date = datetime.strptime(element[0].release_date, '%Y-%m-%d')
-                release_date = tmp_date.strftime("%d %b %Y")
-            except:
-                release_date = "Unknown"
+            release_date = element[0].release_date
+            if release_date != "Unknown":
+                release_date = datetime.strptime(release_date, '%Y-%m-%d').strftime("%d %b %Y")
 
-            # Get actors
-            try:
-                tmp = element[3]
-                actors = tmp.replace(',', ', ')
-            except:
-                actors = "Unknown"
-
-            # Get genres
-            try:
-                tmp = element[2]
-                genres = tmp.replace(',', ', ')
-            except:
-                genres = "Unknown"
+            actors = element[3].replace(',', ', ')
+            genres = element[2].replace(',', ', ')
 
             element_info = {"id": element[0].id,
                             "cover": "{}{}".format(covers_path, element[0].image_cover),
@@ -2340,10 +2304,8 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
         element_all_data = [[completed_list, "COMPLETED"], [completed_list_animation, "COMPLETED ANIMATION"] ,
                             [plantowatch_list, "PLAN TO WATCH"]]
 
-        try:
-            percentage = int(common_elements/len(element_data)*100)
-        except:
-            percentage = 0
+        try: percentage = int((common_elements/len(element_data))*100)
+        except ZeroDivisionError: percentage = 0
         all_data_media = {"all_data": element_all_data,
                           "common_elements": [common_elements, len(element_data), percentage]}
 
