@@ -21,8 +21,8 @@ from flask_login import login_user, current_user, logout_user, login_required
 from flask import render_template, url_for, flash, redirect, request, jsonify, session, abort
 from MyLists.forms import RegistrationForm, LoginForm, UpdateAccountForm, ChangePasswordForm, AddFollowForm, \
     ResetPasswordForm, ResetPasswordRequestForm
-from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork, \
-    Follow, Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, Movies, MoviesGenre, \
+from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, SeriesNetwork,\
+    Anime, AnimeList, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, HomePage, Movies, MoviesGenre, \
     MoviesList, MoviesActors, SeriesActors, AnimeActors, UserLastUpdate, Badges, MoviesCollections
 
 
@@ -233,14 +233,13 @@ def account(user_name):
     password_form = ChangePasswordForm()
 
     # No account with this username and protection of the admin account
-    if (user is None) or (user.id == 1 and current_user.id != 1):
+    if user is None or user.id == 1 and current_user.id != 1:
         abort(404)
 
     # Check if the account is private or in the follow list
-    follow = Follow.query.filter_by(user_id=current_user.id, follow_id=user.id).first()
     if current_user.id == user.id or current_user.id == 1:
         pass
-    elif user.private and follow is None:
+    elif user.private and current_user.is_following(user) is False:
         abort(404)
 
     # Add follows form
@@ -346,11 +345,11 @@ def account(user_name):
     account_data = get_account_data(user, user_name)
 
     # Recover the last updates of your follows for the follow TAB
-    last_updates = get_follows_full_last_update(user.id)
+    last_updates = get_follows_full_last_update(user)
 
     # Recover the last updates of the follows for the overview TAB
     if user.id == current_user.id:
-        overview_updates = get_follows_last_update(user.id)
+        overview_updates = get_follows_last_update(user)
     else:
         overview_updates = get_user_last_update(user.id)
 
@@ -383,10 +382,9 @@ def badges(user_name):
         abort(404)
 
     # Check if the account is private or in the follow list
-    follow = Follow.query.filter_by(user_id=current_user.id, follow_id=user.id).first()
     if current_user.id == user.id or current_user.id == 1:
         pass
-    elif user.private and follow is None:
+    elif user.private and current_user.is_following(user) is False:
         abort(404)
 
     badges = get_badges(user.id)[0]
@@ -486,10 +484,10 @@ def email_update_token(token):
 def hall_of_fame():
     users = User.query.filter(User.id >= "2").filter_by(active=True).order_by(User.username.asc()).all()
 
-    current_user_follows = Follow.query.filter_by(user_id=current_user.id).all()
+    # Get the follows of the current user
     follows_list = []
-    for follow in current_user_follows:
-        follows_list.append(follow.follow_id)
+    for follows in current_user.followed.all():
+        follows_list.append(follows.id)
 
     all_users_data = []
     for user in users:
@@ -818,27 +816,17 @@ def follow_status():
         abort(400)
 
     # Check if the follow ID exist in the User database and status is boolean
-    if User.query.filter_by(id=follow_id).first() is None or type(status) is not bool:
+    user = User.query.filter_by(id=follow_id).first()
+    if user is None or type(status) is not bool:
         abort(400)
 
     # Check the status
     if status is True:
-        # Check if the follow already exists
-        if Follow.query.filter_by(user_id=current_user.id, follow_id=follow_id).first() is not None:
-            abort(400)
-
-        # Follow the user
-        new_follow = Follow(user_id=current_user.id, follow_id=follow_id)
-        db.session.add(new_follow)
+        current_user.add_follow(user)
         db.session.commit()
-        app.logger.info('[{}] follow the user with ID {}'.format(current_user.id, follow_id))
+        app.logger.info('[{}] Follow the user with ID {}'.format(current_user.id, follow_id))
     else:
-        # Check if the user to unfollow is in the follow list
-        if Follow.query.filter_by(user_id=current_user.id, follow_id=follow_id).first() is None:
-            abort(400)
-
-        # Unfollow the user
-        Follow.query.filter_by(user_id=current_user.id, follow_id=follow_id).delete()
+        current_user.remove_follow(user)
         db.session.commit()
         app.logger.info('[{}] Follow with ID {} unfollowed'.format(current_user.id, follow_id))
 
@@ -857,20 +845,17 @@ def mymedialist(media_list, user_name):
     if list_type is None:
         abort(404)
 
-    # Check if the user exists
-    if user is None:
+    # No account with this username and protection of the admin account
+    if user is None or user.id == 1 and current_user.id != 1:
         abort(404)
 
     # Check if the current user can see the target user's list
-    if current_user.id != user.id and current_user.id != 1:
-        follow = Follow.query.filter_by(user_id=current_user.id, follow_id=user.id).first()
-        if user.id == 1:
-            abort(404)
-        if user.private:
-            if follow is None:
-                abort(404)
+    if current_user.id == user.id or current_user.id == 1:
+        pass
+    elif user.private and current_user.is_following(user) is False:
+        abort(404)
 
-    # Check the route and retrieve the media data
+    # Retrieve the media data
     if list_type == ListType.SERIES:
         element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
                                         func.group_concat(SeriesNetwork.network.distinct()),
@@ -1629,27 +1614,25 @@ def get_trending_data(trends_data, list_type):
 
 def get_account_data(user, user_name):
     # Recover the follows list
-    follows_list = db.session.query(User, Follow).join(Follow, Follow.follow_id == User.id)\
-        .filter(Follow.user_id == user.id).group_by(Follow.follow_id).order_by(User.username).all()
+    follows_list = user.followed.all()
 
     follows_list_data = []
     for follow in follows_list:
-        picture_url = url_for('static', filename='profile_pics/{}'.format(follow[0].image_file))
-        follow_data = {"username": follow[0].username,
-                       "user_id" : follow[0].id,
+        picture_url = url_for('static', filename='profile_pics/{}'.format(follow.image_file))
+        follow_data = {"username": follow.username,
+                       "user_id" : follow.id,
                        "picture" : picture_url}
 
-        if follow[0].private:
-            isPrivate = Follow.query.filter_by(user_id=current_user.id, follow_id=follow[0].id).first()
-            if isPrivate is not None or current_user.id == 1:
+        if follow.private:
+            if current_user.id == 1 or current_user.is_following(follow):
                 follows_list_data.append(follow_data)
-            elif current_user.id == follow[0].id:
+            elif current_user.id == follow.id:
                 follows_list_data.append(follow_data)
         else:
             follows_list_data.append(follow_data)
 
     # Recover the number of user that follows you
-    followers = Follow.query.filter_by(follow_id=user.id).all()
+    followers = user.followers.count()
 
     # Recover the view count of the account and the media lists
     if current_user.id != 1 and user.id != current_user.id:
@@ -1670,15 +1653,14 @@ def get_account_data(user, user_name):
     account_data["id"]         = user.id
     account_data["username"]   = user_name
     account_data["follows"]    = follows_list_data
-    account_data["followers"]  = len(followers)
+    account_data["followers"]  = followers
     account_data["view_count"] = view_count
     account_data["register"]   = user.registered_on.strftime("%d %b %Y")
 
-    if user.id != current_user.id:
-        if Follow.query.filter_by(user_id=current_user.id, follow_id=user.id).first() is None:
-            account_data["isfollowing"] = False
-        else:
-            account_data["isfollowing"] = True
+    if user.id != current_user.id and current_user.is_following(user):
+        account_data["isfollowing"] = True
+    else:
+        account_data["isfollowing"] = False
 
     # Recover the profile picture
     account_data["profile_picture"] = url_for('static', filename='profile_pics/{0}'.format(user.image_file))
@@ -2332,46 +2314,47 @@ def set_last_update(media_name, media_type, old_status=None, new_status=None, ol
     db.session.commit()
 
 
-def get_follows_full_last_update(user_id):
-    follows_update = db.session.query(Follow, User, UserLastUpdate)\
-        .join(User, Follow.follow_id == User.id)\
-        .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
-        .filter(Follow.user_id == user_id)\
-        .order_by(User.username, UserLastUpdate.date.desc()).all()
+def get_follows_full_last_update(user):
+    # follows_update = db.session.query(Follow, User, UserLastUpdate)\
+    #     .join(User, Follow.follow_id == User.id)\
+    #     .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
+    #     .filter(Follow.user_id == user_id)\
+    #     .order_by(User.username, UserLastUpdate.date.desc()).all()
+    follows_update = user.followed_last_updates()
 
     tmp = ""
     follows_data = []
     for i in range(0, len(follows_update)):
         element = follows_update[i]
-        if element[1].username != tmp:
-            tmp = element[1].username
+        if element[0].username != tmp:
+            tmp = element[0].username
             follow_data = {}
-            follow_data["username"] = element[1].username
+            follow_data["username"] = element[0].username
             follow_data["update"] = []
 
         element_data = {}
         # Season or episode update
-        if element[2].old_status is None and element[2].new_status is None:
-            element_data["update"] = ["S{:02d}.E{:02d}".format(element[2].old_season, element[2].old_episode),
-                                      "S{:02d}.E{:02d}".format(element[2].new_season, element[2].new_episode)]
+        if element[3].old_status is None and element[3].new_status is None:
+            element_data["update"] = ["S{:02d}.E{:02d}".format(element[3].old_season, element[3].old_episode),
+                                      "S{:02d}.E{:02d}".format(element[3].new_season, element[3].new_episode)]
 
         # Category update
-        elif element[2].old_status is not None and element[2].new_status is not None:
-            element_data["update"] = ["{}".format(element[2].old_status.value).replace("Animation", "Anime"),
-                                      "{}".format(element[2].new_status.value).replace("Animation", "Anime")]
+        elif element[3].old_status is not None and element[3].new_status is not None:
+            element_data["update"] = ["{}".format(element[3].old_status.value).replace("Animation", "Anime"),
+                                      "{}".format(element[3].new_status.value).replace("Animation", "Anime")]
 
         # Media newly added
-        elif element[2].old_status is None and element[2].new_status is not None:
-            element_data["update"] = ["{}".format(element[2].new_status.value)]
+        elif element[3].old_status is None and element[3].new_status is not None:
+            element_data["update"] = ["{}".format(element[3].new_status.value)]
 
-        element_data["date"] = element[2].date.replace(tzinfo=pytz.UTC).isoformat()
-        element_data["media_name"] = element[2].media_name
+        element_data["date"] = element[3].date.replace(tzinfo=pytz.UTC).isoformat()
+        element_data["media_name"] = element[3].media_name
 
-        if element[2].media_type == ListType.SERIES:
+        if element[3].media_type == ListType.SERIES:
             element_data["category"] = "series"
-        elif element[2].media_type == ListType.ANIME:
+        elif element[3].media_type == ListType.ANIME:
             element_data["category"] = "anime"
-        elif element[2].media_type == ListType.MOVIES:
+        elif element[3].media_type == ListType.MOVIES:
             element_data["category"] = "movie"
 
         # TODO: TEMP FIX
@@ -2379,7 +2362,7 @@ def get_follows_full_last_update(user_id):
             follow_data["update"].append(element_data)
 
         try:
-            if element[1].username != follows_update[i+1][1].username:
+            if element[0].username != follows_update[i+1][0].username:
                 follows_data.append(follow_data)
             else:
                 pass
@@ -2425,43 +2408,44 @@ def get_user_last_update(user_id):
     return update
 
 
-def get_follows_last_update(user_id):
-    follows_update = db.session.query(Follow, User, UserLastUpdate)\
-                               .join(User, Follow.follow_id == User.id)\
-                               .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
-                               .filter(Follow.user_id == user_id)\
-                               .order_by(UserLastUpdate.date.desc()).limit(4)
+def get_follows_last_update(user):
+    # follows_update = db.session.query(Follow, User, UserLastUpdate)\
+    #     .join(User, Follow.follow_id == User.id)\
+    #     .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
+    #     .filter(Follow.user_id == user_id)\
+    #     .order_by(UserLastUpdate.date.desc()).limit(4)
+    follows_update = user.followed_last_updates_overview()
 
     update = []
     for element in follows_update:
         element_data = {}
         # Season or episode update
-        if element[2].old_status is None and element[2].new_status is None:
-            element_data["update"] = ["S{:02d}.E{:02d}".format(element[2].old_season, element[2].old_episode),
-                                      "S{:02d}.E{:02d}".format(element[2].new_season, element[2].new_episode)]
+        if element[3].old_status is None and element[3].new_status is None:
+            element_data["update"] = ["S{:02d}.E{:02d}".format(element[3].old_season, element[3].old_episode),
+                                      "S{:02d}.E{:02d}".format(element[3].new_season, element[3].new_episode)]
 
         # Category update
-        elif element[2].old_status is not None and element[2].new_status is not None:
-            element_data["update"] = ["{}".format(element[2].old_status.value).replace("Animation", "Anime"),
-                                      "{}".format(element[2].new_status.value).replace("Animation", "Anime")]
+        elif element[3].old_status is not None and element[3].new_status is not None:
+            element_data["update"] = ["{}".format(element[3].old_status.value).replace("Animation", "Anime"),
+                                      "{}".format(element[3].new_status.value).replace("Animation", "Anime")]
 
         # Newly added media
-        elif element[2].old_status is None and element[2].new_status is not None:
-            element_data["update"] = ["{}".format(element[2].new_status.value)]
+        elif element[3].old_status is None and element[3].new_status is not None:
+            element_data["update"] = ["{}".format(element[3].new_status.value)]
 
         # Update date
-        element_data["date"] = element[2].date.replace(tzinfo=pytz.UTC).isoformat()
+        element_data["date"] = element[3].date.replace(tzinfo=pytz.UTC).isoformat()
 
-        element_data["media_name"] = element[2].media_name
+        element_data["media_name"] = element[3].media_name
 
-        if element[2].media_type == ListType.SERIES:
+        if element[3].media_type == ListType.SERIES:
             element_data["category"] = "series"
-        elif element[2].media_type == ListType.ANIME:
+        elif element[3].media_type == ListType.ANIME:
             element_data["category"] = "anime"
-        elif element[2].media_type == ListType.MOVIES:
+        elif element[3].media_type == ListType.MOVIES:
             element_data["category"] = "movie"
 
-        element_data["username"] = element[1].username
+        element_data["username"] = element[0].username
 
         update.append(element_data)
 
@@ -2873,28 +2857,20 @@ def save_profile_picture(form_picture):
 
 
 def add_follow(follow_username):
-    follow_to_add = User.query.filter_by(username=follow_username).first()
+    follow = User.query.filter_by(username=follow_username).first()
 
-    if follow_to_add is None or follow_to_add.id == 1:
+    if follow is None or follow.id == 1:
         app.logger.info('[{}] Attempt to follow user {}'.format(current_user.id, follow_username))
-        return flash('This user does not exist', 'warning')
+        return flash('Sorry, this user does not exist', 'warning')
 
-    if follow_to_add.username is current_user.username:
-        return flash("You can't follow yourself", 'warning')
-    else:
-        follow_exists = Follow.query.filter_by(user_id=current_user.id, follow_id=follow_to_add.id).first()
+    if current_user.id == follow.id:
+        return flash("You cannot follow yourself", 'warning')
 
-        if follow_exists:
-            return flash('User already in your follow list', 'info')
+    current_user.add_follow(follow)
+    db.session.commit()
 
-        add_follow = Follow(user_id   = current_user.id,
-                            follow_id = follow_to_add.id)
-
-        db.session.add(add_follow)
-        db.session.commit()
-
-        app.logger.info('[{}] is following the user with ID {}'.format(current_user.id, follow_to_add.id))
-        flash("Follow successfully added.", 'success')
+    app.logger.info('[{}] is following the user with ID {}'.format(current_user.id, follow.id))
+    flash("You are now following: {}.".format(follow.username), 'success')
 
 
 def send_reset_email(user):

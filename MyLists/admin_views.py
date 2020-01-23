@@ -3,7 +3,7 @@ from flask_admin import Admin
 from flask_login import current_user
 from flask_admin import expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
-from MyLists.models import User, Follow, UserLastUpdate, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, \
+from MyLists.models import User, UserLastUpdate, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, \
     SeriesNetwork, SeriesActors, Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork, AnimeActors, \
     Movies, MoviesGenre, MoviesList, MoviesActors
 
@@ -257,10 +257,7 @@ admin.add_view(UserAdminView(model=User,
                              name="User",
                              endpoint='user'))
 
-admin.add_view(FollowAdminView(model=Follow,
-                               session=db.session,
-                               name="Follow",
-                               endpoint='follow'))
+
 
 admin.add_view(SeriesAdminView(model=Series,
                                session=db.session,

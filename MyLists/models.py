@@ -33,6 +33,11 @@ class HomePage(enum.Enum):
     MYMOVIESLIST = "mymovieslist"
 
 
+followers = db.Table('followers',
+                     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
+                     db.Column('followed_id', db.Integer, db.ForeignKey('user.id')))
+
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)
@@ -53,6 +58,34 @@ class User(db.Model, UserMixin):
     biography = db.Column(db.Text)
     transition_email = db.Column(db.String(120))
     activated_on = db.Column(db.DateTime)
+    followed = db.relationship('User',
+                               secondary=followers,
+                               primaryjoin=(followers.c.follower_id == id),
+                               secondaryjoin=(followers.c.followed_id == id),
+                               backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
+
+    def followed_last_updates(self):
+        return db.session.query(User, followers, UserLastUpdate)\
+            .join(followers, followers.c.followed_id == User.id)\
+            .join(UserLastUpdate, UserLastUpdate.user_id == User.id).filter(followers.c.follower_id == self.id)\
+            .order_by(User.username, UserLastUpdate.date.desc()).all()
+
+    def followed_last_updates_overview(self):
+        return db.session.query(User, followers, UserLastUpdate)\
+            .join(followers, followers.c.followed_id == User.id)\
+            .join(UserLastUpdate, UserLastUpdate.user_id == User.id).filter(followers.c.follower_id == self.id)\
+            .order_by(UserLastUpdate.date.desc()).limit(4)
+
+    def add_follow(self, user):
+        if not self.is_following(user):
+            self.followed.append(user)
+
+    def remove_follow(self, user):
+        if self.is_following(user):
+            self.followed.remove(user)
+
+    def is_following(self, user):
+        return self.followed.filter(followers.c.followed_id == user.id).count() > 0
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
@@ -92,12 +125,6 @@ class UserLastUpdate(db.Model):
     old_episode = db.Column(db.Integer)
     new_episode = db.Column(db.Integer)
     date = db.Column(db.DateTime, nullable=False)
-
-
-class Follow(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    follow_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 ######################################################## SERIES ########################################################
