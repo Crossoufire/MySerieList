@@ -1,5 +1,5 @@
-import configparser
 import sys
+import configparser
 
 from flask import Flask
 from flask_mail import Mail
@@ -15,6 +15,7 @@ config.read('config.ini')
 try:
     flask_secret = config['Flask']['secret']
     email = config['Mail']['email']
+    admin_email = config['Mail']['admin_email']
     password = config['Mail']['password']
     server = config['Mail']['server']
     port = int(config['Mail']['port'])
@@ -41,6 +42,7 @@ app.config['RECAPTCHA_DATA_ATTRS'] = {'theme': 'dark', 'size': 'small'}
 
 app.config['TESTING'] = True
 
+app.config['MAIL_ADMIN'] = admin_email
 app.config['MAIL_SERVER'] = server
 app.config['MAIL_PORT'] = port
 app.config['MAIL_USE_TLS'] = False

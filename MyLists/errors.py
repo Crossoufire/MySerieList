@@ -1,5 +1,5 @@
-from flask import render_template, url_for
 from MyLists import app
+from flask import render_template, url_for
 
 
 @app.errorhandler(400)

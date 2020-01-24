@@ -34,6 +34,7 @@ secret = <random_value>
 
 [Mail]
 email = <mail used for sending registration / reset password / email update email>
+admin_email = <mail used to receive the log errors>
 password = <password of the email>
 server = <server to connect to>
 port = <port to connect to>
