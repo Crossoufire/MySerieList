@@ -257,8 +257,6 @@ admin.add_view(UserAdminView(model=User,
                              name="User",
                              endpoint='user'))
 
-
-
 admin.add_view(SeriesAdminView(model=Series,
                                session=db.session,
                                name="Series",

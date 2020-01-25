@@ -84,7 +84,9 @@ def home():
             app.logger.info('[{}] Logged in'.format(user.id))
             flash("You're now logged in. Welcome {0}".format(user.username), "success")
             next_page = request.args.get('next')
-            if next_page is None:
+            if next_page:
+                return redirect(next_page)
+            else:
                 if user.homepage == HomePage.MYSERIESLIST:
                     return redirect(url_for('mymedialist', media_list='serieslist', user_name=current_user.username))
                 elif user.homepage == HomePage.MYANIMELIST:
@@ -97,8 +99,6 @@ def home():
                     return redirect(url_for('hall_of_fame'))
                 else:
                     abort(404)
-            else:
-                return redirect(next_page)
         else:
             flash('Login Failed. Please check Username and Password', 'warning')
     if register_form.validate_on_submit():
@@ -129,10 +129,13 @@ def home():
             return redirect(url_for('account', user_name=current_user.username))
         elif user.homepage == HomePage.HALL_OF_FAME:
             return redirect(url_for('hall_of_fame'))
+        else:
+            abort(404)
 
     home_header = url_for('static', filename='img/home_header.jpg')
     home_img_1 = url_for('static', filename='img/home_img1.jpg')
     home_img_2 = url_for('static', filename='img/home_img2.jpg')
+
     return render_template('home.html',
                            login_form    = login_form,
                            register_form = register_form,
@@ -215,9 +218,8 @@ def admin():
 @app.route("/logout", methods=['GET'])
 @login_required
 def logout():
-    user = User.query.filter_by(id=current_user.id).first()
+    app.logger.info('[{}] Logged out'.format(current_user.id))
     logout_user()
-    app.logger.info('[{}] Logged out'.format(user.id))
 
     return redirect(url_for('home'))
 
@@ -339,6 +341,7 @@ def account(user_name):
         db.session.commit()
         app.logger.info('[{}] Password updated'.format(current_user.id))
         flash('Your password has been successfully updated!', 'success')
+
         return redirect(url_for('account', user_name=current_user.username, message="settings"))
 
     # Recover account data
@@ -482,7 +485,7 @@ def email_update_token(token):
 @app.route("/hall_of_fame", methods=['GET'])
 @login_required
 def hall_of_fame():
-    users = User.query.filter(User.id >= "2").filter_by(active=True).order_by(User.username.asc()).all()
+    users = User.query.filter(User.id >= "2", User.active==True).order_by(User.username.asc()).all()
 
     # Get the follows of the current user
     follows_list = []
@@ -492,8 +495,8 @@ def hall_of_fame():
     all_users_data = []
     for user in users:
         user_data = {}
-        user_data["username"]        = user.username
         user_data["id"]              = user.id
+        user_data["username"]        = user.username
         user_data["profile_picture"] = user.image_file
 
         series_level = get_level_and_grade(user.time_spent_series)
@@ -544,13 +547,13 @@ def global_stats():
     times_spent = db.session.query(User, func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
                              func.sum(User.time_spent_movies)).filter(User.id >= '2', User.active==True).all()
 
-    if times_spent[0][0] is None:
-        total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0}
+    if times_spent[0][0]:
+        total_time = {"total": int((times_spent[0][1] / 60) + (times_spent[0][2] / 60) + (times_spent[0][3] / 60)),
+                      "series": int(times_spent[0][1] / 60),
+                      "anime": int(times_spent[0][2] / 60),
+                      "movies": int(times_spent[0][3] / 60)}
     else:
-        total_time = {"total": int((times_spent[0][1]/60)+(times_spent[0][2]/60)+(times_spent[0][3]/60)),
-                      "series": int(times_spent[0][1]/60),
-                      "anime": int(times_spent[0][2]/60),
-                      "movies": int(times_spent[0][3]/60)}
+        total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0}
 
     # Top media in users' lists
     top_series = db.session.query(Series, SeriesList, func.count(SeriesList.series_id==Series.id).label("count"))\

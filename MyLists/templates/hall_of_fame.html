@@ -29,133 +29,37 @@
         </thead>
         <tbody>
         {% for user in all_data %}
-            <tr class="text-center align-middle mt-auto mb-auto">
-            {% if current_user.get_id() == '1' %}
+            <tr class="text-center align-middle mt-auto mb-auto {% if user['iscurrentuser'] %} current_user {% endif %}">
                 <td>
+                    {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
+                    <img class="profile_picture" src="/static/profile_pics/anonymous.jpg" alt="anonymous">
+                    {% else %}
                     <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
+                    {% endif %}
                 </td>
                 <td>
-                    <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
-                </td>
-                <td>
-                    <a class="text-light" href="/serieslist/{{ user['username'] }}">
-                        <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
-                        <br>
-                        {{ user['series_level'] }}
-                    </a>
-                </td>
-                <td>
-                    <a class="text-light" href="/animelist/{{ user['username'] }}">
-                        <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
-                        <br>
-                        {{ user['anime_level'] }}
-                    </a>
-                </td>
-                <td>
-                    <a class="text-light" href="/movieslist/{{ user['username'] }}">
-                        <img class="grade_picture" src="static/img/levels_ranks/{{ user['movies_grade_id'] }}.png">
-                        <br>
-                        {{ user['movies_level'] }}
-                    </a>
-                </td>
-                <td>
-                    <img class="k_grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
-                    <br>
-                    {{ user['knowledge_level'] }}
-                </td>
-                <td>
-                    <a class="btn btn-sm btn-test" href="{{ url_for('badges', user_name=user['username']) }}">Badges</a>
-                </td>
-
-            {% elif user["iscurrentuser"] %}
-                <td class="current_user">
-                    <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
-                </td>
-                <td class="current_user">
-                    <b><a href="/account/{{ user['username'] }}">{{ user["username"] }}</a></b>
-                </td>
-                <td class="current_user">
-                    <a class="text-light" href="/serieslist/{{ user['username'] }}">
-                        <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
-                        <br>
-                        {{ user['series_level'] }}
-                    </a>
-                </td>
-                <td class="current_user">
-                    <a class="text-light" href="/animelist/{{ user['username'] }}">
-                        <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
-                        <br>
-                        {{ user['anime_level'] }}
-                    </a>
-                </td>
-                <td class="current_user">
-                    <a class="text-light" href="/movieslist/{{ user['username'] }}">
-                        <img class="grade_picture" src="static/img/levels_ranks/{{ user['movies_grade_id'] }}.png">
-                        <br>
-                        {{ user['movies_level'] }}
-                    </a>
-                </td >
-                <td class="current_user">
-                    <img class="k_grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
-                    <br>
-                    {{ user['knowledge_level'] }}
-                </td>
-                <td class="current_user">
-                    <a class="btn btn-sm btn-test" href="{{ url_for('badges', user_name=user['username']) }}">Badges</a>
-                </td>
-
-            {% elif user["isprivate"] and not user["isfollowing"] %}
-                <td>
-                    <img class="profile_picture" src="{{ url_for('static', filename='profile_pics/anonymous.jpg') }}" alt="Anonymous">
-                </td>
-                <td>
-                    <b>Anonymous</b>
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
-                    <br>
-                    {{ user['series_level'] }}
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
-                    <br>
-                    {{ user['anime_level'] }}
-                </td>
-                <td>
-                    <img class="grade_picture" src="static/img/levels_ranks/{{ user['movies_grade_id'] }}.png">
-                    <br>
-                    {{ user['movies_level'] }}
-                </td>
-                <td>
-                    <img class="k_grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
-                    <br>
-                    {{ user['knowledge_level'] }}
-                </td>
-                <td></td>
-
-            {% else %}
-                <td>
-                    <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
-                </td>
-                <td>
+                    {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
+                    <b><a class="disabled">Anonymous</a></b>
+                    {% else %}
                     <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
+                    {% endif %}
                 </td>
                 <td>
-                    <a class="text-light" href="/serieslist/{{ user['username'] }}">
+                    <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %} disabled {% endif %}" href="/serieslist/{{ user['username'] }}">
                         <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
                         <br>
                         {{ user['series_level'] }}
                     </a>
                 </td>
                 <td>
-                    <a class="text-light" href="/animelist/{{ user['username'] }}">
+                    <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %} disabled {% endif %}" href="/animelist/{{ user['username'] }}">
                         <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
                         <br>
                         {{ user['anime_level'] }}
                     </a>
                 </td>
                 <td>
-                    <a class="text-light" href="/movieslist/{{ user['username'] }}">
+                    <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %} disabled {% endif %}" href="/movieslist/{{ user['username'] }}">
                         <img class="grade_picture" src="static/img/levels_ranks/{{ user['movies_grade_id'] }}.png">
                         <br>
                         {{ user['movies_level'] }}
@@ -166,15 +70,16 @@
                     <br>
                     {{ user['knowledge_level'] }}
                 </td>
-                <td>
+                <td>{% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
+                    {% else %}
                     <a class="btn btn-sm btn-test" href="{{ url_for('badges', user_name=user['username']) }}">Badges</a>
                     {% if user["isfollowing"] %}
                     <button class="btn btn-sm btn-dark" onclick="follow_status('{{ user['id'] }}', this)">Unfollow</button>
                     {% else %}
                     <button class="btn btn-sm btn-primary" onclick="follow_status('{{ user['id'] }}', this)">Follow</button>
                     {% endif %}
+                    {% endif %}
                 </td>
-            {% endif %}
             </tr>
         {% endfor %}
         </tbody>

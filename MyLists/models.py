@@ -28,9 +28,9 @@ class ListType(enum.Enum):
 class HomePage(enum.Enum):
     ACCOUNT = "account"
     HALL_OF_FAME = "hall_of_fame"
-    MYSERIESLIST = "myserieslist"
-    MYANIMELIST = "myanimelist"
-    MYMOVIESLIST = "mymovieslist"
+    MYSERIESLIST = "serieslist"
+    MYANIMELIST = "animelist"
+    MYMOVIESLIST = "movieslist"
 
 
 followers = db.Table('followers',
@@ -305,7 +305,7 @@ class MoviesCollections(db.Model):
     overview = db.Column(db.String(100))
 
 
-######################################################## ACHIEVEMENTS ##################################################
+######################################################## BADGES ########################################################
 
 
 class Badges(db.Model):
