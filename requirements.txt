@@ -7,8 +7,12 @@ flask-admin
 flask-login
 flask-mail
 flask-wtf
+itsdangerous
 apscheduler
+sqlalchemy
 requests
 jikanpy
+wtforms
 Pillow
 regex
+pytz

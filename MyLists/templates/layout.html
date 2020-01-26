@@ -62,16 +62,13 @@
                     </div>
                     <div class="navbar-nav">
                     {% if current_user.is_authenticated %}
+                        <a class="nav-item nav-link text-light" href="{{ url_for('badges', user_name=current_user.username) }}">Badges</a>
+                        <a class="nav-item nav-link text-light" href="{{ url_for('account', user_name=current_user.username) }}">Profile</a>
                         {% if current_user.get_id() == '1' %}
-                        <a class="nav-item nav-link text-light" href="{{ url_for('badges', user_name=current_user.username) }}">Badges</a>
-                        <a class="nav-item nav-link text-light" href="{{ url_for('account', user_name=current_user.username) }}">Profile</a>
                         <a class="nav-item nav-link text-light" href="{{ url_for('admin') }}">Administration</a>
-                        <a class="nav-item nav-link text-light" href="{{ url_for('logout') }}">Logout</a>
-                        {% else %}
-                        <a class="nav-item nav-link text-light" href="{{ url_for('badges', user_name=current_user.username) }}">Badges</a>
-                        <a class="nav-item nav-link text-light" href="{{ url_for('account', user_name=current_user.username) }}">Profile</a>
-                        <a class="nav-item nav-link text-light" href="{{ url_for('logout') }}">Logout</a>
                         {% endif %}
+                        <a class="nav-link text-light" href="{{ url_for('settings') }}"><i class="fas fa-sm fa-cog"></i></a>
+                        <a class="nav-link text-light" href="{{ url_for('logout') }}"><i class="fas fa-sm fa-sign-out-alt"></i></a>
                     {% elif not current_user.is_authenticated and request.path == '/' %}
                         <a type="button" class="btn btn-sm btn-light text-dark" data-toggle="modal" data-target="#modalLoginForm">Login</a>
                         <a type="button" class="btn btn-sm btn-danger m-r-0" data-toggle="modal" data-target="#modalRegisterForm">Register</a>
@@ -125,7 +122,7 @@
             <a href="https://developers.themoviedb.org/3/getting-started/introduction" target="_blank">TMDb API</a>&nbsp;&nbsp;|&nbsp;&nbsp;
             <a href="https://www.palletsprojects.com/p/flask/" target="_blank">Flask</a>&nbsp;&nbsp;|&nbsp;
             © 2020 Copyright:&nbsp;<a href="https://MyLists.info" target="_blank">Mylists.info</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-            <i class="far fa-2x fa-envelope"></i>&nbsp;&nbsp;<a href="#!" target="_blank">Contact</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="#!" target="_blank">Contact</a>&nbsp;&nbsp;|&nbsp;&nbsp;
             <a href="https://github.com/Crossoufire/MyLists" target="_blank">Github</a>
         </div>
     </div>

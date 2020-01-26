@@ -32,7 +32,8 @@ class LastUpdateAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
 
-    column_list = ('user_id', 'media_name', 'media_type', 'old_status', 'new_status', 'old_season', 'new_season', 'old_episode', 'new_episode', 'date')
+    column_list = ('user_id', 'media_name', 'media_type', 'old_status', 'new_status', 'old_season', 'new_season',
+                   'old_episode', 'new_episode', 'date')
     column_searchable_list = ('user_id', 'media_name')
     column_sortable_list = ('user_id', 'media_name', 'date')
     list_template = 'admin/last_update.html'
@@ -199,8 +200,8 @@ class MoviesAdminView(ModelView):
     column_display_pk = True
     column_exclude_list = ('homepage', 'released', 'synopsis', 'tagline', 'image_cover', 'themoviedb_id')
     column_searchable_list = ['name']
-    column_sortable_list = ('id', 'name', 'original_name', 'release_date', 'runtime', 'original_language', 'vote_average',
-                            'vote_count', 'popularity', 'budget', 'revenue')
+    column_sortable_list = ('id', 'name', 'original_name', 'release_date', 'runtime', 'original_language',
+                            'vote_average', 'vote_count', 'popularity', 'budget', 'revenue')
     list_template = 'admin/movies.html'
 
 
@@ -333,9 +334,9 @@ admin.add_view(MoviesGenreAdminView(model=MoviesGenre,
                                     endpoint='movies_genre'))
 
 admin.add_view(MoviesActorsAdminView(model=MoviesActors,
-                                    session=db.session,
-                                    name="Movies actors",
-                                    endpoint='movies_actors'))
+                                     session=db.session,
+                                     name="Movies actors",
+                                     endpoint='movies_actors'))
 
 admin.add_view(LastUpdateAdminView(model=UserLastUpdate,
                                    session=db.session,

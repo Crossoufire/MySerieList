@@ -26,14 +26,6 @@ function follow_status(follow_id) {
     });
 }
 
-// ------------------------ Change Tab Biography ---------------------------
-function changeTab() {
-    $('#overview').removeClass('active');
-    $('#settings').addClass('active');
-    $('#overview-tab').removeClass('show active');
-    $('#settings-tab').addClass('show active');
-}
-
 // ------------------------------------------------------------------------
 $(document).ready(function() {
     $body = $("body");

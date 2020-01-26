@@ -1,8 +1,8 @@
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_wtf.file import FileField, FileAllowed
-from flask_wtf import FlaskForm, RecaptchaField
 from flask_login import current_user
+from flask_wtf import FlaskForm
 from MyLists.models import User
 from MyLists import bcrypt
 
@@ -11,15 +11,16 @@ class RegistrationForm(FlaskForm):
     register_username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
     register_email = StringField('Email', validators=[DataRequired(), Email()])
     register_password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    register_confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('register_password')])
+    register_confirm_password = PasswordField('Confirm Password',
+                                              validators=[DataRequired(), EqualTo('register_password')])
     register_submit = SubmitField('Register')
 
-    def validate_register_username(form, field):
+    def validate_register_username(self, field):
         user = User.query.filter_by(username=field.data).first()
         if user is not None:
             raise ValidationError("This username is already taken. Please choose another one.")
 
-    def validate_register_email(form, field):
+    def validate_register_email(self, field):
         user = User.query.filter_by(email=field.data).first()
         if user is not None:
             raise ValidationError("This email already exist.")
@@ -38,7 +39,9 @@ class UpdateAccountForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png'])])
     isprivate = BooleanField('Private mode')
-    homepage = SelectField('Default homepage', choices=[('msl', 'MySeriesList'), ('mal', 'MyAnimeList'), ('mml', 'MyMoviesList'), ('acc', 'Account'), ('hof', 'Hall of Fame')])
+    homepage = SelectField('Default homepage', choices=[('msl', 'MySeriesList'), ('mal', 'MyAnimeList'),
+                                                        ('mml', 'MyMoviesList'), ('acc', 'Account'),
+                                                        ('hof', 'Hall of Fame')])
     submit_account = SubmitField('Update account')
 
     def validate_username(self, username):
@@ -69,13 +72,6 @@ class ChangePasswordForm(FlaskForm):
 class AddFollowForm(FlaskForm):
     follow_to_add = StringField('Type a Username')
     submit_follow = SubmitField('follow')
-
-    # def validate_follow_to_add(self, follow_to_add):
-    #     if follow_to_add.data == current_user.username:
-    #         raise ValidationError("You cannot follow yourself")
-    #     user = User.query.filter_by(username=follow_to_add.data).first()
-    #     if user is None or user.id == 1:
-    #         raise ValidationError("User not found")
 
 
 class ResetPasswordRequestForm(FlaskForm):

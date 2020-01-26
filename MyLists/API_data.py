@@ -11,9 +11,9 @@ from jikanpy import Jikan
 from MyLists.models import ListType
 
 
-class API_data():
-    def __init__(self, API_key=None):
-        self.tmdb_api_key = API_key
+class ApiData:
+    def __init__(self, ):
+        self.tmdb_api_key = app.config['THEMOVIEDB_API_KEY']
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
 
     def autocomplete_search(self, element_name, list_type):
@@ -209,7 +209,8 @@ class API_data():
 
         return [series_data, anime_data, movies_data]
 
-    def get_anime_genres(self, anime_name):
+    @staticmethod
+    def get_anime_genres(anime_name):
         try:
             response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(anime_name))
             data_mal = json.loads(response.text)
@@ -221,7 +222,8 @@ class API_data():
         except:
             return None
 
-    def check_response_status(self, response):
+    @staticmethod
+    def check_response_status(response):
         if response.status_code == 200:
             return json.loads(response.text)
         elif response.status_code == 401:

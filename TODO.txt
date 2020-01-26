@@ -23,8 +23,8 @@ General:
 
 Routes:
     Enhance: By default create one admin user that only has admin view (HoF, Global Stats, Administration and Account settings) and one standard user
-    Enhance: Redo refresh_element_data() to be in API_data.py
+    Enhance: Redo refresh_element_data() to be in ApiData.py
     Enhance: Change the hamburger display to a vertical panel in mobile
-    Fix: Check API_data.py and do some ameliorations (if needed)
+    Fix: Check ApiData.py and do some ameliorations (if needed)
     Fix: Finish the new compute time function
     Add: Send mail when new season/movie is airing

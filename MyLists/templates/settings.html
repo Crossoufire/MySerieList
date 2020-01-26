@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+<style>
+hr {
+    border-top: 1px solid rgba(44, 57, 70, 1);
+    margin-top: 1px;
+}
+.vertical_line {
+    width: 5px;
+    border-left: 2px solid rgba(44, 57, 70, 1);
+    height: 100wh;
+}
+</style>
+{% endblock css %}
+
+
+{% block content %}
+<div class="row text-center m-t-60">
+    <div class="col">
+        <h4><i class="fas fa-sliders-h"></i>&nbsp&nbsp General settings</h4>
+        <hr>
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ settings_form.hidden_tag() }}
+            <div class="m-t-30">
+                {{ settings_form.biography.label }}<br>
+                {{ settings_form.biography(size=32) }}<br>
+                {% for error in settings_form.biography.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="m-t-30">
+                {{ settings_form.username.label }}<br>
+                {{ settings_form.username(size=28) }}<br>
+                {% for error in settings_form.username.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="m-t-30">
+                {{ settings_form.email.label }}<br>
+                {{ settings_form.email(size=28) }}<br>
+                {% for error in settings_form.email.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="m-t-30">
+                {{ settings_form.homepage.label }}: &nbsp&nbsp&nbsp {{ settings_form.homepage }}<br>
+                {% for error in settings_form.homepage.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="m-t-30">
+                {{ settings_form.isprivate.label }}: &nbsp&nbsp&nbsp {{ settings_form.isprivate() }}<br>
+                {% for error in settings_form.isprivate.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="m-t-30">
+                {{ settings_form.picture.label }}<br>
+                {{ settings_form.picture() }}<br>
+                {% for error in settings_form.picture.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="m-t-30">
+                {{ settings_form.submit_account(class="btn btn-outline-info p-2 m-b-40") }}
+            </div>
+        </form>
+    </div>
+    <div class="vertical_line"></div>
+    <div class="col">
+        <h4><i class="fas fa-unlock-alt"></i>&nbsp&nbsp Change your password</h4>
+        <hr>
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ password_form.hidden_tag() }}
+            <div class="m-t-30">
+                {{ password_form.current_password.label }}<br>
+                {{ password_form.current_password(size=28) }}<br>
+                {% for error in password_form.current_password.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="m-t-30">
+                {{ password_form.new_password.label }}<br>
+                {{ password_form.new_password(size=28) }}<br>
+                {% for error in password_form.new_password.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="m-t-30">
+                {{ password_form.confirm_new_password.label }}<br>
+                {{ password_form.confirm_new_password(size=28) }}<br>
+                {% for error in password_form.confirm_new_password.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="m-t-30">
+                {{ password_form.submit_password(class="btn btn-outline-info p-2") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block script %}
+{% endblock script %}
