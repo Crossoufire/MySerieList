@@ -125,4 +125,16 @@ MyLists/static/covers/anime_covers/*
 MyLists/static/covers/movies_covers/*
 !MyLists/static/covers/movies_covers/default.jpg
 MyLists/static/covers/movies_collection_covers/*
+
+
+MyLists/main/static/covers/movies_collection_covers/*
+MyLists/main/static/covers/movies_covers/*
+MyLists/main/static/covers/anime_covers/*
+MyLists/main/static/covers/series_covers/*
+
+!MyLists/main/static/covers/movies_collection_covers/default.jpg
+!MyLists/main/static/covers/movies_covers/default.jpg
+!MyLists/main/static/covers/anime_covers/default.jpg
+!MyLists/main/static/covers/series_covers/default.jpg
+
 start.sh
