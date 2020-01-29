@@ -75,7 +75,7 @@
                     <a class="btn btn-sm btn-test" href="{{ url_for('badges', user_name=user['username']) }}">Badges</a>
                     {% if user["isfollowing"] %}
                     <button class="btn btn-sm btn-dark" onclick="follow_status('{{ user['id'] }}', this)">Unfollow</button>
-                    {% else %}
+                    {% elif user["isfollowing"] and not user['iscurrentuser'] %}
                     <button class="btn btn-sm btn-primary" onclick="follow_status('{{ user['id'] }}', this)">Follow</button>
                     {% endif %}
                     {% endif %}

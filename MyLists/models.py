@@ -64,10 +64,11 @@ class User(db.Model, UserMixin):
                                secondaryjoin=(followers.c.followed_id == id),
                                backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
-    def followed_last_updates(self):
+    def followed_info(self):
         return db.session.query(User, followers, UserLastUpdate)\
-            .join(followers, followers.c.followed_id == User.id)\
-            .join(UserLastUpdate, UserLastUpdate.user_id == User.id).filter(followers.c.follower_id == self.id)\
+            .outerjoin(followers, followers.c.followed_id == User.id)\
+            .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
+            .filter(followers.c.follower_id == self.id)\
             .order_by(User.username, UserLastUpdate.date.desc()).all()
 
     def followed_last_updates_overview(self):
@@ -85,7 +86,7 @@ class User(db.Model, UserMixin):
             self.followed.remove(user)
 
     def is_following(self, user):
-        return self.followed.filter(followers.c.followed_id == user.id).count() > 0
+        return self.followed.filter(followers.c.followed_id == user.id).first()
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
