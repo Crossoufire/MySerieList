@@ -46,36 +46,6 @@ def create_user():
                      registered_on=datetime.utcnow(),
                      activated_on=datetime.utcnow())
         db.session.add(admin)
-    if User.query.filter_by(id='3').first() is None:
-        admin = User(username='bbb',
-                     email='bbb@bbb.com',
-                     password=bcrypt.generate_password_hash("b").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
-    if User.query.filter_by(id='4').first() is None:
-        admin = User(username='ccc',
-                     email='ccc@ccc.com',
-                     password=bcrypt.generate_password_hash("c").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
-    if User.query.filter_by(id='5').first() is None:
-        admin = User(username='ddd',
-                     email='ddd@ddd.com',
-                     password=bcrypt.generate_password_hash("d").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
     refresh_db_badges()
     db.session.commit()
     add_collections_movies()
@@ -283,9 +253,6 @@ def account(user_name):
         flash("You are now following: {}.".format(follow.username), 'success')
 
         return redirect(url_for('account', user_name=user_name, message='follows'))
-
-    # Recover follows informations
-    follows_info = get_account_follow_data(user)
 
     # Recover account data
     account_data = get_account_data(user, user_name)
@@ -1883,86 +1850,6 @@ def get_account_data(user, user_name):
     return account_data
 
 
-def get_account_follow_data(user):
-    # Recover all the followed informations for the user
-    follows_info = user.followed_info()
-
-    # Recover the number of followers for the user
-    followers_count = user.followers.count()
-
-    tmp = ""
-    follows_data = []
-    private_user = False
-    all_follows_updates = []
-    for i in range(0, len(follows_info)):
-        element = follows_info[i]
-
-        if element[0].username != tmp:
-            tmp = element[0].username
-            picture_url = url_for('static', filename='profile_pics/{}'.format(element[0].image_file))
-            follow_data = {"username": element[0].username,
-                           "user_id": element[0].id,
-                           "picture": picture_url,
-                           "update": []}
-
-            if element[0].private and not current_user.id != 1 and not current_user.is_following(element[0]):
-                if current_user.id != element[0].id:
-                    private_user = True
-                    continue
-            else:
-                private_user = False
-
-            if not element[3]:
-                follows_data.append(follow_data)
-                continue
-
-        if private_user:
-            continue
-
-        element_data = {}
-        # Season or episode update
-        if not element[3].old_status and not element[3].new_status:
-            element_data["update"] = ["S{:02d}.E{:02d}".format(element[3].old_season, element[3].old_episode),
-                                      "S{:02d}.E{:02d}".format(element[3].new_season, element[3].new_episode)]
-
-        # Category update
-        elif element[3].old_status and element[3].new_status:
-            element_data["update"] = ["{}".format(element[3].old_status.value).replace("Animation", "Anime"),
-                                      "{}".format(element[3].new_status.value).replace("Animation", "Anime")]
-
-        # Media newly added
-        elif not element[3].old_status and element[3].new_status:
-            element_data["update"] = ["{}".format(element[3].new_status.value)]
-
-        element_data["date"] = element[3].date.replace(tzinfo=pytz.UTC).isoformat()
-        element_data["media_name"] = element[3].media_name
-
-        if element[3].media_type == ListType.SERIES:
-            element_data["category"] = "series"
-        elif element[3].media_type == ListType.ANIME:
-            element_data["category"] = "anime"
-        elif element[3].media_type == ListType.MOVIES:
-            element_data["category"] = "movie"
-
-        all_follows_updates.append(element_data)
-
-        # TODO: TEMP FIX
-        if len(follow_data["update"]) <= 5:
-            follow_data["update"].append(element_data)
-
-        try:
-            if element[0].username != follows_info[i+1][0].username:
-                follows_data.append(follow_data)
-            else:
-                pass
-        except:
-            follows_data.append(follow_data)
-
-    all_follows_updates = sorted(all_follows_updates, key=lambda i: i['date'], reverse=True)
-
-    return [follows_data, followers_count, all_follows_updates[:4]]
-
-
 def get_level_and_grade(total_time_min):
     # Compute the corresponding level using the equation
     element_level_tmp = "{:.2f}".format(round((((400+80*total_time_min)**(1/2))-20)/40, 2))
@@ -2439,6 +2326,12 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
 def set_last_update(media_name, media_type, old_status=None, new_status=None, old_season=None,
                     new_season=None, old_episode=None, new_episode=None):
     user = User.query.filter_by(id=current_user.id).first()
+    # element = UserLastUpdate.query.filter_by(user_id=user.id).all()
+    # if len(element) >= 6:
+    #     oldest_id = UserLastUpdate.query.filter_by(user_id=current_user.id)\
+    #         .order_by(UserLastUpdate.date.asc()).first().id
+    #     UserLastUpdate.query.filter_by(id=oldest_id).delete()
+    #     db.session.commit()
 
     update = UserLastUpdate(user_id=user.id, media_name=media_name, media_type=media_type, old_status=old_status,
                             new_status=new_status, old_season=old_season, new_season=new_season,
@@ -2448,6 +2341,11 @@ def set_last_update(media_name, media_type, old_status=None, new_status=None, ol
 
 
 def get_follows_full_last_update(user):
+    # follows_update = db.session.query(Follow, User, UserLastUpdate)\
+    #     .join(User, Follow.follow_id == User.id)\
+    #     .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
+    #     .filter(Follow.user_id == user_id)\
+    #     .order_by(User.username, UserLastUpdate.date.desc()).all()
     follows_update = user.followed_last_updates()
 
     tmp = ""
@@ -2537,6 +2435,11 @@ def get_user_last_update(user_id):
 
 
 def get_follows_last_update(user):
+    # follows_update = db.session.query(Follow, User, UserLastUpdate)\
+    #     .join(User, Follow.follow_id == User.id)\
+    #     .join(UserLastUpdate, UserLastUpdate.user_id == Follow.follow_id)\
+    #     .filter(Follow.user_id == user_id)\
+    #     .order_by(UserLastUpdate.date.desc()).limit(4)
     follows_update = user.followed_last_updates_overview()
 
     update = []
