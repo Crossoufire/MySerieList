@@ -1,7 +1,8 @@
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from MyLists import db, login_manager, app
-from flask_login import UserMixin
 import enum
+
+from flask_login import UserMixin
+from MyLists import db, login_manager, app
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 
 @login_manager.user_loader

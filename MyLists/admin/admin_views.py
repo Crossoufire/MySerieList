@@ -39,7 +39,7 @@ class LastUpdateAdminView(ModelView):
     list_template = 'admin/last_update.html'
 
 
-######################################################## SERIES ########################################################
+# ------------------------------------------------------ SERIES ------------------------------------------------------ #
 
 
 class SeriesAdminView(ModelView):
@@ -115,7 +115,7 @@ class SeriesEpisodeTimestampAdminView(ModelView):
     list_template = 'admin/series_episode_timestamp.html'
 
 
-######################################################## ANIME #########################################################
+# ------------------------------------------------------ ANIME ------------------------------------------------------- #
 
 
 class AnimeAdminView(ModelView):
@@ -191,7 +191,8 @@ class AnimeEpisodeTimestampAdminView(ModelView):
     list_template = 'admin/anime_episode_timestamp.html'
 
 
-######################################################## MOVIE #########################################################
+# ------------------------------------------------------ MOVIES ------------------------------------------------------ #
+
 
 class MoviesAdminView(ModelView):
     def is_accessible(self):
@@ -235,7 +236,7 @@ class MoviesActorsAdminView(ModelView):
     list_template = 'admin/movies_actors.html'
 
 
-########################################################################################################################
+# -------------------------------------------------------------------------------------------------------------------- #
 
 
 # Override of the index flask-admin view:
@@ -284,9 +285,9 @@ admin.add_view(SeriesNetworkAdminView(model=SeriesNetwork,
                                       endpoint='series_network'))
 
 admin.add_view(SeriesActorsAdminView(model=SeriesActors,
-                                      session=db.session,
-                                      name="Series actors",
-                                      endpoint='series_actors'))
+                                     session=db.session,
+                                     name="Series actors",
+                                     endpoint='series_actors'))
 
 admin.add_view(AnimeAdminView(model=Anime,
                               session=db.session,

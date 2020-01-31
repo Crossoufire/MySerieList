@@ -1,8 +1,8 @@
 import os
 import json
-import urllib
 import platform
 import requests
+import urllib.request
 
 from PIL import Image
 from MyLists import app

@@ -121,7 +121,7 @@ MyLists/static/profile_pics/*
 MyLists/static/covers/series_covers/*
 !MyLists/static/covers/series_covers/default.jpg
 MyLists/static/covers/anime_covers/*
-!MyLists/static/covers/anime_covers/default.jpg
+!MyLists/static/covers/default.jpg
 MyLists/static/covers/movies_covers/*
 !MyLists/static/covers/movies_covers/default.jpg
 MyLists/static/covers/movies_collection_covers/*

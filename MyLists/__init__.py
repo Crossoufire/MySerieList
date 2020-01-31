@@ -58,7 +58,3 @@ scheduler.start()
 login_manager = LoginManager(app)
 login_manager.login_view = 'home'
 login_manager.login_message_category = 'info'
-
-
-from MyLists import routes
-import MyLists.errors
