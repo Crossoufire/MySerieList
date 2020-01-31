@@ -10,7 +10,7 @@ from logging.handlers import RotatingFileHandler, SMTPHandler
 
 
 formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s")
-handler = RotatingFileHandler("MyLists/log/mylists.log", maxBytes=10000000, backupCount=5)
+handler = RotatingFileHandler("MyLists/static/log/mylists.log", maxBytes=10000000, backupCount=5)
 handler.setLevel(logging.INFO)
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)

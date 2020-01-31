@@ -34,11 +34,11 @@ def account(user_name):
         if follow is None or follow.id == 1:
             app.logger.info('[{}] Attempt to follow user {}'.format(current_user.id, follow_username))
             flash('Sorry, this user does not exist', 'warning')
-            return redirect(url_for('account', user_name=user_name, message='follows'))
+            return redirect(url_for('account.account', user_name=user_name, message='follows'))
 
         if current_user.id == follow.id:
             flash("You cannot follow yourself", 'warning')
-            return redirect(url_for('account', user_name=user_name, message='follows'))
+            return redirect(url_for('account.account', user_name=user_name, message='follows'))
 
         current_user.add_follow(follow)
         db.session.commit()
@@ -46,7 +46,7 @@ def account(user_name):
         app.logger.info('[{}] is following the user with ID {}'.format(current_user.id, follow.id))
         flash("You are now following: {}.".format(follow.username), 'success')
 
-        return redirect(url_for('account', user_name=user_name, message='follows'))
+        return redirect(url_for('account.account', user_name=user_name, message='follows'))
 
     # Recover account data
     account_data = get_account_data(user, user_name)

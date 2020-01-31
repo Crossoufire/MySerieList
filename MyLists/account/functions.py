@@ -4,7 +4,6 @@ from MyLists import db
 from flask import url_for
 from sqlalchemy import func
 from flask_login import current_user
-
 from MyLists.main.functions import get_level_and_grade, get_knowledge_grade
 from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, \
     AnimeEpisodesPerSeason, SeriesEpisodesPerSeason

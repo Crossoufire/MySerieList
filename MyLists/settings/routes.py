@@ -119,10 +119,10 @@ def email_update_token(token):
     user = User.verify_reset_token(token)
     if user is None:
         flash('That is an invalid or expired token', 'warning')
-        return redirect(url_for('home'))
+        return redirect(url_for('auth.home'))
 
     if user.id != current_user.id:
-        return redirect(url_for('home'))
+        return redirect(url_for('auth.home'))
 
     old_email = user.email
     user.email = user.transition_email
@@ -131,4 +131,4 @@ def email_update_token(token):
     app.logger.info('[{}] Email successfully changed from {} to {}'.format(user.id, old_email, user.email))
     flash('Email successfully updated!', 'success')
 
-    return redirect(url_for('home'))
+    return redirect(url_for('auth.home'))

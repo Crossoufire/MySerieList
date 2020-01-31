@@ -41,13 +41,13 @@
                 <div class="navbar-brand nav-item dropdown m-r-30">
                     <a class="dropdown-toggle" data-toggle="dropdown" style="color: #ffffffe6;" href="#">MyLists<span class="caret"></span></a>
                     <div class="dropdown-menu dropdown_mylist bg-dark p-r-0 m-r-0">
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='serieslist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MySeriesList</a>
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='animelist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyAnimeList</a>
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='movieslist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyMoviesList</a>
+                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('medialists.mymedialist', media_list='serieslist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MySeriesList</a>
+                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('medialists.mymedialist', media_list='animelist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyAnimeList</a>
+                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('medialists.mymedialist', media_list='movieslist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyMoviesList</a>
                     </div>
                 </div>
                 {% else %}
-                <a class="navbar-brand" href="{{ url_for('home') }}">MyLists</a>
+                <a class="navbar-brand" href="{{ url_for('auth.home') }}">MyLists</a>
                 {% endif %}
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle">
                     <span class="navbar-toggler-icon"></span>
@@ -63,12 +63,12 @@
                     <div class="navbar-nav">
                     {% if current_user.is_authenticated %}
                         <a class="nav-item nav-link text-light" href="{{ url_for('badges', user_name=current_user.username) }}">Badges</a>
-                        <a class="nav-item nav-link text-light" href="{{ url_for('account', user_name=current_user.username) }}">Profile</a>
+                        <a class="nav-item nav-link text-light" href="{{ url_for('account.account', user_name=current_user.username) }}">Profile</a>
                         {% if current_user.get_id() == '1' %}
-                        <a class="nav-item nav-link text-light" href="{{ url_for('admin') }}">Administration</a>
+                        <a class="nav-item nav-link text-light" href="{{ url_for('admin.admin') }}">Administration</a>
                         {% endif %}
-                        <a class="nav-link text-light" href="{{ url_for('settings') }}"><i class="fas fa-sm fa-cog"></i></a>
-                        <a class="nav-link text-light" href="{{ url_for('logout') }}"><i class="fas fa-sm fa-sign-out-alt"></i></a>
+                        <a class="nav-link text-light" href="{{ url_for('settings.settings') }}"><i class="fas fa-sm fa-cog"></i></a>
+                        <a class="nav-link text-light" href="{{ url_for('auth.logout') }}"><i class="fas fa-sm fa-sign-out-alt"></i></a>
                     {% elif not current_user.is_authenticated and request.path == '/' %}
                         <a type="button" class="btn btn-sm btn-light text-dark" data-toggle="modal" data-target="#modalLoginForm">Login</a>
                         <a type="button" class="btn btn-sm btn-danger m-r-0" data-toggle="modal" data-target="#modalRegisterForm">Register</a>

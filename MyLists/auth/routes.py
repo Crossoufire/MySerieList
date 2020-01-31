@@ -29,15 +29,15 @@ def home():
                 return redirect(next_page)
             else:
                 if user.homepage == HomePage.MYSERIESLIST:
-                    return redirect(url_for('mymedialist', media_list='serieslist', user_name=current_user.username))
+                    return redirect(url_for('medialists.mymedialist', media_list='serieslist', user_name=current_user.username))
                 elif user.homepage == HomePage.MYANIMELIST:
-                    return redirect(url_for('mymedialist', media_list='animelist', user_name=current_user.username))
+                    return redirect(url_for('medialists.mymedialist', media_list='animelist', user_name=current_user.username))
                 elif user.homepage == HomePage.MYMOVIESLIST:
-                    return redirect(url_for('mymedialist', media_list='movieslist', user_name=current_user.username))
+                    return redirect(url_for('medialists.mymedialist', media_list='movieslist', user_name=current_user.username))
                 elif user.homepage == HomePage.ACCOUNT:
-                    return redirect(url_for('account', user_name=current_user.username))
+                    return redirect(url_for('account.account', user_name=current_user.username))
                 elif user.homepage == HomePage.HALL_OF_FAME:
-                    return redirect(url_for('hall_of_fame'))
+                    return redirect(url_for('main.hall_of_fame'))
                 else:
                     abort(404)
         else:
@@ -61,15 +61,15 @@ def home():
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.id).first()
         if user.homepage == HomePage.MYSERIESLIST:
-            return redirect(url_for('mymedialist', media_list='serieslist', user_name=current_user.username))
+            return redirect(url_for('medialists.mymedialist', media_list='serieslist', user_name=current_user.username))
         elif user.homepage == HomePage.MYANIMELIST:
-            return redirect(url_for('mymedialist', media_list='animelist', user_name=current_user.username))
+            return redirect(url_for('medialists.mymedialist', media_list='animelist', user_name=current_user.username))
         elif user.homepage == HomePage.MYMOVIESLIST:
-            return redirect(url_for('mymedialist', media_list='movieslist', user_name=current_user.username))
+            return redirect(url_for('medialists.mymedialist', media_list='movieslist', user_name=current_user.username))
         elif user.homepage == HomePage.ACCOUNT:
-            return redirect(url_for('account', user_name=current_user.username))
+            return redirect(url_for('account.account', user_name=current_user.username))
         elif user.homepage == HomePage.HALL_OF_FAME:
-            return redirect(url_for('hall_of_fame'))
+            return redirect(url_for('main.hall_of_fame'))
         else:
             abort(404)
 
@@ -91,7 +91,7 @@ def logout():
     app.logger.info('[{}] Logged out'.format(current_user.id))
     logout_user()
 
-    return redirect(url_for('home'))
+    return redirect(url_for('auth.home'))
 
 
 @bp.route("/reset_password", methods=['GET', 'POST'])
@@ -99,18 +99,18 @@ def reset_password():
     form = ResetPasswordRequestForm()
 
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('auth.home'))
 
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if send_reset_email(user):
             app.logger.info('[{}] Reset password email sent'.format(user.id))
             flash('An email has been sent with instructions to reset your password.', 'info')
-            return redirect(url_for('home'))
+            return redirect(url_for('auth.home'))
         else:
             app.logger.error('[SYSTEM] Error while sending the reset password email to {}'.format(user.email))
             flash("There was an error while sending the reset password email. Please try again later.")
-            return redirect(url_for('home'))
+            return redirect(url_for('auth.home'))
 
     return render_template('reset_password.html',
                            title='Reset Password',
@@ -120,12 +120,12 @@ def reset_password():
 @bp.route("/reset_password/<token>", methods=['GET', 'POST'])
 def reset_passord_token(token):
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('auth.home'))
 
     user = User.verify_reset_token(token)
     if user is None:
         flash('That is an invalid or expired token', 'warning')
-        return redirect(url_for('reset_password'))
+        return redirect(url_for('auth.reset_password'))
 
     form = ResetPasswordForm()
     if form.validate_on_submit():
@@ -134,7 +134,7 @@ def reset_passord_token(token):
         db.session.commit()
         app.logger.info('[{}] Password reset via reset password email'.format(user.id))
         flash('Your password has been updated! You are now able to log in', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('auth.home'))
 
     return render_template('reset_passord_token.html',
                            title='Reset Password',
@@ -144,12 +144,12 @@ def reset_passord_token(token):
 @bp.route("/register_account/<token>", methods=['GET'])
 def register_account_token(token):
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('auth.home'))
 
     user = User.verify_reset_token(token)
     if user is None or user.active:
         flash('That is an invalid or expired token', 'warning')
-        return redirect(url_for('reset_password'))
+        return redirect(url_for('auth.reset_password'))
 
     user.active = True
     user.activated_on = datetime.utcnow()
@@ -157,4 +157,4 @@ def register_account_token(token):
     app.logger.info('[{}] Account activated'.format(user.id))
     flash('Your account has been activated.', 'success')
 
-    return redirect(url_for('home'))
+    return redirect(url_for('auth.home'))
