@@ -21,9 +21,9 @@ class Status(enum.Enum):
 
 
 class ListType(enum.Enum):
-    SERIES = "Series"
-    ANIME = "Anime"
-    MOVIES = 'Movies'
+    SERIES = "serieslist"
+    ANIME = "animelist"
+    MOVIES = 'movieslist'
 
 
 class HomePage(enum.Enum):

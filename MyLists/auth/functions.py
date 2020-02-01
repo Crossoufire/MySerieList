@@ -27,7 +27,7 @@ def send_reset_email(user):
         mail.send(msg)
         return True
     except Exception as e:
-        app.logger.error('[SYSTEM] - Exception raised sending reset email to user ID {}: {}'.format(user.id, e))
+        app.logger.error('[SYSTEM] - Exception raised sending reset email to account ID {}: {}'.format(user.id, e))
         return False
 
 
@@ -52,6 +52,6 @@ def send_register_email(user):
         mail.send(msg)
         return True
     except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised when sending register email to user with the ID {} : {}'
+        app.logger.error('[SYSTEM] Exception raised when sending register email to account with the ID {} : {}'
                          .format(user.id, e))
         return False

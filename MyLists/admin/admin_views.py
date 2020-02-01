@@ -14,7 +14,7 @@ from MyLists.models import User, UserLastUpdate, Series, SeriesList, SeriesEpiso
 #     column_list = ('id', 'username', 'email', 'active', 'private')
 #     column_searchable_list = ('username', 'email')
 #     column_sortable_list = ('id', 'username', 'email', 'active', 'private')
-#     list_template = 'admin/user.html'
+#     list_template = 'admin/account.html'
 #
 #
 # class FollowAdminView(ModelView):
@@ -255,7 +255,7 @@ from MyLists.models import User, UserLastUpdate, Series, SeriesList, SeriesEpiso
 # admin.add_view(UserAdminView(model=User,
 #                              session=db.session,
 #                              name="User",
-#                              endpoint='user'))
+#                              endpoint='account'))
 #
 # admin.add_view(SeriesAdminView(model=Series,
 #                                session=db.session,

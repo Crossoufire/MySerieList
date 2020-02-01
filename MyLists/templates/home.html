@@ -8,7 +8,7 @@
 
 {% block home_header %}
 <div class="view">
-    <img class="img-fluid" src="{{ image_header }}" alt=""/>
+    <img class="img-fluid" src="{{ url_for('static', filename='img/home_header.jpg') }}" alt=""/>
     <div class="mask d-flex justify-content-center align-items-center">
         <div class="text-center white-text mx-5 wow fadeIn">
             <h1 class="title" style="font-size: 50pt; text-shadow: 0 0 2px #000; -moz-text-shadow: 0 0 2px #000; -webkit-text-shadow: 0 0 2px #000;">
@@ -164,7 +164,7 @@
         <h5 class="title_section my-5 text-center" >MyLists has a beautiful and clear interface which allows you to track all your TV shows / anime / movies without remembering what was your last watched episode. It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see your friends' list and compare it to yours.</h5>
         <div class="row wow fadeIn">
             <div class="col-md-12 flex-center">
-                <img src="{{ home_img_1 }}" class="img-fluid z-depth-1-half" alt="">
+                <img src="{{ url_for('static', filename='img/home_img1.jpg') }}" class="img-fluid z-depth-1-half" alt="">
             </div>
         </div>
     </section>
@@ -175,7 +175,7 @@
         <h5 class="title_section my-5 text-center">MyLists includes a Hall of Fame of all registered users. By default, all users can see the List of everyone. You can also set your profile to private, so only your friends can see your List.</h5>
         <div class="row wow fadeIn">
             <div class="col-md-12 flex-center">
-                <img src="{{ home_img_2 }}" class="img-fluid z-depth-1-half" alt="">
+                <img src="{{ url_for('static', filename='img/home_img2.jpg') }}" class="img-fluid z-depth-1-half" alt="">
             </div>
         </div>
     </section>

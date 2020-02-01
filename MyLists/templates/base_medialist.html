@@ -172,7 +172,7 @@ $(function() {
     $("#autocomplete").catcomplete({
         delay: 500,
         source: function(request, response) {
-                $.getJSON("{{url_for('medialists.autocomplete', media=media_list)}}", {
+                $.getJSON("{{url_for('main.autocomplete', media=media_list)}}", {
                     q: request.term,
                 },
                     function(data) {
@@ -202,7 +202,7 @@ $(function() {
 });
 </script>
 {% else %}
-<!------------ Add media to current user from the other lists ------------->
+<!------------ Add media to current profile from the other lists ------------->
 <script src="{{ url_for('static', filename='js/add_to_user.js') }}"></script>
 {% endif %}
 {% endblock script %}

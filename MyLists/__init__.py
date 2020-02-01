@@ -58,9 +58,6 @@ login_manager.login_view = 'home'
 login_manager.login_message_category = 'info'
 
 
-from MyLists.account.routes import bp as account_bp
-app.register_blueprint(account_bp)
-
 from MyLists.admin.routes import bp as admin_bp
 app.register_blueprint(admin_bp)
 
@@ -70,11 +67,14 @@ app.register_blueprint(auth_bp)
 from MyLists.errors.errors import bp as errors_bp
 app.register_blueprint(errors_bp)
 
+from MyLists.general.routes import bp as general_bp
+app.register_blueprint(general_bp)
+
 from MyLists.main.routes import bp as main_bp
 app.register_blueprint(main_bp)
 
-from MyLists.medialists.routes import bp as medialists_bp
-app.register_blueprint(medialists_bp)
+from MyLists.profile.routes import bp as profile_bp
+app.register_blueprint(profile_bp)
 
 from MyLists.settings.routes import bp as settings_bp
 app.register_blueprint(settings_bp)

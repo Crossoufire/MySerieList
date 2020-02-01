@@ -28,16 +28,12 @@ def home():
             if next_page:
                 return redirect(next_page)
             else:
-                if user.homepage == HomePage.MYSERIESLIST:
-                    return redirect(url_for('medialists.mymedialist', media_list='serieslist', user_name=current_user.username))
-                elif user.homepage == HomePage.MYANIMELIST:
-                    return redirect(url_for('medialists.mymedialist', media_list='animelist', user_name=current_user.username))
-                elif user.homepage == HomePage.MYMOVIESLIST:
-                    return redirect(url_for('medialists.mymedialist', media_list='movieslist', user_name=current_user.username))
+                if user.homepage != HomePage.ACCOUNT or user.homepage != HomePage.HALL_OF_FAME:
+                    return redirect(url_for('main.mymedialist', media_list=user.homepage.value, user_name=current_user.username))
                 elif user.homepage == HomePage.ACCOUNT:
-                    return redirect(url_for('account.account', user_name=current_user.username))
+                    return redirect(url_for('profile.account', user_name=current_user.username))
                 elif user.homepage == HomePage.HALL_OF_FAME:
-                    return redirect(url_for('main.hall_of_fame'))
+                    return redirect(url_for('profile.hall_of_fame'))
                 else:
                     abort(404)
         else:
@@ -54,35 +50,24 @@ def home():
                         .format(user.id, register_form.register_username.data, register_form.register_email.data))
         if send_register_email(user):
             flash('Your account has been created. Check your e-mail address to activate your account!', 'info')
-            return redirect(url_for('home'))
+            return redirect(url_for('auth.home'))
         else:
             app.logger.error('[SYSTEM] Error while sending the registration email to {}'.format(user.email))
             abort(500)
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.id).first()
-        if user.homepage == HomePage.MYSERIESLIST:
-            return redirect(url_for('medialists.mymedialist', media_list='serieslist', user_name=current_user.username))
-        elif user.homepage == HomePage.MYANIMELIST:
-            return redirect(url_for('medialists.mymedialist', media_list='animelist', user_name=current_user.username))
-        elif user.homepage == HomePage.MYMOVIESLIST:
-            return redirect(url_for('medialists.mymedialist', media_list='movieslist', user_name=current_user.username))
+        if user.homepage != HomePage.ACCOUNT or user.homepage != HomePage.HALL_OF_FAME:
+            return redirect(url_for('main.mymedialist', media_list=user.homepage.value, user_name=current_user.username))
         elif user.homepage == HomePage.ACCOUNT:
-            return redirect(url_for('account.account', user_name=current_user.username))
+            return redirect(url_for('profile.account', user_name=current_user.username))
         elif user.homepage == HomePage.HALL_OF_FAME:
-            return redirect(url_for('main.hall_of_fame'))
+            return redirect(url_for('profile.hall_of_fame'))
         else:
             abort(404)
 
-    home_header = url_for('static', filename='img/home_header.jpg')
-    home_img_1 = url_for('static', filename='img/home_img1.jpg')
-    home_img_2 = url_for('static', filename='img/home_img2.jpg')
-
     return render_template('home.html',
                            login_form=login_form,
-                           register_form=register_form,
-                           image_header=home_header,
-                           home_img_1=home_img_1,
-                           home_img_2=home_img_2)
+                           register_form=register_form)
 
 
 @bp.route("/logout", methods=['GET'])
@@ -112,9 +97,7 @@ def reset_password():
             flash("There was an error while sending the reset password email. Please try again later.")
             return redirect(url_for('auth.home'))
 
-    return render_template('reset_password.html',
-                           title='Reset Password',
-                           form=form)
+    return render_template('reset_password.html', title='Reset Password', form=form)
 
 
 @bp.route("/reset_password/<token>", methods=['GET', 'POST'])
@@ -136,9 +119,7 @@ def reset_passord_token(token):
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('auth.home'))
 
-    return render_template('reset_passord_token.html',
-                           title='Reset Password',
-                           form=form)
+    return render_template('reset_passord_token.html', title='Reset Password', form=form)
 
 
 @bp.route("/register_account/<token>", methods=['GET'])

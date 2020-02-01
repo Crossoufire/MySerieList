@@ -29,7 +29,7 @@ def send_email_update_email(user):
         mail.send(msg)
         return True
     except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised sending email update email to user ID {}: {}'.format(user.id, e))
+        app.logger.error('[SYSTEM] Exception raised sending email update email to account ID {}: {}'.format(user.id, e))
         return False
 
 
