@@ -17,12 +17,12 @@
     <li>24 grades. You gain a grade each 15 levels.</li>
     <li>Equation is: Grade = (lvl(Series)+lvl(Anime)+lvl(Movies))/15.</li>
     <li>Knowledge grades are based on the sum of the different levels.</li>
-    <li>You earn a grade until level 345. Min = 555 days, Max = 1658 days.</li>
+    <li>You earn a grade until level 345.</li>
 </ul>
 
 <div class="table-responsive-sm m-t-30 table-style-2">
     <table class="table text-light">
-        <thead style="border-bottom: solid 2px grey;">
+        <thead>
             <tr>
                 <th class="text-center">Grade</th>
                 <th class="text-center">Title</th>
@@ -30,21 +30,19 @@
             </tr>
         </thead>
         <tbody>
-        {% for i in range(0, data|length) %}
-        <tr class="text-center align-middle mt-auto mb-auto">
+        {% for rank in data %}
+        <tr>
+            {% if loop.index0 % 15 == 0 %}
             <td class="text-center">
-                <img height='50' width="50" src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data[i][0] }}.png" alt="">
+                <img height='50' width="50" src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ rank.image_id }}.png" alt="">
             </td>
-            <td style="vertical-align: middle;">
-                <strong class="text-center align-middle">{{ data[i][1] }}</strong>
+            <td class="text-center" style="vertical-align: middle;">
+                <strong class="text-center align-middle">{{ rank.name }}</strong>
             </td>
-            <td style="vertical-align: middle;">
-                {% if i == data|length - 1 %}
-                <strong class="text-center align-middle">{{ data[i][2][0] }}{{ data[i][2][1] }}</strong>
-                {% else %}
-                <strong class="text-center align-middle">{{ data[i][2][0] }} - {{ data[i][2][1] }}</strong>
-                {% endif %}
+            <td class="text-center" style="vertical-align: middle;">
+                <strong class="text-center align-middle">{{ rank.level }}</strong>
             </td>
+            {% endif %}
         </tr>
         {% endfor %}
         </tbody>

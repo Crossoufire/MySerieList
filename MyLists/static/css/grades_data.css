@@ -1,18 +1,8 @@
 
-table {
-    margin: 0 auto;
-}
-
-thead {
-    border-botton: solid 2px grey;
-}
-
-tr {
-    border-bottom: solid 1px grey;
-}
-
 td {
     text-align: center;
+    padding: 5px 0px 5px 0px !important;
+    border-bottom: 1px solid grey;
 }
 
 .details {
@@ -25,13 +15,13 @@ td {
 }
 
 .table-style {
-    max-width: 800px;
+    max-width: 600px;
     margin-left: auto;
     margin-right: auto;
 }
 
 .table-style-2 {
-    max-width: 600px;
+    max-width: 500px;
     margin-left: auto;
     margin-right: auto;
 }

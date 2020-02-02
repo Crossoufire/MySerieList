@@ -14,10 +14,10 @@
 
 <ul class="details p-t-10 p-b-10 p-r-10">
     <li>All grades are from the video game Halo Reach.</li>
-    <li>49 grades and 147 levels. You gain a grade each 3 levels.</li>
+    <li>50 grades and 150 levels. You gain a grade each 3 levels.</li>
     <li>Levels are based on time spent in series, anime, and movies.</li>
     <li>XP calculation is: XP = 20*lvl*(1+lvl) &#8596; Level = (&#8730;(400+80*XP)-20)/40</li>
-    <li>1min = 1XP from series and anime episode duration, and runtime for the movies.</li>
+    <li>1 min = 1 XP from the media duration.</li>
 </ul>
 
 <div class="table-responsive-sm m-t-30 table-style">
@@ -28,39 +28,33 @@
                 <th class="text-center">Title</th>
                 <th class="text-center">Levels</th>
                 <th class="text-center">XP</th>
-                <th class="text-center">Equivalent hours</th>
+                <th class="text-center">hours (days)</th>
             </tr>
         </thead>
         <tbody>
-        {% for i in range(0, data|length) %}
+        {% for rank in data %}
             <tr>
+                {% if loop.index0 % 3 == 0 %}
                 <td class="text-center">
-                    <img height='40' width="40" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ data[i][0] }}.png" alt="">
+                    <img height='40' width="40" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ rank.image_id }}.png" alt="">
                 </td>
                 <td class="text-center" style="vertical-align: middle;">
-                    <strong>{{ data[i][1] }}</strong>
+                    <strong>{{ rank.name }}</strong>
                 </td>
                 <td class="text-center" style="vertical-align: middle;">
-                    {% if i == data|length - 1 %}
-                    <strong>{{ data[i][2][0] }}{{ data[i][2][1] }}</strong>
+                    <strong>{{ rank.level }}</strong>
+                </td>
+                <td class="text-center" style="vertical-align: middle;">
+                    <strong>{{ 20*rank.level*(1+rank.level) }}</strong>
+                </td>
+                <td class="text-center" style="vertical-align: middle;">
+                    {% if ((20*rank.level*(1+rank.level))/60) > 24 %}
+                    <strong>{{ ((20*rank.level*(1+rank.level))/60)|round(2) }}&nbsp; - &nbsp;({{ ((20*rank.level*(1+rank.level))/1440)|round(2) }})</strong>
                     {% else %}
-                    <strong>{{ data[i][2][0] }} - {{ data[i][2][1] }}</strong>
+                    <strong>{{ ((20*rank.level*(1+rank.level))/60)|round(2) }}</strong>
                     {% endif %}
                 </td>
-                <td class="text-center" style="vertical-align: middle;">
-                    {% if i == data|length - 1 %}
-                    <strong>{{ data[i][3][0] }}{{ data[i][3][1] }}</strong>
-                    {% else %}
-                    <strong>{{ data[i][3][0] }} - {{ data[i][3][1] }}</strong>
-                    {% endif %}
-                </td>
-                <td class="text-center" style="vertical-align: middle;">
-                    {% if i == data|length - 1 %}
-                    <strong>{{ data[i][4][0] }}{{ data[i][4][1] }}</strong>
-                    {% else %}
-                    <strong>{{ data[i][4][0] }} - {{ data[i][4][1] }}</strong>
-                    {% endif %}
-                </td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

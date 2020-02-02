@@ -41,19 +41,19 @@ table.table a {
 }
 
 .profile_picture {
-    width: 60px;
-    height: 60px;
+    width: 75px;
+    height: 75px;
     border-radius: 50%;
 }
 
 .grade_picture {
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
 }
 
 .k_grade_picture {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
 }
 
 .btn-smaller {

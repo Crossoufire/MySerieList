@@ -1,13 +1,11 @@
-import os
-import platform
-
+from pathlib import Path
 from MyLists import app, db
-from MyLists.models import User
 from MyLists.profile.forms import AddFollowForm
+from MyLists.models import User, ListType, Ranks
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
-from MyLists.profile.functions import get_account_data, get_follows_full_last_update, get_follows_last_update, \
-    get_user_last_update, get_level_and_grade, get_knowledge_grade, get_badges
+from MyLists.profile.functions import get_follows_full_last_update, get_follows_last_update, get_media_data, \
+    get_level_and_grade, get_knowledge_grade, get_badges, get_follows_data, get_user_data
 
 
 bp = Blueprint('profile', __name__)
@@ -38,7 +36,6 @@ def account(user_name):
             app.logger.info('[{}] Attempt to follow account {}'.format(current_user.id, follow_username))
             flash('Sorry, this account does not exist', 'warning')
             return redirect(url_for('profile.account', user_name=user_name, message='follows'))
-
         if current_user.id == follow.id:
             flash("You cannot follow yourself", 'warning')
             return redirect(url_for('profile.account', user_name=user_name, message='follows'))
@@ -48,36 +45,41 @@ def account(user_name):
 
         app.logger.info('[{}] is following the account with ID {}'.format(current_user.id, follow.id))
         flash("You are now following: {}.".format(follow.username), 'success')
-
         return redirect(url_for('profile.account', user_name=user_name, message='follows'))
 
-    # Recover account data
-    account_data = get_account_data(user, user_name)
+    # Recover user data
+    user_data = get_user_data(user)
+
+    # Recover media data
+    series_data = get_media_data(user, ListType.SERIES)
+    anime_data = get_media_data(user, ListType.ANIME)
+    movies_data = get_media_data(user, ListType.MOVIES)
+
+    # Recover follows data
+    follows_data = get_follows_data(user)
 
     # Recover the last updates of your follows for the follow TAB
     last_updates = get_follows_full_last_update(user)
 
     # Recover the last updates of the follows for the overview TAB
-    if user.id == current_user.id:
-        overview_updates = get_follows_last_update(user)
-    else:
-        overview_updates = get_user_last_update(user.id)
+    overview_updates = get_follows_last_update(user)
 
     # Reload on the specified TAB
-    message_tab = request.args.get("message")
-    if message_tab is None:
+    message_tab = request.args.get("message") or None
+    if not message_tab:
         message_tab = 'overview'
 
     return render_template('account.html',
                            title="{}'s account".format(user.username),
-                           data=account_data,
+                           user_data=user_data,
+                           series_data=series_data,
+                           anime_data=anime_data,
+                           movies_data=movies_data,
                            follow_form=follow_form,
-                           user_id=str(user.id),
-                           user_name=user_name,
+                           follows_data=follows_data,
                            message_tab=message_tab,
                            last_updates=last_updates,
-                           overview_updates=overview_updates,
-                           user_biography=user.biography)
+                           overview_updates=overview_updates)
 
 
 @app.route("/hall_of_fame", methods=['GET'])
@@ -92,33 +94,18 @@ def hall_of_fame():
 
     all_users_data = []
     for user in users:
+        series_level = get_level_and_grade(user, ListType.SERIES)
+        anime_level = get_level_and_grade(user, ListType.ANIME)
+        movies_level = get_level_and_grade(user, ListType.MOVIES)
+        knowledge_grade = get_knowledge_grade(user)
+
         user_data = {"id": user.id,
                      "username": user.username,
-                     "profile_picture": user.image_file}
-
-        series_level = get_level_and_grade(user.time_spent_series)
-        user_data["series_level"] = series_level["level"]
-        user_data["series_percent"] = series_level["level_percent"]
-        user_data["series_grade_id"] = series_level["grade_id"]
-        user_data["series_grade_title"] = series_level["grade_title"]
-
-        anime_level = get_level_and_grade(user.time_spent_anime)
-        user_data["anime_level"] = anime_level["level"]
-        user_data["anime_percent"] = anime_level["level_percent"]
-        user_data["anime_grade_id"] = anime_level["grade_id"]
-        user_data["anime_grade_title"] = anime_level["grade_title"]
-
-        movies_level = get_level_and_grade(user.time_spent_movies)
-        user_data["movies_level"] = movies_level["level"]
-        user_data["movies_percent"] = movies_level["level_percent"]
-        user_data["movies_grade_id"] = movies_level["grade_id"]
-        user_data["movies_grade_title"] = movies_level["grade_title"]
-
-        knowledge_level = int(series_level["level"] + anime_level["level"] + movies_level["level"])
-        knowledge_grade = get_knowledge_grade(knowledge_level)
-        user_data["knowledge_level"] = knowledge_level
-        user_data["knowledge_grade_id"] = knowledge_grade["grade_id"]
-        user_data["knowledge_grade_title"] = knowledge_grade["grade_title"]
+                     "profile_picture": user.image_file,
+                     "series_data": series_level,
+                     "anime_data": anime_level,
+                     "movies_data": movies_level,
+                     'knowledge_grade': knowledge_grade}
 
         if user.id in follows_list:
             user_data["isfollowing"] = True
@@ -134,9 +121,7 @@ def hall_of_fame():
 
         all_users_data.append(user_data)
 
-    return render_template("hall_of_fame.html",
-                           title='Hall of Fame',
-                           all_data=all_users_data)
+    return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
 
 
 @app.route("/badges/<user_name>", methods=['GET', 'POST'])
@@ -151,84 +136,27 @@ def badges(user_name):
     # Check if the account is private or in the follow list
     if current_user.id == user.id or current_user.id == 1:
         pass
-    elif user.private and current_user.is_following(user) is False:
+    elif user.private and not current_user.is_following(user):
         abort(404)
 
     user_badges = get_badges(user.id)[0]
-    return render_template('badges.html',
-                           title="{}'s badges".format(user_name),
-                           user_badges=user_badges)
+    return render_template('badges.html', title="{}'s badges".format(user_name), user_badges=user_badges)
 
 
 @app.route("/level_grade_data", methods=['GET'])
 @login_required
 def level_grade_data():
-    all_ranks_list = []
-    if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\\csv_data\\levels_ranks.csv")
-    else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/csv_data/levels_ranks.csv")
-    with open(path, "r") as fp:
-        for line in fp:
-            all_ranks_list.append(line.split(";"))
+    ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
 
-    all_ranks_list.pop(0)
-
-    i, low, incr = [0, 0, 0]
-    data = []
-    while True:
-        rank = all_ranks_list[i][2]
-        if rank == 'ReachRank49':
-            data.append(["ReachRank49", "Inheritor", [147, "+"], [(20*low)*(1+low), "+"],
-                         [int(((20*low)*(1+low))/60), "+"]])
-            break
-        for j in range(i, len(all_ranks_list)):
-            if str(rank) == all_ranks_list[j][2]:
-                incr += 1
-            else:
-                data.append([rank, all_ranks_list[j-1][3], [low, incr-1],
-                             [(20*low)*(1+low), ((20*incr)*(1+incr))-1],
-                             [int(((20*low)*(1+low))/60), int((((20*incr)*(1+incr))-1)/60)]])
-                i = j
-                low = incr
-                break
-
-    return render_template('level_grade_data.html',
-                           title='Level grade data',
-                           data=data)
+    return render_template('level_grade_data.html', title='Level grade data', data=ranks)
 
 
 @app.route("/knowledge_grade_data", methods=['GET'])
 @login_required
 def knowledge_grade_data():
-    all_knowledge_ranks_list = []
-    if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\\csv_data\\knowledge_ranks.csv")
-    else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/csv_data/knowledge_ranks.csv")
-    with open(path, "r") as fp:
-        for line in fp:
-            all_knowledge_ranks_list.append(line.split(";"))
+    ranks = Ranks.query.filter_by(type='knowledge_rank\n').order_by(Ranks.level.asc()).all()
 
-    i, low, incr = [1, 1, 1]
-    data = []
-    while True:
-        rank = all_knowledge_ranks_list[i][1]
-        if i == 346:
-            data.append(["Knowledge_Emperor_Grade_4", "Knowledge Emperor Grade 4", [345, "+"]])
-            break
-        for j in range(i, len(all_knowledge_ranks_list)):
-            if str(rank) == all_knowledge_ranks_list[j][1]:
-                incr += 1
-            else:
-                data.append([rank, all_knowledge_ranks_list[j - 1][2], [low-1, incr-2]])
-                i = j
-                low = incr
-                break
-
-    return render_template('knowledge_grade_data.html',
-                           title='Knowledge grade data',
-                           data=data)
+    return render_template('knowledge_grade_data.html', title='Knowledge grade data', data=ranks)
 
 
 @app.route("/follow_status", methods=['POST'])
@@ -237,17 +165,17 @@ def follow_status():
     try:
         json_data = request.get_json()
         follow_id = int(json_data['follow_id'])
-        status = json_data['follow_status']
+        follow_condition = json_data['follow_status']
     except:
         abort(400)
 
     # Check if the follow ID exist in the User database and status is boolean
     user = User.query.filter_by(id=follow_id).first()
-    if user is None or type(status) is not bool:
+    if user is None or type(follow_status) is not bool:
         abort(400)
 
-    # Check the status
-    if status is True:
+    # Check the status of the follow
+    if follow_condition:
         current_user.add_follow(user)
         db.session.commit()
         app.logger.info('[{}] Follow the account with ID {}'.format(current_user.id, follow_id))

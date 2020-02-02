@@ -46,39 +46,37 @@
                 </td>
                 <td>
                     <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %} disabled {% endif %}" href="/serieslist/{{ user['username'] }}">
-                        <img class="grade_picture" src="static/img/levels_ranks/{{ user['series_grade_id'] }}.png">
+                        <img class="grade_picture" src="{{ user['series_data']['grade_id'] }}.png">
                         <br>
-                        {{ user['series_level'] }}
+                        {{ user['series_data']['level'] }}
                     </a>
                 </td>
                 <td>
                     <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %} disabled {% endif %}" href="/animelist/{{ user['username'] }}">
-                        <img class="grade_picture" src="static/img/levels_ranks/{{ user['anime_grade_id'] }}.png">
+                        <img class="grade_picture" src="{{ user['anime_data']['grade_id'] }}.png">
                         <br>
-                        {{ user['anime_level'] }}
+                        {{ user['anime_data']['level'] }}
                     </a>
                 </td>
                 <td>
                     <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %} disabled {% endif %}" href="/movieslist/{{ user['username'] }}">
-                        <img class="grade_picture" src="static/img/levels_ranks/{{ user['movies_grade_id'] }}.png">
+                        <img class="grade_picture" src="{{ user['movies_data']['grade_id'] }}.png">
                         <br>
-                        {{ user['movies_level'] }}
+                        {{ user['movies_data']['level'] }}
                     </a>
                 </td>
                 <td>
-                    <img class="k_grade_picture" src="static/img/knowledge_ranks/{{ user['knowledge_grade_id'] }}.png">
+                    <img class="k_grade_picture" src="{{ user['knowledge_grade']['grade_id'] }}.png">
                     <br>
-                    {{ user['knowledge_level'] }}
+                    {{ user['knowledge_grade']['level'] }}
                 </td>
                 <td>{% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
                     {% else %}
                     <a class="btn btn-sm btn-test" href="{{ url_for('badges', user_name=user['username']) }}">Badges</a>
                     <br>
-                    {% endif %}
-                    {% if not user['iscurrentuser'] %}
-                    {% if user["isfollowing"] %}
+                    {% if user["isfollowing"] and not user['iscurrentuser'] %}
                     <button class="btn btn-sm btn-dark btn-smaller" onclick="follow_status('{{ user['id'] }}', this)">Unfollow</button>
-                    {% else %}
+                    {% elif not user["isfollowing"] and not user['iscurrentuser'] %}
                     <button class="btn btn-sm btn-primary" onclick="follow_status('{{ user['id'] }}', this)">Follow</button>
                     {% endif %}
                     {% endif %}

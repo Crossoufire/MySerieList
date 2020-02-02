@@ -6,13 +6,14 @@ import platform
 import urllib.request
 
 from PIL import Image
+from pathlib import Path
 from flask import url_for
 from MyLists import db, app
 from sqlalchemy import func
 from datetime import datetime
 from MyLists.API_data import ApiData
 from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
-    SeriesList, Series, MoviesList, Movies, Badges, SeriesActors, MoviesActors, MoviesCollections, AnimeActors
+    SeriesList, Series, MoviesList, Movies, Badges, SeriesActors, MoviesActors, MoviesCollections, AnimeActors, Ranks
 
 
 def compute_media_time_spent(list_type):
@@ -148,8 +149,8 @@ def get_trending_data(trends_data, list_type):
 
 def refresh_db_badges():
     list_all_badges = []
-    path = os.path.join(app.root_path, 'static/csv_data/badges.csv')
-    with open(path, "r") as fp:
+    path = Path(app.root_path, 'static/csv_data/badges.csv')
+    with open(path) as fp:
         for line in fp:
             list_all_badges.append(line.split(";"))
 
@@ -166,13 +167,44 @@ def refresh_db_badges():
         badges[i-1].genres_id = genre_id
 
 
+def refresh_db_ranks():
+    list_all_ranks = []
+    path = Path(app.root_path, 'static/csv_data/ranks.csv')
+    with open(path) as fp:
+        for line in fp:
+            list_all_ranks.append(line.split(";"))
+
+    ranks = Ranks.query.order_by(Ranks.id).all()
+    for i in range(1, len(list_all_ranks)):
+        ranks[i-1].level = int(list_all_ranks[i][0])
+        ranks[i-1].image_id = list_all_ranks[i][1]
+        ranks[i-1].name = list_all_ranks[i][2]
+        ranks[i-1].type = list_all_ranks[i][3]
+
+
 # -------------------------------------------- Add data Retroactively ------------------------------------------------ #
+
+
+def add_ranks_to_db():
+    list_all_ranks = []
+    path = Path(app.root_path, 'static/csv_data/ranks.csv')
+    with open(path) as fp:
+        for line in fp:
+            list_all_ranks.append(line.split(";"))
+
+    for i in range(1, len(list_all_ranks)):
+        rank = Ranks(level=int(list_all_ranks[i][0]),
+                     image_id=list_all_ranks[i][1],
+                     name=list_all_ranks[i][2],
+                     type=list_all_ranks[i][3])
+        db.session.add(rank)
+    db.session.commit()
 
 
 def add_badges_to_db():
     list_all_badges = []
-    path = os.path.join(app.root_path, 'static/csv_data/badges.csv')
-    with open(path, "r") as fp:
+    path = Path(app.root_path, 'static/csv_data/badges.csv')
+    with open(path) as fp:
         for line in fp:
             list_all_badges.append(line.split(";"))
 
@@ -187,6 +219,7 @@ def add_badges_to_db():
                        type=list_all_badges[i][3],
                        genres_id=genre_id)
         db.session.add(badge)
+    db.session.commit()
 
 
 def add_actors_movies():
@@ -224,11 +257,7 @@ def add_actors_movies():
 
 
 def add_collections_movies():
-    if platform.system() == "Windows":
-        local_covers_path = os.path.join(app.root_path, "static\\covers\\movies_collection_covers\\")
-    else:  # Linux & macOS
-        local_covers_path = os.path.join(app.root_path, "static/covers/movies_collection_covers/")
-
+    local_covers_path = Path(app.root_path, "static\\covers\\movies_collection_covers\\")
     all_movies = Movies.query.filter_by(themoviedb_id=9799).all()
     for movie in all_movies:
         tmdb_movies_id = movie.themoviedb_id

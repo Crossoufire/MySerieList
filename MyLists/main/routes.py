@@ -3,8 +3,8 @@ from MyLists import db, app
 from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify
-from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, \
-    check_cat_type, add_element_to_user, add_element_in_base
+from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
+    add_element_to_user, add_element_in_base
 from MyLists.models import User, Movies, MoviesActors, MoviesGenre, Series, SeriesGenre, SeriesList, \
     SeriesEpisodesPerSeason, SeriesNetwork, Anime, AnimeActors, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections

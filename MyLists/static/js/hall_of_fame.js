@@ -6,11 +6,11 @@ function follow_status(follow_id, button) {
 
     if ($(button).text() == 'Unfollow') {
         $(button).text('Follow');
-        $(button).addClass('btn-primary').removeClass('btn-dark');
+        $(button).addClass('btn-primary').removeClass('btn-dark btn-smaller');
         status = false;
     } else {
         $(button).text('Unfollow');
-        $(button).removeClass('btn-primary').addClass('btn-dark');
+        $(button).removeClass('btn-primary').addClass('btn-dark btn-smaller');
         status = true;
     }
 

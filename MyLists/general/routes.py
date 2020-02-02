@@ -5,8 +5,8 @@ from MyLists import app, db, bcrypt
 from MyLists.API_data import ApiData
 from flask_login import current_user, login_required
 from flask import render_template, url_for, flash, redirect, request
-from MyLists.general.functions import refresh_db_badges, add_collections_movies, compute_media_time_spent, \
-    add_badges_to_db, get_trending_data
+from MyLists.general.functions import refresh_db_badges, compute_media_time_spent, add_badges_to_db, get_trending_data,\
+    add_ranks_to_db, refresh_db_ranks
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, Anime, User, \
     AnimeList, AnimeEpisodesPerSeason, AnimeGenre, MoviesGenre, MoviesList, MoviesActors, SeriesActors, Movies, \
     AnimeActors
@@ -29,6 +29,7 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
         add_badges_to_db()
+        add_ranks_to_db()
     if User.query.filter_by(id='2').first() is None:
         admin = User(username='aaa',
                      email='aaa@aaa.com',
@@ -40,6 +41,7 @@ def create_user():
                      activated_on=datetime.utcnow())
         db.session.add(admin)
     refresh_db_badges()
+    refresh_db_ranks()
     db.session.commit()
     compute_media_time_spent(ListType.SERIES)
     compute_media_time_spent(ListType.ANIME)

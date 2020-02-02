@@ -306,7 +306,7 @@ class MoviesCollections(db.Model):
     overview = db.Column(db.String(100))
 
 
-######################################################## BADGES ########################################################
+#################################################### BADGES & RANKS ####################################################
 
 
 class Badges(db.Model):
@@ -316,3 +316,11 @@ class Badges(db.Model):
     title = db.Column(db.String(100), nullable=False)
     type = db.Column(db.String(100), nullable=False)
     genres_id = db.Column(db.String(100))
+
+
+class Ranks(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    level = db.Column(db.Integer, nullable=False)
+    image_id = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
