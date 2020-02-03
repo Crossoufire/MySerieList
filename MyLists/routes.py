@@ -154,7 +154,7 @@ def reset_password():
 
 
 @app.route("/reset_password/<token>", methods=['GET', 'POST'])
-def reset_passord_token(token):
+def reset_password_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('home'))
 
@@ -3567,7 +3567,7 @@ def send_reset_email(user):
         path = os.path.join(app.root_path, "static/emails/password_reset.html")
 
     email_template = open(path).read().replace("{1}", user.username)
-    email_template = email_template.replace("{2}", url_for('reset_passord_token', token=token, _external=True))
+    email_template = email_template.replace("{2}", url_for('reset_password_token', token=token, _external=True))
     msg.html = email_template
 
     try:
@@ -3588,7 +3588,7 @@ def send_register_email(user):
                   reply_to=app.config['MAIL_USERNAME'])
 
     if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\emails\\register.html")
+        path = os.path.join(app.root_path, "static\\emails\\register.html")
     else:  # Linux & macOS
         path = os.path.join(app.root_path, "static/emails/register.html")
 
@@ -3614,7 +3614,7 @@ def send_email_update_email(user):
                   reply_to=app.config['MAIL_USERNAME'])
 
     if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\emails\\email_update.html")
+        path = os.path.join(app.root_path, "static\\emails\\email_update.html")
     else:  # Linux & macOS
         path = os.path.join(app.root_path, "static/emails/email_update.html")
 
@@ -3707,7 +3707,7 @@ def automatic_media_refresh():
 def refresh_db_badges():
     list_all_badges = []
     path = os.path.join(app.root_path, 'static/csv_data/badges.csv')
-    with open(path, "r") as fp:
+    with open(path) as fp:
         for line in fp:
             list_all_badges.append(line.split(";"))
 
