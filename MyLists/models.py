@@ -65,11 +65,11 @@ class User(db.Model, UserMixin):
                                secondaryjoin=(followers.c.followed_id == id),
                                backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
-    def followed_last_updates(self):
-        return db.session.query(User, followers, UserLastUpdate)\
-            .join(followers, followers.c.followed_id == User.id)\
-            .join(UserLastUpdate, UserLastUpdate.user_id == User.id).filter(followers.c.follower_id == self.id)\
-            .order_by(User.username, UserLastUpdate.date.desc()).all()
+    # def followed_last_updates(self):
+    #     return db.session.query(User, followers, UserLastUpdate)\
+    #         .join(followers, followers.c.followed_id == User.id)\
+    #         .join(UserLastUpdate, UserLastUpdate.user_id == User.id).filter(followers.c.follower_id == self.id)\
+    #         .order_by(User.username, UserLastUpdate.date.desc()).all()
 
     def followed_last_updates_overview(self):
         return db.session.query(User, followers, UserLastUpdate)\
