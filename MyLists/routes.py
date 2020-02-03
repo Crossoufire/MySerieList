@@ -3562,12 +3562,12 @@ def send_reset_email(user):
                   reply_to=app.config['MAIL_USERNAME'])
 
     if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\emails\\password_reset.html")
+        path = os.path.join(app.root_path, "static\\emails\\password_reset.html")
     else:  # Linux & macOS
         path = os.path.join(app.root_path, "static/emails/password_reset.html")
 
-    email_template = open(path, 'r').read().replace("{1}", user.username)
-    email_template = email_template.replace("{2}", url_for('reset_token', token=token, _external=True))
+    email_template = open(path).read().replace("{1}", user.username)
+    email_template = email_template.replace("{2}", url_for('reset_passord_token', token=token, _external=True))
     msg.html = email_template
 
     try:
