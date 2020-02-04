@@ -65,12 +65,6 @@ class User(db.Model, UserMixin):
                                secondaryjoin=(followers.c.followed_id == id),
                                backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
-    def followed_last_updates_overview(self):
-        return db.session.query(User, followers, UserLastUpdate)\
-            .join(followers, followers.c.followed_id == User.id)\
-            .join(UserLastUpdate, UserLastUpdate.user_id == User.id).filter(followers.c.follower_id == self.id)\
-            .order_by(UserLastUpdate.date.desc()).limit(4)
-
     def add_follow(self, user):
         if not self.is_following(user):
             self.followed.append(user)

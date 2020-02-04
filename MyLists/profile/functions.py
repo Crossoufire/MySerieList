@@ -1,4 +1,5 @@
 import pytz
+import time
 
 from MyLists import db
 from flask import url_for
@@ -9,7 +10,8 @@ from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, Movi
     followers
 
 
-def get_count_and_percentage(user_id, list_type):
+def get_media_count(user_id, list_type):
+    start = time.time()
     if list_type == ListType.SERIES:
         media_count = db.session.query(SeriesList.status, func.count(SeriesList.status))\
             .filter_by(user_id=user_id).group_by(SeriesList.status).all()
@@ -38,13 +40,59 @@ def get_count_and_percentage(user_id, list_type):
         data['nodata'] = True
     else:
         data['nodata'] = False
+
+    end = time.time()
+    print(end-start)
     return data
 
 
-def get_total_episodes(user_id, list_type):
+def get_media_count2(user_id, list_type):
+    start = time.time()
+    if list_type == ListType.SERIES:
+        watching = SeriesList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
+        completed = SeriesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+        on_hold = SeriesList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
+        random = SeriesList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
+        dropped = SeriesList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
+        plan_to_watch = SeriesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
+        total = SeriesList.query.filter_by(user_id=user_id).count()
+    if list_type == ListType.ANIME:
+        watching = AnimeList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
+        completed = AnimeList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+        on_hold = AnimeList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
+        random = AnimeList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
+        dropped = AnimeList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
+        plan_to_watch = AnimeList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
+        total = AnimeList.query.filter_by(user_id=user_id).count()
+    if list_type == ListType.MOVIES:
+        completed = MoviesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
+        completed_anime = MoviesList.query.filter_by(user_id=user_id, status=Status.COMPLETED_ANIMATION).count()
+        plan_to_watch = MoviesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
+        total = MoviesList.query.filter_by(user_id=user_id).count()
+
+    if list_type != ListType.MOVIES:
+        data = {"Watching": watching,
+                "Completed": completed,
+                "On Hold": on_hold,
+                "Random": random,
+                "Dropped": dropped,
+                "Plan to Watch": plan_to_watch,
+                "total": total}
+    else:
+        data = {"Completed": completed,
+                "Completed Animation": completed_anime,
+                "Plan to Watch": plan_to_watch,
+                "total": total}
+
+    end = time.time()
+    print(end-start)
+    return data
+
+
+def get_total_eps(user_id, list_type):
     if list_type == ListType.SERIES:
         media_data = db.session.query(SeriesList, SeriesEpisodesPerSeason,
-                                       func.group_concat(SeriesEpisodesPerSeason.episodes)) \
+                                      func.group_concat(SeriesEpisodesPerSeason.episodes)) \
             .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id) \
             .filter(SeriesList.user_id == user_id).group_by(SeriesList.series_id).all()
     elif list_type == ListType.ANIME:
@@ -59,13 +107,13 @@ def get_total_episodes(user_id, list_type):
             episodes = element[2].split(",")
             episodes = [int(x) for x in episodes]
             for i in range(1, element[0].current_season):
-                nb_eps_watched += episodes[i - 1]
+                nb_eps_watched += episodes[i-1]
             nb_eps_watched += element[0].last_episode_watched
 
     return nb_eps_watched
 
 
-def get_level_and_grade(user, list_type):
+def get_media_levels(user, list_type):
     if list_type == ListType.SERIES:
         total_time_min = user.time_spent_series
     elif list_type == ListType.ANIME:
@@ -113,18 +161,22 @@ def get_knowledge_grade(user):
             "grade_title": grade_title}
 
 
-def get_time_spent(user, list_type):
-    if list_type == ListType.SERIES:
-        time_in_min = user.time_spent_series
-    elif list_type == ListType.ANIME:
-        time_in_min = user.time_spent_anime
-    elif list_type == ListType.MOVIES:
-        time_in_min = user.time_spent_movies
-
-    return time_in_min
+def get_media_time(user, list_type=None, total_time=False):
+    if total_time:
+        total_time_spent = user.time_spent_series + user.time_spent_series + user.time_spent_series
+        return total_time_spent
+    else:
+        if list_type == ListType.SERIES:
+            time_in_min = user.time_spent_series
+        elif list_type == ListType.ANIME:
+            time_in_min = user.time_spent_anime
+        elif list_type == ListType.MOVIES:
+            time_in_min = user.time_spent_movies
+        return time_in_min
 
 
 def get_updates(last_update):
+    count = 0
     update = []
     for element in last_update:
         element_data = {}
@@ -153,7 +205,9 @@ def get_updates(last_update):
         elif element.media_type == ListType.MOVIES:
             element_data["category"] = "movie"
 
-        update.append(element_data)
+        count += 1
+        if count <= 6:
+            update.append(element_data)
 
     return update
 
@@ -209,19 +263,19 @@ def get_media_data(user):
 
     media_dict = {}
     for list_type in all_lists:
-        media_count_percentage = get_count_and_percentage(user.id, list_type[1])
-        levels_and_grades = get_level_and_grade(user, list_type[1])
-        time_spent = get_time_spent(user, list_type[1])
+        media_count = get_media_count(user.id, list_type[1])
+        media_levels = get_media_levels(user, list_type[1])
+        media_time = get_media_time(user, list_type[1])
         if list_type[1] != ListType.MOVIES:
-            media_total_episodes = get_total_episodes(user.id, list_type[1])
+            media_total_eps = get_total_eps(user.id, list_type[1])
         else:
-            media_total_episodes = None
+            media_total_eps = None
 
-        media_data = {"time_spent_hour": round(time_spent/60),
-                      "time_spent_day": round(time_spent/1440, 2),
-                      "count_and_percentage": media_count_percentage,
-                      "nb_ep_watched": media_total_episodes,
-                      "level_and_grades": levels_and_grades}
+        media_data = {"time_spent_hour": round(media_time/60),
+                      "time_spent_day": round(media_time/1440, 2),
+                      "media_count": media_count,
+                      "media_total_eps": media_total_eps,
+                      "media_levels": media_levels}
 
         media_dict['{}'.format(list_type[0])] = media_data
 
@@ -229,106 +283,54 @@ def get_media_data(user):
 
 
 def get_follows_data(user):
-    follows_and_updates = db.session.query(User, followers, UserLastUpdate)\
-        .outerjoin(followers, followers.c.followed_id == User.id)\
-        .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
-        .filter(followers.c.follower_id == user.id)\
-        .order_by(User.id, UserLastUpdate.date.desc()).all()
+    if current_user.id != user.id:
+        followed_by_user = user.followed.all()
+        current_user_follows = current_user.followed.all()
 
-    tmp = ""
-    follows_data = []
-    for i in range(0, len(follows_and_updates)):
-        follow = follows_and_updates[i]
-
-        if follow[0].username != tmp:
-            tmp = follow[0].username
-            follow_data = {"username": follow[0].username,
-                           "user_id": follow[0].id,
-                           "picture": url_for('static', filename='profile_pics/{0}'.format(follow[0].image_file)),
-                           "update": []}
-            # if follow[0].private:
-            #     if current_user.id == 1 or current_user.is_following(follow[0]):
-            #         follows_data.append(follow_data)
-            #     elif current_user.id == follow.id:
-            #         follows_data.append(follow_data)
-            # else:
-            #     follows_data.append(follow_data)
-
-        get_updates()
-
-
-        # TODO: TEMP FIX
-        if len(follow_data["update"]) <= 5:
-            follow_data["update"].append(element_data)
-
-        try:
-            if element[0].username != follows_update[i+1][0].username:
-                follows_data.append(follow_data)
+        follows_to_display = []
+        for follow in followed_by_user:
+            if follow.private:
+                if follow in current_user_follows or current_user.id == follow.id:
+                    follows_to_display.append(follow.id)
             else:
-                pass
-        except:
-            follows_data.append(follow_data)
+                follows_to_display.append(follow.id)
 
-    return follows_data
+        follows_update = db.session.query(User, followers, UserLastUpdate)\
+            .join(followers, followers.c.followed_id == User.id)\
+            .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
+            .filter(followers.c.followed_id.in_(follows_to_display))\
+            .order_by(User.username, UserLastUpdate.date.desc()).all()
+    else:
+        follows_update = db.session.query(User, followers, UserLastUpdate)\
+            .join(followers, followers.c.followed_id == User.id)\
+            .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
+            .filter(followers.c.follower_id == user.id)\
+            .order_by(User.username, UserLastUpdate.date.desc()).all()
 
+    follow_dict = {}
+    for follow in follows_update:
+        name = follow[0].username
+        if name not in follow_dict:
+            follow_dict[name] = {'user_id': follow[0].id,
+                                 'picture': url_for('static', filename='profile_pics/{0}'.format(follow[0].image_file)),
+                                 'update': [follow[3]]}
+        elif follow[3]:
+            follow_dict[name]['update'].append(follow[3])
 
-    # Recover the follows list
-    follows_data = []
-    for follow in user.followed.all():
-        follow_data = {"username": follow.username,
-                       "user_id": follow.id,
-                       "picture": url_for('static', filename='profile_pics/{0}'.format(follow.image_file))}
+    for name in follow_dict:
+        if follow_dict[name]['update'][0] is not None:
+            follow_dict[name]['update'] = get_updates(follow_dict[name]['update'])
 
-        if follow.private:
-            if current_user.id == 1 or current_user.is_following(follow):
-                follows_data.append(follow_data)
-            elif current_user.id == follow.id:
-                follows_data.append(follow_data)
-        else:
-            follows_data.append(follow_data)
-
-    return follows_data
-
-
-def get_follows_full_last_update(user):
-
+    return follow_dict
 
 
 def get_follows_last_update(user):
-    follows_update = user.followed_last_updates_overview()
+    follows_update = db.session.query(User, followers, UserLastUpdate)\
+        .join(followers, followers.c.followed_id == User.id)\
+        .join(UserLastUpdate, UserLastUpdate.user_id == User.id).filter(followers.c.follower_id == user.id)\
+        .order_by(UserLastUpdate.date.desc()).limit(4)
 
-    update = []
-    for element in follows_update:
-        element_data = {}
-        # Season or episode update
-        if element[3].old_status is None and element[3].new_status is None:
-            element_data["update"] = ["S{:02d}.E{:02d}".format(element[3].old_season, element[3].old_episode),
-                                      "S{:02d}.E{:02d}".format(element[3].new_season, element[3].new_episode)]
-
-        # Category update
-        elif element[3].old_status is not None and element[3].new_status is not None:
-            element_data["update"] = ["{}".format(element[3].old_status.value).replace("Animation", "Anime"),
-                                      "{}".format(element[3].new_status.value).replace("Animation", "Anime")]
-
-        # Newly added media
-        elif element[3].old_status is None and element[3].new_status is not None:
-            element_data["update"] = ["{}".format(element[3].new_status.value)]
-
-        # Update date
-        element_data["date"] = element[3].date.replace(tzinfo=pytz.UTC).isoformat()
-
-        element_data["media_name"] = element[3].media_name
-
-        if element[3].media_type == ListType.SERIES:
-            element_data["category"] = "series"
-        elif element[3].media_type == ListType.ANIME:
-            element_data["category"] = "anime"
-        elif element[3].media_type == ListType.MOVIES:
-            element_data["category"] = "movie"
-
-        element_data["username"] = element[0].username
-
-        update.append(element_data)
+    update = get_updates(follows_update)
 
     return update
 
@@ -415,7 +417,7 @@ def get_badges(user_id):
         return badge_data
 
     total_data = get_queries()
-    time_spent = int(user.time_spent_anime) + int(user.time_spent_series) + int(user.time_spent_movies)
+    time_spent = get_media_time(user, total_time=True)
 
     all_badges = []
     time_by_genre = {}

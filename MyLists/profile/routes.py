@@ -1,11 +1,10 @@
-from pathlib import Path
 from MyLists import app, db
 from MyLists.profile.forms import AddFollowForm
 from MyLists.models import User, ListType, Ranks
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
-from MyLists.profile.functions2 import get_follows_last_update, get_media_data, \
-    get_level_and_grade, get_knowledge_grade, get_badges, get_follows_data, get_user_data
+from MyLists.profile.functions import get_follows_last_update, get_media_data, get_media_levels, get_knowledge_grade, \
+    get_badges, get_follows_data, get_user_data
 
 
 bp = Blueprint('profile', __name__)
@@ -89,9 +88,9 @@ def hall_of_fame():
 
     all_users_data = []
     for user in users:
-        series_level = get_level_and_grade(user, ListType.SERIES)
-        anime_level = get_level_and_grade(user, ListType.ANIME)
-        movies_level = get_level_and_grade(user, ListType.MOVIES)
+        series_level = get_media_levels(user, ListType.SERIES)
+        anime_level = get_media_levels(user, ListType.ANIME)
+        movies_level = get_media_levels(user, ListType.MOVIES)
         knowledge_grade = get_knowledge_grade(user)
 
         user_data = {"id": user.id,
@@ -166,7 +165,7 @@ def follow_status():
 
     # Check if the follow ID exist in the User database and status is boolean
     user = User.query.filter_by(id=follow_id).first()
-    if user is None or type(follow_status) is not bool:
+    if user is None or type(follow_condition) is not bool:
         abort(400)
 
     # Check the status of the follow
