@@ -69,11 +69,11 @@
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
-                                         title="{{ series_data['level_and_grades']['grade_title'] }}" src="{{ series_data['level_and_grades']['grade_id'] }}.png"/>
+                                         title="{{ media_data['series']['level_and_grades']['grade_title'] }}" src="{{ media_data['series']['level_and_grades']['grade_id'] }}.png"/>
                                     <span class='account-bar-name'>Series</span>
-                                    <div id="series_level" class='account-bar-level'>Level {{ '%02d' | format(series_data['level_and_grades']['level']) }}</div>
-                                    <div class='xp-bar' data-toggle="tooltip" title="{{ series_data['level_and_grades']['level_percent'] }}%">
-                                        <div id='xp-bar-fill-series' data-percentage="{{ series_data['level_and_grades']['level_percent'] }}">
+                                    <div id="series_level" class='account-bar-level'>Level {{ '%02d' | format(media_data['series']['level_and_grades']['level']) }}</div>
+                                    <div class='xp-bar' data-toggle="tooltip" title="{{ media_data['series']['level_and_grades']['level_percent'] }}%">
+                                        <div id='xp-bar-fill-series' data-percentage="{{ media_data['series']['level_and_grades']['level_percent'] }}">
                                             <div class='xp-increase-fx'>
                                                 <div class='xp-increase-fx-flicker'>
                                                     <div class='xp-increase-glow1'></div>
@@ -84,7 +84,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(series_data['level_and_grades']['level'] | int+1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['series']['level_and_grades']['level'] | int+1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -92,11 +92,11 @@
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
-                                         title="{{ anime_data['level_and_grades']['grade_title'] }}" src="{{ anime_data['level_and_grades']['grade_id'] }}.png"/>
+                                         title="{{ media_data['anime']['level_and_grades']['grade_title'] }}" src="{{ media_data['anime']['level_and_grades']['grade_id'] }}.png"/>
                                     <div class='account-bar-name'>Anime</div>
-                                    <div id="anime_level" class='account-bar-level'>Level {{ '%02d' | format(anime_data['level_and_grades']['level']) }}</div>
-                                    <div class='xp-bar' data-toggle="tooltip" title="{{ anime_data['level_and_grades']['level_percent'] }}%">
-                                        <div id='xp-bar-fill-anime' data-percentage="{{ anime_data['level_and_grades']['level_percent'] }}">
+                                    <div id="anime_level" class='account-bar-level'>Level {{ '%02d' | format(media_data['anime']['level_and_grades']['level']) }}</div>
+                                    <div class='xp-bar' data-toggle="tooltip" title="{{ media_data['anime']['level_and_grades']['level_percent'] }}%">
+                                        <div id='xp-bar-fill-anime' data-percentage="{{ media_data['anime']['level_and_grades']['level_percent'] }}">
                                             <div class='xp-increase-fx'>
                                                 <div class='xp-increase-fx-flicker'>
                                                     <div class='xp-increase-glow1'></div>
@@ -107,7 +107,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(anime_data['level_and_grades']['level'] | int+1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['anime']['level_and_grades']['level'] | int+1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -115,11 +115,11 @@
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
-                                         title="{{ movies_data['level_and_grades']['grade_title'] }}" src="{{ movies_data['level_and_grades']['grade_id'] }}.png"/>
+                                         title="{{ media_data['movies']['level_and_grades']['grade_title'] }}" src="{{ media_data['movies']['level_and_grades']['grade_id'] }}.png"/>
                                     <span class='account-bar-name'>Movies</span>
-                                    <div id="movies_level" class='account-bar-level'>Level {{ '%02d' | format(movies_data['level_and_grades']['level']) }}</div>
-                                    <div class='xp-bar' data-toggle="tooltip" title="{{ movies_data['level_and_grades']['level_percent'] }}%">
-                                        <div id='xp-bar-fill-movies' data-percentage="{{ movies_data['level_and_grades']['level_percent'] }}">
+                                    <div id="movies_level" class='account-bar-level'>Level {{ '%02d' | format(media_data['movies']['level_and_grades']['level']) }}</div>
+                                    <div class='xp-bar' data-toggle="tooltip" title="{{ media_data['movies']['level_and_grades']['level_percent'] }}%">
+                                        <div id='xp-bar-fill-movies' data-percentage="{{ media_data['movies']['level_and_grades']['level_percent'] }}">
                                             <div class='xp-increase-fx'>
                                                 <div class='xp-increase-fx-flicker'>
                                                     <div class='xp-increase-glow1'></div>
@@ -130,7 +130,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(movies_data['level_and_grades']['level'] | int+1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['movies']['level_and_grades']['level'] | int+1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -215,32 +215,32 @@
                             </h5>
                             <div id="SERIES" class="m-b-16">
                                 <div class="m-b-5">
-                                    <span class="stat-text"><b>Days:</b> {{ series_data['time_spent_day'] }}</span>
-                                    <span class="stat-text float-right"><b>Hours:</b> {{ series_data['time_spent_hour'] }}</span>
+                                    <span class="stat-text"><b>Days:</b> {{ media_data['series']['time_spent_day'] }}</span>
+                                    <span class="stat-text float-right"><b>Hours:</b> {{ media_data['series']['time_spent_hour'] }}</span>
                                 </div>
                                 <figure class="d-flex">
-                                    {% if series_data['count_and_percentage']['nodata'] %}
+                                    {% if media_data['series']['count_and_percentage']['nodata'] %}
                                     <span class="block-no-data" data-toggle="tooltip" title="No data">
                                         <span id="100%" class="value"></span>
                                     </span>
                                     {% else %}
                                     <span class="block" data-toggle="tooltip" title="Watching">
-                                        <span id="{{ series_data['count_and_percentage']['Watching']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['series']['count_and_percentage']['Watching']['percent'] }}%" class="value"></span>
                                     </span>
                                     <span class="block" data-toggle="tooltip" title="Completed">
-                                        <span id="{{ series_data['count_and_percentage']['Completed']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['series']['count_and_percentage']['Completed']['percent'] }}%" class="value"></span>
                                     </span>
                                     <span class="block" data-toggle="tooltip" title="On Hold">
-                                        <span id="{{ series_data['count_and_percentage']['On Hold']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['series']['count_and_percentage']['On Hold']['percent'] }}%" class="value"></span>
                                     </span>
                                     <span class="block" data-toggle="tooltip" title="Random">
-                                        <span id="{{ series_data['count_and_percentage']['Random']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['series']['count_and_percentage']['Random']['percent'] }}%" class="value"></span>
                                     </span>
                                     <span class="block" data-toggle="tooltip" title="Dropped">
-                                        <span id="{{ series_data['count_and_percentage']['Dropped']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['series']['count_and_percentage']['Dropped']['percent'] }}%" class="value"></span>
                                     </span>
                                     <span class="block" data-toggle="tooltip" title="Plan to Watch">
-                                        <span id="{{ series_data['count_and_percentage']['Plan to Watch']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['series']['count_and_percentage']['Plan to Watch']['percent'] }}%" class="value"></span>
                                     </span>
                                     {% endif %}
                                 </figure>
@@ -250,13 +250,13 @@
                                             <span class="stat-text">Watching:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ series_data['count_and_percentage']['Watching']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['count_and_percentage']['Watching']['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Dropped:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ series_data['count_and_percentage']['Dropped']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['count_and_percentage']['Dropped']['count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -264,13 +264,13 @@
                                             <span class="stat-text">Completed:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ series_data['count_and_percentage']['Completed']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['count_and_percentage']['Completed']['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Plan to Watch:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ series_data['count_and_percentage']['Plan to Watch']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['count_and_percentage']['Plan to Watch']['count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -278,14 +278,14 @@
                                             <span class="stat-text">On Hold:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ series_data['count_and_percentage']['On Hold']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['count_and_percentage']['On Hold']['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">Total Series:</span>
                                         </div>
                                         <div class="col p-l-0 position">
                                             <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">
-                                                {{ series_data['count_and_percentage']['total'] }}</span>
+                                                {{ media_data['series']['count_and_percentage']['total'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -293,13 +293,13 @@
                                             <span class="stat-text">Random:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ series_data['count_and_percentage']['Random']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['count_and_percentage']['Random']['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Episodes:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ series_data['nb_ep_watched'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['nb_ep_watched'] }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -315,32 +315,32 @@
                             </h5>
                             <div id="ANIME" class="m-b-16">
                                 <div class="m-b-5">
-                                    <span class="stat-text"><b>Days:</b> {{ anime_data['time_spent_day'] }}</span>
-                                    <span class="stat-text float-right"><b>Hours:</b> {{ anime_data['time_spent_hour'] }}</span>
+                                    <span class="stat-text"><b>Days:</b> {{ media_data['anime']['time_spent_day'] }}</span>
+                                    <span class="stat-text float-right"><b>Hours:</b> {{ media_data['anime']['time_spent_hour'] }}</span>
                                 </div>
                                 <figure class="d-flex">
-                                    {% if anime_data['count_and_percentage']['nodata'] %}
+                                    {% if media_data['anime']['count_and_percentage']['nodata'] %}
                                     <span class="block-no-data" data-toggle="tooltip" title="No data">
                                         <span id="100%" class="value"></span>
                                     </span>
                                     {% else %}
                                     <span class="block" data-toggle="tooltip" title="Watching">
-                                        <span id="{{ anime_data['count_and_percentage']['Watching']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['anime']['count_and_percentage']['Watching']['percent'] }}%" class="value"></span>
                                     </span>
                                     <span class="block" data-toggle="tooltip" title="Completed">
-                                        <span id="{{ anime_data['count_and_percentage']['Completed']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['anime']['count_and_percentage']['Completed']['percent'] }}%" class="value"></span>
                                     </span>
                                     <span class="block" data-toggle="tooltip" title="On Hold">
-                                        <span id="{{ anime_data['count_and_percentage']['On Hold']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['anime']['count_and_percentage']['On Hold']['percent'] }}%" class="value"></span>
                                     </span>
                                     <span class="block" data-toggle="tooltip" title="Random">
-                                        <span id="{{ anime_data['count_and_percentage']['Random']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['anime']['count_and_percentage']['Random']['percent'] }}%" class="value"></span>
                                     </span>
                                     <span class="block" data-toggle="tooltip" title="Dropped">
-                                        <span id="{{ anime_data['count_and_percentage']['Dropped']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['anime']['count_and_percentage']['Dropped']['percent'] }}%" class="value"></span>
                                     </span>
                                     <span class="block" data-toggle="tooltip" title="Plan to Watch">
-                                        <span id="{{ anime_data['count_and_percentage']['Plan to Watch']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['anime']['count_and_percentage']['Plan to Watch']['percent'] }}%" class="value"></span>
                                     </span>
                                     {% endif %}
                                 </figure>
@@ -350,13 +350,13 @@
                                             <span class="stat-text">Watching:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ anime_data['count_and_percentage']['Watching']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['count_and_percentage']['Watching']['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Dropped:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ anime_data['count_and_percentage']['Dropped']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['count_and_percentage']['Dropped']['count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -364,13 +364,13 @@
                                             <span class="stat-text">Completed:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ anime_data['count_and_percentage']['Completed']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['count_and_percentage']['Completed']['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Plan to Watch:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ anime_data['count_and_percentage']['Plan to Watch']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['count_and_percentage']['Plan to Watch']['count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -378,14 +378,14 @@
                                             <span class="stat-text">On Hold:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ anime_data['count_and_percentage']['On Hold']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['count_and_percentage']['On Hold']['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">Total Anime:</span>
                                         </div>
                                         <div class="col p-l-0 position">
                                             <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">
-                                                {{ anime_data['count_and_percentage']['total'] }}</span>
+                                                {{ media_data['anime']['count_and_percentage']['total'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -393,13 +393,13 @@
                                             <span class="stat-text">Random:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ anime_data['count_and_percentage']['Random']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['count_and_percentage']['Random']['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Episodes:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ anime_data['nb_ep_watched'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['nb_ep_watched'] }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -415,23 +415,23 @@
                             </h5>
                             <div id="MOVIES">
                                 <div class="m-b-16">
-                                    <span class="stat-text"><b>Days:</b> {{ movies_data['time_spent_day'] }}</span>
-                                    <span class="stat-text float-right"><b>Hours:</b> {{ movies_data['time_spent_hour'] }}</span>
+                                    <span class="stat-text"><b>Days:</b> {{ media_data['movies']['time_spent_day'] }}</span>
+                                    <span class="stat-text float-right"><b>Hours:</b> {{ media_data['movies']['time_spent_hour'] }}</span>
                                 </div>
                                 <figure class="d-flex">
-                                    {% if movies_data['count_and_percentage']['nodata'] %}
+                                    {% if media_data['movies']['count_and_percentage']['nodata'] %}
                                     <span class="block-no-data" data-toggle="tooltip" title="No data">
                                         <span id="100%" class="value"></span>
                                     </span>
                                     {% else %}
                                     <span class="block" data-toggle="tooltip" title="Completed">
-                                        <span id="{{ movies_data['count_and_percentage']['Completed']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['movies']['count_and_percentage']['Completed']['percent'] }}%" class="value"></span>
                                     </span>
                                     <span class="block" data-toggle="tooltip" title="Completed Animation">
-                                        <span id="{{ movies_data['count_and_percentage']['Completed Animation']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['movies']['count_and_percentage']['Completed Animation']['percent'] }}%" class="value"></span>
                                     </span>
                                     <span class="block" data-toggle="tooltip" title="Plan to Watch">
-                                        <span id="{{ movies_data['count_and_percentage']['Plan to Watch']['percent'] }}%" class="value"></span>
+                                        <span id="{{ media_data['movies']['count_and_percentage']['Plan to Watch']['percent'] }}%" class="value"></span>
                                     </span>
                                     {% endif %}
                                 </figure>
@@ -441,13 +441,13 @@
                                             <span class="stat-text">Completed:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ movies_data['count_and_percentage']['Completed']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['movies']['count_and_percentage']['Completed']['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Plan to Watch:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ movies_data['count_and_percentage']['Plan to Watch']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['movies']['count_and_percentage']['Plan to Watch']['count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -455,14 +455,14 @@
                                             <span class="stat-text">Completed Anime:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ movies_data['count_and_percentage']['Completed Animation']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['movies']['count_and_percentage']['Completed Animation']['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">Total movies:</span>
                                         </div>
                                         <div class="col p-l-0 position">
                                             <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">
-                                                {{ movies_data['count_and_percentage']['total'] }}</span>
+                                                {{ media_data['movies']['count_and_percentage']['total'] }}</span>
                                         </div>
                                     </div>
                                 </div>

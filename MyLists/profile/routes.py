@@ -51,9 +51,7 @@ def account(user_name):
     user_data = get_user_data(user)
 
     # Recover media data
-    series_data = get_media_data(user, ListType.SERIES)
-    anime_data = get_media_data(user, ListType.ANIME)
-    movies_data = get_media_data(user, ListType.MOVIES)
+    media_data = get_media_data(user)
 
     # Recover follows data
     follows_data = get_follows_data(user)
@@ -72,9 +70,7 @@ def account(user_name):
     return render_template('account.html',
                            title="{}'s account".format(user.username),
                            user_data=user_data,
-                           series_data=series_data,
-                           anime_data=anime_data,
-                           movies_data=movies_data,
+                           media_data=media_data,
                            follow_form=follow_form,
                            follows_data=follows_data,
                            message_tab=message_tab,
