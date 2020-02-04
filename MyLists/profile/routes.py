@@ -3,8 +3,8 @@ from MyLists.profile.forms import AddFollowForm
 from MyLists.models import User, ListType, Ranks
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
-from MyLists.profile.functions import get_follows_last_update, get_media_data, get_media_levels, get_knowledge_grade, \
-    get_badges, get_follows_data, get_user_data
+from MyLists.profile.functions import get_media_data, get_media_levels, get_knowledge_grade, get_badges, \
+    get_follows_data, get_user_data
 
 
 bp = Blueprint('profile', __name__)
@@ -53,13 +53,7 @@ def account(user_name):
     media_data = get_media_data(user)
 
     # Recover follows data
-    follows_data = get_follows_data(user)
-
-    # Recover the last updates of your follows for the follow TAB
-    # last_updates = get_follows_full_last_update(user)
-
-    # Recover the last updates of the follows for the overview TAB
-    overview_updates = get_follows_last_update(user)
+    follows_data_overview, follows_data_tab = get_follows_data(user)
 
     # Reload on the specified TAB
     message_tab = request.args.get("message") or None
@@ -68,12 +62,12 @@ def account(user_name):
 
     return render_template('account.html',
                            title="{}'s account".format(user.username),
+                           message_tab=message_tab,
                            user_data=user_data,
                            media_data=media_data,
                            follow_form=follow_form,
-                           follows_data=follows_data,
-                           message_tab=message_tab,
-                           overview_updates=overview_updates)
+                           follows_data_tab=follows_data_tab,
+                           follows_data_overview=follows_data_overview)
 
 
 @app.route("/hall_of_fame", methods=['GET'])

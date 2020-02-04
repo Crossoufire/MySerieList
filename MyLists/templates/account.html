@@ -143,7 +143,7 @@
                             </h4>
                         </div>
                         <hr>
-                        {% for update in overview_updates %}
+                        {% for update in follows_data_overview %}
                             {% if update['category'] == 'anime' %}
                             <div class="p-2 m-b-5" style="border-bottom: solid 1px #945141;">
                                 <div style="font-size: 12pt;">
@@ -192,7 +192,7 @@
                                         document.write(date_day + " " + date_month + " at " + date_time)
                                     </script> by
                                 </span>
-                                <a href="{{ update['username'] }}" style="color: #359aff; font-size: 11pt;">
+                                <a href="{{ url_for('profile.account', user_name=update['username']) }}" style="color: #359aff; font-size: 11pt;">
                                     {{ update['username'] }}
                                 </a>
                             </div>
@@ -209,7 +209,7 @@
                         <!------------------------ Series statistics --------------------------->
                         <div class="stats-size">
                             <h5 class="text-center mb-0">
-                                <a class="text-light" href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=user_name) }}">
+                                <a class="text-light" href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=user_data['username']) }}">
                                    <b>Series </b><i class="fas fa-xs fa-external-link-square-alt"></i>
                                 </a>
                             </h5>
@@ -309,7 +309,7 @@
                         <!------------------------- Anime statistics --------------------------->
                         <div class="stats-size">
                             <h5 class="text-center mb-0">
-                                <a class="text-light" href="{{ url_for('main.mymedialist', media_list='animelist', user_name=user_name) }}">
+                                <a class="text-light" href="{{ url_for('main.mymedialist', media_list='animelist', user_name=user_data['username']) }}">
                                     <b>Anime </b><i class="fas fa-xs fa-external-link-square-alt"></i>
                                 </a>
                             </h5>
@@ -409,7 +409,7 @@
                         <!------------------------ Movies statistics --------------------------->
                         <div class="stats-size">
                             <h5 class="text-center mb-0">
-                                <a class="text-light" href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=user_name) }}">
+                                <a class="text-light" href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=user_data['username']) }}">
                                     <b>Movies </b><i class="fas fa-xs fa-external-link-square-alt"></i>
                                 </a>
                             </h5>
@@ -479,7 +479,7 @@
                         <div class="stats-size m-b-20">
                             <div class="text-left m-b-10">
                                 Badges page:
-                                <a class="btn btn-sm btn-dark" style='border: solid grey 1px;' href="{{ url_for('badges', user_name=user_name) }}">Badges</a>
+                                <a class="btn btn-sm btn-dark" style='border: solid grey 1px;' href="{{ url_for('badges', user_name=user_data['username']) }}">Badges</a>
                             </div>
                         </div>
                     </li>
@@ -530,14 +530,12 @@
                             {% if user_data['id'] == current_user.get_id() %}
                             <li class="m-b-10">
                                 <a class="text-light" href="{{ url_for('level_grade_data') }}" target="_blank">
-                                    Grades and levels data
-                                    <i class="text-light fas fa-sm fa-external-link-square-alt"></i>
+                                    <u>Grades and levels data</u>
                                 </a>
                             </li>
                             <li class="m-b-10">
                                 <a class="text-light" href="{{ url_for('knowledge_grade_data') }}" target="_blank">
-                                    Knowledge levels data
-                                    <i class="text-light fas fa-sm fa-external-link-square-alt"></i>
+                                    <u>Knowledge levels data</u>
                                 </a>
                             </li>
                             {% endif %}
@@ -631,13 +629,13 @@
             </div>
         </div>
         <div class="d-flex flex-wrap m-t-30 follow_wrapper">
-            {% for key in follows_data %}
+            {% for key in follows_data_tab %}
             <div class="card border-0 m-l-10 m-r-10 m-t-60 m-b-40 follow-card">
                 <div class="card-img-top">
                     <div class="row">
                         <div class="col-4">
                             <a href="{{ key }}">
-                                <img class="follow-picture" src="{{ follows_data[key]['picture'] }}">
+                                <img class="follow-picture" src="{{ follows_data_tab[key]['picture'] }}">
                             </a>
                         </div>
                         <div class="col m-l-20 m-t-15">
@@ -646,7 +644,7 @@
                     </div>
                 </div>
                 <div class="card-body follow-card-body p-2 p-b-10 p-t-0 m-t-1">
-                    {% for update in follows_data[key]['update'] %}
+                    {% for update in follows_data_tab[key]['update'] %}
                     {% if update is not none %}
                     <div>
                         <div class="giveMeEllipsis" style="float: left;">

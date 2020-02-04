@@ -1,5 +1,4 @@
 import pytz
-import time
 
 from MyLists import db
 from flask import url_for
@@ -11,7 +10,6 @@ from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, Movi
 
 
 def get_media_count(user_id, list_type):
-    start = time.time()
     if list_type == ListType.SERIES:
         media_count = db.session.query(SeriesList.status, func.count(SeriesList.status))\
             .filter_by(user_id=user_id).group_by(SeriesList.status).all()
@@ -41,51 +39,6 @@ def get_media_count(user_id, list_type):
     else:
         data['nodata'] = False
 
-    end = time.time()
-    print(end-start)
-    return data
-
-
-def get_media_count2(user_id, list_type):
-    start = time.time()
-    if list_type == ListType.SERIES:
-        watching = SeriesList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
-        completed = SeriesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
-        on_hold = SeriesList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
-        random = SeriesList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
-        dropped = SeriesList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
-        plan_to_watch = SeriesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
-        total = SeriesList.query.filter_by(user_id=user_id).count()
-    if list_type == ListType.ANIME:
-        watching = AnimeList.query.filter_by(user_id=user_id, status=Status.WATCHING).count()
-        completed = AnimeList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
-        on_hold = AnimeList.query.filter_by(user_id=user_id, status=Status.ON_HOLD).count()
-        random = AnimeList.query.filter_by(user_id=user_id, status=Status.RANDOM).count()
-        dropped = AnimeList.query.filter_by(user_id=user_id, status=Status.DROPPED).count()
-        plan_to_watch = AnimeList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
-        total = AnimeList.query.filter_by(user_id=user_id).count()
-    if list_type == ListType.MOVIES:
-        completed = MoviesList.query.filter_by(user_id=user_id, status=Status.COMPLETED).count()
-        completed_anime = MoviesList.query.filter_by(user_id=user_id, status=Status.COMPLETED_ANIMATION).count()
-        plan_to_watch = MoviesList.query.filter_by(user_id=user_id, status=Status.PLAN_TO_WATCH).count()
-        total = MoviesList.query.filter_by(user_id=user_id).count()
-
-    if list_type != ListType.MOVIES:
-        data = {"Watching": watching,
-                "Completed": completed,
-                "On Hold": on_hold,
-                "Random": random,
-                "Dropped": dropped,
-                "Plan to Watch": plan_to_watch,
-                "total": total}
-    else:
-        data = {"Completed": completed,
-                "Completed Animation": completed_anime,
-                "Plan to Watch": plan_to_watch,
-                "total": total}
-
-    end = time.time()
-    print(end-start)
     return data
 
 
@@ -240,7 +193,7 @@ def get_user_data(user):
     # Recover the knowledge grade and level of the user
     knowledge_info = get_knowledge_grade(user)
 
-    # Recover the last update (in the overview) of the user
+    # Recover the overview user's last update
     last_update = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).limit(4)
     media_update = get_updates(last_update)
 
@@ -261,6 +214,7 @@ def get_user_data(user):
 def get_media_data(user):
     all_lists = [["series", ListType.SERIES], ["anime", ListType.ANIME], ["movies", ListType.MOVIES]]
 
+    # Create dict with media as key; values are dict or list of dict with the data
     media_dict = {}
     for list_type in all_lists:
         media_count = get_media_count(user.id, list_type[1])
@@ -271,18 +225,21 @@ def get_media_data(user):
         else:
             media_total_eps = None
 
+        # Each media_data dict contains all the data for one type of media
         media_data = {"time_spent_hour": round(media_time/60),
                       "time_spent_day": round(media_time/1440, 2),
                       "media_count": media_count,
                       "media_total_eps": media_total_eps,
                       "media_levels": media_levels}
 
+        # return a media_dict with 3 keys (anime, series, movies) with media_data as values
         media_dict['{}'.format(list_type[0])] = media_data
 
     return media_dict
 
 
 def get_follows_data(user):
+    # If not current_user, check follows to show (remove the private ones if current user does not follow them)
     if current_user.id != user.id:
         followed_by_user = user.followed.all()
         current_user_follows = current_user.followed.all()
@@ -299,40 +256,38 @@ def get_follows_data(user):
             .join(followers, followers.c.followed_id == User.id)\
             .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
             .filter(followers.c.followed_id.in_(follows_to_display))\
-            .order_by(User.username, UserLastUpdate.date.desc()).all()
+            .order_by(UserLastUpdate.date.desc()).all()
     else:
         follows_update = db.session.query(User, followers, UserLastUpdate)\
             .join(followers, followers.c.followed_id == User.id)\
             .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
             .filter(followers.c.follower_id == user.id)\
-            .order_by(User.username, UserLastUpdate.date.desc()).all()
+            .order_by(UserLastUpdate.date.desc()).all()
 
-    follow_dict = {}
+    # Dict for the last update of the follows tab, the keys are the username
+    follow_dict_tab = {}
     for follow in follows_update:
         name = follow[0].username
-        if name not in follow_dict:
-            follow_dict[name] = {'user_id': follow[0].id,
-                                 'picture': url_for('static', filename='profile_pics/{0}'.format(follow[0].image_file)),
-                                 'update': [follow[3]]}
+        if name not in follow_dict_tab:
+            follow_dict_tab[name] = {'user_id': follow[0].id,
+                                     'picture': url_for('static', filename='profile_pics/{0}'
+                                                        .format(follow[0].image_file)),
+                                     'update': [follow[3]]}
         elif follow[3]:
-            follow_dict[name]['update'].append(follow[3])
+            follow_dict_tab[name]['update'].append(follow[3])
+    # Convert the <UserLastUpdate> SQL object to dict to use in the template
+    for name in follow_dict_tab:
+        if follow_dict_tab[name]['update'][0] is not None:
+            follow_dict_tab[name]['update'] = get_updates(follow_dict_tab[name]['update'])
 
-    for name in follow_dict:
-        if follow_dict[name]['update'][0] is not None:
-            follow_dict[name]['update'] = get_updates(follow_dict[name]['update'])
+    # List of dict for the follows last update in overview tab
+    follow_list_overview = []
+    for follow in follows_update[:4]:
+        follows = {'username': follow[0].username}
+        follows.update(get_updates([follow[3]])[0])
+        follow_list_overview.append(follows)
 
-    return follow_dict
-
-
-def get_follows_last_update(user):
-    follows_update = db.session.query(User, followers, UserLastUpdate)\
-        .join(followers, followers.c.followed_id == User.id)\
-        .join(UserLastUpdate, UserLastUpdate.user_id == User.id).filter(followers.c.follower_id == user.id)\
-        .order_by(UserLastUpdate.date.desc()).limit(4)
-
-    update = get_updates(follows_update)
-
-    return update
+    return follow_list_overview, follow_dict_tab
 
 
 def get_badges(user_id):
