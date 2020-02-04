@@ -4,7 +4,7 @@ from MyLists.profile.forms import AddFollowForm
 from MyLists.models import User, ListType, Ranks
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
-from MyLists.profile.functions import get_follows_full_last_update, get_follows_last_update, get_media_data, \
+from MyLists.profile.functions2 import get_follows_last_update, get_media_data, \
     get_level_and_grade, get_knowledge_grade, get_badges, get_follows_data, get_user_data
 
 
@@ -57,7 +57,7 @@ def account(user_name):
     follows_data = get_follows_data(user)
 
     # Recover the last updates of your follows for the follow TAB
-    last_updates = get_follows_full_last_update(user)
+    # last_updates = get_follows_full_last_update(user)
 
     # Recover the last updates of the follows for the overview TAB
     overview_updates = get_follows_last_update(user)
@@ -74,7 +74,6 @@ def account(user_name):
                            follow_form=follow_form,
                            follows_data=follows_data,
                            message_tab=message_tab,
-                           last_updates=last_updates,
                            overview_updates=overview_updates)
 
 
