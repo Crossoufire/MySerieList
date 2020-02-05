@@ -129,7 +129,6 @@ def get_media_time(user, list_type=None, total_time=False):
 
 
 def get_updates(last_update):
-    count = 0
     update = []
     for element in last_update:
         element_data = {}
@@ -158,9 +157,7 @@ def get_updates(last_update):
         elif element.media_type == ListType.MOVIES:
             element_data["category"] = "movie"
 
-        count += 1
-        if count <= 6:
-            update.append(element_data)
+        update.append(element_data)
 
     return update
 
@@ -201,7 +198,6 @@ def get_user_data(user):
                  "username": user.username,
                  "profile_picture": url_for('static', filename='profile_pics/{0}'.format(user.image_file)),
                  "register": user.registered_on.strftime("%d %b %Y"),
-                 "biography": user.biography,
                  "followers": followers,
                  "isfollowing": isfollowing,
                  "knowledge_info": knowledge_info,
@@ -253,41 +249,29 @@ def get_follows_data(user):
                 follows_to_display.append(follow.id)
 
         follows_update = db.session.query(User, followers, UserLastUpdate)\
-            .join(followers, followers.c.followed_id == User.id)\
+            .outerjoin(followers, followers.c.followed_id == User.id)\
             .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
-            .filter(followers.c.followed_id.in_(follows_to_display))\
+            .filter(followers.c.followed_id.in_(follows_to_display), followers.c.follower_id == user.id)\
             .order_by(UserLastUpdate.date.desc()).all()
     else:
         follows_update = db.session.query(User, followers, UserLastUpdate)\
-            .join(followers, followers.c.followed_id == User.id)\
+            .outerjoin(followers, followers.c.followed_id == User.id)\
             .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
             .filter(followers.c.follower_id == user.id)\
             .order_by(UserLastUpdate.date.desc()).all()
 
-    # Dict for the last update of the follows tab, the keys are the username
-    follow_dict_tab = {}
-    for follow in follows_update:
-        name = follow[0].username
-        if name not in follow_dict_tab:
-            follow_dict_tab[name] = {'user_id': follow[0].id,
-                                     'picture': url_for('static', filename='profile_pics/{0}'
-                                                        .format(follow[0].image_file)),
-                                     'update': [follow[3]]}
-        elif follow[3]:
-            follow_dict_tab[name]['update'].append(follow[3])
-    # Convert the <UserLastUpdate> SQL object to dict to use in the template
-    for name in follow_dict_tab:
-        if follow_dict_tab[name]['update'][0] is not None:
-            follow_dict_tab[name]['update'] = get_updates(follow_dict_tab[name]['update'])
+    print(follows_update)
 
-    # List of dict for the follows last update in overview tab
-    follow_list_overview = []
-    for follow in follows_update[:4]:
+    follows_update_list = []
+    for follow in follows_update[:7]:
         follows = {'username': follow[0].username}
-        follows.update(get_updates([follow[3]])[0])
-        follow_list_overview.append(follows)
+        if follow[3] is not None:
+            follows.update(get_updates([follow[3]])[0])
+        follows_update_list.append(follows)
 
-    return follow_list_overview, follow_dict_tab
+    print(follows_update_list)
+
+    return follows_update_list
 
 
 def get_badges(user_id):
@@ -524,3 +508,57 @@ def get_badges(user_id):
         total_unlocked += item["unlocked"]
 
     return [all_badges, total_unlocked]
+
+
+## Backup old function follow data
+# def get_follows_data_backup(user):
+#     # If not current_user, check follows to show (remove the private ones if current user does not follow them)
+#     if current_user.id != user.id:
+#         followed_by_user = user.followed.all()
+#         current_user_follows = current_user.followed.all()
+#
+#         follows_to_display = []
+#         for follow in followed_by_user:
+#             if follow.private:
+#                 if follow in current_user_follows or current_user.id == follow.id:
+#                     follows_to_display.append(follow.id)
+#             else:
+#                 follows_to_display.append(follow.id)
+#
+#         follows_update = db.session.query(User, followers, UserLastUpdate)\
+#             .join(followers, followers.c.followed_id == User.id)\
+#             .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
+#             .filter(followers.c.followed_id.in_(follows_to_display))\
+#             .order_by(UserLastUpdate.date.desc()).all()
+#     else:
+#         follows_update = db.session.query(User, followers, UserLastUpdate)\
+#             .join(followers, followers.c.followed_id == User.id)\
+#             .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
+#             .filter(followers.c.follower_id == user.id)\
+#             .order_by(UserLastUpdate.date.desc()).all()
+#
+#     # Dict for the last update of the follows tab, the keys are the username
+#     follow_dict_tab = {}
+#     for follow in follows_update:
+#         name = follow[0].username
+#         if name not in follow_dict_tab:
+#             follow_dict_tab[name] = {'user_id': follow[0].id,
+#                                      'picture': url_for('static', filename='profile_pics/{0}'
+#                                                         .format(follow[0].image_file)),
+#                                      'update': [follow[3]]}
+#         elif follow[3]:
+#             follow_dict_tab[name]['update'].append(follow[3])
+#
+#     # Convert the <UserLastUpdate> SQL object to dict to use in the template
+#     for name in follow_dict_tab:
+#         if follow_dict_tab[name]['update'][0] is not None:
+#             follow_dict_tab[name]['update'] = get_updates(follow_dict_tab[name]['update'])
+#
+#     # List of dict for the follows last update in overview tab
+#     follow_list_overview = []
+#     for follow in follows_update[:6]:
+#         follows = {'username': follow[0].username}
+#         follows.update(get_updates([follow[3]])[0])
+#         follow_list_overview.append(follows)
+#
+#     return follow_list_overview, follow_dict_tab

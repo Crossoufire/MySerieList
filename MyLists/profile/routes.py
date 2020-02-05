@@ -3,8 +3,8 @@ from MyLists.profile.forms import AddFollowForm
 from MyLists.models import User, ListType, Ranks
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
-from MyLists.profile.functions import get_media_data, get_media_levels, get_knowledge_grade, get_badges, \
-    get_follows_data, get_user_data
+from MyLists.profile.functions import get_media_data, get_media_levels, get_follows_data, get_badges, get_user_data, \
+    get_knowledge_grade
 
 
 bp = Blueprint('profile', __name__)
@@ -34,40 +34,31 @@ def account(user_name):
         if follow is None or follow.id == 1:
             app.logger.info('[{}] Attempt to follow account {}'.format(current_user.id, follow_username))
             flash('Sorry, this account does not exist', 'warning')
-            return redirect(url_for('profile.account', user_name=user_name, message='follows'))
+            return redirect(url_for('profile.account', user_name=current_user.username))
         if current_user.id == follow.id:
             flash("You cannot follow yourself", 'warning')
-            return redirect(url_for('profile.account', user_name=user_name, message='follows'))
+            return redirect(url_for('profile.account', user_name=current_user.username))
 
         current_user.add_follow(follow)
         db.session.commit()
 
         app.logger.info('[{}] is following the account with ID {}'.format(current_user.id, follow.id))
         flash("You are now following: {}.".format(follow.username), 'success')
-        return redirect(url_for('profile.account', user_name=user_name, message='follows'))
+        return redirect(url_for('profile.account', user_name=current_user.username))
 
     # Recover user data
     user_data = get_user_data(user)
-
     # Recover media data
     media_data = get_media_data(user)
-
     # Recover follows data
-    follows_data_overview, follows_data_tab = get_follows_data(user)
-
-    # Reload on the specified TAB
-    message_tab = request.args.get("message") or None
-    if not message_tab:
-        message_tab = 'overview'
+    follows_list = get_follows_data(user)
 
     return render_template('account.html',
                            title="{}'s account".format(user.username),
-                           message_tab=message_tab,
                            user_data=user_data,
                            media_data=media_data,
                            follow_form=follow_form,
-                           follows_data_tab=follows_data_tab,
-                           follows_data_overview=follows_data_overview)
+                           follows_list=follows_list)
 
 
 @app.route("/hall_of_fame", methods=['GET'])
@@ -135,7 +126,6 @@ def badges(user_name):
 @login_required
 def level_grade_data():
     ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
-
     return render_template('level_grade_data.html', title='Level grade data', data=ranks)
 
 
@@ -143,7 +133,6 @@ def level_grade_data():
 @login_required
 def knowledge_grade_data():
     ranks = Ranks.query.filter_by(type='knowledge_rank\n').order_by(Ranks.level.asc()).all()
-
     return render_template('knowledge_grade_data.html', title='Knowledge grade data', data=ranks)
 
 

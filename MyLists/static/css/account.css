@@ -11,44 +11,13 @@ hr {
 /* --------------------------------- */
 
 
-/* -------------- Tabs ------------- */
-.account-tab {
-    border-bottom: grey 1px solid;
-    background: rgba(44, 57, 70, 1);
-}
-
-.account-tab > li > .active {
-    background: rgba(24, 37, 50, 1) !important;
-}
-
-.account-tab > li > a {
-    color: white;
-}
-
-@media (max-width: 363px) {
-    .navbar-account {
-        font-size: 0.8rem;
-    }
-}
-@media (min-width: 364px) and (max-width: 385px) {
-    .navbar-account {
-        font-size: 0.9rem;
-    }
-}
-@media (min-width: 386px) {
-    .navbar-account {
-        font-size: 1rem;
-    }
-}
-/* --------------------------------- */
-
-
 /* ------------ Header ------------- */
 .header-container {
     position: relative;
     height: 300px;
     background-image: url('/static/img/profile_background_2.jpg');
     background-size: cover;
+    border-bottom: 2px solid grey;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -56,7 +25,7 @@ hr {
 .header-profile-img {
     position: absolute;
     left: 30px;
-    bottom: -8%;
+    bottom: 20px;
     border-radius: 50%;
     border: solid 2px black;
     height: 150px;
@@ -68,7 +37,7 @@ hr {
     background: #262626;
     min-width: 50px;
     left: 80px;
-    bottom: -10%;
+    bottom: 13px;
     font-weight: 400;
     border: solid 1px white;
     border-radius: 8px;
@@ -77,44 +46,21 @@ hr {
 .header-profile-data {
     position: absolute;
     left: 200px;
-    bottom: 3px;
+    bottom: 30px;
 }
 
-@media (max-width: 790px) {
-    .header-profile-img {
-        bottom: 10px;
-    }
-    .header-edit-profile-img {
-        bottom: 10px;
-    }
-    .header-profile-data {
-        bottom: 15px;
-    }
-    .header-knowledge-level {
-        bottom: 4px;
-    }
-}
 @media (max-width: 490px) {
     .header-profile-img {
-        left: 10px;
-        bottom: 20px;
+        left: 15px;
         height: 110px;
         width: 110px;
-    }
-    .header-edit-profile-img {
-        left: 10px;
-        bottom: 20px;
-        height: 110px;
-        width: 110px;
-        padding-top: 40px;
     }
     .header-profile-data {
-        left: 135px;
-        bottom: 15px;
+        left: 140px;
+        bottom: 20px;
     }
     .header-knowledge-level {
         left: 44px;
-        bottom: 14px;
         font-size: 10pt;
         min-width: 40px;
     }
@@ -171,40 +117,13 @@ hr {
     min-width: 105px;
 }
 
-@media (max-width: 990px) {
-    #overview-tab {
-        padding-left: 100px;
-        padding-right: 100px;
-    }
+.tata {
+    padding: 0px 8px 8px 8px;
 }
-@media (max-width: 650px) {
-    #overview-tab {
-        padding-left: 0px;
-        padding-right: 0px;
-    }
-}
-@media (max-width: 490px) {
-    .stat-text {
-        font-size: 10pt;
-    }
-    .mini {
-        min-width: 100px;
-    }
-    .tab-content {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-}
-/* --------------------------------- */
 
-
-/* ------------ Follows ------------ */
-.modal-content {
-    background: #131418;
-    border: solid 1px white !important;
-    max-width: 300px;
-    margin-left: auto;
-    margin-right: auto;
+.media-container {
+    position: relative;
+    height: 200px;
 }
 
 .form-control {
@@ -226,38 +145,6 @@ hr {
     color: #fff;
 }
 
-.card-img-top {
-    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-    min-height: 70px;
-    max-height: 70px;
-}
-
-.follow-card {
-    min-width: 310px;
-    max-width: 310px;
-}
-
-.follow-card-body {
-    max-height: 335px;
-    min-height: 335px;
-    background-image: url('/static/img/profile_background1.jpg');
-}
-
-.follow-date {
-    color: #b3b3b3;
-    font-size: 11pt;
-}
-
-.follow-picture {
-    position: absolute;
-    top: -50px;
-    left: 35px;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    border: solid 2px black;
-}
-
 .giveMeEllipsis {
    overflow: hidden;
    width: 200px;
@@ -269,13 +156,34 @@ hr {
    max-height: X*N;       /* fallback */
 }
 
-@media (max-width: 700px) {
-    .follow_wrapper {
-        justify-content: space-evenly;
+@media (max-width: 990px) {
+    #overview-tab {
+        padding-left: 100px;
+        padding-right: 100px;
     }
-    .mobile-follow-add {
-        margin-left: auto;
-        margin-right: auto;
+}
+@media (max-width: 767.97px) {
+    .media-container {
+        position: relative;
+        height: 200px;
+    }
+}
+@media (max-width: 650px) {
+    .account-wrapper {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}
+@media (max-width: 490px) {
+    .stat-text {
+        font-size: 10pt;
+    }
+    .mini {
+        min-width: 100px;
+    }
+    .account-wrapper {
+        padding-left: 10px;
+        padding-right: 10px;
     }
 }
 /* --------------------------------- */
