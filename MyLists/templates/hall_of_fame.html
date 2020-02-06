@@ -72,7 +72,7 @@
                 </td>
                 <td>{% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
                     {% else %}
-                    <a class="btn btn-sm btn-test" href="{{ url_for('badges', user_name=user['username']) }}">Badges</a>
+                    <a class="btn btn-sm btn-test" href="{{ url_for('profile.badges', user_name=user['username']) }}">Badges</a>
                     <br>
                     {% if user["isfollowing"] and not user['iscurrentuser'] %}
                     <button class="btn btn-sm btn-dark btn-smaller" onclick="follow_status('{{ user['id'] }}', this)">Unfollow</button>

@@ -40,7 +40,7 @@
                         <div class="text-left m-b-10">
                             Badges page:
                             <a class="btn btn-sm btn-dark" style='border: solid grey 1px;'
-                               href="{{ url_for('badges', user_name=user_data['username']) }}">Badges
+                               href="{{ url_for('profile.badges', user_name=user_data['username']) }}">Badges
                             </a>
                         </div>
                     </div>
@@ -228,12 +228,12 @@
                         </li>
                         {% if user_data['id'] == current_user.get_id() %}
                         <li class="m-b-10">
-                            <a class="text-light" href="{{ url_for('level_grade_data') }}" target="_blank">
+                            <a class="text-light" href="{{ url_for('profile.level_grade_data') }}" target="_blank">
                                 <u>Grades and levels data</u>
                             </a>
                         </li>
                         <li class="m-b-10">
-                            <a class="text-light" href="{{ url_for('knowledge_grade_data') }}" target="_blank">
+                            <a class="text-light" href="{{ url_for('profile.knowledge_grade_data') }}" target="_blank">
                                 <u>Knowledge levels data</u>
                             </a>
                         </li>

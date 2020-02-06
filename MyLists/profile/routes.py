@@ -32,7 +32,7 @@ def account(user_name):
         follow = User.query.filter_by(username=follow_username).first()
 
         if follow is None or follow.id == 1:
-            app.logger.info('[{}] Attempt to follow account {}'.format(current_user.id, follow_username))
+            current_app.logger.info('[{}] Attempt to follow account {}'.format(current_user.id, follow_username))
             flash('Sorry, this account does not exist', 'warning')
             return redirect(url_for('profile.account', user_name=current_user.username))
         if current_user.id == follow.id:
@@ -42,7 +42,7 @@ def account(user_name):
         current_user.add_follow(follow)
         db.session.commit()
 
-        app.logger.info('[{}] is following the account with ID {}'.format(current_user.id, follow.id))
+        current_app.logger.info('[{}] is following the account with ID {}'.format(current_user.id, follow.id))
         flash("You are now following: {}.".format(follow.username), 'success')
         return redirect(url_for('profile.account', user_name=current_user.username))
 
@@ -156,10 +156,10 @@ def follow_status():
     if follow_condition:
         current_user.add_follow(user)
         db.session.commit()
-        app.logger.info('[{}] Follow the account with ID {}'.format(current_user.id, follow_id))
+        current_app.logger.info('[{}] Follow the account with ID {}'.format(current_user.id, follow_id))
     else:
         current_user.remove_follow(user)
         db.session.commit()
-        app.logger.info('[{}] Follow with ID {} unfollowed'.format(current_user.id, follow_id))
+        current_app.logger.info('[{}] Follow with ID {} unfollowed'.format(current_user.id, follow_id))
 
     return '', 204

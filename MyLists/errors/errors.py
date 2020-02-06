@@ -15,7 +15,7 @@ def error400(e):
 @bp.app_errorhandler(403)
 def error403(e):
     image_error = url_for('static', filename='img/error.jpg')
-    app.logger.info('[{}] User ID tried the /admin URL'.format(current_user.id))
+    current_app.logger.info('[{}] User ID tried the /admin URL'.format(current_user.id))
     return render_template('error.html', title='Error 403', error_code=403, image_error=image_error), 403
 
 

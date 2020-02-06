@@ -1,17 +1,17 @@
-import os
+import sys
 import logging
 import smtplib
 import email.utils
+import configparser
 
-from config import Config
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
 from flask_compress import Compress
+from flask import Flask, current_app
 from flask_login import LoginManager
 from email.message import EmailMessage
 from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
-from flask import Flask, request, current_app
 from logging.handlers import SMTPHandler, RotatingFileHandler
 
 
@@ -24,10 +24,38 @@ login_manager.login_view = 'auth.home'
 login_manager.login_message_category = 'info'
 
 
-def create_app(config_class=Config):
+config = configparser.ConfigParser()
+config.read('config.ini')
+try:
+    flask_secret = config['Flask']['secret']
+    email = config['Mail']['email']
+    password = config['Mail']['password']
+    server = config['Mail']['server']
+    port = int(config['Mail']['port'])
+    themoviedb_key = config['TheMovieDB']['api_key']
+except:
+    print("Config file error. Please read the README to configure the config.ini file properly. Exit.")
+    sys.exit()
+
+
+def create_app():
     app = Flask(__name__)
     Compress(app)
-    app.config.from_object(config_class)
+
+    app.config["SECRET_KEY"] = flask_secret
+    app.config["SESSION_COOKIE_SECURE"] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['TESTING'] = True
+    app.config['MAX_CONTENT_LENGTH'] = 8*1024*1024
+
+    app.config['MAIL_SERVER'] = server
+    app.config['MAIL_PORT'] = port
+    app.config['MAIL_USE_TLS'] = False
+    app.config['MAIL_USE_SSL'] = True
+    app.config['MAIL_USERNAME'] = email
+    app.config['MAIL_PASSWORD'] = password
+    app.config['THEMOVIEDB_API_KEY'] = themoviedb_key
 
     db.init_app(app)
     mail.init_app(app)
@@ -82,7 +110,7 @@ def create_app(config_class=Config):
                     self.handleError(record)
         mail_handler = SSLSMTPHandler(mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
                                       fromaddr=app.config['MAIL_USERNAME'],
-                                      toaddrs=app.config['MAIL_SERVER'],
+                                      toaddrs=app.config['MAIL_USERNAME'],
                                       subject='Mylists - exceptions occurred!',
                                       credentials=(app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD']))
         mail_handler.setLevel(logging.ERROR)

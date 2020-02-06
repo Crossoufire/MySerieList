@@ -34,14 +34,9 @@ secret = <random_value>
 
 [Mail]
 email = <mail used for sending registration / reset password / email update email>
-admin_email = <mail used to receive the log errors>
 password = <password of the email>
 server = <server to connect to>
 port = <port to connect to>
-
-[Captcha]
-public_key = <public key of Google reCAPTCHA>
-private_key = <private key of Google reCAPTCHA>
 
 [TheMovieDB]
 api_key = <API key of TheMovieDB. You need to register on their website to get one>

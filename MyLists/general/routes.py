@@ -1,12 +1,12 @@
 from flask import Blueprint
 from datetime import datetime
+from MyLists import db, bcrypt
 from sqlalchemy import func, text
 from MyLists.API_data import ApiData
-from MyLists import current_app, db, bcrypt
 from flask_login import current_user, login_required
 from flask import render_template, url_for, flash, redirect, request
-from MyLists.general.functions import refresh_db_badges, compute_media_time_spent, add_badges_to_db, get_trending_data,\
-    add_ranks_to_db, refresh_db_ranks
+from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, get_trending_data, add_ranks_to_db
+from MyLists.main.functions import automatic_media_refresh
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, Anime, User, \
     AnimeList, AnimeEpisodesPerSeason, AnimeGenre, MoviesGenre, MoviesList, MoviesActors, SeriesActors, Movies, \
     AnimeActors
@@ -30,19 +30,8 @@ def create_user():
         db.session.add(admin)
         add_badges_to_db()
         add_ranks_to_db()
-    if User.query.filter_by(id='2').first() is None:
-        admin = User(username='aaa',
-                     email='aaa@aaa.com',
-                     password=bcrypt.generate_password_hash("a").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=False,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
-    refresh_db_badges()
-    refresh_db_ranks()
     db.session.commit()
+    automatic_media_refresh()
     compute_media_time_spent(ListType.SERIES)
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
@@ -52,8 +41,10 @@ def create_user():
 @login_required
 def global_stats():
     # Total time spent for each media
-    times_spent = db.session.query(User, func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
-                                   func.sum(User.time_spent_movies)).filter(User.id >= '2', User.active == True).all()
+    times_spent = db.session.query(User, func.sum(User.time_spent_series),
+                                   func.sum(User.time_spent_anime),
+                                   func.sum(User.time_spent_movies))\
+        .filter(User.id >= '2', User.active == True).all()
 
     if times_spent[0][0]:
         total_time = {"total": int((times_spent[0][1] / 60) + (times_spent[0][2] / 60) + (times_spent[0][3] / 60)),

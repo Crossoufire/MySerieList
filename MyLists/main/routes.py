@@ -534,7 +534,7 @@ def add_element():
         element = Movies.query.filter_by(**kargs).first()
 
     # If media ID exists, add to account without API calls
-    if element is not None:
+    if element:
         # Check if the element is already in the current's account list
         if list_type == ListType.SERIES:
             if SeriesList.query.filter_by(user_id=current_user.id, series_id=element.id).first():
@@ -545,6 +545,7 @@ def add_element():
         elif list_type == ListType.MOVIES:
             if MoviesList.query.filter_by(user_id=current_user.id, movies_id=element.id).first():
                 flash("This movie is already in your list", "warning")
+
         add_element_to_user(element.id, current_user.id, list_type, new_status)
     else:
         add_element_in_base(element_id, list_type, new_status)

@@ -5,6 +5,7 @@ import requests
 import urllib.request
 
 from PIL import Image
+from pathlib import Path
 from flask import url_for
 from jikanpy import Jikan
 from MyLists import current_app
@@ -13,7 +14,7 @@ from MyLists.models import ListType
 
 class ApiData:
     def __init__(self, ):
-        self.tmdb_api_key = app.config['THEMOVIEDB_API_KEY']
+        self.tmdb_api_key = current_app.config['THEMOVIEDB_API_KEY']
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
 
     def autocomplete_search(self, element_name, list_type):
@@ -24,8 +25,8 @@ class ApiData:
             if list_type == ListType.MOVIES:
                 response = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
                                         .format(self.tmdb_api_key, element_name))
-        except:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: Could not reach the endpoint')
+        except Exception as e:
+            current_app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
             return [{"nb_results": 0}]
 
         data = self.check_response_status(response)
@@ -126,8 +127,8 @@ class ApiData:
             if list_type == ListType.MOVIES:
                 response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}&append_to_response=credits"
                                         .format(api_id, self.tmdb_api_key))
-        except:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: Could not reach the endpoint')
+        except Exception as e:
+            current_app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
             return None
 
         data = self.check_response_status(response)
@@ -140,8 +141,8 @@ class ApiData:
         try:
             response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
                                     .format(collection_id, self.tmdb_api_key))
-        except:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: Could not reach the endpoint')
+        except Exception as e:
+            current_app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
             return None
 
         data = self.check_response_status(response)
@@ -152,32 +153,20 @@ class ApiData:
 
     def save_api_cover(self, media_cover_path, media_cover_name, list_type, collection=False):
         if list_type == ListType.SERIES:
-            if platform.system() == "Windows":
-                local_covers_path = os.path.join(app.root_path, "static\\covers\\series_covers\\")
-            else:  # Linux & macOS
-                local_covers_path = os.path.join(app.root_path, "static/covers/series_covers/")
+            local_covers_path = Path(current_app.root_path, "static/covers/series_covers/")
         elif list_type == ListType.ANIME:
-            if platform.system() == "Windows":
-                local_covers_path = os.path.join(app.root_path, "static\\covers\\anime_covers\\")
-            else:  # Linux & macOS
-                local_covers_path = os.path.join(app.root_path, "static/covers/anime_covers/")
+            local_covers_path = Path(current_app.root_path, "static/covers/anime_covers/")
         elif list_type == ListType.MOVIES:
             if collection is True:
-                if platform.system() == "Windows":
-                    local_covers_path = os.path.join(app.root_path, "static\\covers\\movies_collection_covers\\")
-                else:  # Linux & macOS
-                    local_covers_path = os.path.join(app.root_path, "static/covers/movies_collection_covers/")
+                local_covers_path = Path(current_app.root_path, "static/covers/movies_collection_covers/")
             else:
-                if platform.system() == "Windows":
-                    local_covers_path = os.path.join(app.root_path, "static\\covers\\movies_covers\\")
-                else:  # Linux & macOS
-                    local_covers_path = os.path.join(app.root_path, "static/covers/movies_covers/")
+                local_covers_path = Path(current_app.root_path, "static/covers/movies_covers/")
 
         try:
             urllib.request.urlretrieve("{0}{1}".format(self.tmdb_poster_base_url, media_cover_path),
                                        "{0}{1}".format(local_covers_path, media_cover_name))
-        except:
-            app.logger.error('[SYSTEM] Error trying to recover the poster: Could not reach the endpoint')
+        except Exception as e:
+            current_app.logger.error('[SYSTEM] Error trying to recover the poster: {}'.format(e))
             return False
 
         img = Image.open("{}{}".format(local_covers_path, media_cover_name))
@@ -193,21 +182,39 @@ class ApiData:
             anime_response = Jikan().top(type='anime', page=1, subtype='airing')
             movies_response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
                                            .format(self.tmdb_api_key))
-        except:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API or the Jikan API: Could not reach the endpoint')
+        except Exception as e:
+            current_app.logger.error('[SYSTEM] Error requesting themoviedb API or the Jikan API: {}'.format(e))
             return None
 
         series_data = self.check_response_status(series_response)
-        if series_data is False:
+        if not series_data:
             return None
 
         anime_data = anime_response
 
         movies_data = self.check_response_status(movies_response)
-        if movies_data is False:
+        if not movies_data:
             return None
 
         return [series_data, anime_data, movies_data]
+
+    def get_changed_data(self, list_type):
+        try:
+            if list_type == ListType.SERIES:
+                response = requests.get("https://api.themoviedb.org/3/tv/changes?api_key={0}"
+                                        .format(self.tmdb_api_key))
+            elif list_type == ListType.MOVIES:
+                response = requests.get("https://api.themoviedb.org/3/movie/changes?api_key={0}"
+                                        .format(self.tmdb_api_key))
+        except Exception as e:
+            current_app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+            return None
+
+        changed_data = self.check_response_status(response)
+        if not changed_data:
+            return None
+
+        return changed_data
 
     @staticmethod
     def get_anime_genres(anime_name):
@@ -227,13 +234,14 @@ class ApiData:
         if response.status_code == 200:
             return json.loads(response.text)
         elif response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
+            current_app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
         elif response.status_code == 404:
-            app.logger.error('[SYSTEM] Invalid id: The pre-requisite id is invalid or not found.')
+            current_app.logger.error('[SYSTEM] Invalid id: The pre-requisite id is invalid or not found.')
         elif response.status_code == 500:
-            app.logger.error('[SYSTEM] 	Internal error: Something went wrong, contact TMDb.')
+            current_app.logger.error('[SYSTEM] 	Internal error: Something went wrong, contact TMDb.')
         elif response.status_code == 503:
-            app.logger.error('[SYSTEM] Service offline: This service is temporarily offline, try again later.')
+            current_app.logger.error('[SYSTEM] Service offline: This service is temporarily offline, try again later.')
         elif response.status_code == 504:
-            app.logger.error('[SYSTEM] Your request to the backend server timed out. Try again.')
+            current_app.logger.error('[SYSTEM] Your request to the backend server timed out. Try again.')
+
         return False

@@ -194,14 +194,16 @@ def get_user_data(user):
 
 
 def get_media_data(user):
-    all_lists = [["series", ListType.SERIES], ["anime", ListType.ANIME], ["movies", ListType.MOVIES]]
+    all_lists = [["series", ListType.SERIES, user.time_spent_series],
+                 ["anime", ListType.ANIME, user.time_spent_anime],
+                 ["movies", ListType.MOVIES, user.time_spent_movies]]
 
     # Create dict with media as key; values are dict or list of dict with the data
     media_dict = {}
     for list_type in all_lists:
         media_count = get_media_count(user.id, list_type[1])
         media_levels = get_media_levels(user, list_type[1])
-        media_time = user.time_spent_series + user.time_spent_anime + user.time_spent_movies
+        media_time = list_type[2]
 
         if list_type[1] != ListType.MOVIES:
             media_total_eps = get_total_eps(user.id, list_type[1])
