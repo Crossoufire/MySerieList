@@ -1,8 +1,8 @@
 
 Medialists:
-	Add: Button "More results" to the autocomplete
+	Add: Button 'More results' to the autocomplete
 	Add: Movie director in metadata modal
-	Add: In modal add "Also in the list of" kind of info of followed people
+	Add: In modal add 'Also in the list of' kind of info of followed people
 	Add: If API is down, user can still add a media but check in our database instead of the API
 
 Advanced Statistics:

@@ -1,4 +1,4 @@
-from MyLists import db, app
+from MyLists import db, current_app
 from flask_login import current_user
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import Admin, expose, AdminIndexView

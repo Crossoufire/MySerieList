@@ -24,13 +24,6 @@ hr {
         <form method="POST" action="" enctype="multipart/form-data">
             {{ settings_form.hidden_tag() }}
             <div class="m-t-30">
-                {{ settings_form.biography.label }}<br>
-                {{ settings_form.biography(size=32) }}<br>
-                {% for error in settings_form.biography.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </div>
-            <div class="m-t-30">
                 {{ settings_form.username.label }}<br>
                 {{ settings_form.username(size=28) }}<br>
                 {% for error in settings_form.username.errors %}

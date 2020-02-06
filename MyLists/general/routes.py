@@ -1,8 +1,8 @@
 from flask import Blueprint
 from datetime import datetime
 from sqlalchemy import func, text
-from MyLists import app, db, bcrypt
 from MyLists.API_data import ApiData
+from MyLists import current_app, db, bcrypt
 from flask_login import current_user, login_required
 from flask import render_template, url_for, flash, redirect, request
 from MyLists.general.functions import refresh_db_badges, compute_media_time_spent, add_badges_to_db, get_trending_data,\
@@ -15,7 +15,7 @@ from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, 
 bp = Blueprint('general', __name__)
 
 
-@app.before_first_request
+@bp.before_app_first_request
 def create_user():
     db.create_all()
     if User.query.filter_by(id='1').first() is None:
@@ -48,7 +48,7 @@ def create_user():
     compute_media_time_spent(ListType.MOVIES)
 
 
-@app.route("/global_stats", methods=['GET'])
+@bp.route("/global_stats", methods=['GET'])
 @login_required
 def global_stats():
     # Total time spent for each media
@@ -247,7 +247,7 @@ def global_stats():
                            most_genres_media=most_genres_media)
 
 
-@app.route("/current_trends", methods=['GET'])
+@bp.route("/current_trends", methods=['GET'])
 @login_required
 def current_trends():
     # Recover the trending media data from the API

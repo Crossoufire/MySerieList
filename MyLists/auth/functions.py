@@ -2,8 +2,8 @@ import os
 import platform
 
 from flask import url_for
-from MyLists import app, mail
 from flask_mail import Message
+from MyLists import current_app, mail
 
 
 def send_reset_email(user):

@@ -1,4 +1,4 @@
-from MyLists import app, db
+from MyLists import current_app, db
 from MyLists.profile.forms import AddFollowForm
 from MyLists.models import User, ListType, Ranks
 from flask_login import login_required, current_user
@@ -50,18 +50,19 @@ def account(user_name):
     user_data = get_user_data(user)
     # Recover media data
     media_data = get_media_data(user)
-    # Recover follows data
-    follows_list = get_follows_data(user)
+    # Recover follows data and last updates
+    follows_list, follows_update_list = get_follows_data(user)
 
     return render_template('account.html',
                            title="{}'s account".format(user.username),
                            user_data=user_data,
                            media_data=media_data,
                            follow_form=follow_form,
-                           follows_list=follows_list)
+                           follows_list=follows_list,
+                           follows_update_list=follows_update_list)
 
 
-@app.route("/hall_of_fame", methods=['GET'])
+@bp.route("/hall_of_fame", methods=['GET'])
 @login_required
 def hall_of_fame():
     users = User.query.filter(User.id >= "2", User.active == True).order_by(User.username.asc()).all()
@@ -103,7 +104,7 @@ def hall_of_fame():
     return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
 
 
-@app.route("/badges/<user_name>", methods=['GET', 'POST'])
+@bp.route("/badges/<user_name>", methods=['GET', 'POST'])
 @login_required
 def badges(user_name):
     user = User.query.filter_by(username=user_name).first()
@@ -118,25 +119,25 @@ def badges(user_name):
     elif user.private and not current_user.is_following(user):
         abort(404)
 
-    user_badges = get_badges(user.id)[0]
+    user_badges = get_badges(user)[0]
     return render_template('badges.html', title="{}'s badges".format(user_name), user_badges=user_badges)
 
 
-@app.route("/level_grade_data", methods=['GET'])
+@bp.route("/level_grade_data", methods=['GET'])
 @login_required
 def level_grade_data():
     ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
     return render_template('level_grade_data.html', title='Level grade data', data=ranks)
 
 
-@app.route("/knowledge_grade_data", methods=['GET'])
+@bp.route("/knowledge_grade_data", methods=['GET'])
 @login_required
 def knowledge_grade_data():
     ranks = Ranks.query.filter_by(type='knowledge_rank\n').order_by(Ranks.level.asc()).all()
     return render_template('knowledge_grade_data.html', title='Knowledge grade data', data=ranks)
 
 
-@app.route("/follow_status", methods=['POST'])
+@bp.route("/follow_status", methods=['POST'])
 @login_required
 def follow_status():
     try:

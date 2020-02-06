@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from MyLists import db, app
+from MyLists import db, current_app
 from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify
@@ -101,7 +101,7 @@ def mymedialist(media_list, user_name):
                                target_user_id=str(user.id))
 
 
-@app.route("/movies_collection/<user_name>", methods=['GET'])
+@bp.route("/movies_collection/<user_name>", methods=['GET'])
 @login_required
 def movies_collection(user_name):
     user = User.query.filter_by(username=user_name).first()
@@ -189,7 +189,7 @@ def update_element_season():
         old_episode = anime_list.last_episode_watched
         anime_list.current_season = new_season
         anime_list.last_episode_watched = 1
-        app.logger.info("[{}] Anime season with ID {} updated: {}".format(current_user.id, element_id, new_season))
+        current_app.logger.info("[{}] Anime season with ID {} updated: {}".format(current_user.id, element_id, new_season))
 
         # Commit the changes
         db.session.commit()
@@ -223,7 +223,7 @@ def update_element_season():
         old_episode = series_list.last_episode_watched
         series_list.current_season = new_season
         series_list.last_episode_watched = 1
-        app.logger.info('[{}] Series season with ID {} updated: {}'.format(current_user.id, element_id, new_season))
+        current_app.logger.info('[{}] Series season with ID {} updated: {}'.format(current_user.id, element_id, new_season))
 
         # Commit the changes
         db.session.commit()
@@ -277,7 +277,7 @@ def update_element_episode():
         old_season = anime_list.current_season
         old_episode = anime_list.last_episode_watched
         anime_list.last_episode_watched = new_episode
-        app.logger.info('[{}] Anime episode with ID {} updated: {}'.format(current_user.id, element_id, new_episode))
+        current_app.logger.info('[{}] Anime episode with ID {} updated: {}'.format(current_user.id, element_id, new_episode))
 
         # Commit the changes
         db.session.commit()
@@ -310,7 +310,7 @@ def update_element_episode():
         old_season = series_list.current_season
         old_episode = series_list.last_episode_watched
         series_list.last_episode_watched = new_episode
-        app.logger.info('[{}] Series episode with ID {} updated: {}'.format(current_user.id, element_id, new_episode))
+        current_app.logger.info('[{}] Series episode with ID {} updated: {}'.format(current_user.id, element_id, new_episode))
 
         # Commit the changes
         db.session.commit()
@@ -364,7 +364,7 @@ def delete_element():
         # Delete the media from the account' list
         SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).delete()
         db.session.commit()
-        app.logger.info('[{}] Series with ID {} deleted'.format(current_user.id, element_id))
+        current_app.logger.info('[{}] Series with ID {} deleted'.format(current_user.id, element_id))
     elif list_type == ListType.ANIME:
         # Check if anime exists in the database
         anime = Anime.query.filter_by(id=element_id).first()
@@ -387,7 +387,7 @@ def delete_element():
         # Delete the media from the account' list
         AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).delete()
         db.session.commit()
-        app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.id, element_id))
+        current_app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.id, element_id))
     elif list_type == ListType.MOVIES:
         # Check if movie exists in the database
         movies = Movies.query.filter_by(id=element_id).first()
@@ -405,7 +405,7 @@ def delete_element():
         # Delete the media from the account' list
         MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).delete()
         db.session.commit()
-        app.logger.info('[{}] Movie with ID {} deleted'.format(current_user.id, element_id))
+        current_app.logger.info('[{}] Movie with ID {} deleted'.format(current_user.id, element_id))
 
     return '', 204
 
@@ -490,7 +490,7 @@ def change_element_category():
                            list_type=list_type)
 
     db.session.commit()
-    app.logger.info('[{}] Category of the element with ID {} ({}) changed to {}'
+    current_app.logger.info('[{}] Category of the element with ID {} ({}) changed to {}'
                     .format(current_user.id, element_id, list_type, new_status))
 
     return '', 204

@@ -1,8 +1,8 @@
 import secrets
 
 from flask import flash
-from MyLists import db, app
 from datetime import datetime
+from MyLists import db, current_app
 from flask_login import current_user
 from MyLists.API_data import ApiData
 from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
@@ -352,7 +352,7 @@ def add_element_to_user(element_id, user_id, list_type, status):
         # Commit the changes
         db.session.add(user_list)
         db.session.commit()
-        app.logger.info('[{}] Added a series with the ID {}'.format(user_id, element_id))
+        current_app.logger.info('[{}] Added a series with the ID {}'.format(user_id, element_id))
 
         # Set the last update
         media = Series.query.filter_by(id=element_id).first()
@@ -376,7 +376,7 @@ def add_element_to_user(element_id, user_id, list_type, status):
         # Commit the changes
         db.session.add(user_list)
         db.session.commit()
-        app.logger.info('[{}] Added an anime with the ID {}'.format(user_id, element_id))
+        current_app.logger.info('[{}] Added an anime with the ID {}'.format(user_id, element_id))
 
         # Set the last update
         media = Anime.query.filter_by(id=element_id).first()
@@ -396,7 +396,7 @@ def add_element_to_user(element_id, user_id, list_type, status):
         # Commit the changes
         db.session.add(user_list)
         db.session.commit()
-        app.logger.info('[{}] Added movie with the ID {}'.format(user_id, element_id))
+        current_app.logger.info('[{}] Added movie with the ID {}'.format(user_id, element_id))
 
         # Set the last update
         media = Movies.query.filter_by(id=element_id).first()

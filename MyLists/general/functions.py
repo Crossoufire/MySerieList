@@ -8,10 +8,10 @@ import urllib.request
 from PIL import Image
 from pathlib import Path
 from flask import url_for
-from MyLists import db, app
 from sqlalchemy import func
 from datetime import datetime
 from MyLists.API_data import ApiData
+from MyLists import db, current_app, scheduler
 from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
     SeriesList, Series, MoviesList, Movies, Badges, SeriesActors, MoviesActors, MoviesCollections, AnimeActors, Ranks
 
@@ -149,7 +149,7 @@ def get_trending_data(trends_data, list_type):
 
 def refresh_db_badges():
     list_all_badges = []
-    path = Path(app.root_path, 'static/csv_data/badges.csv')
+    path = Path(current_app.root_path, 'static/csv_data/badges.csv')
     with open(path) as fp:
         for line in fp:
             list_all_badges.append(line.split(";"))
@@ -169,7 +169,7 @@ def refresh_db_badges():
 
 def refresh_db_ranks():
     list_all_ranks = []
-    path = Path(app.root_path, 'static/csv_data/ranks.csv')
+    path = Path(current_app.root_path, 'static/csv_data/ranks.csv')
     with open(path) as fp:
         for line in fp:
             list_all_ranks.append(line.split(";"))
@@ -187,7 +187,7 @@ def refresh_db_ranks():
 
 def add_ranks_to_db():
     list_all_ranks = []
-    path = Path(app.root_path, 'static/csv_data/ranks.csv')
+    path = Path(current_app.root_path, 'static/csv_data/ranks.csv')
     with open(path) as fp:
         for line in fp:
             list_all_ranks.append(line.split(";"))
@@ -203,7 +203,7 @@ def add_ranks_to_db():
 
 def add_badges_to_db():
     list_all_badges = []
-    path = Path(app.root_path, 'static/csv_data/badges.csv')
+    path = Path(current_app.root_path, 'static/csv_data/badges.csv')
     with open(path) as fp:
         for line in fp:
             list_all_badges.append(line.split(";"))
@@ -228,7 +228,7 @@ def add_actors_movies():
         tmdb_movies_id = all_movies[i].themoviedb_id
         movies_id = all_movies[i].id
         response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
-                                .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']))
+                                .format(tmdb_movies_id, current_app.config['THEMOVIEDB_API_KEY']))
         element_actors = json.loads(response.text)
 
         try:
@@ -257,13 +257,13 @@ def add_actors_movies():
 
 
 def add_collections_movies():
-    local_covers_path = Path(app.root_path, "static\\covers\\movies_collection_covers\\")
+    local_covers_path = Path(current_app.root_path, "static\\covers\\movies_collection_covers\\")
     all_movies = Movies.query.filter_by(themoviedb_id=9799).all()
     for movie in all_movies:
         tmdb_movies_id = movie.themoviedb_id
         try:
             response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
-                                    .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']))
+                                    .format(tmdb_movies_id, current_app.config['THEMOVIEDB_API_KEY']))
 
             data = json.loads(response.text)
 
@@ -271,7 +271,7 @@ def add_collections_movies():
             collection_poster = data["belongs_to_collection"]["poster_path"]
 
             response_collection = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
-                                               .format(collection_id, app.config['THEMOVIEDB_API_KEY']))
+                                               .format(collection_id, current_app.config['THEMOVIEDB_API_KEY']))
 
             data_collection = json.loads(response_collection.text)
 
@@ -326,7 +326,7 @@ def add_actors_series():
         tmdb_series_id = all_series[i].themoviedb_id
         series_id = all_series[i].id
         response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
-                                .format(tmdb_series_id, app.config['THEMOVIEDB_API_KEY']))
+                                .format(tmdb_series_id, current_app.config['THEMOVIEDB_API_KEY']))
         element_actors = json.loads(response.text)
 
         try:
@@ -360,7 +360,7 @@ def add_actors_anime():
         tmdb_anime_id = all_anime[i].themoviedb_id
         anime_id = all_anime[i].id
         response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
-                                .format(tmdb_anime_id, app.config['THEMOVIEDB_API_KEY']))
+                                .format(tmdb_anime_id, current_app.config['THEMOVIEDB_API_KEY']))
         element_actors = json.loads(response.text)
 
         try:
@@ -402,7 +402,7 @@ def refresh_element_data(api_id, list_type):
         element = Movies.query.filter_by(themoviedb_id=api_id).first()
 
     if details_data is None or element is None:
-        app.logger.info('[SYSTEM] Could not refresh the element with the TMDb ID {}'.format(api_id))
+        current_app.logger.info('[SYSTEM] Could not refresh the element with the TMDb ID {}'.format(api_id))
     else:
         if list_type != ListType.MOVIES:
             name = details_data.get("name", "Unknown") or "Unkwown"
@@ -468,14 +468,14 @@ def refresh_element_data(api_id, list_type):
             # Refresh the cover
             if list_type == ListType.SERIES:
                 if platform.system() == "Windows":
-                    local_covers_path = os.path.join(app.root_path, "static\\covers\\series_covers\\")
+                    local_covers_path = os.path.join(current_app.root_path, "static\\covers\\series_covers\\")
                 else:  # Linux & macOS
-                    local_covers_path = os.path.join(app.root_path, "static/covers/series_covers/")
+                    local_covers_path = os.path.join(current_app.root_path, "static/covers/series_covers/")
             elif list_type == ListType.ANIME:
                 if platform.system() == "Windows":
-                    local_covers_path = os.path.join(app.root_path, "static\\covers\\anime_covers\\")
+                    local_covers_path = os.path.join(current_app.root_path, "static\\covers\\anime_covers\\")
                 else:  # Linux & macOS
-                    local_covers_path = os.path.join(app.root_path, "static/covers/anime_covers/")
+                    local_covers_path = os.path.join(current_app.root_path, "static/covers/anime_covers/")
 
             # Refresh the cover
             try:
@@ -487,7 +487,7 @@ def refresh_element_data(api_id, list_type):
                     img = img.resize((300, 450), Image.ANTIALIAS)
                     img.save(local_covers_path + element.image_cover, quality=90)
             except:
-                app.logger.info("Error while refreshing the cover of ID {}".format(element.id))
+                current_app.logger.info("Error while refreshing the cover of ID {}".format(element.id))
                 pass
 
             # Refresh the data for Anime/Series
@@ -535,7 +535,7 @@ def refresh_element_data(api_id, list_type):
 
             element.last_update = datetime.utcnow()
             db.session.commit()
-            app.logger.info("[SYSTEM] Refreshed the series/anime with the ID {}".format(element.id))
+            current_app.logger.info("[SYSTEM] Refreshed the series/anime with the ID {}".format(element.id))
         elif list_type == ListType.MOVIES:
             release_date = details_data.get("release_date", "Unknown") or "Unknown"
             homepage = details_data.get("homepage", "Unknown") or "Unknown"
@@ -554,9 +554,9 @@ def refresh_element_data(api_id, list_type):
 
             # Refresh the cover
             if platform.system() == "Windows":
-                local_covers_path = os.path.join(app.root_path, "static\\covers\\movies_covers\\")
+                local_covers_path = os.path.join(current_app.root_path, "static\\covers\\movies_covers\\")
             else:  # Linux & macOS
-                local_covers_path = os.path.join(app.root_path, "static/covers/movies_covers/")
+                local_covers_path = os.path.join(current_app.root_path, "static/covers/movies_covers/")
 
             # Refresh the cover
             try:
@@ -568,7 +568,7 @@ def refresh_element_data(api_id, list_type):
                     img = img.resize((300, 450), Image.ANTIALIAS)
                     img.save(local_covers_path + element.image_cover, quality=90)
             except:
-                app.logger.info("Error while refreshing the movie cover of ID {}".format(element.id))
+                current_app.logger.info("Error while refreshing the movie cover of ID {}".format(element.id))
                 pass
 
             # Refresh the movies data
@@ -589,11 +589,13 @@ def refresh_element_data(api_id, list_type):
             # TODO: Refresh genres and actors
 
             db.session.commit()
-            app.logger.info("[SYSTEM] Refreshed the movie with the ID {}".format(element.id))
+            current_app.logger.info("[SYSTEM] Refreshed the movie with the ID {}".format(element.id))
+    # your scheduled task code here
 
 
+@scheduler.task('cron', id="{}".format(secrets.token_hex(8)), hour=3)
 def automatic_media_refresh():
-    app.logger.info('[SYSTEM] Starting automatic refresh')
+    current_app.logger.info('[SYSTEM] Starting automatic refresh')
 
     # Recover all the data
     all_movies = Movies.query.all()
@@ -618,12 +620,12 @@ def automatic_media_refresh():
     # Recover from API all the changed Movies ID
     try:
         response = requests.get("https://api.themoviedb.org/3/movie/changes?api_key={0}"
-                                .format(app.config['THEMOVIEDB_API_KEY']))
+                                .format(current_app.config['THEMOVIEDB_API_KEY']))
     except Exception as e:
-        app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+        current_app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
         return
     if response.status_code == 401:
-        app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
+        current_app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
         return
 
     try:
@@ -634,12 +636,12 @@ def automatic_media_refresh():
     # Recover from API all the changed series/anime ID
     try:
         response = requests.get("https://api.themoviedb.org/3/tv/changes?api_key={0}"
-                                .format(app.config['THEMOVIEDB_API_KEY']))
+                                .format(current_app.config['THEMOVIEDB_API_KEY']))
     except Exception as e:
-        app.logger.error('[SYSTEM] Error requesting themoviedb API : {}'.format(e))
+        current_app.logger.error('[SYSTEM] Error requesting themoviedb API : {}'.format(e))
         return
     if response.status_code == 401:
-        app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
+        current_app.logger.error('[SYSTEM] Error requesting themoviedb API : invalid API key')
         return
 
     try:
@@ -662,7 +664,4 @@ def automatic_media_refresh():
         if element["id"] in all_anime_tmdb_id_list:
             refresh_element_data(element["id"], ListType.ANIME)
 
-    app.logger.info('[SYSTEM] Automatic refresh completed')
-
-
-app.apscheduler.add_job(func=automatic_media_refresh, trigger='cron', hour=3, id="{}".format(secrets.token_hex(8)))
+    current_app.logger.info('[SYSTEM] Automatic refresh completed')

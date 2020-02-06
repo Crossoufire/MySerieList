@@ -1,6 +1,6 @@
 from datetime import datetime
-from MyLists import app, bcrypt, db
 from MyLists.models import User, HomePage
+from MyLists import current_app, bcrypt, db
 from MyLists.auth.functions import send_register_email, send_reset_email
 from flask_login import login_user, current_user, logout_user, login_required
 from flask import Blueprint, flash, request, redirect, url_for, abort, render_template
@@ -29,7 +29,8 @@ def home():
                 return redirect(next_page)
             else:
                 if user.homepage != HomePage.ACCOUNT or user.homepage != HomePage.HALL_OF_FAME:
-                    return redirect(url_for('main.mymedialist', media_list=user.homepage.value, user_name=current_user.username))
+                    return redirect(url_for('main.mymedialist', media_list=user.homepage.value,
+                                            user_name=current_user.username))
                 elif user.homepage == HomePage.ACCOUNT:
                     return redirect(url_for('profile.account', user_name=current_user.username))
                 elif user.homepage == HomePage.HALL_OF_FAME:
@@ -57,7 +58,8 @@ def home():
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.id).first()
         if user.homepage != HomePage.ACCOUNT or user.homepage != HomePage.HALL_OF_FAME:
-            return redirect(url_for('main.mymedialist', media_list=user.homepage.value, user_name=current_user.username))
+            return redirect(url_for('main.mymedialist', media_list=user.homepage.value,
+                                    user_name=current_user.username))
         elif user.homepage == HomePage.ACCOUNT:
             return redirect(url_for('profile.account', user_name=current_user.username))
         elif user.homepage == HomePage.HALL_OF_FAME:

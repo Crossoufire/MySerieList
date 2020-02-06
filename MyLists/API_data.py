@@ -5,9 +5,9 @@ import requests
 import urllib.request
 
 from PIL import Image
-from MyLists import app
 from flask import url_for
 from jikanpy import Jikan
+from MyLists import current_app
 from MyLists.models import ListType
 
 

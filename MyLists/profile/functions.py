@@ -11,7 +11,7 @@ from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, Movi
 
 def get_media_count(user_id, list_type):
     if list_type == ListType.SERIES:
-        media_count = db.session.query(SeriesList.status, func.count(SeriesList.status))\
+        media_count = db.session.query(SeriesList.status, func.count(SeriesList.status)) \
             .filter_by(user_id=user_id).group_by(SeriesList.status).all()
     if list_type == ListType.ANIME:
         media_count = db.session.query(AnimeList.status, func.count(AnimeList.status)) \
@@ -97,8 +97,8 @@ def get_media_levels(user, list_type):
 
 def get_knowledge_grade(user):
     # Compute the corresponding level and percentage from the media time
-    knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) + \
-                      int((((400+80*user.time_spent_anime)**(1/2))-20)/40) + \
+    knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
+                      int((((400+80*user.time_spent_anime)**(1/2))-20)/40) +\
                       int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
 
     query_rank = Ranks.query.filter_by(level=knowledge_level, type='knowledge_rank\n').first()
@@ -112,20 +112,6 @@ def get_knowledge_grade(user):
     return {"level": knowledge_level,
             "grade_id": grade_id,
             "grade_title": grade_title}
-
-
-def get_media_time(user, list_type=None, total_time=False):
-    if total_time:
-        total_time_spent = user.time_spent_series + user.time_spent_series + user.time_spent_series
-        return total_time_spent
-    else:
-        if list_type == ListType.SERIES:
-            time_in_min = user.time_spent_series
-        elif list_type == ListType.ANIME:
-            time_in_min = user.time_spent_anime
-        elif list_type == ListType.MOVIES:
-            time_in_min = user.time_spent_movies
-        return time_in_min
 
 
 def get_updates(last_update):
@@ -215,7 +201,8 @@ def get_media_data(user):
     for list_type in all_lists:
         media_count = get_media_count(user.id, list_type[1])
         media_levels = get_media_levels(user, list_type[1])
-        media_time = get_media_time(user, list_type[1])
+        media_time = user.time_spent_series + user.time_spent_anime + user.time_spent_movies
+
         if list_type[1] != ListType.MOVIES:
             media_total_eps = get_total_eps(user.id, list_type[1])
         else:
@@ -240,43 +227,42 @@ def get_follows_data(user):
         followed_by_user = user.followed.all()
         current_user_follows = current_user.followed.all()
 
-        follows_to_display = []
+        follows_list = []
         for follow in followed_by_user:
             if follow.private:
                 if follow in current_user_follows or current_user.id == follow.id:
-                    follows_to_display.append(follow.id)
+                    follows_list.append(follow)
             else:
-                follows_to_display.append(follow.id)
+                follows_list.append(follow)
+
+        follows_to_update = []
+        for follow in follows_list:
+            follows_to_update.append(follow.id)
 
         follows_update = db.session.query(User, followers, UserLastUpdate)\
-            .outerjoin(followers, followers.c.followed_id == User.id)\
-            .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
-            .filter(followers.c.followed_id.in_(follows_to_display), followers.c.follower_id == user.id)\
+            .join(followers, followers.c.followed_id == User.id)\
+            .join(UserLastUpdate, UserLastUpdate.user_id == User.id)\
+            .filter(followers.c.followed_id.in_(follows_to_update), followers.c.follower_id == user.id)\
             .order_by(UserLastUpdate.date.desc()).all()
     else:
         follows_update = db.session.query(User, followers, UserLastUpdate)\
-            .outerjoin(followers, followers.c.followed_id == User.id)\
-            .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
+            .join(followers, followers.c.followed_id == User.id)\
+            .join(UserLastUpdate, UserLastUpdate.user_id == User.id)\
             .filter(followers.c.follower_id == user.id)\
             .order_by(UserLastUpdate.date.desc()).all()
 
-    print(follows_update)
+        follows_list = user.followed.all()
 
     follows_update_list = []
     for follow in follows_update[:7]:
         follows = {'username': follow[0].username}
-        if follow[3] is not None:
-            follows.update(get_updates([follow[3]])[0])
+        follows.update(get_updates([follow[3]])[0])
         follows_update_list.append(follows)
 
-    print(follows_update_list)
-
-    return follows_update_list
+    return follows_list, follows_update_list
 
 
-def get_badges(user_id):
-    user = User.query.filter_by(id=user_id).first()
-
+def get_badges(user):
     def get_queries():
         series_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
                                        func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
@@ -284,7 +270,7 @@ def get_badges(user_id):
             .join(SeriesList, SeriesList.series_id == Series.id)\
             .join(SeriesGenre, SeriesGenre.series_id == Series.id)\
             .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id)\
-            .filter(SeriesList.user_id == user_id)\
+            .filter(SeriesList.user_id == user.id)\
             .filter(or_(SeriesGenre.genre == "Animation", SeriesGenre.genre == "Comedy", SeriesGenre.genre == "Crime",
                         SeriesGenre.genre == "Documentary", SeriesGenre.genre == "Mystery",
                         SeriesGenre.genre == "Historical", SeriesGenre.genre == "War & Politics",
@@ -297,7 +283,7 @@ def get_badges(user_id):
             .join(AnimeList, AnimeList.anime_id == Anime.id)\
             .join(AnimeGenre, AnimeGenre.anime_id == Anime.id)\
             .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id)\
-            .filter(AnimeList.user_id == user_id) \
+            .filter(AnimeList.user_id == user.id) \
             .filter(or_(AnimeGenre.genre == "Comedy", AnimeGenre.genre == "Police", AnimeGenre.genre == "Supernatural",
                         AnimeGenre.genre == "Music", AnimeGenre.genre == "Mystery", AnimeGenre.genre == "Historical",
                         AnimeGenre.genre == "Romance", AnimeGenre.genre == "Sci-Fi", AnimeGenre.genre == "Fantasy",
@@ -308,7 +294,7 @@ def get_badges(user_id):
         movies_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre.distinct()))\
             .join(MoviesList, MoviesList.movies_id == Movies.id)\
             .join(MoviesGenre, MoviesGenre.movies_id == Movies.id)\
-            .filter(MoviesList.user_id == user_id) \
+            .filter(MoviesList.user_id == user.id) \
             .filter(or_(MoviesGenre.genre == "Comedy", MoviesGenre.genre == "Crime", MoviesGenre.genre == "Music",
                         MoviesGenre.genre == "Mystery", MoviesGenre.genre == "History",
                         MoviesGenre.genre == "Documentary", MoviesGenre.genre == "Romance",
@@ -356,7 +342,7 @@ def get_badges(user_id):
         return badge_data
 
     total_data = get_queries()
-    time_spent = get_media_time(user, total_time=True)
+    time_spent = user.time_spent_series + user.time_spent_anime + user.time_spent_movies
 
     all_badges = []
     time_by_genre = {}
@@ -508,57 +494,3 @@ def get_badges(user_id):
         total_unlocked += item["unlocked"]
 
     return [all_badges, total_unlocked]
-
-
-## Backup old function follow data
-# def get_follows_data_backup(user):
-#     # If not current_user, check follows to show (remove the private ones if current user does not follow them)
-#     if current_user.id != user.id:
-#         followed_by_user = user.followed.all()
-#         current_user_follows = current_user.followed.all()
-#
-#         follows_to_display = []
-#         for follow in followed_by_user:
-#             if follow.private:
-#                 if follow in current_user_follows or current_user.id == follow.id:
-#                     follows_to_display.append(follow.id)
-#             else:
-#                 follows_to_display.append(follow.id)
-#
-#         follows_update = db.session.query(User, followers, UserLastUpdate)\
-#             .join(followers, followers.c.followed_id == User.id)\
-#             .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
-#             .filter(followers.c.followed_id.in_(follows_to_display))\
-#             .order_by(UserLastUpdate.date.desc()).all()
-#     else:
-#         follows_update = db.session.query(User, followers, UserLastUpdate)\
-#             .join(followers, followers.c.followed_id == User.id)\
-#             .outerjoin(UserLastUpdate, UserLastUpdate.user_id == User.id)\
-#             .filter(followers.c.follower_id == user.id)\
-#             .order_by(UserLastUpdate.date.desc()).all()
-#
-#     # Dict for the last update of the follows tab, the keys are the username
-#     follow_dict_tab = {}
-#     for follow in follows_update:
-#         name = follow[0].username
-#         if name not in follow_dict_tab:
-#             follow_dict_tab[name] = {'user_id': follow[0].id,
-#                                      'picture': url_for('static', filename='profile_pics/{0}'
-#                                                         .format(follow[0].image_file)),
-#                                      'update': [follow[3]]}
-#         elif follow[3]:
-#             follow_dict_tab[name]['update'].append(follow[3])
-#
-#     # Convert the <UserLastUpdate> SQL object to dict to use in the template
-#     for name in follow_dict_tab:
-#         if follow_dict_tab[name]['update'][0] is not None:
-#             follow_dict_tab[name]['update'] = get_updates(follow_dict_tab[name]['update'])
-#
-#     # List of dict for the follows last update in overview tab
-#     follow_list_overview = []
-#     for follow in follows_update[:6]:
-#         follows = {'username': follow[0].username}
-#         follows.update(get_updates([follow[3]])[0])
-#         follow_list_overview.append(follows)
-#
-#     return follow_list_overview, follow_dict_tab

@@ -560,13 +560,17 @@
                     </form>
                     {% endif %}
                     <div class='row no-gutters text-center' style="margin-bottom: -15px;">
-                        {% for update in follows_list %}
+                        {% if follows_list %}
+                        {% for follow in follows_list %}
                         <div class="col-3 m-b-15">
-                            <a href="{{ update['username'] }}" data-toggle="tooltip" title="{{ update['username'] }}">
-                                <img width='50' height='50' src="{{ update['username'] }}">
+                            <a href="{{ follow.username }}" data-toggle="tooltip" title="{{ follow.username }}">
+                                <img width='50' height='50' src="{{ url_for('static', filename='profile_pics/{}'.format(follow.image_file)) }}">
                             </a>
                         </div>
                         {% endfor %}
+                        {% else %}
+                        <div class="m-b-10" style="color: grey;"><i>No follows to display.</i></div>
+                        {% endif %}
                     </div>
                 </li>
                 <li class="m-b-20">
@@ -577,8 +581,8 @@
                         </h4>
                     </div>
                     <hr class='m-b-8'>
-                    {% for update in follows_list %}
-                    {% if update['category'] %}
+                    {% if follows_update_list %}
+                    {% for update in follows_update_list %}
                     {% if update['category'] == 'anime' %}
                     <div class="tata m-b-5" style="border-bottom: solid 1px #945141;">
                         <div style="font-size: 12pt;">
@@ -631,9 +635,10 @@
                             {{ update['username'] }}
                         </a>
                     </div>
-                    {% else %}
-                    {% endif %}
                     {% endfor %}
+                    {% else %}
+                    <div class="m-b-10" style="color: grey;"><i>No updates to display.</i></div>
+                    {% endif %}
                 </li>
             </ul>
         </div>
