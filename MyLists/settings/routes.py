@@ -1,5 +1,5 @@
 from MyLists.models import HomePage, User
-from MyLists import db, current_app, bcrypt
+from MyLists import db, app, bcrypt
 from flask_login import login_required, current_user
 from MyLists.settings.forms import UpdateAccountForm, ChangePasswordForm
 from flask import Blueprint, flash, request, render_template, redirect, url_for
@@ -20,36 +20,36 @@ def settings():
         if settings_form.picture.data:
             old_picture_file = current_user.image_file
             current_user.image_file = save_profile_picture(settings_form.picture.data)
-            current_app.logger.info('[{}] Settings updated: Old picture file = {}. New picture file = {}'
+            app.logger.info('[{}] Settings updated: Old picture file = {}. New picture file = {}'
                             .format(current_user.id, old_picture_file, current_user.image_file))
         if settings_form.username.data != current_user.username:
             old_username = current_user.username
             current_user.username = settings_form.username.data
-            current_app.logger.info('[{}] Settings updated: Old username = {}. New username = {}'
+            app.logger.info('[{}] Settings updated: Old username = {}. New username = {}'
                             .format(current_user.id, old_username, current_user.username))
         if settings_form.isprivate.data != current_user.private:
             old_value = current_user.private
             current_user.private = settings_form.isprivate.data
-            current_app.logger.info('[{}] Settings updated: Old private mode = {}. New private mode = {}'
+            app.logger.info('[{}] Settings updated: Old private mode = {}. New private mode = {}'
                             .format(current_user.id, old_value, settings_form.isprivate.data))
 
         old_homepage = current_user.homepage
         current_user.homepage = HomePage(settings_form.homepage.data)
-        current_app.logger.info('[{}] Settings updated: Old homepage = {}. New homepage = {}'
+        app.logger.info('[{}] Settings updated: Old homepage = {}. New homepage = {}'
                         .format(current_user.id, old_homepage, HomePage(settings_form.homepage.data)))
 
         email_changed = False
         if settings_form.email.data != current_user.email:
             old_email = current_user.email
             current_user.transition_email = settings_form.email.data
-            current_app.logger.info('[{}] Settings updated : Old email = {}. New email = {}'
+            app.logger.info('[{}] Settings updated : Old email = {}. New email = {}'
                             .format(current_user.id, old_email, current_user.transition_email))
             email_changed = True
             if send_email_update_email(current_user):
                 success = True
             else:
                 success = False
-                current_app.logger.error('[SYSTEM] Error while sending the email update email to {}'.format(current_user.email))
+                app.logger.error('[SYSTEM] Error while sending the email update email to {}'.format(current_user.email))
         if not email_changed:
             flash("Your settings has been updated! ", 'success')
         else:
@@ -72,7 +72,7 @@ def settings():
         current_user.password = hashed_password
 
         db.session.commit()
-        current_app.logger.info('[{}] Password updated'.format(current_user.id))
+        app.logger.info('[{}] Password updated'.format(current_user.id))
         flash('Your password has been successfully updated!', 'success')
 
     return render_template('settings.html',
@@ -97,7 +97,7 @@ def email_update_token(token):
     user.email = user.transition_email
     user.transition_email = None
     db.session.commit()
-    current_app.logger.info('[{}] Email successfully changed from {} to {}'.format(user.id, old_email, user.email))
+    app.logger.info('[{}] Email successfully changed from {} to {}'.format(user.id, old_email, user.email))
     flash('Email successfully updated!', 'success')
 
     return redirect(url_for('auth.home'))

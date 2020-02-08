@@ -1,14 +1,15 @@
+from datetime import datetime
+
 from sqlalchemy import func
-from MyLists import db, current_app
+from MyLists import db, app
 from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify
 from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
-    add_element_to_user, add_element_in_base
+    add_element_to_user, add_element_in_db
 from MyLists.models import User, Movies, MoviesActors, MoviesGenre, Series, SeriesGenre, SeriesList, \
     SeriesEpisodesPerSeason, SeriesNetwork, Anime, AnimeActors, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, \
-    AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections
-
+    AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, UserLastUpdate
 
 bp = Blueprint('main', __name__)
 
@@ -189,7 +190,8 @@ def update_element_season():
         old_episode = anime_list.last_episode_watched
         anime_list.current_season = new_season
         anime_list.last_episode_watched = 1
-        current_app.logger.info("[{}] Anime season with ID {} updated: {}".format(current_user.id, element_id, new_season))
+        app.logger.info("[{}] Anime season with ID {} updated: {}"
+                                .format(current_user.id, element_id, new_season))
 
         # Commit the changes
         db.session.commit()
@@ -223,7 +225,8 @@ def update_element_season():
         old_episode = series_list.last_episode_watched
         series_list.current_season = new_season
         series_list.last_episode_watched = 1
-        current_app.logger.info('[{}] Series season with ID {} updated: {}'.format(current_user.id, element_id, new_season))
+        app.logger.info('[{}] Series season with ID {} updated: {}'
+                                .format(current_user.id, element_id, new_season))
 
         # Commit the changes
         db.session.commit()
@@ -277,7 +280,8 @@ def update_element_episode():
         old_season = anime_list.current_season
         old_episode = anime_list.last_episode_watched
         anime_list.last_episode_watched = new_episode
-        current_app.logger.info('[{}] Anime episode with ID {} updated: {}'.format(current_user.id, element_id, new_episode))
+        app.logger.info('[{}] Anime episode with ID {} updated: {}'
+                                .format(current_user.id, element_id, new_episode))
 
         # Commit the changes
         db.session.commit()
@@ -310,7 +314,8 @@ def update_element_episode():
         old_season = series_list.current_season
         old_episode = series_list.last_episode_watched
         series_list.last_episode_watched = new_episode
-        current_app.logger.info('[{}] Series episode with ID {} updated: {}'.format(current_user.id, element_id, new_episode))
+        app.logger.info('[{}] Series episode with ID {} updated: {}'
+                                .format(current_user.id, element_id, new_episode))
 
         # Commit the changes
         db.session.commit()
@@ -364,7 +369,7 @@ def delete_element():
         # Delete the media from the account' list
         SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).delete()
         db.session.commit()
-        current_app.logger.info('[{}] Series with ID {} deleted'.format(current_user.id, element_id))
+        app.logger.info('[{}] Series with ID {} deleted'.format(current_user.id, element_id))
     elif list_type == ListType.ANIME:
         # Check if anime exists in the database
         anime = Anime.query.filter_by(id=element_id).first()
@@ -387,7 +392,7 @@ def delete_element():
         # Delete the media from the account' list
         AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).delete()
         db.session.commit()
-        current_app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.id, element_id))
+        app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.id, element_id))
     elif list_type == ListType.MOVIES:
         # Check if movie exists in the database
         movies = Movies.query.filter_by(id=element_id).first()
@@ -405,7 +410,7 @@ def delete_element():
         # Delete the media from the account' list
         MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).delete()
         db.session.commit()
-        current_app.logger.info('[{}] Movie with ID {} deleted'.format(current_user.id, element_id))
+        app.logger.info('[{}] Movie with ID {} deleted'.format(current_user.id, element_id))
 
     return '', 204
 
@@ -490,7 +495,7 @@ def change_element_category():
                            list_type=list_type)
 
     db.session.commit()
-    current_app.logger.info('[{}] Category of the element with ID {} ({}) changed to {}'
+    app.logger.info('[{}] Category of the element with ID {} ({}) changed to {}'
                     .format(current_user.id, element_id, list_type, new_status))
 
     return '', 204
@@ -546,9 +551,9 @@ def add_element():
             if MoviesList.query.filter_by(user_id=current_user.id, movies_id=element.id).first():
                 flash("This movie is already in your list", "warning")
 
-        add_element_to_user(element.id, current_user.id, list_type, new_status)
+        add_element_to_user(element, current_user.id, list_type, new_status)
     else:
-        add_element_in_base(element_id, list_type, new_status)
+        add_element_in_db(element_id, list_type, new_status)
 
     return '', 204
 

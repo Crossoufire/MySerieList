@@ -5,16 +5,15 @@ Medialists:
 	Add: In modal add 'Also in the list of' kind of info of followed people
 	Add: If API is down, user can still add a media but check in our database instead of the API
 
-Advanced Statistics:
-	Add: Personal advanced statistics for media
-
 Homepage:
     Fix: Update pictures
 
 Account:
+	Add: Time watched by weeks, month and years
     Add: Change background image
-    Enhance: The settings tab CSS
-    Enhance: Change profile picture
+
+Settings:
+    Enhance: Better CSS
 
 General:
     Add: Contact form
@@ -22,9 +21,7 @@ General:
     Add: Collection Movies to finish (70%)
 
 Routes:
-    Enhance: By default create one admin user that only has admin view (HoF, Global Stats, Administration and Account settings) and one standard user
-    Enhance: Redo refresh_element_data() to be in ApiData.py
+    Enhance: By default create one admin user that only has admin view
+             (HoF, Global Stats, Administration and Account settings) and one standard user
     Enhance: Change the hamburger display to a vertical panel in mobile
-    Fix: Check ApiData.py and do some ameliorations (if needed)
-    Fix: Finish the new compute time function
     Add: Send mail when new season/movie is airing

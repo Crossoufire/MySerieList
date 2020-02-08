@@ -6,9 +6,9 @@ import urllib.request
 from PIL import Image
 from pathlib import Path
 from flask import url_for
+from MyLists import db, app
 from sqlalchemy import func
 from datetime import datetime
-from MyLists import db, current_app
 from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
     SeriesList, Series, MoviesList, Movies, Badges, SeriesActors, MoviesActors, MoviesCollections, AnimeActors, Ranks
 
@@ -149,7 +149,7 @@ def compute_media_time_spent(list_type):
 
 def add_ranks_to_db():
     list_all_ranks = []
-    path = Path(current_app.root_path, 'static/csv_data/ranks.csv')
+    path = Path(app.root_path, 'static/csv_data/ranks.csv')
     with open(path) as fp:
         for line in fp:
             list_all_ranks.append(line.split(";"))
@@ -165,7 +165,7 @@ def add_ranks_to_db():
 
 def refresh_db_ranks():
     list_all_ranks = []
-    path = Path(current_app.root_path, 'static/csv_data/ranks.csv')
+    path = Path(app.root_path, 'static/csv_data/ranks.csv')
     with open(path) as fp:
         for line in fp:
             list_all_ranks.append(line.split(";"))
@@ -180,7 +180,7 @@ def refresh_db_ranks():
 
 def add_badges_to_db():
     list_all_badges = []
-    path = Path(current_app.root_path, 'static/csv_data/badges.csv')
+    path = Path(app.root_path, 'static/csv_data/badges.csv')
     with open(path) as fp:
         for line in fp:
             list_all_badges.append(line.split(";"))
@@ -201,7 +201,7 @@ def add_badges_to_db():
 
 def refresh_db_badges():
     list_all_badges = []
-    path = Path(current_app.root_path, 'static/csv_data/badges.csv')
+    path = Path(app.root_path, 'static/csv_data/badges.csv')
     with open(path) as fp:
         for line in fp:
             list_all_badges.append(line.split(";"))
@@ -228,7 +228,7 @@ def add_actors_movies():
         tmdb_movies_id = all_movies[i].themoviedb_id
         movies_id = all_movies[i].id
         response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
-                                .format(tmdb_movies_id, current_app.config['THEMOVIEDB_API_KEY']))
+                                .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']))
         element_actors = json.loads(response.text)
 
         try:
@@ -257,13 +257,13 @@ def add_actors_movies():
 
 
 def add_collections_movies():
-    local_covers_path = Path(current_app.root_path, "static\\covers\\movies_collection_covers\\")
+    local_covers_path = Path(app.root_path, "static\\covers\\movies_collection_covers\\")
     all_movies = Movies.query.filter_by(themoviedb_id=9799).all()
     for movie in all_movies:
         tmdb_movies_id = movie.themoviedb_id
         try:
             response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
-                                    .format(tmdb_movies_id, current_app.config['THEMOVIEDB_API_KEY']))
+                                    .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']))
 
             data = json.loads(response.text)
 
@@ -271,7 +271,7 @@ def add_collections_movies():
             collection_poster = data["belongs_to_collection"]["poster_path"]
 
             response_collection = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
-                                               .format(collection_id, current_app.config['THEMOVIEDB_API_KEY']))
+                                               .format(collection_id, app.config['THEMOVIEDB_API_KEY']))
 
             data_collection = json.loads(response_collection.text)
 
@@ -326,7 +326,7 @@ def add_actors_series():
         tmdb_series_id = all_series[i].themoviedb_id
         series_id = all_series[i].id
         response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
-                                .format(tmdb_series_id, current_app.config['THEMOVIEDB_API_KEY']))
+                                .format(tmdb_series_id, app.config['THEMOVIEDB_API_KEY']))
         element_actors = json.loads(response.text)
 
         try:
@@ -360,7 +360,7 @@ def add_actors_anime():
         tmdb_anime_id = all_anime[i].themoviedb_id
         anime_id = all_anime[i].id
         response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
-                                .format(tmdb_anime_id, current_app.config['THEMOVIEDB_API_KEY']))
+                                .format(tmdb_anime_id, app.config['THEMOVIEDB_API_KEY']))
         element_actors = json.loads(response.text)
 
         try:

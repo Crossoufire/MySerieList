@@ -65,7 +65,7 @@
                         <a class="nav-item nav-link text-light" href="{{ url_for('profile.badges', user_name=current_user.username) }}">Badges</a>
                         <a class="nav-item nav-link text-light" href="{{ url_for('profile.account', user_name=current_user.username) }}">Profile</a>
                         {% if current_user.get_id() == '1' %}
-                        <a class="nav-item nav-link text-light" href="{{ url_for('admin.admin') }}">Administration</a>
+                        <a class="nav-item nav-link text-light" href="{{ url_for('general.admin') }}">Administration</a>
                         {% endif %}
                         <a class="nav-link text-light" href="{{ url_for('settings.settings') }}"><i class="fas fa-sm fa-cog"></i></a>
                         <a class="nav-link text-light" href="{{ url_for('auth.logout') }}"><i class="fas fa-sm fa-sign-out-alt"></i></a>

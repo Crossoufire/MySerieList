@@ -1,6 +1,4 @@
-import os
 import json
-import platform
 import requests
 import urllib.request
 
@@ -8,13 +6,13 @@ from PIL import Image
 from pathlib import Path
 from flask import url_for
 from jikanpy import Jikan
-from MyLists import current_app
+from MyLists import app
 from MyLists.models import ListType
 
 
 class ApiData:
     def __init__(self, ):
-        self.tmdb_api_key = current_app.config['THEMOVIEDB_API_KEY']
+        self.tmdb_api_key = app.config['THEMOVIEDB_API_KEY']
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
 
     def autocomplete_search(self, element_name, list_type):
@@ -26,7 +24,7 @@ class ApiData:
                 response = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
                                         .format(self.tmdb_api_key, element_name))
         except Exception as e:
-            current_app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
             return [{"nb_results": 0}]
 
         data = self.check_response_status(response)
@@ -78,7 +76,7 @@ class ApiData:
                     media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300",
                                                               data["results"][i]["poster_path"])
                 else:
-                    media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
+                    media_data["poster_path"] = url_for('static', filename="covers/series_covers/default.jpg")
 
                 first_air_date = data["results"][i].get("first_air_date")
                 if first_air_date:
@@ -102,7 +100,7 @@ class ApiData:
                     movies_data["poster_path"] = "{0}{1}".format("http://image.tmdb.org/t/p/w300",
                                                                  data["results"][i]["poster_path"])
                 else:
-                    movies_data["poster_path"] = url_for('static', filename="covers/movies_covers/default.jpg")
+                    movies_data["poster_path"] = url_for('static', filename="covers/series_covers/default.jpg")
 
                 release_date = data["results"][i].get("release_date")
 
@@ -128,7 +126,7 @@ class ApiData:
                 response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}&append_to_response=credits"
                                         .format(api_id, self.tmdb_api_key))
         except Exception as e:
-            current_app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
             return None
 
         data = self.check_response_status(response)
@@ -142,7 +140,7 @@ class ApiData:
             response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
                                     .format(collection_id, self.tmdb_api_key))
         except Exception as e:
-            current_app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
             return None
 
         data = self.check_response_status(response)
@@ -153,25 +151,25 @@ class ApiData:
 
     def save_api_cover(self, media_cover_path, media_cover_name, list_type, collection=False):
         if list_type == ListType.SERIES:
-            local_covers_path = Path(current_app.root_path, "static/covers/series_covers/")
+            local_covers_path = Path(app.root_path, "static/covers/series_covers/")
         elif list_type == ListType.ANIME:
-            local_covers_path = Path(current_app.root_path, "static/covers/anime_covers/")
+            local_covers_path = Path(app.root_path, "static/covers/anime_covers/")
         elif list_type == ListType.MOVIES:
             if collection is True:
-                local_covers_path = Path(current_app.root_path, "static/covers/movies_collection_covers/")
+                local_covers_path = Path(app.root_path, "static/covers/movies_collection_covers")
             else:
-                local_covers_path = Path(current_app.root_path, "static/covers/movies_covers/")
+                local_covers_path = Path(app.root_path, "static/covers/movies_covers")
 
         try:
             urllib.request.urlretrieve("{0}{1}".format(self.tmdb_poster_base_url, media_cover_path),
-                                       "{0}{1}".format(local_covers_path, media_cover_name))
+                                       "{0}/{1}".format(local_covers_path, media_cover_name))
         except Exception as e:
-            current_app.logger.error('[SYSTEM] Error trying to recover the poster: {}'.format(e))
+            app.logger.error('[SYSTEM] Error trying to recover the poster: {}'.format(e))
             return False
 
-        img = Image.open("{}{}".format(local_covers_path, media_cover_name))
+        img = Image.open("{}/{}".format(local_covers_path, media_cover_name))
         img = img.resize((300, 450), Image.ANTIALIAS)
-        img.save("{0}{1}".format(local_covers_path, media_cover_name), quality=90)
+        img.save("{0}/{1}".format(local_covers_path, media_cover_name), quality=90)
 
         return True
 
@@ -183,7 +181,7 @@ class ApiData:
             movies_response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
                                            .format(self.tmdb_api_key))
         except Exception as e:
-            current_app.logger.error('[SYSTEM] Error requesting themoviedb API or the Jikan API: {}'.format(e))
+            app.logger.error('[SYSTEM] Error requesting themoviedb API or the Jikan API: {}'.format(e))
             return None
 
         series_data = self.check_response_status(series_response)
@@ -207,7 +205,7 @@ class ApiData:
                 response = requests.get("https://api.themoviedb.org/3/movie/changes?api_key={0}"
                                         .format(self.tmdb_api_key))
         except Exception as e:
-            current_app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
             return None
 
         changed_data = self.check_response_status(response)
@@ -218,6 +216,12 @@ class ApiData:
 
     @staticmethod
     def get_anime_genres(anime_name):
+        """
+        "genres": [{"mal_id":1,"type":"anime","name":"Action","url":""},
+        {"mal_id":37,"type":"anime","name":"Supernatural","url":""},
+        {"mal_id":16,"type":"anime","name":"Magic","url":""},
+        {"mal_id":10,"type":"anime","name":"Fantasy","url":""}]
+        """
         try:
             response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(anime_name))
             data_mal = json.loads(response.text)
@@ -234,14 +238,14 @@ class ApiData:
         if response.status_code == 200:
             return json.loads(response.text)
         elif response.status_code == 401:
-            current_app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
         elif response.status_code == 404:
-            current_app.logger.error('[SYSTEM] Invalid id: The pre-requisite id is invalid or not found.')
+            app.logger.error('[SYSTEM] Invalid id: The pre-requisite id is invalid or not found.')
         elif response.status_code == 500:
-            current_app.logger.error('[SYSTEM] 	Internal error: Something went wrong, contact TMDb.')
+            app.logger.error('[SYSTEM] 	Internal error: Something went wrong, contact TMDb.')
         elif response.status_code == 503:
-            current_app.logger.error('[SYSTEM] Service offline: This service is temporarily offline, try again later.')
+            app.logger.error('[SYSTEM] Service offline: This service is temporarily offline, try again later.')
         elif response.status_code == 504:
-            current_app.logger.error('[SYSTEM] Your request to the backend server timed out. Try again.')
+            app.logger.error('[SYSTEM] Your request to the backend server timed out. Try again.')
 
         return False

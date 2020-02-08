@@ -6,11 +6,9 @@ from MyLists.API_data import ApiData
 from flask_login import current_user, login_required
 from flask import render_template, url_for, flash, redirect, request
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, get_trending_data, add_ranks_to_db
-from MyLists.main.functions import automatic_media_refresh
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, Anime, User, \
     AnimeList, AnimeEpisodesPerSeason, AnimeGenre, MoviesGenre, MoviesList, MoviesActors, SeriesActors, Movies, \
     AnimeActors
-
 
 bp = Blueprint('general', __name__)
 
@@ -31,10 +29,15 @@ def create_user():
         add_badges_to_db()
         add_ranks_to_db()
     db.session.commit()
-    automatic_media_refresh()
     compute_media_time_spent(ListType.SERIES)
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
+
+
+@bp.route("/admin", methods=['GET'])
+@login_required
+def admin():
+    return render_template('admin/index.html')
 
 
 @bp.route("/global_stats", methods=['GET'])

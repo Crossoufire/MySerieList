@@ -1,38 +1,59 @@
 {% extends "layout.html" %}
 
+
+{% block css %}
+<style>
+    .vertical_line {
+        width: 5px;
+        border-left: 2px solid rgba(44, 57, 70, 1);
+        height: 100wh;
+    }
+</style>
+{% endblock %}
+
+
 {% block content %}
-    <h2 class="m-t-30">Global</h2>
-    <ul>
-        <li><a href="{{ url_for('user.index_view') }}">User</a></li>
-        <li><a href="{{ url_for('follow.index_view') }}">Follow</a></li>
-        <li><a href="{{ url_for('user_last_update.index_view') }}">User Last Update</a></li>
-    </ul>
-
-    <h2 class="m-t-30">Series</h2>
-    <ul>
-        <li><a href="{{ url_for('series.index_view') }}">Series</a></li>
-        <li><a href="{{ url_for('series_list.index_view') }}">Series list</a></li>
-        <li><a href="{{ url_for('series_episodes_per_season.index_view') }}">Series episodes per season</a></li>
-        <li><a href="{{ url_for('series_genre.index_view') }}">Series genre</a></li>
-        <li><a href="{{ url_for('series_network.index_view') }}">Series network</a></li>
-        <li><a href="{{ url_for('series_actors.index_view') }}">Series actors</a></li>
-    </ul>
-
-    <h2 class="m-t-30">Anime</h2>
-    <ul>
-        <li><a href="{{ url_for('anime.index_view') }}">Anime</a></li>
-        <li><a href="{{ url_for('anime_list.index_view') }}">Anime list</a></li>
-        <li><a href="{{ url_for('anime_episodes_per_season.index_view') }}">Anime episodes per season</a></li>
-        <li><a href="{{ url_for('anime_genre.index_view') }}">Anime genre</a></li>
-        <li><a href="{{ url_for('anime_network.index_view') }}">Anime network</a></li>
-        <li><a href="{{ url_for('anime_actors.index_view') }}">Anime actors</a></li>
-    </ul>
-
-    <h2 class="m-t-30">Movies</h2>
-    <ul>
-        <li><a href="{{ url_for('movies.index_view') }}">Movies</a></li>
-        <li><a href="{{ url_for('movies_list.index_view') }}">Movies list</a></li>
-        <li><a href="{{ url_for('movies_genre.index_view') }}">Movies genre</a></li>
-        <li><a href="{{ url_for('movies_actors.index_view') }}">Movies actors</a></li>
-    </ul>
+<div class="row m-t-60">
+    <div class="col">
+        <h2>Users</h2>
+        <ul>
+            <li><a class='text-light' href="{{ url_for('user.index_view') }}">User</a></li>
+            <li><a class='text-light' href="{{ url_for('userlastupdate.index_view') }}">User Last Update</a></li>
+        </ul>
+    </div>
+    <div class="vertical_line"></div>
+    <div class="col">
+        <h2>Series</h2>
+        <ul>
+            <li><a class='text-light' href="{{ url_for('series.index_view') }}">Series</a></li>
+            <li><a class='text-light' href="{{ url_for('serieslist.index_view') }}">Series list</a></li>
+            <li><a class='text-light' href="{{ url_for('seriesepisodesperseason.index_view') }}">Series episodes per season</a></li>
+            <li><a class='text-light' href="{{ url_for('seriesgenre.index_view') }}">Series genre</a></li>
+            <li><a class='text-light' href="{{ url_for('seriesnetwork.index_view') }}">Series network</a></li>
+            <li><a class='text-light' href="{{ url_for('seriesactors.index_view') }}">Series actors</a></li>
+        </ul>
+     </div>
+    <div class="vertical_line"></div>
+    <div class="col">
+        <h2>Anime</h2>
+        <ul>
+            <li><a class='text-light' href="{{ url_for('anime.index_view') }}">Anime</a></li>
+            <li><a class='text-light' href="{{ url_for('animelist.index_view') }}">Anime list</a></li>
+            <li><a class='text-light' href="{{ url_for('animeepisodesperseason.index_view') }}">Anime episodes per season</a></li>
+            <li><a class='text-light' href="{{ url_for('animegenre.index_view') }}">Anime genre</a></li>
+            <li><a class='text-light' href="{{ url_for('animenetwork.index_view') }}">Anime network</a></li>
+            <li><a class='text-light' href="{{ url_for('animeactors.index_view') }}">Anime actors</a></li>
+        </ul>
+     </div>
+    <div class="vertical_line"></div>
+    <div class="col">
+        <h2>Movies</h2>
+        <ul>
+            <li><a class='text-light' href="{{ url_for('movies.index_view') }}">Movies</a></li>
+            <li><a class='text-light' href="{{ url_for('movieslist.index_view') }}">Movies list</a></li>
+            <li><a class='text-light' href="{{ url_for('moviesgenre.index_view') }}">Movies genre</a></li>
+            <li><a class='text-light' href="{{ url_for('moviesactors.index_view') }}">Movies actors</a></li>
+        </ul>
+ </div>
+</div>
 {% endblock %}
