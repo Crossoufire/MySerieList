@@ -1,7 +1,6 @@
-from datetime import datetime
-
 from sqlalchemy import func
 from MyLists import db, app
+from datetime import datetime
 from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify
@@ -10,6 +9,7 @@ from MyLists.main.functions import get_medialist_data, set_last_update, compute_
 from MyLists.models import User, Movies, MoviesActors, MoviesGenre, Series, SeriesGenre, SeriesList, \
     SeriesEpisodesPerSeason, SeriesNetwork, Anime, AnimeActors, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, UserLastUpdate
+
 
 bp = Blueprint('main', __name__)
 
@@ -121,7 +121,7 @@ def movies_collection(user_name):
                                         func.count(MoviesCollections.collection_id)) \
         .join(MoviesList, MoviesList.movies_id == Movies.id) \
         .join(MoviesCollections, MoviesCollections.collection_id == Movies.collection_id) \
-        .filter(Movies.collection_id != None, MoviesList.user_id == current_user.id,
+        .filter(Movies.collection_id != None, MoviesList.user_id == user.id,
                 MoviesList.status != Status.PLAN_TO_WATCH).group_by(Movies.collection_id).all()
 
     completed_collections = []
@@ -133,7 +133,9 @@ def movies_collection(user_name):
                       "overview": movie[2].overview,
                       "poster": '/static/covers/movies_collection_covers/' + movie[2].poster}
 
-        if movie_data["total"] == movie_data["parts"]:
+        if movie_data['total'] == 1:
+            pass
+        elif movie_data["total"] == movie_data["parts"]:
             movie_data["completed"] = True
             completed_collections.append(movie_data)
         else:

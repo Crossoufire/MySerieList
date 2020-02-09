@@ -43,6 +43,12 @@ input::placeholder {
     margin-left: 45px;
 }
 
+#search_id {
+    text-align: center !important;
+    margin-top: 7px;
+    margin-left: 75px;
+}
+
 .filters-button-group {
     justify-content: center;
 }

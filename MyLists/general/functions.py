@@ -257,10 +257,12 @@ def add_actors_movies():
 
 
 def add_collections_movies():
-    local_covers_path = Path(app.root_path, "static\\covers\\movies_collection_covers\\")
-    all_movies = Movies.query.filter_by(themoviedb_id=9799).all()
+    print('started')
+    local_covers_path = Path(app.root_path, "static/covers/movies_collection_covers/")
+    all_movies = Movies.query.filter_by().all()
     for movie in all_movies:
         tmdb_movies_id = movie.themoviedb_id
+
         try:
             response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
                                     .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']))
@@ -291,15 +293,14 @@ def add_collections_movies():
                     pass
 
             collection_parts = len(data_collection["parts"]) - remove
-
             collection_poster_id = "{}.jpg".format(secrets.token_hex(8))
 
             urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(collection_poster),
-                                       "{}{}".format(local_covers_path, collection_poster_id))
+                                       "{}/{}".format(local_covers_path, collection_poster_id))
 
-            img = Image.open("{}{}".format(local_covers_path, collection_poster_id))
+            img = Image.open("{}/{}".format(local_covers_path, collection_poster_id))
             img = img.resize((300, 450), Image.ANTIALIAS)
-            img.save("{0}{1}".format(local_covers_path, collection_poster_id), quality=90)
+            img.save("{0}/{1}".format(local_covers_path, collection_poster_id), quality=90)
 
             movie.collection_id = collection_id
 
@@ -316,8 +317,43 @@ def add_collections_movies():
 
             db.session.add(add_collection)
             db.session.commit()
+            print('And... ANOTHER ONE')
         except:
             continue
+        print('finished')
+
+
+def refresh_collections_movies():
+    print('started')
+
+    all_collection_movies = MoviesCollections.query.filter_by().all()
+    for collection in all_collection_movies:
+        try:
+            response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
+                                    .format(collection.collection_id, app.config['THEMOVIEDB_API_KEY']))
+
+            data = json.loads(response.text)
+
+            remove = 0
+            utc_now = datetime.utcnow()
+            for part in data["parts"]:
+                part_date = part['release_date']
+                try:
+                    part_date_datetime = datetime.strptime(part_date, '%Y-%m-%d')
+                    difference = (utc_now - part_date_datetime).total_seconds()
+                    if float(difference) < 0:
+                        remove += 1
+                except:
+                    remove += 1
+
+            collection.parts = len(data["parts"]) - remove
+
+            db.session.commit()
+            print('And... ANOTHER ONE')
+        except:
+            continue
+
+    print('finished')
 
 
 def add_actors_series():

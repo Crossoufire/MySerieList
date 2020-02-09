@@ -42,8 +42,10 @@ function remove_cat() {
 
 // ----------------------- Search by Title or Actor -------------------------
 function searchElement() {
-    var input, filter, cards, cardContainer, title, i, l;
+    var input, cat, filter, cards, cardContainer, title, i, l;
     input = document.getElementById("searchInput");
+    cat = document.getElementsByClassName("search-select")[0].value;
+    console.log(cat);
     filter = input.value.toUpperCase();
     cardContainer = document.getElementById("categories-iso");
     cards = cardContainer.getElementsByClassName("col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4");
@@ -53,13 +55,13 @@ function searchElement() {
         original_title = cards[i].querySelector(".original-title");
         actors = cards[i].querySelector(".actors-yes");
         genres = cards[i].querySelector(".genre-yes");
-        if (title.innerText.toUpperCase().indexOf(filter) > -1) {
+        if (title.innerText.toUpperCase().indexOf(filter) > -1 && (cat == 'Title' || cat == 'All')) {
             cards[i].style.display = "";
-        } else if (original_title.innerText.toUpperCase().indexOf(filter) > -1) {
+        } else if (original_title.innerText.toUpperCase().indexOf(filter) > -1 && (cat == 'Title' || cat == 'All')) {
             cards[i].style.display = "";
-        } else if (actors.innerText.toUpperCase().indexOf(filter) > -1) {
+        } else if (actors.innerText.toUpperCase().indexOf(filter) > -1 && (cat == 'Actors' || cat == 'All')) {
             cards[i].style.display = "";
-        } else if (genres.innerText.toUpperCase().indexOf(filter) > -1) {
+        } else if (genres.innerText.toUpperCase().indexOf(filter) > -1 && (cat == 'Genres' || cat == 'All')) {
             cards[i].style.display = "";
         } else {
             cards[i].style.display = "none";

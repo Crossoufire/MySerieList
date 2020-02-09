@@ -23,7 +23,14 @@
         </div>
         <input type="hidden" id="element_id" value=""/>
         <div class="search-by m-r-25 m-t-20">
-            <input id="searchInput" placeholder="Search titles/actors/genres" onkeyup="searchElement()">
+            <input id="searchInput" placeholder="Search in the list" onkeyup="searchElement()">
+            <br>
+            <select id="search_id" class="search-select">
+                <option selected="selected">All</option>
+                <option>Titles</option>
+                <option>Actors</option>
+                <option>Genres</option>
+            </select>
         </div>
     </div>
 

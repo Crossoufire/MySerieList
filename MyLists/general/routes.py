@@ -5,10 +5,12 @@ from sqlalchemy import func, text
 from MyLists.API_data import ApiData
 from flask_login import current_user, login_required
 from flask import render_template, url_for, flash, redirect, request
-from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, get_trending_data, add_ranks_to_db
+from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, get_trending_data, add_ranks_to_db,\
+    refresh_collections_movies
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, Anime, User, \
     AnimeList, AnimeEpisodesPerSeason, AnimeGenre, MoviesGenre, MoviesList, MoviesActors, SeriesActors, Movies, \
     AnimeActors
+
 
 bp = Blueprint('general', __name__)
 
