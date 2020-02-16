@@ -5,8 +5,7 @@ from sqlalchemy import func, text
 from MyLists.API_data import ApiData
 from flask_login import current_user, login_required
 from flask import render_template, url_for, flash, redirect, request
-from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, get_trending_data, add_ranks_to_db,\
-    refresh_collections_movies
+from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, get_trending_data, add_ranks_to_db
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, Anime, User, \
     AnimeList, AnimeEpisodesPerSeason, AnimeGenre, MoviesGenre, MoviesList, MoviesActors, SeriesActors, Movies, \
     AnimeActors
@@ -71,7 +70,7 @@ def global_stats():
         .filter(MoviesList.user_id >= '2').order_by(text("count desc")).limit(5).all()
 
     top_all_series, top_all_anime, top_all_movies = [], [], []
-    for i in range(5):
+    for i in range(0, 5):
         try:
             tmp_series = {"name": top_series[i][0].name, "quantity": top_series[i][2]}
         except:

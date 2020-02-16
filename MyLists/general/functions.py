@@ -10,7 +10,7 @@ from MyLists import db, app
 from sqlalchemy import func
 from datetime import datetime
 from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
-    SeriesList, Series, MoviesList, Movies, Badges, SeriesActors, MoviesActors, MoviesCollections, AnimeActors, Ranks
+    SeriesList, Series, MoviesList, Movies, Badges, MoviesCollections, Ranks
 
 
 def get_trending_data(trends_data, list_type):
@@ -25,14 +25,19 @@ def get_trending_data(trends_data, list_type):
 
         for data in trends_data:
             series = {"title": data.get("name", "Unknown") or "Unknown"}
+
             media_cover_path = data.get("poster_path") or None
             if media_cover_path:
                 series["poster_path"] = tmdb_posters_path + media_cover_path
             else:
-                series["poster_path"] = url_for('static', filename='covers/default.jpg')
-            series["first_air_date"] = data.get("first_air_date", "Unknown") or "Unknown"
-            if series["first_air_date"] != "Unknown":
+                series["poster_path"] = url_for('static', filename='covers/series_covers/default.jpg')
+
+            series["first_air_date"] = data.get("first_air_date") or None
+            if series["first_air_date"]:
                 series["first_air_date"] = datetime.strptime(series["first_air_date"], '%Y-%m-%d').strftime("%d %b %Y")
+            else:
+                series["first_air_date"] = 'Not avalaible'
+
             series["overview"] = data.get("overview", "There is no overview for this series.") \
                                  or "There is no overview for this series."
             series["tmdb_link"] = "https://www.themoviedb.org/tv/{}".format(data.get("id"))
@@ -49,11 +54,13 @@ def get_trending_data(trends_data, list_type):
 
         for data in trends_data:
             anime = {"title": data.get("title", "Unknown") or "Unknown"}
+
             media_cover_path = data.get("image_url") or None
             if media_cover_path:
                 anime["poster_path"] = media_cover_path
             else:
                 anime["poster_path"] = url_for('static', filename='covers/default.jpg')
+
             anime["first_air_date"] = data.get("start_date", 'Unknown') or "Unknown"
             anime["overview"] = "There is no overview from this API. " \
                                 "You can check it on MyAnimeList by clicking on the title"
@@ -71,14 +78,19 @@ def get_trending_data(trends_data, list_type):
 
         for data in trends_data:
             movies = {"title": data.get("title", "Unknown") or "Unknown"}
+
             media_cover_path = data.get("poster_path") or None
             if media_cover_path:
                 movies["poster_path"] = tmdb_posters_path + media_cover_path
             else:
                 movies["poster_path"] = url_for('static', filename='covers/default.jpg')
-            movies["release_date"] = data.get("release_date", "Unknown") or "Unknown"
-            if movies["release_date"] != "Unknown":
+
+            movies["release_date"] = data.get("release_date") or None
+            if movies["release_date"]:
                 movies["release_date"] = datetime.strptime(movies["release_date"], '%Y-%m-%d').strftime("%d %b %Y")
+            else:
+                movies["release_date"] = "Not avalaible"
+
             movies["overview"] = data.get("overview", "No overview available for this movie.") or \
                                  'No overview available for this movie.'
             movies["tmdb_link"] = "https://www.themoviedb.org/movie/{}".format(data.get("id"))
@@ -143,9 +155,7 @@ def compute_media_time_spent(list_type):
 
         db.session.commit()
 
-
 # ---------------------------------------- DB add/refresh from CSV data ---------------------------------------------- #
-
 
 def add_ranks_to_db():
     list_all_ranks = []
@@ -218,46 +228,10 @@ def refresh_db_badges():
         badges[i-1].type = list_all_badges[i][3]
         badges[i-1].genres_id = genre_id
 
-
 # -------------------------------------------- Add data Retroactively ------------------------------------------------ #
 
-
-def add_actors_movies():
-    all_movies = Movies.query.all()
-    for i in range(0, len(all_movies)):
-        tmdb_movies_id = all_movies[i].themoviedb_id
-        movies_id = all_movies[i].id
-        response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
-                                .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']))
-        element_actors = json.loads(response.text)
-
-        try:
-            actors_names = []
-            for j in range(0, len(element_actors["cast"])):
-                try:
-                    actors_names.append(element_actors["cast"][j]["name"])
-                    if j == 3:
-                        break
-                except:
-                    pass
-        except:
-            pass
-
-        if len(actors_names) == 0:
-            actors = MoviesActors(movies_id=movies_id,
-                                  name="Unknown")
-            db.session.add(actors)
-        else:
-            for k in range(0, len(actors_names)):
-                actors = MoviesActors(movies_id=movies_id,
-                                      name=actors_names[k])
-                db.session.add(actors)
-
-        db.session.commit()
-
-
 def add_collections_movies():
-    print('started')
+    print('Started.')
     local_covers_path = Path(app.root_path, "static/covers/movies_collection_covers/")
     all_movies = Movies.query.filter_by().all()
     for movie in all_movies:
@@ -320,11 +294,11 @@ def add_collections_movies():
             print('And... ANOTHER ONE')
         except:
             continue
-        print('finished')
+        print('Finished.')
 
 
 def refresh_collections_movies():
-    print('started')
+    print('Started.')
 
     all_collection_movies = MoviesCollections.query.filter_by().all()
     for collection in all_collection_movies:
@@ -353,72 +327,4 @@ def refresh_collections_movies():
         except:
             continue
 
-    print('finished')
-
-
-def add_actors_series():
-    all_series = Series.query.all()
-    for i in range(0, len(all_series)):
-        tmdb_series_id = all_series[i].themoviedb_id
-        series_id = all_series[i].id
-        response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
-                                .format(tmdb_series_id, app.config['THEMOVIEDB_API_KEY']))
-        element_actors = json.loads(response.text)
-
-        try:
-            actors_names = []
-            for j in range(0, len(element_actors["cast"])):
-                try:
-                    actors_names.append(element_actors["cast"][j]["name"])
-                    if j == 3:
-                        break
-                except:
-                    pass
-        except:
-            pass
-
-        if len(actors_names) == 0:
-            actors = SeriesActors(series_id=series_id,
-                                  name="Unknown")
-            db.session.add(actors)
-        else:
-            for k in range(0, len(actors_names)):
-                actors = SeriesActors(series_id=series_id,
-                                      name=actors_names[k])
-                db.session.add(actors)
-
-        db.session.commit()
-
-
-def add_actors_anime():
-    all_anime = Anime.query.all()
-    for i in range(0, len(all_anime)):
-        tmdb_anime_id = all_anime[i].themoviedb_id
-        anime_id = all_anime[i].id
-        response = requests.get("https://api.themoviedb.org/3/tv/{0}/credits?api_key={1}"
-                                .format(tmdb_anime_id, app.config['THEMOVIEDB_API_KEY']))
-        element_actors = json.loads(response.text)
-
-        try:
-            actors_names = []
-            for j in range(0, len(element_actors["cast"])):
-                try:
-                    actors_names.append(element_actors["cast"][j]["name"])
-                    if j == 3:
-                        break
-                except:
-                    pass
-        except:
-            pass
-
-        if len(actors_names) == 0:
-            actors = AnimeActors(anime_id=anime_id,
-                                 name="Unknown")
-            db.session.add(actors)
-        else:
-            for k in range(0, len(actors_names)):
-                actors = AnimeActors(anime_id=anime_id,
-                                     name=actors_names[k])
-                db.session.add(actors)
-
-        db.session.commit()
+    print('Finished.')

@@ -1,9 +1,7 @@
-import os
-import platform
-
+from pathlib import Path
 from flask import url_for
-from flask_mail import Message
 from MyLists import app, mail
+from flask_mail import Message
 
 
 def send_reset_email(user):
@@ -14,20 +12,16 @@ def send_reset_email(user):
                   bcc=[app.config['MAIL_USERNAME']],
                   reply_to=app.config['MAIL_USERNAME'])
 
-    if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\\emails\\password_reset.html")
-    else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/emails/password_reset.html")
-
+    path = Path(app.root_path, "static/emails/password_reset.html")
     email_template = open(path).read().replace("{1}", user.username)
-    email_template = email_template.replace("{2}", url_for('reset_token', token=token, _external=True))
+    email_template = email_template.replace("{2}", url_for('reset_passord_token', token=token, _external=True))
     msg.html = email_template
 
     try:
         mail.send(msg)
         return True
     except Exception as e:
-        app.logger.error('[SYSTEM] - Exception raised sending reset email to account ID {}: {}'.format(user.id, e))
+        app.logger.error('[SYSTEM] - Exception sending password reset email to account ID {}: {}'.format(user.id, e))
         return False
 
 
@@ -39,11 +33,7 @@ def send_register_email(user):
                   bcc=[app.config['MAIL_USERNAME']],
                   reply_to=app.config['MAIL_USERNAME'])
 
-    if platform.system() == "Windows":
-        path = os.path.join(app.root_path, "static\\emails\\register.html")
-    else:  # Linux & macOS
-        path = os.path.join(app.root_path, "static/emails/register.html")
-
+    path = Path(app.root_path, "static/emails/register.html")
     email_template = open(path).read().replace("{1}", user.username)
     email_template = email_template.replace("{2}", url_for('register_account_token', token=token, _external=True))
     msg.html = email_template

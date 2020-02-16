@@ -8,8 +8,8 @@ class RegistrationForm(FlaskForm):
     register_username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
     register_email = StringField('Email', validators=[DataRequired(), Email()])
     register_password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    register_confirm_password = PasswordField('Confirm Password',
-                                              validators=[DataRequired(), EqualTo('register_password')])
+    register_confirm_password = PasswordField('Confirm Password', validators=[DataRequired(),
+                                                                              EqualTo('register_password')])
     register_submit = SubmitField('Register')
 
     def validate_register_username(self, field):
