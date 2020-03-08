@@ -1671,9 +1671,9 @@ def get_level_and_grade(total_time_min):
     list_all_levels_ranks.pop(0)
 
     user_level_rank = []
-    # Check if the user has a level greater than 125
-    if element_level[0] > 125:
-        user_level_rank.append(["General_Grade_4", "General Grade 4"])
+    # Check if the user has a level greater than 149
+    if element_level[0] > 149:
+        user_level_rank.append(["ReachRank49", "Inheritor"])
     else:
         for rank in list_all_levels_ranks:
             if int(rank[0]) == element_level[0]:
@@ -1781,12 +1781,11 @@ def get_badges(user_id):
         else:
             value = count
 
-        badge_data = {}
-        badge_data["type"] = badge.type
-        badge_data["image_id"] = badge.image_id
-        badge_data["title"] = badge.title
-        badge_data["unlocked"] = unlocked
-        badge_data["value"] = value
+        badge_data = {"type": badge.type,
+                      "image_id": badge.image_id,
+                      "title": badge.title,
+                      "unlocked": unlocked,
+                      "value": value}
 
         return badge_data
 
