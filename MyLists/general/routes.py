@@ -253,7 +253,7 @@ def current_trends():
 
     if trending_data is None:
         flash('The current trends are not available right now, please try again later', 'warning')
-        return redirect(url_for('profile.account', user_name=current_user.username))
+        return redirect(url_for('users.account', user_name=current_user.username))
 
     series_trends = get_trending_data(trending_data[0], ListType.SERIES)
     anime_trends = get_trending_data(trending_data[1], ListType.ANIME)
@@ -261,7 +261,7 @@ def current_trends():
 
     if series_trends is None or anime_trends is None or movies_trends is None:
         flash('The current trends are not available right now, please try again later', 'warning')
-        return redirect(url_for('profile.account', user_name=current_user.username))
+        return redirect(url_for('users.account', user_name=current_user.username))
 
     platform = str(request.user_agent.platform)
     if platform == "iphone" or platform == "android" or platform is None or platform == 'None':

@@ -72,8 +72,8 @@ app.register_blueprint(general_bp)
 from MyLists.main.routes import bp as main_bp
 app.register_blueprint(main_bp)
 
-from MyLists.profile.routes import bp as profile_bp
-app.register_blueprint(profile_bp)
+from MyLists.users.routes import bp as users_bp
+app.register_blueprint(users_bp)
 
 from MyLists.settings.routes import bp as settings_bp
 app.register_blueprint(settings_bp)

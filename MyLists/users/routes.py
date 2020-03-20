@@ -1,13 +1,13 @@
 from MyLists import app, db
-from MyLists.profile.forms import AddFollowForm
+from MyLists.users.forms import AddFollowForm
 from MyLists.models import User, ListType, Ranks
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
-from MyLists.profile.functions import get_media_data, get_media_levels, get_follows_data, get_badges, get_user_data, \
+from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_badges, get_user_data, \
     get_knowledge_grade, get_knowledge_frame
 
 
-bp = Blueprint('profile', __name__)
+bp = Blueprint('users', __name__)
 
 
 @bp.route('/account/<user_name>', methods=['GET', 'POST'])
@@ -34,17 +34,17 @@ def account(user_name):
         if follow is None or follow.id == 1:
             app.logger.info('[{}] Attempt to follow account {}'.format(current_user.id, follow_username))
             flash('Sorry, this account does not exist', 'warning')
-            return redirect(url_for('profile.account', user_name=current_user.username))
+            return redirect(url_for('users.account', user_name=current_user.username))
         if current_user.id == follow.id:
             flash("You cannot follow yourself", 'warning')
-            return redirect(url_for('profile.account', user_name=current_user.username))
+            return redirect(url_for('users.account', user_name=current_user.username))
 
         current_user.add_follow(follow)
         db.session.commit()
 
         app.logger.info('[{}] is following the account with ID {}'.format(current_user.id, follow.id))
         flash("You are now following: {}.".format(follow.username), 'success')
-        return redirect(url_for('profile.account', user_name=current_user.username))
+        return redirect(url_for('users.account', user_name=current_user.username))
 
     # Recover user data
     user_data = get_user_data(user)

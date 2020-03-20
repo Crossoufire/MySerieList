@@ -32,9 +32,9 @@ def home():
                     return redirect(url_for('main.mymedialist', media_list=user.homepage.value,
                                             user_name=current_user.username))
                 elif user.homepage == HomePage.ACCOUNT:
-                    return redirect(url_for('profile.account', user_name=current_user.username))
+                    return redirect(url_for('users.account', user_name=current_user.username))
                 elif user.homepage == HomePage.HALL_OF_FAME:
-                    return redirect(url_for('profile.hall_of_fame'))
+                    return redirect(url_for('users.hall_of_fame'))
                 else:
                     abort(404)
         else:
@@ -61,9 +61,9 @@ def home():
             return redirect(url_for('main.mymedialist', media_list=user.homepage.value,
                                     user_name=current_user.username))
         elif user.homepage == HomePage.ACCOUNT:
-            return redirect(url_for('profile.account', user_name=current_user.username))
+            return redirect(url_for('users.account', user_name=current_user.username))
         elif user.homepage == HomePage.HALL_OF_FAME:
-            return redirect(url_for('profile.hall_of_fame'))
+            return redirect(url_for('users.hall_of_fame'))
         else:
             abort(404)
 
