@@ -10,7 +10,7 @@ from MyLists import db, app
 from sqlalchemy import func
 from datetime import datetime
 from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
-    SeriesList, Series, MoviesList, Movies, Badges, MoviesCollections, Ranks
+    SeriesList, Series, MoviesList, Movies, Badges, MoviesCollections, Ranks, Frames
 
 
 def get_trending_data(trends_data, list_type):
@@ -227,6 +227,33 @@ def refresh_db_badges():
         badges[i-1].title = list_all_badges[i][2]
         badges[i-1].type = list_all_badges[i][3]
         badges[i-1].genres_id = genre_id
+
+
+def add_frames_to_db():
+    list_all_frames = []
+    path = Path(app.root_path, 'static/csv_data/icon_frames.csv')
+    with open(path) as fp:
+        for line in fp:
+            list_all_frames.append(line.split(";"))
+
+    for i in range(1, len(list_all_frames)):
+        frame = Frames(level=int(list_all_frames[i][0]),
+                       image_id=list_all_frames[i][1])
+        db.session.add(frame)
+    db.session.commit()
+
+
+def refresh_db_frames():
+    list_all_frames = []
+    path = Path(app.root_path, 'static/csv_data/icon_frames.csv')
+    with open(path) as fp:
+        for line in fp:
+            list_all_frames.append(line.split(";"))
+
+    frames = Frames.query.order_by(Frames.id).all()
+    for i in range(1, len(list_all_frames)):
+        frames[i-1].level = int(list_all_frames[i][0])
+        frames[i-1].image_id = list_all_frames[i][1]
 
 # -------------------------------------------- Add data Retroactively ------------------------------------------------ #
 

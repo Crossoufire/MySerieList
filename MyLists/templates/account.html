@@ -9,11 +9,12 @@
 {% block content %}
 <div class="header-container">
     <img class="header-profile-img" src="{{ user_data['profile_picture'] }}"/>
+    <img class="header-profile-img-2" src="{{ user_data['knowledge_info']['frame_id'] }}.png"/>
     <div class="header-knowledge-level text-center">{{ user_data['knowledge_info']['level'] }}</div>
     <div class="header-profile-data">
         <h2><b>{{ user_data['username'] }}</b>
-            <img height='50' width='50' data-toggle="tooltip" title="{{ user_data['knowledge_info']['grade_title'] }}"
-                 src="{{ user_data['knowledge_info']['grade_id'] }}.png"/>
+            <!--<img height='50' width='50' data-toggle="tooltip" title="{{ user_data['knowledge_info']['grade_title'] }}"-->
+            <!--src="{{ user_data['knowledge_info']['grade_id'] }}.png"/>-->
             {% if user_data['id'] != current_user.get_id() %}
             {% if user_data["isfollowing"] %}
             <button class="btn btn-sm btn-dark follow-btn" onclick="follow_status('{{ user_data['id'] }}')">Unfollow</button>

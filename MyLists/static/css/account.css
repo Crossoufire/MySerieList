@@ -24,12 +24,20 @@ hr {
 
 .header-profile-img {
     position: absolute;
-    left: 30px;
-    bottom: 20px;
+    left: 55px;
+    bottom: 55px;
     border-radius: 50%;
     border: solid 2px black;
-    height: 150px;
-    width: 150px;
+    height: 100px;
+    width: 100px;
+}
+
+.header-profile-img-2 {
+    position: absolute;
+    left: -5px;
+    bottom: -6px;
+    height: 220px;
+    width: 220px;
 }
 
 .header-knowledge-level {
@@ -37,7 +45,7 @@ hr {
     background: #262626;
     min-width: 50px;
     left: 80px;
-    bottom: 13px;
+    bottom: 17px;
     font-weight: 400;
     border: solid 1px white;
     border-radius: 8px;
@@ -46,7 +54,7 @@ hr {
 .header-profile-data {
     position: absolute;
     left: 200px;
-    bottom: 30px;
+    bottom: 35px;
 }
 
 @media (max-width: 490px) {

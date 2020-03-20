@@ -6,7 +6,7 @@ from sqlalchemy import func, or_
 from flask_login import current_user
 from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
     AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, SeriesGenre, AnimeGenre, MoviesGenre, Movies, Badges, Ranks, \
-    followers
+    followers, Frames
 
 
 def get_media_count(user_id, list_type):
@@ -114,6 +114,24 @@ def get_knowledge_grade(user):
             "grade_title": grade_title}
 
 
+def get_knowledge_frame(user):
+    # Compute the corresponding level and percentage from the media time
+    knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
+                      int((((400+80*user.time_spent_anime)**(1/2))-20)/40) +\
+                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
+
+    frame_level = round(knowledge_level/15, 0)+1
+
+    query_frame = Frames.query.filter_by(level=frame_level).first()
+    if query_frame:
+        frame_id = url_for('static', filename='img/icon_frames/{}'.format(query_frame.image_id))
+    else:
+        frame_id = url_for('static', filename='img/icon_frames/border_30')
+
+    return {"level": knowledge_level,
+            "frame_id": frame_id}
+
+
 def get_updates(last_update):
     update = []
     for element in last_update:
@@ -174,7 +192,7 @@ def get_user_data(user):
     followers = user.followers.count()
 
     # Recover the knowledge grade and level of the user
-    knowledge_info = get_knowledge_grade(user)
+    knowledge_info = get_knowledge_frame(user)
 
     # Recover the overview user's last update
     last_update = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).limit(4)

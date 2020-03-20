@@ -4,7 +4,7 @@ from MyLists.models import User, ListType, Ranks
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
 from MyLists.profile.functions import get_media_data, get_media_levels, get_follows_data, get_badges, get_user_data, \
-    get_knowledge_grade
+    get_knowledge_grade, get_knowledge_frame
 
 
 bp = Blueprint('profile', __name__)
@@ -77,7 +77,8 @@ def hall_of_fame():
         series_level = get_media_levels(user, ListType.SERIES)
         anime_level = get_media_levels(user, ListType.ANIME)
         movies_level = get_media_levels(user, ListType.MOVIES)
-        knowledge_grade = get_knowledge_grade(user)
+        # knowledge_grade = get_knowledge_grade(user)
+        knowledge_frame = get_knowledge_frame(user)
 
         user_data = {"id": user.id,
                      "username": user.username,
@@ -85,7 +86,7 @@ def hall_of_fame():
                      "series_data": series_level,
                      "anime_data": anime_level,
                      "movies_data": movies_level,
-                     'knowledge_grade': knowledge_grade}
+                     'knowledge_frame': knowledge_frame}
 
         if user.id in follows_list:
             user_data["isfollowing"] = True

@@ -31,10 +31,10 @@ function follow_status(follow_id, button) {
 $(document).ready(function () {
     // Datables functions
     $('#hall_of_fame').DataTable({
-        "order": [[ 5, "desc" ], [ 1, "asc" ]],
+        "order": [[ 4, "desc" ], [ 1, "asc" ]],
         columnDefs: [
             {orderable: false, targets: 0},
-            {orderable: false, targets: 6}
+            {orderable: false, targets: 5}
         ],
         "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
     });
