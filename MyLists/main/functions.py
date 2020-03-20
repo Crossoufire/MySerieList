@@ -768,7 +768,7 @@ def scheduled_task():
         for element in all_id_tv_changes["results"]:
             if element["id"] in all_series_tmdb_id:
                 info = refresh_element_data(element["id"], ListType.SERIES)
-                if info is True:
+                if info:
                     app.logger.info('Refresh Series with TMDb_ID: {}'.format(element["id"]))
                 else:
                     app.logger.error('Error while refreshing: no <tv_data>')
@@ -777,7 +777,7 @@ def scheduled_task():
         for element in all_id_tv_changes["results"]:
             if element["id"] in all_anime_tmdb_id:
                 info = refresh_element_data(element["id"], ListType.ANIME)
-                if info is True:
+                if info:
                     app.logger.info('Refresh Anime with TMDb_ID: {}'.format(element["id"]))
                 else:
                     app.logger.error('Error while refreshing: no <tv_data>')
@@ -786,7 +786,7 @@ def scheduled_task():
         for element in all_id_movies_changes["results"]:
             if element["id"] in all_movies_tmdb_id:
                 info = refresh_element_data(element["id"], ListType.MOVIES)
-                if info is True:
+                if info:
                     app.logger.info('Refresh Movie with TMDb_ID: {}'.format(element["id"]))
                 else:
                     app.logger.error('Error while refreshing: no <movie_data>')

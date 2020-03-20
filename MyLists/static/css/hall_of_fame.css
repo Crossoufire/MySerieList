@@ -16,9 +16,7 @@ table.dataTable thead .sorting_desc_disabled:before {
     color: white !important;
 }
 
-.table {
-    width: 750px;
-}
+
 
 table.table th {
     font-size: 12pt;
