@@ -15,17 +15,18 @@
 </h2>
 
 
-{# <div class="row justify-content-center align-middle">
+<div class="row justify-content-center align-middle">
     {% for user in all_data %}
-    <div class="col-7 m-t-25 p-t-15 p-l-35 p-b-27 {% if user['iscurrentuser'] %} current_user {% endif %}" style="border: grey 2px solid;">
+    <div class="col-7 m-t-25 p-t-23 p-l-35 p-b-30 {% if user['iscurrentuser'] %} current_user {% endif %}" style="border: grey 2px solid;">
         <div class="row no-gutters">
             <div class="col-1 align-middle">
                 {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
                 <img class="profile_picture" src="/static/profile_pics/anonymous.jpg" alt="anonymous">
                 {% else %}
-                <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
+                <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}">
                 {% endif %}
-                <img style="position: absolute; top: -45px; left: -50px; width: 180px; height: 180px;" src="/static/test.webp">
+                <img style="position: absolute; top: -18px; left: -26px; width: 140px; height: 140px;"
+                     src="{{ user['knowledge_frame']['frame_id'] }}.png">
             </div>
             <div class="col-3 m-l-65 m-t-15" style="margin-right: -25px;">
                 {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
@@ -73,7 +74,7 @@
             <div class="col-2 text-center m-t-10">
                 {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
                 {% else %}
-                <a class="btn btn-sm btn-test" href="{{ url_for('profile.badges', user_name=user['username']) }}">Badges</a>
+                <a class="btn btn-sm btn-test" href="{{ url_for('users.badges', user_name=user['username']) }}">Badges</a>
                 <br>
                 {% if user["isfollowing"] and not user['iscurrentuser'] %}
                 <button class="btn btn-sm btn-dark btn-smaller" onclick="follow_status('{{ user['id'] }}', this)">Unfollow</button>
@@ -86,7 +87,7 @@
         </div>
     </div>
     {% endfor %}
-</div> #}
+</div>
 
 
 <div class="m-t-30">
@@ -104,15 +105,14 @@
         <tbody>
         {% for user in all_data %}
             <tr class="{% if user['iscurrentuser'] %} current_user {% endif %}">
-                <td style="width: 80px;">
-                    <div style="overflow: hidden; height: 120px;">
-                        {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
-                        <img class="profile_picture" src="/static/profile_pics/anonymous.jpg" alt="anonymous">
-                        {% else %}
-                        <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
-                        {% endif %}
-                        <img style="position: relative; left: 0px; top: -87px; height: 150px; width: 150px;" src="{{ user['knowledge_frame']['frame_id'] }}.png"/>
-                    </div>
+                <td>
+                    {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
+                    <img class="profile_picture" src="/static/profile_pics/anonymous.jpg" alt="anonymous">
+                    {% else %}
+                    <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}">
+                    {% endif %}
+                    <img style="position: relative; left: 0px; top: -87px; height: 150px; width: 150px;"
+                         src="{{ user['knowledge_frame']['frame_id'] }}.png"/>
                 </td>
                 <td>
                     {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
@@ -145,7 +145,7 @@
                 <td>
                     {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
                     {% else %}
-                    <a class="btn btn-sm btn-test" href="{{ url_for('profile.badges', user_name=user['username']) }}">Badges</a>
+                    <a class="btn btn-sm btn-test" href="{{ url_for('users.badges', user_name=user['username']) }}">Badges</a>
                     <br>
                     {% if user["isfollowing"] and not user['iscurrentuser'] %}
                     <button class="btn btn-sm btn-dark btn-smaller" onclick="follow_status('{{ user['id'] }}', this)">Unfollow</button>

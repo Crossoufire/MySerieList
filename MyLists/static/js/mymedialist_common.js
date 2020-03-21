@@ -84,7 +84,7 @@ $(document).ready(function() {
     })
 });
 
-// // ------------------------- Isotopes ------------------------------------
+// ------------------------- Isotopes ------------------------------------
 var $categories = $('.categories-iso').isotope({
     itemSelector: '.categories',
     layoutMode: 'vertical',
@@ -111,7 +111,7 @@ $('.filters-button-group').each(function(i, buttonGroup) {
 });
 $categories.isotope('layout');
 
-// // -------------------------- Row gutters --------------------------------
+// -------------------------- Row gutters --------------------------------
 (function($) {
     var $window = $(window),
         $row = $('.row');

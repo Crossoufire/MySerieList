@@ -17,14 +17,14 @@
     height: 250px;
 }
 
-input {
+.modded-input {
     background: rgba(220, 220, 220, 0.5);
     border: none;
     padding: 5px;
     min-width: 220px;
 }
 
-input::placeholder {
+.modded-input::placeholder {
     color: black;
     opacity: 1;
 }

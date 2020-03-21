@@ -8,10 +8,10 @@
 
 {% block content %}
 <div class="header-container">
-    <img class="header-users-img" src="{{ user_data['users_picture'] }}"/>
-    <img class="header-users-img-2" src="{{ user_data['knowledge_info']['frame_id'] }}.png"/>
+    <img class="header-profile-img" src="{{ user_data['profile_picture'] }}"/>
+    <img class="header-profile-img-2" src="{{ user_data['knowledge_info']['frame_id'] }}.png"/>
     <div class="header-knowledge-level text-center">{{ user_data['knowledge_info']['level'] }}</div>
-    <div class="header-users-data">
+    <div class="header-profile-data">
         <h2><b>{{ user_data['username'] }}</b>
             <!--<img height='50' width='50' data-toggle="tooltip" title="{{ user_data['knowledge_info']['grade_title'] }}"-->
             <!--src="{{ user_data['knowledge_info']['grade_id'] }}.png"/>-->
@@ -190,10 +190,10 @@
                         <li class="m-b-10">
                             <div class="row">
                                 <div  class="col-9">
-                                    users views:
+                                    profile views:
                                 </div>
                                 <div  class="col-2">
-                                    {{ user_data['view_count']["users"] }}
+                                    {{ user_data['view_count']["profile"] }}
                                 </div>
                             </div>
                         </li>

@@ -583,15 +583,57 @@ def autocomplete(media):
 @bp.route('/search_media', methods=['GET'])
 @login_required
 def search_media():
-    search = request.args['test']
+    search = request.args['search']
 
     if search is None:
         flash('Sorry, no results found for your query.', 'warning')
 
-    results = ApiData().media_search(search)
+    series_results, anime_results, movies_results = ApiData().media_search(search)
 
-    if results is None:
+    if series_results is None and anime_results is None and movies_results is None:
         flash('Sorry, no results found for your query.', 'warning')
-        return redirect(url_for('users.account', user_name=current_user.username))
+        return redirect(request.referrer)
 
-    return render_template('media_search.html', title="Media search", results=results)
+    # Recover all the data
+    series = db.session.query(Series.themoviedb_id, SeriesList)\
+        .join(Series, SeriesList.series_id == Series.id)\
+        .filter(SeriesList.user_id==current_user.id).all()
+
+    series_id = [r.themoviedb_id for r in series]
+
+    # Recover all the data
+    anime = db.session.query(Anime.themoviedb_id, AnimeList)\
+        .join(Anime, AnimeList.anime_id == Anime.id)\
+        .filter(AnimeList.user_id==current_user.id).all()
+
+    anime_id = [r.themoviedb_id for r in anime]
+
+    # Recover all the data
+    movies = db.session.query(Movies.themoviedb_id, MoviesList)\
+        .join(Movies, MoviesList.movies_id == Movies.id)\
+        .filter(MoviesList.user_id==current_user.id).all()
+
+    movies_id = [r.themoviedb_id for r in movies]
+
+    for result in series_results:
+        if result['tmdb_id'] in series_id:
+            result['already'] = True
+        else:
+            result['already'] = False
+    for result in anime_results:
+        if result['tmdb_id'] in anime_id:
+            result['already'] = True
+        else:
+            result['already'] = False
+    for result in movies_results:
+        if result['tmdb_id'] in movies_id:
+            result['already'] = True
+        else:
+            result['already'] = False
+
+    return render_template('media_search.html',
+                           title="Media search",
+                           series_results=series_results,
+                           anime_results=anime_results,
+                           movies_results=movies_results,
+                           search=search)

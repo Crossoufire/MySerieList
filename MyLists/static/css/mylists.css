@@ -38,6 +38,25 @@ hr {
     padding-right: 15px;
 }
 
+.form-control {
+    background: transparent;
+    border-radius: 0px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    color: #fff;
+}
+
+.form-control:focus {
+    background: transparent;
+    border-radius: 0px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    box-shadow: 0 0 0 0rem;
+    color: #fff;
+}
+
 @media (max-width: 490px) {
     .container {
         padding-left: 0px;

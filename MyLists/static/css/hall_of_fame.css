@@ -17,7 +17,6 @@ table.dataTable thead .sorting_desc_disabled:before {
 }
 
 
-
 table.table th {
     font-size: 12pt;
 }
@@ -43,12 +42,12 @@ table.table a {
 }
 
 .profile_picture {
-    width: 66px;
-    height: 66px;
+    width: 80px;
+    height: 80px;
     border-radius: 45%;
     position: relative;
-    left: 0px;
-    top: 20px;
+    left: 5px;
+    top: 10px;
     }
 
 .grade_picture {

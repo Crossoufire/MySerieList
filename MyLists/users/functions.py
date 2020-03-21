@@ -177,7 +177,7 @@ def get_user_data(user):
         db.session.commit()
     else:
         profile_view_count = user.profile_views
-    view_count = {"users": profile_view_count,
+    view_count = {"profile": profile_view_count,
                   "series": user.series_views,
                   "anime": user.anime_views,
                   "movies": user.movies_views}
