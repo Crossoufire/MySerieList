@@ -1,9 +1,8 @@
 from sqlalchemy import func
 from MyLists import db, app
-from datetime import datetime
 from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
-from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify
+from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
     add_element_to_user, add_element_in_db
 from MyLists.models import User, Movies, MoviesActors, MoviesGenre, Series, SeriesGenre, SeriesList, \
@@ -579,3 +578,20 @@ def autocomplete(media):
         results = ApiData().autocomplete_search(search, list_type)
 
     return jsonify(matching_results=results)
+
+
+@bp.route('/search_media', methods=['GET'])
+@login_required
+def search_media():
+    search = request.args['test']
+
+    if search is None:
+        flash('Sorry, no results found for your query.', 'warning')
+
+    results = ApiData().media_search(search)
+
+    if results is None:
+        flash('Sorry, no results found for your query.', 'warning')
+        return redirect(url_for('users.account', user_name=current_user.username))
+
+    return render_template('media_search.html', title="Media search", results=results)

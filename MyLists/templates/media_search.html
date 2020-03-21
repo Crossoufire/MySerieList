@@ -1,6 +1,46 @@
 {% extends "layout.html" %}
 
 
-{% block content %}
+{% block css %}
+<link href="{{ url_for('static', filename='css/current_trends.css') }}" rel="stylesheet">
+{% endblock css %}
 
+
+{% block content %}
+<h2 class="font-weight-light mt-1 mb-0 p-t-50">Search > Results<hr class="mt-2 mb-0"></h2>
+<div class="row m-t-30 justify-content-center">
+    {% for media in results %}
+    <div class="col-7">
+        <div class="card mb-4" {% if media['media_type'] == 'movie' %} style="background: #8c7821;"
+        {% elif media['media_type'] == 'tv' %} style="background: #216c7d;" {% endif %}>
+            <div class="row no-gutters">
+                <div class="col-md-4">
+                    <img src="{{ media['poster_path'] }}" class="card-img">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body p-3">
+                        <h5 class="card-title">
+                            <a class="text-light giveMeEllipsis2">{{ media['name'] }}</a>
+                            <hr class="mt-1 mb-1" style="border-top: 1px solid #bfbfbf;">
+                            <div class="fs-13 text-grey"><i>{{ media['first_air_date'] }}</i></div>
+                        </h5>
+                        <p class="card-text text-light giveMeEllipsis">{{ media['overview'] }}</p>
+                        <div class="btn" title="Watching">W</div>
+                        <div class="btn" title="Completed">C</div>
+                        <div class="btn" title="On Hold">H</div>
+                        <div class="btn" title="Random">R</div>
+                        <div class="btn" title="Dropped">D</div>
+                        <div class="btn" title="Plan to Watch">P</div>
+                    </div>
+                </div>
+            </div>
+            <p class="card-hashtag text-light fs-20">#{{ loop.index0 +1 }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% endblock content %}
+
+
+{% block script %}
+{% endblock script %}

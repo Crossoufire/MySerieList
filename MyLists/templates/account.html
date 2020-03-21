@@ -8,10 +8,10 @@
 
 {% block content %}
 <div class="header-container">
-    <img class="header-profile-img" src="{{ user_data['profile_picture'] }}"/>
-    <img class="header-profile-img-2" src="{{ user_data['knowledge_info']['frame_id'] }}.png"/>
+    <img class="header-users-img" src="{{ user_data['users_picture'] }}"/>
+    <img class="header-users-img-2" src="{{ user_data['knowledge_info']['frame_id'] }}.png"/>
     <div class="header-knowledge-level text-center">{{ user_data['knowledge_info']['level'] }}</div>
-    <div class="header-profile-data">
+    <div class="header-users-data">
         <h2><b>{{ user_data['username'] }}</b>
             <!--<img height='50' width='50' data-toggle="tooltip" title="{{ user_data['knowledge_info']['grade_title'] }}"-->
             <!--src="{{ user_data['knowledge_info']['grade_id'] }}.png"/>-->
@@ -41,7 +41,7 @@
                         <div class="text-left m-b-10">
                             Badges page:
                             <a class="btn btn-sm btn-dark" style='border: solid grey 1px;'
-                               href="{{ url_for('profile.badges', user_name=user_data['username']) }}">Badges
+                               href="{{ url_for('users.badges', user_name=user_data['username']) }}">Badges
                             </a>
                         </div>
                     </div>
@@ -190,10 +190,10 @@
                         <li class="m-b-10">
                             <div class="row">
                                 <div  class="col-9">
-                                    Profile views:
+                                    users views:
                                 </div>
                                 <div  class="col-2">
-                                    {{ user_data['view_count']["profile"] }}
+                                    {{ user_data['view_count']["users"] }}
                                 </div>
                             </div>
                         </li>
@@ -229,12 +229,12 @@
                         </li>
                         {% if user_data['id'] == current_user.get_id() %}
                         <li class="m-b-10">
-                            <a class="text-light" href="{{ url_for('profile.level_grade_data') }}" target="_blank">
+                            <a class="text-light" href="{{ url_for('users.level_grade_data') }}" target="_blank">
                                 <u>Grades and levels data</u>
                             </a>
                         </li>
                         <li class="m-b-10">
-                            <a class="text-light" href="{{ url_for('profile.knowledge_grade_data') }}" target="_blank">
+                            <a class="text-light" href="{{ url_for('users.knowledge_grade_data') }}" target="_blank">
                                 <u>Knowledge levels data</u>
                             </a>
                         </li>
@@ -565,7 +565,7 @@
                         {% for follow in follows_list %}
                         <div class="col-3 m-b-15">
                             <a href="{{ follow.username }}" data-toggle="tooltip" title="{{ follow.username }}">
-                                <img width='50' height='50' src="{{ url_for('static', filename='profile_pics/{}'.format(follow.image_file)) }}">
+                                <img width='50' height='50' src="{{ url_for('static', filename='users_pics/{}'.format(follow.image_file)) }}">
                             </a>
                         </div>
                         {% endfor %}
@@ -632,7 +632,7 @@
                     document.write(date_day + " " + date_month + " at " + date_time)
                 </script> by
                         </span>
-                        <a href="{{ url_for('profile.account', user_name=update['username']) }}" style="color: #359aff; font-size: 11pt;">
+                        <a href="{{ url_for('users.account', user_name=update['username']) }}" style="color: #359aff; font-size: 11pt;">
                             {{ update['username'] }}
                         </a>
                     </div>

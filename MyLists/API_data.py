@@ -117,6 +117,68 @@ class ApiData:
 
         return tmdb_results
 
+    def media_search(self, element_name):
+        try:
+            response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={}&query={}"
+                                    .format(self.tmdb_api_key, element_name))
+
+        except Exception as e:
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+            return None
+
+        data = self.check_response_status(response)
+        if data is False:
+            return None
+
+        if data.get("total_results", 0) == 0:
+            return None
+
+        # Only the first 20 results. There are 20 results per page.
+        tmdb_results, i = [], 0
+        while i < data["total_results"] and i < 20 and len(tmdb_results) < 20:
+            media_data = {}
+
+            if data["results"][i]['media_type'] == 'person':
+                i += 1
+                continue
+
+            if data["results"][i]['media_type'] == 'tv':
+                media_data['name'] = data["results"][i]['name']
+                first_air_date = data["results"][i].get("first_air_date") or None
+                if first_air_date:
+                    if data["results"][i]["first_air_date"].split('-') != ['']:
+                        media_data["first_air_date"] = data["results"][i]["first_air_date"].split('-')[0]
+                    else:
+                        media_data["first_air_date"] = "Unknown"
+                else:
+                    media_data["first_air_date"] = "Unknown"
+
+            elif data["results"][i]['media_type'] == 'movie':
+                media_data['name'] = data["results"][i]['title']
+                first_air_date = data["results"][i].get("release_date") or None
+                if first_air_date:
+                    if data["results"][i]["release_date"].split('-') != ['']:
+                        media_data["first_air_date"] = data["results"][i]["release_date"].split('-')[0]
+                    else:
+                        media_data["first_air_date"] = "Unknown"
+                else:
+                    media_data["first_air_date"] = "Unknown"
+
+            if data["results"][i]["poster_path"]:
+                media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300",
+                                                          data["results"][i]["poster_path"])
+            else:
+                media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
+
+            media_data['media_type'] = data["results"][i]['media_type']
+            media_data['overview'] = data["results"][i]['overview']
+            media_data['tmdb_id'] = data["results"][i]["id"]
+
+            tmdb_results.append(media_data)
+            i += 1
+
+        return tmdb_results
+
     def get_details_and_credits_data(self, api_id, list_type):
         try:
             if list_type != ListType.MOVIES:
