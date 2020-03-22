@@ -617,23 +617,35 @@ def search_media():
 
     for result in series_results:
         if result['tmdb_id'] in series_id:
+            result['type'] = 'series'
             result['already'] = True
         else:
             result['already'] = False
     for result in anime_results:
+        result['type'] = 'anime'
         if result['tmdb_id'] in anime_id:
             result['already'] = True
         else:
             result['already'] = False
     for result in movies_results:
+        result['type'] = 'movies'
         if result['tmdb_id'] in movies_id:
             result['already'] = True
         else:
             result['already'] = False
 
-    return render_template('media_search.html',
+    results = series_results + anime_results + movies_results
+
+    platform = str(request.user_agent.platform)
+    if platform == "iphone" or platform == "android" or platform is None or platform == 'None':
+        template = 'media_search_mobile.html'
+    else:
+        template = 'media_search.html'
+
+    return render_template(template,
                            title="Media search",
                            series_results=series_results,
                            anime_results=anime_results,
                            movies_results=movies_results,
+                           results=results,
                            search=search)

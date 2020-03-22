@@ -1,18 +1,22 @@
 
 /* ---------------- CARD CSS -------------------- */
-.card-hashtag {
-    position: absolute;
-    bottom: -8px;
-    right: 16px;
-}
-
 .giveMeEllipsis {
    overflow: hidden;
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 4; /* number of lines to show */
-   line-height: X;        /* fallback */
+   -webkit-line-clamp: 3; /* number of lines to show */
+   line-height: X;       /* fallback */
+   max-height: X*N;       /* fallback */
+}
+
+.giveMeEllipsis-3 {
+   overflow: hidden;
+   text-overflow: ellipsis;
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-line-clamp: 5; /* number of lines to show */
+   line-height: X;       /* fallback */
    max-height: X*N;       /* fallback */
 }
 
@@ -27,7 +31,12 @@
 }
 
 .btn-perso {
-    padding: 10px 25px 10px 25px;
+    padding: 6px 15px 6px 15px;
+    background: #2a2b2d;
+}
+
+.btn-perso-mobile {
+    padding: 5px 10px 5px 10px;
     background: #2a2b2d;
 }
 /* ------------------------------------------ */

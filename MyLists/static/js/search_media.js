@@ -7,14 +7,16 @@
 //    })
 //});
 
-// -------------------- Add the media to the right list for the user --------------------------
+// -------------------- Add the media to the list for the user mobile version --------------------------
 function add_media(selected_cat, tmdb_id, media_type) {
     var hide_buttons = $('#buttons-'+tmdb_id);
     var change_title = $('#title-'+tmdb_id);
+    var change_title_container = $('#title-container-'+tmdb_id);
     var change_icon = $('#icon-'+tmdb_id)
-    hide_buttons.html('Media successfully added to you list. ('+selected_cat+' category)');
-    hide_buttons.attr('class', 'fs-18 p-t-10 text-center');
-    change_title.text('Added to your list!');
+
+    hide_buttons.hide();
+    change_title.text('Added to your list');
+    change_title_container.attr('class', 'fs-15 text-right m-r-10 m-b-5');
     change_icon.attr('class', 'fas fa-check');
 
     $body = $("body");
@@ -29,5 +31,4 @@ function add_media(selected_cat, tmdb_id, media_type) {
             console.log("ok");
         }
     });
-
 }
