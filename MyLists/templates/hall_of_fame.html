@@ -2,97 +2,96 @@
 
 
 {% block css %}
-<!------ CDN Datatables ------->
-<link href="{{ url_for('static', filename='css/datatables.min.css') }}" rel="stylesheet">
-<link href="{{ url_for('static', filename='css/hall_of_fame.css') }}" rel="stylesheet">
+    <!------ CDN Datatables ------->
+    <link href="{{ url_for('static', filename='css/datatables.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/hall_of_fame.css') }}" rel="stylesheet">
 {% endblock css %}
 
 
 {% block content %}
-<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">
-    HALL OF FAME
-    <hr class="mt-2 mb-0">
-</h2>
+    <h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">
+        HALL OF FAME
+        <hr class="mt-2 mb-0">
+    </h2>
+
+    {# <div class="row justify-content-center align-middle">
+    {#    {% for user in all_data %}
+    {#    <div class="col-7 m-t-25 p-t-23 p-l-35 p-b-30 {% if user['iscurrentuser'] %} current_user {% endif %}" style="border: grey 2px solid;">
+    {#        <div class="row no-gutters">
+    {#            <div class="col-1 align-middle">
+    {#                {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
+    {#                <img class="profile_picture" src="/static/profile_pics/anonymous.jpg" alt="anonymous">
+    {#                {% else %}
+    {#                <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}">
+    {#                {% endif %}
+    {#                <img style="position: absolute; top: -18px; left: -26px; width: 140px; height: 140px;"
+    {#                     src="{{ user['knowledge_frame']['frame_id'] }}.png">
+    {#            </div>
+    {#            <div class="col-3 m-l-65 m-t-15" style="margin-right: -25px;">
+    {#                {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
+    {#                <b><a class="disabled">Anonymous</a></b>
+    {#                {% else %}
+    {#                <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
+    {#                {% endif %}<br>
+    {#                <b>Joined: 01 nov 2019</b><br>
+    {#                <b>Followers: 21</b>
+    {#            </div>
+    {#            <div class="col-4 m-t-10">
+    {#                <div class="row no-gutters">
+    {#                    <div class="col text-center">
+    {#                        <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
+    {#                        disabled {% endif %}"href="/serieslist/{{ user['username'] }}">
+    {#                            <span>Series</span>
+    {#                            <br>
+    {#                            <img class="grade_picture" src="{{ user['series_data']['grade_id'] }}.png">
+    {#                            <br>
+    {#                            {{ user['series_data']['level'] }}
+    {#                        </a>
+    {#                    </div>
+    {#                    <div class="col text-center align-middle">
+    {#                        <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
+    {#                        disabled {% endif %}" href="/animelist/{{ user['username'] }}">
+    {#                            <span>Anime</span>
+    {#                            <br>
+    {#                            <img class="grade_picture" src="{{ user['anime_data']['grade_id'] }}.png">
+    {#                            <br>
+    {#                            {{ user['anime_data']['level'] }}
+    {#                        </a>
+    {#                    </div>
+    {#                    <div class="col text-center align-middle">
+    {#                        <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
+    {#                        disabled {% endif %}" href="/movieslist/{{ user['username'] }}">
+    {#                            <span>Movies</span>
+    {#                            <br>
+    {#                            <img class="grade_picture" src="{{ user['movies_data']['grade_id'] }}.png">
+    {#                            <br>
+    {#                            {{ user['movies_data']['level'] }}
+    {#                        </a>
+    {#                    </div>
+    {#                </div>
+    {#            </div>
+    {#            <div class="col-2 text-center m-t-10">
+    {#                {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
+    {#                {% else %}
+    {#                <a class="btn btn-sm btn-test" href="{{ url_for('users.badges', user_name=user['username']) }}">Badges</a>
+    {#                <br>
+    {#                {% if user["isfollowing"] and not user['iscurrentuser'] %}
+    {#                <button class="btn btn-sm btn-dark btn-smaller" onclick="follow_status('{{ user['id'] }}', this)">Unfollow</button>
+    {#                {% elif not user["isfollowing"] and not user['iscurrentuser'] %}
+    {#                <button class="btn btn-sm btn-primary" onclick="follow_status('{{ user['id'] }}', this)">Follow</button>
+    {#                {% endif %}
+    {#                {% endif %}
+    {#            </div>
+    {#            <div style="position: absolute; top: 8px; right: 12px;"><b>#{{ loop.index }}</b></div>
+    {#        </div>
+    {#    </div>
+    {#    {% endfor %}
+    {#</div> #}
 
 
-<div class="row justify-content-center align-middle">
-    {% for user in all_data %}
-    <div class="col-7 m-t-25 p-t-23 p-l-35 p-b-30 {% if user['iscurrentuser'] %} current_user {% endif %}" style="border: grey 2px solid;">
-        <div class="row no-gutters">
-            <div class="col-1 align-middle">
-                {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
-                <img class="profile_picture" src="/static/profile_pics/anonymous.jpg" alt="anonymous">
-                {% else %}
-                <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}">
-                {% endif %}
-                <img style="position: absolute; top: -18px; left: -26px; width: 140px; height: 140px;"
-                     src="{{ user['knowledge_frame']['frame_id'] }}.png">
-            </div>
-            <div class="col-3 m-l-65 m-t-15" style="margin-right: -25px;">
-                {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
-                <b><a class="disabled">Anonymous</a></b>
-                {% else %}
-                <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
-                {% endif %}<br>
-                <b>Joined: 01 nov 2019</b><br>
-                <b>Followers: 21</b>
-            </div>
-            <div class="col-4 m-t-10">
-                <div class="row no-gutters">
-                    <div class="col text-center">
-                        <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
-                        disabled {% endif %}"href="/serieslist/{{ user['username'] }}">
-                            <span>Series</span>
-                            <br>
-                            <img class="grade_picture" src="{{ user['series_data']['grade_id'] }}.png">
-                            <br>
-                            {{ user['series_data']['level'] }}
-                        </a>
-                    </div>
-                    <div class="col text-center align-middle">
-                        <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
-                        disabled {% endif %}" href="/animelist/{{ user['username'] }}">
-                            <span>Anime</span>
-                            <br>
-                            <img class="grade_picture" src="{{ user['anime_data']['grade_id'] }}.png">
-                            <br>
-                            {{ user['anime_data']['level'] }}
-                        </a>
-                    </div>
-                    <div class="col text-center align-middle">
-                        <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
-                        disabled {% endif %}" href="/movieslist/{{ user['username'] }}">
-                            <span>Movies</span>
-                            <br>
-                            <img class="grade_picture" src="{{ user['movies_data']['grade_id'] }}.png">
-                            <br>
-                            {{ user['movies_data']['level'] }}
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-2 text-center m-t-10">
-                {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
-                {% else %}
-                <a class="btn btn-sm btn-test" href="{{ url_for('users.badges', user_name=user['username']) }}">Badges</a>
-                <br>
-                {% if user["isfollowing"] and not user['iscurrentuser'] %}
-                <button class="btn btn-sm btn-dark btn-smaller" onclick="follow_status('{{ user['id'] }}', this)">Unfollow</button>
-                {% elif not user["isfollowing"] and not user['iscurrentuser'] %}
-                <button class="btn btn-sm btn-primary" onclick="follow_status('{{ user['id'] }}', this)">Follow</button>
-                {% endif %}
-                {% endif %}
-            </div>
-            <div style="position: absolute; top: 8px; right: 12px;"><b>#{{ loop.index }}</b></div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-
-<div class="m-t-30">
-    <table id="hall_of_fame" class="table table-responsive-sm text-light ml-auto mr-auto">
-        <thead>
+    <div class="m-t-30">
+        <table id="hall_of_fame" class="table table-responsive-sm text-light ml-auto mr-auto">
+            <thead>
             <tr>
                 <th class="text-center"></th>
                 <th class="text-center">Username</th>
@@ -101,69 +100,84 @@
                 <th class="text-center">Movies</th>
                 <th class="text-center"></th>
             </tr>
-        </thead>
-        <tbody>
-        {% for user in all_data %}
-            <tr class="{% if user['iscurrentuser'] %} current_user {% endif %}">
-                <td>
-                    {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
-                    <img class="profile_picture" src="/static/profile_pics/anonymous.jpg" alt="anonymous">
-                    {% else %}
-                    <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}">
-                    {% endif %}
-                    <img style="position: relative; left: 0px; top: -87px; height: 150px; width: 150px;"
-                         src="{{ user['knowledge_frame']['frame_id'] }}.png"/>
-                </td>
-                <td>
-                    {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
-                    <b><a class="disabled">Anonymous</a></b>
-                    {% else %}
-                    <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
-                    {% endif %}
-                </td>
-                <td>
-                    <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %} disabled {% endif %}" href="/serieslist/{{ user['username'] }}">
-                        <img class="grade_picture" src="{{ user['series_data']['grade_id'] }}.png">
-                        <br>
-                        {{ user['series_data']['level'] }}
-                    </a>
-                </td>
-                <td>
-                    <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %} disabled {% endif %}" href="/animelist/{{ user['username'] }}">
-                        <img class="grade_picture" src="{{ user['anime_data']['grade_id'] }}.png">
-                        <br>
-                        {{ user['anime_data']['level'] }}
-                    </a>
-                </td>
-                <td>
-                    <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %} disabled {% endif %}" href="/movieslist/{{ user['username'] }}">
-                        <img class="grade_picture" src="{{ user['movies_data']['grade_id'] }}.png">
-                        <br>
-                        {{ user['movies_data']['level'] }}
-                    </a>
-                </td>
-                <td>
-                    {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
-                    {% else %}
-                    <a class="btn btn-sm btn-test" href="{{ url_for('users.badges', user_name=user['username']) }}">Badges</a>
-                    <br>
-                    {% if user["isfollowing"] and not user['iscurrentuser'] %}
-                    <button class="btn btn-sm btn-dark btn-smaller" onclick="follow_status('{{ user['id'] }}', this)">Unfollow</button>
-                    {% elif not user["isfollowing"] and not user['iscurrentuser'] %}
-                    <button class="btn btn-sm btn-primary" onclick="follow_status('{{ user['id'] }}', this)">Follow</button>
-                    {% endif %}
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+            {% for user in all_data %}
+                <tr class="{% if user['iscurrentuser'] %} current_user {% endif %}">
+                    <td style="width: 100px;">
+                        {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
+                            <img class="profil-pic" src="/static/profile_pics/anonymous.jpg" alt=""/>
+                            <div style="position: relative;">
+                                <img class="frame-pic" src="static/img/icon_frames/border_9.png" alt="">
+                            </div>
+                            <div class="fs-12 frame-level">{{ user['knowledge_frame']['level'] }}</div>
+                        {% else %}
+                            <img class="profil-pic" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="tata">
+                            <div style="position: relative;">
+                                <img class="frame-pic" src="{{ user['knowledge_frame']['frame_id'] }}.png" alt="">
+                            </div>
+                            <div class="fs-12 frame-level">{{ user['knowledge_frame']['level'] }}</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
+                            <b><a class="disabled">Anonymous</a></b>
+                        {% else %}
+                            <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a class="text-light {% if user['isprivate'] and not user['isfollowing']
+                        and current_user.id != 1 %} disabled {% endif %}" href="/serieslist/{{ user['username'] }}">
+                            <img class="grade_picture" src="{{ user['series_data']['grade_id'] }}.png" alt="">
+                            <br>
+                            {{ user['series_data']['level'] }}
+                        </a>
+                    </td>
+                    <td>
+                        <a class="text-light {% if user['isprivate'] and not user['isfollowing']
+                        and current_user.id != 1 %} disabled {% endif %}" href="/animelist/{{ user['username'] }}">
+                            <img class="grade_picture" src="{{ user['anime_data']['grade_id'] }}.png" alt="">
+                            <br>
+                            {{ user['anime_data']['level'] }}
+                        </a>
+                    </td>
+                    <td>
+                        <a class="text-light {% if user['isprivate'] and not user['isfollowing']
+                        and current_user.id != 1 %} disabled {% endif %}" href="/movieslist/{{ user['username'] }}">
+                            <img class="grade_picture" src="{{ user['movies_data']['grade_id'] }}.png" alt="">
+                            <br>
+                            {{ user['movies_data']['level'] }}
+                        </a>
+                    </td>
+                    <td>
+                        {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
+                        {% else %}
+                            <a class="btn btn-sm btn-badges"
+                               href="{{ url_for('users.badges', user_name=user['username']) }}">Badges
+                            </a>
+                            <br>
+                            {% if user["isfollowing"] and not user['iscurrentuser'] %}
+                                <button class="btn btn-sm btn-dark btn-smaller"
+                                        onclick="follow_status('{{ user['id'] }}', this)">Unfollow
+                                </button>
+                            {% elif not user["isfollowing"] and not user['iscurrentuser'] %}
+                                <button class="btn btn-sm btn-primary"
+                                        onclick="follow_status('{{ user['id'] }}', this)">Follow
+                                </button>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock content %}
 
 
 {% block script %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/hall_of_fame.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/hall_of_fame.js') }}"></script>
 {% endblock script %}
 

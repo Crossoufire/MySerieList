@@ -59,18 +59,26 @@ hr {
 
 @media (max-width: 490px) {
     .header-profile-img {
-        left: 15px;
-        height: 110px;
-        width: 110px;
+        left: 30px;
+        bottom: 70px;
+        height: 80px;
+        width: 80px;
     }
     .header-profile-data {
         left: 140px;
         bottom: 20px;
     }
     .header-knowledge-level {
-        left: 44px;
+        left: 50px;
+        bottom: 40px;
         font-size: 10pt;
         min-width: 40px;
+    }
+    .header-profile-img-2 {
+        left: 5px;
+        bottom: 45px;
+        height: 130px;
+        width: 130px;
     }
 }
 /* --------------------------------- */
@@ -126,7 +134,7 @@ hr {
 }
 
 .tata {
-    padding: 0px 8px 8px 8px;
+    padding: 0 8px 8px 8px;
 }
 
 .media-container {
@@ -141,8 +149,6 @@ hr {
    display: -webkit-box;
    -webkit-box-orient: vertical;
    -webkit-line-clamp: 1; /* number of lines to show */
-   line-height: X;        /* fallback */
-   max-height: X*N;       /* fallback */
 }
 
 @media (max-width: 990px) {
@@ -151,7 +157,7 @@ hr {
         padding-right: 100px;
     }
 }
-@media (max-width: 767.97px) {
+@media (max-width: 768px) {
     .media-container {
         position: relative;
         height: 200px;
@@ -159,8 +165,8 @@ hr {
 }
 @media (max-width: 650px) {
     .account-wrapper {
-        padding-left: 0px;
-        padding-right: 0px;
+        padding-left: 0;
+        padding-right: 0;
     }
 }
 @media (max-width: 490px) {
@@ -185,19 +191,19 @@ hr {
 
 .account-bar {
     height: 100%;
-    margin: 0px auto;
+    margin: 0 auto;
 }
 
 .account-bar-name {
     font-size: 12pt;
-    margin: 0px 0px 0px 5px;
+    margin: 0 0 0 5px;
     display: inline-block;
     vertical-align: bottom;
 }
 
 .account-bar-level {
     font-size: 12pt;
-    margin: 0px 0px 0px;
+    margin: 0 0 0;
     display: inline-block;
 }
 
@@ -222,7 +228,7 @@ hr {
     height: 10px;
     width: 70%;
     background: grey;
-    margin: 0px 0px 0px 5px;
+    margin: 0 0 0 5px;
     display: inline-block;
     vertical-align: middle;
 }
@@ -262,33 +268,33 @@ hr {
 
 .xp-increase-glow1 {
     position: absolute;
-    margin: 0px 0px 0px -2px;
-    left: 0px;
-    top: 0px;
+    margin: 0 0 0 -2px;
+    left: 0;
+    top: 0;
     background: #fff;
     width: 5px;
     height: 100%;
-    border-radius: 0px;
+    border-radius: 0;
     -webkit-filter: blur(2px);
 }
 
 .xp-increase-glow2 {
     position: absolute;
-    margin: -5px 0px 0px -2px;
-    left: 0px;
-    top: 0px;
+    margin: -5px 0 0 -2px;
+    left: 0;
+    top: 0;
     background: #aaf;
     width: 5px;
     height: 200%;
-    border-radius: 0px;
+    border-radius: 0;
     -webkit-filter: blur(10px);
 }
 
 .xp-increase-glow3 {
     position: absolute;
-    margin: 0px 0px 0px -5px;
-    left: 0px;
-    top: 0px;
+    margin: 0 0 0 -5px;
+    left: 0;
+    top: 0;
     background: #fff;
     width: 10px;
     height: 100%;
