@@ -28,15 +28,15 @@
     <div class="tab-pane fade show active" id="series">
         <div class="d-flex flex-wrap justify-content-center m-t-30">
             {% for media in series_results %}
-            <div class="card mb-4" style="background: #216c7d; width: 700px; border-radius: 0px;">
+            <div class="card mb-4" style="background: #216c7d; width: 700px; border-radius: 0;">
                 <div class="row no-gutters">
                     <div class="col-3 p-3">
-                        <img width="150" src="{{ media['poster_path'] }}">
+                        <img width="150" style="min-height: 225px;" src="{{ media['poster_path'] }}" alt=""/>
                     </div>
                     <div class="col-9">
                         <div class="card-body p-3">
                             <h5 class="card-title">
-                                <a class="text-light fs-20 giveMeEllipsis2">{{ media['name'] }}</a>
+                                <a class="text-light fs-20 giveMeEllipsis2" href="{{ media['url'] }}" target="_blank">{{ media['name'] }}</a>
                                 <div class="fs-15 text-grey"><i>{{ media['first_air_date'] }}</i></div>
                             </h5>
                             {% if media['overview'] %}
@@ -57,12 +57,19 @@
                                 <span id="icon-{{ media['tmdb_id'] }}" class="fas fa-plus"></span>
                                 <span id="title-{{ media['tmdb_id'] }}">Add</span>
                                 <div id="buttons-{{ media['tmdb_id'] }}" style="display: inline-block;">
-                                    <span class="btn btn-perso" onclick="add_media('Watching', {{ media['tmdb_id'] }}, 'serieslist')" data-toggle="tooltip" title="Watching">W</span>
-                                    <span class="btn btn-perso" onclick="add_media('Completed', {{ media['tmdb_id'] }}, 'serieslist')" data-toggle="tooltip" title="Completed">C</span>
-                                    <span class="btn btn-perso" onclick="add_media('On Hold', {{ media['tmdb_id'] }}, 'serieslist')" data-toggle="tooltip" title="On Hold">H</span>
-                                    <span class="btn btn-perso" onclick="add_media('Random', {{ media['tmdb_id'] }}, 'serieslist')" data-toggle="tooltip" title="Random">R</span>
-                                    <span class="btn btn-perso" onclick="add_media('Dropped', {{ media['tmdb_id'] }}, 'serieslist')" data-toggle="tooltip" title="Dropped">D</span>
-                                    <span class="btn btn-perso" onclick="add_media('Plan to Watch', {{ media['tmdb_id'] }}, 'serieslist')" data-toggle="tooltip" title="Plan to Watch">P</span>
+                                    <span class="btn btn-perso" onclick="add_media('Watching', {{ media['tmdb_id'] }},
+                                            'serieslist')" data-toggle="tooltip" title="Watching">W</span>
+                                    <span class="btn btn-perso" onclick="add_media('Completed', {{ media['tmdb_id'] }},
+                                            'serieslist')" data-toggle="tooltip" title="Completed">C</span>
+                                    <span class="btn btn-perso" onclick="add_media('On Hold', {{ media['tmdb_id'] }},
+                                            'serieslist')" data-toggle="tooltip" title="On Hold">H</span>
+                                    <span class="btn btn-perso" onclick="add_media('Random', {{ media['tmdb_id'] }},
+                                            'serieslist')" data-toggle="tooltip" title="Random">R</span>
+                                    <span class="btn btn-perso" onclick="add_media('Dropped', {{ media['tmdb_id'] }},
+                                            'serieslist')" data-toggle="tooltip" title="Dropped">D</span>
+                                    <span class="btn btn-perso" onclick="add_media('Plan to Watch',
+                                            {{ media['tmdb_id'] }}, 'serieslist')" data-toggle="tooltip"
+                                          title="Plan to Watch">P</span>
                                 </div>
                             </div>
                             {% endif %}
@@ -76,15 +83,15 @@
     <div class="tab-pane fade" id="anime">
         <div class="d-flex flex-wrap justify-content-center m-t-30">
             {% for media in anime_results %}
-            <div class="card mb-4" style="background: #945141; width: 700px; border-radius: 0px;">
+            <div class="card mb-4" style="background: #945141; width: 700px; border-radius: 0;">
                 <div class="row no-gutters">
                     <div class="col-3 p-3">
-                        <img width="150" src="{{ media['poster_path'] }}">
+                        <img width="150" src="{{ media['poster_path'] }}" alt=""/>
                     </div>
                     <div class="col-9">
                         <div class="card-body p-3">
                             <h5 class="card-title">
-                                <a class="text-light fs-20 giveMeEllipsis2">{{ media['name'] }}</a>
+                                <a class="text-light fs-20 giveMeEllipsis2" href="{{ media['url'] }}" target="_blank">{{ media['name'] }}</a>
                                 <div class="fs-15 text-grey"><i>{{ media['first_air_date'] }}</i></div>
                             </h5>
                             {% if media['overview'] %}
@@ -105,12 +112,19 @@
                                 <span id="icon-{{ media['tmdb_id'] }}" class="fas fa-plus"></span>
                                 <span id="title-{{ media['tmdb_id'] }}">Add</span>
                                 <div id="buttons-{{ media['tmdb_id'] }}" style="display: inline-block;">
-                                    <span class="btn btn-perso" onclick="add_media('Watching', {{ media['tmdb_id'] }}, 'animelist')" data-toggle="tooltip" title="Watching">W</span>
-                                    <span class="btn btn-perso" onclick="add_media('Completed', {{ media['tmdb_id'] }}, 'animelist')" data-toggle="tooltip" title="Completed">C</span>
-                                    <span class="btn btn-perso" onclick="add_media('On Hold', {{ media['tmdb_id'] }}, 'animelist')" data-toggle="tooltip" title="On Hold">H</span>
-                                    <span class="btn btn-perso" onclick="add_media('Random', {{ media['tmdb_id'] }}, 'animelist')" data-toggle="tooltip" title="Random">R</span>
-                                    <span class="btn btn-perso" onclick="add_media('Dropped', {{ media['tmdb_id'] }}, 'animelist')" data-toggle="tooltip" title="Dropped">D</span>
-                                    <span class="btn btn-perso" onclick="add_media('Plan to Watch', {{ media['tmdb_id'] }}, 'animelist')" data-toggle="tooltip" title="Plan to Watch">P</span>
+                                    <span class="btn btn-perso" onclick="add_media('Watching', {{ media['tmdb_id'] }},
+                                            'animelist')" data-toggle="tooltip" title="Watching">W</span>
+                                    <span class="btn btn-perso" onclick="add_media('Completed', {{ media['tmdb_id'] }},
+                                            'animelist')" data-toggle="tooltip" title="Completed">C</span>
+                                    <span class="btn btn-perso" onclick="add_media('On Hold', {{ media['tmdb_id'] }},
+                                            'animelist')" data-toggle="tooltip" title="On Hold">H</span>
+                                    <span class="btn btn-perso" onclick="add_media('Random', {{ media['tmdb_id'] }},
+                                            'animelist')" data-toggle="tooltip" title="Random">R</span>
+                                    <span class="btn btn-perso" onclick="add_media('Dropped', {{ media['tmdb_id'] }},
+                                            'animelist')" data-toggle="tooltip" title="Dropped">D</span>
+                                    <span class="btn btn-perso" onclick="add_media('Plan to Watch',
+                                            {{ media['tmdb_id'] }}, 'animelist')"
+                                          data-toggle="tooltip" title="Plan to Watch">P</span>
                                 </div>
                             </div>
                             {% endif %}
@@ -124,15 +138,15 @@
     <div class="tab-pane fade" id="movies">
         <div class="d-flex flex-wrap justify-content-center m-t-30">
             {% for media in movies_results %}
-            <div class="card mb-4" style="background: #8c7821; width: 700px; border-radius: 0px;">
+            <div class="card mb-4" style="background: #8c7821; width: 700px; border-radius: 0;">
                 <div class="row no-gutters">
                     <div class="col-3 p-3">
-                        <img width="150" src="{{ media['poster_path'] }}">
+                        <img width="150" src="{{ media['poster_path'] }}" alt=""/>
                     </div>
                     <div class="col-9">
                         <div class="card-body p-3">
                             <h5 class="card-title">
-                                <a class="text-light fs-20 giveMeEllipsis2">{{ media['name'] }}</a>
+                                <a class="text-light fs-20 giveMeEllipsis2" href="{{ media['url'] }}" target="_blank">{{ media['name'] }}</a>
                                 <div class="fs-15 text-grey"><i>{{ media['first_air_date'] }}</i></div>
                             </h5>
                             {% if media['overview'] %}
@@ -153,8 +167,10 @@
                                 <span id="icon-{{ media['tmdb_id'] }}" class="fas fa-plus"></span>
                                 <span id="title-{{ media['tmdb_id'] }}">Add</span>
                                 <div id="buttons-{{ media['tmdb_id'] }}" style="display: inline-block;">
-                                    <span class="btn btn-perso" onclick="add_media('Completed', {{ media['tmdb_id'] }}, 'movieslist')">Completed</span>
-                                    <span class="btn btn-perso" onclick="add_media('Plan to Watch', {{ media['tmdb_id'] }}, 'movieslist')">Plan to Watch</span>
+                                    <span class="btn btn-perso" onclick="add_media('Completed', {{ media['tmdb_id'] }},
+                                            'movieslist')">Completed</span>
+                                    <span class="btn btn-perso" onclick="add_media('Plan to Watch',
+                                            {{ media['tmdb_id'] }}, 'movieslist')">Plan to Watch</span>
                                 </div>
                             </div>
                             {% endif %}

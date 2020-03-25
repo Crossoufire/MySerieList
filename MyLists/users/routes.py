@@ -1,10 +1,10 @@
 from MyLists import app, db
 from MyLists.users.forms import AddFollowForm
-from MyLists.models import User, ListType, Ranks
+from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_badges, get_user_data, \
-    get_knowledge_grade, get_knowledge_frame
+    get_knowledge_grade, get_knowledge_frame, get_updates
 
 
 bp = Blueprint('users', __name__)
@@ -131,11 +131,11 @@ def level_grade_data():
     return render_template('level_grade_data.html', title='Level grade data', data=ranks)
 
 
-@bp.route("/knowledge_grade_data", methods=['GET'])
+@bp.route("/knowledge_frame_data", methods=['GET'])
 @login_required
-def knowledge_grade_data():
-    ranks = Ranks.query.filter_by(type='knowledge_rank\n').order_by(Ranks.level.asc()).all()
-    return render_template('knowledge_grade_data.html', title='Knowledge grade data', data=ranks)
+def knowledge_frame_data():
+    ranks = Frames.query.all()
+    return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
 
 
 @bp.route("/follow_status", methods=['POST'])
@@ -164,3 +164,24 @@ def follow_status():
         app.logger.info('[{}] Follow with ID {} unfollowed'.format(current_user.id, follow_id))
 
     return '', 204
+
+
+@bp.route("/all_history/<user_name>", methods=['GET'])
+@login_required
+def all_history(user_name):
+    user = User.query.filter_by(username=user_name).first()
+
+    # No account with this username and protection of the admin account
+    if user is None or user.id == 1 and current_user.id != 1:
+        abort(404)
+
+    # Check if the account is private or in the follow list
+    if current_user.id == user.id or current_user.id == 1:
+        pass
+    elif user.private and not current_user.is_following(user):
+        abort(404)
+
+    updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
+    media_updates = get_updates(updates)
+
+    return render_template('all_history.html', title='Media History', media_updates=media_updates)

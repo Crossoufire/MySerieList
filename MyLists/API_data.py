@@ -119,55 +119,55 @@ class ApiData:
 
     def media_search(self, element_name):
         try:
-            response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={}&query={}"
+            response_tv = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
+                                    .format(self.tmdb_api_key, element_name))
+            response_movies = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
                                     .format(self.tmdb_api_key, element_name))
         except Exception as e:
             app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
-            return None
-
-        data = self.check_response_status(response)
-        if data is False:
             return None, None, None
 
-        if data.get("total_results", 0) == 0:
+        data_tv = self.check_response_status(response_tv)
+        data_movies = self.check_response_status(response_movies)
+        if data_tv is False and data_movies is False:
             return None, None, None
 
-        # Recover all the results on one page. Max 20 results.
-        series_results, anime_results, movies_results = [], [], []
-        for result in data['results']:
-            media_data = {}
+        if data_tv.get("total_results", 0) == 0 and data_movies.get("total_results", 0) == 0:
+            return None, None, None
 
-            if result['media_type'] == 'person':
-                continue
+        # Recover movies results
+        movies_results = []
+        for result in data_movies['results']:
+            media_data = {'name': result['title'],
+                          'overview': result['overview'],
+                          'tmdb_id': result["id"],
+                          "first_air_date": result.get('release_date', 'Unknown') or 'Unknown',
+                          'url': "https://www.themoviedb.org/movie/{}".format(result["id"])}
 
-            if result['media_type'] == 'tv':
-                media_data['name'] = result['name']
-                media_data['overview'] = result['overview']
-                media_data['tmdb_id'] = result["id"]
-                media_data["first_air_date"] = result.get('first_air_date', 'Unknown') or 'Unknown'
-
-                if result["poster_path"]:
-                    media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
-                else:
-                    media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
-
-                if result['origin_country'] == 'JP' or result['original_language'] == 'ja' and 16 in result['genre_ids']:
-                    anime_results.append(media_data)
-                else:
-                    series_results.append(media_data)
-
+            if result["poster_path"]:
+                media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
             else:
-                media_data['name'] = result['title']
-                media_data['overview'] = result['overview']
-                media_data['tmdb_id'] = result["id"]
-                media_data["first_air_date"] = result.get('release_date', 'Unknown') or 'Unknown'
+                media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
+            movies_results.append(media_data)
 
-                if result["poster_path"]:
-                    media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
-                else:
-                    media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
+        # Recover anime and series results
+        series_results, anime_results = [], []
+        for result in data_tv['results']:
+            media_data = {'name': result['name'],
+                          'overview': result['overview'],
+                          'tmdb_id': result["id"],
+                          "first_air_date": result.get('first_air_date', 'Unknown') or 'Unknown',
+                          'url': "https://www.themoviedb.org/tv/{}".format(result["id"])}
 
-                movies_results.append(media_data)
+            if result["poster_path"]:
+                media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
+            else:
+                media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
+
+            if result['origin_country'] == 'JP' or result['original_language'] == 'ja' and 16 in result['genre_ids']:
+                anime_results.append(media_data)
+            else:
+                series_results.append(media_data)
 
         return series_results, anime_results, movies_results
 

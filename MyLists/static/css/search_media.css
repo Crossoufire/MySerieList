@@ -6,8 +6,6 @@
    display: -webkit-box;
    -webkit-box-orient: vertical;
    -webkit-line-clamp: 3; /* number of lines to show */
-   line-height: X;       /* fallback */
-   max-height: X*N;       /* fallback */
 }
 
 .giveMeEllipsis-3 {
@@ -16,8 +14,6 @@
    display: -webkit-box;
    -webkit-box-orient: vertical;
    -webkit-line-clamp: 5; /* number of lines to show */
-   line-height: X;       /* fallback */
-   max-height: X*N;       /* fallback */
 }
 
 .giveMeEllipsis2 {
@@ -26,8 +22,6 @@
    display: -webkit-box;
    -webkit-box-orient: vertical;
    -webkit-line-clamp: 2; /* number of lines to show */
-   line-height: X;        /* fallback */
-   max-height: X*N;       /* fallback */
 }
 
 .btn-perso {

@@ -12,8 +12,8 @@
     border-width: 0 35px 35px 0;
     border-color: transparent #2d6f22;
     position: absolute;
-	right: 0px;
-	top: 0px;
+	right: 0;
+	top: 0;
 }
 
 .giveMeEllipsis {
@@ -21,9 +21,7 @@
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 3; /* number of lines to show */
-   line-height: X;        /* fallback */
-   max-height: X*N;       /* fallback */
+   -webkit-line-clamp: 5; /* number of lines to show */
 }
 
 .giveMeEllipsis2 {
@@ -32,8 +30,6 @@
    display: -webkit-box;
    -webkit-box-orient: vertical;
    -webkit-line-clamp: 2; /* number of lines to show */
-   line-height: X;        /* fallback */
-   max-height: X*N;       /* fallback */
 }
 /* ------------------------------------------ */
 

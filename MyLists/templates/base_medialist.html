@@ -13,15 +13,15 @@
 {% block content %}
 <div class="back-image p-b-50">
     <div class="justify-mobile d-flex flex-wrap">
-        {#<div class="add-element m-l-25 m-t-20">
-            {% if target_user_id == current_user.get_id() %}
-                <input id="autocomplete" class='modded-input' placeholder="Add new media" />
-                <br>
-                {% block add %}
-                {% endblock add %}
-            {% endif %}
-        </div>
-        <input type="hidden" id="element_id" value=""/>#}
+{#        <div class="add-element m-l-25 m-t-20">#}
+{#            {% if target_user_id == current_user.get_id() %}#}
+{#                <input id="autocomplete" class='modded-input' placeholder="Add new media" />#}
+{#                <br>#}
+{#                {% block add %}#}
+{#                {% endblock add %}#}
+{#            {% endif %}#}
+{#        </div>#}
+        <input type="hidden" id="element_id" value=""/>
         <div class="search-by m-r-25 m-t-20">
             <input id="searchInput" class='modded-input' placeholder="Search in the list" onkeyup="searchElement()">
             <br>
