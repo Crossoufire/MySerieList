@@ -1,6 +1,5 @@
 
 Medialists:
-	Add: Button 'More results' to the autocomplete
 	Add: Movie director in metadata modal
 	Add: In modal add 'Also in the list of' kind of info of followed people
 	Add: If API is down, user can still add a media but check in our database instead of the API
@@ -9,19 +8,17 @@ Homepage:
     Fix: Update pictures
 
 Account:
-	Add: Time watched by weeks, month and years
-    Add: Change background image
+    Enhance: Possibility to change background image
 
 Settings:
     Enhance: Better CSS
 
 General:
     Add: Contact form
-    Add: Page with full personal history
     Add: Collection Movies to finish (70%)
 
 Routes:
     Enhance: By default create one admin user that only has admin view
              (HoF, Global Stats, Administration and Account settings) and one standard user
     Enhance: Change the hamburger display to a vertical panel in mobile
-    Add: Send mail when new season/movie is airing
+    Add: Send mail when new season/movie is airing/released

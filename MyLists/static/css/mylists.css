@@ -69,6 +69,18 @@ hr {
         padding-right: 0;
     }
 }
+
+@media (max-width: 450px) {
+    .modded-form {
+        width: 100px;
+    }
+}
+
+@media (max-width: 320px) {
+    .modded-form {
+        width: 90px;
+    }
+}
 /* ---------------------------------------------------------- */
 
 
@@ -97,4 +109,8 @@ hr {
 
 .navbar-nav .nav-item:hover::after {
     width: 100%;
+}
+
+.navbar .nav {
+    white-space: nowrap;
 }
