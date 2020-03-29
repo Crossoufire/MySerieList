@@ -1,6 +1,8 @@
 # MyLists
 
-MyLists is a website with a beautiful and clear interface which allows you to track all your TV shows / Anime / Movies. It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see you follow' list and compare it to yours. You can see a live version here : [https://mylists.info](https://mylists.info).
+MyLists is a website with a beautiful and clear interface which allows you to track all your TV shows / Anime / Movies. 
+It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see you follow' list and 
+compare it to yours. You can see a live version here : [https://mylists.info](https://mylists.info).
 
 ![MyLists](https://raw.githubusercontent.com/Crossoufire/MyLists/master/MyLists/static/img/home_img1.jpg)
 
@@ -42,19 +44,26 @@ port = <port to connect to>
 api_key = <API key of TheMovieDB. You need to register on their website to get one>
 ```
 
-For example if you want to use Gmail, set `server = smtp.gmail.com` and `port = 465` . If you need more settings, feel free to adapt it as you want (file `Mylists/__init__.py`, parameters `app.config['MAIL_X]`).
+For example if you want to use Gmail, set `server = smtp.gmail.com` and `port = 465` . If you need more settings, feel 
+free to adapt it as you want (file `Mylists/__init__.py`, parameters `app.config['MAIL_X]`).
 
-If you want to first test the project locally, you should change the values of `app.config['TESTING']` to `True` and `app.config["SESSION_COOKIE_SECURE"]` to `False` in the `Mylists/__init__.py` file.
+If you want to first test the project locally, you should change the values of `app.config['TESTING']` to `True` and 
+`app.config["SESSION_COOKIE_SECURE"]` to `False` in the `Mylists/__init__.py` file.
 
 Then run the command `python3 Run.py` and open the link [http://localhost:5000](http://localhost:5000).
 
 ## Administration
 
-When you run the program for the first time, it will create a user `admin` with the password `password` with the ID `1`. Do NOT forget to change the password. This can be done at the beginning of the file `Mylists/routes.py` or using the UI. All the administration tasks are filtered on the user ID (ID == 1), so feel free to also change the username if you want (again in the file `Mylists/routes.py` or using the UI). The admin has access to the pages `/admin`.
+When you run the program for the first time, it will create a user `admin` with the password `password` with the ID `1`.
+ Do NOT forget to change the password. This can be done at the beginning of the file `Mylists/routes.py` or using the 
+ UI. All the administration tasks are filtered on the user ID (ID == 1), so feel free to also change the username if you
+  want (again in the file `Mylists/routes.py` or using the UI). The admin has access to the pages `/admin`.
  
 ## Misc
 
-We started this project to fulfill our needs. The live version [https://mylists.info](https://mylists.info) runs on a raspberry pi 3B+, thus not meant to be used by thousand of people at the same time. If you can see the register button at the top right of the homepage, feel free to do it. Otherwise, you can run your own version of MyLists ;)
+We started this project to fulfill our needs. The live version [https://mylists.info](https://mylists.info) runs on a 
+raspberry pi 3B+, thus not meant to be used by thousand of people at the same time. If you can see the register button 
+at the top right of the homepage, feel free to do it. Otherwise, you can run your own version of MyLists ;)
 
 ## Contact
 

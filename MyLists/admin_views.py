@@ -17,6 +17,7 @@ class UserAdminView(ModelView):
     column_searchable_list = ('username', 'email')
     column_sortable_list = ('id', 'username', 'email', 'active', 'private')
 
+
 class LastUpdateAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
@@ -25,6 +26,7 @@ class LastUpdateAdminView(ModelView):
                    'old_episode', 'new_episode', 'date')
     column_searchable_list = ('user_id', 'media_name')
     column_sortable_list = ('user_id', 'media_name', 'date')
+
 
 # ------------------------------------------------------ SERIES ------------------------------------------------------ #
 
@@ -36,6 +38,7 @@ class SeriesAdminView(ModelView):
     column_exclude_list = ('original_name', 'homepage', 'synopsis', 'image_cover', 'in_production')
     column_searchable_list = ['name']
 
+
 class SeriesListAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
@@ -43,6 +46,7 @@ class SeriesListAdminView(ModelView):
     column_list = ('user_id', 'series_id', 'current_season', 'last_episode_watched', 'status', 'score')
     column_searchable_list = ('user_id', 'series_id', 'status')
     column_sortable_list = ('id', 'user_id', 'series_id', 'status')
+
 
 class SeriesEpisodesPerSeasonAdminView(ModelView):
     def is_accessible(self):
@@ -52,6 +56,7 @@ class SeriesEpisodesPerSeasonAdminView(ModelView):
     column_searchable_list = ['series_id']
     column_sortable_list = ('id', 'series_id')
 
+
 class SeriesGenreAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
@@ -59,6 +64,7 @@ class SeriesGenreAdminView(ModelView):
     column_list = ('series_id', 'genre')
     column_searchable_list = ['series_id']
     column_sortable_list = ('series_id', 'genre')
+
 
 class SeriesNetworkAdminView(ModelView):
     def is_accessible(self):
@@ -68,6 +74,7 @@ class SeriesNetworkAdminView(ModelView):
     column_searchable_list = ('series_id', 'network')
     column_sortable_list = ('series_id', 'network')
 
+
 class SeriesActorsAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
@@ -75,6 +82,7 @@ class SeriesActorsAdminView(ModelView):
     column_list = ('series_id', 'name')
     column_searchable_list = ('series_id', 'name')
     column_sortable_list = ('series_id', 'name')
+
 
 # ------------------------------------------------------ ANIME ------------------------------------------------------- #
 
@@ -89,6 +97,7 @@ class AnimeAdminView(ModelView):
                             'episode_duration', 'total_seasons', 'total_episodes', 'vote_average', 'vote_count',
                             'popularity', 'first_air_date', 'last_air_date', 'last_update')
 
+
 class AnimeListAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
@@ -96,6 +105,7 @@ class AnimeListAdminView(ModelView):
     column_list = ('user_id', 'anime_id', 'current_season', 'last_episode_watched', 'status', 'score')
     column_searchable_list = ('user_id', 'anime_id', 'status')
     column_sortable_list = ('id', 'user_id', 'anime_id', 'status')
+
 
 class AnimeEpisodesPerSeasonAdminView(ModelView):
     def is_accessible(self):
@@ -105,6 +115,7 @@ class AnimeEpisodesPerSeasonAdminView(ModelView):
     column_searchable_list = ['anime_id']
     column_sortable_list = ('id', 'anime_id')
 
+
 class AnimeGenreAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
@@ -112,6 +123,7 @@ class AnimeGenreAdminView(ModelView):
     column_list = ('anime_id', 'genre')
     column_searchable_list = ('anime_id', 'genre')
     column_sortable_list = ('anime_id', 'genre')
+
 
 class AnimeNetworkAdminView(ModelView):
     def is_accessible(self):
@@ -121,6 +133,7 @@ class AnimeNetworkAdminView(ModelView):
     column_searchable_list = ('anime_id', 'network')
     column_sortable_list = ('anime_id', 'network')
 
+
 class AnimeActorsAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
@@ -128,6 +141,7 @@ class AnimeActorsAdminView(ModelView):
     column_list = ('anime_id', 'name')
     column_searchable_list = ('anime_id', 'name')
     column_sortable_list = ('anime_id', 'name')
+
 
 # ------------------------------------------------------ MOVIES ------------------------------------------------------ #
 
@@ -141,6 +155,7 @@ class MoviesAdminView(ModelView):
     column_sortable_list = ('id', 'name', 'original_name', 'release_date', 'runtime', 'original_language',
                             'vote_average', 'vote_count', 'popularity', 'budget', 'revenue')
 
+
 class MoviesGenreAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
@@ -148,6 +163,7 @@ class MoviesGenreAdminView(ModelView):
     column_list = ('movies_id', 'genre')
     column_searchable_list = ['movies_id']
     column_sortable_list = ('movies_id', 'genre')
+
 
 class MoviesListAdminView(ModelView):
     def is_accessible(self):
@@ -157,6 +173,7 @@ class MoviesListAdminView(ModelView):
     column_searchable_list = ('user_id', 'movies_id', 'status')
     column_sortable_list = ('id', 'user_id', 'movies_id', 'status')
 
+
 class MoviesActorsAdminView(ModelView):
     def is_accessible(self):
         return current_user.get_id() == '1'
@@ -165,17 +182,19 @@ class MoviesActorsAdminView(ModelView):
     column_searchable_list = ('movies_id', 'name')
     column_sortable_list = ('id', 'movies_id', 'name')
 
+
 # -------------------------------------------------------------------------------------------------------------------- #
 
 # Override of the index flask-admin view:
 class MyHomeAdminView(AdminIndexView):
-    @expose('/')
+    @expose()
     def index(self):
         return self.render('admin/index.html')
 
     @staticmethod
-    def is_accessible():
+    def is_accessible(**kwargs):
         return current_user.get_id() == '1'
+
 
 # Create the /admin index view:
 admin = Admin(app, name='Admin Panel', index_view=MyHomeAdminView())

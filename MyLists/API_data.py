@@ -3,10 +3,10 @@ import requests
 import urllib.request
 
 from PIL import Image
+from MyLists import app
 from pathlib import Path
 from flask import url_for
 from jikanpy import Jikan
-from MyLists import app
 from MyLists.models import ListType
 
 
@@ -20,7 +20,7 @@ class ApiData:
             if list_type != ListType.MOVIES:
                 response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
                                         .format(self.tmdb_api_key, element_name))
-            if list_type == ListType.MOVIES:
+            elif list_type == ListType.MOVIES:
                 response = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
                                         .format(self.tmdb_api_key, element_name))
         except Exception as e:
@@ -120,9 +120,9 @@ class ApiData:
     def media_search(self, element_name):
         try:
             response_tv = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
-                                    .format(self.tmdb_api_key, element_name))
+                                       .format(self.tmdb_api_key, element_name))
             response_movies = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
-                                    .format(self.tmdb_api_key, element_name))
+                                           .format(self.tmdb_api_key, element_name))
         except Exception as e:
             app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
             return None, None, None
@@ -176,7 +176,7 @@ class ApiData:
             if list_type != ListType.MOVIES:
                 response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}&append_to_response=credits"
                                         .format(api_id, self.tmdb_api_key))
-            if list_type == ListType.MOVIES:
+            elif list_type == ListType.MOVIES:
                 response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}&append_to_response=credits"
                                         .format(api_id, self.tmdb_api_key))
         except Exception as e:

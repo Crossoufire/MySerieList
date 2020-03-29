@@ -14,7 +14,7 @@ def send_reset_email(user):
 
     path = Path(app.root_path, "static/emails/password_reset.html")
     email_template = open(path).read().replace("{1}", user.username)
-    email_template = email_template.replace("{2}", url_for('reset_passord_token', token=token, _external=True))
+    email_template = email_template.replace("{2}", url_for('auth.reset_password_token', token=token, _external=True))
     msg.html = email_template
 
     try:
@@ -35,7 +35,7 @@ def send_register_email(user):
 
     path = Path(app.root_path, "static/emails/register.html")
     email_template = open(path).read().replace("{1}", user.username)
-    email_template = email_template.replace("{2}", url_for('register_account_token', token=token, _external=True))
+    email_template = email_template.replace("{2}", url_for('auth.register_account_token', token=token, _external=True))
     msg.html = email_template
 
     try:

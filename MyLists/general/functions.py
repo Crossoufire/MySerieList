@@ -155,6 +155,7 @@ def compute_media_time_spent(list_type):
 
         db.session.commit()
 
+
 # ---------------------------------------- DB add/refresh from CSV data ---------------------------------------------- #
 
 def add_ranks_to_db():
@@ -255,7 +256,6 @@ def refresh_db_frames():
         frames[i-1].level = int(list_all_frames[i][0])
         frames[i-1].image_id = list_all_frames[i][1]
 
-# -------------------------------------------- Add data Retroactively ------------------------------------------------ #
 
 def add_collections_movies():
     print('Started.')

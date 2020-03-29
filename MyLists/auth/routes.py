@@ -22,7 +22,7 @@ def home():
             flash('Your Account is not activated. Please check your e-mail address to activate your account.', 'danger')
         elif user and bcrypt.check_password_hash(user.password, login_form.login_password.data):
             login_user(user, remember=login_form.login_remember.data)
-            app.logger.info('[{}] Logged in'.format(user.id))
+            app.logger.info('[{}] Logged in.'.format(user.id))
             flash("You're now logged in. Welcome {0}".format(user.username), "success")
             next_page = request.args.get('next')
             if next_page:
@@ -38,7 +38,7 @@ def home():
                 else:
                     abort(404)
         else:
-            flash('Login Failed. Please check Username and Password', 'warning')
+            flash('Login Failed. Please check username and password.', 'warning')
     if register_form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(register_form.register_password.data).decode('utf-8')
         user = User(username=register_form.register_username.data,
@@ -47,10 +47,10 @@ def home():
                     registered_on=datetime.utcnow())
         db.session.add(user)
         db.session.commit()
-        app.logger.info('[{}] New account registration : username = {}, email = {}'
+        app.logger.info('[{}] New account registration: Username = {}, email = {}'
                         .format(user.id, register_form.register_username.data, register_form.register_email.data))
         if send_register_email(user):
-            flash('Your account has been created. Check your e-mail address to activate your account!', 'info')
+            flash('Your account has been created. Check your e-mail address to activate your account.', 'info')
             return redirect(url_for('auth.home'))
         else:
             app.logger.error('[SYSTEM] Error while sending the registration email to {}'.format(user.email))
@@ -67,9 +67,7 @@ def home():
         else:
             abort(404)
 
-    return render_template('home.html',
-                           login_form=login_form,
-                           register_form=register_form)
+    return render_template('home.html', login_form=login_form, register_form=register_form)
 
 
 @bp.route("/logout", methods=['GET'])
@@ -117,11 +115,11 @@ def reset_passord_token(token):
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user.password = hashed_password
         db.session.commit()
-        app.logger.info('[{}] Password reset via reset password email'.format(user.id))
-        flash('Your password has been updated! You are now able to log in', 'success')
+        app.logger.info('[{}] Password reset via reset password email.'.format(user.id))
+        flash('Your password has been updated! You are now able to log in.', 'success')
         return redirect(url_for('auth.home'))
 
-    return render_template('reset_passord_token.html', title='Reset Password', form=form)
+    return render_template('reset_password_token.html', title='Reset Password', form=form)
 
 
 @bp.route("/register_account/<token>", methods=['GET'])
@@ -131,7 +129,7 @@ def register_account_token(token):
 
     user = User.verify_reset_token(token)
     if user is None or user.active:
-        flash('That is an invalid or expired token', 'warning')
+        flash('That is an invalid or expired token.', 'warning')
         return redirect(url_for('auth.reset_password'))
 
     user.active = True

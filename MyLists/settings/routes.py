@@ -1,5 +1,5 @@
-from MyLists.models import HomePage, User
 from MyLists import db, app, bcrypt
+from MyLists.models import HomePage, User
 from flask_login import login_required, current_user
 from MyLists.settings.forms import UpdateAccountForm, ChangePasswordForm
 from flask import Blueprint, flash, request, render_template, redirect, url_for
@@ -38,28 +38,22 @@ def settings():
         app.logger.info('[{}] Settings updated: Old homepage = {}. New homepage = {}'
                         .format(current_user.id, old_homepage, HomePage(settings_form.homepage.data)))
 
-        email_changed = False
         if settings_form.email.data != current_user.email:
             old_email = current_user.email
             current_user.transition_email = settings_form.email.data
             app.logger.info('[{}] Settings updated : Old email = {}. New email = {}'
                             .format(current_user.id, old_email, current_user.transition_email))
-            email_changed = True
             if send_email_update_email(current_user):
-                success = True
-            else:
-                success = False
-                app.logger.error('[SYSTEM] Error while sending the email update email to {}'.format(current_user.email))
-        if not email_changed:
-            flash("Your settings has been updated! ", 'success')
-        else:
-            if success:
                 flash("Your account has been updated! Please click on the link to validate your new email address.",
                       'success')
             else:
-                flash("There was an error internal error. Please contact the administrator.", 'danger')
+                flash("There was an error. Please contact an administrator.", 'danger')
+                app.logger.error('[SYSTEM] Error while sending the email update email to {}'.format(current_user.email))
+        else:
+            flash("Your settings has been updated!", 'success')
 
         db.session.commit()
+
     elif request.method == 'GET':
         settings_form.username.data = current_user.username
         settings_form.email.data = current_user.email
@@ -75,9 +69,7 @@ def settings():
         app.logger.info('[{}] Password updated'.format(current_user.id))
         flash('Your password has been successfully updated!', 'success')
 
-    return render_template('settings.html',
-                           title='Your settings',
-                           settings_form=settings_form,
+    return render_template('settings.html', title='Your settings', settings_form=settings_form,
                            password_form=password_form)
 
 
@@ -96,6 +88,7 @@ def email_update_token(token):
     old_email = user.email
     user.email = user.transition_email
     user.transition_email = None
+
     db.session.commit()
     app.logger.info('[{}] Email successfully changed from {} to {}'.format(user.id, old_email, user.email))
     flash('Email successfully updated!', 'success')

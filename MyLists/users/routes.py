@@ -4,7 +4,7 @@ from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_badges, get_user_data, \
-    get_knowledge_grade, get_knowledge_frame, get_updates
+    get_knowledge_frame, get_updates
 
 
 bp = Blueprint('users', __name__)

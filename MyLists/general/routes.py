@@ -19,15 +19,15 @@ bp = Blueprint('general', __name__)
 def create_user():
     db.create_all()
     if User.query.filter_by(id='1').first() is None:
-        admin = User(username='admin',
-                     email='admin@admin.com',
-                     password=bcrypt.generate_password_hash("password").decode('utf-8'),
-                     image_file='default.jpg',
-                     active=True,
-                     private=True,
-                     registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
-        db.session.add(admin)
+        new_admin = User(username='admin',
+                         email='admin@admin.com',
+                         password=bcrypt.generate_password_hash("password").decode('utf-8'),
+                         image_file='default.jpg',
+                         active=True,
+                         private=True,
+                         registered_on=datetime.utcnow(),
+                         activated_on=datetime.utcnow())
+        db.session.add(new_admin)
         add_frames_to_db()
         add_badges_to_db()
         add_ranks_to_db()
