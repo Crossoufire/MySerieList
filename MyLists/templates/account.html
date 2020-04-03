@@ -570,7 +570,7 @@
                         {% for follow in follows_list %}
                         <div class="col-3 m-b-15">
                             <a href="{{ follow.username }}" data-toggle="tooltip" title="{{ follow.username }}">
-                                <img width='50' height='50' src="{{ url_for('static', filename='profile_pics/{}'.format(follow.image_file)) }}.">
+                                <img width='50' height='50' src="{{ url_for('static', filename='profile_pics/{}'.format(follow.image_file)) }}">
                             </a>
                         </div>
                         {% endfor %}
