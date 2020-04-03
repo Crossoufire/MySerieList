@@ -16,11 +16,15 @@
             <!--<img height='50' width='50' data-toggle="tooltip" title="{{ user_data['knowledge_info']['grade_title'] }}"-->
             <!--src="{{ user_data['knowledge_info']['grade_id'] }}.png"/>-->
             {% if user_data['id'] != current_user.get_id() %}
-            {% if user_data["isfollowing"] %}
-            <button class="btn btn-sm btn-dark follow-btn" onclick="follow_status('{{ user_data['id'] }}')">Unfollow</button>
-            {% else %}
-            <button class="btn btn-sm btn-primary follow-btn" onclick="follow_status('{{ user_data['id'] }}')">Follow</button>
-            {% endif %}
+                {% if user_data["isfollowing"] %}
+                    <button class="btn btn-sm btn-dark follow-btn" onclick="follow_status('{{ user_data['id'] }}')">
+                        Unfollow
+                    </button>
+                {% else %}
+                    <button class="btn btn-sm btn-primary follow-btn" onclick="follow_status('{{ user_data['id'] }}')">
+                        Follow
+                    </button>
+                {% endif %}
             {% endif %}
         </h2>
         <p class="p-0 m-0">
@@ -280,7 +284,7 @@
                 <li class="m-b-20">
                     <!------------------------ Series statistics --------------------------->
                     <div class="stats-size">
-                        <h5 class="text-left mb-2">
+                        <h5 class="text-center mb-2">
                             <a class="text-light" href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=user_data['username']) }}">
                                 <b>Series </b><i class="fas fa-xs fa-external-link-square-alt"></i>
                             </a>
@@ -380,7 +384,7 @@
                     <hr>
                     <!------------------------- Anime statistics --------------------------->
                     <div class="stats-size">
-                        <h5 class="text-left mb-2">
+                        <h5 class="text-center mb-2">
                             <a class="text-light" href="{{ url_for('main.mymedialist', media_list='animelist', user_name=user_data['username']) }}">
                                 <b>Anime </b><i class="fas fa-xs fa-external-link-square-alt"></i>
                             </a>
@@ -480,7 +484,7 @@
                     <hr>
                     <!------------------------ Movies statistics --------------------------->
                     <div class="stats-size m-b-60">
-                        <h5 class="text-left mb-2">
+                        <h5 class="text-center mb-2">
                             <a class="text-light" href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=user_data['username']) }}">
                                 <b>Movies </b><i class="fas fa-xs fa-external-link-square-alt"></i>
                             </a>

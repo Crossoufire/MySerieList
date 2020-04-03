@@ -10,20 +10,10 @@
 {% endblock css %}
 
 
-{#        <div class="add-element m-l-25 m-t-20">#}
-{#            {% if target_user_id == current_user.get_id() %}#}
-{#                <input id="autocomplete" class='modded-input' placeholder="Add new media" />#}
-{#                <br>#}
-{#                {% block add %}#}
-{#                {% endblock add %}#}
-{#            {% endif %}#}
-{#        </div>#}
-
-
 {% block content %}
 <div class="back-image p-b-50">
     <div class="justify-mobile d-flex flex-wrap">
-        <div class="m-l-25 mr-auto m-t-25 justify-mobile">
+        <div class="m-l-25 mr-auto m-t-30 justify-mobile">
             <a class="fas fa-lg fa-user m-r-20" href="{{ url_for('users.account', user_name=target_user_name) }}"
                data-toggle="tooltip" title="{{ target_user_name }}" style="color: grey;"></a>
             {% if media_list == 'serieslist' %}
@@ -45,13 +35,16 @@
         </div>
         <div class="ml-auto m-r-25 m-t-15 justify-mobile">
             {% if target_user_id != current_user.get_id() %}
-            <div class="text-center common-media">
-                You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)
-            </div>
+                <div class="text-center common-media">
+                    You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)
+                </div>
+                <div class="meter">
+                    <span style="width: {{ common_elements[2] }}%;"></span>
+                </div>
             {% endif %}
         </div>
     </div>
-    <hr style="border-color: darkgrey;">
+    <hr class="m-l-20 m-r-20" style="border-color: darkgrey;">
     <div class="justify-mobile d-flex flex-wrap m-t-50">
         <div class="ml-auto mr-auto">
             <i class="fas fa-search"></i>
@@ -218,7 +211,8 @@ $(function() {
                 type: "POST",
                 url: "/add_element",
                 contentType: "application/json",
-                data: JSON.stringify({element_id: ui.item.tmdb_id, element_type: '{{ media_list }}', element_cat: $(".cat-select").val(), from_other_list: false }),
+                data: JSON.stringify({element_id: ui.item.tmdb_id, element_type: '{{ media_list }}',
+                    element_cat: $(".cat-select").val(), from_other_list: false }),
                 dataType: "json",
                 beforeSend: function() { $body.addClass("loading"); },
                 success: function(response) {

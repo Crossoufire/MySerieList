@@ -52,10 +52,30 @@
 .common-media {
     background: rgba(220, 220, 220, 0.5);
     min-width: 300px;
-    border: none;
-    padding: 5px;
+    padding: 5px 5px 0 5px;
     color: black;
     font-weight: 400;
+}
+
+.meter {
+	height: 10px;
+	background: rgba(220, 220, 220, 0.5);
+}
+
+.meter > span {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    background-color: forestgreen;
+}
+
+.search-select {
+    background: rgba(220, 220, 220, 0.5);
+}
+
+option {
+    background: rgba(220, 220, 220, 0.5);
 }
 
 @media (max-width: 592px) {
