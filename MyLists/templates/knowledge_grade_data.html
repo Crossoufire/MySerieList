@@ -8,42 +8,44 @@
 
 {% block content %}
 <h2 class="text-center p-t-50">
-    KNOWLEDGE GRADES DATA
+{#    KNOWLEDGE GRADE DATA#}
+    KNOWLEDGE FRAME DATA
     <hr class="mt-2 m-b-25">
 </h2>
 
 <ul class="details p-t-10 p-b-10 p-r-10">
-    <li>Grades from the unity assets store.</li>
-    <li>24 grades. You gain a grade each 15 levels.</li>
-    <li>Equation is: Grade = (lvl(Series)+lvl(Anime)+lvl(Movies))/15.</li>
-    <li>Knowledge grades are based on the sum of the different levels.</li>
-    <li>You earn a grade until level 345. Min = 555 days, Max = 1658 days.</li>
+{#    <li>Grades from the unity assets store.</li>#}
+{#    <li>24 grades. You gain a grade each 15 levels.</li>#}
+{#    <li>Equation is: Grade = (lvl(Series)+lvl(Anime)+lvl(Movies))/15.</li>#}
+{#    <li>Knowledge grades are based on the sum of the different levels.</li>#}
+{#    <li>You earn a grade until level 345.</li>#}
+    <li>Frames from Overwatch.</li>
+    <li>30 frames. You gain a frame each 15 levels.</li>
+    <li>Equation is: Frame = (lvl(Series)+lvl(Anime)+lvl(Movies))/15.</li>
+    <li>Knowledge frame are based on the sum of the different levels.</li>
+    <li>You earn a new frame until level 435.</li>
 </ul>
 
 <div class="table-responsive-sm m-t-30 table-style-2">
     <table class="table text-light">
-        <thead style="border-bottom: solid 2px grey;">
+        <thead>
             <tr>
-                <th class="text-center">Grade</th>
-                <th class="text-center">Title</th>
+                <th class="text-center">Frame</th>
                 <th class="text-center">Levels</th>
             </tr>
         </thead>
         <tbody>
-        {% for i in range(0, data|length) %}
-        <tr class="text-center align-middle mt-auto mb-auto">
+        {% for rank in data %}
+        <tr>
             <td class="text-center">
-                <img height='50' width="50" src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ data[i][0] }}.png" alt="">
+{#                <img height='50' width="50" src="{{ url_for('static', filename='img/knowledge_ranks/') }}{{ rank.image_id }}.png" alt="">#}
+                <img height='100' width="100" src="{{ url_for('static', filename='img/icon_frames/') }}{{ rank.image_id }}.png" alt="">
             </td>
-            <td style="vertical-align: middle;">
-                <strong class="text-center align-middle">{{ data[i][1] }}</strong>
-            </td>
-            <td style="vertical-align: middle;">
-                {% if i == data|length - 1 %}
-                <strong class="text-center align-middle">{{ data[i][2][0] }}{{ data[i][2][1] }}</strong>
-                {% else %}
-                <strong class="text-center align-middle">{{ data[i][2][0] }} - {{ data[i][2][1] }}</strong>
-                {% endif %}
+{#            <td class="text-center" style="vertical-align: middle;">#}
+{#                <strong class="text-center align-middle">{{ rank.name }}</strong>#}
+{#            </td>#}
+            <td class="text-center" style="vertical-align: middle;">
+                <strong class="text-center align-middle fs-25">{{ rank.level*15 }}</strong>
             </td>
         </tr>
         {% endfor %}

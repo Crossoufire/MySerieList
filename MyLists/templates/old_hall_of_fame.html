@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+<!------ CDN Datatables ------->
+<link href="{{ url_for('static', filename='css/datatables.min.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/hall_of_fame.css') }}" rel="stylesheet">
+{% endblock css %}
+
+
+{% block content %}
+<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">
+    HALL OF FAME
+    <hr class="mt-2 mb-0">
+</h2>
+
+<div class="m-t-30">
+    <table id="hall_of_fame" class="table table-responsive-sm text-light">
+        <thead>
+            <tr>
+                <th class="text-center"></th>
+                <th class="text-center">Username</th>
+                <th class="text-center">Series levels</th>
+                <th class="text-center">Anime levels</th>
+                <th class="text-center">Movies levels</th>
+                <th class="text-center">Knowledge levels</th>
+                <th class="text-center"></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in all_data %}
+            <tr class="text-center align-middle mt-auto mb-auto {% if user['iscurrentuser'] %} current_user {% endif %}">
+                <td>
+                    {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
+                    <img class="profile_picture" src="/static/profile_pics/anonymous.jpg" alt="anonymous">
+                    {% else %}
+                    <img class="profile_picture" src="/static/profile_pics/{{ user['profile_picture'] }}" alt="{{ user['username'] }}">
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
+                    <b><a class="disabled">Anonymous</a></b>
+                    {% else %}
+                    <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
+                    {% endif %}
+                </td>
+                <td>
+                    <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %} disabled {% endif %}" href="/serieslist/{{ user['username'] }}">
+                        <img class="grade_picture" src="{{ user['series_data']['grade_id'] }}.png">
+                        <br>
+                        {{ user['series_data']['level'] }}
+                    </a>
+                </td>
+                <td>
+                    <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %} disabled {% endif %}" href="/animelist/{{ user['username'] }}">
+                        <img class="grade_picture" src="{{ user['anime_data']['grade_id'] }}.png">
+                        <br>
+                        {{ user['anime_data']['level'] }}
+                    </a>
+                </td>
+                <td>
+                    <a class="text-light {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %} disabled {% endif %}" href="/movieslist/{{ user['username'] }}">
+                        <img class="grade_picture" src="{{ user['movies_data']['grade_id'] }}.png">
+                        <br>
+                        {{ user['movies_data']['level'] }}
+                    </a>
+                </td>
+                <td>
+                    <img class="k_grade_picture" src="{{ user['knowledge_grade']['grade_id'] }}.png">
+                    <br>
+                    {{ user['knowledge_grade']['level'] }}
+                </td>
+                <td>{% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
+                    {% else %}
+                    <a class="btn btn-sm btn-test" href="{{ url_for('profile.badges', user_name=user['username']) }}">Badges</a>
+                    <br>
+                    {% if user["isfollowing"] and not user['iscurrentuser'] %}
+                    <button class="btn btn-sm btn-dark btn-smaller" onclick="follow_status('{{ user['id'] }}', this)">Unfollow</button>
+                    {% elif not user["isfollowing"] and not user['iscurrentuser'] %}
+                    <button class="btn btn-sm btn-primary" onclick="follow_status('{{ user['id'] }}', this)">Follow</button>
+                    {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
+
+
+{% block script %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/hall_of_fame.js') }}"></script>
+{% endblock script %}
+

@@ -2,26 +2,25 @@
 
 // ------------------------ Follow status ---------------------------------
 function follow_status(follow_id, button) {
-    var status;
+    let status;
 
-    if ($(button).text() == 'Unfollow') {
+    if ($(button).text() === 'Unfollow') {
         $(button).text('Follow');
-        $(button).addClass('btn-primary').removeClass('btn-dark');
+        $(button).addClass('btn-primary').removeClass('btn-dark btn-smaller');
         status = false;
     } else {
         $(button).text('Unfollow');
-        $(button).removeClass('btn-primary').addClass('btn-dark');
+        $(button).removeClass('btn-primary').addClass('btn-dark btn-smaller');
         status = true;
     }
 
-    $body = $("body");
     $.ajax ({
         type: "POST",
         url: "/follow_status",
         contentType: "application/json",
         data: JSON.stringify({follow_id: follow_id, follow_status: status}),
         dataType: "json",
-        success: function(response) {
+        success: function() {
             console.log("ok"); }
     });
 }
@@ -29,12 +28,12 @@ function follow_status(follow_id, button) {
 
 // -------------------- Tooltip and Datatable -----------------------------
 $(document).ready(function () {
-    // Datables functions
+    // Datatable functions
     $('#hall_of_fame').DataTable({
-        "order": [[ 5, "desc" ], [ 1, "asc" ]],
+        "order": [[ 0, "desc" ]],
         columnDefs: [
-            {orderable: false, targets: 0},
-            {orderable: false, targets: 6}
+            {orderable: true, targets: 0},
+            {orderable: false, targets: 5}
         ],
         "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
     });
@@ -46,4 +45,3 @@ $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip()
     })
 });
-

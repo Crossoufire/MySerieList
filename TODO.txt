@@ -1,22 +1,24 @@
 
 Medialists:
-	Add: Button "More results" to the autocomplete
 	Add: Movie director in metadata modal
-	Add: In modal add "Also in the list of" kind of info of followed people
-
-Advanced Statistics:
-	Add: Personal advanced statistics for media
+	Add: In modal add 'Also in the list of' kind of info of followed people
+	Add: If API is down, user can still add a media but check in our database instead of the API
 
 Homepage:
     Fix: Update pictures
 
 Account:
-    Add: Change background image
-    Enhance: "Settings" tab CSS
-    Enhance: Change profile picture
+    Enhance: Possibility to change background image
+
+Settings:
+    Enhance: Better CSS
 
 General:
     Add: Contact form
-    Add: Page with full personal history
-    Add: Page with current trends (popular movie, best rated movie of year X, etc) based on https://www.themoviedb.org/documentation/api/discover
-    Enhance: By default create one admin user that only has admin view (HoF, Global Stats, Administration and Account settings) and one standard user
+    Add: Collection Movies to finish (70%)
+
+Routes:
+    Enhance: By default create one admin user that only has admin view
+             (HoF, Global Stats, Administration and Account settings) and one standard user
+    Enhance: Change the hamburger display to a vertical panel in mobile
+    Add: Send mail when new season/movie is airing/released

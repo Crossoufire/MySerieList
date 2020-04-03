@@ -5,14 +5,13 @@
 }
 
 body {
-    margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: calc(100vh - 60px);
+    min-height: calc(100vh - 56px);
     background: #131418;
-    margin-top: 56px;
+    margin: 56px 0 0;
     color: #e2e2e2;
 }
 
@@ -28,9 +27,16 @@ hr {
     border-top: 1px solid rgba(255, 255, 255, 0.9);
 }
 
-.dropdown_mylist {
+.dropdown-mylist {
     z-index: 101;
-    border: solid 1px black;
+    min-width: 100%;
+    padding: 0;
+    border-radius: 0;
+    background: #2a2b2d;
+}
+
+.drop-item {
+    display: block;
 }
 
 .btn.btn-sm {
@@ -38,10 +44,41 @@ hr {
     padding-right: 15px;
 }
 
+.form-control {
+    background: transparent;
+    border-radius: 0;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    color: #fff;
+}
+
+.form-control:focus {
+    background: transparent;
+    border-radius: 0;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    box-shadow: 0 0 0 0;
+    color: #fff;
+}
+
 @media (max-width: 490px) {
     .container {
-        padding-left: 0px;
-        padding-right: 0px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+@media (max-width: 450px) {
+    .modded-form {
+        width: 100px;
+    }
+}
+
+@media (max-width: 320px) {
+    .modded-form {
+        width: 90px;
     }
 }
 /* ---------------------------------------------------------- */
@@ -51,7 +88,7 @@ hr {
 .dropdown_mylist > .nav-item::after {
     content: '';
     display: block;
-    width: 0px;
+    width: 0;
     height: 1px;
     background: #fec400;
     transition: 0.4s;
@@ -64,7 +101,7 @@ hr {
 .navbar-nav > .nav-item::after {
     content: '';
     display: block;
-    width: 0px;
+    width: 0;
     height: 1px;
     background: #fec400;
     transition: 0.4s;
@@ -72,4 +109,8 @@ hr {
 
 .navbar-nav .nav-item:hover::after {
     width: 100%;
+}
+
+.navbar .nav {
+    white-space: nowrap;
 }

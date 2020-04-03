@@ -29,9 +29,9 @@ function add_to_user(cat, card_id, element_id, media_type) {
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/add_to_medialist",
+        url: "/add_element",
         contentType: "application/json",
-        data: JSON.stringify({ add_cat: add_cat, element_id: element_id, media_type: media_type }),
+        data: JSON.stringify({ element_cat: add_cat, element_id: element_id, element_type: media_type, from_other_list: true }),
         dataType: "json",
         success: function(response) {
             console.log("ok");

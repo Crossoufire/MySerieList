@@ -1,10 +1,13 @@
 
 .title {
-    font-size: 70pt;
+    font-size: 50pt;
+    text-shadow: 0 0 2px #000;
+    -moz-text-shadow: 0 0 2px #000;
+    -webkit-text-shadow: 0 0 2px #000;
 }
 
 /* On screens that are 768px or less */
-@media (max-width: 767.98px) {
+@media (max-width: 768px) {
     .title {
         font-size: 2rem !important;
         font-weight: 200 !important;

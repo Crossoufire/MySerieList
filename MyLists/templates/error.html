@@ -6,7 +6,7 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-12 text-center">
-                    <span class="display-1 d-block">{{ error_code }}</span>
+                    <span class="display-1 d-block m-t-20">{{ error_code }}</span>
                     {% if error_code == 400 %}
                         <div class="mb-4 lead">You made an invalid request.</div>
                     {% elif error_code == 403 %}
@@ -22,7 +22,7 @@
                     {% else %}
                         <div class="mb-4 lead">RIP</div>
                     {% endif %}
-                    <img class="card-img-top" src="{{ image_error }}" alt="Error Image">
+                    <img class="card-img-top m-t-30" src="{{ image_error }}" alt="Error Image" style="max-width: 500px;">
                 </div>
             </div>
         </div>

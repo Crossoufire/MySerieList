@@ -17,24 +17,26 @@
     height: 250px;
 }
 
-input {
+.modded-input {
     background: rgba(220, 220, 220, 0.5);
     border: none;
     padding: 5px;
-    min-width: 220px;
+    width: 350px;
 }
 
-input::placeholder {
+.test {
+    background: rgba(220, 220, 220, 0.5);
+    border: none;
+    padding: 5px;
+}
+
+.modded-input::placeholder {
     color: black;
     opacity: 1;
 }
 
 .add-element {
     margin-right: auto;
-}
-
-.search-by {
-    margin-left: auto;
 }
 
 .cat-select {
@@ -49,14 +51,34 @@ input::placeholder {
 
 .common-media {
     background: rgba(220, 220, 220, 0.5);
-    min-width: 280px;
-    border: none;
-    padding: 5px;
+    min-width: 300px;
+    padding: 5px 5px 0 5px;
     color: black;
     font-weight: 400;
 }
 
-@media (max-width: 537px) {
+.meter {
+	height: 10px;
+	background: rgba(220, 220, 220, 0.5);
+}
+
+.meter > span {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    background-color: forestgreen;
+}
+
+.search-select {
+    background: rgba(220, 220, 220, 0.5);
+}
+
+option {
+    background: rgba(220, 220, 220, 0.5);
+}
+
+@media (max-width: 592px) {
     .add-element {
         margin-right: 0;
         margin-left: 0;
@@ -67,6 +89,7 @@ input::placeholder {
     }
     .justify-mobile {
         justify-content: center;
+        margin: 10px 0 10px 0 !important;
     }
 }
 @media (max-width: 469px) {
@@ -77,6 +100,9 @@ input::placeholder {
 @media (max-width: 403px) {
     .back-image {
         height: 320px;
+    }
+    .modded-input {
+        width: 180px;
     }
 }
 /* ---------------------------------------------- */
@@ -165,13 +191,11 @@ input::placeholder {
 
 .card-opt-box {
     background: black;
-    padding: 5px !important;
-    margin: 5px !important;
 }
 
 .card-cat-buttons {
     position: absolute;
-    padding: 0px;
+    padding: 0;
     -webkit-transform: translate(-50%, -50%);
     margin-right: -50%;
     top: 50%;
@@ -190,7 +214,7 @@ input::placeholder {
 
 @media (max-width: 1025px) {
     .card {
-        margin-bottom: 0px;
+        margin-bottom: 0;
     }
     .card-btn-top-right {
         opacity: 0.8;

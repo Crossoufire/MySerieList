@@ -14,7 +14,8 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="description" content="Create your TV shows/anime/movies list, see how much time you spent and gain levels and badges." />
+    <meta name="description" content="Create your TV shows/anime/movies list, see how much time you spent and gain
+    levels and badges." />
 
     <link href="https://use.fontawesome.com/releases/v5.12.0/css/all.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
@@ -35,19 +36,31 @@
 
 <body>
     <header class="site-header">
-        <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
+        <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top" style="white-space: nowrap;">
             <div class="container">
                 {% if current_user.is_authenticated %}
-                <div class="navbar-brand nav-item dropdown m-r-30">
-                    <a class="dropdown-toggle" data-toggle="dropdown" style="color: #ffffffe6;" href="#">MyLists<span class="caret"></span></a>
-                    <div class="dropdown-menu dropdown_mylist bg-dark p-r-0 m-r-0">
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='serieslist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MySeriesList</a>
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='animelist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyAnimeList</a>
-                        <a class="nav-item dropdown-item text-light bg-dark" href="{{ url_for('mymedialist', media_list='movieslist', user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> MyMoviesList</a>
+                <div class="navbar-brand nav-item dropdown m-l-10">
+                    <a class="dropdown-toggle" data-toggle="dropdown" style="color: #ffffffe6;" href="#">MyLists<span
+                            class="caret"></span></a>
+                    <div class="dropdown-menu dropdown-mylist p-r-0 m-r-0">
+                        <a class="nav-item drop-item text-light"
+                           href="{{ url_for('main.mymedialist', media_list='serieslist',
+                           user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> &nbsp;SeriesList</a>
+                        <a class="nav-item drop-item text-light"
+                           href="{{ url_for('main.mymedialist', media_list='animelist',
+                           user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> &nbsp;AnimeList</a>
+                        <a class="nav-item drop-item text-light"
+                           href="{{ url_for('main.mymedialist', media_list='movieslist',
+                           user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> &nbsp;MoviesList</a>
                     </div>
                 </div>
+                <div class="m-l-10 m-r-20">
+                    <form action="{{ url_for('main.search_media') }}">
+                        <input name='search' class="form-control modded-form" placeholder="Search and add media">
+                    </form>
+                </div>
                 {% else %}
-                <a class="navbar-brand" href="{{ url_for('home') }}">MyLists</a>
+                <a class="navbar-brand" href="{{ url_for('auth.home') }}">MyLists</a>
                 {% endif %}
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle">
                     <span class="navbar-toggler-icon"></span>
@@ -55,26 +68,30 @@
                 <div class="collapse navbar-collapse" id="navbarToggle">
                     <div class="navbar-nav mr-auto">
                     {% if current_user.is_authenticated %}
-                        <a class="nav-item nav-link text-light" href="{{ url_for('hall_of_fame') }}">Hall of Fame</a>
-                        <a class="nav-item nav-link text-light" href="{{ url_for('global_stats') }}">Global Stats</a>
-                    <!--<a class="nav-item nav-link text-light" href="{{ url_for('current_trends') }}">Current Trends</a>-->
+                        <a class="nav-item nav-link text-light"
+                           href="{{ url_for('users.hall_of_fame') }}">Hall of Fame</a>
+                        <a class="nav-item nav-link text-light"
+                           href="{{ url_for('general.global_stats') }}">Stats</a>
+                        <a class="nav-item nav-link text-light"
+                           href="{{ url_for('general.current_trends') }}">Trends</a>
                     {% endif %}
                     </div>
                     <div class="navbar-nav">
                     {% if current_user.is_authenticated %}
+                        <a class="nav-item nav-link text-light" href="{{ url_for('users.account',
+                         user_name=current_user.username) }}">Profile</a>
                         {% if current_user.get_id() == '1' %}
-                        <a class="nav-item nav-link text-light" href="{{ url_for('badges', user_name=current_user.username) }}">Badges</a>
-                        <a class="nav-item nav-link text-light" href="{{ url_for('account', user_name=current_user.username) }}">Profile</a>
-                        <a class="nav-item nav-link text-light" href="{{ url_for('admin') }}">Administration</a>
-                        <a class="nav-item nav-link text-light" href="{{ url_for('logout') }}">Logout</a>
-                        {% else %}
-                        <a class="nav-item nav-link text-light" href="{{ url_for('badges', user_name=current_user.username) }}">Badges</a>
-                        <a class="nav-item nav-link text-light" href="{{ url_for('account', user_name=current_user.username) }}">Profile</a>
-                        <a class="nav-item nav-link text-light" href="{{ url_for('logout') }}">Logout</a>
+                        <a class="nav-item nav-link text-light" href="{{ url_for('general.admin') }}">Manage</a>
                         {% endif %}
+                        <a class="nav-link text-light" href="{{ url_for('settings.settings') }}">
+                            <i class="fas fa-sm fa-cog"></i></a>
+                        <a class="nav-link text-light" href="{{ url_for('auth.logout') }}">
+                            <i class="fas fa-sm fa-sign-out-alt"></i></a>
                     {% elif not current_user.is_authenticated and request.path == '/' %}
-                        <a type="button" class="btn btn-sm btn-light text-dark" data-toggle="modal" data-target="#modalLoginForm">Login</a>
-                        <a type="button" class="btn btn-sm btn-danger m-r-0" data-toggle="modal" data-target="#modalRegisterForm">Register</a>
+                        <a type="button" class="btn btn-sm btn-light text-dark" data-toggle="modal"
+                           data-target="#modalLoginForm">Login</a>
+                        <a type="button" class="btn btn-sm btn-danger m-r-0" data-toggle="modal"
+                           data-target="#modalRegisterForm">Register</a>
                     {% endif %}
                     </div>
                 </div>
@@ -87,7 +104,7 @@
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible m-t-10" role="alert">
+                        <div class="alert alert-{{ category }} alert-dismissible m-t-15" role="alert">
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -109,18 +126,27 @@
         </div>
     </main>
 
-    <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/js/mdb.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/js/mdb.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
 
     {% block script %}
     {% endblock %}
 
 <footer class="page-footer font-small">
-    <div class="footer-copyright text-center py-3">© 2020 Copyright: MyLists</div>
+    <div class="footer-copyright text-center py-3">
+        <div class="d-flex flex-wrap" style="justify-content: center;">
+            <a href="https://developers.themoviedb.org/3/getting-started/introduction"
+               target="_blank">TMDb API</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="https://www.palletsprojects.com/p/flask/" target="_blank">Flask</a>&nbsp;&nbsp;|&nbsp;
+            © 2020 Copyright:&nbsp;<a href="https://MyLists.info" target="_blank">Mylists.info</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="#!" target="_blank">Contact</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="https://github.com/Crossoufire/MyLists" target="_blank">Github</a>
+        </div>
+    </div>
 </footer>
 </body>
 </html>

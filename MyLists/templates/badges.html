@@ -5,7 +5,7 @@
 <h4 class="text-center m-t-40"><i class="fas fa-star"></i>&nbsp&nbsp BADGES</h4><hr>
 <div class="row m-t-20 p-l-15 p-r-15">
     {% for badge in user_badges %}
-        <div class="col-xl-2 col-lg-3 col-md-4 col-6 m-b-20 align-middle text-center">
+        <div class="col-xl-2 col-lg-3 col-md-4 col-6 m-b-30 align-middle text-center">
             <div class="text-center" style="font-size: 15pt;"><b>{{ badge['title'] }}</b></div>
             <img width="70" height="70" src="/static/img/media_badges/{{ badge['image_id'] }}.png"/>
             <br>
@@ -31,6 +31,7 @@
                 {% endif %}
             </div>
         </div>
+
     {% endfor %}
 </div>
 {% endblock content %}

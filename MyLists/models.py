@@ -1,7 +1,8 @@
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from MyLists import db, login_manager, app
-from flask_login import UserMixin
 import enum
+
+from flask_login import UserMixin
+from MyLists import app, db, login_manager
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 
 @login_manager.user_loader
@@ -20,17 +21,22 @@ class Status(enum.Enum):
 
 
 class ListType(enum.Enum):
-    SERIES = "Series"
-    ANIME = "Anime"
-    MOVIES = 'Movies'
+    SERIES = "serieslist"
+    ANIME = "animelist"
+    MOVIES = 'movieslist'
 
 
 class HomePage(enum.Enum):
     ACCOUNT = "account"
     HALL_OF_FAME = "hall_of_fame"
-    MYSERIESLIST = "myserieslist"
-    MYANIMELIST = "myanimelist"
-    MYMOVIESLIST = "mymovieslist"
+    MYSERIESLIST = "serieslist"
+    MYANIMELIST = "animelist"
+    MYMOVIESLIST = "movieslist"
+
+
+followers = db.Table('followers',
+                     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
+                     db.Column('followed_id', db.Integer, db.ForeignKey('user.id')))
 
 
 class User(db.Model, UserMixin):
@@ -53,6 +59,22 @@ class User(db.Model, UserMixin):
     biography = db.Column(db.Text)
     transition_email = db.Column(db.String(120))
     activated_on = db.Column(db.DateTime)
+    followed = db.relationship('User',
+                               secondary=followers,
+                               primaryjoin=(followers.c.follower_id == id),
+                               secondaryjoin=(followers.c.followed_id == id),
+                               backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
+
+    def add_follow(self, user):
+        if not self.is_following(user):
+            self.followed.append(user)
+
+    def remove_follow(self, user):
+        if self.is_following(user):
+            self.followed.remove(user)
+
+    def is_following(self, user):
+        return self.followed.filter(followers.c.followed_id == user.id).count() > 0
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
@@ -92,12 +114,6 @@ class UserLastUpdate(db.Model):
     old_episode = db.Column(db.Integer)
     new_episode = db.Column(db.Integer)
     date = db.Column(db.DateTime, nullable=False)
-
-
-class Follow(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    follow_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 ######################################################## SERIES ########################################################
@@ -245,6 +261,7 @@ class Movies(db.Model):
     tagline = db.Column(db.String(30))
     image_cover = db.Column(db.String(100), nullable=False)
     themoviedb_id = db.Column(db.Integer, nullable=False)
+    collection_id = db.Column(db.Integer)
 
 
 class MoviesList(db.Model):
@@ -262,19 +279,22 @@ class MoviesGenre(db.Model):
     genre_id = db.Column(db.Integer, nullable=False)
 
 
-class MoviesProd(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
-    production_company = db.Column(db.String(150), nullable=False)
-
-
 class MoviesActors(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     name = db.Column(db.String(150))
 
 
-######################################################## ACHIEVEMENTS ##################################################
+class MoviesCollections(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    collection_id = db.Column(db.Integer, db.ForeignKey('movies.collection_id'), nullable=False)
+    parts = db.Column(db.Integer)
+    name = db.Column(db.String(100))
+    poster = db.Column(db.String(100))
+    overview = db.Column(db.String(100))
+
+
+#################################################### BADGES & RANKS ####################################################
 
 
 class Badges(db.Model):
@@ -284,3 +304,17 @@ class Badges(db.Model):
     title = db.Column(db.String(100), nullable=False)
     type = db.Column(db.String(100), nullable=False)
     genres_id = db.Column(db.String(100))
+
+
+class Ranks(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    level = db.Column(db.Integer, nullable=False)
+    image_id = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
+
+
+class Frames(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    level = db.Column(db.Integer, nullable=False)
+    image_id = db.Column(db.String(50), nullable=False)

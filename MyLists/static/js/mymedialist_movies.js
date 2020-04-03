@@ -88,6 +88,5 @@ function show_metadata(data) {
     $('#original_language').html("<b>Original Language</b>: " +data.original_language);
     $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10 &nbsp;(" +data.vote_count.toLocaleString("en")+ " votes)");
     $('#tagline').html("<b>Tagline</b>: " +data.tagline);
-    $('#prod_companies').html("<b>Prod. Companies</b>: " +data.prod_companies);
     $('#synopsis').html("<b>Synopsis</b>: " +data.synopsis);
 }

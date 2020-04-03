@@ -11,9 +11,13 @@ table.dataTable thead .sorting_desc_disabled:before {
     bottom: .5em;
 }
 
-.btn-test {
+.btn-badges {
     background-color: #4d0000;
     color: white !important;
+}
+
+.table {
+    width: 900px;
 }
 
 table.table th {
@@ -33,25 +37,56 @@ table.table a {
 .table td {
     text-align: center;
     vertical-align: middle;
-    padding: 10px !important;
+    padding: 30px 20px 30px 20px !important;
 }
 
 .current_user {
     background-color: #2c3946;
 }
 
-.profile_picture {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
+.profil-pic {
+    width: 70px;
+    height: 70px;
+    border-radius: 45%;
+}
+
+.frame-pic {
+    position: absolute;
+    top: -96px;
+    left: -12px;
+    width: 120px;
+    height: 120px;
+}
+
+.frame-level {
+    width: 40px;
+    position: relative;
+    left: 28px;
+    top:5px;
+    z-index: 100;
+    background: #262626;
+    border: 1px solid white;
+    border-radius: 20%;
+    font-weight: 400;
 }
 
 .grade_picture {
-    width: 35px;
-    height: 35px;
-}
-
-.k_grade_picture {
     width: 40px;
     height: 40px;
+}
+
+.btn-smaller {
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+}
+
+@media (max-width: 573px) {
+    .frame-pic {
+        top: -96px;
+        left: -25px;
+    }
+
+    .frame-level {
+        left: 14px;
+    }
 }

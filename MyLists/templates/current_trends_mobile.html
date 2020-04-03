@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+<link href="{{ url_for('static', filename='css/current_trends.css') }}" rel="stylesheet">
+{% endblock css %}
+
+
+{% block content %}
+<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">TRENDING SERIES<hr class="mt-2 mb-0"></h2>
+<div id="series-sly" class="frame">
+    <div class="slide">
+        {% for series in series_trends %}
+        <div class="media" style="background: #216c7d;">
+            <div class="row no-gutters">
+                <div class="col-5">
+                    <img src="{{ series['poster_path'] }}" class="card-img" alt="{{ series['title'] }}">
+                </div>
+                <div class="col-7">
+                    <div class="p-3">
+                        <h5>
+                            <a class="text-light giveMeEllipsis2" href="{{ series['tmdb_link'] }}" target="_blank">{{ series['title'] }}</a>
+                            <hr class="mt-1 mb-1" style="border-top: 1px solid #bfbfbf;">
+                            <div class="fs-13 text-grey"><i>{{ series['first_air_date'] }}</i></div>
+                        </h5>
+                        <p class="card-text text-light giveMeEllipsis">{{ series['overview'] }}</p>
+                        <p class="card-hashtag text-light fs-20">#{{ loop.index0 +1 }}</p>
+                    </div>
+                </div>
+            </div>
+            <p class="card-hashtag text-light fs-20">#{{ loop.index0 +1 }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">TRENDING ANIME<hr class="mt-2 mb-0"></h2>
+<div id="anime-sly" class="frame">
+    <div class="slide">
+        {% for anime in anime_trends %}
+        <div class="card media" style="background: #945141;">
+            <div class="row no-gutters">
+                <div class="col-5">
+                    <img src="{{ anime['poster_path'] }}" class="card-img" alt="{{ anime['title'] }}">
+                </div>
+                <div class="col-7">
+                    <div class="card-body p-3">
+                        <h5 class="card-title">
+                            <a class="text-light giveMeEllipsis2"
+                               href="{{ anime['tmdb_link'] }}"
+                               data-toggle="tooltip"
+                               title="{{ anime['title'] }}"
+                               target="_blank">{{ anime['title'] }}</a>
+                            <hr class="mt-1 mb-1" style="border-top: 1px solid #bfbfbf;">
+                            <div class="fs-13 text-grey"><i>{{ anime['first_air_date'] }}</i></div>
+                        </h5>
+                        <p class="card-text text-light giveMeEllipsis">{{ anime['overview'] }}</p>
+
+                    </div>
+                </div>
+            </div>
+            <p class="card-hashtag text-light fs-20">#{{ loop.index0 +1 }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">TRENDING MOVIES<hr class="mt-2 mb-0"></h2>
+<div id="movies-sly" class="frame m-b-50">
+    <div class="slide">
+        {% for movies in movies_trends %}
+        <div class="card media" style="background: #8c7821;">
+            <div class="row no-gutters">
+                <div class="col-5">
+                    <img src="{{ movies['poster_path'] }}" class="card-img" alt="{{ movies['title'] }}">
+                </div>
+                <div class="col-7">
+                    <div class="card-body p-3">
+                        <h5 class="card-title">
+                            <a class="text-light giveMeEllipsis2" href="{{ movies['tmdb_link'] }}" target="_blank">{{ movies['title'] }}</a>
+                            <hr class="mt-1 mb-1" style="border-top: 1px solid #bfbfbf;">
+                            <div class="fs-13 text-grey"><i>{{ movies['release_date'] }}</i></div>
+                        </h5>
+                        <p class="card-text text-light giveMeEllipsis">{{ movies['overview'] }}</p>
+                    </div>
+                </div>
+            </div>
+            <p class="card-hashtag text-light fs-20">#{{ loop.index0 +1 }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/sly.js') }}"></script>
+<script>
+var options = {
+    horizontal: true,
+    speed: 200,
+    itemNav: 'basic',
+    mouseDragging: true,
+    touchDragging: true,
+    scrollBy: true,
+};
+var frame = new Sly('#series-sly', options).init();
+var frame = new Sly('#anime-sly', options).init();
+var frame = new Sly('#movies-sly', options).init();
+</script>
+{% endblock script %}
