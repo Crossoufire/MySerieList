@@ -23,8 +23,9 @@ try:
     server = config['Mail']['server']
     port = int(config['Mail']['port'])
     themoviedb_key = config['TheMovieDB']['api_key']
-except:
+except Exception as e:
     print("Config file error. Please read the README to configure the config.ini file properly. Exit.")
+    print('Error is: {}'.format(e))
     sys.exit()
 
 

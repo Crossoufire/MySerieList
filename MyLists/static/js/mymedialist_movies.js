@@ -75,9 +75,10 @@ function show_metadata(data) {
     var data = JSON.parse($('#'+data).text());
 
     $('#original_name').text('');
-    $('#modal-title').html(data.name);
-    if (data.name != data.original_name) {
-        $('#original_name').html("<b>Original Name</b>: " +data.original_name);
+    if (data.original_language =='ja') {
+        $('#modal-title').html(data.name);
+    } else {
+        $('#modal-title').html(data.original_name);
     }
     $('#release_date').html("<b>Release Date</b>: " +data.release_date);
     $('#actors').html("<b>Actors</b>: " +data.actors);

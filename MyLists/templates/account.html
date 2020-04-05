@@ -57,11 +57,16 @@
                         <div class='account-bar-wrapper'>
                             <div class='account-bar'>
                                 <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
-                                     title="{{ media_data['series']['media_levels']['grade_title'] }}" src="{{ media_data['series']['media_levels']['grade_id'] }}.png"/>
+                                     title="{{ media_data['series']['media_levels']['grade_title'] }}"
+                                     src="{{ media_data['series']['media_levels']['grade_id'] }}.png"/>
                                 <span class='account-bar-name'>Series</span>
-                                <div id="series_level" class='account-bar-level'>Level {{ '%02d' | format(media_data['series']['media_levels']['level']) }}</div>
-                                <div class='xp-bar' data-toggle="tooltip" title="{{ media_data['series']['media_levels']['level_percent'] }}%">
-                                    <div id='xp-bar-fill-series' data-percentage="{{ media_data['series']['media_levels']['level_percent'] }}">
+                                <div id="series_level" class='account-bar-level'>
+                                    Level {{ '%02d' | format(media_data['series']['media_levels']['level']) }}
+                                </div>
+                                <div class='xp-bar' data-toggle="tooltip"
+                                     title="{{ media_data['series']['media_levels']['level_percent'] }}%">
+                                    <div id='xp-bar-fill-series'
+                                         data-percentage="{{ media_data['series']['media_levels']['level_percent'] }}">
                                         <div class='xp-increase-fx'>
                                             <div class='xp-increase-fx-flicker'>
                                                 <div class='xp-increase-glow1'></div>
@@ -146,7 +151,7 @@
                                     {% elif update['category'] == 'movie' %}
                                     <div class="tata m-b-5" style="border-bottom: solid 1px #8c7821;">
                                         <div style="font-size: 12pt;">
-                                            <i style="color: #8c7821;" class="far fa-star m-r-12" data-toggle="tooltip" title="Movie"></i>
+                                            <i style="color: #8c7821;" class="fas fa-film m-r-12" data-toggle="tooltip" title="Movie"></i>
                                             {% endif %}
                                             <span data-toggle="tooltip" title="{{ update['media_name'] }}">{{ update['media_name'] }}</span>
                                         </div>
@@ -570,7 +575,7 @@
                         {% for follow in follows_list %}
                         <div class="col-3 m-b-15">
                             <a href="{{ follow.username }}" data-toggle="tooltip" title="{{ follow.username }}">
-                                <img width='50' height='50' src="{{ url_for('static', filename='users_pics/{}'.format(follow.image_file)) }}">
+                                <img width='50' height='50' src="{{ url_for('static', filename='profile_pics/{}'.format(follow.image_file)) }}">
                             </a>
                         </div>
                         {% endfor %}
@@ -600,7 +605,7 @@
                     {% elif update['category'] == 'movie' %}
                     <div class="tata m-b-5" style="border-bottom: solid 1px #8c7821;">
                         <div style="font-size: 12pt;">
-                            <i style="color: #8c7821;" class="far fa-star m-r-12" data-toggle="tooltip" title="Movie"></i>
+                            <i style="color: #8c7821;" class="fas fa-film m-r-12" data-toggle="tooltip" title="Movie"></i>
                     {% endif %}
                         <span data-toggle="tooltip" title="{{ update['media_name'] }}">{{ update['media_name'] }}</span>
                     </div>
