@@ -16,8 +16,14 @@ table.dataTable thead .sorting_desc_disabled:before {
     color: white !important;
 }
 
-.table {
-    width: 900px;
+@media (min-width: 901px) {
+    .hof {
+        width: 900px;
+    }
+}
+
+option {
+    background-color: #131418;
 }
 
 table.table th {

@@ -16,6 +16,7 @@ Settings:
 General:
     Add: Contact form
     Add: Collection Movies to finish (70%)
+    Add: Add trending table (automatic update)
 
 Routes:
     Enhance: By default create one admin user that only has admin view
