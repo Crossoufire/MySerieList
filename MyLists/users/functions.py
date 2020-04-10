@@ -120,9 +120,9 @@ def get_knowledge_frame(user):
                       int((((400+80*user.time_spent_anime)**(1/2))-20)/40) +\
                       int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
 
-    frame_level = round(knowledge_level/15, 0)+1
-
+    frame_level = round(knowledge_level/15, 0) + 1
     query_frame = Frames.query.filter_by(level=frame_level).first()
+
     if query_frame:
         frame_id = url_for('static', filename='img/icon_frames/{}'.format(query_frame.image_id))
     else:
@@ -274,7 +274,7 @@ def get_follows_data(user):
         follows_list = user.followed.all()
 
     follows_update_list = []
-    for follow in follows_update[:7]:
+    for follow in follows_update[:8]:
         follows = {'username': follow[0].username}
         follows.update(get_updates([follow[3]])[0])
         follows_update_list.append(follows)

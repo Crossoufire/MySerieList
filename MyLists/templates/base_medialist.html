@@ -19,12 +19,12 @@
             {% if media_list == 'serieslist' %}
                 <a class="fas fa-lg fa-torii-gate m-r-20" href="/animelist/{{ target_user_name }}" data-toggle="tooltip"
                    title="Anime list" style="color: #945141;"></a>
-                <a class="fas fa-lg fa-star m-r-20" href="/movieslist/{{ target_user_name }}" data-toggle="tooltip"
+                <a class="fas fa-lg fa-film m-r-20" href="/movieslist/{{ target_user_name }}" data-toggle="tooltip"
                    title="Movies list" style="color: #8c7821;"></a>
             {% elif media_list == 'animelist' %}
                 <a class="fas fa-lg fa-tv m-r-20" href="/serieslist/{{ target_user_name }}" data-toggle="tooltip"
                    title="Series list" style="color: #216e7d;"></a>
-                <a class="fas fa-lg fa-star m-r-20" href="/movieslist/{{ target_user_name }}" data-toggle="tooltip"
+                <a class="fas fa-lg fa-film m-r-20" href="/movieslist/{{ target_user_name }}" data-toggle="tooltip"
                    title="Movies list" style="color: #8c7821;"></a>
             {% else %}
                 <a class="fas fa-lg fa-tv m-r-20" href="/serieslist/{{ target_user_name }}" data-toggle="tooltip"
@@ -77,8 +77,21 @@
                         <div class="mask flex-center rgba-black-strong" data-toggle="modal"
                              data-target="#modal_metadata" onclick="show_metadata('metadata_{{ data[0]['id'] }}',
                              '{{ media_list }}')">
-                            <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
-                            <span class="original-title" style="display: none;" >{{ data[0]['original_name'] }}</span>
+                            {% if media_list == 'serieslist' %}
+                                <span class="font-mask text-center text-light">{{ data[0]['original_name'] }}</span>
+                                <span class="original-title" style="display: none;" >{{ data[0]['name'] }}</span>
+                            {% elif media_list == 'animelist' %}
+                                <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
+                                <span class="original-title" style="display: none;" >{{ data[0]['original_name'] }}</span>
+                            {% elif media_list == 'movieslist' %}
+                                {% if data[0]['original_language'] == 'ja' %}
+                                    <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
+                                    <span class="original-title" style="display: none;" >{{ data[0]['original_name'] }}</span>
+                                {% else %}
+                                    <span class="font-mask text-center text-light">{{ data[0]['original_name'] }}</span>
+                                    <span class="original-title" style="display: none;" >{{ data[0]['name'] }}</span>
+                                {% endif %}
+                            {% endif %}
                             <span class="actors-yes" style="display: none;" >{{ data[0]['actors'] }}</span>
                             <span class="genre-yes" style="display: none;" >{{ data[0]['genres'] }}</span>
                         </div>

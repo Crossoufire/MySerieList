@@ -56,9 +56,10 @@ function show_metadata(data, media_list) {
     var data = JSON.parse($('#'+data).text());
 
     $('#original_name').text('');
-    $('#modal-title').html(data.name);
-    if (data.name != data.original_name) {
-        $('#original_name').html("<b>Original Name</b>: " +data.original_name);
+    if (media_list == 'animelist') {
+        $('#modal-title').html(data.name);
+    } else {
+        $('#modal-title').html(data.original_name);
     }
     $('#actors').html("<b>Actors</b>: " +data.actors);
     $('#genres').html("<b>Genres</b>: " +data.genres);

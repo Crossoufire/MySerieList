@@ -16,8 +16,14 @@ table.dataTable thead .sorting_desc_disabled:before {
     color: white !important;
 }
 
-.table {
-    width: 900px;
+@media (min-width: 901px) {
+    .hof {
+        width: 900px;
+    }
+}
+
+option {
+    background-color: #131418;
 }
 
 table.table th {
@@ -37,7 +43,7 @@ table.table a {
 .table td {
     text-align: center;
     vertical-align: middle;
-    padding: 30px 20px 30px 20px !important;
+    padding: 30px 20px 20px 20px !important;
 }
 
 .current_user {

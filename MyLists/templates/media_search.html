@@ -25,7 +25,7 @@
 </ul>
 
 <div class="tab-content" id="media-search">
-    <div class="tab-pane fade show active" id="series">
+    <div id="series" class="tab-pane fade show active">
         <div class="d-flex flex-wrap justify-content-center m-t-30">
             {% for media in series_results %}
             <div class="card mb-4" style="background: #216c7d; width: 700px; border-radius: 0;">
@@ -36,7 +36,8 @@
                     <div class="col-9">
                         <div class="card-body p-3">
                             <h5 class="card-title">
-                                <a class="text-light fs-20 giveMeEllipsis2" href="{{ media['url'] }}" target="_blank">{{ media['name'] }}</a>
+                                <a class="text-light fs-20 giveMeEllipsis2" href="{{ media['url'] }}"
+                                   target="_blank">{{ media['name'] }}</a>
                                 <div class="fs-15 text-grey"><i>{{ media['first_air_date'] }}</i></div>
                             </h5>
                             {% if media['overview'] %}
@@ -55,7 +56,8 @@
                             {% else %}
                             <div id="title-container-{{ media['tmdb_id'] }}" class="text-left fs-15 m-l-10">
                                 <span id="icon-{{ media['tmdb_id'] }}" class="fas fa-plus"></span>
-                                <span id="title-{{ media['tmdb_id'] }}">Add</span>
+                                <a id="title-{{ media['tmdb_id'] }}" class="disabled text-light"
+                                   href="/serieslist/{{ media['username'] }}">Add</a>
                                 <div id="buttons-{{ media['tmdb_id'] }}" style="display: inline-block;">
                                     <span class="btn btn-perso" onclick="add_media('Watching', {{ media['tmdb_id'] }},
                                             'serieslist')" data-toggle="tooltip" title="Watching">W</span>
@@ -80,7 +82,7 @@
             {% endfor %}
         </div>
     </div>
-    <div class="tab-pane fade" id="anime">
+    <div id="anime" class="tab-pane fade">
         <div class="d-flex flex-wrap justify-content-center m-t-30">
             {% for media in anime_results %}
             <div class="card mb-4" style="background: #945141; width: 700px; border-radius: 0;">
@@ -110,7 +112,8 @@
                             {% else %}
                             <div id="title-container-{{ media['tmdb_id'] }}" class="text-left fs-15 m-l-10">
                                 <span id="icon-{{ media['tmdb_id'] }}" class="fas fa-plus"></span>
-                                <span id="title-{{ media['tmdb_id'] }}">Add</span>
+                                <a id="title-{{ media['tmdb_id'] }}" class="disabled text-light"
+                                   href="/animelist/{{ media['username'] }}">Add</a>
                                 <div id="buttons-{{ media['tmdb_id'] }}" style="display: inline-block;">
                                     <span class="btn btn-perso" onclick="add_media('Watching', {{ media['tmdb_id'] }},
                                             'animelist')" data-toggle="tooltip" title="Watching">W</span>
@@ -135,7 +138,7 @@
             {% endfor %}
         </div>
     </div>
-    <div class="tab-pane fade" id="movies">
+    <div id="movies" class="tab-pane fade">
         <div class="d-flex flex-wrap justify-content-center m-t-30">
             {% for media in movies_results %}
             <div class="card mb-4" style="background: #8c7821; width: 700px; border-radius: 0;">
@@ -165,7 +168,8 @@
                             {% else %}
                             <div id="title-container-{{ media['tmdb_id'] }}" class="text-left fs-15 m-l-10">
                                 <span id="icon-{{ media['tmdb_id'] }}" class="fas fa-plus"></span>
-                                <span id="title-{{ media['tmdb_id'] }}">Add</span>
+                                <a id="title-{{ media['tmdb_id'] }}" class="disabled text-light"
+                                   href="/movieslist/{{ media['username'] }}">Add</a>
                                 <div id="buttons-{{ media['tmdb_id'] }}" style="display: inline-block;">
                                     <span class="btn btn-perso" onclick="add_media('Completed', {{ media['tmdb_id'] }},
                                             'movieslist')">Completed</span>

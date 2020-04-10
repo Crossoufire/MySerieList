@@ -332,20 +332,20 @@ def compute_time_spent(cat_type=None, old_eps=None, new_eps=None, old_seas=None,
                 current_user.time_spent_movies = current_user.time_spent_movies + media.runtime
         elif new_status == Status.RANDOM:
             if list_type == ListType.SERIES:
-                if old_status != Status.PLAN_TO_WATCH or old_status is not None:
+                if old_status != Status.PLAN_TO_WATCH and old_status is not None:
                     eps_watched = eps_watched_status(old_seas, old_eps, all_seas_data)
                     current_user.time_spent_series = current_user.time_spent_series - eps_watched*media.episode_duration
             elif list_type == ListType.ANIME:
-                if old_status != Status.PLAN_TO_WATCH or old_status is not None:
+                if old_status != Status.PLAN_TO_WATCH and old_status is not None:
                     eps_watched = eps_watched_status(old_seas, old_eps, all_seas_data)
                     current_user.time_spent_anime = current_user.time_spent_anime - eps_watched*media.episode_duration
         elif new_status == Status.PLAN_TO_WATCH:
             if list_type == ListType.SERIES:
-                if old_status != Status.RANDOM or old_status is not None:
+                if old_status != Status.RANDOM and old_status is not None:
                     eps_watched = eps_watched_status(old_seas, old_eps, all_seas_data)
                     current_user.time_spent_series = current_user.time_spent_series-(eps_watched*media.episode_duration)
             elif list_type == ListType.ANIME:
-                if old_status != Status.RANDOM or old_status is not None:
+                if old_status != Status.RANDOM and old_status is not None:
                     eps_watched = eps_watched_status(old_seas, old_eps, all_seas_data)
                     current_user.time_spent_anime = current_user.time_spent_anime - eps_watched*media.episode_duration
             elif list_type == ListType.MOVIES:

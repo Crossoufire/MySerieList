@@ -7,15 +7,6 @@
     right: 16px;
 }
 
-.card-ribbon {
-    border-style: solid;
-    border-width: 0 35px 35px 0;
-    border-color: transparent #2d6f22;
-    position: absolute;
-	right: 0;
-	top: 0;
-}
-
 .giveMeEllipsis {
    overflow: hidden;
    text-overflow: ellipsis;
@@ -48,6 +39,17 @@
     margin: 0;
     padding: 0;
     width: 440px;
+}
+
+.card {
+    border-radius: 0;
+}
+
+.card-img {
+    border-radius: 0;
+}
+
+.img-anime {
 }
 
 @media (max-width: 601px) {
