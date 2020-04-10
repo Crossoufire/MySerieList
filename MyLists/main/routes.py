@@ -597,7 +597,7 @@ def search_media():
     # Recover all the data
     series = db.session.query(Series.themoviedb_id, SeriesList)\
         .join(Series, SeriesList.series_id == Series.id)\
-        .filter(SeriesList.user_id==current_user.id).all()
+        .filter(SeriesList.user_id == current_user.id).all()
 
     series_id = [r.themoviedb_id for r in series]
 
@@ -616,19 +616,22 @@ def search_media():
     movies_id = [r.themoviedb_id for r in movies]
 
     for result in series_results:
+        result['type'] = 'series'
+        result['username'] = current_user.username
         if result['tmdb_id'] in series_id:
-            result['type'] = 'series'
             result['already'] = True
         else:
             result['already'] = False
     for result in anime_results:
         result['type'] = 'anime'
+        result['username'] = current_user.username
         if result['tmdb_id'] in anime_id:
             result['already'] = True
         else:
             result['already'] = False
     for result in movies_results:
         result['type'] = 'movies'
+        result['username'] = current_user.username
         if result['tmdb_id'] in movies_id:
             result['already'] = True
         else:

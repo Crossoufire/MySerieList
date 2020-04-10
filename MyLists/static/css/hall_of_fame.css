@@ -43,7 +43,7 @@ table.table a {
 .table td {
     text-align: center;
     vertical-align: middle;
-    padding: 30px 20px 30px 20px !important;
+    padding: 30px 20px 20px 20px !important;
 }
 
 .current_user {

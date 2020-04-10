@@ -24,7 +24,7 @@ def get_trending_data(trends_data, list_type):
             return None
 
         for data in trends_data:
-            series = {"title": data.get("name", "Unknown") or "Unknown"}
+            series = {"title": data.get("original_name", "Unknown") or "Unknown"}
 
             media_cover_path = data.get("poster_path") or None
             if media_cover_path:

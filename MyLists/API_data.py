@@ -138,7 +138,7 @@ class ApiData:
         # Recover movies results
         movies_results = []
         for result in data_movies['results']:
-            media_data = {'name': result['title'],
+            media_data = {'name': result['original_title'],
                           'overview': result['overview'],
                           'tmdb_id': result["id"],
                           "first_air_date": result.get('release_date', 'Unknown') or 'Unknown',
@@ -153,7 +153,7 @@ class ApiData:
         # Recover anime and series results
         series_results, anime_results = [], []
         for result in data_tv['results']:
-            media_data = {'name': result['name'],
+            media_data = {'name': result['original_name'],
                           'overview': result['overview'],
                           'tmdb_id': result["id"],
                           "first_air_date": result.get('first_air_date', 'Unknown') or 'Unknown',
