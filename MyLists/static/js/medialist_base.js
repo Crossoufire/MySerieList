@@ -1,0 +1,202 @@
+
+
+// --- Delete element --------------------------------------------------
+function deleteElement(element_id, card_id, media_list) {
+    if (!confirm("Are you sure you want to delete this from your list?")) {
+        return false;
+    }
+
+    $("#"+card_id).remove();
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/deleteElement",
+        contentType: "application/json",
+        data: JSON.stringify({ delete: element_id, element_type: media_list }),
+        dataType: "json",
+        success: function(response) {
+            console.log("ok");
+        }
+    });
+
+    $categories.isotope('layout');
+}
+
+
+// --- Remove the category list ----------------------------------------
+function removeCat() {
+    $('.card-cat-buttons').remove();
+    $('.card-btn-top-right-2').remove();
+    $('.card-btn-top-left').attr('style', 'display: block;');
+    $('.card-btn-top-right').attr('style', 'display: block;');
+
+    $('.seas-eps-box').each(function () {
+        if ($(this).parent().parent().parent()[0].className === 'row category-PLAN TO WATCH') {
+            $(this).attr('style', 'display: none;');
+        } else {
+            $(this).attr('style', 'display: inline-block;');
+        }
+    });
+
+    $('.card-img-top').attr('style', 'filter: brightness(100%); height: auto;');
+    $('.mask').show();
+}
+
+
+// --- Search by Title or Actor ----------------------------------------
+function searchElement() {
+    let input, cat, filter, cards, cardContainer, title, i, l;
+    input = document.getElementById("searchInput");
+    cat = document.getElementsByClassName("search-select")[0].value;
+    filter = input.value.toUpperCase();
+    cardContainer = document.getElementById("categories-iso");
+    cards = cardContainer.getElementsByClassName("card-container");
+    l = cards.length;
+    for (i = 0; i < l; i++) {
+        title = cards[i].querySelector(".font-mask");
+        original_title = cards[i].querySelector(".by-original-title");
+        actors = cards[i].querySelector(".by-actor");
+        genres = cards[i].querySelector(".by-genre");
+        if (title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
+            cards[i].style.display = "";
+        } else if (original_title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
+            cards[i].style.display = "";
+        } else if (actors.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Actors' || cat === 'All')) {
+            cards[i].style.display = "";
+        } else if (genres.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Genres' || cat === 'All')) {
+            cards[i].style.display = "";
+        } else {
+            cards[i].style.display = "none";
+        }
+    }
+
+    $categories.isotope('layout');
+}
+
+
+// --- Add media to favorite -------------------------------------------
+function addFavorite() {}
+
+
+// --- Show/Hide common media ------------------------------------------
+function HideCommon(checkbox) {
+    let cards, cardContainer, common_media, l;
+
+    cardContainer = document.getElementById("categories-iso");
+    cards = cardContainer.getElementsByClassName("card-container");
+    l = cards.length;
+    for (i = 0; i < l; i++) {
+        common_media = cards[i].querySelector(".card-ribbon");
+        if (common_media != null && $(checkbox).prop("checked") == true) {
+            cards[i].style.display = 'none';
+        } else if ($(checkbox).prop("checked") == false) {
+            cards[i].style.display = '';
+        }
+    }
+
+    $categories.isotope('layout');
+}
+
+
+// --- Show/Hide favorites media ---------------------------------------
+function ShowFavorites(checkbox) {
+    let cards, cardContainer, favorites, l;
+
+    cardContainer = document.getElementById("categories-iso");
+    cards = cardContainer.getElementsByClassName("card-container");
+    l = cards.length;
+    for (i = 0; i < l; i++) {
+        favorites = cards[i].querySelector(".far.fa-heart");
+        if (favorites != null && $(checkbox).prop("checked") == true) {
+            cards[i].style.display = 'none';
+        } else if ($(checkbox).prop("checked") == false) {
+            cards[i].style.display = '';
+        }
+    }
+
+    $categories.isotope('layout');
+}
+
+
+// --- Add the category to the user (from other list) ------------------
+function AddCatUser(cat, card_id, element_id, media_type) {
+    var add_cat = cat.childNodes[0].data
+
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/add_element",
+        contentType: "application/json",
+        data: JSON.stringify({ element_cat: add_cat, element_id: element_id, element_type: media_type, from_other_list: true }),
+        dataType: "json",
+        success: function(response) {
+            console.log("ok");
+        }
+    });
+
+    removeCat();
+    $("#"+card_id).children().children('div[class="view overlay"]').append("<div class='card-ribbon'></div>");
+    $("#"+card_id).children().children().children().remove(".card-btn-top-left.fas.fa-plus.text-light");
+}
+
+
+// --- Select box & tooltip --------------------------------------------
+$(document).ready(function() {
+    // --- Select box ----------
+    $(".add_element").val('');
+    $(".cat-select").prop('selectedIndex', 0);
+
+    // --- Tooltip -------------
+    $('.tooltip').tooltip();
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+});
+
+
+// --- Isotopes --------------------------------------------------------
+let $categories = $('.categories-iso').isotope({
+    itemSelector: '.categories',
+    layoutMode: 'vertical',
+    onLayout: function() {
+        $window.trigger("scroll");
+    }
+});
+$("img.lazyload").lazyload({
+    failure_limit : Math.max($("img.lazyload").length-1, 0)
+});
+
+$('.filters-button-group').on('click', 'button', function() {
+    var filterValue = $(this).attr('data-filter');
+    $categories.isotope({ filter: filterValue });
+});
+
+$('.filters-button-group').each(function(i, buttonGroup) {
+    var $buttonGroup = $(buttonGroup);
+    $buttonGroup.on('click', 'button', function() {
+        $buttonGroup.find('.btn-primary').addClass('btn-dark');
+        $buttonGroup.find('.btn-primary').removeClass('btn-primary');
+        $(this).addClass('btn-primary');
+        $(this).removeClass('btn-dark');
+    });
+});
+$categories.isotope('layout');
+
+
+// --- Row gutters -----------------------------------------------------
+(function($) {
+    var $window = $(window),
+        $row = $('.row');
+
+    function resize() {
+        if ($window.width() < 1025) {
+            return $row.addClass('no-gutters');
+        }
+        $row.removeClass('no-gutters');
+    }
+    $window.resize(resize).trigger('resize');
+    $categories.isotope('layout');
+})(jQuery);
+
+
+$categories.isotope('layout');

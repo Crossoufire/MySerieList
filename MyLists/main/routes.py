@@ -84,7 +84,7 @@ def mymedialist(media_list, user_name):
         db.session.commit()
 
     if list_type != ListType.MOVIES:
-        return render_template('series_anime_list.html',
+        return render_template('medialist_tv.html',
                                title="{}'s {}".format(user_name, media_list),
                                all_data=media_all_data["all_data"],
                                common_elements=media_all_data["common_elements"],
@@ -92,7 +92,7 @@ def mymedialist(media_list, user_name):
                                target_user_name=user_name,
                                target_user_id=str(user.id))
     elif list_type == ListType.MOVIES:
-        return render_template('movieslist.html',
+        return render_template('medialist_movies.html',
                                title="{}'s {}".format(user_name, media_list),
                                all_data=media_all_data["all_data"],
                                common_elements=media_all_data["common_elements"],
@@ -332,7 +332,7 @@ def update_element_episode():
     return '', 204
 
 
-@bp.route('/delete_element', methods=['POST'])
+@bp.route('/deleteElement', methods=['POST'])
 @login_required
 def delete_element():
     try:

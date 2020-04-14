@@ -98,7 +98,7 @@
                         </div>
                         {% if target_user_id == current_user.get_id() %}
                             <a class="btn_left fas fa-bars text-light" data-toggle="modal" data-target="#modal_cat{{ data[0][0].id }}"></a>
-                            <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0][0].id }}', 'card_{{ data[0][0].id }}', '{{ media_list }}')"></a>
+                            <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="deleteElement('{{ data[0][0].id }}', 'card_{{ data[0][0].id }}', '{{ media_list }}')"></a>
                             {% if media_list != 'movieslist' %}
                                 {% if can_update["{}".format(data[0][0].id)] %}
                                     <a class="btn_bottom_right fas fa-sync text-light" data-toggle="tooltip" title="Sync metadata" onclick="refresh('{{ data[0][0].id }}', '{{ media_list }}', '{{ current_user.username }}')"></a>
@@ -118,12 +118,12 @@
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0][0].id }}', '{{ media_list }}', 'Watching', 'card_{{ data[0][0].id }}')">Watching</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0][0].id }}', '{{ media_list }}', 'Completed', 'card_{{ data[0][0].id }}')">Completed</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0][0].id }}', '{{ media_list }}', 'On Hold', 'card_{{ data[0][0].id }}')">On Hold</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0][0].id }}', '{{ media_list }}', 'Random', 'card_{{ data[0][0].id }}')">Random</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0][0].id }}', '{{ media_list }}', 'Dropped', 'card_{{ data[0][0].id }}')">Dropped</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0][0].id }}', '{{ media_list }}', 'Plan to Watch', 'card_{{ data[0][0].id }}')">Plan to Watch</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="ChargeButtonsTV('{{ data[0][0].id }}', '{{ media_list }}', 'Watching', 'card_{{ data[0][0].id }}')">Watching</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="ChargeButtonsTV('{{ data[0][0].id }}', '{{ media_list }}', 'Completed', 'card_{{ data[0][0].id }}')">Completed</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="ChargeButtonsTV('{{ data[0][0].id }}', '{{ media_list }}', 'On Hold', 'card_{{ data[0][0].id }}')">On Hold</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="ChargeButtonsTV('{{ data[0][0].id }}', '{{ media_list }}', 'Random', 'card_{{ data[0][0].id }}')">Random</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="ChargeButtonsTV('{{ data[0][0].id }}', '{{ media_list }}', 'Dropped', 'card_{{ data[0][0].id }}')">Dropped</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="ChargeButtonsTV('{{ data[0][0].id }}', '{{ media_list }}', 'Plan to Watch', 'card_{{ data[0][0].id }}')">Plan to Watch</a>
                                         </div>
                                     </div>
                                 </div>
@@ -139,8 +139,8 @@
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0][0].id }}', '{{ media_list }}', 'Completed', 'card_{{ data[0][0].id }}')">Completed</a>
-                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="add_user('{{ data[0][0].id }}', '{{ media_list }}', 'Plan to Watch', 'card_{{ data[0][0].id }}')">Plan to Watch</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="ChargeButtonsTV('{{ data[0][0].id }}', '{{ media_list }}', 'Completed', 'card_{{ data[0][0].id }}')">Completed</a>
+                                            <a data-dismiss="modal" class="list-group-item bg-dark modded" onclick="ChargeButtonsTV('{{ data[0][0].id }}', '{{ media_list }}', 'Plan to Watch', 'card_{{ data[0][0].id }}')">Plan to Watch</a>
                                         </div>
                                     </div>
                                 </div>
@@ -496,16 +496,16 @@ $(function() {
 });
 </script>
 {% else %}
-<script src="{{ url_for('static', filename='js/add_to_user.js') }}"></script>
+<script src="{{ url_for('static', filename='js/AddCatUser.js') }}"></script>
 {% endif %}
 
 <!------------------ Isotope ------------------->
 <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
 
-<script src="{{ url_for('static', filename='js/mymedialist_common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/medialist_base.js') }}"></script>
 {% if media_list == 'movieslist' %}
-<script src="{{ url_for('static', filename='js/mymedialist_movies.js') }}"></script>
+<script src="{{ url_for('static', filename='js/medialist_movies.js') }}"></script>
 {% elif media_list != 'movieslist' %}
-<script src="{{ url_for('static', filename='js/mymedialist.js') }}"></script>
+<script src="{{ url_for('static', filename='js/medialist_tv.js') }}"></script>
 {% endif %}
 {% endblock script %}
