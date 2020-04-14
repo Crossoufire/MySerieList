@@ -110,10 +110,19 @@
                             {% endblock card_top_left_1 %}
                             <a class="card-btn-top-right fas fa-trash text-light" onclick="deleteElement(
                             '{{ data[0]['id'] }}', 'card_{{ data[0]['id'] }}', '{{ media_list }}')"></a>
-                            <a class="card-btn-bottom-left far fa-heart text-light" onclick="addFavorite(
-                            '{{ data[0]['id'] }}', 'card_{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                            {% if data[0]['favorite'] %}
+                                <a id="fav-{{ data[0]['id'] }}" class="card-favorite fas fa-star" style="color: darkgoldenrod;"
+                                   onclick="addFavorite('{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                            {% else %}
+                                <a id="fav-{{ data[0]['id'] }}" class="card-btn-bottom-left far fa-star"
+                                   onclick="addFavorite('{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                            {% endif %}
                         {% else %}
-                            <a class="card-btn-bottom-left far fa-heart text-light"></a>
+                            {% if data[0]['favorite'] %}
+                                <a class="card-btn-bottom-left fas fa-heart text-light"></a>
+                            {% else %}
+                                <a class="card-btn-bottom-left far fa-heart text-light"></a>
+                            {% endif %}
                             {% if data[1] %}
                                 <div class="card-ribbon"></div>
                             {% else %}

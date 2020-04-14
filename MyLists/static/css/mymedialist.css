@@ -123,8 +123,8 @@ option {
 
 .card-btn-bottom-left {
     position: absolute;
-    bottom: 10px;
-    left: 10px;
+    bottom: 15px;
+    left: 6%;
     opacity: 0;
 }
 
@@ -153,8 +153,8 @@ option {
     font-size: 17pt;
 }
 
-.fas .far {
-    text-shadow: 0 0 3px #000;
+.fas {
+    text-shadow: 0 0 4px #000;
 }
 
 .seas-eps-box {
@@ -162,6 +162,13 @@ option {
     bottom: 10px;
     right: 6%;
     background: #1a1a1a;
+    border-radius: 2px;
+}
+
+.card-favorite {
+    position: absolute;
+    bottom: 15px;
+    left: 6%;
     border-radius: 2px;
 }
 

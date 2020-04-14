@@ -75,7 +75,31 @@ function searchElement() {
 
 
 // --- Add media to favorite -------------------------------------------
-function addFavorite() {}
+function addFavorite(element_id, media_type) {
+    let favorite
+
+    if ($('#fav-'+element_id).hasClass('far')) {
+        $('#fav-'+element_id).removeClass('far card-btn-bottom-left').addClass('fas card-favorite')
+        $('#fav-'+element_id).attr('style', 'color: darkgoldenrod;')
+        favorite = true
+    } else {
+        $('#fav-'+element_id).removeClass('fas card-favorite').addClass('far card-btn-bottom-left')
+        $('#fav-'+element_id).attr('style', 'color: white;')
+        favorite = false
+    }
+
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/add_favorite",
+        contentType: "application/json",
+        data: JSON.stringify({ element_id: element_id, element_type: media_type, favorite: favorite }),
+        dataType: "json",
+        success: function(response) {
+            console.log("ok");
+        }
+    });
+}
 
 
 // --- Show/Hide common media ------------------------------------------
@@ -106,7 +130,7 @@ function ShowFavorites(checkbox) {
     cards = cardContainer.getElementsByClassName("card-container");
     l = cards.length;
     for (i = 0; i < l; i++) {
-        favorites = cards[i].querySelector(".far.fa-heart");
+        favorites = cards[i].querySelector(".far.fa-star");
         if (favorites != null && $(checkbox).prop("checked") == true) {
             cards[i].style.display = 'none';
         } else if ($(checkbox).prop("checked") == false) {

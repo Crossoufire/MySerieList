@@ -170,11 +170,6 @@ def update_element_season():
         abort(400)
 
     if list_type == ListType.ANIME:
-        # Check if the element exists
-        anime = Anime.query.filter_by(id=element_id).first()
-        if anime is None:
-            abort(400)
-
         # Check if the element is in the current account's list
         anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
         if anime_list is None:
@@ -205,11 +200,6 @@ def update_element_season():
         compute_time_spent(cat_type="season", old_eps=old_episode, old_seas=old_season, new_seas=new_season,
                            all_seas_data=all_seasons, media=anime, list_type=list_type)
     elif list_type == ListType.SERIES:
-        # Check if the element exists
-        series = Series.query.filter_by(id=element_id).first()
-        if series is None:
-            abort(400)
-
         # Check if the element is in the current account's list
         series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
         if series_list is None:
@@ -261,12 +251,7 @@ def update_element_episode():
         abort(400)
 
     if list_type == ListType.ANIME:
-        # Check if the element exists
-        anime = Anime.query.filter_by(id=element_id).first()
-        if anime is None:
-            abort(400)
-
-        # Check if the element is in the current account's list
+        # Check if the element is in the current user's list
         anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
         if anime_list is None:
             abort(400)
@@ -295,12 +280,7 @@ def update_element_episode():
         compute_time_spent(cat_type='episode', new_eps=new_episode, old_eps=old_episode, media=anime,
                            list_type=list_type)
     elif list_type == ListType.SERIES:
-        # Check if the element exists
-        series = Series.query.filter_by(id=element_id).first()
-        if series is None:
-            abort(400)
-
-        # Check if the element is in the current account's list
+        # Check if the element is in the current user's list
         series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
         if series_list is None:
             abort(400)
@@ -332,6 +312,46 @@ def update_element_episode():
     return '', 204
 
 
+@bp.route('/add_favorite', methods=['POST'])
+@login_required
+def add_favorite():
+    try:
+        json_data = request.get_json()
+        element_id = int(json_data['element_id'])
+        element_type = json_data['element_type']
+        favorite = bool(json_data['favorite'])
+    except:
+        abort(400)
+
+    # Check if the medialist exist and is valid
+    try:
+        list_type = ListType(element_type)
+    except ValueError:
+        abort(400)
+
+    # Check if favorite is boolean
+    if type(favorite) is not bool:
+        abort(400)
+
+    # Check if the element is in the current user's list
+    if list_type == ListType.ANIME:
+        element_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
+    elif list_type == ListType.SERIES:
+        element_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
+    else:
+        element_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
+
+    if element_list is None:
+        abort(400)
+
+    element_list.favorite = favorite
+
+    # Commit the changes
+    db.session.commit()
+
+    return '', 204
+
+
 @bp.route('/deleteElement', methods=['POST'])
 @login_required
 def delete_element():
@@ -349,12 +369,7 @@ def delete_element():
         abort(400)
 
     if list_type == ListType.SERIES:
-        # Check if series exists in the database
-        series = Series.query.filter_by(id=element_id).first()
-        if series is None:
-            abort(400)
-
-        # Check if series exists in list of the current account
+        # Check if series exists in the current user's list
         series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
         if series_list is None:
             abort(400)
@@ -372,11 +387,6 @@ def delete_element():
         db.session.commit()
         app.logger.info('[{}] Series with ID {} deleted'.format(current_user.id, element_id))
     elif list_type == ListType.ANIME:
-        # Check if anime exists in the database
-        anime = Anime.query.filter_by(id=element_id).first()
-        if anime is None:
-            abort(400)
-
         # Check if anime exists in list of the current account
         anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
         if anime_list is None:
@@ -395,11 +405,6 @@ def delete_element():
         db.session.commit()
         app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.id, element_id))
     elif list_type == ListType.MOVIES:
-        # Check if movie exists in the database
-        movies = Movies.query.filter_by(id=element_id).first()
-        if movies is None:
-            abort(400)
-
         # Check if movie exists in the account's list
         movies_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
         if movies_list is None:

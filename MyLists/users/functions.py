@@ -66,6 +66,24 @@ def get_total_eps(user_id, list_type):
     return nb_eps_watched
 
 
+def get_favorites(user_id):
+    series_favorites = db.session.query(Series, SeriesList) \
+        .join(Series, Series.id == SeriesList.series_id) \
+        .filter(SeriesList.user_id == user_id, SeriesList.favorite == True).group_by(SeriesList.series_id).all()
+
+    anime_favorites = db.session.query(Anime, AnimeList) \
+        .join(Anime, Anime.id == AnimeList.anime_id) \
+        .filter(AnimeList.user_id == user_id, AnimeList.favorite == True).group_by(AnimeList.anime_id).all()
+
+    movies_favorites = db.session.query(Movies, MoviesList) \
+        .join(Movies, Movies.id == MoviesList.movies_id) \
+        .filter(MoviesList.user_id == user_id, MoviesList.favorite == True).group_by(MoviesList.movies_id).all()
+
+    favorites = [series_favorites, anime_favorites, movies_favorites]
+
+    return favorites
+
+
 def get_media_levels(user, list_type):
     if list_type == ListType.SERIES:
         total_time_min = user.time_spent_series

@@ -417,6 +417,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "eps_per_season": eps_per_season,
                             "current_season": element[1].current_season,
                             "score": element[1].score,
+                            "favorite": element[1].favorite,
                             "actors": actors,
                             "genres": genres,
                             "networks": networks}
@@ -500,6 +501,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "revenue": element[0].revenue,
                             "tagline": element[0].tagline,
                             "score": element[1].score,
+                            "favorite": element[1].favorite,
                             "actors": actors,
                             "genres": genres}
 
