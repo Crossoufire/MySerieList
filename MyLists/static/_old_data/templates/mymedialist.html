@@ -109,7 +109,7 @@
                     <div class="view overlay">
                         <img class="card-img-top" loading="lazy" src="{{ data[0]['cover'] }}" alt="{{ data[0]['name'] }}">
                         <div class="mask flex-center rgba-black-strong" data-toggle="modal"
-                             data-target="#modal_metadata" onclick="show_metadata(metadata_{{ data[0]['id'] }},
+                             data-target="#modal_metadata" onclick="showMetadata(metadata_{{ data[0]['id'] }},
                              '{{ media_list }}')">
                             <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
                             <span class="original-title" style="display: none;" >{{ data[0]['original_name'] }}</span>
@@ -119,7 +119,7 @@
                         {% if target_user_id == current_user.get_id() %}
                             {% if media_list != 'movieslist' %}
                             <a class="card-btn-top-left fas fa-bars text-light"
-                               onclick="charge_cat('card_{{ data[0]['id'] }}','{{ data[0]['id'] }}',
+                               onclick="chargeButtons('card_{{ data[0]['id'] }}','{{ data[0]['id'] }}',
                                'S_{{ data[0]['id'] }}', 'E_{{ data[0]['id'] }}', '{{ data[0]['eps_per_season'] }}',
                                '{{ media_list }}')"></a>
                             {% else %}
@@ -128,17 +128,17 @@
                                '{{ data[0]['genres'] }}', '{{ media_list }}')"></a>
                             {% endif %}
                         <a class="card-btn-top-right fas fa-ban text-light"
-                           onclick="delete_element('{{ data[0]['id'] }}', 'card_{{ data[0]['id'] }}',
+                           onclick="deleteElement('{{ data[0]['id'] }}', 'card_{{ data[0]['id'] }}',
                            '{{ media_list }}')"></a>
                         {% else %}
                             {% if data[1] == "no" %}
                                 {% if media_list != 'movieslist' %}
                                 <a class="card-btn-top-left fas fa-plus text-light"
-                                   onclick="add_user('card_{{ data[0]['id'] }}',
+                                   onclick="ChargeButtonsTV('card_{{ data[0]['id'] }}',
                                    '{{ data[0]['id'] }}', '{{ media_list }}')"></a>
                                 {% else %}
                                 <a class="card-btn-top-left fas fa-plus text-light"
-                                   onclick="add_user_movies('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}',
+                                   onclick="ChargeButtonsMovies('card_{{ data[0]['id'] }}', '{{ data[0]['id'] }}',
                                    '{{ media_list }}')"></a>
                                 {% endif %}
                             {% else %}
@@ -295,11 +295,11 @@
 </script>
 
 <!------------------ Main scripts ------------------->
-<script src="{{ url_for('static', filename='js/mymedialist_common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/medialist_base.js') }}"></script>
 {% if media_list == 'movieslist' %}
-<script src="{{ url_for('static', filename='js/mymedialist_movies.js') }}"></script>
+<script src="{{ url_for('static', filename='js/medialist_movies.js') }}"></script>
 {% elif media_list != 'movieslist' %}
-<script src="{{ url_for('static', filename='js/mymedialist.js') }}"></script>
+<script src="{{ url_for('static', filename='js/medialist_tv.js') }}"></script>
 {% endif %}
 
 {% if current_user.get_id() == target_user_id %}
@@ -386,6 +386,6 @@ $(function() {
 </script>
 {% else %}
 <!------------ Add media to current users from the other lists ------------->
-<script src="{{ url_for('static', filename='js/add_to_user.js') }}"></script>
+<script src="{{ url_for('static', filename='js/AddCatUser.js') }}"></script>
 {% endif %}
 {% endblock script %}

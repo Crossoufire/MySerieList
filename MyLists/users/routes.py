@@ -4,7 +4,7 @@ from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_badges, get_user_data, \
-    get_knowledge_frame, get_updates
+    get_knowledge_frame, get_updates, get_favorites
 
 
 bp = Blueprint('users', __name__)
@@ -53,9 +53,12 @@ def account(user_name):
     # Recover follows data and last updates
     follows_list, follows_update_list = get_follows_data(user)
 
+    favorites = get_favorites(user.id)
+
     return render_template('account.html',
                            title="{}'s account".format(user.username),
                            user_data=user_data,
+                           favorites=favorites,
                            media_data=media_data,
                            follow_form=follow_form,
                            follows_list=follows_list,

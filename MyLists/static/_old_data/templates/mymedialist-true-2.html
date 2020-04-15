@@ -94,17 +94,17 @@
                         </div>
                         {% if target_user_id == current_user.get_id() %}
                             {% if media_list != 'movieslist' %}
-                            <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="charge_cat('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', 'S_{{ data[0][0].id }}', 'E_{{ data[0][0].id }}', '{{ eps['{}'.format(data[0][0].id)] }}', '{{ media_list }}')"></a>
+                            <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="chargeButtons('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', 'S_{{ data[0][0].id }}', 'E_{{ data[0][0].id }}', '{{ eps['{}'.format(data[0][0].id)] }}', '{{ media_list }}')"></a>
                             {% else %}
                             <a class="btn_left fas fa-bars text-light" data-toggle="tooltip" title="Categories" onclick="changeCategory('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ genres['{}'.format(data[0][0].id)] }}', '{{ media_list }}')"></a>
                             {% endif %}
-                        <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="delete_element('{{ data[0][0].id }}', 'card_{{ data[0][0].id }}', '{{ media_list }}')"></a>
+                        <a class="btn_right fas fa-ban text-light" data-toggle="tooltip" title="Delete" onclick="deleteElement('{{ data[0][0].id }}', 'card_{{ data[0][0].id }}', '{{ media_list }}')"></a>
                         {% else %}
                             {% if data[1] == "no" %}
                                 {% if media_list != 'movieslist' %}
-                                <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ media_list }}')"></a>
+                                <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="ChargeButtonsTV('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ media_list }}')"></a>
                                 {% else %}
-                                <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="add_user_movies('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ media_list }}')"></a>
+                                <a class="btn_left fas fa-plus text-light" data-toggle="tooltip" title="Add to your list" onclick="ChargeButtonsMovies('card_{{ data[0][0].id }}', '{{ data[0][0].id }}', '{{ media_list }}')"></a>
                                 {% endif %}
                             {% else %}
                                 <div class="ribbon"></div>
@@ -269,11 +269,11 @@
 <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
 
 <!------------------ Main scripts ------------------->
-<script src="{{ url_for('static', filename='js/mymedialist_common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/medialist_base.js') }}"></script>
 {% if media_list == 'movieslist' %}
-<script src="{{ url_for('static', filename='js/mymedialist_movies.js') }}"></script>
+<script src="{{ url_for('static', filename='js/medialist_movies.js') }}"></script>
 {% elif media_list != 'movieslist' %}
-<script src="{{ url_for('static', filename='js/mymedialist.js') }}"></script>
+<script src="{{ url_for('static', filename='js/medialist_tv.js') }}"></script>
 {% endif %}
 
 {% if current_user.get_id() == target_user_id %}
@@ -349,6 +349,6 @@ $(function() {
 </script>
 {% else %}
 <!------------ Add media to current users from the other lists ------------->
-<script src="{{ url_for('static', filename='js/add_to_user.js') }}"></script>
+<script src="{{ url_for('static', filename='js/AddCatUser.js') }}"></script>
 {% endif %}
 {% endblock script %}

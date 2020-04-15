@@ -1,8 +1,8 @@
 
 
-// ------------------------- Create the category list -------------------------
-function charge_cat(card, element_id, genres, media_list) {
-    remove_cat();
+// --- Create the cat buttons list ---------------------------
+function chargeButtons(card, element_id, genres, media_list) {
+    removeCat();
 
     if ($('#'+card.id).parent().hasClass('category-COMPLETED')) {
         var display_completed = "none;";
@@ -26,15 +26,15 @@ function charge_cat(card, element_id, genres, media_list) {
     $(card).find('.card-btn-top-left').attr('style', 'display: none;');
     $(card).find('.card-btn-top-right').attr('style', 'display: none;');
     $(card).find('.mask').hide();
-    $(card).find('.view.overlay').prepend("<a class='card-btn-top-right-2 fas fa-times' onclick='remove_cat()')></a>");
+    $(card).find('.view.overlay').prepend("<a class='card-btn-top-right-2 fas fa-times' onclick='removeCat()')></a>");
     $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
 }
 
 
-// ----------------------------- Change category ------------------------------
+// --- Change category ---------------------------------------
 function changeCategory(new_category, element_id, card_id, genres, media_list) {
     var new_cat = new_category.childNodes[0].data
-    remove_cat();
+    removeCat();
 
     if ($('#'+card_id).parent().hasClass('category-COMPLETED')) {
         $("#"+card_id).prependTo(".category-PLAN.TO.WATCH");
@@ -70,8 +70,8 @@ function changeCategory(new_category, element_id, card_id, genres, media_list) {
 }
 
 
-// ------------------------- Movies metadata test -----------------------------
-function show_metadata(data) {
+// --- Movies metadata ---------------------------------------
+function showMetadata(data) {
     var data = JSON.parse($('#'+data).text());
 
     $('#original_name').text('');
@@ -90,4 +90,24 @@ function show_metadata(data) {
     $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10 &nbsp;(" +data.vote_count.toLocaleString("en")+ " votes)");
     $('#tagline').html("<b>Tagline</b>: " +data.tagline);
     $('#synopsis').html("<b>Synopsis</b>: " +data.synopsis);
+}
+
+
+
+// --- FROM OTHER LISTS ---------------------------------------------------------------------
+
+// --- Charge the buttons from other lists -------------------
+function ChargeButtonsMovies(card_id, element_id, media_type) {
+    removeCat();
+
+    $('#'+card_id).children().children().first().prepend (
+    "<ul class='card-cat-buttons'>" +
+        "<li style='display: block;' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='AddCatUser(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Completed</li>" +
+        "<li style='display: block;' class='btn btn-light p-1 m-1 card-btn-mobile' onclick='AddCatUser(this, \"" + card_id + "\", \"" + element_id + "\", \"" + media_type + "\")')'>Plan to Watch</li>" +
+    "</ul>");
+
+    $('#'+card_id).children().children().children('.card-btn-top-left').attr('style', 'display: none;');
+    $('#'+card_id).children().children().children('.mask').hide();
+    $('#'+card_id).children().children().first().prepend("<a class='card-btn-top-right-2 fas fa-times' onclick='removeCat()')></a>");
+    $('#'+card_id).children().children().children('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
 }

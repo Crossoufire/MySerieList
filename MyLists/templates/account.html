@@ -200,7 +200,7 @@
                         <li class="m-b-10">
                             <div class="row">
                                 <div  class="col-9">
-                                    profile views:
+                                    Profile views:
                                 </div>
                                 <div  class="col-2">
                                     {{ user_data['view_count']["profile"] }}
@@ -290,11 +290,12 @@
                     <!------------------------ Series statistics --------------------------->
                     <div class="stats-size">
                         <h5 class="text-center mb-2">
-                            <a class="text-light" href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=user_data['username']) }}">
+                            <a class="text-light" href="{{ url_for('main.mymedialist', media_list='serieslist',
+                            user_name=user_data['username']) }}">
                                 <b>Series </b><i class="fas fa-xs fa-external-link-square-alt"></i>
                             </a>
                         </h5>
-                        <div id="SERIES" class="m-b-16">
+                        <div id="SERIES" class="m-b-8">
                             <div class="m-b-5">
                                 <span class="stat-text"><b>Days:</b> {{ media_data['series']['time_spent_day'] }}</span>
                                 <span class="stat-text float-right"><b>Hours:</b> {{ media_data['series']['time_spent_hour'] }}</span>
@@ -385,6 +386,18 @@
                                 </div>
                             </div>
                         </div>
+                        <div><b>Favorites ({{ favorites[0]|length }}):</b></div>
+                        <div class="row m-b-16">
+                            <div class="col">
+                                {% for favorite in favorites[0] %}
+                                    {% if loop.index < 11 %}
+                                        <img height="90" width="60"
+                                             src="/static/covers/series_covers/{{ favorite[0].image_cover }}"
+                                             data-toggle="tooltip" title="{{ favorite[0].name }}"/>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
                     <hr>
                     <!------------------------- Anime statistics --------------------------->
@@ -394,7 +407,7 @@
                                 <b>Anime </b><i class="fas fa-xs fa-external-link-square-alt"></i>
                             </a>
                         </h5>
-                        <div id="ANIME" class="m-b-16">
+                        <div id="ANIME" class="m-b-8">
                             <div class="m-b-5">
                                 <span class="stat-text"><b>Days:</b> {{ media_data['anime']['time_spent_day'] }}</span>
                                 <span class="stat-text float-right"><b>Hours:</b> {{ media_data['anime']['time_spent_hour'] }}</span>
@@ -485,6 +498,18 @@
                                 </div>
                             </div>
                         </div>
+                        <div><b>Favorites ({{ favorites[1]|length }}):</b></div>
+                        <div class="row m-b-16">
+                            <div class="col">
+                                {% for favorite in favorites[1] %}
+                                    {% if loop.index < 11 %}
+                                        <img height="90" width="60"
+                                             src="/static/covers/anime_covers/{{ favorite[0].image_cover }}"
+                                             data-toggle="tooltip" title="{{ favorite[0].name }}"/>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
                     <hr>
                     <!------------------------ Movies statistics --------------------------->
@@ -494,7 +519,7 @@
                                 <b>Movies </b><i class="fas fa-xs fa-external-link-square-alt"></i>
                             </a>
                         </h5>
-                        <div id="MOVIES">
+                        <div id="MOVIES" class="m-b-8">
                             <div class="m-b-16">
                                 <span class="stat-text"><b>Days:</b> {{ media_data['movies']['time_spent_day'] }}</span>
                                 <span class="stat-text float-right"><b>Hours:</b> {{ media_data['movies']['time_spent_hour'] }}</span>
@@ -548,6 +573,18 @@
                                 </div>
                             </div>
                         </div>
+                        <div><b>Favorites ({{ favorites[2]|length }}):</b></div>
+                        <div class="row m-b-16">
+                            <div class="col">
+                                {% for favorite in favorites[2] %}
+                                   {% if loop.index < 11 %}
+                                        <img height="90" width="60"
+                                             src="/static/covers/movies_covers/{{ favorite[0].image_cover }}"
+                                             data-toggle="tooltip" title="{{ favorite[0].name }}"/>
+                                   {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
                 </li>
             </ul>
@@ -558,7 +595,6 @@
                 <li class="m-b-20">
                     <h4>
                         <i class="fas fa-user-check"></i>&nbsp&nbsp Follows
-                        {#<a class='fs-20 m-t-5 m-r-2' style='float: right; color: grey;'><u><i>All ({{ follows_data_tab|length }})</i></u></a>#}
                     </h4>
                     <hr>
                     {% if user_data['id'] == current_user.get_id() %}
