@@ -213,7 +213,7 @@ def get_user_data(user):
     knowledge_info = get_knowledge_frame(user)
 
     # Recover the overview user's last update
-    last_update = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).limit(4)
+    last_update = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).limit(7)
     media_update = get_updates(last_update)
 
     user_data = {"id": str(user.id),
@@ -292,7 +292,7 @@ def get_follows_data(user):
         follows_list = user.followed.all()
 
     follows_update_list = []
-    for follow in follows_update[:8]:
+    for follow in follows_update[:11]:
         follows = {'username': follow[0].username}
         follows.update(get_updates([follow[3]])[0])
         follows_update_list.append(follows)

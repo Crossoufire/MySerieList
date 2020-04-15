@@ -129,15 +129,18 @@
                     </div>
                 </li>
                 <li class="m-b-20">
-                    <div>
-                        <h4>
-                            <i class="fas fa-highlighter text-light"></i>&nbsp&nbspMy Updates
-                            <a class='fs-15 m-t-10 m-r-2' href="{{ url_for('users.all_history',
-                            user_name=user_data['username']) }}" target="_blank" style='float: right; color: grey;'>
-                                <u><i>All history</i></u>
-                            </a>
-                        </h4>
-                    </div>
+                    <h4>
+                        <i class="fas fa-highlighter text-light"></i>
+                        {% if current_user.get_id() != user_data['id'] %}
+                        &nbsp&nbspHis Updates
+                        {% else %}
+                        &nbsp&nbspMy Updates
+                        {% endif %}
+                        <a class='fs-15 m-t-10 m-r-2' href="{{ url_for('users.all_history',
+                        user_name=user_data['username']) }}" target="_blank" style='float: right; color: grey;'>
+                            <u><i>All history</i></u>
+                        </a>
+                    </h4>
                     <hr class='m-b-8'>
                     {% for update in user_data['media_update'] %}
                     {% if update['category'] == 'anime' %}
@@ -513,7 +516,7 @@
                     </div>
                     <hr>
                     <!------------------------ Movies statistics --------------------------->
-                    <div class="stats-size m-b-60">
+                    <div class="stats-size m-b-25">
                         <h5 class="text-center mb-2">
                             <a class="text-light" href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=user_data['username']) }}">
                                 <b>Movies </b><i class="fas fa-xs fa-external-link-square-alt"></i>
@@ -611,7 +614,7 @@
                         {% for follow in follows_list %}
                         <div class="col-3 m-b-15">
                             <a href="{{ follow.username }}" data-toggle="tooltip" title="{{ follow.username }}">
-                                <img width='50' height='50' src="{{ url_for('static', filename='profile_pics/{}'.format(follow.image_file)) }}">
+                                <img width='70' height='70' src="{{ url_for('static', filename='profile_pics/{}'.format(follow.image_file)) }}">
                             </a>
                         </div>
                         {% endfor %}
