@@ -3,8 +3,6 @@ Medialists:
 	Add: Movie director in modal
 	Add: 'Also in the list of' in modal for followed people
 	Add: If API down, user can still add media but check in our database instead of API
-	Add: Show/hide media in common when look at other lists 
-	Add: Media to favorite and show favorites on profile and show/hide only favorite
 	Add: Send mail when new season/movie is airing/released
 	Add: Table view ?
 

@@ -48,6 +48,18 @@
     background: rgba(220, 220, 220, 0.5);
 }
 
+.return-icon {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 50%;
+    padding: 13px 13px 13px 13px;
+}
+
+.return-icon-tv {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 50%;
+    padding: 13px 10px 13px 10px;
+}
+
 option {
     background: rgba(220, 220, 220, 0.5);
 }

@@ -9,24 +9,24 @@
 {% block content %}
     <div class="back-image p-b-50">
         <div class="justify-mobile d-flex flex-wrap">
-            <div class="m-l-25 mr-auto m-t-20 justify-mobile p-t-3 p-l-20 p-b-3" style="background: rgba(0, 0, 0, 0.7);">
-                <a class="fas fa-2x fa-user m-r-20" href="{{ url_for('users.account', user_name=target_user_name) }}"
+            <div class="m-l-10 mr-auto m-t-20 justify-mobile p-t-3 p-l-20 p-b-3">
+                <a class="fas fa-lg fa-user m-r-5 return-icon" href="{{ url_for('users.account', user_name=target_user_name) }}"
                    data-toggle="tooltip" title="{{ target_user_name }}" style="color: grey;"></a>
                 {% if media_list == 'serieslist' %}
-                    <a class="fas fa-2x fa-torii-gate m-r-20" href="/animelist/{{ target_user_name }}" data-toggle="tooltip"
-                       title="Anime list" style="color: #945141;"></a>
-                    <a class="fas fa-2x fa-film m-r-20" href="/movieslist/{{ target_user_name }}" data-toggle="tooltip"
-                       title="Movies list" style="color: #8c7821;"></a>
+                    <a class="fas fa-lg fa-torii-gate m-r-5 return-icon" href="/animelist/{{ target_user_name }}"
+                       data-toggle="tooltip" title="Anime list" style="color: #945141;"></a>
+                    <a class="fas fa-lg fa-film m-r-v return-icon" href="/movieslist/{{ target_user_name }}"
+                       data-toggle="tooltip" title="Movies list" style="color: #8c7821;"></a>
                 {% elif media_list == 'animelist' %}
-                    <a class="fas fa-2x fa-tv m-r-20" href="/serieslist/{{ target_user_name }}" data-toggle="tooltip"
-                       title="Series list" style="color: #216e7d;"></a>
-                    <a class="fas fa-2x fa-film m-r-20" href="/movieslist/{{ target_user_name }}" data-toggle="tooltip"
-                       title="Movies list" style="color: #8c7821;"></a>
+                    <a class="fas fa-lg fa-tv m-r-5 return-icon-tv" href="/serieslist/{{ target_user_name }}"
+                       data-toggle="tooltip" title="Series list" style="color: #216e7d;"></a>
+                    <a class="fas fa-lg fa-film m-r-5 return-icon" href="/movieslist/{{ target_user_name }}"
+                       data-toggle="tooltip" title="Movies list" style="color: #8c7821;"></a>
                 {% else %}
-                    <a class="fas fa-2x fa-tv m-r-20" href="/serieslist/{{ target_user_name }}" data-toggle="tooltip"
-                       title="Series list" style="color: #216e7d;"></a>
-                    <a class="fas fa-2x fa-torii-gate m-r-20" href="/animelist/{{ target_user_name }}" data-toggle="tooltip"
-                       title="Anime list" style="color: #945141;"></a>
+                    <a class="fas fa-lg fa-tv m-r-5 return-icon-tv" href="/serieslist/{{ target_user_name }}"
+                       data-toggle="tooltip" title="Series list" style="color: #216e7d;"></a>
+                    <a class="fas fa-lg fa-torii-gate m-r-5 return-icon" href="/animelist/{{ target_user_name }}"
+                       data-toggle="tooltip" title="Anime list" style="color: #945141;"></a>
                 {% endif %}
             </div>
             <div class="ml-auto m-r-25 m-t-20 justify-mobile">
@@ -40,7 +40,7 @@
                 {% endif %}
             </div>
         </div>
-        <hr class="m-l-20 m-r-20 m-t-10" style="border-color: darkgrey;">
+        <hr class="m-l-20 m-r-20 m-t-5" style="border-color: darkgrey;">
         <div class="justify-mobile d-flex flex-wrap m-t-40">
             <div class="ml-auto mr-auto">
                 <i class="fas fa-search"></i>
@@ -69,7 +69,7 @@
         {% endif %}
             <div class="custom-control custom-switch">
                 <input type="checkbox" class="custom-control-input" id="ShowFavorites" onchange="ShowFavorites(this)">
-                <label class="custom-control-label" for="ShowFavorites"><b>Show favorites</b></label>
+                <label class="custom-control-label" for="ShowFavorites"><b>Show only favorites</b></label>
             </div>
     </div>
 
