@@ -270,17 +270,18 @@
                         <div class="col-5 text-center m-t-10">
                             <div>
                                 <div class="m-b-10">
-                                    <b class="fs-20">Total media time</b>
+                                    <b class="mobile-time">Total media time</b>
                                     <br>
-                                    &nbsp;&nbsp;{{ media_data['series']['time_spent_hour'] + media_data['anime']['time_spent_hour'] + media_data['movies']['time_spent_hour'] }} h
+                                    &nbsp;&nbsp;{{ media_data['series']['time_spent_hour'] +
+                                    media_data['anime']['time_spent_hour'] + media_data['movies']['time_spent_hour'] }} h
                                 </div>
                                 <div class="m-b-10">
-                                    <b class="fs-20">Total media time</b>
+                                    <b class="mobile-time">Total media time</b>
                                     <br>
                                     &nbsp;&nbsp;{{ ((media_data['series']['time_spent_hour'] + media_data['anime']['time_spent_hour'] + media_data['movies']['time_spent_hour'])/24)|round(2) }} days
                                 </div>
                                 <div>
-                                    <b class="fs-20">Total episodes</b>
+                                    <b class="mobile-time">Total episodes</b>
                                     <br>
                                     &nbsp;&nbsp;{{ media_data['series']['media_total_eps'] + media_data['anime']['media_total_eps'] }}
                                 </div>

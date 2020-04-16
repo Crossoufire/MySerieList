@@ -2,20 +2,24 @@
 /* -------------- HEADER CSS --------------- */
 
 .back-image {
-    background-image: url('/static/img/profile_background.jpg');
-    background-size: cover;
-    height: 250px;
+    /*background-image: url('/static/img/profile_background.jpg');*/
+    /*background-size: cover;*/
+    /*height: 250px;*/
+}
+
+.header-bar {
+    border-color: darkgrey;
 }
 
 .modded-input {
-    background: rgba(220, 220, 220, 0.5);
+    background: rgba(0, 0, 0, 0.8);
     border: none;
     padding: 5px;
     width: 350px;
 }
 
 .modded-input::placeholder {
-    color: black;
+    color: darkgray;
     opacity: 1;
 }
 
@@ -23,20 +27,36 @@
     justify-content: center;
 }
 
+.btn-header {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.btn-header:hover {
+    color: white;
+}
+
+.btn-selected {
+    background-color: grey;
+}
+
+.btn-selected:hover {
+    color: white;
+}
+
 .common-media {
-    background: rgba(220, 220, 220, 0.5);
+    background: rgba(0, 0, 0, 0.7);
     min-width: 300px;
-    padding: 5px 5px 0 5px;
-    color: black;
+    padding: 5px 5px 5px 5px;
+    color: darkgrey;
     font-weight: 400;
 }
 
 .common-media-meter {
-	height: 10px;
-	background: rgba(220, 220, 220, 0.5);
+	height: 8px;
+	background: rgba(50, 50, 50, 0.8);
 }
 
-.common-media-meter > span {
+.common-media-meter-bar {
     display: block;
     position: relative;
     overflow: hidden;
@@ -45,44 +65,33 @@
 }
 
 .search-select {
-    background: rgba(220, 220, 220, 0.5);
+    background: rgba(0, 0, 0, 0.7);
+    color: darkgray;
 }
 
 .return-icon {
     background: rgba(0, 0, 0, 0.8);
-    border-radius: 50%;
     padding: 13px 13px 13px 13px;
 }
 
 .return-icon-tv {
     background: rgba(0, 0, 0, 0.8);
-    border-radius: 50%;
     padding: 13px 10px 13px 10px;
 }
 
 option {
-    background: rgba(220, 220, 220, 0.5);
+    background: rgba(0, 0, 0, 0.8);
 }
 
 @media (max-width: 592px) {
-    .search-by {
-        margin-right: 0;
-        margin-left: 0;
-    }
-    .justify-mobile {
+    .center-mobile {
         justify-content: center;
-        margin: 10px 0 10px 0 !important;
     }
-}
-@media (max-width: 469px) {
-    .back-image {
-        height: 280px;
+    .icons-mobile {
+        margin-left: 0;
     }
 }
 @media (max-width: 403px) {
-    .back-image {
-        height: 320px;
-    }
     .modded-input {
         width: 180px;
     }

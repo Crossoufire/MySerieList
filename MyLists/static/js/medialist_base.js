@@ -198,10 +198,10 @@ $('.filters-button-group').on('click', 'button', function() {
 $('.filters-button-group').each(function(i, buttonGroup) {
     var $buttonGroup = $(buttonGroup);
     $buttonGroup.on('click', 'button', function() {
-        $buttonGroup.find('.btn-primary').addClass('btn-dark');
-        $buttonGroup.find('.btn-primary').removeClass('btn-primary');
-        $(this).addClass('btn-primary');
-        $(this).removeClass('btn-dark');
+        $buttonGroup.find('.btn-selected').addClass('btn-header');
+        $buttonGroup.find('.btn-selected').removeClass('btn-selected');
+        $(this).addClass('btn-selected');
+        $(this).removeClass('btn-header');
     });
 });
 $categories.isotope('layout');
