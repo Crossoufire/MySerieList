@@ -133,35 +133,6 @@ function changeCategory(new_category, element_id, card_id, seas_drop_id, ep_drop
 }
 
 
-// --- Anime/Series metadata -------------------------------
-function showMetadata(data, media_list) {
-    $categories.isotope('layout');
-    var data = JSON.parse($('#'+data).text());
-
-    $('#original_name').text('');
-    if (media_list == 'animelist') {
-        $('#modal-title').html(data.name);
-    } else {
-        $('#modal-title').html(data.original_name);
-    }
-    $('#actors').html("<b>Actors</b>: " +data.actors);
-    $('#genres').html("<b>Genres</b>: " +data.genres);
-    $('#air_dates').html("<b>Air Dates</b>: " +data.first_air_date+" - "+data.last_air_date);
-    $('#networks').html("<b>Networks</b>: " +data.networks);
-    $('#created_by').html("<b>Created By</b>: " +data.created_by);
-    $('#episode_duration').html("<b>Episode Duration</b>: " +data.episode_duration+ " min");
-    $('#total_seasons').html("<b>Total Seasons</b>: " +data.total_seasons);
-    $('#total_episodes').html("<b>Total Episodes</b>: " +data.total_episodes);
-    $('#episodes_per_season').html("<b>Episodes Per Season</b>: " +data.eps_per_season.toString().replace(/,/g, ", "));
-    if (media_list == "serieslist") {
-        $('#origin_country').html("<b>Origin Country</b>: " +data.origin_country);
-    }
-    $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10 &nbsp;(" +data.vote_count.toLocaleString("en")+ " votes)");
-    $('#status').html("<b>Status</b>: " +data.status);
-    $('#synopsis').html("<b>Synopsis</b>: " +data.synopsis);
-}
-
-
 // --- Update episode --------------------------------------
 function updateEpisode(element_id, episode, media_list) {
     var selected_episode = episode.selectedIndex

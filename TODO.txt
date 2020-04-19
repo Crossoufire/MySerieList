@@ -4,13 +4,16 @@ Medialists:
 	Add: 'Also in the list of' in modal for followed people
 	Add: If API down, user can still add media but check in our database instead of API
 	Add: Send mail when new season/movie is airing/released
-	Add: Table view ?
+	Fix: Hide/Show favorites and common inter connected
+	Fix: Hide common when added from another list
+	Add: Table view for movies?
 
 Homepage:
     Fix: Update pictures
 
 Account:
     Enhance: Possibility to change background image
+    Add: Roles moderators and user to lock media from TMDb updates
 
 Settings:
     Enhance: Better CSS
@@ -18,8 +21,10 @@ Settings:
 General:
     Add: Contact form
     Add: Collection Movies to finish (70%)
-    Add: Add trending table (automatic update)
+    Add: Add trending table (automatic update at 3:AM)
 
 Routes:
     Enhance: Create one admin with admin view (HoF, Stats, admin and settings) and one standard user
     Enhance: Change the hamburger display to a vertical panel in mobile
+    Enhance: Change the calculation and the update seasons/episodes to cache in JS and only send AJAX data when the
+             user quit the page.

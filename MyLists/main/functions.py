@@ -1,10 +1,11 @@
 import os
 import secrets
 
-from flask import flash
 from pathlib import Path
+from sqlalchemy import func
 from MyLists import db, app
 from datetime import datetime
+from flask import flash, abort
 from flask_login import current_user
 from MyLists.API_data import ApiData
 from MyLists.models import ListType, Status, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
@@ -241,7 +242,7 @@ def check_cat_type(list_type, status):
         else:
             return None
     elif list_type == ListType.MOVIES:
-        if status == 'Completed':
+        if status == 'Completed' or status == 'Completed Animation':
             return Status.COMPLETED
         elif status == 'Plan to Watch':
             return Status.PLAN_TO_WATCH
@@ -396,6 +397,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             networks = element[3].replace(',', ', ')
 
             element_info = {"id": element[0].id,
+                            "tmdb_id": element[0].themoviedb_id,
                             "cover": "{}{}".format(covers_path, element[0].image_cover),
                             "name": element[0].name,
                             "original_name": element[0].original_name,
@@ -486,6 +488,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             genres = element[2].replace(',', ', ')
 
             element_info = {"id": element[0].id,
+                            "tmdb_id": element[0].themoviedb_id,
                             "cover": "{}{}".format(covers_path, element[0].image_cover),
                             "name": element[0].name,
                             "original_name": element[0].original_name,
@@ -559,6 +562,132 @@ def set_last_update(media_name, media_type, old_status=None, new_status=None, ol
         db.session.add(update)
 
     db.session.commit()
+
+
+def load_media_sheet(element_id, user_id, list_type):
+    # Retrieve the media data
+    if list_type == ListType.SERIES:
+        element = db.session.query(Series, func.group_concat(SeriesGenre.genre.distinct()),
+                                   func.group_concat(SeriesNetwork.network.distinct()),
+                                   func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
+                                   func.group_concat(SeriesActors.name.distinct()),
+                                   func.group_concat(SeriesEpisodesPerSeason.episodes))\
+            .join(SeriesGenre, SeriesGenre.series_id == Series.id)\
+            .join(SeriesNetwork, SeriesNetwork.series_id == Series.id)\
+            .join(SeriesActors, SeriesActors.series_id == Series.id)\
+            .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id)\
+            .filter(Series.id == element_id).first()
+        cover = 'series_covers'
+        in_user_list = SeriesList.query.filter_by(user_id=user_id, series_id=element_id).first()
+    elif list_type == ListType.ANIME:
+        element = db.session.query(Anime, func.group_concat(AnimeGenre.genre.distinct()),
+                                   func.group_concat(AnimeNetwork.network.distinct()),
+                                   func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
+                                   func.group_concat(AnimeActors.name.distinct()),
+                                   func.group_concat(AnimeEpisodesPerSeason.episodes))\
+            .join(AnimeGenre, AnimeGenre.anime_id == Anime.id)\
+            .join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id)\
+            .join(AnimeActors, AnimeActors.anime_id == Anime.id)\
+            .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id)\
+            .filter(AnimeList.user_id == user_id, Anime.id == element_id).first()
+        cover = 'anime_covers'
+        in_user_list = AnimeList.query.filter_by(user_id=user_id, anime_id=element_id).first()
+    elif list_type == ListType.MOVIES:
+        element = db.session.query(Movies, func.group_concat(MoviesGenre.genre.distinct()),
+                                   func.group_concat(MoviesActors.name.distinct()))\
+            .join(MoviesGenre, MoviesGenre.movies_id == Movies.id)\
+            .join(MoviesActors, MoviesActors.movies_id == Movies.id)\
+            .filter(MoviesList.user_id == user_id, Movies.id == element_id).first()
+        cover = 'movies_covers'
+        in_user_list = MoviesList.query.filter_by(user_id=user_id, movies_id=element_id).first()
+
+    if list_type != ListType.MOVIES:
+        # Get episodes per season
+        nb_season = len(element[3].split(","))
+        eps_per_season = element[5].split(",")[:nb_season]
+        eps_per_season = [int(i) for i in eps_per_season]
+        print(eps_per_season)
+
+        # Change first air time format
+        first_air_date = element[0].first_air_date
+        if 'Unknown' not in first_air_date:
+            first_air_date = datetime.strptime(first_air_date, '%Y-%m-%d').strftime("%d %b %Y")
+
+        # Change last air time format
+        last_air_date = element[0].last_air_date
+        if 'Unknown' not in last_air_date:
+            last_air_date = datetime.strptime(last_air_date, '%Y-%m-%d').strftime("%d %b %Y")
+
+        actors = element[4].replace(',', ', ')
+        genres = element[1].replace(',', ', ')
+        networks = element[2].replace(',', ', ')
+
+        element_info = {"id": element[0].id,
+                        "cover": '{}/{}'.format(cover, element[0].image_cover),
+                        "name": element[0].name,
+                        "original_name": element[0].original_name,
+                        "first_air_date": first_air_date,
+                        "last_air_date": last_air_date,
+                        "created_by": element[0].created_by,
+                        "episode_duration": element[0].episode_duration,
+                        "homepage": element[0].homepage,
+                        "in_production": element[0].in_production,
+                        "origin_country": element[0].origin_country,
+                        "total_seasons": element[0].total_seasons,
+                        "total_episodes": element[0].total_episodes,
+                        "status": element[0].status,
+                        "vote_average": element[0].vote_average,
+                        "vote_count": element[0].vote_count,
+                        "synopsis": element[0].synopsis,
+                        "popularity": element[0].popularity,
+                        "eps_per_season": eps_per_season,
+                        "in_user_list": False,
+                        "actors": actors,
+                        "genres": genres,
+                        "networks": networks}
+
+        if in_user_list:
+            element_info['in_user_list'] = True
+            element_info['last_episode_watched'] = in_user_list.last_episode_watched
+            element_info['current_season'] = in_user_list.current_season
+            element_info['score'] = in_user_list.score
+            element_info['favorite'] = in_user_list.favorite
+            element_info['status'] = in_user_list.status.value
+        else:
+            element_info['last_episode_watched'] = 1
+            element_info['current_season'] = 1
+            element_info['score'] = 0
+            element_info['favorite'] = False
+            element_info['status'] = Status.WATCHING.value
+    else:
+        # Change release date format
+        release_date = element[0].release_date
+        if 'Unknown' not in release_date:
+            release_date = datetime.strptime(release_date, '%Y-%m-%d').strftime("%d %b %Y")
+
+        actors = element[2].replace(',', ', ')
+        genres = element[1].replace(',', ', ')
+
+        element_info = {"id": element[0].id,
+                        "cover": '{}/{}'.format(cover, element[0].image_cover),
+                        "name": element[0].name,
+                        "original_name": element[0].original_name,
+                        "release_date": release_date,
+                        "homepage": element[0].homepage,
+                        "runtime": element[0].runtime,
+                        "original_language": element[0].original_language,
+                        "synopsis": element[0].synopsis,
+                        "vote_average": element[0].vote_average,
+                        "vote_count": element[0].vote_count,
+                        "popularity": element[0].popularity,
+                        "budget": element[0].budget,
+                        "revenue": element[0].revenue,
+                        "tagline": element[0].tagline,
+                        "actors": actors,
+                        "genres": genres,
+                        "in_list": in_user_list}
+
+    return element_info
 
 
 def add_element_to_user(element, user_id, list_type, category):
@@ -713,6 +842,94 @@ def add_element_in_db(api_id, list_type, element_cat):
 
     db.session.commit()
     add_element_to_user(element, current_user.id, list_type, element_cat)
+
+
+def add_element_in_db_bis(api_id, list_type):
+    if list_type != ListType.MOVIES:
+        # Add TV details to DB
+        try:
+            tv_data, seasons_list, genres_list, a_genres_list, actors_list, networks_list = get_details(api_id, list_type)
+        except:
+            app.logger.error('[SYSTEM] - Error while getting: <tv_data>')
+            abort(404)
+        if list_type == ListType.SERIES:
+            element = Series(**tv_data)
+        elif list_type == ListType.ANIME:
+            element = Anime(**tv_data)
+        db.session.add(element)
+        db.session.commit()
+
+        # Add genres to DB
+        if list_type == ListType.SERIES:
+            for genre in genres_list:
+                genre.update({'series_id': element.id})
+                db.session.add(SeriesGenre(**genre))
+        elif list_type == ListType.ANIME:
+            if a_genres_list:
+                for genre in a_genres_list:
+                    genre.update({'anime_id': element.id})
+                    db.session.add(AnimeGenre(**genre))
+            else:
+                for genre in genres_list:
+                    genre.update({'anime_id': element.id})
+                    db.session.add(AnimeGenre(**genre))
+
+        # Add actors to DB
+        for actor in actors_list:
+            if list_type == ListType.SERIES:
+                actor.update({'series_id': element.id})
+                db.session.add(SeriesActors(**actor))
+            elif list_type == ListType.ANIME:
+                actor.update({'anime_id': element.id})
+                db.session.add(AnimeActors(**actor))
+
+        # Add networks to DB
+        for network in networks_list:
+            if list_type == ListType.SERIES:
+                network.update({'series_id': element.id})
+                db.session.add(SeriesNetwork(**network))
+            elif list_type == ListType.ANIME:
+                network.update({'anime_id': element.id})
+                db.session.add(AnimeNetwork(**network))
+
+        # Add seasons to DB
+        for season in seasons_list:
+            if list_type == ListType.SERIES:
+                season.update({'series_id': element.id})
+                db.session.add(SeriesEpisodesPerSeason(**season))
+            elif list_type == ListType.ANIME:
+                season.update({'anime_id': element.id})
+                db.session.add(AnimeEpisodesPerSeason(**season))
+    elif list_type == ListType.MOVIES:
+        # Add movie details to DB
+        try:
+            movie_data, collection_id, genres_list, actors_list = get_details(api_id, list_type)
+        except:
+            app.logger.error('[SYSTEM] - Error while getting: <movie_data>')
+            abort(404)
+        element = Movies(**movie_data)
+        db.session.add(element)
+        db.session.commit()
+
+        # Add genres to DB
+        for genre in genres_list:
+            genre.update({'movies_id': element.id})
+            db.session.add(MoviesGenre(**genre))
+
+        # Add actors to DB
+        for actor in actors_list:
+            actor.update({'movies_id': element.id})
+            db.session.add(MoviesActors(**actor))
+
+        # Add collection movie to DB
+        if collection_id:
+            collection_info = get_collection_movie(collection_id)
+            db.session.add(MoviesCollections(**collection_info))
+
+    db.session.commit()
+    media_data = load_media_sheet(element.id, current_user.id, list_type)
+
+    return media_data
 
 
 # ------------------------------------------- TMDb API Update Scheduler ---------------------------------------------- #

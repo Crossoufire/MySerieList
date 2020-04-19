@@ -1,3 +1,4 @@
+pykakasi
 flask
 Flask-APScheduler
 flask-sqlalchemy

@@ -70,29 +70,6 @@ function changeCategory(new_category, element_id, card_id, genres, media_list) {
 }
 
 
-// --- Movies metadata ---------------------------------------
-function showMetadata(data) {
-    var data = JSON.parse($('#'+data).text());
-
-    $('#original_name').text('');
-    if (data.original_language =='ja') {
-        $('#modal-title').html(data.name);
-    } else {
-        $('#modal-title').html(data.original_name);
-    }
-    $('#release_date').html("<b>Release Date</b>: " +data.release_date);
-    $('#actors').html("<b>Actors</b>: " +data.actors);
-    $('#genres').html("<b>Genres</b>: " +data.genres);
-    $('#budget').html("<b>Budget</b>: " +data.budget.toLocaleString("en")+ " $");
-    $('#revenue').html("<b>Revenue</b>: " +data.revenue.toLocaleString("en")+ " $");
-    $('#runtime').html("<b>Runtime</b>: " +data.runtime+ " min");
-    $('#original_language').html("<b>Original Language</b>: " +data.original_language);
-    $('#tmdb_score').html("<b>TMDb Score</b>: " +data.vote_average+ "/10 &nbsp;(" +data.vote_count.toLocaleString("en")+ " votes)");
-    $('#tagline').html("<b>Tagline</b>: " +data.tagline);
-    $('#synopsis').html("<b>Synopsis</b>: " +data.synopsis);
-}
-
-
 
 // --- FROM OTHER LISTS ---------------------------------------------------------------------
 

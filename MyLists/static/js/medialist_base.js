@@ -164,14 +164,10 @@ function AddCatUser(cat, card_id, element_id, media_type) {
 }
 
 
-// --- Select box & tooltip --------------------------------------------
+// --- Tooltip ---------------------------------------------------------
 $(document).ready(function() {
-    // --- Select box ----------
-    $(".add_element").val('');
-    $(".cat-select").prop('selectedIndex', 0);
-
-    // --- Tooltip -------------
-    $('.tooltip').tooltip();
+    $body = $("body");
+    $body.tooltip();
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()
     })

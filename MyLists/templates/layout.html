@@ -20,6 +20,7 @@
     <link href="https://use.fontawesome.com/releases/v5.12.0/css/all.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/css/mdb.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="Stylesheet">
 
     <link href="{{ url_for('static', filename='img/favicon.ico') }}" rel='icon' type='image/gif'>
 	<link href="{{ url_for('static', filename='css/mylists.css') }}" rel="stylesheet">
@@ -56,7 +57,8 @@
                 </div>
                 <div class="m-l-10 m-r-20">
                     <form action="{{ url_for('main.search_media') }}">
-                        <input name='search' class="form-control modded-form" placeholder="Search and add media">
+                        <input id="autocomplete" name='search' class="form-control modded-form"
+                               placeholder="Search and add media">
                     </form>
                 </div>
                 {% else %}
@@ -126,8 +128,10 @@
         </div>
     </main>
 
+
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/js/mdb.min.js"></script>
@@ -135,6 +139,70 @@
 
     {% block script %}
     {% endblock %}
+
+    <script type="text/javascript">
+        $.widget("custom.catcomplete", $.ui.autocomplete, {
+            _create: function() {
+                this._super();
+                this.widget().menu("option", "items", "> :not(.ui-autocomplete-category)");
+            },
+            _renderMenu: function(ul, items) {
+                let that = this,
+                currentCategory = "";
+                ul.attr('style', 'padding-top: 9px;');
+                $.each(items, function(index, item) {
+                    let li;
+                    if (item.nb_results === 0) {
+                        let a = "No results found."
+                        ul.append('<li class="disabled bg-dark text-light">' + a + '</li>');
+                    } else {
+                        li = that._renderItemData(ul, item);
+                    }
+                });
+            },
+            _renderItem: function(ul, item) {
+                let $li = $('<li class="bg-dark p-t-2 p-b-2" style="border-bottom: solid black 1px;">');
+
+                $li.append(
+                    "<div class='row'>" +
+                        "<div class='col' style='min-width: 60px; max-width: 60px;'>" +
+                            "<img src="+item.poster_path+" alt="+item.name+" style='width: 50px; height: 75px;'>" +
+                        "</div>" +
+                        "<div class='col'>" +
+                            "<a class='text-light'>" +
+                                " "+item.name+" " +
+                                "<br>" +
+                                "<span style='font-size: 10pt;'>("+item.first_air_date+")</span>" +
+                            "</a>" +
+                        "</div>" +
+                   "</div>");
+
+                return $li.appendTo(ul);
+            }
+        });
+        $(function() {
+            $("#autocomplete").catcomplete({
+                delay: 200,
+                source: function(request, response) {
+                    $.getJSON("{{ url_for('main.autocomplete') }}", {
+                        q: request.term,
+                    },
+                        function(data) {
+                            response(data.matching_results);
+                        }
+                    );
+                },
+                minLength: 2,
+                select: function(event, ui) {
+                    var form = document.createElement("form");
+                    form.method = "POST";
+                    form.action = "/media_sheet/"+ui.item.media_type+"/"+ui.item.tmdb_id;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        });
+    </script>
 
 <footer class="page-footer font-small">
     <div class="footer-copyright text-center py-3">

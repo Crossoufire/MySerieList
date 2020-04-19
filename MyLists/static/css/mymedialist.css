@@ -2,9 +2,9 @@
 /* -------------- HEADER CSS --------------- */
 
 .back-image {
-    /*background-image: url('/static/img/profile_background.jpg');*/
-    /*background-size: cover;*/
-    /*height: 250px;*/
+    background-image: url('/static/img/profile_background.jpg');
+    background-size: cover;
+    height: 250px;
 }
 
 .header-bar {
@@ -91,9 +91,17 @@ option {
         margin-left: 0;
     }
 }
+@media (max-width: 469px) {
+    .back-image {
+        height: 280px;
+    }
+}
 @media (max-width: 403px) {
     .modded-input {
         width: 180px;
+    }
+    .back-image {
+        height: 320px;
     }
 }
 /* ---------------------------------------------- */
@@ -248,29 +256,9 @@ option {
 /* ------------------------------------------ */
 
 
-/* ----- CATEGORIES, MODAL AND LOADING ------ */
-.modal-style {
-    border: solid white 1px !important;
-    background: #131418;
-}
-
+/* --- CATEGORIES --------------------------- */
 .categories {
     width: 100%;
 }
 
-.modal-loading {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background: rgba(0, 0, 0, .6) url('/static/img/pacman_loader.gif') 50% 50% no-repeat;
-}
-
-body.loading .modal-loading {
-    display: block;
-    overflow: hidden;
-}
 /* ------------------------------------------ */
