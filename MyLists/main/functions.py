@@ -221,7 +221,7 @@ def get_details(api_id, list_type):
         return movie_data, collection_id, genres_list, actors_list
 
 
-# -------------------------------------------
+# -------------------------------------------------------------------------------------------
 
 
 def check_cat_type(list_type, status):
@@ -241,7 +241,7 @@ def check_cat_type(list_type, status):
         else:
             return None
     elif list_type == ListType.MOVIES:
-        if status == 'Completed':
+        if status == 'Completed' or status == 'Completed Animation':
             return Status.COMPLETED
         elif status == 'Plan to Watch':
             return Status.PLAN_TO_WATCH
