@@ -10,7 +10,7 @@ function deleteElement(element_id, card_id, media_list) {
     $body = $("body");
     $.ajax ({
         type: "POST",
-        url: "/deleteElement",
+        url: "/delete_element",
         contentType: "application/json",
         data: JSON.stringify({ delete: element_id, element_type: media_list }),
         dataType: "json",
@@ -103,39 +103,28 @@ function addFavorite(element_id, media_type) {
 
 
 // --- Show/Hide common media ------------------------------------------
-function HideCommon(checkbox) {
-    let cards, cardContainer, common_media, l;
-
-    cardContainer = document.getElementById("categories-iso");
-    cards = cardContainer.getElementsByClassName("card-container");
-    l = cards.length;
-    for (i = 0; i < l; i++) {
-        common_media = cards[i].querySelector(".card-ribbon");
-        if (common_media != null && $(checkbox).prop("checked") == true) {
-            cards[i].style.display = 'none';
-        } else if ($(checkbox).prop("checked") == false) {
-            cards[i].style.display = '';
-        }
+function HideCommon() {
+    if ($('#SharedMedia').prop("checked") == true) {
+        $('.card-ribbon').parent().parent().parent().hide();
+    } else if ($('#SharedMedia').prop("checked") == false && $('#ShowFavorites').prop("checked") == true) {
+        $('.card-ribbon').parent().parent().parent().show();
+        $('.far.fa-star').parent().parent().parent().hide();
+    } else if ($('#SharedMedia').prop("checked") == false && $('#ShowFavorites').prop("checked") == false) {
+        $('.card-ribbon').parent().parent().parent().show();
     }
-
     $categories.isotope('layout');
 }
 
 
 // --- Show/Hide favorites media ---------------------------------------
-function ShowFavorites(checkbox) {
-    let cards, cardContainer, favorites, l;
-
-    cardContainer = document.getElementById("categories-iso");
-    cards = cardContainer.getElementsByClassName("card-container");
-    l = cards.length;
-    for (i = 0; i < l; i++) {
-        favorites = cards[i].querySelector(".far.fa-star");
-        if (favorites != null && $(checkbox).prop("checked") == true) {
-            cards[i].style.display = 'none';
-        } else if ($(checkbox).prop("checked") == false) {
-            cards[i].style.display = '';
-        }
+function ShowFavorites() {
+    if ($('#ShowFavorites').prop("checked") == true) {
+        $('.far.fa-star').parent().parent().parent().hide();
+    } else if ($('#ShowFavorites').prop("checked") == false && $('#SharedMedia').prop("checked") == true) {
+        $('.far.fa-star').parent().parent().parent().show();
+        $('.card-ribbon').parent().parent().parent().hide();
+    } else if ($('#ShowFavorites').prop("checked") == false && $('#SharedMedia').prop("checked") == false) {
+        $('.far.fa-star').parent().parent().parent().show();
     }
 
     $categories.isotope('layout');
@@ -151,7 +140,7 @@ function AddCatUser(cat, card_id, element_id, media_type) {
         type: "POST",
         url: "/add_element",
         contentType: "application/json",
-        data: JSON.stringify({ element_cat: add_cat, element_id: element_id, element_type: media_type, from_other_list: true }),
+        data: JSON.stringify({element_cat: add_cat, element_id: element_id, element_type: media_type}),
         dataType: "json",
         success: function(response) {
             console.log("ok");

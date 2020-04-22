@@ -64,12 +64,12 @@
     <div class="m-t-10">
             {% if target_user_id != current_user.get_id() %}
                 <div class="custom-control custom-switch m-b-10">
-                    <input type="checkbox" class="custom-control-input" id="SharedMedia" onchange="HideCommon(this)">
+                    <input id="SharedMedia" type="checkbox" class="custom-control-input" onchange="HideCommon()">
                     <label class="custom-control-label" for="SharedMedia"><b>Hide shared media</b></label>
                 </div>
             {% endif %}
             <div class="custom-control custom-switch">
-                <input type="checkbox" class="custom-control-input" id="ShowFavorites" onchange="ShowFavorites(this)">
+                <input id="ShowFavorites" type="checkbox" class="custom-control-input" onchange="ShowFavorites()">
                 <label class="custom-control-label" for="ShowFavorites"><b>Show only favorites</b></label>
             </div>
         </div>
@@ -83,7 +83,10 @@
                             <div class="card bg-transparent">
                                 <div class="view overlay">
                                     <img class="card-img-top lazyload" data-src="{{ data[0]['cover'] }}" height="300" width="200" style="height: auto;"/>
-                                    <a class="mask flex-center rgba-black-strong" href="/media_sheet/{{ media_list }}/{{ data[0]['tmdb_id'] }}">
+                                    <a class="mask flex-center rgba-black-strong" {% if media_list == 'serieslist' %}
+                                       href="/media_sheet/Series/{{ data[0]['id'] }}" {% elif media_list == 'animelist' %}
+                                       href="/media_sheet/Anime/{{ data[0]['id'] }}" {% else %}
+                                       href="/media_sheet/Movies/{{ data[0]['id'] }}" {% endif %}>
                                         {% if media_list == 'serieslist' %}
                                             <span class="font-mask text-center text-light">{{ data[0]['original_name'] }}</span>
                                             <span class="by-original-title" style="display: none;" >{{ data[0]['name'] }}</span>

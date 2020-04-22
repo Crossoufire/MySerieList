@@ -29,9 +29,9 @@
     {% endblock %}
 
 	{% if title %}
-    <title>MyLists - {{ title }}</title>
+        <title>MyLists - {{ title }}</title>
     {% else %}
-    <title>MyLists</title>
+        <title>MyLists</title>
     {% endif %}
 </head>
 
@@ -196,7 +196,7 @@
                 select: function(event, ui) {
                     var form = document.createElement("form");
                     form.method = "POST";
-                    form.action = "/media_sheet/"+ui.item.media_type+"/"+ui.item.tmdb_id;
+                    form.action = "/check_media/"+ui.item.media_type+"/"+ui.item.tmdb_id;
                     document.body.appendChild(form);
                     form.submit();
                 }

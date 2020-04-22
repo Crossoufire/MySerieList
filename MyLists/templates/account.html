@@ -76,7 +76,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['series']['media_levels']['level'] | int+1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['series']['media_levels']['level'] | int + 1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -99,7 +99,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['anime']['media_levels']['level'] | int+1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['anime']['media_levels']['level'] | int + 1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -122,7 +122,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['movies']['media_levels']['level'] | int+1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['movies']['media_levels']['level'] | int + 1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -394,9 +394,10 @@
                                 <div class="col">
                                     {% for favorite in favorites[0] %}
                                         {% if loop.index < 11 %}
-                                            <img height="90" width="60"
-                                                 src="/static/covers/series_covers/{{ favorite[0].image_cover }}"
-                                                 data-toggle="tooltip" title="{{ favorite[0].name }}"/>
+                                            <a href="/media_sheet/Series/{{ favorite[0].id }}" data-toggle="tooltip"
+                                               title="{{ favorite[0].name }}">
+                                                <img height="90" width="60" src="/static/covers/series_covers/{{ favorite[0].image_cover }}"/>
+                                            </a>
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -506,9 +507,10 @@
                                 <div class="col">
                                     {% for favorite in favorites[1] %}
                                         {% if loop.index < 11 %}
-                                            <img height="90" width="60"
-                                                 src="/static/covers/anime_covers/{{ favorite[0].image_cover }}"
-                                                 data-toggle="tooltip" title="{{ favorite[0].name }}"/>
+                                            <a href="/media_sheet/Anime/{{ favorite[0].id }}" data-toggle="tooltip"
+                                               title="{{ favorite[0].name }}">
+                                                <img height="90" width="60" src="/static/covers/anime_covers/{{ favorite[0].image_cover }}"/>
+                                            </a>
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -581,9 +583,9 @@
                                 <div class="col">
                                     {% for favorite in favorites[2] %}
                                        {% if loop.index < 11 %}
-                                            <img height="90" width="60"
-                                                 src="/static/covers/movies_covers/{{ favorite[0].image_cover }}"
-                                                 data-toggle="tooltip" title="{{ favorite[0].name }}"/>
+                                           <a href="/media_sheet/Movies/{{ favorite[0].id }}">
+                                               <img  data-toggle="tooltip" title="{{ favorite[0].name }}" height="90" width="60" src="/static/covers/movies_covers/{{ favorite[0].image_cover }}"/>
+                                           </a>
                                        {% endif %}
                                     {% endfor %}
                                 </div>

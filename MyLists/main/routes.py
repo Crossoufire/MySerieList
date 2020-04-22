@@ -4,7 +4,7 @@ from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
-    add_element_to_user, add_element_in_db, load_media_sheet, add_element_in_db_bis
+    add_element_to_user, add_element_in_db, load_media_sheet
 from MyLists.models import User, Movies, MoviesActors, MoviesGenre, Series, SeriesGenre, SeriesList, \
     SeriesEpisodesPerSeason, SeriesNetwork, Anime, AnimeActors, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, UserLastUpdate
@@ -372,7 +372,7 @@ def add_favorite():
     return '', 204
 
 
-@bp.route('/deleteElement', methods=['POST'])
+@bp.route('/delete_element', methods=['POST'])
 @login_required
 def delete_element():
     try:
@@ -477,8 +477,6 @@ def change_element_category():
     if new_status is None:
         abort(400)
 
-    print("oui")
-
     # Check if the element is in the account's list
     if list_type == ListType.SERIES:
         element = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
@@ -552,7 +550,6 @@ def add_element():
         element_id = json_data['element_id']
         element_type = json_data['element_type']
         element_cat = json_data['element_cat']
-        from_other_list = json_data['from_other_list']
     except:
         abort(400)
 
@@ -566,37 +563,25 @@ def add_element():
     if new_status is None:
         abort(400)
 
-    if from_other_list is True:
-        kargs = {'id': element_id}
-    elif from_other_list is False:
-        kargs = {'themoviedb_id': element_id}
-    else:
-        abort(400)
-
-    # Check if the element ID exist in the database
     if list_type == ListType.SERIES:
-        element = Series.query.filter_by(**kargs).first()
+        element = Series.query.filter_by(id=element_id).first()
     elif list_type == ListType.ANIME:
-        element = Anime.query.filter_by(**kargs).first()
+        element = Anime.query.filter_by(id=element_id).first()
     elif list_type == ListType.MOVIES:
-        element = Movies.query.filter_by(**kargs).first()
+        element = Movies.query.filter_by(id=element_id).first()
 
-    # If media ID exists, add to account without API calls
-    if element:
-        # Check if the element is already in the current's account list
-        if list_type == ListType.SERIES:
-            if SeriesList.query.filter_by(user_id=current_user.id, series_id=element.id).first():
-                flash("This series is already in your list", "warning")
-        elif list_type == ListType.ANIME:
-            if AnimeList.query.filter_by(user_id=current_user.id, anime_id=element.id).first():
-                flash("This anime is already in your list", "warning")
-        elif list_type == ListType.MOVIES:
-            if MoviesList.query.filter_by(user_id=current_user.id, movies_id=element.id).first():
-                flash("This movie is already in your list", "warning")
+    # Check if the element is already in the current's account list
+    if list_type == ListType.SERIES:
+        if SeriesList.query.filter_by(user_id=current_user.id, series_id=element.id).first():
+            flash("This series is already in your list", "warning")
+    elif list_type == ListType.ANIME:
+        if AnimeList.query.filter_by(user_id=current_user.id, anime_id=element.id).first():
+            flash("This anime is already in your list", "warning")
+    elif list_type == ListType.MOVIES:
+        if MoviesList.query.filter_by(user_id=current_user.id, movies_id=element.id).first():
+            flash("This movie is already in your list", "warning")
 
-        add_element_to_user(element, current_user.id, list_type, new_status)
-    else:
-        add_element_in_db(element_id, list_type, new_status)
+    add_element_to_user(element, current_user.id, list_type, new_status)
 
     return '', 204
 
@@ -604,11 +589,27 @@ def add_element():
 @bp.route('/media_sheet/<media_type>/<media_id>', methods=['GET', 'POST'])
 @login_required
 def media_sheet(media_type, media_id):
+    if media_type == 'Series':
+        media_type = ListType.SERIES
+    elif media_type == 'Anime':
+        media_type = ListType.ANIME
+    elif media_type == 'Movies':
+        media_type = ListType.MOVIES
+
+    element_sheet = load_media_sheet(media_id, current_user.id, media_type)
+    title = element_sheet['name']
+
+    return render_template('media_sheet.html', title=title, data=element_sheet, media_list=media_type.value)
+
+
+@bp.route('/check_media/<media_type>/<media_id>', methods=['GET', 'POST'])
+@login_required
+def check_media(media_type, media_id):
     # Check if the media_list exist and is valid
     try:
         list_type = ListType(media_type)
     except ValueError:
-        abort(400)
+        abort(404)
 
     # Check if the element ID exist in the database
     if list_type == ListType.SERIES:
@@ -620,11 +621,18 @@ def media_sheet(media_type, media_id):
 
     # If media ID exists, load the media sheet wihout API call
     if element:
-        element_sheet = load_media_sheet(element.id, current_user.id, list_type)
+        element_id = element.id
     else:
-        element_sheet = add_element_in_db_bis(media_id, list_type)
+        element_id = add_element_in_db(media_id, list_type)
 
-    return render_template('media_sheet.html', title='test', data=element_sheet, media_list=list_type.value)
+    if list_type == ListType.SERIES:
+        list_type = 'Series'
+    elif list_type == ListType.ANIME:
+        list_type = 'Anime'
+    else:
+        list_type = 'Movies'
+
+    return redirect(url_for('main.media_sheet', media_type=list_type, media_id=element_id))
 
 
 @bp.route('/autocomplete', methods=['GET'])

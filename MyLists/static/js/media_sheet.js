@@ -4,14 +4,50 @@
 function addToUser(element_id, media_type) {
     $('#your-medialist-data').show();
     $('#addlist').hide();
+    $('#removeList').show();
+
+    let category;
+
+    if (media_type === 'movieslist') {
+       category = 'Plan to Watch';
+    } else {
+       category = 'Watching';
+    }
 
     $body = $("body");
     $.ajax ({
         type: "POST",
         url: "/add_element",
         contentType: "application/json",
-        data: JSON.stringify({ element_id: element_id, element_type: media_type, element_cat: 'Watching',
-            from_other_list: false }),
+        data: JSON.stringify({element_id: element_id, element_type: media_type, element_cat: category}),
+        dataType: "json",
+        success: function(response) {
+            console.log("ok");
+        }
+    });
+}
+
+
+// --- Remove the media to the user ------------------------
+function removeFromUser(element_id, media_type) {
+    $('#your-medialist-data').hide();
+    $('#removeList').hide();
+    $('#addlist').show();
+
+    if (media_type !== 'movieslist') {
+        $('#category-dropdown').val('Watching').change();
+        $('#season-dropdown').val(1).change();
+        $('#episode-dropdown').val(1).change();
+    } else {
+        $('#category-dropdown').val('Plan to Watch').change();
+    }
+
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/delete_element",
+        contentType: "application/json",
+        data: JSON.stringify({ delete: element_id, element_type: media_type }),
         dataType: "json",
         success: function(response) {
             console.log("ok");
@@ -57,8 +93,8 @@ function addFavorite(element_id, media_type) {
 }
 
 
-// --- Change the category ---------------------------------
-function changeCategory(element_id, cat_selector, seas_data, media_list) {
+// --- Change the TV category ------------------------------
+function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
     let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
 
     $('#season-row').show();
@@ -101,6 +137,30 @@ function changeCategory(element_id, cat_selector, seas_data, media_list) {
         url: "/change_element_category",
         contentType: "application/json",
         data: JSON.stringify({status: new_cat, element_id: element_id, element_type: media_list }),
+        dataType: "json",
+        success: function(response) {
+            console.log("ok");
+        }
+    });
+}
+
+
+// --- Change the Movie category ---------------------------
+function changeCategoryMovies(element_id, cat_selector, genres) {
+    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
+
+    if (new_cat === 'Completed') {
+        if (genres.includes("Animation")) {
+           new_cat = 'Completed Animation';
+        }
+    }
+
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/change_element_category",
+        contentType: "application/json",
+        data: JSON.stringify({status: new_cat, element_id: element_id, element_type: 'movieslist' }),
         dataType: "json",
         success: function(response) {
             console.log("ok");
@@ -154,4 +214,22 @@ function updateEpisode(element_id, episode, media_list) {
         success: function(response) {
             console.log("ok"); }
     });
+}
+
+
+// --- Tooltip ---------------------------------------------
+$(document).ready(function() {
+    // Tooltip initialization
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+});
+
+
+// --- Random box color ------------------------------------
+let colors = ['#6e7f80', '#536872', '#708090', '#536878', '#36454f'];
+let boxes = document.querySelectorAll(".box");
+
+for (i = 0; i < boxes.length; i++) {
+    boxes[i].style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
 }

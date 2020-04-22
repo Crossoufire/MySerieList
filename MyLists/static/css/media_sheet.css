@@ -1,7 +1,17 @@
-/* ------------ Main CSS ----------- */
-hr {
-    border-top: 1px solid #216e7d;
-    margin-top: 5px;
+
+ul {
+    list-style-type: none;
+}
+
+.message-favorite {
+    position: absolute;
+    right: 10%;
+    z-index: 9999;
+}
+
+.eps-per-season {
+    overflow-y : auto;
+    max-height: 250px;
 }
 
 .vertical_line {
@@ -10,8 +20,23 @@ hr {
     height: 100wh;
 }
 
+.favorite-css {
+    cursor: pointer;
+    color: darkgoldenrod;
+    float: right;
+}
+
 .btn-smaller {
     padding: 8px !important;
+}
+
+.cat-drop {
+    background: #131418;
+    border: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    width: 110px;
 }
 
 .wrapper {
@@ -20,21 +45,36 @@ hr {
     margin-right: auto;
 }
 
-@media (max-width: 650px) {
-    .account-wrapper {
+.box {
+    width: 53px;
+    height: 75px;
+}
+
+@media (max-width: 1100px) {
+    .wrapper {
+        width: auto;
         padding-left: 0;
         padding-right: 0;
     }
 }
+@media (max-width: 767px) {
+    .media-title-mobile {
+        display: "";
+    }
+    .media-title-pc {
+        display: none;
+    }
+    .mobile-follow {
+        margin-bottom: 20px;
+    }
+}
 @media (max-width: 490px) {
-    .account-wrapper {
+    .wrapper {
         padding-left: 10px;
         padding-right: 10px;
     }
-}
-
-.message-favorite {
-    position: absolute;
-    right: 10%;
-    z-index: 9999;
+    .media-cover {
+        width: 200px;
+        height: 300px;
+    }
 }
