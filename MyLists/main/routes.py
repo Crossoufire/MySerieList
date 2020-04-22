@@ -662,3 +662,9 @@ def search_media():
                            anime_results=anime_results,
                            movies_results=movies_results,
                            search=search)
+
+
+@bp.route("/test", methods=['GET'])
+@login_required
+def test():
+    return "hello"
