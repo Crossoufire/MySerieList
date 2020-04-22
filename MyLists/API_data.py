@@ -1,5 +1,6 @@
 import json
 import requests
+import pykakasi
 import urllib.request
 
 from PIL import Image
@@ -15,14 +16,10 @@ class ApiData:
         self.tmdb_api_key = app.config['THEMOVIEDB_API_KEY']
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
 
-    def autocomplete_search(self, element_name, list_type):
+    def autocomplete_search(self, element_name):
         try:
-            if list_type != ListType.MOVIES:
-                response = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
-                                        .format(self.tmdb_api_key, element_name))
-            elif list_type == ListType.MOVIES:
-                response = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
-                                        .format(self.tmdb_api_key, element_name))
+            response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
+                                    .format(self.tmdb_api_key, element_name))
         except Exception as e:
             app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
             return [{"nb_results": 0}]
@@ -34,87 +31,41 @@ class ApiData:
         if data.get("total_results", 0) == 0:
             return [{"nb_results": 0}]
 
-        if list_type != ListType.MOVIES:
-            # Only the first 6 results. There are 20 results per page.
-            tmdb_results, i = [], 0
-            while i < data["total_results"] and i < 20 and len(tmdb_results) < 6:
-                # genre_ids: list
-                if "genre_ids" in data["results"][i]:
-                    genre_ids = data["results"][i]["genre_ids"]
-                else:
-                    genre_ids = ["Unknown"]
+        # Recover 10 results without peoples
+        tmdb_results, i = [], 0
+        while i < data["total_results"] and i < 20 and len(tmdb_results) < 7:
+            result = data["results"][i]
 
-                # origin_country: list
-                if "origin_country" in data["results"][i]:
-                    origin_country = data["results"][i]["origin_country"]
-                else:
-                    origin_country = ["Unknown"]
-
-                # original_language: string
-                if "original_language" in data["results"][i]:
-                    original_language = data["results"][i]["original_language"]
-                else:
-                    original_language = "Unknown"
-
-                if list_type == ListType.ANIME:
-                    if (16 in genre_ids and "JP" in origin_country) or (16 in genre_ids and original_language == "ja"):
-                        pass
-                    else:
-                        i += 1
-                        continue
-                elif list_type == ListType.SERIES:
-                    if (16 in genre_ids and "JP" in origin_country) or (16 in genre_ids and original_language == "ja"):
-                        i += 1
-                        continue
-                    else:
-                        pass
-
-                media_data = {"tmdb_id": data["results"][i]["id"],
-                              "name": data["results"][i]["name"]}
-
-                if data["results"][i]["poster_path"]:
-                    media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300",
-                                                              data["results"][i]["poster_path"])
-                else:
-                    media_data["poster_path"] = url_for('static', filename="covers/series_covers/default.jpg")
-
-                first_air_date = data["results"][i].get("first_air_date")
-                if first_air_date:
-                    if data["results"][i]["first_air_date"].split('-') != ['']:
-                        media_data["first_air_date"] = data["results"][i]["first_air_date"].split('-')[0]
-                    else:
-                        media_data["first_air_date"] = "Unknown"
-                else:
-                    media_data["first_air_date"] = "Unknown"
-
-                tmdb_results.append(media_data)
+            if result.get('known_for_department') is not None:
                 i += 1
-        elif list_type == ListType.MOVIES:
-            # Take only the first 6 results. There are 20 results per page.
-            tmdb_results, i = [], 0
-            while i < data["total_results"] and i < 20 and len(tmdb_results) < 6:
-                movies_data = {"tmdb_id": data["results"][i]["id"],
-                               "name": data["results"][i]["title"]}
+                continue
 
-                if data["results"][i]["poster_path"]:
-                    movies_data["poster_path"] = "{0}{1}".format("http://image.tmdb.org/t/p/w300",
-                                                                 data["results"][i]["poster_path"])
+            media_data = {'name': result.get('original_title') or result.get('original_name'),
+                          "first_air_date": result.get('first_air_date') or result.get('release_date'),
+                          'tmdb_id': result["id"]}
+
+            if media_data['first_air_date'] == '':
+                media_data['first_air_date'] = 'Unknown'
+
+            if result['media_type'] == 'tv':
+                if result['origin_country'] == 'JP' or result['original_language'] == 'ja' and 16 \
+                        in result['genre_ids']:
+                    media_data['media_type'] = 'animelist'
+                    media_data['name'] = result['name']
                 else:
-                    movies_data["poster_path"] = url_for('static', filename="covers/series_covers/default.jpg")
+                    media_data['media_type'] = 'serieslist'
+            elif result['media_type'] == 'movie':
+                media_data['media_type'] = 'movieslist'
+                if result['original_language'] == 'ja' and 16 in result['genre_ids']:
+                    media_data['name'] = result['title']
 
-                release_date = data["results"][i].get("release_date")
+            if result["poster_path"]:
+                media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
+            else:
+                media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
+            tmdb_results.append(media_data)
 
-                if release_date:
-                    if data["results"][i]["release_date"] != ['']:
-                        movies_data["first_air_date"] = data["results"][i]["release_date"].split('-')[0]
-                    else:
-                        movies_data["first_air_date"] = "Unknown"
-                else:
-                    movies_data["first_air_date"] = "Unknown"
-
-                tmdb_results.append(movies_data)
-                i += 1
-
+            i += 1
         return tmdb_results
 
     def media_search(self, element_name):

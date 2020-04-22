@@ -1,10 +1,6 @@
 
 Medialists:
-	Add: Movie director in modal
-	Add: 'Also in the list of' in modal for followed people
-	Add: If API down, user can still add media but check in our database instead of API
-	Add: Send mail when new season/movie is airing/released
-	Add: Table view ?
+	Add: Table view?
 
 Homepage:
     Fix: Update pictures
@@ -15,11 +11,24 @@ Account:
 Settings:
     Enhance: Better CSS
 
+Trends:
+    Add: Add trending table (automatic update at 3:AM)
+
+Media sheet:
+    Add: Movie director in modal
+    Enhance: Better similar by genre
+    Add: Airing dates for each seasons
+    Enhance: Better CSS for tablet and Mobile
+    Add: Last follow's update on the watched media
+    Add: Show if "in follow's list" is a user's favorite
+    Add: Possibility to edit media and lock media from TMDb updates
+
 General:
     Add: Contact form
+    Add: Roles moderators and user
     Add: Collection Movies to finish (70%)
-    Add: Add trending table (automatic update)
-
-Routes:
-    Enhance: Create one admin with admin view (HoF, Stats, admin and settings) and one standard user
+    Add: Send mail when new season/movie is airing/released
+    Enhance: Change some of AJAX calls method to avoid spamming
     Enhance: Change the hamburger display to a vertical panel in mobile
+    Add: If API down, user can still add media but check in our database instead of API
+    Enhance: Create one admin with admin view (HoF, Stats, admin and settings) and one standard user

@@ -23,14 +23,4 @@
    -webkit-box-orient: vertical;
    -webkit-line-clamp: 2; /* number of lines to show */
 }
-
-.btn-perso {
-    padding: 6px 15px 6px 15px;
-    background: #2a2b2d;
-}
-
-.btn-perso-mobile {
-    padding: 5px 10px 5px 10px;
-    background: #2a2b2d;
-}
 /* ------------------------------------------ */

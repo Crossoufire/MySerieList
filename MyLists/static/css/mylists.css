@@ -4,6 +4,10 @@
     background-color: #2c3946 !important;
 }
 
+.container {
+    max-width: 1350px;
+}
+
 body {
     padding: 0;
     display: flex;
@@ -13,10 +17,6 @@ body {
     background: #131418;
     margin: 56px 0 0;
     color: #e2e2e2;
-}
-
-.container {
-    max-width: 1350px;
 }
 
 main {
@@ -69,13 +69,11 @@ hr {
         padding-right: 0;
     }
 }
-
 @media (max-width: 450px) {
     .modded-form {
         width: 100px;
     }
 }
-
 @media (max-width: 320px) {
     .modded-form {
         width: 90px;
@@ -113,4 +111,35 @@ hr {
 
 .navbar .nav {
     white-space: nowrap;
+}
+
+#autocomplete.ui-autocomplete-loading {
+    background-image: url('/static/img/add_loader.gif');
+    background-position: right 7% bottom 50%;
+    background-repeat: no-repeat;
+}
+
+.ui-menu-item .ui-menu-item-wrapper.ui-state-active {
+    background: #131418 !important;
+    border: solid white 1px;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

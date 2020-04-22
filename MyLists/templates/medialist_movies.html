@@ -2,10 +2,10 @@
 
 
 {% block cat_button %}
-    <button class="btn btn-sm btn-primary" data-filter="*">Show all</button>
-    <button class="btn btn-sm btn-dark" data-filter=".categories.COMPLETED">Completed</button>
-    <button class="btn btn-sm btn-dark" data-filter=".categories.ANIMATION">Completed Animation</button>
-    <button class="btn btn-sm btn-dark" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
+    <button class="btn btn-sm btn-selected" data-filter="*">Show all</button>
+    <button class="btn btn-sm btn-header" data-filter=".categories.COMPLETED">Completed</button>
+    <button class="btn btn-sm btn-header" data-filter=".categories.ANIMATION">Completed Animation</button>
+    <button class="btn btn-sm btn-header" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
 {% endblock cat_button %}
 
 
@@ -23,21 +23,6 @@
 
 {% block select_box %}
 {% endblock select_box %}
-
-
-{% block modal %}
-    <p id="actors"></p>
-    <p id="genres"></p>
-    <p id="release_date"></p>
-    <p id="budget"></p>
-    <p id="revenue"></p>
-    <p id="runtime"></p>
-    <p id="original_language"></p>
-    <p id="tmdb_score"></p>
-    <p id="tagline"></p>
-    <hr class="m-b-15">
-    <p id="synopsis" class="m-b-0 text-justify"></p>
-{% endblock modal %}
 
 
 {% block javascript %}

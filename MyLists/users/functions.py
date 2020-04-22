@@ -1,4 +1,5 @@
 import pytz
+import random
 
 from MyLists import db
 from flask import url_for
@@ -70,14 +71,17 @@ def get_favorites(user_id):
     series_favorites = db.session.query(Series, SeriesList) \
         .join(Series, Series.id == SeriesList.series_id) \
         .filter(SeriesList.user_id == user_id, SeriesList.favorite == True).group_by(SeriesList.series_id).all()
+    random.shuffle(series_favorites)
 
     anime_favorites = db.session.query(Anime, AnimeList) \
         .join(Anime, Anime.id == AnimeList.anime_id) \
         .filter(AnimeList.user_id == user_id, AnimeList.favorite == True).group_by(AnimeList.anime_id).all()
+    random.shuffle(anime_favorites)
 
     movies_favorites = db.session.query(Movies, MoviesList) \
         .join(Movies, Movies.id == MoviesList.movies_id) \
         .filter(MoviesList.user_id == user_id, MoviesList.favorite == True).group_by(MoviesList.movies_id).all()
+    random.shuffle(movies_favorites)
 
     favorites = [series_favorites, anime_favorites, movies_favorites]
 

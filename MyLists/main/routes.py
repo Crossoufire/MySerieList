@@ -4,7 +4,7 @@ from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
-    add_element_to_user, add_element_in_db
+    add_element_to_user, add_element_in_db, load_media_sheet
 from MyLists.models import User, Movies, MoviesActors, MoviesGenre, Series, SeriesGenre, SeriesList, \
     SeriesEpisodesPerSeason, SeriesNetwork, Anime, AnimeActors, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, UserLastUpdate
@@ -170,6 +170,11 @@ def update_element_season():
         abort(400)
 
     if list_type == ListType.ANIME:
+        # Check if the element is in the database
+        anime = Anime.query.filter_by(id=element_id).first()
+        if anime is None:
+            abort(400)
+
         # Check if the element is in the current account's list
         anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
         if anime_list is None:
@@ -200,6 +205,11 @@ def update_element_season():
         compute_time_spent(cat_type="season", old_eps=old_episode, old_seas=old_season, new_seas=new_season,
                            all_seas_data=all_seasons, media=anime, list_type=list_type)
     elif list_type == ListType.SERIES:
+        # Check if the element is in the database
+        series = Series.query.filter_by(id=element_id).first()
+        if series is None:
+            abort(400)
+
         # Check if the element is in the current account's list
         series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
         if series_list is None:
@@ -251,6 +261,11 @@ def update_element_episode():
         abort(400)
 
     if list_type == ListType.ANIME:
+        # Check if the element is in the database
+        anime = Anime.query.filter_by(id=element_id).first()
+        if anime is None:
+            abort(400)
+
         # Check if the element is in the current user's list
         anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
         if anime_list is None:
@@ -280,6 +295,11 @@ def update_element_episode():
         compute_time_spent(cat_type='episode', new_eps=new_episode, old_eps=old_episode, media=anime,
                            list_type=list_type)
     elif list_type == ListType.SERIES:
+        # Check if the element is in the database
+        series = Series.query.filter_by(id=element_id).first()
+        if series is None:
+            abort(400)
+
         # Check if the element is in the current user's list
         series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
         if series_list is None:
@@ -352,7 +372,7 @@ def add_favorite():
     return '', 204
 
 
-@bp.route('/deleteElement', methods=['POST'])
+@bp.route('/delete_element', methods=['POST'])
 @login_required
 def delete_element():
     try:
@@ -369,6 +389,11 @@ def delete_element():
         abort(400)
 
     if list_type == ListType.SERIES:
+        # Check if series exists in the database
+        series = Series.query.filter_by(id=element_id).first()
+        if series is None:
+            abort(400)
+
         # Check if series exists in the current user's list
         series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
         if series_list is None:
@@ -387,6 +412,11 @@ def delete_element():
         db.session.commit()
         app.logger.info('[{}] Series with ID {} deleted'.format(current_user.id, element_id))
     elif list_type == ListType.ANIME:
+        # Check if anime exists in the database
+        anime = Anime.query.filter_by(id=element_id).first()
+        if anime is None:
+            abort(400)
+
         # Check if anime exists in list of the current account
         anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
         if anime_list is None:
@@ -405,6 +435,11 @@ def delete_element():
         db.session.commit()
         app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.id, element_id))
     elif list_type == ListType.MOVIES:
+        # Check if movie exists in the database
+        movies = Movies.query.filter_by(id=element_id).first()
+        if movies is None:
+            abort(400)
+
         # Check if movie exists in the account's list
         movies_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
         if movies_list is None:
@@ -512,10 +547,9 @@ def change_element_category():
 def add_element():
     try:
         json_data = request.get_json()
-        element_id = int(json_data['element_id'])
+        element_id = json_data['element_id']
         element_type = json_data['element_type']
         element_cat = json_data['element_cat']
-        from_other_list = json_data['from_other_list']
     except:
         abort(400)
 
@@ -529,58 +563,83 @@ def add_element():
     if new_status is None:
         abort(400)
 
-    if from_other_list is True:
-        kargs = {'id': element_id}
-    elif from_other_list is False:
-        kargs = {'themoviedb_id': element_id}
-    else:
-        abort(400)
-
-    # Check if the element ID exist in the database
     if list_type == ListType.SERIES:
-        element = Series.query.filter_by(**kargs).first()
+        element = Series.query.filter_by(id=element_id).first()
     elif list_type == ListType.ANIME:
-        element = Anime.query.filter_by(**kargs).first()
+        element = Anime.query.filter_by(id=element_id).first()
     elif list_type == ListType.MOVIES:
-        element = Movies.query.filter_by(**kargs).first()
+        element = Movies.query.filter_by(id=element_id).first()
 
-    # If media ID exists, add to account without API calls
-    if element:
-        # Check if the element is already in the current's account list
-        if list_type == ListType.SERIES:
-            if SeriesList.query.filter_by(user_id=current_user.id, series_id=element.id).first():
-                flash("This series is already in your list", "warning")
-        elif list_type == ListType.ANIME:
-            if AnimeList.query.filter_by(user_id=current_user.id, anime_id=element.id).first():
-                flash("This anime is already in your list", "warning")
-        elif list_type == ListType.MOVIES:
-            if MoviesList.query.filter_by(user_id=current_user.id, movies_id=element.id).first():
-                flash("This movie is already in your list", "warning")
+    # Check if the element is already in the current's account list
+    if list_type == ListType.SERIES:
+        if SeriesList.query.filter_by(user_id=current_user.id, series_id=element.id).first():
+            flash("This series is already in your list", "warning")
+    elif list_type == ListType.ANIME:
+        if AnimeList.query.filter_by(user_id=current_user.id, anime_id=element.id).first():
+            flash("This anime is already in your list", "warning")
+    elif list_type == ListType.MOVIES:
+        if MoviesList.query.filter_by(user_id=current_user.id, movies_id=element.id).first():
+            flash("This movie is already in your list", "warning")
 
-        add_element_to_user(element, current_user.id, list_type, new_status)
-    else:
-        add_element_in_db(element_id, list_type, new_status)
+    add_element_to_user(element, current_user.id, list_type, new_status)
 
     return '', 204
 
 
-@bp.route('/autocomplete/<media>', methods=['GET'])
+@bp.route('/media_sheet/<media_type>/<media_id>', methods=['GET', 'POST'])
 @login_required
-def autocomplete(media):
+def media_sheet(media_type, media_id):
+    if media_type == 'Series':
+        media_type = ListType.SERIES
+    elif media_type == 'Anime':
+        media_type = ListType.ANIME
+    elif media_type == 'Movies':
+        media_type = ListType.MOVIES
+
+    element_sheet = load_media_sheet(media_id, current_user.id, media_type)
+    title = element_sheet['name']
+
+    return render_template('media_sheet.html', title=title, data=element_sheet, media_list=media_type.value)
+
+
+@bp.route('/check_media/<media_type>/<media_id>', methods=['GET', 'POST'])
+@login_required
+def check_media(media_type, media_id):
     # Check if the media_list exist and is valid
     try:
-        list_type = ListType(media)
+        list_type = ListType(media_type)
     except ValueError:
-        abort(400)
+        abort(404)
 
-    search = request.args.get('q')
+    # Check if the element ID exist in the database
+    if list_type == ListType.SERIES:
+        element = Series.query.filter_by(themoviedb_id=media_id).first()
+    elif list_type == ListType.ANIME:
+        element = Anime.query.filter_by(themoviedb_id=media_id).first()
+    elif list_type == ListType.MOVIES:
+        element = Movies.query.filter_by(themoviedb_id=media_id).first()
+
+    # If media ID exists, load the media sheet wihout API call
+    if element:
+        element_id = element.id
+    else:
+        element_id = add_element_in_db(media_id, list_type)
 
     if list_type == ListType.SERIES:
-        results = ApiData().autocomplete_search(search, list_type)
+        list_type = 'Series'
     elif list_type == ListType.ANIME:
-        results = ApiData().autocomplete_search(search, list_type)
-    elif list_type == ListType.MOVIES:
-        results = ApiData().autocomplete_search(search, list_type)
+        list_type = 'Anime'
+    else:
+        list_type = 'Movies'
+
+    return redirect(url_for('main.media_sheet', media_type=list_type, media_id=element_id))
+
+
+@bp.route('/autocomplete', methods=['GET'])
+@login_required
+def autocomplete():
+    search = request.args.get('q')
+    results = ApiData().autocomplete_search(search)
 
     return jsonify(matching_results=results)
 
@@ -599,51 +658,6 @@ def search_media():
         flash('Sorry, no results found for your query.', 'warning')
         return redirect(request.referrer)
 
-    # Recover all the data
-    series = db.session.query(Series.themoviedb_id, SeriesList)\
-        .join(Series, SeriesList.series_id == Series.id)\
-        .filter(SeriesList.user_id == current_user.id).all()
-
-    series_id = [r.themoviedb_id for r in series]
-
-    # Recover all the data
-    anime = db.session.query(Anime.themoviedb_id, AnimeList)\
-        .join(Anime, AnimeList.anime_id == Anime.id)\
-        .filter(AnimeList.user_id==current_user.id).all()
-
-    anime_id = [r.themoviedb_id for r in anime]
-
-    # Recover all the data
-    movies = db.session.query(Movies.themoviedb_id, MoviesList)\
-        .join(Movies, MoviesList.movies_id == Movies.id)\
-        .filter(MoviesList.user_id==current_user.id).all()
-
-    movies_id = [r.themoviedb_id for r in movies]
-
-    for result in series_results:
-        result['type'] = 'series'
-        result['username'] = current_user.username
-        if result['tmdb_id'] in series_id:
-            result['already'] = True
-        else:
-            result['already'] = False
-    for result in anime_results:
-        result['type'] = 'anime'
-        result['username'] = current_user.username
-        if result['tmdb_id'] in anime_id:
-            result['already'] = True
-        else:
-            result['already'] = False
-    for result in movies_results:
-        result['type'] = 'movies'
-        result['username'] = current_user.username
-        if result['tmdb_id'] in movies_id:
-            result['already'] = True
-        else:
-            result['already'] = False
-
-    results = series_results + anime_results + movies_results
-
     platform = str(request.user_agent.platform)
     if platform == "iphone" or platform == "android" or platform is None or platform == 'None':
         template = 'media_search_mobile.html'
@@ -655,5 +669,10 @@ def search_media():
                            series_results=series_results,
                            anime_results=anime_results,
                            movies_results=movies_results,
-                           results=results,
                            search=search)
+
+
+@bp.route("/test", methods=['GET'])
+@login_required
+def test():
+    return "hello"
