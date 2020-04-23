@@ -142,33 +142,35 @@
                         </h4>
                         <hr class='m-b-8'>
                         {% for update in user_data['media_update'] %}
-                        {% if update['category'] == 'anime' %}
-                        <div class="tata m-b-5" style="border-bottom: solid 1px #945141;">
+                        {% if update['category'] == 'series' %}
+                            <div class="tata m-b-5" style="border-bottom: solid 1px #216e7d;">
                             <div style="font-size: 12pt;">
-                                <i style="color: #945141;" class="fas fa-torii-gate m-r-14" data-toggle="tooltip" title="Anime"></i>
-                                {% elif update['category'] == 'series' %}
-                                <div class="tata m-b-5" style="border-bottom: solid 1px #216e7d;">
-                                    <div style="font-size: 12pt;">
-                                        <i style="color: #216e7d;" class="fas fa-tv m-r-10" data-toggle="tooltip" title="Series"></i>
-                                        {% elif update['category'] == 'movie' %}
-                                        <div class="tata m-b-5" style="border-bottom: solid 1px #8c7821;">
-                                            <div style="font-size: 12pt;">
-                                                <i style="color: #8c7821;" class="fas fa-film m-r-12" data-toggle="tooltip" title="Movie"></i>
-                                                {% endif %}
-                                                <span data-toggle="tooltip" title="{{ update['media_name'] }}">{{ update['media_name'] }}</span>
-                                            </div>
+                            <i style="color: #216e7d;" class="fas fa-tv m-r-10" data-toggle="tooltip" title="Series"></i>
+                            <a class="text-light" href="/media_sheet/Series/{{ update['media_name']|replace('/', '-') }}">{{ update['media_name'] }}</a>
+                        {% elif update['category'] == 'anime' %}
+                            <div class="tata m-b-5" style="border-bottom: solid 1px #945141;">
+                            <div style="font-size: 12pt;">
+                            <i style="color: #945141;" class="fas fa-torii-gate m-r-14" data-toggle="tooltip" title="Anime"></i>
+                            <a class="text-light" href="/media_sheet/Anime/{{ update['media_name']|replace('/', '-') }}">{{ update['media_name'] }}</a>
+                        {% elif update['category'] == 'movie' %}
+                            <div class="tata m-b-5" style="border-bottom: solid 1px #8c7821;">
+                            <div style="font-size: 12pt;">
+                            <i style="color: #8c7821;" class="fas fa-film m-r-12" data-toggle="tooltip" title="Movie"></i>
+                            <a class="text-light" href="/media_sheet/Movies/{{ update['media_name']|replace('/', '-') }}">{{ update['media_name'] }}</a>
+                        {% endif %}
+                        </div>
 
-                                            <div class="m-l-35" style="font-size: 11pt;">
-                                                {% if update['update']|length == 2 %}
-                                                {{ update['update'][0] }}
-                                                <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
-                                                {{ update['update'][1] }}
-                                                {% else %}
-                                                {{ update['update'][0] }}
-                                                {% endif %}
-                                            </div>
+                        <div class="m-l-35" style="font-size: 11pt;">
+                            {% if update['update']|length == 2 %}
+                                {{ update['update'][0] }}
+                                <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
+                                {{ update['update'][1] }}
+                            {% else %}
+                                {{ update['update'][0] }}
+                            {% endif %}
+                        </div>
 
-                                            <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
+                        <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
                                     <script>
                                         var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
                                         var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB", {timeZone: tz});
@@ -192,8 +194,8 @@
                                         document.write(date_day + " " + date_month + " at " + date_time)
                                     </script>
                                 </span>
-                                        </div>
-                                        {% endfor %}
+                        </div>
+                        {% endfor %}
                     </li>
                     <li class="m-b-20">
                         <h4><i class="fas fa-sm fa-info-circle"></i>&nbsp&nbspInformation</h4>
@@ -634,62 +636,65 @@
                         </div>
                         <hr class='m-b-8'>
                         {% if follows_update_list %}
-                        {% for update in follows_update_list %}
-                        {% if update['category'] == 'anime' %}
-                        <div class="tata m-b-5" style="border-bottom: solid 1px #945141;">
-                            <div style="font-size: 12pt;">
-                                <i style="color: #945141;" class="fas fa-torii-gate m-r-14" data-toggle="tooltip" title="Anime"></i>
-                        {% elif update['category'] == 'series' %}
-                        <div class="tata m-b-5" style="border-bottom: solid 1px #216e7d;">
-                            <div style="font-size: 12pt;">
-                                <i style="color: #216e7d;" class="fas fa-tv m-r-10" data-toggle="tooltip" title="Series"></i>
-                        {% elif update['category'] == 'movie' %}
-                        <div class="tata m-b-5" style="border-bottom: solid 1px #8c7821;">
-                            <div style="font-size: 12pt;">
-                                <i style="color: #8c7821;" class="fas fa-film m-r-12" data-toggle="tooltip" title="Movie"></i>
-                        {% endif %}
-                            <span data-toggle="tooltip" title="{{ update['media_name'] }}">{{ update['media_name'] }}</span>
-                        </div>
+                            {% for update in follows_update_list %}
+                                {% if update['category'] == 'series' %}
+                                    <div class="tata m-b-5" style="border-bottom: solid 1px #216e7d;">
+                                    <div style="font-size: 12pt;">
+                                    <i style="color: #216e7d;" class="fas fa-tv m-r-10" data-toggle="tooltip" title="Series"></i>
+                                    <a class="text-light" href="/media_sheet/Series/{{ update['media_name']|replace('/', '-') }}">{{ update['media_name'] }}</a>
+                                {% elif update['category'] == 'anime' %}
+                                    <div class="tata m-b-5" style="border-bottom: solid 1px #945141;">
+                                    <div style="font-size: 12pt;">
+                                    <i style="color: #945141;" class="fas fa-torii-gate m-r-14" data-toggle="tooltip" title="Anime"></i>
+                                    <a class="text-light" href="/media_sheet/Anime/{{ update['media_name'] }}">{{ update['media_name'] }}</a>
+                                {% elif update['category'] == 'movie' %}
+                                    <div class="tata m-b-5" style="border-bottom: solid 1px #8c7821;">
+                                    <div style="font-size: 12pt;">
+                                    <i style="color: #8c7821;" class="fas fa-film m-r-12" data-toggle="tooltip" title="Movie"></i>
+                                    <a class="text-light" href="/media_sheet/Movies/{{ update['media_name'] }}">{{ update['media_name'] }}</a>
+                                {% endif %}
+                            </div>
                             <div class="m-l-35" style="font-size: 11pt;">
                                 {% if update['update']|length == 2 %}
-                                {{ update['update'][0] }}
-                                <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
-                                {{ update['update'][1] }}
+                                    {{ update['update'][0] }}
+                                    <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
+                                    {{ update['update'][1] }}
                                 {% else %}
-                                {{ update['update'][0] }}
+                                    {{ update['update'][0] }}
                                 {% endif %}
                             </div>
                             <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
-                                <script>
-                        var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-                        var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB", {timeZone: tz});
-                        var d = new Date("{{ update['date'] }}")
-                        var month = new Array();
-                        month[0] = "Jan";
-                        month[1] = "Feb";
-                        month[2] = "Mar";
-                        month[3] = "Apr";
-                        month[4] = "May";
-                        month[5] = "Jun";
-                        month[6] = "Jul";
-                        month[7] = "Aug";
-                        month[8] = "Sep";
-                        month[9] = "Oct";
-                        month[10] = "Nov";
-                        month[11] = "Dec";
-                        var date_month = month[d.getMonth()];
-                        var date_day = localdate.slice(0,2);
-                        var date_time = localdate.slice(11,17)
-                        document.write(date_day + " " + date_month + " at " + date_time)
-                    </script> by
-                            </span>
-                            <a href="{{ url_for('users.account', user_name=update['username']) }}" style="color: #359aff; font-size: 11pt;">
-                                {{ update['username'] }}
+                                    <script>
+                                        var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+                                        var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB", {timeZone: tz});
+                                        var d = new Date("{{ update['date'] }}")
+                                        var month = new Array();
+                                        month[0] = "Jan";
+                                        month[1] = "Feb";
+                                        month[2] = "Mar";
+                                        month[3] = "Apr";
+                                        month[4] = "May";
+                                        month[5] = "Jun";
+                                        month[6] = "Jul";
+                                        month[7] = "Aug";
+                                        month[8] = "Sep";
+                                        month[9] = "Oct";
+                                        month[10] = "Nov";
+                                        month[11] = "Dec";
+                                        var date_month = month[d.getMonth()];
+                                        var date_day = localdate.slice(0,2);
+                                        var date_time = localdate.slice(11,17)
+                                        document.write(date_day + " " + date_month + " at " + date_time)
+                                    </script>
+                                    by
+                                </span>
+                            <a href="{{ url_for('users.account', user_name=update['username']) }}"
+                               style="color: #359aff; font-size: 11pt;">{{ update['username'] }}
                             </a>
-                        </div>
-                        {% endfor %}
+                            </div>
+                            {% endfor %}
                         {% else %}
-                        <div class="m-b-10" style="color: grey;"><i>No updates to display.</i></div>
+                            <div class="m-b-10" style="color: grey;"><i>No updates to display.</i></div>
                         {% endif %}
                     </li>
                 </ul>

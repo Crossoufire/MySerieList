@@ -1,5 +1,5 @@
 import sys
-import email
+import email as em
 import logging
 import smtplib
 import configparser
@@ -89,11 +89,11 @@ if not app.debug and not app.testing:
                 if not port:
                     port = smtplib.SMTP_PORT
                 smtp = smtplib.SMTP_SSL(self.mailhost, port)
-                msg = email.message.EmailMessage()
+                msg = em.message.EmailMessage()
                 msg['From'] = self.fromaddr
                 msg['To'] = ','.join(self.toaddrs)
                 msg['Subject'] = self.getSubject(record)
-                msg['Date'] = email.utils.localtime()
+                msg['Date'] = em.utils.localtime()
                 msg.set_content(self.format(record))
                 if self.username:
                     smtp.login(self.username, self.password)

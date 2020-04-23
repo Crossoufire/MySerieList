@@ -582,6 +582,9 @@ def load_media_sheet(element_id, user_id, list_type):
             .filter(followers.c.follower_id == user_id, SeriesList.series_id == element_id).all()
         in_user_list = SeriesList.query.filter_by(user_id=user_id, series_id=element_id).first()
 
+        if element == (None, None, None, None, None, None):
+            return abort(404)
+
         if len(element[1].split(',')) > 2:
             genres_list = [element[1].split(',')[0], element[1].split(',')[1]]
             genre_str = ','.join([g for g in genres_list])
@@ -613,10 +616,12 @@ def load_media_sheet(element_id, user_id, list_type):
             .filter(followers.c.follower_id == user_id, AnimeList.anime_id == element_id).all()
         in_user_list = AnimeList.query.filter_by(user_id=user_id, anime_id=element_id).first()
 
+        if element == (None, None, None, None, None, None):
+            return abort(404)
+
         if len(element[1].split(',')) > 3:
             genres_list = [element[1].split(',')[0], element[1].split(',')[1], element[1].split(',')[2]]
             genre_str = ','.join([g for g in genres_list])
-            print(genre_str)
         else:
             genres_list = element[1].split(',')
             genre_str = element[1]
@@ -639,6 +644,9 @@ def load_media_sheet(element_id, user_id, list_type):
             .join(AnimeList, MoviesList.user_id == followers.c.followed_id)\
             .filter(followers.c.follower_id == user_id, MoviesList.movies_id == element_id).all()
         in_user_list = MoviesList.query.filter_by(user_id=user_id, movies_id=element_id).first()
+
+        if element == (None, None, None):
+            return abort(404)
 
         if len(element[1].split(',')) > 2:
             genres_list = [element[1].split(',')[0], element[1].split(',')[1]]

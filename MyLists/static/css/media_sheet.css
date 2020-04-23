@@ -59,10 +59,10 @@ ul {
 }
 @media (max-width: 767px) {
     .media-title-mobile {
-        display: "";
+        display: block !important;
     }
     .media-title-pc {
-        display: none;
+        display: none !important;
     }
     .mobile-follow {
         margin-bottom: 20px;

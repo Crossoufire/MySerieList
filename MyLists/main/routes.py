@@ -590,16 +590,32 @@ def add_element():
 @login_required
 def media_sheet(media_type, media_id):
     if media_type == 'Series':
-        media_type = ListType.SERIES
+        list_type = ListType.SERIES
     elif media_type == 'Anime':
-        media_type = ListType.ANIME
+        list_type = ListType.ANIME
     elif media_type == 'Movies':
-        media_type = ListType.MOVIES
+        list_type = ListType.MOVIES
 
-    element_sheet = load_media_sheet(media_id, current_user.id, media_type)
+    try:
+        media_id = int(media_id)
+        seek_media = None
+    except:
+        if media_id == 'Nip-Tuck':
+            media_id = 'Nip/Tuck'
+        if list_type == ListType.SERIES:
+            seek_media = Series.query.filter((Series.name == media_id) | (Series.original_name == media_id)).first()
+        elif list_type == ListType.ANIME:
+            seek_media = Anime.query.filter((Anime.name == media_id) | (Anime.original_name == media_id)).first()
+        else:
+            seek_media = Movies.query.filter((Movies.name == media_id) | (Movies.original_name == media_id)).first()
+
+    if seek_media:
+        return redirect(url_for('main.media_sheet', media_type=media_type, media_id=seek_media.id))
+
+    element_sheet = load_media_sheet(media_id, current_user.id, list_type)
     title = element_sheet['name']
 
-    return render_template('media_sheet.html', title=title, data=element_sheet, media_list=media_type.value)
+    return render_template('media_sheet.html', title=title, data=element_sheet, media_list=list_type.value)
 
 
 @bp.route('/check_media/<media_type>/<media_id>', methods=['GET', 'POST'])

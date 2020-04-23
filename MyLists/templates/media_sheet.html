@@ -131,9 +131,9 @@
                 <hr class="m-l-20 m-r-24">
                 <div class="mobile-follow m-l-15 m-r-15 p-2 m-b-50" style="margin-top: -10px;">
                     {% for follow in data['in_follows_lists'] %}
-                        <a class="m-r-10" href="/account/{{ follow[0].username }}" data-toggle="tooltip"
-                           title="{{ follow[0].username }}">
-                            <img class="m-b-10" height="55" width="55" src="/static/profile_pics/{{ follow[0].image_file }}" alt=""/>
+                        <a class="m-r-10" href="/account/{{ follow[0].username }}">
+                            <img class="m-b-10" height="55" width="55"  data-toggle="tooltip" title="{{ follow[0].username }}"
+                                 src="/static/profile_pics/{{ follow[0].image_file }}" alt=""/>
                         </a>
                     {% endfor %}
                 </div>
@@ -318,9 +318,8 @@
                         <hr>
                         <div>
                             {% for similar in data['same_genres'] %}
-                                <a class="m-r-10" href="/media_sheet/{{ data['media_type'] }}/{{ similar[0].id }}"
-                                   data-toggle="tooltip" title="{{ similar[0].name }}">
-                                    <img class="m-b-10" height="80" width="53"
+                                <a class="m-r-10" href="/media_sheet/{{ data['media_type'] }}/{{ similar[0].id }}">
+                                    <img class="m-b-10" height="80" width="53" data-toggle="tooltip" title="{{ similar[0].name }}"
                                          src="/static/covers/{{ data['cover_path'] }}/{{ similar[0].image_cover }}" alt=""/>
                                 </a>
                             {% endfor %}
