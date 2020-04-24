@@ -18,10 +18,10 @@ Media sheet:
     Add: Movie director in modal
     Enhance: Better similar by genre
     Add: Airing dates for each seasons
-    Enhance: Better CSS for tablet and Mobile
     Add: Last follow's update on the watched media
     Add: Show if "in follow's list" is a user's favorite
-    Add: Possibility to edit media and lock media from TMDb updates
+    Add: Possibility to edit media from form
+    Add: Possibility to lock media from TMDb updates
 
 General:
     Add: Contact form

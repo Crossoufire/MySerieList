@@ -38,8 +38,8 @@ def get_trending_data(trends_data, list_type):
             else:
                 series["first_air_date"] = 'Not avalaible'
 
-            series["overview"] = data.get("overview", "There is no overview for this series.") \
-                                 or "There is no overview for this series."
+            series["overview"] = data.get("overview", "There is no overview for this series.") or "There is no overv" \
+                                                                                                  "iew for this series."
             series["tmdb_link"] = "https://www.themoviedb.org/tv/{}".format(data.get("id"))
             trending_list.append(series)
             i += 1
@@ -91,8 +91,8 @@ def get_trending_data(trends_data, list_type):
             else:
                 movies["release_date"] = "Not avalaible"
 
-            movies["overview"] = data.get("overview", "No overview available for this movie.") or \
-                                 'No overview available for this movie.'
+            movies["overview"] = data.get("overview", "No overview available for this movie.") or 'No overview avail' \
+                                                                                                  'able for this movie.'
             movies["tmdb_link"] = "https://www.themoviedb.org/movie/{}".format(data.get("id"))
             trending_list.append(movies)
             i += 1
@@ -107,17 +107,17 @@ def compute_media_time_spent(list_type):
 
     for user in users:
         if list_type == ListType.ANIME:
-            element_data = db.session.query(AnimeList, Anime, func.group_concat(AnimeEpisodesPerSeason.episodes))\
-                .join(Anime, Anime.id == AnimeList.anime_id)\
-                .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id)\
+            element_data = db.session.query(AnimeList, Anime, func.group_concat(AnimeEpisodesPerSeason.episodes)) \
+                .join(Anime, Anime.id == AnimeList.anime_id) \
+                .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id) \
                 .filter(AnimeList.user_id == user.id).group_by(AnimeList.anime_id)
         elif list_type == ListType.SERIES:
-            element_data = db.session.query(SeriesList, Series, func.group_concat(SeriesEpisodesPerSeason.episodes))\
-                .join(Series, Series.id == SeriesList.series_id)\
-                .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id)\
+            element_data = db.session.query(SeriesList, Series, func.group_concat(SeriesEpisodesPerSeason.episodes)) \
+                .join(Series, Series.id == SeriesList.series_id) \
+                .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id) \
                 .filter(SeriesList.user_id == user.id).group_by(SeriesList.series_id)
         elif list_type == ListType.MOVIES:
-            element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id)\
+            element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id) \
                 .filter(MoviesList.user_id == user.id).group_by(MoviesList.movies_id)
 
         if list_type != ListType.MOVIES:
@@ -133,7 +133,7 @@ def compute_media_time_spent(list_type):
                         episodes = element[2].split(",")
                         episodes = [int(x) for x in episodes]
                         for i in range(1, element[0].current_season):
-                            total_time += element[1].episode_duration * episodes[i-1]
+                            total_time += element[1].episode_duration * episodes[i - 1]
                         total_time += element[0].last_episode_watched * element[1].episode_duration
                     except:
                         pass
@@ -183,10 +183,10 @@ def refresh_db_ranks():
 
     ranks = Ranks.query.order_by(Ranks.id).all()
     for i in range(1, len(list_all_ranks)):
-        ranks[i-1].level = int(list_all_ranks[i][0])
-        ranks[i-1].image_id = list_all_ranks[i][1]
-        ranks[i-1].name = list_all_ranks[i][2]
-        ranks[i-1].type = list_all_ranks[i][3]
+        ranks[i - 1].level = int(list_all_ranks[i][0])
+        ranks[i - 1].image_id = list_all_ranks[i][1]
+        ranks[i - 1].name = list_all_ranks[i][2]
+        ranks[i - 1].type = list_all_ranks[i][3]
 
 
 def add_badges_to_db():
@@ -223,11 +223,11 @@ def refresh_db_badges():
             genre_id = str(list_all_badges[i][4])
         except:
             genre_id = None
-        badges[i-1].threshold = int(list_all_badges[i][0])
-        badges[i-1].image_id = list_all_badges[i][1]
-        badges[i-1].title = list_all_badges[i][2]
-        badges[i-1].type = list_all_badges[i][3]
-        badges[i-1].genres_id = genre_id
+        badges[i - 1].threshold = int(list_all_badges[i][0])
+        badges[i - 1].image_id = list_all_badges[i][1]
+        badges[i - 1].title = list_all_badges[i][2]
+        badges[i - 1].type = list_all_badges[i][3]
+        badges[i - 1].genres_id = genre_id
 
 
 def add_frames_to_db():
@@ -253,8 +253,8 @@ def refresh_db_frames():
 
     frames = Frames.query.order_by(Frames.id).all()
     for i in range(1, len(list_all_frames)):
-        frames[i-1].level = int(list_all_frames[i][0])
-        frames[i-1].image_id = list_all_frames[i][1]
+        frames[i - 1].level = int(list_all_frames[i][0])
+        frames[i - 1].image_id = list_all_frames[i][1]
 
 
 def add_collections_movies():
@@ -287,7 +287,7 @@ def add_collections_movies():
                 part_date = part['release_date']
                 try:
                     part_date_datetime = datetime.strptime(part_date, '%Y-%m-%d')
-                    difference = (utc_now-part_date_datetime).total_seconds()
+                    difference = (utc_now - part_date_datetime).total_seconds()
                     if float(difference) < 0:
                         remove += 1
                 except:
@@ -322,6 +322,29 @@ def add_collections_movies():
         except:
             continue
         print('Finished.')
+
+
+def add_director_movies():
+    print('Started')
+    all_movies = Movies.query.all()
+    for movie in all_movies:
+        tmdb_movies_id = movie.themoviedb_id
+        response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
+                                .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']))
+        element_cast = json.loads(response.text)
+
+        try:
+            for data in element_cast['crew']:
+                if data['job'] == "Director":
+                    director_name = data['name']
+                    break
+        except:
+            director_name = "Unknown"
+
+        movie.director_name = director_name
+        db.session.commit()
+
+        print('Added one', director_name)
 
 
 def refresh_collections_movies():

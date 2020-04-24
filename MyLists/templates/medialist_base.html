@@ -45,10 +45,13 @@
             <div class="ml-auto mr-auto">
                 <i class="fas fa-search text-dark" style="text-shadow: 0 0 0 #000 !important;"></i>
                 <label for="searchInput"></label>
-                <input id="searchInput" class='modded-input' placeholder="Search title / actor / genre" onkeyup="searchElement()">
+                <input id="searchInput" class='modded-input text-light' placeholder="Search title / actor / genre" onkeyup="searchElement()">
                 <label>
                     <select class="search-select m-l-10">
                         <option selected="selected">All</option>
+                        {% if media_list == 'movieslist' %}
+                            <option>Director</option>
+                        {% endif %}
                         <option>Titles</option>
                         <option>Actors</option>
                         <option>Genres</option>
@@ -62,12 +65,11 @@
         </div>
     </div>
     <div class="m-t-10">
-            {% if target_user_id != current_user.get_id() %}
-                <div class="custom-control custom-switch m-b-10">
-                    <input id="SharedMedia" type="checkbox" class="custom-control-input" onchange="HideCommon()">
-                    <label class="custom-control-label" for="SharedMedia"><b>Hide shared media</b></label>
-                </div>
-            {% endif %}
+            <div class="custom-control custom-switch m-b-10"
+                    {% if target_user_id == current_user.get_id() %} style="display: none;" {% endif %}>
+                <input id="SharedMedia" type="checkbox" class="custom-control-input" onchange="HideCommon()">
+                <label class="custom-control-label" for="SharedMedia"><b>Hide shared media</b></label>
+            </div>
             <div class="custom-control custom-switch">
                 <input id="ShowFavorites" type="checkbox" class="custom-control-input" onchange="ShowFavorites()">
                 <label class="custom-control-label" for="ShowFavorites"><b>Show only favorites</b></label>
@@ -79,51 +81,52 @@
                 <h2 class="text-center m-t-20 mb-0">{{ category[1] }}<hr class="mt-2 pb-3 mb-0"></h2>
                 <div class="row category-{% if category[1] == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ category[1] }}{% endif %}">
                     {% for data in category[0] %}
-                        <div id="card_{{ data[0]['id'] }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+                        <div id="card_{{ data['id'] }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
                             <div class="card bg-transparent">
                                 <div class="view overlay">
-                                    <img class="card-img-top lazyload" data-src="{{ data[0]['cover'] }}" height="300" width="200" style="height: auto;"/>
+                                    <img class="card-img-top lazyload" data-src="{{ data['cover'] }}" height="300" width="200" style="height: auto;"/>
                                     <a class="mask flex-center rgba-black-strong" {% if media_list == 'serieslist' %}
-                                       href="/media_sheet/Series/{{ data[0]['id'] }}" {% elif media_list == 'animelist' %}
-                                       href="/media_sheet/Anime/{{ data[0]['id'] }}" {% else %}
-                                       href="/media_sheet/Movies/{{ data[0]['id'] }}" {% endif %}>
+                                       href="/media_sheet/Series/{{ data['id'] }}" {% elif media_list == 'animelist' %}
+                                       href="/media_sheet/Anime/{{ data['id'] }}" {% else %}
+                                       href="/media_sheet/Movies/{{ data['id'] }}" {% endif %}>
                                         {% if media_list == 'serieslist' %}
-                                            <span class="font-mask text-center text-light">{{ data[0]['original_name'] }}</span>
-                                            <span class="by-original-title" style="display: none;" >{{ data[0]['name'] }}</span>
+                                            <span class="font-mask text-center text-light">{{ data['original_name'] }}</span>
+                                            <span class="by-original-title" style="display: none;" >{{ data['name'] }}</span>
                                         {% elif media_list == 'animelist' %}
-                                            <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
-                                            <span class="by-original-title" style="display: none;" >{{ data[0]['original_name'] }}</span>
+                                            <span class="font-mask text-center text-light">{{ data['name'] }}</span>
+                                            <span class="by-original-title" style="display: none;" >{{ data['original_name'] }}</span>
                                         {% elif media_list == 'movieslist' %}
-                                            {% if data[0]['original_language'] == 'ja' %}
-                                                <span class="font-mask text-center text-light">{{ data[0]['name'] }}</span>
-                                                <span class="by-original-title" style="display: none;" >{{ data[0]['original_name'] }}</span>
+                                            {% if data['original_language'] == 'ja' %}
+                                                <span class="font-mask text-center text-light">{{ data['name'] }}</span>
+                                                <span class="by-original-title" style="display: none;" >{{ data['original_name'] }}</span>
                                             {% else %}
-                                                <span class="font-mask text-center text-light">{{ data[0]['original_name'] }}</span>
-                                                <span class="by-original-title" style="display: none;" >{{ data[0]['name'] }}</span>
+                                                <span class="font-mask text-center text-light">{{ data['original_name'] }}</span>
+                                                <span class="by-original-title" style="display: none;" >{{ data['name'] }}</span>
                                             {% endif %}
                                         {% endif %}
-                                        <span class="by-actor" style="display: none;" >{{ data[0]['actors'] }}</span>
-                                        <span class="by-genre" style="display: none;" >{{ data[0]['genres'] }}</span>
+                                        <span class="by-actor" style="display: none;" >{{ data['actors'] }}</span>
+                                        <span class="by-genre" style="display: none;" >{{ data['genres'] }}</span>
+                                        <span class="by-director" style="display: none;" >{{ data['director'] }}</span>
                                     </a>
                                     {% if target_user_id == current_user.get_id() %}
                                         {% block card_top_left_1 scoped %}
                                         {% endblock card_top_left_1 %}
                                         <a class="card-btn-top-right fas fa-trash text-light" onclick="deleteElement(
-                                                '{{ data[0]['id'] }}', 'card_{{ data[0]['id'] }}', '{{ media_list }}')"></a>
-                                        {% if data[0]['favorite'] %}
-                                            <a id="fav-{{ data[0]['id'] }}" class="card-favorite fas fa-star" style="color: darkgoldenrod;"
-                                               onclick="addFavorite('{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                                                '{{ data['id'] }}', 'card_{{ data['id'] }}', '{{ media_list }}')"></a>
+                                        {% if data['favorite'] %}
+                                            <a id="fav-{{ data['id'] }}" class="card-favorite fas fa-star" style="color: darkgoldenrod;"
+                                               onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></a>
                                         {% else %}
-                                            <a id="fav-{{ data[0]['id'] }}" class="card-btn-bottom-left far fa-star"
-                                               onclick="addFavorite('{{ data[0]['id'] }}', '{{ media_list }}')"></a>
+                                            <a id="fav-{{ data['id'] }}" class="card-btn-bottom-left far fa-star"
+                                               onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></a>
                                         {% endif %}
                                     {% else %}
-                                        {% if data[0]['favorite'] %}
+                                        {% if data['favorite'] %}
                                             <a class="card-btn-bottom-left fas fa-star text-light"></a>
                                         {% else %}
                                             <a class="card-btn-bottom-left far fa-star text-light"></a>
                                         {% endif %}
-                                        {% if data[1] %}
+                                        {% if data['common'] %}
                                             <div class="card-ribbon"></div>
                                         {% else %}
                                             {% block card_top_left_2 scoped %}

@@ -54,8 +54,8 @@ def get_details(api_id, list_type):
 
     if media_cover_path:
         media_cover_name = "{}.jpg".format(secrets.token_hex(8))
-        issuccess = ApiData().save_api_cover(media_cover_path, media_cover_name, list_type)
-        if issuccess is False:
+        is_success = ApiData().save_api_cover(media_cover_path, media_cover_name, list_type)
+        if is_success is False:
             media_cover_name = "default.jpg"
     else:
         media_cover_name = "default.jpg"
@@ -183,7 +183,16 @@ def get_details(api_id, list_type):
                       'runtime': details_data.get("runtime", 0) or 0,
                       'original_language': details_data.get("original_language", "Unknown") or 'Unknown',
                       'themoviedb_id': details_data.get("id"),
-                      'image_cover': media_cover_name}
+                      'image_cover': media_cover_name,
+                      'director_name': "Unknown"}
+
+        # Director Name: str
+        the_crew = details_data.get("credits").get("crew") or None
+        if the_crew:
+            for element in the_crew:
+                if element['job'] == "Director":
+                    movie_data['director_name'] = element['name']
+                    break
 
         # Collection ID: Number
         collection_id = details_data.get("belongs_to_collection")
@@ -382,84 +391,50 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             eps_per_season = element[6].split(",")[:nb_season]
             eps_per_season = [int(i) for i in eps_per_season]
 
-            # Change first air time format
-            first_air_date = element[0].first_air_date
-            if 'Unknown' not in first_air_date:
-                first_air_date = datetime.strptime(first_air_date, '%Y-%m-%d').strftime("%d %b %Y")
-
-            # Change last air time format
-            last_air_date = element[0].last_air_date
-            if 'Unknown' not in last_air_date:
-                last_air_date = datetime.strptime(last_air_date, '%Y-%m-%d').strftime("%d %b %Y")
-
-            actors = element[5].replace(',', ', ')
-            genres = element[2].replace(',', ', ')
-            networks = element[3].replace(',', ', ')
-
             element_info = {"id": element[0].id,
                             "tmdb_id": element[0].themoviedb_id,
                             "cover": "{}{}".format(covers_path, element[0].image_cover),
                             "name": element[0].name,
                             "original_name": element[0].original_name,
-                            "first_air_date": first_air_date,
-                            "last_air_date": last_air_date,
-                            "created_by": element[0].created_by,
-                            "episode_duration": element[0].episode_duration,
-                            "homepage": element[0].homepage,
-                            "in_production": element[0].in_production,
-                            "origin_country": element[0].origin_country,
-                            "total_seasons": element[0].total_seasons,
-                            "total_episodes": element[0].total_episodes,
-                            "status": element[0].status,
-                            "vote_average": element[0].vote_average,
-                            "vote_count": element[0].vote_count,
-                            "synopsis": element[0].synopsis,
-                            "popularity": element[0].popularity,
                             "last_episode_watched": element[1].last_episode_watched,
                             "eps_per_season": eps_per_season,
                             "current_season": element[1].current_season,
                             "score": element[1].score,
                             "favorite": element[1].favorite,
-                            "actors": actors,
-                            "genres": genres,
-                            "networks": networks}
+                            "actors": element[5],
+                            "genres": element[2],
+                            "common": False}
 
             if element[1].status == Status.WATCHING:
                 if element[0].id in current_list:
-                    watching_list.append([element_info, True])
+                    element_info['common'] = True
                     common_elements += 1
-                else:
-                    watching_list.append([element_info, False])
+                watching_list.append(element_info)
             elif element[1].status == Status.COMPLETED:
                 if element[0].id in current_list:
-                    completed_list.append([element_info, True])
+                    element_info['common'] = True
                     common_elements += 1
-                else:
-                    completed_list.append([element_info, False])
+                completed_list.append(element_info)
             elif element[1].status == Status.ON_HOLD:
                 if element[0].id in current_list:
-                    onhold_list.append([element_info, True])
+                    element_info['common'] = True
                     common_elements += 1
-                else:
-                    onhold_list.append([element_info, False])
+                onhold_list.append(element_info)
             elif element[1].status == Status.RANDOM:
                 if element[0].id in current_list:
-                    random_list.append([element_info, True])
+                    element_info['common'] = True
                     common_elements += 1
-                else:
-                    random_list.append([element_info, False])
+                random_list.append(element_info)
             elif element[1].status == Status.DROPPED:
                 if element[0].id in current_list:
-                    dropped_list.append([element_info, True])
+                    element_info['common'] = True
                     common_elements += 1
-                else:
-                    dropped_list.append([element_info, False])
+                dropped_list.append(element_info)
             elif element[1].status == Status.PLAN_TO_WATCH:
                 if element[0].id in current_list:
-                    plantowatch_list.append([element_info, True])
+                    element_info['common'] = True
                     common_elements += 1
-                else:
-                    plantowatch_list.append([element_info, False])
+                plantowatch_list.append(element_info)
 
         element_all_data = [[watching_list, "WATCHING"], [completed_list, "COMPLETED"], [onhold_list, "ON HOLD"],
                             [random_list, "RANDOM"], [dropped_list, "DROPPED"], [plantowatch_list, "PLAN TO WATCH"]]
@@ -479,53 +454,33 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
 
         common_elements = 0
         for element in element_data:
-            # Change release date format
-            release_date = element[0].release_date
-            if 'Unknown' not in release_date:
-                release_date = datetime.strptime(release_date, '%Y-%m-%d').strftime("%d %b %Y")
-
-            actors = element[3].replace(',', ', ')
-            genres = element[2].replace(',', ', ')
-
             element_info = {"id": element[0].id,
                             "tmdb_id": element[0].themoviedb_id,
                             "cover": "{}{}".format(covers_path, element[0].image_cover),
                             "name": element[0].name,
                             "original_name": element[0].original_name,
-                            "release_date": release_date,
-                            "homepage": element[0].homepage,
-                            "runtime": element[0].runtime,
-                            "original_language": element[0].original_language,
-                            "synopsis": element[0].synopsis,
-                            "vote_average": element[0].vote_average,
-                            "vote_count": element[0].vote_count,
-                            "popularity": element[0].popularity,
-                            "budget": element[0].budget,
-                            "revenue": element[0].revenue,
-                            "tagline": element[0].tagline,
+                            "director": element[0].director_name,
                             "score": element[1].score,
                             "favorite": element[1].favorite,
-                            "actors": actors,
-                            "genres": genres}
+                            "actors": element[3],
+                            "genres": element[2],
+                            "common": False}
 
             if element[1].status == Status.COMPLETED:
                 if element[0].id in current_list:
-                    completed_list.append([element_info, True])
+                    element_info['common'] = True
                     common_elements += 1
-                else:
-                    completed_list.append([element_info, False])
+                completed_list.append(element_info)
             elif element[1].status == Status.COMPLETED_ANIMATION:
                 if element[0].id in current_list:
-                    completed_list_animation.append([element_info, True])
+                    element_info['common'] = True
                     common_elements += 1
-                else:
-                    completed_list_animation.append([element_info, False])
+                completed_list_animation.append(element_info)
             elif element[1].status == Status.PLAN_TO_WATCH:
                 if element[0].id in current_list:
-                    plantowatch_list.append([element_info, True])
+                    element_info['common'] = True
                     common_elements += 1
-                else:
-                    plantowatch_list.append([element_info, False])
+                plantowatch_list.append(element_info)
 
         element_all_data = [[completed_list, "COMPLETED"], [completed_list_animation, "COMPLETED ANIMATION"],
                             [plantowatch_list, "PLAN TO WATCH"]]
@@ -534,8 +489,11 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             percentage = int((common_elements / len(element_data)) * 100)
         except ZeroDivisionError:
             percentage = 0
+
         all_data_media = {"all_data": element_all_data,
                           "common_elements": [common_elements, len(element_data), percentage]}
+
+        print(all_data_media)
 
         return all_data_media
 
@@ -644,7 +602,6 @@ def load_media_sheet(element_id, user_id, list_type):
             .join(AnimeList, MoviesList.user_id == followers.c.followed_id)\
             .filter(followers.c.follower_id == user_id, MoviesList.movies_id == element_id).all()
         in_user_list = MoviesList.query.filter_by(user_id=user_id, movies_id=element_id).first()
-
         if element == (None, None, None):
             return abort(404)
 
@@ -739,6 +696,7 @@ def load_media_sheet(element_id, user_id, list_type):
                         "cover_path": cover,
                         "name": element[0].name,
                         "original_name": element[0].original_name,
+                        "director": element[0].director_name,
                         "release_date": release_date,
                         "homepage": element[0].homepage,
                         "runtime": element[0].runtime,
@@ -931,8 +889,7 @@ def add_element_in_db(api_id, list_type):
     return element.id
 
 
-# ------------------------------------------- TMDb API Update Scheduler ---------------------------------------------- #
-
+# --- TMDb API Update Scheduler ------------------------------------------------------------------------------
 
 def scheduled_task():
     def automatic_media_refresh():

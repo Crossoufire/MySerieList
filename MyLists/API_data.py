@@ -31,12 +31,12 @@ class ApiData:
         if data.get("total_results", 0) == 0:
             return [{"nb_results": 0}]
 
-        # Recover 10 results without peoples
+        # Recover 7 results without peoples
         tmdb_results, i = [], 0
         while i < data["total_results"] and i < 20 and len(tmdb_results) < 7:
             result = data["results"][i]
 
-            if result.get('known_for_department') is not None:
+            if result.get('known_for_department'):
                 i += 1
                 continue
 
@@ -66,6 +66,7 @@ class ApiData:
             tmdb_results.append(media_data)
 
             i += 1
+
         return tmdb_results
 
     def media_search(self, element_name):

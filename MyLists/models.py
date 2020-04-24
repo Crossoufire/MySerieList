@@ -249,6 +249,7 @@ class Movies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     original_name = db.Column(db.String(50), nullable=False)
+    director_name = db.Column(db.String(100))
     release_date = db.Column(db.String(30))
     homepage = db.Column(db.String(200))
     released = db.Column(db.String(30))

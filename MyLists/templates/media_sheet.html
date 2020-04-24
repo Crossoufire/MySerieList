@@ -160,14 +160,17 @@
                         <h4><i class="fas fa-info-circle"></i>&nbsp&nbsp <b>Information</b></h4>
                         <hr>
                         <ul class="text-left p-0">
-                            {% if media_list != 'movieslist' %}
-                                <li class="m-b-10">
-                                    <div class="row">
-                                        <div class="col-5"><b>Created by:</b></div>
-                                        <div class="col-7">{{ data['created_by'] }}</div>
-                                    </div>
-                                </li>
-                            {% endif %}
+                            <li class="m-b-10">
+                                <div class="row">
+                                    {% if media_list != 'movieslist' %}
+                                    <div class="col-5"><b>Created by:</b></div>
+                                    <div class="col-7">{{ data['created_by'] }}</div>
+                                    {% else %}
+                                        <div class="col-5"><b>Directed by:</b></div>
+                                        <div class="col-7">{{ data['director'] }}</div>
+                                    {% endif %}
+                                </div>
+                            </li>
                             <li class="m-b-10">
                                 <div class="row">
                                     {% if media_list != 'movieslist' %}

@@ -57,6 +57,7 @@ function searchElement() {
         original_title = cards[i].querySelector(".by-original-title");
         actors = cards[i].querySelector(".by-actor");
         genres = cards[i].querySelector(".by-genre");
+        director = cards[i].querySelector(".by-director");
         if (title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
             cards[i].style.display = "";
         } else if (original_title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
@@ -64,6 +65,8 @@ function searchElement() {
         } else if (actors.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Actors' || cat === 'All')) {
             cards[i].style.display = "";
         } else if (genres.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Genres' || cat === 'All')) {
+            cards[i].style.display = "";
+        } else if (director.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Director' || cat === 'All')) {
             cards[i].style.display = "";
         } else {
             cards[i].style.display = "none";

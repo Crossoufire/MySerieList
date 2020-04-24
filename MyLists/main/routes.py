@@ -1,6 +1,7 @@
 from sqlalchemy import func
 from MyLists import db, app
 from MyLists.API_data import ApiData
+from MyLists.main.forms import EditMediaData
 from flask_login import login_required, current_user
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
@@ -651,13 +652,43 @@ def check_media(media_type, media_id):
     return redirect(url_for('main.media_sheet', media_type=list_type, media_id=element_id))
 
 
-@bp.route('/autocomplete', methods=['GET'])
+@bp.route("/media_sheet_form/<media_type>/<media_id>", methods=['GET', 'POST'])
 @login_required
-def autocomplete():
-    search = request.args.get('q')
-    results = ApiData().autocomplete_search(search)
+def media_sheet_form(media_type, media_id):
+    form = EditMediaData()
 
-    return jsonify(matching_results=results)
+    if media_type == 'Series':
+        element = db.session.query(Series, func.group_concat(SeriesGenre.genre.distinct()),
+                                   func.group_concat(SeriesNetwork.network.distinct()),
+                                   func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
+                                   func.group_concat(SeriesActors.name.distinct()),
+                                   func.group_concat(SeriesEpisodesPerSeason.episodes)) \
+            .join(SeriesGenre, SeriesGenre.series_id == Series.id) \
+            .join(SeriesNetwork, SeriesNetwork.series_id == Series.id) \
+            .join(SeriesActors, SeriesActors.series_id == Series.id) \
+            .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id) \
+            .filter(Series.id == media_id).first()
+
+    if request.method == 'GET':
+        form.cover.data = element[0].image_cover
+        form.original_name.data = element[0].original_name
+        form.name.data = element[0].name
+        # form.director_name.data = element[0].director_name
+        form.created_by.data = element[0].created_by
+        form.airing_dates.data = element[0].first_air_date + ' - ' + element[0].last_air_date
+        # form.release_date.data = element[0].release_date
+        # form.production_status.data = element[0].production_status
+        form.genres.data = element[1]
+        form.actors.data = element[4]
+        form.duration.data = element[0].episode_duration
+        form.origin_country.data = element[0].origin_country
+        # form.original_language.data = element[0].original_language
+        form.newtorks.data = element[2]
+        # form.tagline.data = element[0].tagline
+        form.homepage.data = element[0].homepage
+        form.synopsis.data = element[0].synopsis
+
+    return render_template('media_sheet_form.html', form=form)
 
 
 @bp.route('/search_media', methods=['GET'])
@@ -688,7 +719,10 @@ def search_media():
                            search=search)
 
 
-@bp.route("/test", methods=['GET'])
+@bp.route('/autocomplete', methods=['GET'])
 @login_required
-def test():
-    return "hello"
+def autocomplete():
+    search = request.args.get('q')
+    results = ApiData().autocomplete_search(search)
+
+    return jsonify(matching_results=results)

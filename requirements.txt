@@ -6,6 +6,7 @@ flask-compress
 flask-bcrypt
 flask-admin
 flask-login
+flask-user
 flask-mail
 flask-wtf
 python-dotenv

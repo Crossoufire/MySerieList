@@ -6,7 +6,7 @@ from MyLists.API_data import ApiData
 from flask_login import current_user, login_required
 from flask import render_template, url_for, flash, redirect, request
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, get_trending_data, add_ranks_to_db, \
-    add_frames_to_db, refresh_db_frames, refresh_db_badges, refresh_db_ranks
+    add_frames_to_db, refresh_db_frames, refresh_db_badges, refresh_db_ranks, add_director_movies
 from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, Anime, User, \
     AnimeList, AnimeEpisodesPerSeason, AnimeGenre, MoviesGenre, MoviesList, MoviesActors, SeriesActors, Movies, \
     AnimeActors
@@ -26,7 +26,7 @@ def create_user():
                          active=True,
                          private=True,
                          registered_on=datetime.utcnow(),
-                         activated_on=datetime.utcnow())
+                         activated_on=datetime.utcnow()),
         db.session.add(new_admin)
         add_frames_to_db()
         add_badges_to_db()
