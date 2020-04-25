@@ -23,16 +23,24 @@
                 <div class="media-title-mobile" style="display: none;">
                     {% if media_list == 'serieslist' %}
                         <h3>{{ data['original_name'] }}</h3>
-                        <h5 class="text-grey"><i>{{ data['name'] }}</i></h5>
+                        {% if data['original_name'] != data['name'] %}
+                            <h5 class="text-grey"><i>{{ data['name'] }}</i></h5>
+                        {% endif %}
                     {% elif media_list == 'animelist' %}
                         <h3>{{ data['name'] }}</h3>
-                        <h5 class="text-grey"><i>{{ data['original_name'] }}</i></h5>
+                        {% if data['original_name'] != data['name'] %}
+                            <h5 class="text-grey"><i>{{ data['original_name'] }}</i></h5>
+                        {% endif %}
                     {% elif media_list == 'movieslist' and data['original_language'] == 'ja' %}
                         <h3>{{ data['name'] }}</h3>
-                        <h5 class="text-grey"><i>{{ data['original_name'] }}</i></h5>
+                        {% if data['original_name'] != data['name'] %}
+                            <h5 class="text-grey"><i>{{ data['original_name'] }}</i></h5>
+                        {% endif %}
                     {% elif media_list == 'movieslist' and data['original_language'] != 'ja' %}
                         <h3>{{ data['original_name'] }}</h3>
-                        <h5 class="text-grey"><i>{{ data['name'] }}</i></h5>
+                        {% if data['original_name'] != data['name'] %}
+                            <h5 class="text-grey"><i>{{ data['name'] }}</i></h5>
+                        {% endif %}
                     {% endif %}
                     <hr>
                 </div>
@@ -132,8 +140,16 @@
                 <div class="mobile-follow m-l-15 m-r-15 p-2 m-b-50" style="margin-top: -10px;">
                     {% for follow in data['in_follows_lists'] %}
                         <a class="m-r-10" href="/account/{{ follow[0].username }}">
-                            <img class="m-b-10" height="55" width="55"  data-toggle="tooltip" title="{{ follow[0].username }}"
-                                 src="/static/profile_pics/{{ follow[0].image_file }}" alt=""/>
+                            <div class="text-center m-b-10" style="display: inline-block;">
+                                <img height="55" width="55" data-toggle="tooltip" title="{{ follow[0].username }}"
+                                     src="/static/profile_pics/{{ follow[0].image_file }}" alt=""/>
+                                <br>
+                                {% if follow[1].favorite %}
+                                    <i class="fas fa-sm fa-star" style="color: darkgoldenrod;"></i>
+                                {% else %}
+                                    <i class="far fa-sm fa-star" style="color: rgba(255, 255, 255, 0.25);"></i>
+                                {% endif %}
+                            </div>
                         </a>
                     {% endfor %}
                 </div>
@@ -142,16 +158,24 @@
                 <div class="media-title-pc">
                     {% if media_list == 'serieslist' %}
                         <h3>{{ data['original_name'] }}</h3>
-                        <h5 class="text-grey"><i>{{ data['name'] }}</i></h5>
+                        {% if data['original_name'] != data['name'] %}
+                            <h5 class="text-grey"><i>{{ data['name'] }}</i></h5>
+                        {% endif %}
                     {% elif media_list == 'animelist' %}
                         <h3>{{ data['name'] }}</h3>
-                        <h5 class="text-grey"><i>{{ data['original_name'] }}</i></h5>
+                        {% if data['original_name'] != data['name'] %}
+                            <h5 class="text-grey"><i>{{ data['original_name'] }}</i></h5>
+                        {% endif %}
                     {% elif media_list == 'movieslist' and data['original_language'] == 'ja' %}
                         <h3>{{ data['name'] }}</h3>
-                        <h5 class="text-grey"><i>{{ data['original_name'] }}</i></h5>
+                        {% if data['original_name'] != data['name'] %}
+                            <h5 class="text-grey"><i>{{ data['original_name'] }}</i></h5>
+                        {% endif %}
                     {% elif media_list == 'movieslist' and data['original_language'] != 'ja' %}
                         <h3>{{ data['original_name'] }}</h3>
-                        <h5 class="text-grey"><i>{{ data['name'] }}</i></h5>
+                        {% if data['original_name'] != data['name'] %}
+                            <h5 class="text-grey"><i>{{ data['name'] }}</i></h5>
+                        {% endif %}
                     {% endif %}
                     <hr>
                 </div>
@@ -275,10 +299,10 @@
                                 <div class="row">
                                     <div class="col-5"><b>Homepage:</b></div>
                                     <div class="col-7" style="overflow-wrap: break-word;">
-                                        {% if data['homepage'] %}
+                                        {% if data['homepage'] != 'Unknown' %}
                                             <a href="{{ data['homepage'] }}">{{ data['homepage'] }}</a>
-                                        {% else %}
-                                            <div>No homepage available.</div>
+                                        {% elif data['homepage'] == 'Unknown' %}
+                                            <div><i>No homepage available</i></div>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -306,13 +330,13 @@
                                 <li class="m-b-10">
                                     <div class="row">
                                         <div class="col-4"><b>Budget:</b></div>
-                                        <div class="col-8">{{ "{:,.2f}".format(data['budget']).replace(',', ' ') }}</div>
+                                        <div class="col-8">{{ "{:,.2f}".format(data['budget']).replace(',', ' ') }} $</div>
                                     </div>
                                 </li>
                                 <li class="m-b-10">
                                     <div class="row">
                                         <div class="col-4"><b>Revenue:</b></div>
-                                        <div class="col-8">{{ "{:,.2f}".format(data['revenue']).replace(',', ' ') }}</div>
+                                        <div class="col-8">{{ "{:,.2f}".format(data['revenue']).replace(',', ' ') }} $</div>
                                     </div>
                                 </li>
                             </ul>

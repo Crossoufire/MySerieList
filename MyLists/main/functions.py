@@ -608,7 +608,6 @@ def load_media_sheet(element_id, user_id, list_type):
         if len(element[1].split(',')) > 2:
             genres_list = [element[1].split(',')[0], element[1].split(',')[1]]
             genre_str = ','.join([g for g in genres_list])
-            print(genre_str)
         else:
             genres_list = element[1].split(',')
             genre_str = element[1]
