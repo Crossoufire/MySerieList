@@ -1,10 +1,10 @@
 # MyLists
 
 MyLists is a website with a beautiful and clear interface which allows you to track all your TV shows / Anime / Movies. 
-It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see you follow' list and 
+It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see you follows' list and 
 compare it to yours. You can see a live version here : [https://mylists.info](https://mylists.info).
 
-![MyLists](https://raw.githubusercontent.com/Crossoufire/MyLists/master/MyLists/static/img/home_img1.jpg)
+![MyLists](https://raw.githubusercontent.com/Crossoufire/MyLists/master/MyLists/static/img/home222.jpg)
 
 MyLists uses [Flask](http://flask.pocoo.org/) and [Material Design for Bootstrap 4](https://mdbootstrap.com/)
 
