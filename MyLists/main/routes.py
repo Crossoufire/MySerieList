@@ -668,27 +668,53 @@ def media_sheet_form(media_type, media_id):
             .join(SeriesActors, SeriesActors.series_id == Series.id) \
             .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id) \
             .filter(Series.id == media_id).first()
+    elif media_type == 'Anime':
+        element = db.session.query(Anime, func.group_concat(AnimeGenre.genre.distinct()),
+                                   func.group_concat(AnimeNetwork.network.distinct()),
+                                   func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
+                                   func.group_concat(AnimeActors.name.distinct()),
+                                   func.group_concat(AnimeEpisodesPerSeason.episodes)) \
+            .join(AnimeGenre, AnimeGenre.anime_id == Anime.id) \
+            .join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id) \
+            .join(AnimeActors, AnimeActors.anime_id == Anime.id) \
+            .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id) \
+            .filter(Anime.id == media_id).first()
+    elif media_type == 'Movies':
+        element = db.session.query(Movies, func.group_concat(MoviesGenre.genre.distinct()),
+                                   func.group_concat(MoviesActors.name.distinct()))\
+            .join(MoviesGenre, MoviesGenre.movies_id == Movies.id) \
+            .join(MoviesActors, MoviesActors.movies_id == Movies.id) \
+            .filter(Movies.id == media_id).first()
 
-    if request.method == 'GET':
+    if media_type == 'Series' or media_type == 'Anime' and request.method == 'GET':
         form.cover.data = element[0].image_cover
         form.original_name.data = element[0].original_name
         form.name.data = element[0].name
-        # form.director_name.data = element[0].director_name
         form.created_by.data = element[0].created_by
-        form.airing_dates.data = element[0].first_air_date + ' - ' + element[0].last_air_date
-        # form.release_date.data = element[0].release_date
-        # form.production_status.data = element[0].production_status
+        form.airing_dates.data = element[0].first_air_date + ' / ' + element[0].last_air_date
+        form.production_status.data = element[0].status
         form.genres.data = element[1]
         form.actors.data = element[4]
         form.duration.data = element[0].episode_duration
         form.origin_country.data = element[0].origin_country
-        # form.original_language.data = element[0].original_language
         form.newtorks.data = element[2]
-        # form.tagline.data = element[0].tagline
+        form.homepage.data = element[0].homepage
+        form.synopsis.data = element[0].synopsis
+    elif media_type == 'Movies' and request.method == 'GET':
+        form.cover.data = element[0].image_cover
+        form.original_name.data = element[0].original_name
+        form.name.data = element[0].name
+        form.directed_by.data = element[0].director_name
+        form.release_date.data = element[0].release_date
+        form.genres.data = element[1]
+        form.actors.data = element[2]
+        form.duration.data = element[0].runtime
+        form.original_language.data = element[0].original_language
+        form.tagline.data = element[0].tagline
         form.homepage.data = element[0].homepage
         form.synopsis.data = element[0].synopsis
 
-    return render_template('media_sheet_form.html', form=form)
+    return render_template('media_sheet_form.html', form=form, media_type=media_type)
 
 
 @bp.route('/search_media', methods=['GET'])

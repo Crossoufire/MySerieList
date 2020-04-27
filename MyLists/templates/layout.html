@@ -83,7 +83,7 @@
                         <a class="nav-item nav-link text-light" href="{{ url_for('users.account',
                          user_name=current_user.username) }}">Profile</a>
                         {% if current_user.get_id() == '1' %}
-                        <a class="nav-item nav-link text-light" href="{{ url_for('general.admin') }}">Manage</a>
+                        <a class="nav-item nav-link text-light" href="{{ url_for('general.admin') }}">Dashboard</a>
                         {% endif %}
                         <a class="nav-link text-light" href="{{ url_for('settings.settings') }}">
                             <i class="fas fa-sm fa-cog"></i></a>
