@@ -76,8 +76,8 @@ hr {
     }
     .header-profile-img-2 {
         left: 5px;
-        bottom: 8px;
-        height: 130px;
+        bottom: 0px;
+        height: 138px;
         width: 130px;
     }
 }
