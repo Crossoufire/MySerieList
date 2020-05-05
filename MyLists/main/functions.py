@@ -168,7 +168,12 @@ def get_details(api_id, list_type):
             networks_dict = {'network': 'No networks found'}
             networks_list.append(networks_dict)
 
-        return tv_data, seasons_list, genres_list, a_genres_list, actors_list, networks_list
+        data = {'tv_data': tv_data,
+                'seasons_data': seasons_list,
+                'genres_data': genres_list,
+                'anime_genres_data': a_genres_list,
+                'actors_data': actors_list,
+                'networks_data': networks_list}
     elif list_type == ListType.MOVIES:
         movie_data = {'name': details_data.get("title", "Unknown") or 'Unknown',
                       'original_name': details_data.get("original_title", "Unknown") or 'Unknown',
@@ -230,8 +235,12 @@ def get_details(api_id, list_type):
             actors_dict = {'name': 'No actors found'}
             actors_list.append(actors_dict)
 
-        return movie_data, collection_id, genres_list, actors_list
+        data = {'movies_data': movie_data,
+                'collections_data': collection_id,
+                'genres_data': genres_list,
+                'actors_data': actors_list}
 
+    return data
 
 # ---------------------------------------------------------------------------------------------------
 
@@ -379,6 +388,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             current_media = MoviesList.query(MoviesList.movies_id).filter_by(user_id=current_user.id).all()
         current_list = [r[0] for r in current_media]
 
+    common_elements = 0
     if list_type != ListType.MOVIES:
         watching_list = []
         completed_list = []
@@ -387,7 +397,6 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
         dropped_list = []
         plantowatch_list = []
 
-        common_elements = 0
         for element in element_data:
             # Get episodes per season
             nb_season = len(element[4].split(","))
@@ -408,58 +417,30 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "genres": element[2],
                             "common": False}
 
+            if element[0].id in current_list:
+                element_info['common'] = True
+                common_elements += 1
+
             if element[1].status == Status.WATCHING:
-                element_info['cat'] = 'WATCHING'
-                if element[0].id in current_list:
-                    element_info['common'] = True
-                    common_elements += 1
                 watching_list.append(element_info)
             elif element[1].status == Status.COMPLETED:
-                element_info['cat'] = 'COMPLETED'
-                if element[0].id in current_list:
-                    element_info['common'] = True
-                    common_elements += 1
                 completed_list.append(element_info)
             elif element[1].status == Status.ON_HOLD:
-                element_info['cat'] = 'ON HOLD'
-                if element[0].id in current_list:
-                    element_info['common'] = True
-                    common_elements += 1
                 onhold_list.append(element_info)
             elif element[1].status == Status.RANDOM:
-                element_info['cat'] = 'RANDOM'
-                if element[0].id in current_list:
-                    element_info['common'] = True
-                    common_elements += 1
                 random_list.append(element_info)
             elif element[1].status == Status.DROPPED:
-                element_info['cat'] = 'DROPPED'
-                if element[0].id in current_list:
-                    element_info['common'] = True
-                    common_elements += 1
                 dropped_list.append(element_info)
             elif element[1].status == Status.PLAN_TO_WATCH:
-                element_info['cat'] = 'PLAN TO WATCH'
-                if element[0].id in current_list:
-                    element_info['common'] = True
-                    common_elements += 1
                 plantowatch_list.append(element_info)
 
-        element_all_data = [watching_list, completed_list, onhold_list, random_list, dropped_list, plantowatch_list]
-
-        try: percentage = int((common_elements/len(element_data))*100)
-        except ZeroDivisionError: percentage = 0
-
-        all_data_media = {"all_data": element_all_data,
-                          "common_elements": [common_elements, len(element_data), percentage]}
-
-        return all_data_media
+        all_element_data = [[watching_list, 'WATCHING'], [completed_list, 'COMPLETED'], [onhold_list, 'ON HOLD'],
+                            [random_list, 'RANDOM'], [dropped_list, 'DROPPED'], [plantowatch_list, 'PLAN TO WATCH']]
     elif list_type == ListType.MOVIES:
         completed_list = []
         completed_list_animation = []
         plantowatch_list = []
 
-        common_elements = 0
         for element in element_data:
             element_info = {"id": element[0].id,
                             "tmdb_id": element[0].themoviedb_id,
@@ -473,34 +454,29 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "genres": element[2],
                             "common": False}
 
+            if element[0].id in current_list:
+                element_info['common'] = True
+                common_elements += 1
+
             if element[1].status == Status.COMPLETED:
-                element_info['cat'] = 'COMPLETED'
-                if element[0].id in current_list:
-                    element_info['common'] = True
-                    common_elements += 1
                 completed_list.append(element_info)
             elif element[1].status == Status.COMPLETED_ANIMATION:
-                element_info['cat'] = 'COMPLETED ANIMATION'
-                if element[0].id in current_list:
-                    element_info['common'] = True
-                    common_elements += 1
                 completed_list_animation.append(element_info)
             elif element[1].status == Status.PLAN_TO_WATCH:
-                element_info['cat'] = 'PLAN TO WATCH'
-                if element[0].id in current_list:
-                    element_info['common'] = True
-                    common_elements += 1
                 plantowatch_list.append(element_info)
 
-        element_all_data = [completed_list, completed_list_animation, plantowatch_list]
+        all_element_data = [[completed_list, 'COMPLETED'], [completed_list_animation, 'COMPLETED ANIMATION'],
+                            [plantowatch_list, 'PLAN TO WATCH']]
 
-        try: percentage = int((common_elements/len(element_data))*100)
-        except ZeroDivisionError: percentage = 0
+    try:
+        percentage = int((common_elements / len(element_data)) * 100)
+    except ZeroDivisionError:
+        percentage = 0
 
-        all_data_media = {"all_data": element_all_data,
-                          "common_elements": [common_elements, len(element_data), percentage]}
+    all_media_data = {"all_data": all_element_data,
+                      "common_elements": [common_elements, len(element_data), percentage]}
 
-        return all_data_media
+    return all_media_data
 
 
 def set_last_update(media_name, media_type, old_status=None, new_status=None, old_season=None,
@@ -625,37 +601,36 @@ def add_element_in_db(api_id, list_type):
     if list_type != ListType.MOVIES:
         # Add TV details to DB
         try:
-            tv_data, seasons_list, genres_list, a_genres_list, actors_list, networks_list = get_details(api_id,
-                                                                                                        list_type)
+            data = get_details(api_id, list_type)
         except:
             app.logger.error('[SYSTEM] - Error while getting: <tv_data>')
             abort(404)
 
         if list_type == ListType.SERIES:
-            element = Series(**tv_data)
+            element = Series(**data['tv_data'])
         elif list_type == ListType.ANIME:
-            element = Anime(**tv_data)
+            element = Anime(**data['tv_data'])
 
         db.session.add(element)
         db.session.commit()
 
         # Add genres to DB
         if list_type == ListType.SERIES:
-            for genre in genres_list:
+            for genre in data['genres_data']:
                 genre.update({'series_id': element.id})
                 db.session.add(SeriesGenre(**genre))
         elif list_type == ListType.ANIME:
-            if a_genres_list:
-                for genre in a_genres_list:
+            if data['anime_genres_data']:
+                for genre in data['anime_genres_data']:
                     genre.update({'anime_id': element.id})
                     db.session.add(AnimeGenre(**genre))
             else:
-                for genre in genres_list:
+                for genre in data['genres_data']:
                     genre.update({'anime_id': element.id})
                     db.session.add(AnimeGenre(**genre))
 
         # Add actors to DB
-        for actor in actors_list:
+        for actor in data['actors_data']:
             if list_type == ListType.SERIES:
                 actor.update({'series_id': element.id})
                 db.session.add(SeriesActors(**actor))
@@ -664,7 +639,7 @@ def add_element_in_db(api_id, list_type):
                 db.session.add(AnimeActors(**actor))
 
         # Add networks to DB
-        for network in networks_list:
+        for network in data['networks_data']:
             if list_type == ListType.SERIES:
                 network.update({'series_id': element.id})
                 db.session.add(SeriesNetwork(**network))
@@ -673,7 +648,7 @@ def add_element_in_db(api_id, list_type):
                 db.session.add(AnimeNetwork(**network))
 
         # Add seasons to DB
-        for season in seasons_list:
+        for season in data['seasons_data']:
             if list_type == ListType.SERIES:
                 season.update({'series_id': element.id})
                 db.session.add(SeriesEpisodesPerSeason(**season))
@@ -683,28 +658,28 @@ def add_element_in_db(api_id, list_type):
     elif list_type == ListType.MOVIES:
         # Add movie details to DB
         try:
-            movie_data, collection_id, genres_list, actors_list = get_details(api_id, list_type)
+            data = get_details(api_id, list_type)
         except:
             app.logger.error('[SYSTEM] - Error while getting: <movie_data>')
             abort(404)
 
-        element = Movies(**movie_data)
+        element = Movies(**data['movies_data'])
         db.session.add(element)
         db.session.commit()
 
         # Add genres to DB
-        for genre in genres_list:
+        for genre in data['genres_data']:
             genre.update({'movies_id': element.id})
             db.session.add(MoviesGenre(**genre))
 
         # Add actors to DB
-        for actor in actors_list:
+        for actor in data['actors_data']:
             actor.update({'movies_id': element.id})
             db.session.add(MoviesActors(**actor))
 
         # Add collection movie to DB
-        if collection_id:
-            collection_info = get_collection_movie(collection_id)
+        if data['collection_data']:
+            collection_info = get_collection_movie(data['collection_data'])
             db.session.add(MoviesCollections(**collection_info))
 
     db.session.commit()
@@ -733,8 +708,6 @@ def save_new_cover(cover_file, media_type):
 
     i = i.resize((300, 450), Image.ANTIALIAS)
     i.save(picture_path, quality=90)
-
-    print(picture_fn)
 
     return picture_fn
 
@@ -823,8 +796,8 @@ def scheduled_task():
 
         # SERIES DELETIONS
         series = db.session.query(Series, SeriesList).outerjoin(SeriesList, SeriesList.series_id == Series.id).all()
-        to_delete = []
         count = 0
+        to_delete = []
         for tv_series in series:
             if tv_series[1] is None:
                 to_delete.append(tv_series[0].id)
@@ -841,8 +814,8 @@ def scheduled_task():
 
         # ANIME DELETIONS
         anime = db.session.query(Anime, AnimeList).outerjoin(AnimeList, AnimeList.anime_id == Anime.id).all()
-        to_delete = []
         count = 0
+        to_delete = []
         for tv_anime in anime:
             if tv_anime[1] is None:
                 to_delete.append(tv_anime[0].id)
@@ -859,8 +832,8 @@ def scheduled_task():
 
         # MOVIES DELETIONS
         movies = db.session.query(Movies, MoviesList).outerjoin(MoviesList, MoviesList.movies_id == Movies.id).all()
-        to_delete = []
         count = 0
+        to_delete = []
         for movie in movies:
             if movie[1] is None:
                 to_delete.append([movie[0].id, movie[0].collection_id])
@@ -978,7 +951,6 @@ def scheduled_task():
         total_time_anime = 0
         total_time_series = 0
         total_time_movies = 0
-
         for element in anime_data:
             if element[0].status == Status.COMPLETED:
                 try:
@@ -994,7 +966,6 @@ def scheduled_task():
                     total_time_anime += element[0].last_episode_watched * element[1].episode_duration
                 except:
                     pass
-
         for element in series_data:
             if element[0].status == Status.COMPLETED:
                 try:
@@ -1010,7 +981,6 @@ def scheduled_task():
                     total_time_series += element[0].last_episode_watched * element[1].episode_duration
                 except:
                     pass
-
         for element in movies_data:
             if element[0].status == Status.COMPLETED or element[0].status == Status.COMPLETED_ANIMATION:
                 try:
