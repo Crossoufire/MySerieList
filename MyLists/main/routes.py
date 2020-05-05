@@ -5,7 +5,7 @@ from MyLists.main.forms import EditMediaData
 from flask_login import login_required, current_user
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
-    add_element_to_user, add_element_in_db, load_media_sheet
+    add_element_to_user, add_element_in_db, load_media_sheet, save_new_cover
 from MyLists.models import User, Movies, MoviesActors, MoviesGenre, Series, SeriesGenre, SeriesList, \
     SeriesEpisodesPerSeason, SeriesNetwork, Anime, AnimeActors, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, UserLastUpdate
@@ -19,58 +19,33 @@ bp = Blueprint('main', __name__)
 def mymedialist(media_list, user_name):
     user = User.query.filter_by(username=user_name).first()
 
-    # Check if the media_list exist and is valid
+    # Check if <media_list> is valid
     try:
         list_type = ListType(media_list)
     except ValueError:
         abort(404)
 
     # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
+    if user is None or (user.id == 1 and current_user.id != 1):
         abort(404)
 
     # Check if the current account can see the target account's list
     if current_user.id == user.id or current_user.id == 1:
         pass
-    elif user.private and current_user.is_following(user) is False:
+    elif user.private and not current_user.is_following(user):
         abort(404)
 
     # Retrieve the media data
     if list_type == ListType.SERIES:
-        element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
-                                        func.group_concat(SeriesNetwork.network.distinct()),
-                                        func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(SeriesActors.name.distinct()),
-                                        func.group_concat(SeriesEpisodesPerSeason.episodes))\
-            .join(SeriesList, SeriesList.series_id == Series.id)\
-            .join(SeriesGenre, SeriesGenre.series_id == Series.id)\
-            .join(SeriesNetwork, SeriesNetwork.series_id == Series.id)\
-            .join(SeriesActors, SeriesActors.series_id == Series.id)\
-            .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id)\
-            .filter(SeriesList.user_id == user.id).group_by(Series.id).order_by(Series.name.asc()).all()
+        element_data = SeriesList.get_series_info(user.id)
         covers_path = url_for('static', filename='covers/series_covers/')
         media_all_data = get_medialist_data(element_data, ListType.SERIES, covers_path, user.id)
     elif list_type == ListType.ANIME:
-        element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
-                                        func.group_concat(AnimeNetwork.network.distinct()),
-                                        func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(AnimeActors.name.distinct()),
-                                        func.group_concat(AnimeEpisodesPerSeason.episodes))\
-            .join(AnimeList, AnimeList.anime_id == Anime.id)\
-            .join(AnimeGenre, AnimeGenre.anime_id == Anime.id)\
-            .join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id)\
-            .join(AnimeActors, AnimeActors.anime_id == Anime.id)\
-            .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id)\
-            .filter(AnimeList.user_id == user.id).group_by(Anime.id).order_by(Anime.name.asc()).all()
+        element_data = AnimeList.get_anime_info(user.id)
         covers_path = url_for('static', filename='covers/anime_covers/')
         media_all_data = get_medialist_data(element_data, ListType.ANIME, covers_path, user.id)
     elif list_type == ListType.MOVIES:
-        element_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre.distinct()),
-                                        func.group_concat(MoviesActors.name.distinct()))\
-            .join(MoviesList, MoviesList.movies_id == Movies.id)\
-            .join(MoviesGenre, MoviesGenre.movies_id == Movies.id)\
-            .join(MoviesActors, MoviesActors.movies_id == Movies.id)\
-            .filter(MoviesList.user_id == user.id).group_by(Movies.id).order_by(Movies.name.asc()).all()
+        element_data = MoviesList.get_movies_info(user.id)
         covers_path = url_for('static', filename='covers/movies_covers/')
         media_all_data = get_medialist_data(element_data, ListType.MOVIES, covers_path, user.id)
 
@@ -117,12 +92,7 @@ def movies_collection(user_name):
     elif user.private and current_user.is_following(user) is False:
         abort(404)
 
-    collection_movie = db.session.query(Movies, MoviesList, MoviesCollections,
-                                        func.count(MoviesCollections.collection_id)) \
-        .join(MoviesList, MoviesList.movies_id == Movies.id) \
-        .join(MoviesCollections, MoviesCollections.collection_id == Movies.collection_id) \
-        .filter(Movies.collection_id != None, MoviesList.user_id == user.id,
-                MoviesList.status != Status.PLAN_TO_WATCH).group_by(Movies.collection_id).all()
+    collection_movie = MoviesCollections.get_collection_movies(user.id)
 
     completed_collections = []
     ongoing_collections = []
@@ -171,7 +141,7 @@ def update_element_season():
         abort(400)
 
     if list_type == ListType.ANIME:
-        # Check if the element is in the database
+        # Check if the element is in the database (also used for watched time and last update)
         anime = Anime.query.filter_by(id=element_id).first()
         if anime is None:
             abort(400)
@@ -206,7 +176,7 @@ def update_element_season():
         compute_time_spent(cat_type="season", old_eps=old_episode, old_seas=old_season, new_seas=new_season,
                            all_seas_data=all_seasons, media=anime, list_type=list_type)
     elif list_type == ListType.SERIES:
-        # Check if the element is in the database
+        # Check if the element is in the database (also used for watched time and last update)
         series = Series.query.filter_by(id=element_id).first()
         if series is None:
             abort(400)
@@ -249,7 +219,7 @@ def update_element_season():
 def update_element_episode():
     try:
         json_data = request.get_json()
-        new_episode = int(json_data['episode']) + 1
+        new_episode = int(json_data['episode'])+1
         element_id = int(json_data['element_id'])
         element_type = json_data['element_type']
     except:
@@ -262,7 +232,7 @@ def update_element_episode():
         abort(400)
 
     if list_type == ListType.ANIME:
-        # Check if the element is in the database
+        # Check if the element is in the database (also used for watched time and last update)
         anime = Anime.query.filter_by(id=element_id).first()
         if anime is None:
             abort(400)
@@ -296,7 +266,7 @@ def update_element_episode():
         compute_time_spent(cat_type='episode', new_eps=new_episode, old_eps=old_episode, media=anime,
                            list_type=list_type)
     elif list_type == ListType.SERIES:
-        # Check if the element is in the database
+        # Check if the element is in the database (also used for watched time and last update)
         series = Series.query.filter_by(id=element_id).first()
         if series is None:
             abort(400)
@@ -390,7 +360,7 @@ def delete_element():
         abort(400)
 
     if list_type == ListType.SERIES:
-        # Check if series exists in the database
+        # Check if series exists in the database (also used for watched time and last update)
         series = Series.query.filter_by(id=element_id).first()
         if series is None:
             abort(400)
@@ -408,12 +378,12 @@ def delete_element():
         compute_time_spent(cat_type="delete", old_eps=old_episode, old_seas=old_season, all_seas_data=all_seasons,
                            media=series, list_type=list_type)
 
-        # Delete the media from the account' list
+        # Delete the media from the user's list
         SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).delete()
         db.session.commit()
         app.logger.info('[{}] Series with ID {} deleted'.format(current_user.id, element_id))
     elif list_type == ListType.ANIME:
-        # Check if anime exists in the database
+        # Check if anime exists in the database (also used for watched time and last update)
         anime = Anime.query.filter_by(id=element_id).first()
         if anime is None:
             abort(400)
@@ -431,12 +401,12 @@ def delete_element():
         compute_time_spent(cat_type="delete", old_eps=old_episode, old_seas=old_season, all_seas_data=all_seasons,
                            media=anime, list_type=list_type)
 
-        # Delete the media from the account' list
+        # Delete the media from the user's list
         AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).delete()
         db.session.commit()
         app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.id, element_id))
     elif list_type == ListType.MOVIES:
-        # Check if movie exists in the database
+        # Check if movie exists in the database (also used for watched time and last update)
         movies = Movies.query.filter_by(id=element_id).first()
         if movies is None:
             abort(400)
@@ -449,7 +419,7 @@ def delete_element():
         # Compute the new time spent
         compute_time_spent(cat_type="delete", media=movies, list_type=list_type)
 
-        # Delete the media from the account' list
+        # Delete the media from the user's list
         MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).delete()
         db.session.commit()
         app.logger.info('[{}] Movie with ID {} deleted'.format(current_user.id, element_id))
@@ -468,17 +438,18 @@ def change_element_category():
     except:
         abort(400)
 
-    # Check if the media_list exist and is valid
+    # Check if the <media_list> exist and is valid
     try:
         list_type = ListType(element_type)
     except ValueError:
         abort(400)
 
+    # Check if the status is valid compared to the list type
     new_status = check_cat_type(list_type, element_new_category)
     if new_status is None:
         abort(400)
 
-    # Check if the element is in the account's list
+    # Check if the element is in the user's list
     if list_type == ListType.SERIES:
         element = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
         season_data = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).all()
@@ -496,7 +467,6 @@ def change_element_category():
     if list_type != ListType.MOVIES:
         current_season = element.current_season
         last_episode_watched = element.last_episode_watched
-
     if new_status == Status.COMPLETED:
         # Set to the last seasons and episodes
         if list_type == ListType.SERIES:
@@ -560,10 +530,12 @@ def add_element():
     except ValueError:
         abort(400)
 
+    # Check if the status is valid compared to the list type
     new_status = check_cat_type(list_type, element_cat)
     if new_status is None:
         abort(400)
 
+    # Check if the element exist in the database
     if list_type == ListType.SERIES:
         element = Series.query.filter_by(id=element_id).first()
     elif list_type == ListType.ANIME:
@@ -571,7 +543,7 @@ def add_element():
     elif list_type == ListType.MOVIES:
         element = Movies.query.filter_by(id=element_id).first()
 
-    # Check if the element is already in the current's account list
+    # Check if the element is already in the current user's list
     if list_type == ListType.SERIES:
         if SeriesList.query.filter_by(user_id=current_user.id, series_id=element.id).first():
             flash("This series is already in your list", "warning")
@@ -597,6 +569,7 @@ def media_sheet(media_type, media_id):
     elif media_type == 'Movies':
         list_type = ListType.MOVIES
 
+    # Check if the media sheet loading came from an account (so media_id = media_name)
     try:
         media_id = int(media_id)
         seek_media = None
@@ -619,12 +592,12 @@ def media_sheet(media_type, media_id):
     return render_template('media_sheet.html', title=title, data=element_sheet, media_list=list_type.value)
 
 
-@bp.route('/check_media/<media_type>/<media_id>', methods=['GET', 'POST'])
+@bp.route('/check_media/<list_type>/<media_id>', methods=['GET', 'POST'])
 @login_required
-def check_media(media_type, media_id):
+def check_media(list_type, media_id):
     # Check if the media_list exist and is valid
     try:
-        list_type = ListType(media_type)
+        list_type = ListType(list_type)
     except ValueError:
         abort(404)
 
@@ -643,13 +616,13 @@ def check_media(media_type, media_id):
         element_id = add_element_in_db(media_id, list_type)
 
     if list_type == ListType.SERIES:
-        list_type = 'Series'
+        media_type = 'Series'
     elif list_type == ListType.ANIME:
-        list_type = 'Anime'
-    else:
-        list_type = 'Movies'
+        media_type = 'Anime'
+    elif list_type == ListType.MOVIES:
+        media_type = 'Movies'
 
-    return redirect(url_for('main.media_sheet', media_type=list_type, media_id=element_id))
+    return redirect(url_for('main.media_sheet', media_type=media_type, media_id=element_id))
 
 
 @bp.route("/media_sheet_form/<media_type>/<media_id>", methods=['GET', 'POST'])
@@ -658,61 +631,142 @@ def media_sheet_form(media_type, media_id):
     form = EditMediaData()
 
     if media_type == 'Series':
-        element = db.session.query(Series, func.group_concat(SeriesGenre.genre.distinct()),
-                                   func.group_concat(SeriesNetwork.network.distinct()),
-                                   func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                                   func.group_concat(SeriesActors.name.distinct()),
-                                   func.group_concat(SeriesEpisodesPerSeason.episodes)) \
-            .join(SeriesGenre, SeriesGenre.series_id == Series.id) \
-            .join(SeriesNetwork, SeriesNetwork.series_id == Series.id) \
-            .join(SeriesActors, SeriesActors.series_id == Series.id) \
-            .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id) \
-            .filter(Series.id == media_id).first()
+        list_type = ListType.SERIES
     elif media_type == 'Anime':
-        element = db.session.query(Anime, func.group_concat(AnimeGenre.genre.distinct()),
-                                   func.group_concat(AnimeNetwork.network.distinct()),
-                                   func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
-                                   func.group_concat(AnimeActors.name.distinct()),
-                                   func.group_concat(AnimeEpisodesPerSeason.episodes)) \
-            .join(AnimeGenre, AnimeGenre.anime_id == Anime.id) \
-            .join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id) \
-            .join(AnimeActors, AnimeActors.anime_id == Anime.id) \
-            .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id) \
-            .filter(Anime.id == media_id).first()
+        list_type = ListType.ANIME
     elif media_type == 'Movies':
-        element = db.session.query(Movies, func.group_concat(MoviesGenre.genre.distinct()),
-                                   func.group_concat(MoviesActors.name.distinct()))\
-            .join(MoviesGenre, MoviesGenre.movies_id == Movies.id) \
-            .join(MoviesActors, MoviesActors.movies_id == Movies.id) \
-            .filter(Movies.id == media_id).first()
+        list_type = ListType.MOVIES
+    else:
+        abort(404)
 
-    if media_type == 'Series' or media_type == 'Anime' and request.method == 'GET':
-        form.cover.data = element[0].image_cover
-        form.original_name.data = element[0].original_name
-        form.name.data = element[0].name
-        form.created_by.data = element[0].created_by
-        form.airing_dates.data = element[0].first_air_date + ' / ' + element[0].last_air_date
-        form.production_status.data = element[0].status
-        form.genres.data = element[1]
-        form.actors.data = element[4]
-        form.duration.data = element[0].episode_duration
-        form.origin_country.data = element[0].origin_country
-        form.newtorks.data = element[2]
-        form.homepage.data = element[0].homepage
-        form.synopsis.data = element[0].synopsis
-    elif media_type == 'Movies' and request.method == 'GET':
-        form.cover.data = element[0].image_cover
-        form.original_name.data = element[0].original_name
-        form.name.data = element[0].name
-        form.directed_by.data = element[0].director_name
-        form.release_date.data = element[0].release_date
-        form.genres.data = element[1]
-        form.actors.data = element[2]
-        form.duration.data = element[0].runtime
-        form.original_language.data = element[0].original_language
-        form.tagline.data = element[0].tagline
-        form.homepage.data = element[0].homepage
-        form.synopsis.data = element[0].synopsis
+    if list_type == ListType.SERIES:
+        element = Series.query.filter_by(id=media_id).first()
+    elif list_type == ListType.ANIME:
+        element = Anime.query.filter_by(id=media_id).first()
+    elif list_type == ListType.MOVIES:
+        element = Movies.query.filter_by(id=media_id).first()
+
+    if request.method == 'GET':
+        form.original_name.data = element.original_name
+        form.name.data = element.name
+        form.homepage.data = element.homepage
+        form.synopsis.data = element.synopsis
+        form.genres.data = ', '.join([r.genre for r in element.genres])
+        form.actors.data = ', '.join([r.name for r in element.actors])
+        if list_type != ListType.MOVIES:
+            form.created_by.data = element.created_by
+            form.first_air_date.data = element.first_air_date
+            form.last_air_date.data = element.last_air_date
+            form.production_status.data = element.status
+            form.duration.data = element.episode_duration
+            form.origin_country.data = element.origin_country
+            form.newtorks.data = ', '.join([r.network for r in element.networks])
+        elif list_type == ListType.MOVIES:
+            form.directed_by.data = element.director_name
+            form.release_date.data = element.release_date
+            form.duration.data = element.runtime
+            form.original_language.data = element.original_language
+            form.tagline.data = element.tagline
+            form.budget.data = element.budget
+            form.revenue.data = element.revenue
+    if form.validate_on_submit():
+        if form.cover.data:
+            element.image_cover = save_new_cover(form.cover.data, media_type)
+        element.original_name = form.original_name.data
+        element.name = form.name.data
+        element.homepage = form.homepage.data
+        element.synopsis = form.synopsis.data
+
+        if list_type != ListType.MOVIES:
+            element.created_by = form.created_by.data
+            element.first_air_date = form.first_air_date.data
+            element.last_air_date = form.last_air_date.data
+            element.status = form.production_status.data
+            element.episode_duration = form.duration.data
+            element.origin_country = form.origin_country.data
+        elif list_type == ListType.MOVIES:
+            element.director_name = form.directed_by.data
+            element.release_date = form.release_date.data
+            element.runtime = form.duration.data
+            element.original_language = form.original_language.data
+            element.tagline = form.tagline.data
+            element.budget = form.budget.data
+            element.revenue = form.revenue.data
+
+        db.session.commit()
+
+        # Actors
+        if [r.name for r in element.actors] == form.actors.data.split(','):
+            pass
+        else:
+            for actor in [r.name for r in element.actors]:
+                if list_type == ListType.SERIES:
+                    SeriesActors.query.filter_by(series_id=media_id, name=actor).delete()
+                elif list_type == ListType.ANIME:
+                    AnimeActors.query.filter_by(anime_id=media_id, name=actor).delete()
+                elif list_type == ListType.MOVIES:
+                    MoviesActors.query.filter_by(movies_id=media_id, name=actor).delete()
+            db.session.commit()
+            for actor in form.actors.data.split(','):
+                if list_type == ListType.SERIES:
+                    add_actor = SeriesActors(series_id=media_id,
+                                             name=actor)
+                elif list_type == ListType.ANIME:
+                    add_actor = AnimeActors(anime_id=media_id,
+                                            name=actor)
+                elif list_type == ListType.MOVIES:
+                    add_actor = MoviesActors(movies_id=media_id,
+                                             name=actor)
+                db.session.add(add_actor)
+            db.session.commit()
+
+        # Genres
+        if [r.genre for r in element.genres] == form.genres.data.split(','):
+            pass
+        else:
+            for genre in [r.genre for r in element.genres]:
+                if list_type == ListType.SERIES:
+                    SeriesGenre.query.filter_by(series_id=media_id, genre=genre).delete()
+                elif list_type == ListType.ANIME:
+                    AnimeGenre.query.filter_by(anime_id=media_id, genre=genre).delete()
+                elif list_type == ListType.MOVIES:
+                    MoviesGenre.query.filter_by(movies_id=media_id, genre=genre).delete()
+            db.session.commit()
+            for genre in form.genres.data.split(','):
+                if list_type == ListType.SERIES:
+                    add_genre = SeriesGenre(series_id=media_id,
+                                            genre=genre)
+                elif list_type == ListType.ANIME:
+                    add_genre = AnimeGenre(anime_id=media_id,
+                                           genre=genre)
+                elif list_type == ListType.MOVIES:
+                    add_genre = MoviesGenre(movies_id=media_id,
+                                            genre=genre)
+                db.session.add(add_genre)
+            db.session.commit()
+
+        # Networks
+        if list_type != ListType.MOVIES:
+            if [r.network for r in element.networks] == form.newtorks.data.split(','):
+                pass
+            else:
+                for network in [r.network for r in element.networks]:
+                    if list_type == ListType.SERIES:
+                        SeriesNetwork.query.filter_by(series_id=media_id, network=network).delete()
+                    elif list_type == ListType.ANIME:
+                        AnimeNetwork.query.filter_by(anime_id=media_id, network=network).delete()
+                db.session.commit()
+                for network in form.networks.data.split(','):
+                    if list_type == ListType.SERIES:
+                        add_network = SeriesNetwork(series_id=media_id,
+                                                    network=network)
+                    elif list_type == ListType.ANIME:
+                        add_network = AnimeNetwork(anime_id=media_id,
+                                                   network=network)
+                    db.session.add(add_network)
+                db.session.commit()
+
+        return redirect(url_for('main.media_sheet', media_type=media_type, media_id=media_id))
 
     return render_template('media_sheet_form.html', form=form, media_type=media_type)
 
