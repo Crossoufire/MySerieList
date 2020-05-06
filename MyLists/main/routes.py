@@ -1,4 +1,3 @@
-from sqlalchemy import func
 from MyLists import db, app
 from MyLists.API_data import ApiData
 from MyLists.main.forms import EditMediaData
@@ -8,7 +7,7 @@ from MyLists.main.functions import get_medialist_data, set_last_update, compute_
     add_element_to_user, add_element_in_db, load_media_sheet, save_new_cover
 from MyLists.models import User, Movies, MoviesActors, MoviesGenre, Series, SeriesGenre, SeriesList, \
     SeriesEpisodesPerSeason, SeriesNetwork, Anime, AnimeActors, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, \
-    AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, UserLastUpdate
+    AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections
 
 
 bp = Blueprint('main', __name__)
@@ -555,6 +554,47 @@ def add_element():
             flash("This movie is already in your list", "warning")
 
     add_element_to_user(element, current_user.id, list_type, new_status)
+
+    return '', 204
+
+
+@bp.route('/lock_media', methods=['POST'])
+@login_required
+def lock_media():
+    try:
+        json_data = request.get_json()
+        element_id = json_data['element_id']
+        element_type = json_data['element_type']
+        lock_status = json_data['lock_status']
+    except:
+        abort(400)
+
+    # Check if the user is the admin
+    if current_user.id != 3:
+        abort(400)
+
+    # Check if the list_type exist and is valid
+    try:
+        list_type = ListType(element_type)
+    except ValueError:
+        abort(400)
+
+    # Check if the lock_status is boolean
+    if type(lock_status) is not bool:
+        abort(400)
+
+    if list_type == ListType.SERIES:
+        element = Series.query.filter_by(id=element_id).first()
+    elif list_type == ListType.ANIME:
+        element = Anime.query.filter_by(id=element_id).first()
+    elif list_type == ListType.MOVIES:
+        element = Movies.query.filter_by(id=element_id).first()
+
+    if element is None:
+        abort(400)
+
+    element.lock = lock_status
+    db.session.commit()
 
     return '', 204
 

@@ -1,18 +1,17 @@
 import os
-import time
 import secrets
 
 from PIL import Image
+from flask import abort
 from pathlib import Path
+from sqlalchemy import func
 from MyLists import db, app
 from datetime import datetime
-from flask import flash, abort
 from flask_login import current_user
 from MyLists.API_data import ApiData
-from sqlalchemy import func, and_, text
 from MyLists.models import ListType, Status, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
     SeriesList, Series, MoviesList, Movies, SeriesGenre, AnimeGenre, MoviesGenre, UserLastUpdate, SeriesActors, \
-    SeriesNetwork, AnimeNetwork, MoviesActors, MoviesCollections, AnimeActors, followers, User
+    SeriesNetwork, AnimeNetwork, MoviesActors, MoviesCollections, AnimeActors, User
 
 
 def get_collection_movie(collection_id):
@@ -678,7 +677,7 @@ def add_element_in_db(api_id, list_type):
             db.session.add(MoviesActors(**actor))
 
         # Add collection movie to DB
-        if data['collection_data']:
+        if data['collections_data']:
             collection_info = get_collection_movie(data['collection_data'])
             db.session.add(MoviesCollections(**collection_info))
 
@@ -720,33 +719,32 @@ def scheduled_task():
 
         def refresh_element_data(api_id, list_type):
             if list_type != ListType.MOVIES:
-                tv_data, seasons_list, genres_list, a_genres_list, actors_list, networks_list = get_details(api_id,
-                                                                                                            list_type)
-                if tv_data is None:
+                data = get_details(api_id, list_type)
+                if data['tv_data'] is None:
                     return None
             elif list_type == ListType.MOVIES:
-                movie_data, collection_id, genres_list, actors_list = get_details(api_id, list_type)
-                if movie_data is None:
+                data = get_details(api_id, list_type)
+                if data['movies_data'] is None:
                     return None
 
             # Update the main details data
             if list_type == ListType.SERIES:
-                Series.query.filter_by(themoviedb_id=api_id).update(tv_data)
+                Series.query.filter_by(themoviedb_id=api_id).update(data['tv_data'])
             elif list_type == ListType.ANIME:
-                Anime.query.filter_by(themoviedb_id=api_id).update(tv_data)
+                Anime.query.filter_by(themoviedb_id=api_id).update(data['tv_data'])
             elif list_type == ListType.MOVIES:
-                Movies.query.filter_by(themoviedb_id=api_id).update(movie_data)
+                Movies.query.filter_by(themoviedb_id=api_id).update(data['movies_data'])
 
             db.session.commit()
 
             # Update the seasons
             if list_type == ListType.SERIES:
                 element = Series.query.filter_by(themoviedb_id=api_id).first()
-                for seas in seasons_list:
+                for seas in data['seasons_data']:
                     SeriesEpisodesPerSeason.query.filter_by(series_id=element.id, season=seas['season']).update(seas)
             elif list_type == ListType.ANIME:
                 element = Anime.query.filter_by(themoviedb_id=api_id).first()
-                for season in seasons_list:
+                for season in data['seasons_data']:
                     AnimeEpisodesPerSeason.query.filter_by(anime_id=element.id, season=season['season']).update(season)
 
             db.session.commit()
@@ -1003,4 +1001,4 @@ def scheduled_task():
         compute_media_time_spent(user)
 
 
-app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='scheduled_task', hour=3, minute=0)
+app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='scheduled_task', hour=3, minute=15)
