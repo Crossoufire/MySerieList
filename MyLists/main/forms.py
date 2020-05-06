@@ -22,7 +22,7 @@ class EditMediaData(FlaskForm):
     duration = DecimalField('Duration (min)')
     origin_country = StringField('Origin country')
     original_language = StringField('Original language')
-    newtorks = StringField('Newtorks')
+    networks = StringField('Newtorks')
     tagline = StringField('Tagline')
     homepage = StringField('Homepage')
     budget = StringField('Budget')

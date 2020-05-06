@@ -570,8 +570,10 @@ def lock_media():
         abort(400)
 
     # Check if the user is the admin
-    if current_user.id != 3:
-        abort(400)
+    if current_user.id == 3 or current_user.id == 2 or current_user.id == 1:
+        pass
+    else:
+        abort(404)
 
     # Check if the list_type exist and is valid
     try:
@@ -593,7 +595,7 @@ def lock_media():
     if element is None:
         abort(400)
 
-    element.lock = lock_status
+    element.lock_status = lock_status
     db.session.commit()
 
     return '', 204
@@ -668,6 +670,11 @@ def check_media(list_type, media_id):
 @bp.route("/media_sheet_form/<media_type>/<media_id>", methods=['GET', 'POST'])
 @login_required
 def media_sheet_form(media_type, media_id):
+    if current_user.id == 3 or current_user.id == 2 or current_user.id == 1:
+        pass
+    else:
+        abort(404)
+
     form = EditMediaData()
 
     if media_type == 'Series':
@@ -691,7 +698,7 @@ def media_sheet_form(media_type, media_id):
         form.name.data = element.name
         form.homepage.data = element.homepage
         form.synopsis.data = element.synopsis
-        form.genres.data = ', '.join([r.genre for r in element.genres])
+        # form.genres.data = ', '.join([r.genre for r in element.genres])
         form.actors.data = ', '.join([r.name for r in element.actors])
         if list_type != ListType.MOVIES:
             form.created_by.data = element.created_by
@@ -700,7 +707,7 @@ def media_sheet_form(media_type, media_id):
             form.production_status.data = element.status
             form.duration.data = element.episode_duration
             form.origin_country.data = element.origin_country
-            form.newtorks.data = ', '.join([r.network for r in element.networks])
+            form.networks.data = ', '.join([r.network for r in element.networks])
         elif list_type == ListType.MOVIES:
             form.directed_by.data = element.director_name
             form.release_date.data = element.release_date
@@ -736,7 +743,7 @@ def media_sheet_form(media_type, media_id):
         db.session.commit()
 
         # Actors
-        if [r.name for r in element.actors] == form.actors.data.split(','):
+        if [r.name for r in element.actors] == form.actors.data.split(', '):
             pass
         else:
             for actor in [r.name for r in element.actors]:
@@ -747,7 +754,7 @@ def media_sheet_form(media_type, media_id):
                 elif list_type == ListType.MOVIES:
                     MoviesActors.query.filter_by(movies_id=media_id, name=actor).delete()
             db.session.commit()
-            for actor in form.actors.data.split(','):
+            for actor in form.actors.data.split(', '):
                 if list_type == ListType.SERIES:
                     add_actor = SeriesActors(series_id=media_id,
                                              name=actor)
@@ -761,33 +768,33 @@ def media_sheet_form(media_type, media_id):
             db.session.commit()
 
         # Genres
-        if [r.genre for r in element.genres] == form.genres.data.split(','):
-            pass
-        else:
-            for genre in [r.genre for r in element.genres]:
-                if list_type == ListType.SERIES:
-                    SeriesGenre.query.filter_by(series_id=media_id, genre=genre).delete()
-                elif list_type == ListType.ANIME:
-                    AnimeGenre.query.filter_by(anime_id=media_id, genre=genre).delete()
-                elif list_type == ListType.MOVIES:
-                    MoviesGenre.query.filter_by(movies_id=media_id, genre=genre).delete()
-            db.session.commit()
-            for genre in form.genres.data.split(','):
-                if list_type == ListType.SERIES:
-                    add_genre = SeriesGenre(series_id=media_id,
-                                            genre=genre)
-                elif list_type == ListType.ANIME:
-                    add_genre = AnimeGenre(anime_id=media_id,
-                                           genre=genre)
-                elif list_type == ListType.MOVIES:
-                    add_genre = MoviesGenre(movies_id=media_id,
-                                            genre=genre)
-                db.session.add(add_genre)
-            db.session.commit()
+        # if [r.genre for r in element.genres] == form.genres.data.split(', '):
+        #     pass
+        # else:
+        #     for genre in [r.genre for r in element.genres]:
+        #         if list_type == ListType.SERIES:
+        #             SeriesGenre.query.filter_by(series_id=media_id, genre=genre).delete()
+        #         elif list_type == ListType.ANIME:
+        #             AnimeGenre.query.filter_by(anime_id=media_id, genre=genre).delete()
+        #         elif list_type == ListType.MOVIES:
+        #             MoviesGenre.query.filter_by(movies_id=media_id, genre=genre).delete()
+        #     db.session.commit()
+        #     for genre in form.genres.data.split(', '):
+        #         if list_type == ListType.SERIES:
+        #             add_genre = SeriesGenre(series_id=media_id,
+        #                                     genre=genre)
+        #         elif list_type == ListType.ANIME:
+        #             add_genre = AnimeGenre(anime_id=media_id,
+        #                                    genre=genre)
+        #         elif list_type == ListType.MOVIES:
+        #             add_genre = MoviesGenre(movies_id=media_id,
+        #                                     genre=genre)
+        #         db.session.add(add_genre)
+        #     db.session.commit()
 
         # Networks
         if list_type != ListType.MOVIES:
-            if [r.network for r in element.networks] == form.newtorks.data.split(','):
+            if [r.network for r in element.networks] == form.networks.data.split(', '):
                 pass
             else:
                 for network in [r.network for r in element.networks]:
@@ -796,7 +803,7 @@ def media_sheet_form(media_type, media_id):
                     elif list_type == ListType.ANIME:
                         AnimeNetwork.query.filter_by(anime_id=media_id, network=network).delete()
                 db.session.commit()
-                for network in form.networks.data.split(','):
+                for network in form.networks.data.split(', '):
                     if list_type == ListType.SERIES:
                         add_network = SeriesNetwork(series_id=media_id,
                                                     network=network)

@@ -121,13 +121,6 @@ class UserLastUpdate(db.Model):
 ######################################################## SERIES ########################################################
 
 
-class SeriesGenre(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
-    genre = db.Column(db.String(100), nullable=False)
-    genre_id = db.Column(db.Integer, nullable=False)
-
-
 class Series(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -149,6 +142,7 @@ class Series(db.Model):
     image_cover = db.Column(db.String(100), nullable=False)
     themoviedb_id = db.Column(db.Integer, nullable=False)
     last_update = db.Column(db.DateTime, nullable=False)
+    lock_status = db.Column(db.Boolean, default=0)
 
     genres = db.relationship('SeriesGenre', backref='series', lazy=True)
     actors = db.relationship('SeriesActors', backref='series', lazy=True)
@@ -169,11 +163,19 @@ class Series(db.Model):
         else:
             last_air_date = 'Unknown'
 
+        # Check name and original name
+        if self.original_name != self.name:
+            original_name = self.original_name
+            name = self.name
+        else:
+            original_name = self.original_name
+            name = None
+
         element_info = {"id": self.id,
                         "cover": 'series_covers/{}'.format(self.image_cover),
                         "cover_path": 'series_covers',
-                        "name": self.name,
-                        "original_name": self.original_name,
+                        "name": name,
+                        "original_name": original_name,
                         "first_air_date": first_air_date,
                         "last_air_date": last_air_date,
                         "created_by": self.created_by,
@@ -189,6 +191,7 @@ class Series(db.Model):
                         "synopsis": self.synopsis,
                         "popularity": self.popularity,
                         "media_type": 'Series',
+                        "lock_status": self.lock_status,
                         "eps_per_season": [r.episodes for r in self.eps_per_season],
                         "actors": ', '.join([r.name for r in self.actors]),
                         "genres": ', '.join([r.genre for r in self.genres]),
@@ -266,6 +269,13 @@ class SeriesList(db.Model):
         return element_data
 
 
+class SeriesGenre(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
+    genre = db.Column(db.String(100), nullable=False)
+    genre_id = db.Column(db.Integer, nullable=False)
+
+
 class SeriesEpisodesPerSeason(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -309,6 +319,7 @@ class Anime(db.Model):
     image_cover = db.Column(db.String(100), nullable=False)
     themoviedb_id = db.Column(db.Integer, nullable=False)
     last_update = db.Column(db.DateTime, nullable=False)
+    lock_status = db.Column(db.Boolean, default=0)
 
     genres = db.relationship('AnimeGenre', backref='anime', lazy=True)
     actors = db.relationship('AnimeActors', backref='anime', lazy=True)
@@ -332,8 +343,8 @@ class Anime(db.Model):
         element_info = {"id": self.id,
                         "cover": 'anime_covers/{}'.format(self.image_cover),
                         "cover_path": 'anime_covers',
-                        "name": self.name,
-                        "original_name": self.original_name,
+                        "name": self.original_name,
+                        "original_name": self.name,
                         "first_air_date": first_air_date,
                         "last_air_date": last_air_date,
                         "created_by": self.created_by,
@@ -349,6 +360,7 @@ class Anime(db.Model):
                         "synopsis": self.synopsis,
                         "popularity": self.popularity,
                         "media_type": 'Anime',
+                        "lock_status": self.lock_status,
                         "eps_per_season": [r.episodes for r in self.eps_per_season],
                         "actors": ', '.join([r.name for r in self.actors]),
                         "genres": ', '.join([r.genre for r in self.genres]),
@@ -475,6 +487,7 @@ class Movies(db.Model):
     image_cover = db.Column(db.String(100), nullable=False)
     themoviedb_id = db.Column(db.Integer, nullable=False)
     collection_id = db.Column(db.Integer)
+    lock_status = db.Column(db.Boolean, default=0)
 
     genres = db.relationship('MoviesGenre', backref='anime', lazy=True)
     actors = db.relationship('MoviesActors', backref='anime', lazy=True)
@@ -488,11 +501,21 @@ class Movies(db.Model):
         else:
             release_date = 'Unknown'
 
+        if self.original_language == 'ja':
+            name = self.original_name
+            original_name = self.name
+        elif self.original_name != self.name:
+            name = self.name
+            original_name = self.original_name
+        else:
+            name = None
+            original_name = self.original_name
+
         element_info = {"id": self.id,
                         "cover": 'movies_covers/{}'.format(self.image_cover),
                         "cover_path": 'movies_covers',
-                        "name": self.name,
-                        "original_name": self.original_name,
+                        "name": name,
+                        "original_name": original_name,
                         "director": self.director_name,
                         "release_date": release_date,
                         "homepage": self.homepage,
@@ -506,6 +529,7 @@ class Movies(db.Model):
                         "synopsis": self.synopsis,
                         "popularity": self.popularity,
                         "media_type": 'Movies',
+                        "lock_status": self.lock_status,
                         "actors": ', '.join([r.name for r in self.actors]),
                         "genres": ', '.join([r.genre for r in self.genres])}
 

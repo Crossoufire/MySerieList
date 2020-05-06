@@ -217,6 +217,33 @@ function updateEpisode(element_id, episode, media_list) {
 }
 
 
+// --- Lock the media --------------------------------------
+function lock_media(element_id, element_type) {
+    let lock_status;
+
+    if ($('#lock-button').prop("checked") === true) {
+        $('#lock-button-label').text('Media is Locked')
+        $('#edit-button').attr('style', 'display: "";');
+        lock_status = true;
+    } else {
+        $('#lock-button-label').text('Media is Unlocked');
+        $('#edit-button').attr('style', 'display: none;');
+        lock_status = false;
+    }
+
+    $body = $("body");
+    $.ajax ({
+        type: "POST",
+        url: "/lock_media",
+        contentType: "application/json",
+        data: JSON.stringify({element_id: element_id, element_type: element_type, lock_status: lock_status }),
+        dataType: "json",
+        success: function(response) {
+            console.log("ok"); }
+    });
+}
+
+
 // --- Tooltip ---------------------------------------------
 $(document).ready(function() {
     // Tooltip initialization

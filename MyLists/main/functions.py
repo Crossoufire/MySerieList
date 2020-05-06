@@ -380,12 +380,12 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
     current_list = []
     if user_id != current_user.id:
         if list_type == ListType.ANIME:
-            current_media = AnimeList.query(AnimeList.anime_id).filter_by(user_id=current_user.id).all()
+            current_media = AnimeList.query.filter_by(user_id=current_user.id).all()
         elif list_type == ListType.SERIES:
-            current_media = SeriesList.query(SeriesList.series_id).filter_by(user_id=current_user.id).all()
+            current_media = SeriesList.query.filter_by(user_id=current_user.id).all()
         else:
-            current_media = MoviesList.query(MoviesList.movies_id).filter_by(user_id=current_user.id).all()
-        current_list = [r[0] for r in current_media]
+            current_media = MoviesList.query.filter_by(user_id=current_user.id).all()
+        current_list = [r.id for r in current_media]
 
     common_elements = 0
     if list_type != ListType.MOVIES:
@@ -446,6 +446,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "cover": "{}{}".format(covers_path, element[0].image_cover),
                             "name": element[0].name,
                             "original_name": element[0].original_name,
+                            "original_language": element[0].original_language,
                             "director": element[0].director_name,
                             "score": element[1].score,
                             "favorite": element[1].favorite,
@@ -752,9 +753,9 @@ def scheduled_task():
             return True
 
         # Recover all the data
-        all_series_tmdb_id = [r.themoviedb_id for r in db.session.query(Series)]
-        all_anime_tmdb_id = [r.themoviedb_id for r in db.session.query(Anime)]
-        all_movies_tmdb_id = [r.themoviedb_id for r in db.session.query(Movies)]
+        all_series_tmdb_id = [m.themoviedb_id for m in Series.query.filter(Series.lock_status != True)]
+        all_anime_tmdb_id = [m.themoviedb_id for m in db.session.query(Anime).filter(Anime.lock_status != True)]
+        all_movies_tmdb_id = [m.themoviedb_id for m in db.session.query(Movies).filter(Movies.lock_status != True)]
 
         # Recover from API all the changed TV ID and Movies ID
         all_id_tv_changes = ApiData().get_changed_data(list_type=ListType.SERIES)
@@ -1001,4 +1002,4 @@ def scheduled_task():
         compute_media_time_spent(user)
 
 
-app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='scheduled_task', hour=3, minute=15)
+app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='scheduled_task', hour=21, minute=57)
