@@ -1002,4 +1002,4 @@ def scheduled_task():
         compute_media_time_spent(user)
 
 
-app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='scheduled_task', hour=21, minute=57)
+app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='scheduled_task', hour=3, minute=00)
