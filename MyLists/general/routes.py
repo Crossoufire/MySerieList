@@ -50,8 +50,7 @@ def admin():
 @login_required
 def global_stats():
     # Total time spent for each media
-    times_spent = db.session.query(User, func.sum(User.time_spent_series),
-                                   func.sum(User.time_spent_anime),
+    times_spent = db.session.query(User, func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
                                    func.sum(User.time_spent_movies))\
         .filter(User.id >= '2', User.active == True).all()
 

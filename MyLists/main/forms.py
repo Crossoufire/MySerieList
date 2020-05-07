@@ -3,8 +3,8 @@ from flask_wtf import FlaskForm
 from MyLists.models import User
 from flask_login import current_user
 from flask_wtf.file import FileField, FileAllowed
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from wtforms import StringField, SubmitField, TextAreaField, DecimalField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 
 
 class EditMediaData(FlaskForm):
@@ -13,7 +13,8 @@ class EditMediaData(FlaskForm):
     name = StringField('Name')
     directed_by = StringField('Directed by')
     created_by = StringField('Created by')
-    airing_dates = StringField('Airing dates')
+    first_air_date = StringField('First air date')
+    last_air_date = StringField('Last air date')
     release_date = StringField('Release date')
     production_status = StringField('Production status')
     genres = StringField('Genres')
@@ -21,8 +22,10 @@ class EditMediaData(FlaskForm):
     duration = DecimalField('Duration (min)')
     origin_country = StringField('Origin country')
     original_language = StringField('Original language')
-    newtorks = StringField('Newtorks')
+    networks = StringField('Newtorks')
     tagline = StringField('Tagline')
     homepage = StringField('Homepage')
+    budget = StringField('Budget')
+    revenue = StringField('Revenue')
     synopsis = TextAreaField('Synopsis')
     submit = SubmitField('Submit')

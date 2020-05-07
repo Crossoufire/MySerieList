@@ -9,7 +9,7 @@ from flask import url_for
 from MyLists import db, app
 from sqlalchemy import func
 from datetime import datetime
-from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
+from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason,\
     SeriesList, Series, MoviesList, Movies, Badges, MoviesCollections, Ranks, Frames
 
 

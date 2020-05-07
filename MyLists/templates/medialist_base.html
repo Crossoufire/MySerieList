@@ -79,7 +79,8 @@
         {% for category in all_data %}
             <div class="categories {{ category[1] }}">
                 <h2 class="text-center m-t-20 mb-0">{{ category[1] }}<hr class="mt-2 pb-3 mb-0"></h2>
-                <div class="row category-{% if category[1] == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ category[1] }}{% endif %}">
+                <div class="row category-{% if category[1] == 'COMPLETED ANIMATION' %}ANIMATION
+                {% else %}{{ category[1] }}{% endif %}">
                     {% for data in category[0] %}
                         <div id="card_{{ data['id'] }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
                             <div class="card bg-transparent">
@@ -142,6 +143,7 @@
                 </div>
             </div>
         {% endfor %}
+    </div>
 {% endblock content %}
 
 
