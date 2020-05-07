@@ -325,6 +325,23 @@
                     <hr>
                     <div class="m-b-20 text-right">
                         {% if data['lock_status'] %}
+                            <div class="custom-control custom-switch">
+                                <input id="lock-button" class="custom-control-input" type="checkbox" checked
+                                       onchange="lock_media('{{ data['id'] }}', '{{ media_list }}')">
+                                <label id="lock-button-label" class="custom-control-label" for="lock-button">
+                                    Media is Locked
+                                </label>
+                            </div>
+                        {% else %}
+                            <div class="custom-control custom-switch">
+                                <input id="lock-button" class="custom-control-input" type="checkbox"
+                                       onchange="lock_media('{{ data['id'] }}', '{{ media_list }}')">
+                                <label id="lock-button-label" class="custom-control-label" for="lock-button">
+                                    Media is Unlocked
+                                </label>
+                            </div>
+                        {% endif %}
+                        {% if data['lock_status'] %}
                             <a id="edit-button" class="btn btn-sm btn-warning text-dark"
                             href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}">Edit media</a>
                         {% else %}
@@ -332,17 +349,6 @@
                                  href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}"
                                  style="display: none;">Edit media</a>
                         {% endif %}
-                        <div>
-                            {% if data['lock_status'] %}
-                                <input type="checkbox" id="lock-button" name="lock-button" checked
-                                   onchange="lock_media('{{ data['id'] }}', '{{ media_list }}')">
-                                <label id="lock-button-label" for="lock-button">Media is Locked</label>
-                            {% else %}
-                                <input type="checkbox" id="lock-button" name="lock-button"
-                                   onchange="lock_media('{{ data['id'] }}', '{{ media_list }}')">
-                                <label id="lock-button-label" for="lock-button">Media is Unlocked</label>
-                            {% endif %}
-                        </div>
                     </div>
                 {% endif %}
             </div>
