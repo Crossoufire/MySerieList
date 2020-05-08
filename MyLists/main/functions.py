@@ -380,13 +380,13 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
     current_list = []
     if user_id != current_user.id:
         if list_type == ListType.ANIME:
-            current_media = AnimeList.query.filter_by(user_id=current_user.id).all()
+            current_media = db.session.query(AnimeList.anime_id).filter_by(user_id=current_user.id).all()
         elif list_type == ListType.SERIES:
-            current_media = SeriesList.query.filter_by(user_id=current_user.id).all()
-        else:
-            current_media = MoviesList.query.filter_by(user_id=current_user.id).all()
-        current_list = [r.id for r in current_media]
-
+            current_media = db.session.query(SeriesList.series_id).filter_by(user_id=current_user.id).all()
+        elif list_type == ListType.MOVIES:
+            current_media = db.session.query(MoviesList.movies_id).filter_by(user_id=current_user.id).all()
+        current_list = [r[0] for r in current_media]
+        
     common_elements = 0
     if list_type != ListType.MOVIES:
         watching_list = []
