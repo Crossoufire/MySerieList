@@ -1,14 +1,10 @@
-from MyLists import bcrypt
 from flask_wtf import FlaskForm
-from MyLists.models import User
-from flask_login import current_user
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, SubmitField, TextAreaField, DecimalField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms import StringField, SubmitField, TextAreaField, IntegerField
 
 
 class EditMediaData(FlaskForm):
-    cover = FileField('Media cover', validators=[FileAllowed(['jpg', 'png'])])
+    cover = FileField('Media cover', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
     original_name = StringField('Original name')
     name = StringField('Name')
     directed_by = StringField('Directed by')
@@ -19,7 +15,7 @@ class EditMediaData(FlaskForm):
     production_status = StringField('Production status')
     genres = StringField('Genres')
     actors = StringField('Actors')
-    duration = DecimalField('Duration (min)')
+    duration = IntegerField('Duration (min)')
     origin_country = StringField('Origin country')
     original_language = StringField('Original language')
     networks = StringField('Newtorks')

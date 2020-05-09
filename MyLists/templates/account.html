@@ -37,18 +37,18 @@
         <div class="row m-t-15">
             <div class="col-xl-3 col-lg col-md-12">
                 <ul class="p-l-0">
-                    <li class="m-b-20">
-                        <h4><i class="fas fa-trophy"></i>&nbsp&nbspBadges</h4>
-                        <hr>
-                        <div class="stats-size m-b-20">
-                            <div class="text-left m-b-10">
-                                Badges page:
-                                <a class="btn btn-sm btn-dark" style='border: solid grey 1px;'
-                                   href="{{ url_for('users.badges', user_name=user_data['username']) }}">Badges
-                                </a>
-                            </div>
-                        </div>
-                    </li>
+{#                    <li class="m-b-20">#}
+{#                        <h4><i class="fas fa-trophy"></i>&nbsp&nbspBadges</h4>#}
+{#                        <hr>#}
+{#                        <div class="stats-size m-b-20">#}
+{#                            <div class="text-left m-b-10">#}
+{#                                Badges page:#}
+{#                                <a class="btn btn-sm btn-dark" style='border: solid grey 1px;'#}
+{#                                   href="{{ url_for('users.badges', user_name=user_data['username']) }}">Badges#}
+{#                                </a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </li>#}
                     <li class="m-b-20">
                         <h4><i class="fas fa-angle-double-up"></i>&nbsp&nbsp Lists Levels</h4>
                         <hr>
@@ -260,7 +260,13 @@
             <div class="vertical_line"></div>
             <div class="col-xl col-lg-5 col-md-12">
                 <ul class="p-l-0">
-                    <h4><i class="fas fa-chart-pie"></i>&nbsp&nbspStatistics</h4>
+                    <h4>
+                        <i class="fas fa-chart-pie"></i>&nbsp&nbspStatistics
+                        <a class='fs-15 m-t-10 m-r-2' href="{{ url_for('users.more_stats',
+                        user_name=user_data['username']) }}" target="_blank" style='float: right; color: grey;'>
+                            <u><i>More stats</i></u>
+                        </a>
+                    </h4>
                     <hr>
                     <li class="m-b-20">
                         <div class="row">

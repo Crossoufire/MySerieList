@@ -3,8 +3,8 @@ from MyLists.users.forms import AddFollowForm
 from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
-from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_badges, get_user_data, \
-    get_knowledge_frame, get_updates, get_favorites
+from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
+    get_knowledge_frame, get_updates, get_favorites, get_more_stats_test
 
 
 bp = Blueprint('users', __name__)
@@ -80,7 +80,6 @@ def hall_of_fame():
         series_level = get_media_levels(user, ListType.SERIES)
         anime_level = get_media_levels(user, ListType.ANIME)
         movies_level = get_media_levels(user, ListType.MOVIES)
-        # knowledge_grade = get_knowledge_grade(user)
         knowledge_frame = get_knowledge_frame(user)
 
         user_data = {"id": user.id,
@@ -106,25 +105,6 @@ def hall_of_fame():
         all_users_data.append(user_data)
 
     return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
-
-
-@bp.route("/badges/<user_name>", methods=['GET', 'POST'])
-@login_required
-def badges(user_name):
-    user = User.query.filter_by(username=user_name).first()
-
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
-
-    user_badges = get_badges(user)[0]
-    return render_template('badges.html', title="{}'s badges".format(user_name), user_badges=user_badges)
 
 
 @bp.route("/level_grade_data", methods=['GET'])
@@ -188,3 +168,43 @@ def all_history(user_name):
     media_updates = get_updates(updates)
 
     return render_template('all_history.html', title='Media History', media_updates=media_updates)
+
+
+@bp.route("/more_stats/<user_name>", methods=['GET', 'POST'])
+@login_required
+def more_stats(user_name):
+    user = User.query.filter_by(username=user_name).first()
+
+    # No account with this username and protection of the admin account
+    if user is None or user.id == 1 and current_user.id != 1:
+        abort(404)
+
+    # Check if the account is private or in the follow list
+    if current_user.id == user.id or current_user.id == 1:
+        pass
+    elif user.private and not current_user.is_following(user):
+        abort(404)
+
+    user_stats = get_more_stats(user)[0]
+
+    return render_template('more_stats.html', title="{}'s stats".format(user_name), stats=user_stats)
+
+
+@bp.route("/more_stats_test/<user_name>", methods=['GET'])
+@login_required
+def more_stats_test(user_name):
+    user = User.query.filter_by(username=user_name).first()
+
+    # No account with this username and protection of the admin account
+    if user is None or user.id == 1 and current_user.id != 1:
+        abort(404)
+
+    # Check if the account is private or in the follow list
+    if current_user.id == user.id or current_user.id == 1:
+        pass
+    elif user.private and not current_user.is_following(user):
+        abort(404)
+
+    stats = get_more_stats_test(user)
+
+    return render_template('more_stats_test.html', title='More stats test', stats=stats)

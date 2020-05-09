@@ -1,7 +1,7 @@
 import os
+import imghdr
 import secrets
 
-from PIL import Image
 from pathlib import Path
 from flask import url_for
 from MyLists import app, mail
@@ -29,19 +29,20 @@ def send_email_update_email(user):
         return False
 
 
-def save_profile_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+def save_profile_picture(form_picture, old_picture):
+    if imghdr.what(form_picture) == 'gif' or imghdr.what(form_picture) == 'jpeg' \
+            or imghdr.what(form_picture) == 'png' or imghdr.what(form_picture) == 'jpg':
+        file = form_picture
+        random_hex = secrets.token_hex(8)
+        _, f_ext = os.path.splitext(form_picture.filename)
+        picture_fn = random_hex + f_ext
+        file.save(os.path.join(app.root_path, 'static/profile_pics', picture_fn))
+    else:
+        picture_fn = "default.jpg"
+        app.logger.error('[SYSTEM] Invalid picture format: {}'.format(imghdr.what(form_picture)))
 
-    try:
-        i = Image.open(form_picture)
-    except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised updating profile picture'.format(e))
-        return "default.jpg"
-
-    i = i.resize((300, 300), Image.ANTIALIAS)
-    i.save(picture_path, quality=90)
+    # Remove old cover
+    os.remove(os.path.join(app.root_path, 'static/profile_pics', old_picture))
+    app.logger.info('Settings updated: Removed the old picture: {}'.format(old_picture))
 
     return picture_fn

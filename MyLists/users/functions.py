@@ -1,5 +1,7 @@
 import pytz
+import time
 import random
+import operator
 
 from MyLists import db
 from flask import url_for
@@ -188,7 +190,7 @@ def get_updates(last_update):
     return update
 
 
-# -----------------------------------------------
+# --------------------------------------------------------------------------
 
 
 def get_user_data(user):
@@ -213,7 +215,7 @@ def get_user_data(user):
     # Recover the number of person that follows you
     followers = user.followers.count()
 
-    # Recover the knowledge grade and level of the user
+    # Recover the knowledge frame and level of the user
     knowledge_info = get_knowledge_frame(user)
 
     # Recover the overview user's last update
@@ -304,7 +306,7 @@ def get_follows_data(user):
     return follows_list, follows_update_list
 
 
-def get_badges(user):
+def get_more_stats(user):
     def get_queries():
         series_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
                                        func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
@@ -536,3 +538,167 @@ def get_badges(user):
         total_unlocked += item["unlocked"]
 
     return [all_badges, total_unlocked]
+
+
+def get_more_stats_test_2(user):
+    def get_queries():
+        series_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct())) \
+            .join(SeriesList, SeriesList.series_id == Series.id) \
+            .join(SeriesGenre, SeriesGenre.series_id == Series.id) \
+            .filter(SeriesList.user_id == user.id) \
+            .filter(or_(SeriesGenre.genre == "Animation", SeriesGenre.genre == "Comedy", SeriesGenre.genre == "Crime",
+                        SeriesGenre.genre == "Documentary", SeriesGenre.genre == "Mystery",
+                        SeriesGenre.genre == "Historical", SeriesGenre.genre == "War & Politics",
+                        SeriesGenre.genre == "Sci-Fi & Fantasy")) \
+            .group_by(Series.id).all()
+
+        anime_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct())) \
+            .join(AnimeList, AnimeList.anime_id == Anime.id) \
+            .join(AnimeGenre, AnimeGenre.anime_id == Anime.id) \
+            .filter(AnimeList.user_id == user.id) \
+            .filter(or_(AnimeGenre.genre == "Comedy", AnimeGenre.genre == "Police", AnimeGenre.genre == "Supernatural",
+                        AnimeGenre.genre == "Music", AnimeGenre.genre == "Mystery", AnimeGenre.genre == "Historical",
+                        AnimeGenre.genre == "Romance", AnimeGenre.genre == "Sci-Fi", AnimeGenre.genre == "Fantasy",
+                        AnimeGenre.genre == "Horror", AnimeGenre.genre == "Thriller", AnimeGenre.genre == "Sports",
+                        AnimeGenre.genre == "Slice of Life", AnimeGenre.genre == "School")) \
+            .group_by(Anime.id).all()
+
+        movies_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre.distinct())) \
+            .join(MoviesList, MoviesList.movies_id == Movies.id) \
+            .join(MoviesGenre, MoviesGenre.movies_id == Movies.id) \
+            .filter(MoviesList.user_id == user.id) \
+            .filter(or_(MoviesGenre.genre == "Comedy", MoviesGenre.genre == "Crime", MoviesGenre.genre == "Music",
+                        MoviesGenre.genre == "Mystery", MoviesGenre.genre == "History",
+                        MoviesGenre.genre == "Documentary", MoviesGenre.genre == "Romance",
+                        MoviesGenre.genre == "Horror", MoviesGenre.genre == "War", MoviesGenre.genre == "Fantasy",
+                        MoviesGenre.genre == "Thriller", MoviesGenre.genre == "Animation",
+                        MoviesGenre.genre == "Science Fiction")) \
+            .group_by(Movies.id).all()
+
+        sum_data = series_data + anime_data + movies_data
+
+        return sum_data
+
+    def get_episodes_and_time(element):
+        if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
+            try:
+                return [1, element[0].runtime]
+            except:
+                return [element[0].total_episodes, int(element[0].episode_duration) * element[0].total_episodes]
+        elif element[1].status != Status.PLAN_TO_WATCH and element[1].status != Status.RANDOM:
+            nb_episodes = [m.episodes for m in element[0].eps_per_season]
+
+            ep_duration = int(element[0].episode_duration)
+            ep_counter = 0
+            for i in range(0, element[1].current_season - 1):
+                ep_counter += int(nb_episodes[i])
+            episodes_watched = ep_counter + element[1].last_episode_watched
+            time_watched = (ep_duration * episodes_watched)
+            return [episodes_watched, time_watched]
+        else:
+            return [0, 0]
+
+    total_data = get_queries()
+
+    time_by_genre = {}
+    for element in total_data:
+        episodes_watched, time_watched = get_episodes_and_time(element)
+
+        # Genres badges
+        for genre in element[2].split(','):
+            if genre not in time_by_genre:
+                if genre == "Supernatural":
+                    if "Mystery" not in time_by_genre:
+                        time_by_genre["Mystery"] = time_watched
+                    else:
+                        time_by_genre["Mystery"] += time_watched
+                elif genre == "Police":
+                    if "Crime" not in time_by_genre:
+                        time_by_genre["Crime"] = time_watched
+                    else:
+                        time_by_genre["Crime"] += time_watched
+                elif genre == "War" or genre == "War & Politics" or genre == "History":
+                    if "Historical" not in time_by_genre:
+                        time_by_genre["Historical"] = time_watched
+                    else:
+                        time_by_genre["Historical"] += time_watched
+                elif genre == "Sci-Fi & Fantasy":
+                    if "Fantasy" not in time_by_genre:
+                        time_by_genre["Fantasy"] = time_watched
+                    else:
+                        time_by_genre["Fantasy"] += time_watched
+                    if "Science Fiction" not in time_by_genre:
+                        time_by_genre["Science Fiction"] = time_watched
+                    else:
+                        time_by_genre["Science Fiction"] += time_watched
+                elif genre == "Sci-Fi":
+                    if "Science Fiction" not in time_by_genre:
+                        time_by_genre["Science Fiction"] = time_watched
+                    else:
+                        time_by_genre["Science Fiction"] += time_watched
+                elif genre == "School":
+                    if "Slice of Life" not in time_by_genre:
+                        time_by_genre["Slice of Life"] = time_watched
+                    else:
+                        time_by_genre["Slice of Life"] += time_watched
+                else:
+                    time_by_genre[genre] = time_watched
+            else:
+                time_by_genre[genre] += time_watched
+
+    # Sort from high to low time
+    time_by_genre = sorted(time_by_genre.items(), key=operator.itemgetter(1), reverse=True)
+
+    return time_by_genre
+
+
+def get_more_stats_test(user):
+
+    def get_episodes_and_time(element):
+        if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
+            try:
+                return [1, element[0].runtime]
+            except:
+                return [element[0].total_episodes, int(element[0].episode_duration) * element[0].total_episodes]
+        elif element[1].status != Status.PLAN_TO_WATCH and element[1].status != Status.RANDOM:
+            nb_episodes = [m.episodes for m in element[0].eps_per_season]
+
+            ep_duration = int(element[0].episode_duration)
+            ep_counter = 0
+            for i in range(0, element[1].current_season - 1):
+                ep_counter += int(nb_episodes[i])
+            episodes_watched = ep_counter + element[1].last_episode_watched
+            time_watched = (ep_duration * episodes_watched)
+            return [episodes_watched, time_watched]
+        else:
+            return [0, 0]
+
+    series_data = db.session.query(Series, SeriesList) \
+        .join(SeriesList, SeriesList.series_id == Series.id) \
+        .filter(SeriesList.user_id == user.id) \
+        .group_by(Series.id).all()
+
+    anime_data = db.session.query(Anime, AnimeList) \
+        .join(AnimeList, AnimeList.anime_id == Anime.id) \
+        .filter(AnimeList.user_id == user.id) \
+        .group_by(Anime.id).all()
+
+    movies_data = db.session.query(Movies, MoviesList) \
+        .join(MoviesList, MoviesList.movies_id == Movies.id) \
+        .filter(MoviesList.user_id == user.id) \
+        .group_by(Movies.id).all()
+
+    total_data = series_data + anime_data + movies_data
+
+    time_by_genre = {}
+    for element in total_data:
+        episodes_watched, time_watched = get_episodes_and_time(element)
+
+        # Genres badges
+        for genre in [m.genre for m in element[0].genres]:
+            if genre not in time_by_genre:
+                time_by_genre[genre] = time_watched
+            else:
+                time_by_genre[genre] += time_watched
+
+    return time_by_genre
