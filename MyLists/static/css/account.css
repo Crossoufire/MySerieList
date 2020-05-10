@@ -309,3 +309,17 @@ hr {
     -webkit-filter: blur(5px);
 }
 /* --------------------------------- */
+
+
+.common-media-meter {
+    height: 10px;
+    background: rgba(50, 50, 50, 0.7);
+}
+
+.common-media-meter-bar {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    background-color: darkred;
+}
