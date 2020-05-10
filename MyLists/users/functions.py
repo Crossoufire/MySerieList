@@ -428,15 +428,28 @@ def get_more_stats(user):
             genres_time['Sci-Fi/Fantasy'] = genres_time.pop('Sci-Fi & Fantasy', 0)
             genres_time.pop('Unknown', 0)
 
-        # Sort from high to low time
-        genres_time = sorted(genres_time.items(), key=operator.itemgetter(1), reverse=True)
+        if all(x == 0 for x in genres_time.values()):
+            genres_time = {}
+        else:
+            genres_time = sorted(genres_time.items(), key=operator.itemgetter(1), reverse=True)
+        if all(x == 0 for x in periods_time.values()):
+            periods_time = {}
+        if all(x == 0 for x in episodes_time.values()):
+            episodes_time = {}
+        if all(x == 0 for x in movies_time.values()):
+            movies_time = {}
 
         if index == 0:
-            data.update({'Series_genres': genres_time, 'Series_periods': periods_time,
+            data.update({'Series_genres': genres_time,
+                         'Series_periods': periods_time,
                          'Series_episodes': episodes_time})
         elif index == 1:
-            data.update({'Anime_genres': genres_time, 'Anime_periods': periods_time, 'Anime_episodes': episodes_time})
+            data.update({'Anime_genres': genres_time,
+                         'Anime_periods': periods_time,
+                         'Anime_episodes': episodes_time})
         else:
-            data.update({'Movies_genres': genres_time, 'Movies_periods': periods_time, 'Movies_times': movies_time})
+            data.update({'Movies_genres': genres_time,
+                         'Movies_periods': periods_time,
+                         'Movies_times': movies_time})
 
     return data

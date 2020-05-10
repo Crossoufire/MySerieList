@@ -1,4 +1,5 @@
 
+
 // ----------------------------- Tooltip ---------------------------
 $('.tooltip').tooltip();
 $(function () {
@@ -23,7 +24,7 @@ var series_episodes_config = {
         labels: series_episodes_labels,
         datasets: [{
             data: series_episodes_data,
-            backgroundColor: series_episodes_rgb,
+            backgroundColor: '#216e7d',
         }],
     },
     options: {
@@ -107,7 +108,7 @@ var series_periods_config = {
         labels: series_periods_labels,
         datasets: [{
             data: series_periods_data,
-            backgroundColor: series_periods_rgb,
+            backgroundColor: '#216e7d',
         }],
     },
     options: {
@@ -191,7 +192,7 @@ var series_genres_config = {
         labels: series_genres_labels,
         datasets: [{
             data: series_genres_data,
-            backgroundColor: series_genres_rgb,
+            backgroundColor: '#216e7d',
         }],
     },
     options: {
@@ -277,7 +278,7 @@ var anime_episodes_config = {
         labels: anime_episodes_labels,
         datasets: [{
             data: anime_episodes_data,
-            backgroundColor: anime_episodes_rgb,
+            backgroundColor: '#945141',
         }],
     },
     options: {
@@ -361,7 +362,7 @@ var anime_periods_config = {
         labels: anime_periods_labels,
         datasets: [{
             data: anime_periods_data,
-            backgroundColor: anime_periods_rgb,
+            backgroundColor: '#945141',
         }],
     },
     options: {
@@ -445,7 +446,7 @@ var anime_genres_config = {
         labels: anime_genres_labels,
         datasets: [{
             data: anime_genres_data,
-            backgroundColor: anime_genres_rgb,
+            backgroundColor: '#945141',
         }],
     },
     options: {
@@ -531,7 +532,7 @@ var movies_lengths_config = {
         labels: movies_lengths_labels,
         datasets: [{
             data: movies_lengths_data,
-            backgroundColor: movies_lengths_rgb,
+            backgroundColor: '#8c7821',
         }],
     },
     options: {
@@ -615,7 +616,7 @@ var movies_periods_config = {
         labels: movies_periods_labels,
         datasets: [{
             data: movies_periods_data,
-            backgroundColor: movies_periods_rgb,
+            backgroundColor: '#8c7821',
         }],
     },
     options: {
@@ -699,7 +700,7 @@ var movies_genres_config = {
         labels: movies_genres_labels,
         datasets: [{
             data: movies_genres_data,
-            backgroundColor: movies_genres_rgb,
+            backgroundColor: '#8c7821',
         }],
     },
     options: {
@@ -766,3 +767,13 @@ var movies_genres_config = {
 };
 var movies_genres_ctx = document.getElementById('genres-movies').getContext('2d');
 var movies_genres_bar = new Chart(movies_genres_ctx, movies_genres_config);
+
+
+// --- Media genres container size -------------------------------------------------
+var series_height = 40*series_genres_data.length + 'px';
+var anime_height = 40*anime_genres_data.length + 'px';
+var movies_height = 40*movies_genres_data.length + 'px';
+
+$('.series-genres-container').attr('style', 'height:' +series_height+';');
+$('.anime-genres-container').attr('style', 'height:' +anime_height+';');
+$('.movies-genres-container').attr('style', 'height:' +movies_height+';');
