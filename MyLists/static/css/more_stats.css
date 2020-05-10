@@ -1,0 +1,43 @@
+
+
+.series-container {
+    position: relative;
+    height: 400px;
+    margin-top: -15px;
+}
+
+.series-genres-container {
+    position: relative;
+    height: 600px;
+    margin-top: -15px;
+}
+
+.anime-container {
+    position: relative;
+    height: 400px;
+    margin-top: -15px;
+}
+
+.anime-genres-container {
+    position: relative;
+    height: 1200px;
+    margin-top: -15px;
+}
+
+.movies-container {
+    position: relative;
+    height: 400px;
+    margin-top: -15px;
+}
+
+.movies-genres-container {
+    position: relative;
+    height: 800px;
+    margin-top: -15px;
+}
+
+.vertical_line {
+    width: 5px;
+    border-left: 2px solid rgba(44, 57, 70, 1);
+    height: 100wh;
+}

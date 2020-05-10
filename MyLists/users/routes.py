@@ -4,7 +4,7 @@ from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
-    get_knowledge_frame, get_updates, get_favorites, get_more_stats_test
+    get_knowledge_frame, get_updates, get_favorites
 
 
 bp = Blueprint('users', __name__)
@@ -170,7 +170,7 @@ def all_history(user_name):
     return render_template('all_history.html', title='Media History', media_updates=media_updates)
 
 
-@bp.route("/more_stats/<user_name>", methods=['GET', 'POST'])
+@bp.route("/more_stats/<user_name>", methods=['GET'])
 @login_required
 def more_stats(user_name):
     user = User.query.filter_by(username=user_name).first()
@@ -185,26 +185,6 @@ def more_stats(user_name):
     elif user.private and not current_user.is_following(user):
         abort(404)
 
-    user_stats = get_more_stats(user)[0]
+    stats = get_more_stats(user)
 
-    return render_template('more_stats.html', title="{}'s stats".format(user_name), stats=user_stats)
-
-
-@bp.route("/more_stats_test/<user_name>", methods=['GET'])
-@login_required
-def more_stats_test(user_name):
-    user = User.query.filter_by(username=user_name).first()
-
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
-
-    stats = get_more_stats_test(user)
-
-    return render_template('more_stats_test.html', title='More stats test', stats=stats)
+    return render_template('more_stats.html', title='More stats', stats=stats)

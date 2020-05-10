@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+
+{% block content %}
+<h4 class="text-center m-t-40"><i class="fas fa-chart-line"></i>&nbsp&nbsp MORE STATS</h4><hr>
+<div class="row m-t-20 p-l-15 p-r-15">
+    {% for data in stats %}
+        <div class="col-xl-2 col-lg-3 col-md-4 col-6 m-b-30 align-middle text-center">
+            <div class="text-center" style="font-size: 15pt;"><b>{{ data['title'] }}</b></div>
+            <img width="70" height="70" src="/static/img/media_badges/{{ data['image_id'] }}.png"/>
+            <br>
+            {% if data['unlocked'] == 0 %}
+            <a class="disabled fas fa-sm fa-lock"></a>
+            {% else %}
+            <a class="disabled fas fa-sm fa-lock-open"></a>
+            <span style="font-weight: 600;">&#x2716; {{ data['unlocked'] }}</span>
+            {% endif %}
+            <div class="col-auto p-0 m-l-5 mt-auto mb-auto">
+                {% if data['type'] == 'genre' %}
+                    {{ data['value'] }} hours of {{ data['image_id'] }}
+                {% elif data['type'] == 'classic' %}
+                    {{ data['value'] }} hours of media aired before 1990
+                {% elif data['type'] == 'completed' %}
+                    {{ data['value'] }} media
+                {% elif data['type'] == 'total-time' %}
+                    {{ data['value'] }} days of media
+                {% elif data['type'] == 'longshows' %}
+                    {{ data['value'] }} shows with 100 or more episodes
+                {% elif data['type'] == 'longmovies' %}
+                    {{data['value'] }} movies lasting > 2h30
+                {% endif %}
+            </div>
+        </div>
+
+    {% endfor %}
+</div>
+{% endblock content %}
