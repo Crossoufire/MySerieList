@@ -31,7 +31,7 @@ def send_email_update_email(user):
 
 def save_profile_picture(form_picture, old_picture):
     if imghdr.what(form_picture) == 'gif' or imghdr.what(form_picture) == 'jpeg' \
-            or imghdr.what(form_picture) == 'png' or imghdr.what(form_picture) == 'jpg':
+            or imghdr.what(form_picture) == 'png':
         file = form_picture
         random_hex = secrets.token_hex(8)
         _, f_ext = os.path.splitext(form_picture.filename)
@@ -42,7 +42,10 @@ def save_profile_picture(form_picture, old_picture):
         app.logger.error('[SYSTEM] Invalid picture format: {}'.format(imghdr.what(form_picture)))
 
     # Remove old cover
-    os.remove(os.path.join(app.root_path, 'static/profile_pics', old_picture))
-    app.logger.info('Settings updated: Removed the old picture: {}'.format(old_picture))
+    try:
+        os.remove(os.path.join(app.root_path, 'static/profile_pics', old_picture))
+        app.logger.info('Settings updated: Removed the old picture: {}'.format(old_picture))
+    except:
+        pass
 
     return picture_fn
