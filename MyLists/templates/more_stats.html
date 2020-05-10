@@ -28,7 +28,11 @@
             <div class="row m-t-40">
                 <div class="col">
                     <h4><i class="fas fa-caret-square-right"></i>&nbsp&nbspEpisodes</h4>
-                    <h6>Quantity of TV shows watched containing different episodes. from 1-19 to 500+ episodes.</h6>
+                    <h6>Number of TV shows watched according to the amount of episodes present in the show
+                        (counting only the episodes watched by th user).<br>
+                        <i><u>Example:</u> 1-19: 14 | Means you have watched 14 series which contains
+                            between 1 and 19 episodes.</i>
+                    </h6>
                     <hr class="m-0 p-0" style="border-color: #216e7d;">
                     {% if stats['Series_episodes'] != {} %}
                         <div class="series-container">
@@ -47,7 +51,10 @@
                 <div class="vertical_line"></div>
                 <div class="col">
                     <h4><i class="fas fa-calendar-times"></i>&nbsp&nbspPeriods</h4>
-                    <h6>Quantity of TV shows watched in a certain period. from 1960-1969 to 2020-2029.</h6>
+                    <h6>Number of TV shows watched according to the considered period. from 1960-1969 to 2020+.<br>
+                        <i><u>Example:</u> 2000-2009: 26 | Means that you have watched 26 series which were aired
+                            between 2000 and 2009</i>
+                    </h6>
                     <hr class="m-0 p-0" style="border-color: #216e7d;">
                 {% if stats['Series_periods'] != {} %}
                     <div class="series-container">
@@ -64,9 +71,8 @@
                     {% endif %}
                 </div>
             </div>
-
             <h4><i class="fas fa-theater-masks m-t-30"></i>&nbsp&nbspGenres</h4>
-            <h6>Time in hours of TV shows watched depending on the genre.</h6>
+            <h6>Time by genre in hours. If a series contains several genres, all genres are counted.</h6>
             <hr class="m-0 p-0" style="border-color: #216e7d;">
             {% if stats['Series_genres'] != {} %}
                 <div class="series-genres-container m-b-40">
@@ -86,7 +92,11 @@
             <div class="row m-t-40">
                 <div class="col">
                     <h4><i class="fas fa-caret-square-right"></i>&nbsp&nbspEpisodes</h4>
-                    <h6>Quantity of Anime watched containing different episodes. from 1-19 to 500+ episodes.</h6>
+                    <h6>Number of Anime watched according to the amount of episodes present in the show
+                        (counting only the episodes watched by th user).<br>
+                        <i><u>Example:</u> 1-19: 14 | Means you have watched 14 anime which contains
+                            between 1 and 19 episodes.</i>
+                    </h6>
                     <hr class="m-0 p-0" style="border-color: #945141;">
                     {% if stats['Anime_episodes'] != {} %}
                         <div class="anime-container">
@@ -105,7 +115,10 @@
                 <div class="vertical_line"></div>
                 <div class="col">
                     <h4><i class="fas fa-calendar-times"></i>&nbsp&nbspPeriods</h4>
-                    <h6>Quantity of Anime watched in a certain period. from 1960-1969 to 2020-2029.</h6>
+                    <h6>Number of Anime watched according to the considered period. from 1960-1969 to 2020+.<br>
+                        <i><u>Example:</u> 2000-2009: 26 | Means that you have watched 26 anime which were aired
+                            between 2000 and 2009</i>
+                    </h6>
                     <hr class="m-0 p-0" style="border-color: #945141;">
                     {% if stats['Anime_periods'] != {} %}
                         <div class="anime-container">
@@ -124,7 +137,7 @@
             </div>
 
             <h4><i class="fas fa-theater-masks m-t-30"></i>&nbsp&nbspGenres</h4>
-            <h6>Time in hours of anime watched depending on the genre.</h6>
+            <h6>Time by genre in hours. If an anime contains several genres, all genres are counted.</h6>
             <hr class="m-0 p-0" style="border-color: #945141;">
             {% if stats['Anime_genres'] != {} %}
                 <div class="anime-genres-container m-b-40">
@@ -144,7 +157,10 @@
             <div class="row m-t-40">
                 <div class="col">
                     <h4><i class="fas fa-caret-square-right"></i>&nbsp&nbspLengths</h4>
-                    <h6>Quantity of Movies watched depending on the runtime. from >1h to 3h+.</h6>
+                    <h6>Number of Movies watched by user sorted by duration. from >1h to 3h+.<br>
+                        <i><u>Example:</u> 1h30-1h59: 241 | Means that you have watched 241 movies that
+                            last between 1h30 and 1h59.</i>
+                    </h6>
                     <hr class="m-0 p-0" style="border-color: #8c7821;">
                     {% if stats['Movies_times'] != {} %}
                         <div class="movies-container">
@@ -163,7 +179,10 @@
                 <div class="vertical_line"></div>
                 <div class="col">
                     <h4><i class="fas fa-calendar-times"></i>&nbsp&nbspPeriods</h4>
-                    <h6>Quantity of Movies watched in a certain period. from 1960-1969 to 2020-2029.</h6>
+                    <h6>Number of Movies watched according to the considered period. from 1960-1969 to 2020+.<br>
+                        <i><u>Example:</u> 2000-2009: 26 | Means that you have watched 26 movies which were aired
+                            between 2000 and 2009</i>
+                    </h6>
                     <hr class="m-0 p-0" style="border-color: #8c7821;">
                     {% if stats['Movies_periods'] != {} %}
                         <div class="movies-container">
@@ -182,7 +201,7 @@
             </div>
 
             <h4><i class="fas fa-theater-masks m-t-30"></i>&nbsp&nbspGenres</h4>
-            <h6>Time in hours of Movies watched depending on the genre.</h6>
+            <h6>Time by genre in hours. If an movie contains several genres, all genres are counted.</h6>
             <hr class="m-0 p-0" style="border-color: #8c7821;">
             {% if stats['Movies_genres'] != {} %}
                 <div class="movies-genres-container m-b-40">

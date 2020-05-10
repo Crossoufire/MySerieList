@@ -65,7 +65,7 @@ var series_episodes_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }],
@@ -77,7 +77,7 @@ var series_episodes_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }]
@@ -149,7 +149,7 @@ var series_periods_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }],
@@ -161,7 +161,7 @@ var series_periods_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }]
@@ -233,7 +233,7 @@ var series_genres_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }],
@@ -245,7 +245,7 @@ var series_genres_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }]
@@ -319,7 +319,7 @@ var anime_episodes_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }],
@@ -331,7 +331,7 @@ var anime_episodes_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }]
@@ -403,7 +403,7 @@ var anime_periods_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }],
@@ -415,7 +415,7 @@ var anime_periods_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }]
@@ -487,7 +487,7 @@ var anime_genres_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }],
@@ -499,7 +499,7 @@ var anime_genres_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }]
@@ -573,7 +573,7 @@ var movies_lengths_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }],
@@ -585,7 +585,7 @@ var movies_lengths_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }]
@@ -657,7 +657,7 @@ var movies_periods_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }],
@@ -669,7 +669,7 @@ var movies_periods_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }]
@@ -741,7 +741,7 @@ var movies_genres_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }],
@@ -753,7 +753,7 @@ var movies_genres_config = {
                     fontSize: 18,
                 },
                 gridLines: {
-                    display: true,
+                    display: false,
                     color: 'rgba(127, 127, 127, 0.4)',
                 },
             }]
