@@ -13,8 +13,6 @@
         <div class="header-knowledge-level text-center">{{ user_data['knowledge_info']['level'] }}</div>
         <div class="header-profile-data">
             <h2><b>{{ user_data['username'] }}</b>
-                <!--<img height='50' width='50' data-toggle="tooltip" title="{{ user_data['knowledge_info']['grade_title'] }}"-->
-                <!--src="{{ user_data['knowledge_info']['grade_id'] }}.png"/>-->
                 {% if user_data['id'] != current_user.get_id() %}
                     {% if user_data["isfollowing"] %}
                         <button class="btn btn-sm btn-dark follow-btn" onclick="follow_status('{{ user_data['id'] }}')">
@@ -37,18 +35,6 @@
         <div class="row m-t-15">
             <div class="col-xl-3 col-lg col-md-12">
                 <ul class="p-l-0">
-                    <li class="m-b-20">
-                        <h4><i class="fas fa-trophy"></i>&nbsp&nbspBadges</h4>
-                        <hr>
-                        <div class="stats-size m-b-20">
-                            <div class="text-left m-b-10">
-                                Badges page:
-                                <a class="btn btn-sm btn-dark" style='border: solid grey 1px;'
-                                   href="{{ url_for('users.badges', user_name=user_data['username']) }}">Badges
-                                </a>
-                            </div>
-                        </div>
-                    </li>
                     <li class="m-b-20">
                         <h4><i class="fas fa-angle-double-up"></i>&nbsp&nbsp Lists Levels</h4>
                         <hr>
@@ -136,7 +122,7 @@
                             &nbsp&nbspMy Updates
                             {% endif %}
                             <a class='fs-15 m-t-10 m-r-2' href="{{ url_for('users.all_history',
-                            user_name=user_data['username']) }}" target="_blank" style='float: right; color: grey;'>
+                            user_name=user_data['username']) }}" style='float: right; color: grey;'>
                                 <u><i>All history</i></u>
                             </a>
                         </h4>
@@ -260,7 +246,13 @@
             <div class="vertical_line"></div>
             <div class="col-xl col-lg-5 col-md-12">
                 <ul class="p-l-0">
-                    <h4><i class="fas fa-chart-pie"></i>&nbsp&nbspStatistics</h4>
+                    <h4>
+                        <i class="fas fa-chart-pie"></i>&nbsp&nbspStatistics
+                        <a class='fs-15 m-t-10 m-r-2' href="{{ url_for('users.more_stats',
+                        user_name=user_data['username']) }}" style='float: right; color: grey;'>
+                            <u><i>More stats</i></u>
+                        </a>
+                    </h4>
                     <hr>
                     <li class="m-b-20">
                         <div class="row">
@@ -520,7 +512,7 @@
                         </div>
                         <hr>
                         <!------------------------ Movies statistics --------------------------->
-                        <div class="stats-size m-b-25">
+                        <div class="stats-size m-b-50">
                             <h5 class="text-center mb-2">
                                 <a class="text-light" href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=user_data['username']) }}">
                                     <b>Movies </b><i class="fas fa-xs fa-external-link-square-alt"></i>
@@ -603,10 +595,14 @@
                     <li class="m-b-20">
                         <h4>
                             <i class="fas fa-user-check"></i>&nbsp&nbsp Follows
+                            <a class='fs-15 m-t-10 m-r-2' href="{{ url_for('users.all_follows',
+                            user_name=user_data['username']) }}" style='float: right; color: grey;'>
+                                <u><i>All ({{ follows_list|length }})</i></u>
+                            </a>
                         </h4>
                         <hr>
                         {% if user_data['id'] == current_user.get_id() %}
-                        <form method="POST" action="" enctype="multipart/form-data">
+                            <form method="POST" action="" enctype="multipart/form-data">
                             {{ follow_form.hidden_tag() }}
                             <div class="d-flex m-l-10 m-b-10" style="margin-top: -10px;">
                                 {{ follow_form.follow_to_add(style="max-width: 120px;", class='form-control', placeholder='Username') }}
@@ -616,16 +612,39 @@
                         {% endif %}
                         <div class='row no-gutters text-center' style="margin-bottom: -15px;">
                             {% if follows_list %}
-                            {% for follow in follows_list %}
-                            <div class="col-3 m-b-15">
-                                <a href="{{ follow.username }}">
-                                    <img width='70' height='70' data-toggle="tooltip" title="{{ follow.username }}"
-                                         src="{{ url_for('static', filename='profile_pics/{}'.format(follow.image_file)) }}">
-                                </a>
-                            </div>
-                            {% endfor %}
+                                {% if follows_list|length <= 10 %}
+                                    {% for follow in follows_list %}
+                                        <div class="col-3 m-b-15">
+                                            <a href="{{ follow.username }}">
+                                            <img width='60' height='60' data-toggle="tooltip"
+                                                 title="{{ follow.username }}"
+                                                 src="/static/profile_pics/{{ follow.image_file }}">
+                                            </a>
+                                        </div>
+                                    {% endfor %}
+                                {% elif 10 < follows_list|length <= 15 %}
+                                    {% for follow in follows_list %}
+                                        <div class="col-3 m-b-15">
+                                            <a href="{{ follow.username }}">
+                                            <img width='50' height='50' data-toggle="tooltip"
+                                                 title="{{ follow.username }}"
+                                                 src="/static/profile_pics/{{ follow.image_file }}">
+                                            </a>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    {% for follow in follows_list[:15] %}
+                                        <div class="col-3 m-b-15">
+                                            <a href="{{ follow.username }}">
+                                            <img width='50' height='50' data-toggle="tooltip"
+                                                 title="{{ follow.username }}"
+                                                 src="/static/profile_pics/{{ follow.image_file }}">
+                                            </a>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
                             {% else %}
-                            <div class="m-b-10" style="color: grey;"><i>No follows to display.</i></div>
+                                <div class="m-b-10" style="color: grey;"><i>No follows to display.</i></div>
                             {% endif %}
                         </div>
                     </li>
@@ -702,8 +721,114 @@
                 </ul>
             </div>
         </div>
+{#        <div class="m-t-25 m-b-60">#}
+{#            <h4><i class="fas fa-trophy"></i>&nbsp&nbspAchievements</h4>#}
+{#            <hr>#}
+{#            <div class="row">#}
+{#                <div class="col">#}
+{#                    <h5 class="text-center m-b-20">Series</h5>#}
+{#                    <div class="m-b-20" style="background-color: #216e7d;">#}
+{#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
+{#                            <div class="col-3">#}
+{#                                <img height='100' width='95' style="border-radius: 50%;"#}
+{#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ1kPZoy5MDOZbuDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>#}
+{#                            </div>#}
+{#                            <div class="col-9 m-t-8">#}
+{#                                <div class="relative-medal">#}
+{#                                    <img height='30' width='30' src="https://image.flaticon.com/icons/svg/179/179249.svg" alt=""/>#}
+{#                                </div>#}
+{#                                <h5><b>You're goddamn right</b></h5>#}
+{#                                You've watched 6 series with the actor Bryan Cranston#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="m-b-20" style="background-color: #333333;">#}
+{#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
+{#                            <div class="col-3">#}
+{#                                <img height='100' width='95' style="border-radius: 50%;"#}
+{#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon-linear-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>#}
+{#                            </div>#}
+{#                            <div class="col-9 m-t-8">#}
+{#                                <h5><b>Short is good too</b></h5>#}
+{#                                You've watched 4/8 series with less than 4 episodes.#}
+{#                            </div>#}
+{#                        </div>#}
+{#                        <div class="common-media-meter m-t-4">#}
+{#                            <span class="common-media-meter-bar" style="width: 50%;"></span>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <div class="vertical_line"></div>#}
+{#                <div class="col">#}
+{#                    <h5 class="text-center m-b-20">Anime</h5>#}
+{#                    <div class="m-b-20" style="background-color: #216e7d;">#}
+{#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
+{#                            <div class="col-3">#}
+{#                                <img height='100' width='95' style="border-radius: 50%;"#}
+{#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ1kPZoy5MDOZbuDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>#}
+{#                            </div>#}
+{#                            <div class="col-9 m-t-8">#}
+{#                                <div class="relative-medal">#}
+{#                                    <img height='30' width='30' src="https://image.flaticon.com/icons/svg/179/179249.svg" alt=""/>#}
+{#                                </div>#}
+{#                                <h5><b>You're goddamn right</b></h5>#}
+{#                                You've watched 6 series with the actor Bryan Cranston#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="m-b-20" style="background-color: #333333;">#}
+{#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
+{#                            <div class="col-3">#}
+{#                                <img height='100' width='95' style="border-radius: 50%;"#}
+{#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon-linear-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>#}
+{#                            </div>#}
+{#                            <div class="col-9 m-t-8">#}
+{#                                <h5><b>Short is good too</b></h5>#}
+{#                                You've watched 4/8 series with less than 4 episodes.#}
+{#                            </div>#}
+{#                        </div>#}
+{#                        <div class="common-media-meter m-t-4">#}
+{#                            <span class="common-media-meter-bar" style="width: 50%;"></span>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <div class="vertical_line"></div>#}
+{#                <div class="col">#}
+{#                    <h5 class="text-center m-b-20">Movies</h5>#}
+{#                    <div class="m-b-20" style="background-color: #216e7d;">#}
+{#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
+{#                            <div class="col-3">#}
+{#                                <img height='100' width='95' style="border-radius: 50%;"#}
+{#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ1kPZoy5MDOZbuDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>#}
+{#                            </div>#}
+{#                            <div class="col-9 m-t-8">#}
+{#                                <div class="relative-medal">#}
+{#                                    <img height='30' width='30' src="https://image.flaticon.com/icons/svg/179/179249.svg" alt=""/>#}
+{#                                </div>#}
+{#                                <h5><b>You're goddamn right</b></h5>#}
+{#                                You've watched 6 series with the actor Bryan Cranston#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="m-b-20" style="background-color: #333333;">#}
+{#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
+{#                            <div class="col-3">#}
+{#                                <img height='100' width='95' style="border-radius: 50%;"#}
+{#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon-linear-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>#}
+{#                            </div>#}
+{#                            <div class="col-9 m-t-8">#}
+{#                                <h5><b>Short is good too</b></h5>#}
+{#                                You've watched 4/8 series with less than 4 episodes.#}
+{#                            </div>#}
+{#                        </div>#}
+{#                        <div class="common-media-meter m-t-4">#}
+{#                            <span class="common-media-meter-bar" style="width: 50%;"></span>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
     </div>
-    <div class="modal_loading"></div>
 {% endblock content %}
 
 

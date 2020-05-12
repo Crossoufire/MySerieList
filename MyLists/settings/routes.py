@@ -1,3 +1,5 @@
+import imghdr
+
 from MyLists import db, app, bcrypt
 from MyLists.models import HomePage, User
 from flask_login import login_required, current_user
@@ -19,7 +21,7 @@ def settings():
     if settings_form.submit_account.data and settings_form.validate():
         if settings_form.picture.data:
             old_picture_file = current_user.image_file
-            current_user.image_file = save_profile_picture(settings_form.picture.data)
+            current_user.image_file = save_profile_picture(settings_form.picture.data, old_picture_file)
             app.logger.info('[{}] Settings updated: Old picture file = {}. New picture file = {}'
                             .format(current_user.id, old_picture_file, current_user.image_file))
         if settings_form.username.data != current_user.username:

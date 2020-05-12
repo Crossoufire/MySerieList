@@ -309,3 +309,9 @@ hr {
     -webkit-filter: blur(5px);
 }
 /* --------------------------------- */
+
+.relative-medal {
+    position: absolute;
+    top: -8px;
+    right: 5px;
+}

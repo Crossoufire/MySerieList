@@ -1,0 +1,253 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+    <link href="{{ url_for('static', filename='css/account.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/more_stats.css') }}" rel="stylesheet">
+{% endblock css %}
+
+
+{% block content %}
+    <div class="header-container">
+        <img class="header-profile-img" src="{{ user_data['profile_picture'] }}"/>
+        <img class="header-profile-img-2" src="{{ user_data['knowledge_info']['frame_id'] }}.png"/>
+        <div class="header-knowledge-level text-center">{{ user_data['knowledge_info']['level'] }}</div>
+        <div class="header-profile-data">
+            <h2><b>{{ user_data['username'] }}</b>
+                {% if user_data['id'] != current_user.get_id() %}
+                    {% if user_data["isfollowing"] %}
+                        <button class="btn btn-sm btn-dark follow-btn" onclick="follow_status('{{ user_data['id'] }}')">
+                            Unfollow
+                        </button>
+                    {% else %}
+                        <button class="btn btn-sm btn-primary follow-btn" onclick="follow_status('{{ user_data['id'] }}')">
+                            Follow
+                        </button>
+                    {% endif %}
+                {% endif %}
+            </h2>
+            <p class="p-0 m-0">
+                <b>Joined: {{ user_data['register'] }}</b><br>
+                <b>Followers: {{ user_data['followers'] }}</b>
+            </p>
+        </div>
+    </div>
+    <h4><i class="fas fa-chart-pie m-t-15"></i>&nbsp&nbspMore Statistics</h4><hr>
+    <a class="text-light" href="/account/{{ user_data['username'] }}">
+        <i class="fas fa-caret-left"></i>&nbsp&nbsp <b>Return to account</b>
+    </a>
+    <ul id="media-tab" class="nav nav-tabs md-tabs m-t-25">
+        <li class="nav-item">
+            <div class="nav-link active" id="series-tab" data-toggle="tab"
+                 href="#series"><b>Series</b></div>
+        </li>
+        <li class="nav-item">
+            <div class="nav-link" id="anime-tab" data-toggle="tab"
+                 href="#anime"><b>Anime</b></div>
+        </li>
+        <li class="nav-item">
+            <div class="nav-link" id="movies-tab" data-toggle="tab"
+                 href="#movies"><b>Movies</b></div>
+        </li>
+    </ul>
+    <div class="tab-content" id="media-search">
+        <div id="series" class="tab-pane fade show active">
+            <div class="row m-t-30">
+                <div class="col">
+                    <h4><i class="fas fa-caret-square-right"></i>&nbsp&nbspEpisodes</h4>
+                    <h6>Number of TV shows watched according to the amount of episodes present in the show
+                        (counting only the episodes watched by th user).<br>
+                        <i><u>Example:</u> 1-19: 14 | Means you have watched 14 series which contains
+                            between 1 and 19 episodes.</i>
+                    </h6>
+                    <hr class="m-0 p-0" style="border-color: #216e7d;">
+                    {% if stats['Series_episodes'] != {} %}
+                        <div class="series-container">
+                            <canvas id="episodes-series"></canvas>
+                            <span id="episodes-series-bar"
+                                  values-y="{% for key in stats['Series_episodes'].keys() %} {{ key }}, {% endfor %}"
+                                  values-x="{% for value in stats['Series_episodes'].values() %}{{ value }}, {% endfor %}">
+                            </span>
+                        </div>
+                    {% else %}
+                        <div class="m-t-20">
+                            <i>No data avalaible.</i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="vertical_line"></div>
+                <div class="col">
+                    <h4><i class="fas fa-calendar-times"></i>&nbsp&nbspPeriods</h4>
+                    <h6>Number of TV shows watched according to the considered period. from 1960-1969 to 2020+.<br>
+                        <i><u>Example:</u> 2000-2009: 26 | Means that you have watched 26 series which were aired
+                            between 2000 and 2009</i>
+                    </h6>
+                    <hr class="m-0 p-0" style="border-color: #216e7d;">
+                {% if stats['Series_periods'] != {} %}
+                    <div class="series-container">
+                        <canvas id="periods-series"></canvas>
+                        <span id="periods-series-bar"
+                              values-y="{% for key in stats['Series_periods'].keys() %} {{ key }}, {% endfor %}"
+                              values-x="{% for value in stats['Series_periods'].values() %}{{ value }}, {% endfor %}">
+                        </span>
+                    </div>
+                    {% else %}
+                        <div class="m-t-20">
+                            <i>No data avalaible.</i>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <h4><i class="fas fa-theater-masks m-t-30"></i>&nbsp&nbspGenres</h4>
+            <h6>Time by genre in hours. If a series contains several genres, all genres are counted.</h6>
+            <hr class="m-0 p-0" style="border-color: #216e7d;">
+            {% if stats['Series_genres'] != {} %}
+                <div class="series-genres-container m-b-40">
+                    <canvas id="genres-series"></canvas>
+                    <span id="genres-series-bar"
+                          values-y="{% for key in stats['Series_genres'] %} {{ key[0] }}, {% endfor %}"
+                          values-x="{% for val in stats['Series_genres'] %}{{ (val[1]/60)|round(1) }}, {% endfor %}">
+                    </span>
+                </div>
+            {% else %}
+                <div class="m-t-20">
+                    <i>No data avalaible.</i>
+                </div>
+            {% endif %}
+        </div>
+        <div id="anime" class="tab-pane fade">
+            <div class="row m-t-30">
+                <div class="col">
+                    <h4><i class="fas fa-caret-square-right"></i>&nbsp&nbspEpisodes</h4>
+                    <h6>Number of Anime watched according to the amount of episodes present in the show
+                        (counting only the episodes watched by th user).<br>
+                        <i><u>Example:</u> 1-19: 14 | Means you have watched 14 anime which contains
+                            between 1 and 19 episodes.</i>
+                    </h6>
+                    <hr class="m-0 p-0" style="border-color: #945141;">
+                    {% if stats['Anime_episodes'] != {} %}
+                        <div class="anime-container">
+                            <canvas id="episodes-anime"></canvas>
+                            <span id="episodes-anime-bar"
+                                  values-y="{% for key in stats['Anime_episodes'].keys() %} {{ key }}, {% endfor %}"
+                                  values-x="{% for value in stats['Anime_episodes'].values() %}{{ value }}, {% endfor %}">
+                            </span>
+                        </div>
+                    {% else %}
+                        <div class="m-t-20">
+                            <i>No data avalaible.</i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="vertical_line"></div>
+                <div class="col">
+                    <h4><i class="fas fa-calendar-times"></i>&nbsp&nbspPeriods</h4>
+                    <h6>Number of Anime watched according to the considered period. from 1960-1969 to 2020+.<br>
+                        <i><u>Example:</u> 2000-2009: 26 | Means that you have watched 26 anime which were aired
+                            between 2000 and 2009</i>
+                    </h6>
+                    <hr class="m-0 p-0" style="border-color: #945141;">
+                    {% if stats['Anime_periods'] != {} %}
+                        <div class="anime-container">
+                            <canvas id="periods-anime"></canvas>
+                            <span id="periods-anime-bar"
+                                  values-y="{% for key in stats['Anime_periods'].keys() %} {{ key }}, {% endfor %}"
+                                  values-x="{% for value in stats['Anime_periods'].values() %}{{ value }}, {% endfor %}">
+                            </span>
+                        </div>
+                    {% else %}
+                        <div class="m-t-20">
+                            <i>No data avalaible.</i>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h4><i class="fas fa-theater-masks m-t-30"></i>&nbsp&nbspGenres</h4>
+            <h6>Time by genre in hours. If an anime contains several genres, all genres are counted.</h6>
+            <hr class="m-0 p-0" style="border-color: #945141;">
+            {% if stats['Anime_genres'] != {} %}
+                <div class="anime-genres-container m-b-40">
+                    <canvas id="genres-anime"></canvas>
+                    <span id="genres-anime-bar"
+                          values-y="{% for key in stats['Anime_genres'] %} {{ key[0] }}, {% endfor %}"
+                          values-x="{% for val in stats['Anime_genres'] %}{{ (val[1]/60)|round(1) }}, {% endfor %}">
+                    </span>
+                </div>
+            {% else %}
+                <div class="m-t-20">
+                    <i>No data avalaible.</i>
+                </div>
+            {% endif %}
+        </div>
+        <div id="movies" class="tab-pane fade">
+            <div class="row m-t-30">
+                <div class="col">
+                    <h4><i class="fas fa-caret-square-right"></i>&nbsp&nbspLengths</h4>
+                    <h6>Number of Movies watched by user sorted by duration. from >1h to 3h+.<br>
+                        <i><u>Example:</u> 1h30-1h59: 241 | Means that you have watched 241 movies that
+                            last between 1h30 and 1h59.</i>
+                    </h6>
+                    <hr class="m-0 p-0" style="border-color: #8c7821;">
+                    {% if stats['Movies_times'] != {} %}
+                        <div class="movies-container">
+                            <canvas id="lengths-movies"></canvas>
+                            <span id="lengths-movies-bar"
+                                  values-y="{% for key in stats['Movies_times'].keys() %} {{ key }}, {% endfor %}"
+                                  values-x="{% for value in stats['Movies_times'].values() %}{{ value }}, {% endfor %}">
+                            </span>
+                        </div>
+                    {% else %}
+                        <div class="m-t-20">
+                            <i>No data avalaible.</i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="vertical_line"></div>
+                <div class="col">
+                    <h4><i class="fas fa-calendar-times"></i>&nbsp&nbspPeriods</h4>
+                    <h6>Number of Movies watched according to the considered period. from 1960-1969 to 2020+.<br>
+                        <i><u>Example:</u> 2000-2009: 26 | Means that you have watched 26 movies which were aired
+                            between 2000 and 2009</i>
+                    </h6>
+                    <hr class="m-0 p-0" style="border-color: #8c7821;">
+                    {% if stats['Movies_periods'] != {} %}
+                        <div class="movies-container">
+                            <canvas id="periods-movies"></canvas>
+                            <span id="periods-movies-bar"
+                                  values-y="{% for key in stats['Movies_periods'].keys() %} {{ key }}, {% endfor %}"
+                                  values-x="{% for value in stats['Movies_periods'].values() %}{{ value }}, {% endfor %}">
+                            </span>
+                        </div>
+                    {% else %}
+                        <div class="m-t-20">
+                            <i>No data avalaible.</i>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h4><i class="fas fa-theater-masks m-t-30"></i>&nbsp&nbspGenres</h4>
+            <h6>Time by genre in hours. If an movie contains several genres, all genres are counted.</h6>
+            <hr class="m-0 p-0" style="border-color: #8c7821;">
+            {% if stats['Movies_genres'] != {} %}
+                <div class="movies-genres-container m-b-40">
+                    <canvas id="genres-movies"></canvas>
+                    <span id="genres-movies-bar"
+                          values-y="{% for key in stats['Movies_genres'] %} {{ key[0] }}, {% endfor %}"
+                          values-x="{% for val in stats['Movies_genres'] %}{{ (val[1]/60)|round(1) }}, {% endfor %}">
+                    </span>
+                </div>
+            {% else %}
+                <div class="m-t-20">
+                    <i>No data avalaible.</i>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}
+
+
+{% block script %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/more_stats.js') }}"></script>
+{% endblock script %}

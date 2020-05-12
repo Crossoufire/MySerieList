@@ -32,7 +32,7 @@
                         {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
                             <img class="profil-pic" src="/static/profile_pics/anonymous.jpg" alt=""/>
                             <div style="position: relative;">
-                                <img class="frame-pic" src="static/img/icon_frames/border_9.png" alt="">
+                                <img class="frame-pic" src="{{ user['knowledge_frame']['frame_id'] }}.png" alt="">
                             </div>
                             <div class="fs-12 frame-level">{{ user['knowledge_frame']['level'] }}</div>
                         {% else %}
@@ -77,10 +77,6 @@
                     <td>
                         {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
                         {% else %}
-                            <a class="btn btn-sm btn-badges"
-                               href="{{ url_for('users.badges', user_name=user['username']) }}">Badges
-                            </a>
-                            <br>
                             {% if user["isfollowing"] and not user['iscurrentuser'] %}
                                 <button class="btn btn-sm btn-dark btn-smaller"
                                         onclick="follow_status('{{ user['id'] }}', this)">Unfollow

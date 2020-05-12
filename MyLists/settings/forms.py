@@ -11,7 +11,7 @@ class UpdateAccountForm(FlaskForm):
     biography = TextAreaField('Biography', validators=[Length(max=200)])
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
     isprivate = BooleanField('Private mode')
     homepage = SelectField('Default homepage', choices=[('serieslist', 'MySeriesList'), ('animelist', 'MyAnimeList'),
                                                         ('movieslist', 'MyMoviesList'), ('account', 'Account'),

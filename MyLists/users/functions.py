@@ -1,5 +1,7 @@
 import pytz
 import random
+import operator
+from _collections import OrderedDict
 
 from MyLists import db
 from flask import url_for
@@ -188,7 +190,7 @@ def get_updates(last_update):
     return update
 
 
-# -----------------------------------------------
+# --------------------------------------------------------------------------
 
 
 def get_user_data(user):
@@ -213,7 +215,7 @@ def get_user_data(user):
     # Recover the number of person that follows you
     followers = user.followers.count()
 
-    # Recover the knowledge grade and level of the user
+    # Recover the knowledge frame and level of the user
     knowledge_info = get_knowledge_frame(user)
 
     # Recover the overview user's last update
@@ -234,8 +236,7 @@ def get_user_data(user):
 
 
 def get_media_data(user):
-    all_lists = [["series", ListType.SERIES, user.time_spent_series],
-                 ["anime", ListType.ANIME, user.time_spent_anime],
+    all_lists = [["series", ListType.SERIES, user.time_spent_series], ["anime", ListType.ANIME, user.time_spent_anime],
                  ["movies", ListType.MOVIES, user.time_spent_movies]]
 
     # Create dict with media as key; values are dict or list of dict with the data
@@ -304,60 +305,16 @@ def get_follows_data(user):
     return follows_list, follows_update_list
 
 
-def get_badges(user):
-    def get_queries():
-        series_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
-                                       func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                                       func.group_concat(SeriesEpisodesPerSeason.episodes))\
-            .join(SeriesList, SeriesList.series_id == Series.id)\
-            .join(SeriesGenre, SeriesGenre.series_id == Series.id)\
-            .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id)\
-            .filter(SeriesList.user_id == user.id)\
-            .filter(or_(SeriesGenre.genre == "Animation", SeriesGenre.genre == "Comedy", SeriesGenre.genre == "Crime",
-                        SeriesGenre.genre == "Documentary", SeriesGenre.genre == "Mystery",
-                        SeriesGenre.genre == "Historical", SeriesGenre.genre == "War & Politics",
-                        SeriesGenre.genre == "Sci-Fi & Fantasy"))\
-            .group_by(Series.id).all()
-
-        anime_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
-                                      func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
-                                      func.group_concat(AnimeEpisodesPerSeason.episodes))\
-            .join(AnimeList, AnimeList.anime_id == Anime.id)\
-            .join(AnimeGenre, AnimeGenre.anime_id == Anime.id)\
-            .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id)\
-            .filter(AnimeList.user_id == user.id) \
-            .filter(or_(AnimeGenre.genre == "Comedy", AnimeGenre.genre == "Police", AnimeGenre.genre == "Supernatural",
-                        AnimeGenre.genre == "Music", AnimeGenre.genre == "Mystery", AnimeGenre.genre == "Historical",
-                        AnimeGenre.genre == "Romance", AnimeGenre.genre == "Sci-Fi", AnimeGenre.genre == "Fantasy",
-                        AnimeGenre.genre == "Horror", AnimeGenre.genre == "Thriller", AnimeGenre.genre == "Sports",
-                        AnimeGenre.genre == "Slice of Life", AnimeGenre.genre == "School")) \
-            .group_by(Anime.id).all()
-
-        movies_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre.distinct()))\
-            .join(MoviesList, MoviesList.movies_id == Movies.id)\
-            .join(MoviesGenre, MoviesGenre.movies_id == Movies.id)\
-            .filter(MoviesList.user_id == user.id) \
-            .filter(or_(MoviesGenre.genre == "Comedy", MoviesGenre.genre == "Crime", MoviesGenre.genre == "Music",
-                        MoviesGenre.genre == "Mystery", MoviesGenre.genre == "History",
-                        MoviesGenre.genre == "Documentary", MoviesGenre.genre == "Romance",
-                        MoviesGenre.genre == "Horror", MoviesGenre.genre == "War", MoviesGenre.genre == "Fantasy",
-                        MoviesGenre.genre == "Thriller", MoviesGenre.genre == "Animation",
-                        MoviesGenre.genre == "Science Fiction"))\
-            .group_by(Movies.id).all()
-
-        sum_data = series_data + anime_data + movies_data
-
-        return sum_data
+def get_more_stats(user):
 
     def get_episodes_and_time(element):
         if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
             try:
                 return [1, element[0].runtime]
             except:
-                return [element[0].total_episodes, int(element[0].episode_duration) * element[0].total_episodes]
+                return [element[0].total_episodes, int(element[0].episode_duration)*element[0].total_episodes]
         elif element[1].status != Status.PLAN_TO_WATCH and element[1].status != Status.RANDOM:
-            nb_season = len(element[3].split(","))
-            nb_episodes = element[4].split(",")[:nb_season]
+            nb_episodes = [m.episodes for m in element[0].eps_per_season]
 
             ep_duration = int(element[0].episode_duration)
             ep_counter = 0
@@ -369,170 +326,148 @@ def get_badges(user):
         else:
             return [0, 0]
 
-    def create_badge_dict(badge, unlocked, time=None, count=None):
-        if time is not None:
-            value = int(time/60)
-        else:
-            value = count
+    series_data = db.session.query(Series, SeriesList) \
+        .join(SeriesList, SeriesList.series_id == Series.id) \
+        .filter(SeriesList.user_id == user.id) \
+        .group_by(Series.id).all()
 
-        badge_data = {"type": badge.type,
-                      "image_id": badge.image_id,
-                      "title": badge.title,
-                      "unlocked": unlocked,
-                      "value": value}
+    anime_data = db.session.query(Anime, AnimeList) \
+        .join(AnimeList, AnimeList.anime_id == Anime.id) \
+        .filter(AnimeList.user_id == user.id) \
+        .group_by(Anime.id).all()
 
-        return badge_data
+    movies_data = db.session.query(Movies, MoviesList) \
+        .join(MoviesList, MoviesList.movies_id == Movies.id) \
+        .filter(MoviesList.user_id == user.id) \
+        .group_by(Movies.id).all()
 
-    total_data = get_queries()
-    time_spent = user.time_spent_series + user.time_spent_anime + user.time_spent_movies
+    media_data = [series_data, anime_data, movies_data]
 
-    all_badges = []
-    time_by_genre = {}
-    time_classic = 0
-    count_completed = 0
-    long_media_shows = 0
-    long_media_movies = 0
-    for element in total_data:
-        eps_and_time = get_episodes_and_time(element)
-        episodes_watched = eps_and_time[0]
-        time_watched = eps_and_time[1]
+    data = {}
+    for index, media in enumerate(media_data):
+        genres_time = {}
+        periods_time = OrderedDict({'1960-1969': 0, '1970-1979': 0, '1980-1989': 0, '1990-1999': 0, '2000-2009': 0,
+                                    '2010-2019': 0, '2020+': 0})
+        episodes_time = OrderedDict({'1-19': 0, '20-49': 0, '50-99': 0, '100-149': 0, '150-199': 0, '200-299': 0,
+                                     '300-399': 0, '400-499': 0, '500+': 0})
+        movies_time = OrderedDict({'>1h': 0, '1h-1h29': 0, '1h30-1h59': 0, '2h00-2h29': 0, '2h30-2h59': 0, '3h+': 0})
+        for element in media:
+            # Number of episodes and the time watched by element
+            episodes_watched, time_watched = get_episodes_and_time(element)
 
-        # Genres badges
-        genres = element[2].split(',')
-        for genre in genres:
-            if genre not in time_by_genre:
-                if genre == "Supernatural":
-                    if "Mystery" not in time_by_genre:
-                        time_by_genre["Mystery"] = time_watched
-                    else:
-                        time_by_genre["Mystery"] += time_watched
-                elif genre == "Police":
-                    if "Crime" not in time_by_genre:
-                        time_by_genre["Crime"] = time_watched
-                    else:
-                        time_by_genre["Crime"] += time_watched
-                elif genre == "War" or genre == "War & Politics" or genre == "History":
-                    if "Historical" not in time_by_genre:
-                        time_by_genre["Historical"] = time_watched
-                    else:
-                        time_by_genre["Historical"] += time_watched
-                elif genre == "Sci-Fi & Fantasy":
-                    if "Fantasy" not in time_by_genre:
-                        time_by_genre["Fantasy"] = time_watched
-                    else:
-                        time_by_genre["Fantasy"] += time_watched
-                    if "Science Fiction" not in time_by_genre:
-                        time_by_genre["Science Fiction"] = time_watched
-                    else:
-                        time_by_genre["Science Fiction"] += time_watched
-                elif genre == "Sci-Fi":
-                    if "Science Fiction" not in time_by_genre:
-                        time_by_genre["Science Fiction"] = time_watched
-                    else:
-                        time_by_genre["Science Fiction"] += time_watched
-                elif genre == "School":
-                    if "Slice of Life" not in time_by_genre:
-                        time_by_genre["Slice of Life"] = time_watched
-                    else:
-                        time_by_genre["Slice of Life"] += time_watched
+            # Genres stats
+            for genre in [m.genre for m in element[0].genres]:
+                if genre not in genres_time:
+                    genres_time[genre] = time_watched
                 else:
-                    time_by_genre[genre] = time_watched
+                    genres_time[genre] += time_watched
+
+            # Period stats
+            try:
+                airing_year = int(element[0].first_air_date.split('-')[0])
+            except:
+                try:
+                    airing_year = int(element[0].release_date.split('-')[0])
+                except:
+                    airing_year = 0
+
+            if 1960 <= airing_year < 1970:
+                periods_time['1960-1969'] += 1
+            elif 1970 <= airing_year < 1980:
+                periods_time['1970-1979'] += 1
+            elif 1980 <= airing_year < 1990:
+                periods_time['1980-1989'] += 1
+            elif 1990 <= airing_year < 2000:
+                periods_time['1990-1999'] += 1
+            elif 2000 <= airing_year < 2010:
+                periods_time['2000-2009'] += 1
+            elif 2010 <= airing_year < 2020:
+                periods_time['2010-2019'] += 1
+            elif airing_year >= 2020:
+                periods_time['2020+'] += 1
+
+            # Episodes / time stats
+            if index != 2:
+                if 1 <= episodes_watched < 19:
+                    episodes_time['1-19'] += 1
+                elif 20 <= episodes_watched < 49:
+                    episodes_time['20-49'] += 1
+                elif 50 <= episodes_watched < 99:
+                    episodes_time['50-99'] += 1
+                elif 100 <= episodes_watched < 149:
+                    episodes_time['100-149'] += 1
+                elif 150 <= episodes_watched < 199:
+                    episodes_time['150-199'] += 1
+                elif 200 <= episodes_watched < 299:
+                    episodes_time['200-299'] += 1
+                elif 300 <= episodes_watched < 399:
+                    episodes_time['300-399'] += 1
+                elif 400 <= episodes_watched < 499:
+                    episodes_time['400-499'] += 1
+                elif episodes_watched >= 500:
+                    episodes_time['500+'] += 1
             else:
-                time_by_genre[genre] += time_watched
+                if time_watched < 60:
+                    movies_time['>1h'] += 1
+                elif 60 <= time_watched < 90:
+                    movies_time['1h-1h29'] += 1
+                elif 90 <= time_watched < 120:
+                    movies_time['1h30-1h59'] += 1
+                elif 120 <= time_watched < 150:
+                    movies_time['2h00-2h29'] += 1
+                elif 150 <= time_watched < 180:
+                    movies_time['2h30-2h59'] += 1
+                elif time_watched >= 180:
+                    movies_time['3h+'] += 1
 
-        # Classic media bagdes, before 1990 without movies
-        try:
-            first_year = int(element[0].first_air_date.split('-')[0])
-            if first_year <= 1990 and element[1].status != Status.PLAN_TO_WATCH \
-                    and element[1].status != Status.RANDOM:
-                time_classic += time_watched
-        except:
-            pass
-        # Classic media bagdes, before 1990 movies
-        try:
-            release_date = int(element[0].release_date.split('-')[0])
-            if release_date <= 1990 and element[1].status != Status.PLAN_TO_WATCH:
-                time_classic += time_watched
-        except:
-            pass
+        # Rename
+        if index == 0:
+            genres_time['Action/Adventure'] = genres_time.pop('Action & Adventure', 0)
+            genres_time['War/Politics'] = genres_time.pop('War & Politics', 0)
+            genres_time['Sci-Fi/Fantasy'] = genres_time.pop('Sci-Fi & Fantasy', 0)
+            genres_time.pop('Unknown', 0)
 
-        # Completed media badges without movies
-        try:
-            status = element[0].status
-            if (status == "Ended" or status == "Canceled" or status == "Released") \
-                    and (element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION):
-                count_completed += 1
-        except:
-            pass
-        # Completed media badges movies
-        try:
-            status = element[0].released
-            if status == "Released" and element[1].status == Status.COMPLETED \
-                    or element[1].status == Status.COMPLETED_ANIMATION:
-                count_completed += 1
-        except:
-            pass
+        if all(x == 0 for x in genres_time.values()):
+            genres_time = {}
+        else:
+            genres_time = sorted(genres_time.items(), key=operator.itemgetter(1), reverse=True)
+        if all(x == 0 for x in periods_time.values()):
+            periods_time = {}
+        if all(x == 0 for x in episodes_time.values()):
+            episodes_time = {}
+        if all(x == 0 for x in movies_time.values()):
+            movies_time = {}
 
-        # Long media shows, more than 100 episodes
-        try:
-            if int(episodes_watched) >= 100:
-                long_media_shows += 1
-        except:
-            pass
+        if index == 0:
+            data.update({'Series_genres': genres_time,
+                         'Series_periods': periods_time,
+                         'Series_episodes': episodes_time})
+        elif index == 1:
+            data.update({'Anime_genres': genres_time,
+                         'Anime_periods': periods_time,
+                         'Anime_episodes': episodes_time})
+        else:
+            data.update({'Movies_genres': genres_time,
+                         'Movies_periods': periods_time,
+                         'Movies_times': movies_time})
 
-        # Long media movies, more than 2h30
-        try:
-            if element[0].runtime >= 150:
-                long_media_movies += 1
-        except:
-            pass
+    return data
 
-    # Genres badges
-    genres_values = ["Mystery", "Historical", "Horror", "Music", "Romance", "Sports", "Slice of Life", "Comedy",
-                     "Crime", "Documentary", "Science Fiction", "Animation", "Fantasy", "Thriller"]
-    for i in range(0, len(genres_values)):
-        badge = db.session.query(Badges).filter_by(title=genres_values[i]).first()
-        try:
-            genre_time_data = time_by_genre[genres_values[i]]
-        except:
-            genre_time_data = 0
-        count_unlocked = int((genre_time_data/60)/badge.threshold)
-        badge_data = create_badge_dict(badge, count_unlocked, time=genre_time_data)
-        all_badges.append(badge_data)
 
-    # Classic badges
-    badge = db.session.query(Badges).filter_by(type="classic").first()
-    count_unlocked = int((time_classic/60)/badge.threshold)
-    badge_data = create_badge_dict(badge, count_unlocked, time=time_classic)
-    all_badges.append(badge_data)
+def get_all_follows_data(user):
+    # If not current_user, check follows to show (remove the private ones if current user does not follow them)
+    if current_user.id != user.id:
+        followed_by_user = user.followed.all()
+        current_user_follows = current_user.followed.all()
 
-    # Completed badges
-    badge = db.session.query(Badges).filter_by(type="completed").first()
-    count_unlocked = int(count_completed/badge.threshold)
-    badge_data = create_badge_dict(badge, count_unlocked, count=count_completed)
-    all_badges.append(badge_data)
+        follows_to_display = []
+        for follow in followed_by_user:
+            if follow.private:
+                if follow in current_user_follows or current_user.id == follow.id:
+                    follows_to_display.append(follow)
+            else:
+                follows_to_display.append(follow)
+    else:
+        follows_to_display = current_user.followed.all()
 
-    # Time badges
-    badge = db.session.query(Badges).filter_by(type="total-time").first()
-    count_unlocked = int((time_spent/1440)/badge.threshold)
-    badge_data = create_badge_dict(badge, count_unlocked, time=(time_spent/24))
-    all_badges.append(badge_data)
-
-    # Long shows badges
-    badge = db.session.query(Badges).filter_by(type="longshows").first()
-    count_unlocked = int(long_media_shows/badge.threshold)
-    badge_data = create_badge_dict(badge, count_unlocked, count=long_media_shows)
-    all_badges.append(badge_data)
-
-    # Long movies badges
-    badge = db.session.query(Badges).filter_by(type="longmovies").first()
-    count_unlocked = int(long_media_movies/badge.threshold)
-    badge_data = create_badge_dict(badge, count_unlocked, count=long_media_movies)
-    all_badges.append(badge_data)
-
-    all_badges.sort(key=lambda x: (x['unlocked'], x['value']), reverse=True)
-    total_unlocked = 0
-    for item in all_badges:
-        total_unlocked += item["unlocked"]
-
-    return [all_badges, total_unlocked]
+    return follows_to_display

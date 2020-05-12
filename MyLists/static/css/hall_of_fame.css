@@ -20,6 +20,9 @@ table.dataTable thead .sorting_desc_disabled:before {
     .hof {
         width: 900px;
     }
+    .more_stats {
+        width: 500px;
+    }
 }
 
 option {
