@@ -236,8 +236,7 @@ def get_user_data(user):
 
 
 def get_media_data(user):
-    all_lists = [["series", ListType.SERIES, user.time_spent_series],
-                 ["anime", ListType.ANIME, user.time_spent_anime],
+    all_lists = [["series", ListType.SERIES, user.time_spent_series], ["anime", ListType.ANIME, user.time_spent_anime],
                  ["movies", ListType.MOVIES, user.time_spent_movies]]
 
     # Create dict with media as key; values are dict or list of dict with the data
@@ -453,3 +452,22 @@ def get_more_stats(user):
                          'Movies_times': movies_time})
 
     return data
+
+
+def get_all_follows_data(user):
+    # If not current_user, check follows to show (remove the private ones if current user does not follow them)
+    if current_user.id != user.id:
+        followed_by_user = user.followed.all()
+        current_user_follows = current_user.followed.all()
+
+        follows_to_display = []
+        for follow in followed_by_user:
+            if follow.private:
+                if follow in current_user_follows or current_user.id == follow.id:
+                    follows_to_display.append(follow)
+            else:
+                follows_to_display.append(follow)
+    else:
+        follows_to_display = current_user.followed.all()
+
+    return follows_to_display

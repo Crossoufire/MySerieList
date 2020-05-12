@@ -2,14 +2,43 @@
 
 
 {% block css %}
-    <!------ CDN Datatables ------->
     <link href="{{ url_for('static', filename='css/datatables.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/all_history.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/account.css') }}" rel="stylesheet">
 {% endblock css %}
 
 
 {% block content %}
-    <div class="m-t-50 all_history ml-auto mr-auto">
+    <div class="header-container">
+        <img class="header-profile-img" src="{{ user_data['profile_picture'] }}"/>
+        <img class="header-profile-img-2" src="{{ user_data['knowledge_info']['frame_id'] }}.png"/>
+        <div class="header-knowledge-level text-center">{{ user_data['knowledge_info']['level'] }}</div>
+        <div class="header-profile-data">
+            <h2><b>{{ user_data['username'] }}</b>
+                {% if user_data['id'] != current_user.get_id() %}
+                    {% if user_data["isfollowing"] %}
+                        <button class="btn btn-sm btn-dark follow-btn" onclick="follow_status('{{ user_data['id'] }}')">
+                            Unfollow
+                        </button>
+                    {% else %}
+                        <button class="btn btn-sm btn-primary follow-btn" onclick="follow_status('{{ user_data['id'] }}')">
+                            Follow
+                        </button>
+                    {% endif %}
+                {% endif %}
+            </h2>
+            <p class="p-0 m-0">
+                <b>Joined: {{ user_data['register'] }}</b><br>
+                <b>Followers: {{ user_data['followers'] }}</b>
+            </p>
+        </div>
+    </div>
+    <h4><i class="fas fa-highlighter m-t-15"></i>&nbsp&nbspAll Updates</h4>
+    <hr>
+    <a class="text-light" href="/account/{{ user_data['username'] }}">
+        <i class="fas fa-caret-left"></i>&nbsp&nbsp <b>Return to account</b>
+    </a>
+    <div class="all_history ml-auto mr-auto" style="margin-top: -13px;">
         <table id="all_history" class="table text-light m-t-20 text-center ml-auto mr-auto">
             <thead>
                 <tr>

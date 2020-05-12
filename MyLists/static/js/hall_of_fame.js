@@ -4,7 +4,7 @@
 function follow_status(follow_id, button) {
     let status;
 
-    if ($(button).text() === 'Unfollow') {
+    if ($(button)[0].innerText === 'UNFOLLOW') {
         $(button).text('Follow');
         $(button).addClass('btn-primary').removeClass('btn-dark btn-smaller');
         status = false;

@@ -4,7 +4,7 @@ from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
-    get_knowledge_frame, get_updates, get_favorites
+    get_knowledge_frame, get_updates, get_favorites, get_all_follows_data
 
 
 bp = Blueprint('users', __name__)
@@ -52,11 +52,11 @@ def account(user_name):
     media_data = get_media_data(user)
     # Recover follows data and last updates
     follows_list, follows_update_list = get_follows_data(user)
-
+    # Recover the Favorites
     favorites = get_favorites(user.id)
 
     return render_template('account.html',
-                           title="{}'s account".format(user.username),
+                           title=user.username+"'s account",
                            user_data=user_data,
                            favorites=favorites,
                            media_data=media_data,
@@ -166,8 +166,30 @@ def all_history(user_name):
 
     updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
     media_updates = get_updates(updates)
+    user_data = get_user_data(user)
 
-    return render_template('all_history.html', title='Media History', media_updates=media_updates)
+    return render_template('all_history.html', title='Media History', media_updates=media_updates, user_data=user_data)
+
+
+@bp.route("/all_follows/<user_name>", methods=['GET'])
+@login_required
+def all_follows(user_name):
+    user = User.query.filter_by(username=user_name).first()
+
+    # No account with this username and protection of the admin account
+    if user is None or user.id == 1 and current_user.id != 1:
+        abort(404)
+
+    # Check if the account is private or in the follow list
+    if current_user.id == user.id or current_user.id == 1:
+        pass
+    elif user.private and not current_user.is_following(user):
+        abort(404)
+
+    all_follows = get_all_follows_data(user)
+    user_data = get_user_data(user)
+
+    return render_template('all_follows.html', title='Follows', all_follows=all_follows, user_data=user_data)
 
 
 @bp.route("/more_stats/<user_name>", methods=['GET'])
@@ -186,5 +208,6 @@ def more_stats(user_name):
         abort(404)
 
     stats = get_more_stats(user)
+    user_data = get_user_data(user)
 
-    return render_template('more_stats.html', title='More stats', stats=stats)
+    return render_template('more_stats.html', title='More stats', stats=stats, user_data=user_data)
