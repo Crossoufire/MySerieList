@@ -43,8 +43,9 @@ def save_profile_picture(form_picture, old_picture):
 
     # Remove old cover
     try:
-        os.remove(os.path.join(app.root_path, 'static/profile_pics', old_picture))
-        app.logger.info('Settings updated: Removed the old picture: {}'.format(old_picture))
+        if old_picture != 'default.jpg':
+            os.remove(os.path.join(app.root_path, 'static/profile_pics', old_picture))
+            app.logger.info('Settings updated: Removed the old picture: {}'.format(old_picture))
     except:
         pass
 
