@@ -610,6 +610,8 @@ def media_sheet(media_type, media_id):
         list_type = ListType.ANIME
     elif media_type == 'Movies':
         list_type = ListType.MOVIES
+    else:
+        abort(404)
 
     # Check if the media sheet loading came from an account (so media_id = media_name)
     try:
