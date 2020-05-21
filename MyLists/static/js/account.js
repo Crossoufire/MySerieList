@@ -153,3 +153,5 @@ $(document).ready(function() {
         $("#xp-bar-fill-movies").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
     }, 2000);
 });
+
+

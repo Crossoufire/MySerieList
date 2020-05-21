@@ -144,16 +144,17 @@ def get_knowledge_frame(user):
                       int((((400+80*user.time_spent_anime)**(1/2))-20)/40) +\
                       int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
 
-    frame_level = round(knowledge_level/15, 0) + 1
+    frame_level = round(knowledge_level/8, 0) + 1
     query_frame = Frames.query.filter_by(level=frame_level).first()
 
     if query_frame:
-        frame_id = url_for('static', filename='img/icon_frames/{}'.format(query_frame.image_id))
+        frame_id = url_for('static', filename='img/icon_frames/new/{}'.format(query_frame.image_id))
     else:
-        frame_id = url_for('static', filename='img/icon_frames/border_30')
+        frame_id = url_for('static', filename='img/icon_frames/new/border_40')
 
     return {"level": knowledge_level,
-            "frame_id": frame_id}
+            "frame_id": frame_id,
+            "frame_level": frame_level}
 
 
 def get_updates(last_update):
