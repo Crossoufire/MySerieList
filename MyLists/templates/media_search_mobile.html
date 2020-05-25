@@ -27,7 +27,7 @@
             <div class="d-flex flex-wrap justify-content-center m-t-30">
                 {% for media in series_results %}
                 <a class="card mb-4" style="background: #216c7d; width: 800px; border-radius: 0;"
-                   href="/media_sheet/serieslist/{{ media['tmdb_id'] }}">
+                   href="/check_media/serieslist/{{ media['tmdb_id'] }}">
                     <div class="row no-gutters">
                         <div class="col-3 p-2">
                             <img width="70" src="{{ media['poster_path'] }}">
@@ -54,7 +54,7 @@
             <div class="d-flex flex-wrap justify-content-center m-t-30">
                 {% for media in anime_results %}
                     <a class="card mb-4" style="background: #945141; width: 800px; border-radius: 0;"
-                       href="/media_sheet/animelist/{{ media['tmdb_id'] }}">
+                       href="/check_media/animelist/{{ media['tmdb_id'] }}">
                         <div class="row no-gutters">
                             <div class="col-3 p-2">
                                 <img width="70" src="{{ media['poster_path'] }}">
@@ -81,7 +81,7 @@
             <div class="d-flex flex-wrap justify-content-center m-t-30">
                 {% for media in movies_results %}
                     <a class="card mb-4" style="background: #8c7821; width: 800px; border-radius: 0;"
-                       href="/media_sheet/movieslist/{{ media['tmdb_id'] }}">
+                       href="/check_media/movieslist/{{ media['tmdb_id'] }}">
                         <div class="row no-gutters">
                             <div class="col-3 p-2">
                                 <img width="70" src="{{ media['poster_path'] }}">
