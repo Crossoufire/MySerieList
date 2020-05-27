@@ -679,7 +679,7 @@ def add_element_in_db(api_id, list_type):
 
         # Add collection movie to DB
         if data['collections_data']:
-            collection_info = get_collection_movie(data['collection_data'])
+            collection_info = get_collection_movie(data['collections_data'])
             db.session.add(MoviesCollections(**collection_info))
 
     db.session.commit()
