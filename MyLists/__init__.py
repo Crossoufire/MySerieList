@@ -33,10 +33,10 @@ app = Flask(__name__)
 Compress(app)
 
 app.config['SECRET_KEY'] = flask_secret
-app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SECURE'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['TESTING'] = False
+app.config['TESTING'] = True
 app.config['MAX_CONTENT_LENGTH'] = 8*1024*1024
 app.config['FLASK_ADMIN_SWATCH'] = 'cyborg'
 
@@ -59,6 +59,8 @@ scheduler.start()
 login_manager = LoginManager(app)
 login_manager.login_view = 'auth.home'
 login_manager.login_message_category = 'info'
+
+app.url_map.strict_slashes = False
 
 
 from MyLists.auth.routes import bp as auth_bp

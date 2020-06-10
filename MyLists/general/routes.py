@@ -26,7 +26,7 @@ def create_user():
                          active=True,
                          private=True,
                          registered_on=datetime.utcnow(),
-                         activated_on=datetime.utcnow()),
+                         activated_on=datetime.utcnow())
         db.session.add(new_admin)
         add_frames_to_db()
         add_badges_to_db()
