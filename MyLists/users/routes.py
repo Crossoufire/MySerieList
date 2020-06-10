@@ -1,5 +1,4 @@
 from MyLists import app, db
-from MyLists.main.functions import check_episodes_quantities
 from MyLists.users.forms import AddFollowForm
 from flask_login import login_required, current_user
 from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate
@@ -56,7 +55,7 @@ def account(user_name):
     # Recover the Favorites
     favorites = get_favorites(user.id)
 
-    check_episodes_quantities()
+    # check_episodes_quantities()
 
     return render_template('account.html',
                            title=user.username+"'s account",
