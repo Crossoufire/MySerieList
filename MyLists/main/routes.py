@@ -1,4 +1,5 @@
 from MyLists import db, app
+from datetime import datetime
 from MyLists.API_data import ApiData
 from MyLists.main.forms import EditMediaData
 from flask_login import login_required, current_user
@@ -7,8 +8,7 @@ from MyLists.main.functions import get_medialist_data, set_last_update, compute_
     add_element_to_user, add_element_in_db, load_media_sheet, save_new_cover
 from MyLists.models import User, Movies, MoviesActors, MoviesGenre, Series, SeriesGenre, SeriesList, \
     SeriesEpisodesPerSeason, SeriesNetwork, Anime, AnimeActors, AnimeEpisodesPerSeason, AnimeGenre, AnimeNetwork, \
-    AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections
-
+    AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, Notifications
 
 bp = Blueprint('main', __name__)
 
@@ -161,8 +161,7 @@ def update_element_season():
         old_episode = anime_list.last_episode_watched
         anime_list.current_season = new_season
         anime_list.last_episode_watched = 1
-        app.logger.info("[{}] Anime season with ID {} updated: {}"
-                                .format(current_user.id, element_id, new_season))
+        app.logger.info("[{}] Anime season with ID {} updated: {}".format(current_user.id, element_id, new_season))
 
         # Commit the changes
         db.session.commit()
@@ -597,6 +596,45 @@ def lock_media():
 
     element.lock_status = lock_status
     db.session.commit()
+
+    return '', 204
+
+
+@bp.route('/remove_notifications', methods=['POST'])
+@login_required
+def remove_notifications():
+    try:
+        json_data = request.get_json()
+        element_id = json_data['media_id']
+        element_type = json_data['media_type']
+    except:
+        abort(400)
+
+    # Check if the list type exist and is valid
+    try:
+        ListType(element_type)
+    except ValueError:
+        abort(400)
+
+    Notifications.query.filter_by(user_id=current_user.id, media_id=element_id, media_type=element_type).delete()
+    db.session.commit()
+
+    return '', 204
+
+
+@bp.route('/read_notifications', methods=['POST'])
+@login_required
+def read_notifications():
+    try:
+        json_data = request.get_json()
+        check_time = json_data['check_time']
+    except:
+        abort(400)
+
+    if check_time == "now":
+        user = User.query.filter_by(id=current_user.id).first()
+        user.last_notif_read_time = datetime.utcnow()
+        db.session.commit()
 
     return '', 204
 

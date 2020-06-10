@@ -1,7 +1,7 @@
 import enum
 
-from sqlalchemy import func
 from datetime import datetime
+from sqlalchemy import func, desc
 from flask_login import UserMixin
 from MyLists import app, db, login_manager
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -61,6 +61,7 @@ class User(db.Model, UserMixin):
     biography = db.Column(db.Text)
     transition_email = db.Column(db.String(120))
     activated_on = db.Column(db.DateTime)
+    last_notif_read_time = db.Column(db.DateTime)
     followed = db.relationship('User',
                                secondary=followers,
                                primaryjoin=(followers.c.follower_id == id),
@@ -90,6 +91,14 @@ class User(db.Model, UserMixin):
         s = Serializer(app.config['SECRET_KEY'])
         return s.dumps({'user_id': self.id}).decode('utf-8')
 
+    def count_notifications(self):
+        last_notif_time = self.last_notif_read_time or datetime(1900, 1, 1)
+        return Notifications.query.filter_by(user_id=self.id)\
+            .filter(Notifications.timestamp > last_notif_time).count()
+
+    def get_notifications(self):
+        return Notifications.query.filter_by(user_id=self.id).order_by(desc(Notifications.timestamp)).limit(8).all()
+
     @staticmethod
     def verify_reset_token(token):
         s = Serializer(app.config['SECRET_KEY'])
@@ -118,7 +127,7 @@ class UserLastUpdate(db.Model):
     date = db.Column(db.DateTime, nullable=False)
 
 
-######################################################## SERIES ########################################################
+# --- SERIES -------------------------------------------------------------------------------------------------------
 
 
 class Series(db.Model):
@@ -266,6 +275,7 @@ class SeriesList(db.Model):
             .join(SeriesActors, SeriesActors.series_id == Series.id) \
             .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id) \
             .filter(SeriesList.user_id == user_id).group_by(Series.id).order_by(Series.name.asc()).all()
+
         return element_data
 
 
@@ -295,7 +305,7 @@ class SeriesActors(db.Model):
     name = db.Column(db.String(150))
 
 
-######################################################## ANIME #########################################################
+# --- ANIME -------------------------------------------------------------------------------------------------------
 
 
 class Anime(db.Model):
@@ -464,7 +474,7 @@ class AnimeActors(db.Model):
     name = db.Column(db.String(150))
 
 
-######################################################## MOVIES ########################################################
+# --- MOVIES -------------------------------------------------------------------------------------------------------
 
 
 class Movies(db.Model):
@@ -626,7 +636,7 @@ class MoviesCollections(db.Model):
         return collection_movie
 
 
-#################################################### BADGES & RANKS ####################################################
+# --- BADGES & RANKS -----------------------------------------------------------------------------------------------
 
 
 class Badges(db.Model):
@@ -650,3 +660,15 @@ class Frames(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     level = db.Column(db.Integer, nullable=False)
     image_id = db.Column(db.String(50), nullable=False)
+
+
+class Notifications(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    media_type = db.Column(db.String(50))
+    media_id = db.Column(db.Integer)
+    media_name = db.Column(db.String(100))
+    release_date = db.Column(db.String(30))
+    season = db.Column(db.Integer)
+    episode = db.Column(db.Integer)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)

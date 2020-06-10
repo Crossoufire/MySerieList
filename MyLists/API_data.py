@@ -1,6 +1,5 @@
 import json
 import requests
-import pykakasi
 import urllib.request
 
 from PIL import Image
@@ -180,27 +179,42 @@ class ApiData:
         return True
 
     def get_trending_media(self):
+        data = {'tmdb_error': None,
+                'jikan_error': None}
+
         try:
             series_response = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
                                            .format(self.tmdb_api_key))
-            anime_response = Jikan().top(type='anime', page=1, subtype='airing')
             movies_response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
                                            .format(self.tmdb_api_key))
         except Exception as e:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API or the Jikan API: {}'.format(e))
-            return None
+            app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+            series_response = None
+            movies_response = None
+            data['tmdb_error'] = True
+
+        try:
+            anime_response = Jikan().top(type='anime', page=1, subtype='airing')
+        except Exception as e:
+            app.logger.error('[SYSTEM] Error requesting the Jikan API: {}'.format(e))
+            anime_response = None
+            data['jikan_error'] = True
 
         series_data = self.check_response_status(series_response)
         if not series_data:
-            return None
+            data['tmdb_error'] = True
 
         anime_data = anime_response
 
         movies_data = self.check_response_status(movies_response)
         if not movies_data:
-            return None
+            data['tmdb_error'] = True
 
-        return [series_data, anime_data, movies_data]
+        data['series_data'] = series_data
+        data['anime_data'] = anime_data
+        data['movies_data'] = movies_data
+
+        return data
 
     def get_changed_data(self, list_type):
         try:
@@ -243,12 +257,18 @@ class ApiData:
     def check_response_status(response):
         if response.status_code == 200:
             return json.loads(response.text)
+        elif response.status_code == 400:
+            app.logger.error('[SYSTEM] Error requesting the API (TMDB or Jikan): Bad Request')
         elif response.status_code == 401:
             app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
         elif response.status_code == 404:
             app.logger.error('[SYSTEM] Invalid id: The pre-requisite id is invalid or not found.')
+        elif response.status_code == 405:
+            app.logger.error('[SYSTEM] Method Not Allowed: The requested method is not supported for resource.')
+        elif response.status_code == 429:
+            app.logger.error('[SYSTEM] Too Many Requests: You are being rate limited or Jikan is being rate limited.')
         elif response.status_code == 500:
-            app.logger.error('[SYSTEM] 	Internal error: Something went wrong, contact TMDb.')
+            app.logger.error('[SYSTEM] 	Internal error: Something went wrong, contact TMDb or Jikan.')
         elif response.status_code == 503:
             app.logger.error('[SYSTEM] Service offline: This service is temporarily offline, try again later.')
         elif response.status_code == 504:
