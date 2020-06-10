@@ -252,17 +252,24 @@ def current_trends():
     # Recover the trending media data from the API
     trending_data = ApiData().get_trending_media()
 
-    if trending_data is None:
-        flash('The current trends are not available right now, please try again later', 'warning')
-        return redirect(url_for('users.account', user_name=current_user.username))
+    series_trends = []
+    anime_trends = []
+    movies_trends = []
 
-    series_trends = get_trending_data(trending_data[0], ListType.SERIES)
-    anime_trends = get_trending_data(trending_data[1], ListType.ANIME)
-    movies_trends = get_trending_data(trending_data[2], ListType.MOVIES)
-
-    if series_trends is None or anime_trends is None or movies_trends is None:
-        flash('The current trends are not available right now, please try again later', 'warning')
+    if trending_data['tmdb_error'] and not trending_data['jikan_error']:
+        flash('The current trends from TMDB are not available right now.', 'warning')
+        anime_trends = get_trending_data(trending_data['anime_data'], ListType.ANIME)
+    elif not trending_data['tmdb_error'] and trending_data['jikan_error']:
+        flash('The current trends from Jikan (Anime) are not available right now.', 'warning')
+        series_trends = get_trending_data(trending_data['series_data'], ListType.SERIES)
+        movies_trends = get_trending_data(trending_data['movies_data'], ListType.MOVIES)
+    elif trending_data['tmdb_error'] and trending_data['jikan_error']:
+        flash('The current trends for TMDB and Jikan (Anime) are not available right now.', 'danger')
         return redirect(url_for('users.account', user_name=current_user.username))
+    else:
+        series_trends = get_trending_data(trending_data['series_data'], ListType.SERIES)
+        anime_trends = get_trending_data(trending_data['anime_data'], ListType.ANIME)
+        movies_trends = get_trending_data(trending_data['movies_data'], ListType.MOVIES)
 
     platform = str(request.user_agent.platform)
     if platform == "iphone" or platform == "android" or platform is None or platform == 'None':

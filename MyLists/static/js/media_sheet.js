@@ -35,11 +35,11 @@ function removeFromUser(element_id, media_type) {
     $('#addlist').show();
 
     if (media_type !== 'movieslist') {
-        $('#category-dropdown').val('Watching').change();
-        $('#season-dropdown').val(1).change();
-        $('#episode-dropdown').val(1).change();
+        $('#category-dropdown').val('Watching');
+        $('#season-dropdown').val("0");
+        $('#episode-dropdown').val("0");
     } else {
-        $('#category-dropdown').val('Plan to Watch').change();
+        $('#category-dropdown').val('Plan to Watch');
     }
 
     $body = $("body");
@@ -174,6 +174,8 @@ function updateSeason(element_id, value, seas_data, media_list) {
     let selected_season = value.selectedIndex;
     let episode_drop = document.getElementById('episode-dropdown');
     let season_data = JSON.parse("["+seas_data+"]");
+
+    console.log(selected_season)
 
     episode_drop.length = 1;
     for (i = 2; i <= season_data[0][selected_season]; i++) {

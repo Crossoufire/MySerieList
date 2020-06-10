@@ -87,9 +87,9 @@
                                                     '{{ media_list }}')">
                                         {% for eps in range(0, data['eps_per_season']|length) %}
                                             {% if eps + 1 == data['current_season'] %}
-                                                <option selected="selected">&nbsp{{ eps + 1 }}&nbsp</option>
+                                                <option selected="selected" value="{{ eps }}">&nbsp{{ eps + 1 }}&nbsp</option>
                                             {% else %}
-                                                <option>&nbsp{{ eps + 1 }}&nbsp</option>
+                                                <option value="{{ eps }}">&nbsp{{ eps + 1 }}&nbsp</option>
                                             {% endif %}
                                         {% endfor %}
                                     </select>
@@ -105,9 +105,9 @@
                                             onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
                                         {% for i in range(data['eps_per_season'][data['current_season'] - 1]) %}
                                             {% if i + 1 == data['last_episode_watched'] %}
-                                                <option selected="selected">&nbsp{{ i + 1 }}&nbsp</option>
+                                                <option selected="selected" value="{{ i }}">&nbsp{{ i + 1 }}&nbsp</option>
                                             {% else %}
-                                                <option>&nbsp{{ i + 1 }}&nbsp</option>
+                                                <option value="{{ i }}">&nbsp{{ i + 1 }}&nbsp</option>
                                             {% endif %}
                                         {% endfor %}
                                     </select>

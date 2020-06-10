@@ -1,7 +1,8 @@
 from MyLists import app, db
+from MyLists.main.functions import check_episodes_quantities
 from MyLists.users.forms import AddFollowForm
-from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate
 from flask_login import login_required, current_user
+from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
     get_knowledge_frame, get_updates, get_favorites, get_all_follows_data
@@ -54,6 +55,8 @@ def account(user_name):
     follows_list, follows_update_list = get_follows_data(user)
     # Recover the Favorites
     favorites = get_favorites(user.id)
+
+    check_episodes_quantities()
 
     return render_template('account.html',
                            title=user.username+"'s account",
