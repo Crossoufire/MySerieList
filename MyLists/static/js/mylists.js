@@ -63,11 +63,12 @@ $(function() {
 });
 
 
-$('#ajax-notif').click(function () {
+$('#ajax-notif').click(function a () {
     $('.notif-badge').attr('style', 'background-color: grey;');
     $('.notif-badge').html(0);
 
     $(".notif-item-container").remove();
+    $('#loading-image').show();
 
     $.ajax ({
         type: "GET",
@@ -76,6 +77,9 @@ $('#ajax-notif').click(function () {
         dataType: "json",
         success: function(data) {
             display_notifications(data);
+        },
+        complete: function() {
+            $('#loading-image').hide();
         }
     });
 });

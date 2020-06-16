@@ -114,7 +114,7 @@ hr {
 }
 
 #autocomplete.ui-autocomplete-loading {
-    background-image: url('/static/img/add_loader.gif');
+    background-image: url('/static/img/add_loader_2.webp');
     background-position: right 7% bottom 50%;
     background-repeat: no-repeat;
 }
