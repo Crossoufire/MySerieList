@@ -380,24 +380,3 @@ def add_director_movies():
         db.session.commit()
 
         print('Added one', director_name)
-
-
-def add_media_id_to_userlastupdates():
-    all_updates = UserLastUpdate.query.all()
-    for update in all_updates:
-        if update.media_type == ListType.SERIES:
-            seek_media = Series.query.\
-                filter((Series.name == update.media_name) | (Series.original_name == update.media_name)).first()
-        elif update.media_type == ListType.ANIME:
-            seek_media = Anime.query.\
-                filter((Anime.name == update.media_name) | (Anime.original_name == update.media_name)).first()
-        elif update.media_type == ListType.MOVIES:
-            seek_media = Movies.query.\
-                filter((Movies.name == update.media_name) | (Movies.original_name == update.media_name)).first()
-
-        if seek_media is None:
-            print(update.media_name)
-        else:
-            update.media_id = seek_media.id
-
-    db.session.commit()

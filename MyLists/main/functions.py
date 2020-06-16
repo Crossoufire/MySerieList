@@ -1,6 +1,5 @@
 import os
 import secrets
-import numpy as np
 from collections import OrderedDict
 
 from PIL import Image
@@ -79,6 +78,17 @@ def get_details(api_id, list_type):
                    'themoviedb_id': details_data.get("id"),
                    'image_cover': media_cover_name,
                    'last_update': datetime.utcnow()}
+
+        # Next episode to air (air_date, season, episode):
+        next_episode_to_air = details_data.get("next_episode_to_air") or None
+        if next_episode_to_air:
+            tv_data['next_episode_to_air'] = next_episode_to_air['air_date']
+            tv_data['season_to_air'] = next_episode_to_air['season_number']
+            tv_data['episode_to_air'] = next_episode_to_air['episode_number']
+        else:
+            tv_data['next_episode_to_air'] = None
+            tv_data['season_to_air'] = None
+            tv_data['episode_to_air'] = None
 
         # Episode duration: List
         episode_duration = details_data.get("episode_run_time") or None
@@ -1183,10 +1193,82 @@ def scheduled_task():
 
         db.session.commit()
 
+    def new_releasing_series():
+        all_series = Series.query.filter(Series.next_episode_to_air != None).all()
+
+        series_id = []
+        for series in all_series:
+            try:
+                diff = (datetime.utcnow() - datetime.strptime(series.next_episode_to_air, '%Y-%m-%d')).total_seconds()
+                # Check if the next episode of the series is releasing in one week or less (7 days)
+                # if diff < 0 and abs(diff/(3600*24)) <= 7:
+                if diff < 0:
+                    series_id.append(series.id)
+            except:
+                pass
+
+        from sqlalchemy import and_
+        series_in_ptw = db.session.query(Series, SeriesList) \
+            .join(SeriesList, SeriesList.series_id == Series.id) \
+            .filter(SeriesList.series_id.in_(series_id), and_(SeriesList.status != Status.RANDOM,
+                                                              SeriesList.status != Status.DROPPED)).all()
+
+        for info in series_in_ptw:
+            if not bool(Notifications.query.filter_by(user_id=info[1].user_id,
+                                                      media_type='serieslist',
+                                                      media_id=info[0].id).first()):
+                data = Notifications(user_id=info[1].user_id,
+                                     media_type='serieslist',
+                                     media_id=info[0].id,
+                                     media_name=info[0].name,
+                                     release_date=info[0].next_episode_to_air,
+                                     season=info[0].season_to_air,
+                                     episode=info[0].episode_to_air)
+                db.session.add(data)
+
+        db.session.commit()
+
+    def new_releasing_anime():
+        all_anime = Series.query.filter(Anime.next_episode_to_air != None).all()
+
+        anime_id = []
+        for anime in all_anime:
+            try:
+                diff = (datetime.utcnow() - datetime.strptime(anime.next_episode_to_air, '%Y-%m-%d')).total_seconds()
+                # Check if the next episode of the series is releasing in one week or less (7 days)
+                # if diff < 0 and abs(diff/(3600*24)) <= 7:
+                if diff < 0:
+                    anime_id.append(anime.id)
+            except:
+                pass
+
+        from sqlalchemy import and_
+        anime_in_ptw = db.session.query(Anime, AnimeList) \
+            .join(AnimeList, AnimeList.anime_id == Anime.id) \
+            .filter(AnimeList.anime_id.in_(anime_id), and_(AnimeList.status != Status.RANDOM,
+                                                           AnimeList.status != Status.DROPPED)).all()
+
+        for info in anime_in_ptw:
+            if not bool(Notifications.query.filter_by(user_id=info[1].user_id,
+                                                      media_type='animelist',
+                                                      media_id=info[0].id).first()):
+                data = Notifications(user_id=info[1].user_id,
+                                     media_type='animelist',
+                                     media_id=info[0].id,
+                                     media_name=info[0].name,
+                                     release_date=info[0].next_episode_to_air,
+                                     season=info[0].season_to_air,
+                                     episode=info[0].episode_to_air)
+                db.session.add(data)
+
+        db.session.commit()
+
     remove_non_list_media()
     remove_old_covers()
     automatic_media_refresh()
     new_releasing_movies()
+    new_releasing_series()
+    new_releasing_anime()
 
     all_users = User.query.filter(User.id >= "2", User.active == True)
     for user in all_users:
@@ -1194,3 +1276,56 @@ def scheduled_task():
 
 
 app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='scheduled_task', hour=3, minute=0)
+
+
+def refresh_element_data(api_id, list_type):
+    data = get_details(api_id, list_type)
+    if data is None:
+        return None
+
+    # Update the main details data
+    if list_type == ListType.SERIES:
+        Series.query.filter_by(themoviedb_id=api_id).update(data['tv_data'])
+    elif list_type == ListType.ANIME:
+        Anime.query.filter_by(themoviedb_id=api_id).update(data['tv_data'])
+
+    db.session.commit()
+
+    return True
+
+
+def add_next_episode_to_air():
+    all_series = Series.query.filter(Series.lock_status == False, Series.episode_to_air != None).all()
+    all_anime = Anime.query.filter(Anime.lock_status == False, Anime.episode_to_air != None).all()
+
+    for series in all_series:
+        yes = refresh_element_data(series.themoviedb_id, ListType.SERIES)
+        if yes is None:
+            print(series.themoviedb_id, series.name)
+        print(yes)
+    for anime in all_anime:
+        yes = refresh_element_data(anime.themoviedb_id, ListType.ANIME)
+        if yes is None:
+            print(anime.themoviedb_id, anime.name)
+        print(yes)
+
+
+def add_media_id_to_userlastupdates():
+    all_updates = UserLastUpdate.query.all()
+    for update in all_updates:
+        if update.media_type == ListType.SERIES:
+            seek_media = Series.query.\
+                filter((Series.name == update.media_name) | (Series.original_name == update.media_name)).first()
+        elif update.media_type == ListType.ANIME:
+            seek_media = Anime.query.\
+                filter((Anime.name == update.media_name) | (Anime.original_name == update.media_name)).first()
+        elif update.media_type == ListType.MOVIES:
+            seek_media = Movies.query.\
+                filter((Movies.name == update.media_name) | (Movies.original_name == update.media_name)).first()
+
+        if seek_media is None:
+            print(update.media_name)
+        else:
+            update.media_id = seek_media.id
+
+    db.session.commit()

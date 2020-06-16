@@ -448,8 +448,6 @@ def change_element_category():
     except:
         abort(400)
 
-    print(element_new_category)
-
     # Check if the <media_list> exist and is valid
     try:
         list_type = ListType(element_type)
