@@ -60,6 +60,8 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'auth.home'
 login_manager.login_message_category = 'info'
 
+app.url_map.strict_slashes = False
+
 
 from MyLists.auth.routes import bp as auth_bp
 app.register_blueprint(auth_bp)
