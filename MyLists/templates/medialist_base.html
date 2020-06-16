@@ -76,16 +76,16 @@
             </div>
         </div>
     <div id="categories-iso" class="categories-iso p-t-30">
-        {% for category in all_data %}
-            <div class="categories {{ category[1] }}">
-                <h2 class="text-center m-t-20 mb-0">{{ category[1] }}<hr class="mt-2 pb-3 mb-0"></h2>
-                <div class="row category-{% if category[1] == 'COMPLETED ANIMATION' %}ANIMATION
-                {% else %}{{ category[1] }}{% endif %}">
-                    {% for data in category[0] %}
+        {% for key in all_data %}
+            <div class="categories {% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key }}{% endif %}">
+                <h2 class="text-center m-t-20 mb-0">{{ key }}<hr class="mt-2 pb-3 mb-0"></h2>
+                <div class="row category-{% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key }}{% endif %}">
+                    {% for data in all_data[key] %}
                         <div id="card_{{ data['id'] }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
                             <div class="card bg-transparent">
                                 <div class="view overlay">
-                                    <img class="card-img-top lazyload" data-src="{{ data['cover'] }}" height="300" width="200" style="height: auto;"/>
+                                    <img class="card-img-top lazyload" data-src="{{ data['cover'] }}" height="300"
+                                         width="200" style="height: auto;"/>
                                     <a class="mask flex-center rgba-black-strong" {% if media_list == 'serieslist' %}
                                        href="/media_sheet/Series/{{ data['id'] }}" {% elif media_list == 'animelist' %}
                                        href="/media_sheet/Anime/{{ data['id'] }}" {% else %}

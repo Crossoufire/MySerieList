@@ -26,7 +26,7 @@
 
 
 {% block select_box %}
-    <div class="seas-eps-box" {% if category[1] == 'PLAN TO WATCH' %}style="display: none;"{% endif %}>
+    <div class="seas-eps-box" {% if data['category'].value == "PLAN_TO_WATCH" %}style="display: none;"{% endif %}>
         <div style="display: inline-block;">
             {% if target_user_id == current_user.get_id() %}
             <select id="S_{{ data['id'] }}" class="text-light text-center select-box"

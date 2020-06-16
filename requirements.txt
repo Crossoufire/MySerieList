@@ -1,4 +1,3 @@
-pykakasi
 flask
 Flask-APScheduler
 flask-sqlalchemy
@@ -9,6 +8,7 @@ flask-login
 flask-user
 flask-mail
 flask-wtf
+email_validator
 python-dotenv
 itsdangerous
 apscheduler

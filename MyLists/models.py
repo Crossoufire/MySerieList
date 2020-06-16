@@ -62,6 +62,7 @@ class User(db.Model, UserMixin):
     transition_email = db.Column(db.String(120))
     activated_on = db.Column(db.DateTime)
     last_notif_read_time = db.Column(db.DateTime)
+
     followed = db.relationship('User',
                                secondary=followers,
                                primaryjoin=(followers.c.follower_id == id),
@@ -118,6 +119,7 @@ class UserLastUpdate(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_name = db.Column(db.String(50), nullable=False)
     media_type = db.Column(db.Enum(ListType), nullable=False)
+    media_id = db.Column(db.Integer)
     old_status = db.Column(db.Enum(Status))
     new_status = db.Column(db.Enum(Status))
     old_season = db.Column(db.Integer)
@@ -477,6 +479,27 @@ class AnimeActors(db.Model):
 # --- MOVIES -------------------------------------------------------------------------------------------------------
 
 
+class MoviesCollections(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    collection_id = db.Column(db.Integer, db.ForeignKey('movies.collection_id'), nullable=False)
+    parts = db.Column(db.Integer)
+    name = db.Column(db.String(100))
+    movies_names = db.Column(db.String(500))
+    releases_dates = db.Column(db.String(500))
+    poster = db.Column(db.String(100))
+    overview = db.Column(db.String(100))
+
+    @staticmethod
+    def get_collection_movies(user_id):
+        collection_movie = db.session.query(Movies, MoviesList, MoviesCollections,
+                                            func.count(MoviesCollections.collection_id)) \
+            .join(MoviesList, MoviesList.movies_id == Movies.id) \
+            .join(MoviesCollections, MoviesCollections.collection_id == Movies.collection_id) \
+            .filter(Movies.collection_id != None, MoviesList.user_id == user_id,
+                    MoviesList.status != Status.PLAN_TO_WATCH).group_by(Movies.collection_id).all()
+        return collection_movie
+
+
 class Movies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -499,9 +522,13 @@ class Movies(db.Model):
     collection_id = db.Column(db.Integer)
     lock_status = db.Column(db.Boolean, default=0)
 
-    genres = db.relationship('MoviesGenre', backref='anime', lazy=True)
-    actors = db.relationship('MoviesActors', backref='anime', lazy=True)
-    list_info = db.relationship('MoviesList', backref='anime', lazy='dynamic')
+    collection_movies = db.relationship('MoviesCollections',
+                                        primaryjoin=(MoviesCollections.collection_id == collection_id),
+                                        backref='movies',
+                                        lazy='dynamic')
+    genres = db.relationship('MoviesGenre', backref='movies', lazy=True)
+    actors = db.relationship('MoviesActors', backref='movies', lazy=True)
+    list_info = db.relationship('MoviesList', backref='movies', lazy='dynamic')
 
     def get_info(self):
         # Change release date format
@@ -541,7 +568,8 @@ class Movies(db.Model):
                         "media_type": 'Movies',
                         "lock_status": self.lock_status,
                         "actors": ', '.join([r.name for r in self.actors]),
-                        "genres": ', '.join([r.genre for r in self.genres])}
+                        "genres": ', '.join([r.genre for r in self.genres]),
+                        "collection_data": self.collection_movies}
 
         return element_info
 
@@ -615,25 +643,6 @@ class MoviesActors(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     name = db.Column(db.String(150))
-
-
-class MoviesCollections(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    collection_id = db.Column(db.Integer, db.ForeignKey('movies.collection_id'), nullable=False)
-    parts = db.Column(db.Integer)
-    name = db.Column(db.String(100))
-    poster = db.Column(db.String(100))
-    overview = db.Column(db.String(100))
-
-    @staticmethod
-    def get_collection_movies(user_id):
-        collection_movie = db.session.query(Movies, MoviesList, MoviesCollections,
-                                            func.count(MoviesCollections.collection_id)) \
-            .join(MoviesList, MoviesList.movies_id == Movies.id) \
-            .join(MoviesCollections, MoviesCollections.collection_id == Movies.collection_id) \
-            .filter(Movies.collection_id != None, MoviesList.user_id == user_id,
-                    MoviesList.status != Status.PLAN_TO_WATCH).group_by(Movies.collection_id).all()
-        return collection_movie
 
 
 # --- BADGES & RANKS -----------------------------------------------------------------------------------------------

@@ -144,8 +144,6 @@ hr {
     background: #555;
 }
 
-
-
 .notif-badge {
     border-radius: 50%;
     padding: 0 5px 0 5px;
@@ -158,7 +156,7 @@ hr {
 }
 
 .notif-dropdown-items {
-    z-index: 101;
+    z-index: 9999;
     min-width: 100%;
     padding: 10px;
     border-radius: 0;
@@ -167,13 +165,5 @@ hr {
 
 .notif-item-container {
     position: relative;
-}
-
-.abs-click {
-    color: darkgray;
-    font-size: 15px;
-    position: absolute;
-    top: 13px;
-    right: 5px;
-    cursor: pointer;
+    border-bottom: solid 1px black;
 }

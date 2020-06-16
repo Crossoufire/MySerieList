@@ -9,8 +9,8 @@ from flask import url_for
 from MyLists import db, app
 from sqlalchemy import func
 from datetime import datetime
-from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason,\
-    SeriesList, Series, MoviesList, Movies, Badges, MoviesCollections, Ranks, Frames
+from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
+    SeriesList, Series, MoviesList, Movies, Badges, MoviesCollections, Ranks, Frames, UserLastUpdate
 
 
 def get_trending_data(trends_data, list_type):
@@ -260,8 +260,10 @@ def refresh_db_frames():
 def add_collections_movies():
     print('Started.')
     local_covers_path = Path(app.root_path, "static/covers/movies_collection_covers/")
+
     all_movies = Movies.query.filter_by().all()
-    for movie in all_movies:
+    for index, movie in enumerate(all_movies):
+        print("Movie: {}/{}".format(index + 1, len(all_movies)))
         tmdb_movies_id = movie.themoviedb_id
 
         try:
@@ -318,10 +320,43 @@ def add_collections_movies():
 
             db.session.add(add_collection)
             db.session.commit()
-            print('And... ANOTHER ONE')
         except:
             continue
-        print('Finished.')
+    print('Finished.')
+
+
+def refresh_collections_movies():
+    print('Started.')
+
+    all_collection_movies = MoviesCollections.query.filter_by().all()
+    for index, collection in enumerate(all_collection_movies):
+        print("Movie: {}/{}".format(index + 1, len(all_collection_movies)))
+        try:
+            response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
+                                    .format(collection.collection_id, app.config['THEMOVIEDB_API_KEY']))
+
+            data = json.loads(response.text)
+
+            remove = 0
+            utc_now = datetime.utcnow()
+            for part in data["parts"]:
+                part_date = part['release_date']
+                try:
+                    part_date_datetime = datetime.strptime(part_date, '%Y-%m-%d')
+                    difference = (utc_now - part_date_datetime).total_seconds()
+                    if float(difference) < 0:
+                        remove += 1
+                except:
+                    remove += 1
+
+            collection.parts = len(data["parts"]) - remove
+            collection.movies_names = ', '.join([part['title'] for part in data["parts"]])
+            collection.releases_dates = ', '.join([part['release_date'] for part in data["parts"]])
+
+            db.session.commit()
+        except:
+            continue
+    print('Finished.')
 
 
 def add_director_movies():
@@ -347,34 +382,22 @@ def add_director_movies():
         print('Added one', director_name)
 
 
-def refresh_collections_movies():
-    print('Started.')
+def add_media_id_to_userlastupdates():
+    all_updates = UserLastUpdate.query.all()
+    for update in all_updates:
+        if update.media_type == ListType.SERIES:
+            seek_media = Series.query.\
+                filter((Series.name == update.media_name) | (Series.original_name == update.media_name)).first()
+        elif update.media_type == ListType.ANIME:
+            seek_media = Anime.query.\
+                filter((Anime.name == update.media_name) | (Anime.original_name == update.media_name)).first()
+        elif update.media_type == ListType.MOVIES:
+            seek_media = Movies.query.\
+                filter((Movies.name == update.media_name) | (Movies.original_name == update.media_name)).first()
 
-    all_collection_movies = MoviesCollections.query.filter_by().all()
-    for collection in all_collection_movies:
-        try:
-            response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
-                                    .format(collection.collection_id, app.config['THEMOVIEDB_API_KEY']))
+        if seek_media is None:
+            print(update.media_name)
+        else:
+            update.media_id = seek_media.id
 
-            data = json.loads(response.text)
-
-            remove = 0
-            utc_now = datetime.utcnow()
-            for part in data["parts"]:
-                part_date = part['release_date']
-                try:
-                    part_date_datetime = datetime.strptime(part_date, '%Y-%m-%d')
-                    difference = (utc_now - part_date_datetime).total_seconds()
-                    if float(difference) < 0:
-                        remove += 1
-                except:
-                    remove += 1
-
-            collection.parts = len(data["parts"]) - remove
-
-            db.session.commit()
-            print('And... ANOTHER ONE')
-        except:
-            continue
-
-    print('Finished.')
+    db.session.commit()

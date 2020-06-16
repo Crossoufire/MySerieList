@@ -178,6 +178,7 @@ def get_updates(last_update):
         # Update date and add media name
         element_data["date"] = element.date.replace(tzinfo=pytz.UTC).isoformat()
         element_data["media_name"] = element.media_name
+        element_data["media_id"] = element.media_id
 
         if element.media_type == ListType.SERIES:
             element_data["category"] = "series"

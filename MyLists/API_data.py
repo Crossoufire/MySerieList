@@ -20,7 +20,7 @@ class ApiData:
             response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
                                     .format(self.tmdb_api_key, element_name))
         except Exception as e:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+            app.logger.error('[SYSTEM] Error requesting the TMDB API: {}'.format(e))
             return [{"nb_results": 0}]
 
         data = self.check_response_status(response)
@@ -76,15 +76,15 @@ class ApiData:
                                            .format(self.tmdb_api_key, element_name))
         except Exception as e:
             app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
-            return None, None, None
+            return None
 
         data_tv = self.check_response_status(response_tv)
         data_movies = self.check_response_status(response_movies)
-        if data_tv is False and data_movies is False:
-            return None, None, None
+        if not data_tv and not data_movies:
+            return None
 
         if data_tv.get("total_results", 0) == 0 and data_movies.get("total_results", 0) == 0:
-            return None, None, None
+            return None
 
         # Recover movies results
         movies_results = []
@@ -93,10 +93,10 @@ class ApiData:
                           'overview': result['overview'],
                           'tmdb_id': result["id"],
                           "first_air_date": result.get('release_date', 'Unknown') or 'Unknown',
-                          'url': "https://www.themoviedb.org/movie/{}".format(result["id"])}
+                          'url': f"https://www.themoviedb.org/movie/{result['id']}"}
 
             if result["poster_path"]:
-                media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
+                media_data["poster_path"] = f"{self.tmdb_poster_base_url}{result['poster_path']}"
             else:
                 media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
             movies_results.append(media_data)
@@ -108,10 +108,10 @@ class ApiData:
                           'overview': result['overview'],
                           'tmdb_id': result["id"],
                           "first_air_date": result.get('first_air_date', 'Unknown') or 'Unknown',
-                          'url': "https://www.themoviedb.org/tv/{}".format(result["id"])}
+                          'url': f"https://www.themoviedb.org/tv/{result['id']}"}
 
             if result["poster_path"]:
-                media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
+                media_data["poster_path"] = f"{self.tmdb_poster_base_url}{result['poster_path']}"
             else:
                 media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
 
@@ -120,7 +120,7 @@ class ApiData:
             else:
                 series_results.append(media_data)
 
-        return series_results, anime_results, movies_results
+        return [series_results, anime_results, movies_results]
 
     def get_details_and_credits_data(self, api_id, list_type):
         try:
@@ -131,11 +131,11 @@ class ApiData:
                 response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}&append_to_response=credits"
                                         .format(api_id, self.tmdb_api_key))
         except Exception as e:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+            app.logger.error('[SYSTEM] Error requesting the TMDB API: {}'.format(e))
             return None
 
         data = self.check_response_status(response)
-        if data is False:
+        if not data:
             return None
 
         return data
@@ -145,11 +145,11 @@ class ApiData:
             response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
                                     .format(collection_id, self.tmdb_api_key))
         except Exception as e:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+            app.logger.error('[SYSTEM] Error requesting the TMDB API for movies collection data: {}'.format(e))
             return None
 
         data = self.check_response_status(response)
-        if data is False:
+        if not data:
             return None
 
         return data
@@ -166,15 +166,15 @@ class ApiData:
                 local_covers_path = Path(app.root_path, "static/covers/movies_covers")
 
         try:
-            urllib.request.urlretrieve("{0}{1}".format(self.tmdb_poster_base_url, media_cover_path),
-                                       "{0}/{1}".format(local_covers_path, media_cover_name))
+            urllib.request.urlretrieve(f"{self.tmdb_poster_base_url}{media_cover_path}",
+                                       f"{local_covers_path}/{media_cover_name}")
         except Exception as e:
             app.logger.error('[SYSTEM] Error trying to recover the poster: {}'.format(e))
             return False
 
-        img = Image.open("{}/{}".format(local_covers_path, media_cover_name))
+        img = Image.open(f"{local_covers_path}/{media_cover_name}")
         img = img.resize((300, 450), Image.ANTIALIAS)
-        img.save("{0}/{1}".format(local_covers_path, media_cover_name), quality=90)
+        img.save(f"{local_covers_path}/{media_cover_name}", quality=90)
 
         return True
 
@@ -225,7 +225,7 @@ class ApiData:
                 response = requests.get("https://api.themoviedb.org/3/movie/changes?api_key={0}"
                                         .format(self.tmdb_api_key))
         except Exception as e:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+            app.logger.error('[SYSTEM] Error requesting the TMDB API: {}'.format(e))
             return None
 
         changed_data = self.check_response_status(response)
@@ -249,6 +249,7 @@ class ApiData:
 
             response = requests.get("https://api.jikan.moe/v3/anime/{}".format(mal_id))
             data_mal = json.loads(response.text)
+
             return data_mal["genres"]
         except:
             return None

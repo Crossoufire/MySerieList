@@ -153,17 +153,17 @@
                             <div class="tata m-b-5" style="border-bottom: solid 1px #216e7d;">
                             <div style="font-size: 12pt;">
                             <i style="color: #216e7d;" class="fas fa-tv m-r-10" data-toggle="tooltip" title="Series"></i>
-                            <a class="text-light" href="/media_sheet/Series/{{ update['media_name']|replace('/', '-') }}">{{ update['media_name'] }}</a>
+                            <a class="text-light" href="/media_sheet/Series/{{ update['media_id'] }}">{{ update['media_name'] }}</a>
                         {% elif update['category'] == 'anime' %}
                             <div class="tata m-b-5" style="border-bottom: solid 1px #945141;">
                             <div style="font-size: 12pt;">
                             <i style="color: #945141;" class="fas fa-torii-gate m-r-14" data-toggle="tooltip" title="Anime"></i>
-                            <a class="text-light" href="/media_sheet/Anime/{{ update['media_name']|replace('/', '-') }}">{{ update['media_name'] }}</a>
+                            <a class="text-light" href="/media_sheet/Anime/{{ update['media_id'] }}">{{ update['media_name'] }}</a>
                         {% elif update['category'] == 'movie' %}
                             <div class="tata m-b-5" style="border-bottom: solid 1px #8c7821;">
                             <div style="font-size: 12pt;">
                             <i style="color: #8c7821;" class="fas fa-film m-r-12" data-toggle="tooltip" title="Movie"></i>
-                            <a class="text-light" href="/media_sheet/Movies/{{ update['media_name']|replace('/', '-') }}">{{ update['media_name'] }}</a>
+                            <a class="text-light" href="/media_sheet/Movies/{{ update['media_id'] }}">{{ update['media_name'] }}</a>
                         {% endif %}
                         </div>
 
@@ -683,17 +683,17 @@
                                     <div class="tata m-b-5" style="border-bottom: solid 1px #216e7d;">
                                     <div style="font-size: 12pt;">
                                     <i style="color: #216e7d;" class="fas fa-tv m-r-10" data-toggle="tooltip" title="Series"></i>
-                                    <a class="text-light" href="/media_sheet/Series/{{ update['media_name']|replace('/', '-') }}">{{ update['media_name'] }}</a>
+                                    <a class="text-light" href="/media_sheet/Series/{{ update['media_id'] }}">{{ update['media_name'] }}</a>
                                 {% elif update['category'] == 'anime' %}
                                     <div class="tata m-b-5" style="border-bottom: solid 1px #945141;">
                                     <div style="font-size: 12pt;">
                                     <i style="color: #945141;" class="fas fa-torii-gate m-r-14" data-toggle="tooltip" title="Anime"></i>
-                                    <a class="text-light" href="/media_sheet/Anime/{{ update['media_name'] }}">{{ update['media_name'] }}</a>
+                                    <a class="text-light" href="/media_sheet/Anime/{{ update['media_id'] }}">{{ update['media_name'] }}</a>
                                 {% elif update['category'] == 'movie' %}
                                     <div class="tata m-b-5" style="border-bottom: solid 1px #8c7821;">
                                     <div style="font-size: 12pt;">
                                     <i style="color: #8c7821;" class="fas fa-film m-r-12" data-toggle="tooltip" title="Movie"></i>
-                                    <a class="text-light" href="/media_sheet/Movies/{{ update['media_name'] }}">{{ update['media_name'] }}</a>
+                                    <a class="text-light" href="/media_sheet/Movies/{{ update['media_id'] }}">{{ update['media_name'] }}</a>
                                 {% endif %}
                             </div>
                             <div class="m-l-35" style="font-size: 11pt;">

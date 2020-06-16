@@ -55,8 +55,8 @@ function changeCategory(new_category, element_id, card_id, genres, media_list) {
     }
 
     $categories.isotope('layout');
-    $body = $("body");
 
+    $body = $("body");
     $.ajax ({
         type: "POST",
         url: "/change_element_category",

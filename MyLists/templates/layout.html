@@ -81,62 +81,19 @@
                     <div class="navbar-nav">
                     {% if current_user.is_authenticated %}
 
-{#                        <li class="nav-item dropdown notif-dropdown" onclick="change_badge_color()">#}
-{#                            <a class="nav-link dropdown-toggle" data-toggle="dropdown">#}
-{#                                <i class="fas fa-bell"></i>#}
-{#                                {% set notif_count = current_user.count_notifications() %}#}
-{#                                <span class="notif-badge" {% if notif_count == 0 %} style="background-color: grey;"#}
-{#                                    {% endif %}>{{ notif_count }}#}
-{#                                </span>#}
-{#                            </a>#}
-{#                            <div class="dropdown-menu notif-dropdown-items dropdown-menu-right">#}
-{#                                <div id="notification-items" class="nav-item drop-item text-light">#}
-{#                                    {% set notifications = current_user.get_notifications() %}#}
-{#                                    {% for notif in notifications %}#}
-{#                                        {% if notif.media_type == 'movieslist' %}#}
-{#                                            <div id="{{ notif.media_id }}" class="notif-item-container p-2 m-b-7"#}
-{#                                                 style="background: #8c7821;">#}
-{#                                                <i class="fas fa-film"></i>#}
-{#                                                &nbsp;{{ notif.media_name }}#}
-{#                                                &nbsp;&nbsp;<i class="fas fa-arrow-right"></i>#}
-{#                                                &nbsp;&nbsp;Airs the {{ notif.release_date }}#}
-{#                                                &nbsp;&nbsp;&nbsp;&nbsp;#}
-{#                                                <i class="fas fa-times abs-click"#}
-{#                                                   onclick="delete_notif('{{ notif.media_id }}',#}
-{#                                                           '{{ notif.media_type }}')">#}
-{#                                                </i>#}
-{#                                            </div>#}
-{#                                        {% elif notif.media_type == 'animelist' %}#}
-{#                                            <div id="{{ notif.media_id }}" class="notif-item-container p-2 m-b-7"#}
-{#                                                 style="background: #945141;">#}
-{#                                                <i class="fas fa-torii-gate"></i>#}
-{#                                                &nbsp;{{ notif.media_name }}: S0{{ notif.season }}.E0{{ notif.episode }}#}
-{#                                                &nbsp;&nbsp;<i class="fas fa-arrow-right"></i>#}
-{#                                                &nbsp;&nbsp;Airs the {{ notif.release_date }}#}
-{#                                                &nbsp;&nbsp;&nbsp;&nbsp;#}
-{#                                                <i class="fas fa-times abs-click"#}
-{#                                                   onclick="delete_notif('{{ notif.media_id }}',#}
-{#                                                           '{{ notif.media_type }}')">#}
-{#                                                </i>#}
-{#                                            </div>#}
-{#                                        {% else %}#}
-{#                                            <div id="{{ notif.media_id }}" class="notif-item-container p-2 m-b-7"#}
-{#                                                 style="background: #216e7d;">#}
-{#                                                <i class="fas fa-tv"></i>#}
-{#                                                &nbsp;{{ notif.media_name }}: S0{{ notif.season }}.E0{{ notif.episode }}#}
-{#                                                &nbsp;&nbsp;<i class="fas fa-arrow-right"></i>#}
-{#                                                &nbsp;&nbsp;Airs the {{ notif.release_date }}#}
-{#                                                &nbsp;&nbsp;&nbsp;&nbsp;#}
-{#                                                <i class="fas fa-times abs-click"#}
-{#                                                   onclick="delete_notif('{{ notif.media_id }}',#}
-{#                                                           '{{ notif.media_type }}')">#}
-{#                                                </i>#}
-{#                                            </div>#}
-{#                                        {% endif %}#}
-{#                                    {% endfor %}#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </li>#}
+                        <li class="nav-item dropdown notif-dropdown">
+                            <a id="ajax-notif" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                                <i class="fas fa-bell"></i>
+                                {% set notif_count = current_user.count_notifications() %}
+                                <span class="notif-badge" {% if notif_count == 0 %} style="background-color: grey;"
+                                      {% endif %}>{{ notif_count }}
+                               </span>
+                            </a>
+
+                            <div class="dropdown-menu notif-dropdown-items dropdown-menu-right">
+                                <div id="notification-items" class="nav-item drop-item text-light"></div>
+                            </div>
+                        </li>
 
                         <a class="nav-item nav-link text-light" href="{{ url_for('users.account',
                          user_name=current_user.username) }}">Profile</a>
@@ -197,114 +154,7 @@
     {% block script %}
     {% endblock %}
 
-    <script type="text/javascript">
-        $.widget("custom.catcomplete", $.ui.autocomplete, {
-            _create: function() {
-                this._super();
-                this.widget().menu("option", "items", "> :not(.ui-autocomplete-category)");
-            },
-            _renderMenu: function(ul, items) {
-                let that = this,
-                currentCategory = "";
-                ul.attr('style', 'padding-top: 9px;');
-                $.each(items, function(index, item) {
-                    let li;
-                    if (item.nb_results === 0) {
-                        let a = "No results found."
-                        ul.append('<li class="disabled bg-dark text-light">' + a + '</li>');
-                    } else {
-                        li = that._renderItemData(ul, item);
-                    }
-                });
-            },
-            _renderItem: function(ul, item) {
-                let $li = $('<li class="bg-dark p-t-2 p-b-2" style="border-bottom: solid black 1px;">');
-
-                $li.append(
-                    "<div class='row'>" +
-                        "<div class='col' style='min-width: 60px; max-width: 60px;'>" +
-                            "<img src="+item.poster_path+" alt="+item.name+" style='width: 50px; height: 75px;'>" +
-                        "</div>" +
-                        "<div class='col'>" +
-                            "<a class='text-light'>" +
-                                " "+item.name+" " +
-                                "<br>" +
-                                "<span style='font-size: 10pt;'>("+item.first_air_date+")</span>" +
-                            "</a>" +
-                        "</div>" +
-                   "</div>");
-
-                return $li.appendTo(ul);
-            }
-        });
-
-        $(function() {
-            $("#autocomplete").catcomplete({
-                delay: 200,
-                source: function(request, response) {
-                    $.getJSON("{{ url_for('main.autocomplete') }}", {
-                        q: request.term,
-                    },
-                        function(data) {
-                            response(data.matching_results);
-                        }
-                    );
-                },
-                minLength: 2,
-                select: function(event, ui) {
-                    var form = document.createElement("form");
-                    form.method = "POST";
-                    form.action = "/check_media/"+ui.item.media_type+"/"+ui.item.tmdb_id;
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            });
-        });
-
-        {#function delete_notif(media_id, media_type) {#}
-        {#    $('#'+media_id).fadeOut(300, function() { $(this).remove()});#}
-        {#    $('.dropdown-menu').click(function(e) {#}
-        {#        e.stopPropagation();#}
-        {#    });#}
-        {##}
-        {#    if ($('.notif-item-container').length === 0) {#}
-        {#        $('#notification-items').html("<i>You don't have any notifications.</i>")#}
-        {#    }#}
-        {##}
-        {#    $body = $("body");#}
-        {#    $.ajax ({#}
-        {#        type: "POST",#}
-        {#        url: "/remove_notifications",#}
-        {#        contentType: "application/json",#}
-        {#        data: JSON.stringify({media_id: media_id, media_type: media_type}),#}
-        {#        dataType: "json",#}
-        {#        success: function(response) {#}
-        {#            console.log("ok");#}
-        {#        }#}
-        {#    });#}
-        {#}#}
-        {##}
-        {#function change_badge_color() {#}
-        {#    $('.notif-badge').attr('style', 'background-color: grey;');#}
-        {#    $('.notif-badge').html(0);#}
-        {##}
-        {#    if ($('.notif-item-container').length === 0) {#}
-        {#        $('#notification-items').html("<i>You don't have any notifications.</i>")#}
-        {#    }#}
-        {##}
-        {#    $body = $("body");#}
-        {#    $.ajax ({#}
-        {#        type: "POST",#}
-        {#        url: "/read_notifications",#}
-        {#        contentType: "application/json",#}
-        {#        data: JSON.stringify({check_time: "now" }),#}
-        {#        dataType: "json",#}
-        {#        success: function(response) {#}
-        {#            console.log("ok");#}
-        {#        }#}
-        {#    });#}
-        {#}#}
-    </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/mylists.js') }}" ></script>
 
 <footer class="page-footer font-small">
     <div class="footer-copyright text-center py-3">

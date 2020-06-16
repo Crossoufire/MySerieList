@@ -1,8 +1,8 @@
 # MyLists
 
-MyLists is a website with a beautiful and clear interface which allows you to track all your TV shows / Anime / Movies. 
-It integrates all kind of statistics so you can see how much time you spent. Moreover, you can see you follows' list and 
-compare it to yours. You can see a live version here : [https://mylists.info](https://mylists.info).
+MyLists is a website with a nice and clear interface which allows you to track all your TV shows / Anime and Movies. 
+It integrates statistics so you can see how much time you spent. Moreover, you can see follow people, see their list  
+and compare it to yours. You can see a live version here : [https://mylists.info](https://mylists.info).
 
 ![MyLists](https://raw.githubusercontent.com/Crossoufire/MyLists/master/MyLists/static/img/home222.jpg)
 
@@ -10,14 +10,14 @@ MyLists uses [Flask](http://flask.pocoo.org/) and [Material Design for Bootstrap
 
 ## Features
 
-* Create a list of all your TV shows / Anime / Movies
+* Create a list of all your TV shows / Anime and Movies
 * Compare your list with your follows
-* Get statistics about your list (time spent, number of episodes watched, etc)
+* Get statistics about your list (time spent, number of episodes watched, prefered genres, etc)
 * More to come !
 
 ## Prerequisites
 
-* Python 3.6 (developed and tested with this version)
+* Python 3.6+ (developed and tested with this version)
 * pip3
 
 ## Installation
@@ -62,7 +62,7 @@ When you run the program for the first time, it will create a user `admin` with 
 ## Misc
 
 We started this project to fulfill our needs. The live version [https://mylists.info](https://mylists.info) runs on a 
-raspberry pi 3B+, thus not meant to be used by thousand of people at the same time. If you can see the register button 
+raspberry pi 3B+, thus not meant to be used by a lot of people at the same time. If you can see the register button 
 at the top right of the homepage, feel free to do it. Otherwise, you can run your own version of MyLists ;)
 
 ## Contact
