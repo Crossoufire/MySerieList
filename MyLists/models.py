@@ -453,6 +453,7 @@ class AnimeList(db.Model):
             .join(AnimeActors, AnimeActors.anime_id == Anime.id) \
             .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id) \
             .filter(AnimeList.user_id == user_id).group_by(Anime.id).order_by(Anime.name.asc()).all()
+
         return element_data
 
 

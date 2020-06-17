@@ -19,6 +19,7 @@ bp = Blueprint('general', __name__)
 def create_user():
     db.create_all()
     if User.query.filter_by(id='1').first() is None:
+        # noinspection PyArgumentList
         new_admin = User(username='admin',
                          email='admin@admin.com',
                          password=bcrypt.generate_password_hash("password").decode('utf-8'),

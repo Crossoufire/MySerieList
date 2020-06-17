@@ -22,7 +22,16 @@ function addToUser(element_id, media_type) {
         data: JSON.stringify({element_id: element_id, element_type: media_type, element_cat: category}),
         dataType: "json",
         success: function(response) {
-            console.log("ok");
+            let info = response.data;
+            if (info['code'] === 500) {
+                $('.container > .content').append(
+                    '<div class="alert alert-' + info['category'] + 'alert-dismissible m-t-15" role="alert">' +
+                        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                            '<span aria-hidden="true">&times;</span>' +
+                        '</button>' +
+                            info['body'] +
+                    '</div>');
+            }
         }
     });
 }

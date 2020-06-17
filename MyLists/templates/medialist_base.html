@@ -10,7 +10,7 @@
     <div class="back-image p-b-15">
         <div class="d-flex flex-wrap center-mobile">
             <div class="m-l-30 m-t-20 icons-mobile">
-                <a class="fas fa-lg fa-user m-r-8 return-icon" href="{{ url_for('users.account', user_name=target_user_name) }}"
+                <a class="fas fa-lg fa-user m-r-8 return-icon" href="/account/{{ target_user_name }})"
                    data-toggle="tooltip" title="{{ target_user_name }}" style="color: grey;"></a>
                 {% if media_list == 'serieslist' %}
                     <a class="fas fa-lg fa-torii-gate m-r-8 return-icon" href="/animelist/{{ target_user_name }}"
@@ -32,8 +32,8 @@
             {% if target_user_id != current_user.get_id() %}
                 <div class="ml-auto m-r-30 m-t-20">
                     <div class="text-center common-media">
-                            You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)
-                        </div>
+                        You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)
+                    </div>
                     <div class="common-media-meter">
                         <span class="common-media-meter-bar" style="width: {{ common_elements[2] }}%;"></span>
                     </div>
@@ -45,7 +45,8 @@
             <div class="ml-auto mr-auto">
                 <i class="fas fa-search text-dark" style="text-shadow: 0 0 0 #000 !important;"></i>
                 <label for="searchInput"></label>
-                <input id="searchInput" class='modded-input text-light' placeholder="Search title / actor / genre" onkeyup="searchElement()">
+                <input id="searchInput" class='modded-input text-light' placeholder="Search title / actor / genre"
+                       onkeyup="searchElement()">
                 <label>
                     <select class="search-select m-l-10">
                         <option selected="selected">All</option>
@@ -76,11 +77,11 @@
             </div>
         </div>
     <div id="categories-iso" class="categories-iso p-t-30">
-        {% for key in all_data %}
+        {% for key in media_data %}
             <div class="categories {% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key }}{% endif %}">
                 <h2 class="text-center m-t-20 mb-0">{{ key }}<hr class="mt-2 pb-3 mb-0"></h2>
                 <div class="row category-{% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key }}{% endif %}">
-                    {% for data in all_data[key] %}
+                    {% for data in media_data[key] %}
                         <div id="card_{{ data['id'] }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
                             <div class="card bg-transparent">
                                 <div class="view overlay">
@@ -113,20 +114,18 @@
                                         {% block card_top_left_1 scoped %}
                                         {% endblock card_top_left_1 %}
                                         <a class="card-btn-top-right fas fa-trash text-light" onclick="deleteElement(
-                                                '{{ data['id'] }}', 'card_{{ data['id'] }}', '{{ media_list }}')"></a>
-                                        {% if data['favorite'] %}
-                                            <a id="fav-{{ data['id'] }}" class="card-favorite fas fa-star" style="color: darkgoldenrod;"
-                                               onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></a>
-                                        {% else %}
-                                            <a id="fav-{{ data['id'] }}" class="card-btn-bottom-left far fa-star"
-                                               onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></a>
-                                        {% endif %}
+                                                '{{ data['id'] }}', 'card_{{ data['id'] }}', '{{ media_list }}')">
+                                        </a>
+                                        <a id="fav-{{ data['id'] }}" {% if data['favorite'] %}
+                                        class="card-favorite fas fa-star" style="color: darkgoldenrod;"
+                                        {% else %} class="card-btn-bottom-left far fa-star" {% endif %}
+                                        onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')">
+                                        </a>
                                     {% else %}
-                                        {% if data['favorite'] %}
-                                            <a class="card-favorite fas fa-star" style="color: darkgoldenrod;"></a>
-                                        {% else %}
-                                            <a class="card-btn-bottom-left far fa-star"></a>
-                                        {% endif %}
+                                        <a {% if data['favorite'] %} class="card-favorite fas fa-star"
+                                        style="color: darkgoldenrod;" {% else %} class="card-btn-bottom-left far
+                                        fa-star"> {% endif %}
+                                        </a>
                                         {% if data['common'] %}
                                             <div class="card-ribbon"></div>
                                         {% else %}

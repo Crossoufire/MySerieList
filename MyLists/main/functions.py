@@ -259,6 +259,22 @@ def get_details(api_id, list_type):
 # ---------------------------------------------------------------------------------------------------
 
 
+def check_autorization_user(username):
+    user = User.query.filter_by(username=username).first()
+
+    # No account with this username and protection of the admin account
+    if user is None or user.id == 1 and current_user.id != 1:
+        abort(404)
+
+    # Check if the current account can see the target account's movies collection
+    if current_user.id == user.id or current_user.id == 1:
+        pass
+    elif user.private and current_user.is_following(user) is False:
+        abort(404)
+
+    return user
+
+
 def check_cat_type(list_type, status):
     if list_type != ListType.MOVIES:
         if status == 'Watching':
@@ -531,14 +547,14 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                         alphabet_group[element[0].name[0].upper()] = [element_info]
 
     try:
-        percentage = int((common_elements / len(element_data)) * 100)
+        percentage = int((common_elements/len(element_data))*100)
     except ZeroDivisionError:
         percentage = 0
 
-    all_media_data = {"grouping": category_tv_group,
-                      "common_elements": [common_elements, len(element_data), percentage]}
+    data = {"grouping": category_tv_group,
+            "common_elements": [common_elements, len(element_data), percentage]}
 
-    return all_media_data
+    return data
 
 
 def set_last_update(media, media_type, old_status=None, new_status=None, old_season=None, new_season=None,
@@ -597,70 +613,46 @@ def load_media_sheet(media_id, user_id, list_type):
 
 
 def add_element_to_user(element, user_id, list_type, category):
-    if list_type == ListType.SERIES:
-        # Set season/episode to max if the "completed" category is selected
+    if list_type != ListType.MOVIES:
         if category == Status.COMPLETED:
-            seasons_eps = SeriesEpisodesPerSeason.query.filter_by(series_id=element.id).all()
+            seasons_eps = element.eps_per_season
+            # seasons_eps = SeriesEpisodesPerSeason.query.filter_by(series_id=element.id).all()
             current_season = len(seasons_eps)
             last_episode_watched = seasons_eps[-1].episodes
         else:
             current_season = 1
             last_episode_watched = 1
+    elif list_type == ListType.MOVIES:
+        if category == Status.COMPLETED:
+            # If contain the "ANIMATION" genre add to "COMPLETED_ANIMATION" category
+            is_animation = MoviesGenre.query.filter_by(movies_id=element.id, genre="Animation").first()
+            if is_animation:
+                category = Status.COMPLETED_ANIMATION
 
+    if list_type == ListType.SERIES:
         user_list = SeriesList(user_id=user_id,
                                series_id=element.id,
                                current_season=current_season,
                                last_episode_watched=last_episode_watched,
                                status=category)
-
-        # Commit the changes
-        db.session.add(user_list)
-        db.session.commit()
-        app.logger.info('[{}] Added a series with the ID {}'.format(user_id, element.id))
-
-        # Set the last update
-        set_last_update(media=element, media_type=list_type, new_status=category)
     elif list_type == ListType.ANIME:
-        # Set season/episode to max if the "completed" category is selected
-        if category == Status.COMPLETED:
-            seasons_eps = AnimeEpisodesPerSeason.query.filter_by(anime_id=element.id).all()
-            current_season = len(seasons_eps)
-            last_episode_watched = seasons_eps[-1].episodes
-        else:
-            current_season = 1
-            last_episode_watched = 1
-
         user_list = AnimeList(user_id=user_id,
                               anime_id=element.id,
                               current_season=current_season,
                               last_episode_watched=last_episode_watched,
                               status=category)
-
-        # Commit the changes
-        db.session.add(user_list)
-        db.session.commit()
-        app.logger.info('[{}] Added an anime with the ID {}'.format(user_id, element.id))
-
-        # Set the last update
-        set_last_update(media=element, media_type=list_type, new_status=category)
     elif list_type == ListType.MOVIES:
-        if category == Status.COMPLETED:
-            # If it contain the "Animation" genre add to "Completed Animation"
-            is_animation = MoviesGenre.query.filter_by(movies_id=element.id, genre="Animation").first()
-            if is_animation:
-                category = Status.COMPLETED_ANIMATION
-
         user_list = MoviesList(user_id=user_id,
                                movies_id=element.id,
                                status=category)
 
-        # Commit the changes
-        db.session.add(user_list)
-        db.session.commit()
-        app.logger.info('[{}] Added a movie with the ID {}'.format(user_id, element.id))
+    # Commit the changes
+    db.session.add(user_list)
+    db.session.commit()
+    app.logger.info('[{}] Added the Media ({}) {}, with ID {}'.format(user_id, list_type, element.name, element.id))
 
-        # Set the last update
-        set_last_update(media=element, media_type=list_type, new_status=category)
+    # Set the last update
+    set_last_update(media=element, media_type=list_type, new_status=category)
 
     # Compute the new time spent
     compute_time_spent(cat_type="category", media=element, new_status=category, list_type=list_type)

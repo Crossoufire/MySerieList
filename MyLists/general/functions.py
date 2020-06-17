@@ -13,6 +13,60 @@ from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisod
     SeriesList, Series, MoviesList, Movies, Badges, MoviesCollections, Ranks, Frames, UserLastUpdate
 
 
+def compute_media_time_spent(list_type):
+    users = User.query.all()
+
+    for user in users:
+        if list_type == ListType.ANIME:
+            element_data = db.session.query(AnimeList, Anime, func.group_concat(AnimeEpisodesPerSeason.episodes)) \
+                .join(Anime, Anime.id == AnimeList.anime_id) \
+                .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id) \
+                .filter(AnimeList.user_id == user.id).group_by(AnimeList.anime_id)
+        elif list_type == ListType.SERIES:
+            element_data = db.session.query(SeriesList, Series, func.group_concat(SeriesEpisodesPerSeason.episodes)) \
+                .join(Series, Series.id == SeriesList.series_id) \
+                .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id) \
+                .filter(SeriesList.user_id == user.id).group_by(SeriesList.series_id)
+        elif list_type == ListType.MOVIES:
+            element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id) \
+                .filter(MoviesList.user_id == user.id).group_by(MoviesList.movies_id)
+
+        if list_type != ListType.MOVIES:
+            total_time = 0
+            for element in element_data:
+                if element[0].status == Status.COMPLETED:
+                    try:
+                        total_time += element[1].episode_duration * element[1].total_episodes
+                    except:
+                        pass
+                elif element[0].status != Status.PLAN_TO_WATCH or element[0].status != Status.RANDOM:
+                    try:
+                        episodes = element[2].split(",")
+                        episodes = [int(x) for x in episodes]
+                        for i in range(1, element[0].current_season):
+                            total_time += element[1].episode_duration * episodes[i - 1]
+                        total_time += element[0].last_episode_watched * element[1].episode_duration
+                    except:
+                        pass
+        elif list_type == ListType.MOVIES:
+            total_time = 0
+            for element in element_data:
+                if element[0].status != Status.PLAN_TO_WATCH:
+                    try:
+                        total_time += element[1].runtime
+                    except:
+                        pass
+
+        if list_type == ListType.ANIME:
+            user.time_spent_anime = total_time
+        elif list_type == ListType.SERIES:
+            user.time_spent_series = total_time
+        elif list_type == ListType.MOVIES:
+            user.time_spent_movies = total_time
+
+        db.session.commit()
+
+
 def get_trending_data(trends_data, list_type):
     trending_list = []
     tmdb_posters_path = "http://image.tmdb.org/t/p/w300"
@@ -100,60 +154,6 @@ def get_trending_data(trends_data, list_type):
                 break
 
         return trending_list
-
-
-def compute_media_time_spent(list_type):
-    users = User.query.all()
-
-    for user in users:
-        if list_type == ListType.ANIME:
-            element_data = db.session.query(AnimeList, Anime, func.group_concat(AnimeEpisodesPerSeason.episodes)) \
-                .join(Anime, Anime.id == AnimeList.anime_id) \
-                .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id) \
-                .filter(AnimeList.user_id == user.id).group_by(AnimeList.anime_id)
-        elif list_type == ListType.SERIES:
-            element_data = db.session.query(SeriesList, Series, func.group_concat(SeriesEpisodesPerSeason.episodes)) \
-                .join(Series, Series.id == SeriesList.series_id) \
-                .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id) \
-                .filter(SeriesList.user_id == user.id).group_by(SeriesList.series_id)
-        elif list_type == ListType.MOVIES:
-            element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id) \
-                .filter(MoviesList.user_id == user.id).group_by(MoviesList.movies_id)
-
-        if list_type != ListType.MOVIES:
-            total_time = 0
-            for element in element_data:
-                if element[0].status == Status.COMPLETED:
-                    try:
-                        total_time += element[1].episode_duration * element[1].total_episodes
-                    except:
-                        pass
-                elif element[0].status != Status.PLAN_TO_WATCH or element[0].status != Status.RANDOM:
-                    try:
-                        episodes = element[2].split(",")
-                        episodes = [int(x) for x in episodes]
-                        for i in range(1, element[0].current_season):
-                            total_time += element[1].episode_duration * episodes[i - 1]
-                        total_time += element[0].last_episode_watched * element[1].episode_duration
-                    except:
-                        pass
-        elif list_type == ListType.MOVIES:
-            total_time = 0
-            for element in element_data:
-                if element[0].status != Status.PLAN_TO_WATCH:
-                    try:
-                        total_time += element[1].runtime
-                    except:
-                        pass
-
-        if list_type == ListType.ANIME:
-            user.time_spent_anime = total_time
-        elif list_type == ListType.SERIES:
-            user.time_spent_series = total_time
-        elif list_type == ListType.MOVIES:
-            user.time_spent_movies = total_time
-
-        db.session.commit()
 
 
 # ---------------------------------------- DB add/refresh from CSV data ---------------------------------------------- #
@@ -357,26 +357,3 @@ def refresh_collections_movies():
         except:
             continue
     print('Finished.')
-
-
-def add_director_movies():
-    print('Started')
-    all_movies = Movies.query.all()
-    for movie in all_movies:
-        tmdb_movies_id = movie.themoviedb_id
-        response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
-                                .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']))
-        element_cast = json.loads(response.text)
-
-        try:
-            for data in element_cast['crew']:
-                if data['job'] == "Director":
-                    director_name = data['name']
-                    break
-        except:
-            director_name = "Unknown"
-
-        movie.director_name = director_name
-        db.session.commit()
-
-        print('Added one', director_name)
