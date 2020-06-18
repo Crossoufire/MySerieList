@@ -5,7 +5,7 @@ import urllib.request
 from PIL import Image
 from MyLists import app
 from pathlib import Path
-from flask import url_for
+from flask import url_for, abort
 from jikanpy import Jikan
 from MyLists.models import ListType
 
@@ -16,27 +16,25 @@ class ApiData:
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
 
     def autocomplete_search(self, element_name):
-        try:
-            response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
-                                    .format(self.tmdb_api_key, element_name))
-        except Exception as e:
-            app.logger.error('[SYSTEM] Error requesting the TMDB API: {}'.format(e))
-            return [{"nb_results": 0}]
+        response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
+                                .format(self.tmdb_api_key, element_name))
 
-        data = self.check_response_status(response)
-        if data is False:
-            return [{"nb_results": 0}]
+        if response.status_code != 200:
+            abort(response.status_code)
+
+        # Get the response in a json form
+        data = json.loads(response.text)
 
         if data.get("total_results", 0) == 0:
-            return [{"nb_results": 0}]
+            return [{'nb_results': 0}]
 
         # Recover 7 results without peoples
-        tmdb_results, i = [], 0
-        while i < data["total_results"] and i < 20 and len(tmdb_results) < 7:
-            result = data["results"][i]
+        tmdb_results = []
+        for i, result in enumerate(data["results"]):
+            if i >= data["total_results"] or i > 19 or len(tmdb_results) >= 7:
+                break
 
             if result.get('known_for_department'):
-                i += 1
                 continue
 
             media_data = {'name': result.get('original_title') or result.get('original_name'),
@@ -47,14 +45,14 @@ class ApiData:
                 media_data['first_air_date'] = 'Unknown'
 
             if result['media_type'] == 'tv':
-                if result['origin_country'] == 'JP' or result['original_language'] == 'ja' and 16 \
-                        in result['genre_ids']:
-                    media_data['media_type'] = 'animelist'
+                if result['origin_country'] == 'JP' or result['original_language'] == 'ja' \
+                        and 16 in result['genre_ids']:
+                    media_data['media_type'] = ListType.ANIME.value
                     media_data['name'] = result['name']
                 else:
-                    media_data['media_type'] = 'serieslist'
+                    media_data['media_type'] = ListType.SERIES.value
             elif result['media_type'] == 'movie':
-                media_data['media_type'] = 'movieslist'
+                media_data['media_type'] = ListType.MOVIES.value
                 if result['original_language'] == 'ja' and 16 in result['genre_ids']:
                     media_data['name'] = result['title']
 
@@ -64,19 +62,13 @@ class ApiData:
                 media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
             tmdb_results.append(media_data)
 
-            i += 1
-
         return tmdb_results
 
     def media_search(self, element_name):
-        try:
-            response_tv = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
+        response_tv = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
+                                   .format(self.tmdb_api_key, element_name))
+        response_movies = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
                                        .format(self.tmdb_api_key, element_name))
-            response_movies = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
-                                           .format(self.tmdb_api_key, element_name))
-        except Exception as e:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
-            return None
 
         data_tv = self.check_response_status(response_tv)
         data_movies = self.check_response_status(response_movies)
@@ -253,26 +245,3 @@ class ApiData:
             return data_mal["genres"]
         except:
             return None
-
-    @staticmethod
-    def check_response_status(response):
-        if response.status_code == 200:
-            return json.loads(response.text)
-        elif response.status_code == 400:
-            app.logger.error('[SYSTEM] Error requesting the API (TMDB or Jikan): Bad Request')
-        elif response.status_code == 401:
-            app.logger.error('[SYSTEM] Error requesting themoviedb API: invalid API key')
-        elif response.status_code == 404:
-            app.logger.error('[SYSTEM] Invalid id: The pre-requisite id is invalid or not found.')
-        elif response.status_code == 405:
-            app.logger.error('[SYSTEM] Method Not Allowed: The requested method is not supported for resource.')
-        elif response.status_code == 429:
-            app.logger.error('[SYSTEM] Too Many Requests: You are being rate limited or Jikan is being rate limited.')
-        elif response.status_code == 500:
-            app.logger.error('[SYSTEM] 	Internal error: Something went wrong, contact TMDb or Jikan.')
-        elif response.status_code == 503:
-            app.logger.error('[SYSTEM] Service offline: This service is temporarily offline, try again later.')
-        elif response.status_code == 504:
-            app.logger.error('[SYSTEM] Your request to the backend server timed out. Try again.')
-
-        return False

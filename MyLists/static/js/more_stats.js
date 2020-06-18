@@ -3,8 +3,8 @@
 // --- Series Canvas Data -------------------------------------------------
 let series_episodes_labels = $('#episodes-series-bar').attr('values-y').split(', ');
 let series_episodes_data = $('#episodes-series-bar').attr('values-x').split(', ');
-series_episodes_labels.pop(-1);
-series_episodes_data.pop(-1);
+series_episodes_labels.pop();
+series_episodes_data.pop();
 
 let series_episodes_rgb = [];
 for(let j = 0; j < (series_episodes_data.length); j++) {
@@ -34,15 +34,15 @@ let series_episodes_config = {
         animation: {
             duration: 1,
             onComplete: function () {
-                var chartInstance = this.chart,
+                let chartInstance = this.chart,
                 ctx = chartInstance.ctx;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
 
                 this.data.datasets.forEach(function (dataset, i) {
-                    var meta = chartInstance.controller.getDatasetMeta(i);
+                    let meta = chartInstance.controller.getDatasetMeta(i);
                     meta.data.forEach(function (bar, index) {
-                        var data = dataset.data[index];
+                        let data = dataset.data[index];
                         ctx.fillText(data, bar._model.x + 10, bar._model.y - 7);
                     });
                 });
@@ -83,12 +83,12 @@ let series_episodes_config = {
     }
 };
 let series_episodes_ctx = document.getElementById('episodes-series').getContext('2d');
-let series_episodes_bar = new Chart(series_episodes_ctx, series_episodes_config);
+new Chart(series_episodes_ctx, series_episodes_config);
 
 let series_periods_labels = $('#periods-series-bar').attr('values-y').split(', ');
 let series_periods_data = $('#periods-series-bar').attr('values-x').split(', ');
-series_periods_labels.pop(-1);
-series_periods_data.pop(-1);
+series_periods_labels.pop();
+series_periods_data.pop();
 
 let series_periods_rgb = [];
 for(let j = 0; j < (series_periods_data.length); j++) {
@@ -118,15 +118,15 @@ let series_periods_config = {
         animation: {
             duration: 1,
             onComplete: function () {
-                var chartInstance = this.chart,
+                let chartInstance = this.chart,
                 ctx = chartInstance.ctx;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
 
                 this.data.datasets.forEach(function (dataset, i) {
-                    var meta = chartInstance.controller.getDatasetMeta(i);
+                    let meta = chartInstance.controller.getDatasetMeta(i);
                     meta.data.forEach(function (bar, index) {
-                        var data = dataset.data[index];
+                        let data = dataset.data[index];
                         ctx.fillText(data, bar._model.x + 10, bar._model.y - 7);
                     });
                 });
@@ -167,12 +167,12 @@ let series_periods_config = {
     }
 };
 let series_periods_ctx = document.getElementById('periods-series').getContext('2d');
-let series_periods_bar = new Chart(series_periods_ctx, series_periods_config);
+new Chart(series_periods_ctx, series_periods_config);
 
 let series_genres_labels = $('#genres-series-bar').attr('values-y').split(', ');
 let series_genres_data = $('#genres-series-bar').attr('values-x').split(', ');
-series_genres_labels.pop(-1);
-series_genres_data.pop(-1);
+series_genres_labels.pop();
+series_genres_data.pop();
 
 let series_genres_rgb = [];
 for(let j = 0; j < (series_genres_data.length); j++) {
@@ -202,15 +202,15 @@ let series_genres_config = {
         animation: {
             duration: 1,
             onComplete: function () {
-                var chartInstance = this.chart,
+                let chartInstance = this.chart,
                 ctx = chartInstance.ctx;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
 
                 this.data.datasets.forEach(function (dataset, i) {
-                    var meta = chartInstance.controller.getDatasetMeta(i);
+                    let meta = chartInstance.controller.getDatasetMeta(i);
                     meta.data.forEach(function (bar, index) {
-                        var data = dataset.data[index];
+                        let data = dataset.data[index];
                         ctx.fillText(data + ' h', bar._model.x + 10, bar._model.y - 7);
                     });
                 });
@@ -251,14 +251,14 @@ let series_genres_config = {
     }
 };
 let series_genres_ctx = document.getElementById('genres-series').getContext('2d');
-let series_genres_bar = new Chart(series_genres_ctx, series_genres_config);
+new Chart(series_genres_ctx, series_genres_config);
 
 
 // --- Anime Canvas Data -------------------------------------------------
 let anime_episodes_labels = $('#episodes-anime-bar').attr('values-y').split(', ');
 let anime_episodes_data = $('#episodes-anime-bar').attr('values-x').split(', ');
-anime_episodes_labels.pop(-1);
-anime_episodes_data.pop(-1);
+anime_episodes_labels.pop();
+anime_episodes_data.pop();
 
 let anime_episodes_rgb = [];
 for(let j = 0; j < (anime_episodes_data.length); j++) {
@@ -288,15 +288,15 @@ let anime_episodes_config = {
         animation: {
             duration: 1,
             onComplete: function () {
-                var chartInstance = this.chart,
+                let chartInstance = this.chart,
                 ctx = chartInstance.ctx;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
 
                 this.data.datasets.forEach(function (dataset, i) {
-                    var meta = chartInstance.controller.getDatasetMeta(i);
+                    let meta = chartInstance.controller.getDatasetMeta(i);
                     meta.data.forEach(function (bar, index) {
-                        var data = dataset.data[index];
+                        let data = dataset.data[index];
                         ctx.fillText(data, bar._model.x + 10, bar._model.y - 7);
                     });
                 });
@@ -337,12 +337,12 @@ let anime_episodes_config = {
     }
 };
 let anime_episodes_ctx = document.getElementById('episodes-anime').getContext('2d');
-let anime_episodes_bar = new Chart(anime_episodes_ctx, anime_episodes_config);
+new Chart(anime_episodes_ctx, anime_episodes_config);
 
 let anime_periods_labels = $('#periods-anime-bar').attr('values-y').split(', ');
 let anime_periods_data = $('#periods-anime-bar').attr('values-x').split(', ');
-anime_periods_labels.pop(-1);
-anime_periods_data.pop(-1);
+anime_periods_labels.pop();
+anime_periods_data.pop();
 
 let anime_periods_rgb = [];
 for(let j = 0; j < (anime_periods_data.length); j++) {
@@ -372,15 +372,15 @@ let anime_periods_config = {
         animation: {
             duration: 1,
             onComplete: function () {
-                var chartInstance = this.chart,
+                let chartInstance = this.chart,
                 ctx = chartInstance.ctx;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
 
                 this.data.datasets.forEach(function (dataset, i) {
-                    var meta = chartInstance.controller.getDatasetMeta(i);
+                    let meta = chartInstance.controller.getDatasetMeta(i);
                     meta.data.forEach(function (bar, index) {
-                        var data = dataset.data[index];
+                        let data = dataset.data[index];
                         ctx.fillText(data, bar._model.x + 10, bar._model.y - 7);
                     });
                 });
@@ -421,12 +421,12 @@ let anime_periods_config = {
     }
 };
 let anime_periods_ctx = document.getElementById('periods-anime').getContext('2d');
-let anime_periods_bar = new Chart(anime_periods_ctx, anime_periods_config);
+new Chart(anime_periods_ctx, anime_periods_config);
 
 let anime_genres_labels = $('#genres-anime-bar').attr('values-y').split(', ');
 let anime_genres_data = $('#genres-anime-bar').attr('values-x').split(', ');
-anime_genres_labels.pop(-1);
-anime_genres_data.pop(-1);
+anime_genres_labels.pop();
+anime_genres_data.pop();
 
 let anime_genres_rgb = [];
 for(let j = 0; j < (anime_genres_data.length); j++) {
@@ -456,15 +456,15 @@ let anime_genres_config = {
         animation: {
             duration: 1,
             onComplete: function () {
-                var chartInstance = this.chart,
+                let chartInstance = this.chart,
                 ctx = chartInstance.ctx;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
 
                 this.data.datasets.forEach(function (dataset, i) {
-                    var meta = chartInstance.controller.getDatasetMeta(i);
+                    let meta = chartInstance.controller.getDatasetMeta(i);
                     meta.data.forEach(function (bar, index) {
-                        var data = dataset.data[index];
+                        let data = dataset.data[index];
                         ctx.fillText(data + ' h', bar._model.x + 10, bar._model.y - 7);
                     });
                 });
@@ -505,14 +505,14 @@ let anime_genres_config = {
     }
 };
 let anime_genres_ctx = document.getElementById('genres-anime').getContext('2d');
-let anime_genres_bar = new Chart(anime_genres_ctx, anime_genres_config);
+new Chart(anime_genres_ctx, anime_genres_config);
 
 
 // --- Movies Canvas Data -------------------------------------------------
 let movies_lengths_labels = $('#lengths-movies-bar').attr('values-y').split(', ');
 let movies_lengths_data = $('#lengths-movies-bar').attr('values-x').split(', ');
-movies_lengths_labels.pop(-1);
-movies_lengths_data.pop(-1);
+movies_lengths_labels.pop();
+movies_lengths_data.pop();
 
 let movies_lengths_rgb = [];
 for(let j = 0; j < (movies_lengths_data.length); j++) {
@@ -542,15 +542,15 @@ let movies_lengths_config = {
         animation: {
             duration: 1,
             onComplete: function () {
-                var chartInstance = this.chart,
+                let chartInstance = this.chart,
                 ctx = chartInstance.ctx;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
 
                 this.data.datasets.forEach(function (dataset, i) {
-                    var meta = chartInstance.controller.getDatasetMeta(i);
+                    let meta = chartInstance.controller.getDatasetMeta(i);
                     meta.data.forEach(function (bar, index) {
-                        var data = dataset.data[index];
+                        let data = dataset.data[index];
                         ctx.fillText(data, bar._model.x + 10, bar._model.y - 7);
                     });
                 });
@@ -591,12 +591,12 @@ let movies_lengths_config = {
     }
 };
 let movies_lengths_ctx = document.getElementById('lengths-movies').getContext('2d');
-let movies_lengths_bar = new Chart(movies_lengths_ctx, movies_lengths_config);
+new Chart(movies_lengths_ctx, movies_lengths_config);
 
 let movies_periods_labels = $('#periods-movies-bar').attr('values-y').split(', ');
 let movies_periods_data = $('#periods-movies-bar').attr('values-x').split(', ');
-movies_periods_labels.pop(-1);
-movies_periods_data.pop(-1);
+movies_periods_labels.pop();
+movies_periods_data.pop();
 
 let movies_periods_rgb = [];
 for(let j = 0; j < (movies_periods_data.length); j++) {
@@ -626,15 +626,15 @@ let movies_periods_config = {
         animation: {
             duration: 1,
             onComplete: function () {
-                var chartInstance = this.chart,
+                let chartInstance = this.chart,
                 ctx = chartInstance.ctx;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
 
                 this.data.datasets.forEach(function (dataset, i) {
-                    var meta = chartInstance.controller.getDatasetMeta(i);
+                    let meta = chartInstance.controller.getDatasetMeta(i);
                     meta.data.forEach(function (bar, index) {
-                        var data = dataset.data[index];
+                        let data = dataset.data[index];
                         ctx.fillText(data, bar._model.x + 10, bar._model.y - 7);
                     });
                 });
@@ -675,12 +675,12 @@ let movies_periods_config = {
     }
 };
 let movies_periods_ctx = document.getElementById('periods-movies').getContext('2d');
-let movies_periods_bar = new Chart(movies_periods_ctx, movies_periods_config);
+new Chart(movies_periods_ctx, movies_periods_config);
 
 let movies_genres_labels = $('#genres-movies-bar').attr('values-y').split(', ');
 let movies_genres_data = $('#genres-movies-bar').attr('values-x').split(', ');
-movies_genres_labels.pop(-1);
-movies_genres_data.pop(-1);
+movies_genres_labels.pop();
+movies_genres_data.pop();
 
 let movies_genres_rgb = [];
 for(let j = 0; j < (movies_genres_data.length); j++) {
@@ -710,15 +710,15 @@ let movies_genres_config = {
         animation: {
             duration: 1,
             onComplete: function () {
-                var chartInstance = this.chart,
+                let chartInstance = this.chart,
                 ctx = chartInstance.ctx;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
 
                 this.data.datasets.forEach(function (dataset, i) {
-                    var meta = chartInstance.controller.getDatasetMeta(i);
+                    let meta = chartInstance.controller.getDatasetMeta(i);
                     meta.data.forEach(function (bar, index) {
-                        var data = dataset.data[index];
+                        let data = dataset.data[index];
                         ctx.fillText(data + ' h', bar._model.x + 10, bar._model.y - 7);
                     });
                 });
@@ -759,7 +759,7 @@ let movies_genres_config = {
     }
 };
 let movies_genres_ctx = document.getElementById('genres-movies').getContext('2d');
-let movies_genres_bar = new Chart(movies_genres_ctx, movies_genres_config);
+new Chart(movies_genres_ctx, movies_genres_config);
 
 
 // --- Media genres container size -------------------------------------------------

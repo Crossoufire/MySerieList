@@ -3,11 +3,6 @@ ul {
     list-style-type: none;
 }
 
-.test {
-    position: absolute;
-    z-index: 9999;
-}
-
 .eps-per-season {
     overflow-y : auto;
     max-height: 250px;

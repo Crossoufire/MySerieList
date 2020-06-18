@@ -798,16 +798,16 @@ def lock_media():
 @bp.route('/search_media', methods=['GET'])
 @login_required
 def search_media():
-    search = request.args['search']
+    search = request.args.get('search')
 
-    if search is None:
-        flash('Sorry, no results found for your query.', 'warning')
-
-    results = ApiData().media_search(search)
-
-    if not results[0] and not results[1] and not results[2]:
+    if len(search) == 0 or not search:
         flash('Sorry, no results found for your query.', 'warning')
         return redirect(request.referrer)
+
+    try:
+        results = ApiData().autocomplete_search(search)
+    except Exception as e:
+        app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
 
     platform = str(request.user_agent.platform)
     if platform == "iphone" or platform == "android" or platform is None or platform == 'None':
@@ -817,9 +817,7 @@ def search_media():
 
     return render_template(template,
                            title="Media search",
-                           series_results=results[0],
-                           anime_results=results[1],
-                           movies_results=results[2],
+                           search_results=results,
                            search=search)
 
 
@@ -827,7 +825,12 @@ def search_media():
 @login_required
 def autocomplete():
     search = request.args.get('q')
-    results = ApiData().autocomplete_search(search)
+
+    try:
+        results = ApiData().autocomplete_search(search)
+    except Exception as e:
+        app.logger.error('[SYSTEM] Error requesting the TMDB API: {}'.format(e))
+        results = [{'nb_results': 0}]
 
     return jsonify(matching_results=results), 200
 

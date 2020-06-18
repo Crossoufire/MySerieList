@@ -1,69 +1,63 @@
 
 
 // --- Autocomplete ---------------------------------------------------------
-$.widget("custom.catcomplete", $.ui.autocomplete, {
-    _create: function() {
-        this._super();
-        this.widget().menu("option", "items", "> :not(.ui-autocomplete-category)");
-    },
-    _renderMenu: function(ul, items) {
-        let that = this,
-            currentCategory = "";
-        ul.attr('style', 'padding-top: 9px;');
-        $.each(items, function(index, item) {
-            let li;
-            if (item.nb_results === 0) {
-                let a = "No results found."
-                ul.append('<li class="disabled bg-dark text-light">' + a + '</li>');
-            } else {
-                li = that._renderItemData(ul, item);
-            }
-        });
-    },
-    _renderItem: function(ul, item) {
-        let $li = $('<li class="bg-dark p-t-2 p-b-2" style="border-bottom: solid black 1px;">');
-
-        $li.append(
-            "<div class='row'>" +
-            "<div class='col' style='min-width: 60px; max-width: 60px;'>" +
-            "<img src="+item.poster_path+" alt="+item.name+" style='width: 50px; height: 75px;'>" +
-            "</div>" +
-            "<div class='col'>" +
-            "<a class='text-light'>" +
-            " "+item.name+" " +
-            "<br>" +
-            "<span style='font-size: 10pt;'>("+item.first_air_date+")</span>" +
-            "</a>" +
-            "</div>" +
-            "</div>");
-
-        return $li.appendTo(ul);
-    }
-});
-
-
-// --- Autocomplete ---------------------------------------------------------
 $(function() {
     $("#autocomplete").catcomplete({
         delay: 200,
+        minLength: 2,
         source: function(request, response) {
             $.getJSON("/autocomplete", {
-                    q: request.term,
-                },
-                function(data) {
-                    response(data.matching_results);
-                }
-            );
+                q: request.term,
+            },
+            function(data) {
+                response(data.matching_results);
+            });
         },
-        minLength: 2,
         select: function(event, ui) {
-            var form = document.createElement("form");
+            let form = document.createElement("form");
             form.method = "POST";
             form.action = "/check_media/"+ui.item.media_type+"/"+ui.item.tmdb_id;
             document.body.appendChild(form);
             form.submit();
         }
     });
+});
+
+$.widget("custom.catcomplete", $.ui.autocomplete, {
+    _renderItem: function(ul, item) {
+        ul.attr('style', 'padding-top:9px;');
+
+        let media, $li;
+
+        if (item.media_type === "serieslist") {
+            media = 'TV Show';
+        } else if (item.media_type === "animelist") {
+            media = 'Anime';
+        } else {
+            media = 'Movie';
+        }
+
+        if (item.nb_results === 0) {
+            let a = "No results found.";
+            $li = $('<li class="disabled bg-dark text-light p-l-5">'+ a + '</li>');
+        } else {
+            $li = $('<li class="bg-dark p-t-2 p-b-2" style="border-bottom: solid black 1px;">');
+
+            $li.append(
+                "<div class='row'>" +
+                    "<div class='col' style='min-width: 60px; max-width: 60px;'>" +
+                        "<img src="+item.poster_path+" alt="+item.name+" style='width: 50px; height: 75px;'>" +
+                    "</div>" +
+                    "<div class='col'>" +
+                        "<a class='text-light'>" + item.name +
+                            "<br>" +
+                            "<span style='font-size: 10pt;'>" + media + " | " + item.first_air_date + "</span>" +
+                        "</a>" +
+                    "</div>" +
+                "</div>");
+        }
+        return $li.appendTo(ul);
+    }
 });
 
 

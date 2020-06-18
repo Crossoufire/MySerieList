@@ -12,7 +12,7 @@ function addToUser(element_id, media_type) {
         dataType: "json",
         success: function() {
             $('#medialist-info').prepend(
-                '<div class="alert alert-warning m-t-15">' +
+                '<div class="alert alert-success m-t-15">' +
                     'Media added to your list' +
                 '</div>'
             );

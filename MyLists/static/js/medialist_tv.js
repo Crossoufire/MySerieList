@@ -106,6 +106,9 @@ function changeCategory(new_category, element_id, card_id, seas_drop_id, ep_drop
         dataType: "json",
         success: function(response) {
             console.log("ok");
+        },
+        error: function () {
+            error_ajax_message('Error changing the category of the media. PLease try again later.')
         }
     });
 }
@@ -123,8 +126,12 @@ function updateEpisode(element_id, episode, media_list) {
         contentType: "application/json",
         data: JSON.stringify({episode: selected_episode, element_id: element_id, element_type: media_list }),
         dataType: "json",
-        success: function(response) {
-            console.log("ok"); }
+        success: function() {
+            console.log("ok");
+        },
+        error: function () {
+            error_ajax_message('Error updating the episode of the media. Please try again later.')
+        }
     });
 }
 
@@ -156,14 +163,16 @@ function updateSeason(element_id, value, seas_data, ep_drop_id, media_list) {
         data: JSON.stringify({season: selected_season, element_id: element_id, element_type: media_list }),
         dataType: "json",
         success: function(response) {
-            console.log("ok"); }
+            console.log("ok");
+        },
+        error: function () {
+            error_ajax_message('Error updating the season of the media. Please try again later.')
+        }
     });
 }
 
 
-
-// --- FROM OTHER LISTS ---------------------------------------------------------------------
-
+// --- FROM OTHER LISTS ----------------------------------------------------
 // --- Charge the buttons to choose the category for tv --------------------
 function ChargeButtonsTV(card_id, element_id, media_type) {
     removeCat();

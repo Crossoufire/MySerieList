@@ -351,7 +351,7 @@ def get_more_stats(user):
                                     '2010-2019': 0, '2020+': 0})
         episodes_time = OrderedDict({'1-19': 0, '20-49': 0, '50-99': 0, '100-149': 0, '150-199': 0, '200-299': 0,
                                      '300-399': 0, '400-499': 0, '500+': 0})
-        movies_time = OrderedDict({'>1h': 0, '1h-1h29': 0, '1h30-1h59': 0, '2h00-2h29': 0, '2h30-2h59': 0, '3h+': 0})
+        movies_time = OrderedDict({'<1h': 0, '1h-1h29': 0, '1h30-1h59': 0, '2h00-2h29': 0, '2h30-2h59': 0, '3h+': 0})
         for element in media:
             # Number of episodes and the time watched by element
             episodes_watched, time_watched = get_episodes_and_time(element)
