@@ -2,7 +2,7 @@
 
 // --- Delete element --------------------------------------------------
 function deleteElement(element_id, card_id, media_list) {
-    if (!confirm("Do you want to delete this media from your list?")) {
+    if (!confirm('Delete this media from your list?')) {
         return false;
     }
 
@@ -57,10 +57,10 @@ function searchElement() {
     l = cards.length;
     for (i = 0; i < l; i++) {
         title = cards[i].querySelector(".font-mask");
-        original_title = cards[i].querySelector(".by-original-title");
-        actors = cards[i].querySelector(".by-actor");
-        genres = cards[i].querySelector(".by-genre");
-        director = cards[i].querySelector(".by-director");
+        let original_title = cards[i].querySelector(".by-original-title");
+        let actors = cards[i].querySelector(".by-actor");
+        let genres = cards[i].querySelector(".by-genre");
+        let director = cards[i].querySelector(".by-director");
         if (title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
             cards[i].style.display = "";
         }
@@ -89,7 +89,7 @@ function searchElement() {
 function addFavorite(element_id, media_type) {
     let favorite
 
-    favorite = $('#fav-'+element_id).hasClass('far') ? true : false;
+    favorite = !!$('#fav-' + element_id).hasClass('far');
 
     $.ajax ({
         type: "POST",
@@ -97,8 +97,8 @@ function addFavorite(element_id, media_type) {
         contentType: "application/json",
         data: JSON.stringify({ element_id: element_id, element_type: media_type, favorite: favorite }),
         dataType: "json",
-        success: function(response) {
-            if ($('#fav-'+element_id).hasClass('far')) {
+        success: function() {
+            if (favorite === true) {
                 $('#fav-'+element_id).removeClass('far card-btn-bottom-left').addClass('fas card-favorite')
                 $('#fav-'+element_id).attr('style', 'color: darkgoldenrod;')
             } else {
@@ -115,14 +115,14 @@ function addFavorite(element_id, media_type) {
 
 // --- Show/Hide common media ------------------------------------------
 function HideCommon() {
-    if ($('#SharedMedia').prop("checked") == true) {
+    if ($('#SharedMedia').prop("checked") === true) {
         $('.card-ribbon').parent().parent().parent().hide();
     }
-    else if ($('#SharedMedia').prop("checked") == false && $('#ShowFavorites').prop("checked") == true) {
+    else if ($('#SharedMedia').prop("checked") === false && $('#ShowFavorites').prop("checked") === true) {
         $('.card-ribbon').parent().parent().parent().show();
         $('.far.fa-star').parent().parent().parent().hide();
     }
-    else if ($('#SharedMedia').prop("checked") == false && $('#ShowFavorites').prop("checked") == false) {
+    else if ($('#SharedMedia').prop("checked") === false && $('#ShowFavorites').prop("checked") === false) {
         $('.card-ribbon').parent().parent().parent().show();
     }
 
@@ -132,14 +132,14 @@ function HideCommon() {
 
 // --- Show/Hide favorites media ---------------------------------------
 function ShowFavorites() {
-    if ($('#ShowFavorites').prop("checked") == true) {
+    if ($('#ShowFavorites').prop("checked") === true) {
         $('.far.fa-star').parent().parent().parent().hide();
     }
-    else if ($('#ShowFavorites').prop("checked") == false && $('#SharedMedia').prop("checked") == true) {
+    else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === true) {
         $('.far.fa-star').parent().parent().parent().show();
         $('.card-ribbon').parent().parent().parent().hide();
     }
-    else if ($('#ShowFavorites').prop("checked") == false && $('#SharedMedia').prop("checked") == false) {
+    else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === false) {
         $('.far.fa-star').parent().parent().parent().show();
     }
 
@@ -148,15 +148,12 @@ function ShowFavorites() {
 
 
 // --- Add the category to the user (from other list) ------------------
-function AddCatUser(cat, card_id, element_id, media_type) {
-    let add_cat;
-    add_cat = cat.childNodes[0].data;
-
+function AddCatUser(cat, card_id, media_id, media_type) {
     $.ajax ({
         type: "POST",
         url: "/add_element",
         contentType: "application/json",
-        data: JSON.stringify({element_cat: add_cat, element_id: element_id, element_type: media_type}),
+        data: JSON.stringify({element_cat: cat.childNodes[0].data, element_id: media_id, element_type: media_type}),
         dataType: "json",
         success: function() {
             removeCat();
@@ -182,11 +179,11 @@ $("img.lazyload").lazyload({
     failure_limit : Math.max($("img.lazyload").length-1, 0)
 });
 $('.filters-button-group').on('click', 'button', function() {
-    var filterValue = $(this).attr('data-filter');
+    let filterValue = $(this).attr('data-filter');
     $categories.isotope({ filter: filterValue });
 });
 $('.filters-button-group').each(function(i, buttonGroup) {
-    var $buttonGroup = $(buttonGroup);
+    let $buttonGroup = $(buttonGroup);
     $buttonGroup.on('click', 'button', function() {
         $buttonGroup.find('.btn-selected').addClass('btn-header');
         $buttonGroup.find('.btn-selected').removeClass('btn-selected');
@@ -199,7 +196,7 @@ $categories.isotope('layout');
 
 // --- Row gutters -----------------------------------------------------
 (function($) {
-    var $window = $(window),
+    let $window = $(window),
         $row = $('.row');
 
     function resize() {

@@ -1,5 +1,6 @@
 
 
+// --- Show more media from 6 to 12 per media type -------------------------
 function showmore(show, media) {
     $('#'+show).text("Show less...");
     $('#'+show).attr("onclick", "showless(\"" + show + "\", \"" + media + "\")");
@@ -7,6 +8,7 @@ function showmore(show, media) {
 }
 
 
+// --- Show less media from 12 to 6 per media type -------------------------
 function showless(show, media) {
     let i = 0;
     $('.'+media).each(function () {

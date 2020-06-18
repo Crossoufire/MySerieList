@@ -1,8 +1,7 @@
 
 
-// --- Datatable ----------------------------------------------------
+// --- Datatable functions ------------------------------------------
 $(document).ready(function () {
-    // --- Datatable functions -----------------
     $('#all_history').DataTable({
         "bPaginate": false,
         "bLengthChange": false,

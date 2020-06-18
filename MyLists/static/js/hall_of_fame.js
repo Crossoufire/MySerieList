@@ -13,7 +13,7 @@ function follow_status(follow_id, button) {
         data: JSON.stringify({follow_id: follow_id, follow_status: status}),
         dataType: "json",
         success: function() {
-            if ($(button)[0].innerText === 'UNFOLLOW') {
+            if (status === false) {
                 $(button).text('Follow');
                 $(button).addClass('btn-primary').removeClass('btn-dark btn-smaller');
             } else {

@@ -2,13 +2,7 @@
 
 // --- Add the media to the user ---------------------------------------
 function addToUser(element_id, media_type) {
-    let category;
-
-    if (media_type === 'movieslist') {
-       category = 'Plan to Watch';
-    } else {
-       category = 'Watching';
-    }
+    let category = media_type === 'movieslist' ? 'Plan to Watch' : 'Watching';
 
     $.ajax ({
         type: "POST",
@@ -18,8 +12,8 @@ function addToUser(element_id, media_type) {
         dataType: "json",
         success: function() {
             $('#medialist-info').prepend(
-                '<div class="alert alert-success m-t-15">' +
-                    'Media successfully added to your list' +
+                '<div class="alert alert-warning m-t-15">' +
+                    'Media added to your list' +
                 '</div>'
             );
 
@@ -30,7 +24,7 @@ function addToUser(element_id, media_type) {
             $('.alert').delay(2000).fadeOut(300, function() { $(this).remove(); });
         },
         error: function() {
-            error_ajax_message('Unexpected error: The media could not be added. Please try again later.');
+            error_ajax_message('Error: The media could not be added. Please try again later.');
         }
     });
 }
@@ -85,19 +79,18 @@ function addFavorite(element_id, media_type) {
         data: JSON.stringify({ element_id: element_id, element_type: media_type, favorite: favorite }),
         dataType: "json",
         success: function() {
-            if ($('#favorite').hasClass('far')) {
+            if (favorite === true) {
                 $('#favorite').addClass('fas').removeClass('far');
                 $('#medialist-info').prepend(
                     '<div class="alert alert-success m-t-15">' +
-                        'Added to your favorite' +
+                    'Added to your favorite' +
                     '</div>'
                 );
-            }
-            else {
+            } else {
                 $('#favorite').addClass('far').removeClass('fas');
                 $('#medialist-info').prepend(
                     '<div class="alert alert-warning m-t-15">' +
-                        'Removed from your favorite' +
+                    'Removed from your favorite' +
                     '</div>'
                 );
             }
@@ -136,11 +129,9 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
         }
         $('#episode-dropdown').prop('selectedIndex', season_data[0][seasons_index]-1);
     }
-    else if (new_cat === 'Random') {
-        $('#season-row').hide();
-        $('#episode-row').hide();
-    }
-    else if (new_cat === 'Plan to Watch') {
+    else if (new_cat === 'Random' || new_cat === 'Plan to Watch') {
+        $('#season-dropdown').val("0");
+        $('#episode-dropdown').val("0");
         $('#season-row').hide();
         $('#episode-row').hide();
     }
@@ -166,11 +157,8 @@ function changeCategoryMovies(element_id, cat_selector, genres) {
     let new_cat;
 
     new_cat = cat_selector.options[cat_selector.selectedIndex].value;
-
-    if (new_cat === 'Completed') {
-        if (genres.includes("Animation")) {
-            new_cat = 'Completed Animation';
-        }
+    if (new_cat === 'Completed' && genres.includes("Animation")) {
+        new_cat = 'Completed Animation';
     }
 
     $.ajax ({
@@ -200,7 +188,7 @@ function updateSeason(element_id, value, seas_data, media_list) {
     for (i = 2; i <= season_data[0][selected_season]; i++) {
         opt = document.createElement("option");
         opt.className = "";
-        opt.text = i;
+        opt.innerHTML = '&nbsp;'+i+'&nbsp;';
         $('#episode-dropdown').appendChild(opt);
     }
 
@@ -251,7 +239,7 @@ function lock_media(element_id, element_type) {
         data: JSON.stringify({element_id: element_id, element_type: element_type, lock_status: lock_status }),
         dataType: "json",
         success: function() {
-            if ($('#lock-button').prop("checked") === true) {
+            if (lock_status === true) {
                 $('#lock-button-label').text('Media is Locked');
                 $('#edit-button').attr('style', 'display: "";');
             } else {
