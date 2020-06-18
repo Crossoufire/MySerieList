@@ -1,18 +1,13 @@
 
-// ----------------------------- Tooltip ---------------------------
-$('.tooltip').tooltip();
-$(function () {
-    $('[data-toggle="tooltip"]').tooltip()
-})
+
+// --- Canvas Data -------------------------------------------------
+let time_data = $('#time-spent-pie').attr('values').split(', ');
+let seasons_data = $('#seasons-graph-data').attr('values').split(', ');
+let episodes_data = $('#episodes-graph-data').attr('values').split(', ');
 
 
-// --------------------------- Canvas Data -------------------------
-var time_data = $('#time-spent-pie').attr('values').split(', ');
-var seasons_data = $('#seasons-graph-data').attr('values').split(', ');
-var episodes_data = $('#episodes-graph-data').attr('values').split(', ');
-
-// ------- Time sent pie graph --------
-var config = {
+// --- Time sent pie graph -----------------------------------------
+let config_pie = {
     type: 'pie',
     data: {
         datasets: [{
@@ -83,11 +78,12 @@ var config = {
         },
     }
 };
-var ctx = document.getElementById('media-time').getContext('2d');
-var myPie = new Chart(ctx, config);
+let ctx_pie = document.getElementById('media-time').getContext('2d');
+let myPie = new Chart(ctx_pie, config_pie);
 
-// ---- Total eps/seasons watched -----
-var config = {
+
+// --- Total eps/seasons watched -----------------------------------
+let config_eps = {
     type: 'bar',
     data: {
         datasets: [{
@@ -183,9 +179,8 @@ var config = {
             fontColor: '#e2e2e2',
             fontSize: 18,
             fontStyle: 'normal'
-        },
-        responsive: true
+        }
     }
 };
-var ctx = document.getElementById('total-seasons').getContext('2d');
-var mybar = new Chart(ctx, config);
+let ctx_eps = document.getElementById('total-seasons').getContext('2d');
+let mybar = new Chart(ctx_eps, config_eps);

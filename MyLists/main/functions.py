@@ -161,7 +161,7 @@ def get_details(api_id, list_type):
             for i in range(0, len(actors)):
                 actors_dict = {'name': actors[i]["name"]}
                 actors_list.append(actors_dict)
-                if i == 4:
+                if int(i) == 4:
                     break
         else:
             actors_dict = {'name': 'No actors found'}
@@ -423,7 +423,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             current_media = db.session.query(MoviesList.movies_id).filter_by(user_id=current_user.id).all()
         current_list = [r[0] for r in current_media]
 
-    group = 'categories'
+    group = 'alphabet'
 
     category_tv_group = OrderedDict({'WATCHING': '',
                                      'COMPLETED': '',
@@ -551,7 +551,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
     except ZeroDivisionError:
         percentage = 0
 
-    data = {"grouping": category_tv_group,
+    data = {"grouping": alphabet_group,
             "common_elements": [common_elements, len(element_data), percentage]}
 
     return data
@@ -616,6 +616,7 @@ def add_element_to_user(element, user_id, list_type, category):
     if list_type != ListType.MOVIES:
         if category == Status.COMPLETED:
             seasons_eps = element.eps_per_season
+            print(seasons_eps)
             # seasons_eps = SeriesEpisodesPerSeason.query.filter_by(series_id=element.id).all()
             current_season = len(seasons_eps)
             last_episode_watched = seasons_eps[-1].episodes
@@ -649,7 +650,6 @@ def add_element_to_user(element, user_id, list_type, category):
     # Commit the changes
     db.session.add(user_list)
     db.session.commit()
-    app.logger.info('[{}] Added the Media ({}) {}, with ID {}'.format(user_id, list_type, element.name, element.id))
 
     # Set the last update
     set_last_update(media=element, media_type=list_type, new_status=category)
@@ -663,8 +663,8 @@ def add_element_in_db(api_id, list_type):
         # Add TV details to DB
         try:
             data = get_details(api_id, list_type)
-        except:
-            app.logger.error('[SYSTEM] - Error while getting: <tv_data>')
+        except Exception as e:
+            app.logger.error('[SYSTEM] - Error while getting TV_data: {}'.format(e))
             abort(404)
 
         if list_type == ListType.SERIES:

@@ -5,11 +5,10 @@ from _collections import OrderedDict
 
 from MyLists import db
 from flask import url_for
-from sqlalchemy import func, or_
+from sqlalchemy import func
 from flask_login import current_user
 from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
-    AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, SeriesGenre, AnimeGenre, MoviesGenre, Movies, Badges, Ranks, \
-    followers, Frames
+    AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, Movies, Ranks, followers, Frames
 
 
 def get_media_count(user_id, list_type):

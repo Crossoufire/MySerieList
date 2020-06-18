@@ -2,55 +2,34 @@
 
 // --- Create the buttons category list --------------------
 function chargeButtons(card, element_id, seas_drop_id, ep_drop_id, seas_data, media_list) {
+    let display_watching, display_completed, display_on_hold, display_random, display_dropped, display_plan_to_watch;
+
+    display_watching = "block;";
+    display_completed = "block;";
+    display_on_hold = "block;";
+    display_random = "block;";
+    display_dropped = "block;";
+    display_plan_to_watch = "block;";
+
     removeCat();
 
     if ($('#'+card.id).parent().hasClass('category-WATCHING')) {
-        var display_watching = "none;";
-        var display_completed = "block;";
-        var display_on_hold = "block;";
-        var display_random = "block;";
-        var display_dropped = "block;";
-        var display_plan_to_watch = "block;";
+        display_watching = "none;";
     }
     else if ($('#'+card.id).parent().hasClass('category-COMPLETED')) {
-        var display_watching = "block;";
-        var display_completed = "none;";
-        var display_on_hold = "block;";
-        var display_random = "block;";
-        var display_dropped = "block;";
-        var display_plan_to_watch = "block;";
+        display_completed = "none;";
     }
     else if ($('#'+card.id).parent().hasClass('category-ON.HOLD')) {
-        var display_watching = "block;";
-        var display_completed = "block;";
-        var display_on_hold = "none;";
-        var display_random = "block;";
-        var display_dropped = "block;";
-        var display_plan_to_watch = "block;";
+        display_on_hold = "none;";
     }
     else if ($('#'+card.id).parent().hasClass('category-RANDOM')) {
-        var display_watching = "block;";
-        var display_completed = "block;";
-        var display_on_hold = "block;";
-        var display_random = "none;";
-        var display_dropped = "block;";
-        var display_plan_to_watch = "block;";
+        display_random = "none;";
     }
     else if ($('#'+card.id).parent().hasClass('category-DROPPED')) {
-        var display_watching = "block;";
-        var display_completed = "block;";
-        var display_on_hold = "block;";
-        var display_random = "block;";
-        var display_dropped = "none;";
-        var display_plan_to_watch = "block;";
+        display_dropped = "none;";
     }
     else {
-        var display_watching = "block;";
-        var display_completed = "block;";
-        var display_on_hold = "block;";
-        var display_random = "block;";
-        var display_dropped = "block;";
-        var display_plan_to_watch = "none;";
+        display_plan_to_watch = "none;";
     }
 
     $(card).find('.view.overlay').prepend (
@@ -119,7 +98,6 @@ function changeCategory(new_category, element_id, card_id, seas_drop_id, ep_drop
     removeCat();
     $categories.isotope('layout');
 
-    $body = $("body");
     $.ajax ({
         type: "POST",
         url: "/change_element_category",

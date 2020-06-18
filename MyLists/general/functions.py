@@ -10,7 +10,7 @@ from MyLists import db, app
 from sqlalchemy import func
 from datetime import datetime
 from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
-    SeriesList, Series, MoviesList, Movies, Badges, MoviesCollections, Ranks, Frames, UserLastUpdate
+    SeriesList, Series, MoviesList, Movies, Badges, MoviesCollections, Ranks, Frames
 
 
 def compute_media_time_spent(list_type):

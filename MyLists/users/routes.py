@@ -71,7 +71,71 @@ def account(user_name):
                            follows_update_list=follows_update_list)
 
 
-@bp.route("/hall_of_fame", methods=['GET'])
+@bp.route("/all_history/<user_name>", methods=['GET', 'POST'])
+@login_required
+def all_history(user_name):
+    user = User.query.filter_by(username=user_name).first()
+
+    # No account with this username and protection of the admin account
+    if user is None or user.id == 1 and current_user.id != 1:
+        abort(404)
+
+    # Check if the account is private or in the follow list
+    if current_user.id == user.id or current_user.id == 1:
+        pass
+    elif user.private and not current_user.is_following(user):
+        abort(404)
+
+    updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
+    media_updates = get_updates(updates)
+    user_data = get_user_data(user)
+
+    return render_template('all_history.html', title='Media History', media_updates=media_updates, user_data=user_data)
+
+
+@bp.route("/all_follows/<user_name>", methods=['GET', 'POST'])
+@login_required
+def all_follows(user_name):
+    user = User.query.filter_by(username=user_name).first()
+
+    # No account with this username and protection of the admin account
+    if user is None or user.id == 1 and current_user.id != 1:
+        abort(404)
+
+    # Check if the account is private or in the follow list
+    if current_user.id == user.id or current_user.id == 1:
+        pass
+    elif user.private and not current_user.is_following(user):
+        abort(404)
+
+    all_follows = get_all_follows_data(user)
+    user_data = get_user_data(user)
+
+    return render_template('all_follows.html', title='Follows', all_follows=all_follows, user_data=user_data)
+
+
+@bp.route("/more_stats/<user_name>", methods=['GET', 'POST'])
+@login_required
+def more_stats(user_name):
+    user = User.query.filter_by(username=user_name).first()
+
+    # No account with this username and protection of the admin account
+    if user is None or user.id == 1 and current_user.id != 1:
+        abort(404)
+
+    # Check if the account is private or in the follow list
+    if current_user.id == user.id or current_user.id == 1:
+        pass
+    elif user.private and not current_user.is_following(user):
+        abort(404)
+
+    stats = get_more_stats(user)
+    user_data = get_user_data(user)
+
+    return render_template('more_stats.html', title='More stats', stats=stats, user_data=user_data)
+
+
+@bp.route("/hall_of_fame", methods=['GET', 'POST'])
 @login_required
 def hall_of_fame():
     users = User.query.filter(User.id >= "2", User.active == True).order_by(User.username.asc()).all()
@@ -113,14 +177,14 @@ def hall_of_fame():
     return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
 
 
-@bp.route("/level_grade_data", methods=['GET'])
+@bp.route("/level_grade_data", methods=['GET', 'POST'])
 @login_required
 def level_grade_data():
     ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
     return render_template('level_grade_data.html', title='Level grade data', data=ranks)
 
 
-@bp.route("/knowledge_frame_data", methods=['GET'])
+@bp.route("/knowledge_frame_data", methods=['GET', 'POST'])
 @login_required
 def knowledge_frame_data():
     ranks = Frames.query.all()
@@ -135,12 +199,12 @@ def follow_status():
         follow_id = int(json_data['follow_id'])
         follow_condition = json_data['follow_status']
     except:
-        abort(400)
+        return '', 400
 
     # Check if the follow ID exist in the User database and status is boolean
     user = User.query.filter_by(id=follow_id).first()
     if user is None or type(follow_condition) is not bool:
-        abort(400)
+        return '', 400
 
     # Check the status of the follow
     if follow_condition:
@@ -150,70 +214,6 @@ def follow_status():
     else:
         current_user.remove_follow(user)
         db.session.commit()
-        app.logger.info('[{}] Follow with ID {} unfollowed'.format(current_user.id, follow_id))
+        app.logger.info('[{}] Unfollowed the account with ID {} '.format(current_user.id, follow_id))
 
     return '', 204
-
-
-@bp.route("/all_history/<user_name>", methods=['GET'])
-@login_required
-def all_history(user_name):
-    user = User.query.filter_by(username=user_name).first()
-
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
-
-    updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
-    media_updates = get_updates(updates)
-    user_data = get_user_data(user)
-
-    return render_template('all_history.html', title='Media History', media_updates=media_updates, user_data=user_data)
-
-
-@bp.route("/all_follows/<user_name>", methods=['GET'])
-@login_required
-def all_follows(user_name):
-    user = User.query.filter_by(username=user_name).first()
-
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
-
-    all_follows = get_all_follows_data(user)
-    user_data = get_user_data(user)
-
-    return render_template('all_follows.html', title='Follows', all_follows=all_follows, user_data=user_data)
-
-
-@bp.route("/more_stats/<user_name>", methods=['GET'])
-@login_required
-def more_stats(user_name):
-    user = User.query.filter_by(username=user_name).first()
-
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
-
-    stats = get_more_stats(user)
-    user_data = get_user_data(user)
-
-    return render_template('more_stats.html', title='More stats', stats=stats, user_data=user_data)

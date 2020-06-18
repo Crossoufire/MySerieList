@@ -1,4 +1,6 @@
 
+
+// --- Autocomplete ---------------------------------------------------------
 $.widget("custom.catcomplete", $.ui.autocomplete, {
     _create: function() {
         this._super();
@@ -39,6 +41,8 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
     }
 });
 
+
+// --- Autocomplete ---------------------------------------------------------
 $(function() {
     $("#autocomplete").catcomplete({
         delay: 200,
@@ -63,6 +67,7 @@ $(function() {
 });
 
 
+// --- AJAX Notification ----------------------------------------------------
 $('#ajax-notif').click(function a () {
     $('.notif-badge').attr('style', 'background-color: grey;');
     $('.notif-badge').html(0);
@@ -84,6 +89,8 @@ $('#ajax-notif').click(function a () {
     });
 });
 
+
+// --- Notification ---------------------------------------------------------
 function display_notifications(data) {
     let resp = data.results;
     if (resp.length === 0) {
@@ -133,4 +140,22 @@ function display_notifications(data) {
             }
         }
     }
+}
+
+
+// --- Tooltip initialization -----------------------------------------------
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+});
+
+
+// --- Ajax error handling --------------------------------------------------
+function error_ajax_message(message) {
+    $('.content-message').prepend(
+        '<div class="alert alert-danger alert-dismissible m-t-15">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span>' +
+            '</button>' +
+            message +
+        '</div>');
 }

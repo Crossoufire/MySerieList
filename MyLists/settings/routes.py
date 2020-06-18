@@ -1,5 +1,3 @@
-import imghdr
-
 from MyLists import db, app, bcrypt
 from MyLists.models import HomePage, User
 from flask_login import login_required, current_user
@@ -71,7 +69,9 @@ def settings():
         app.logger.info('[{}] Password updated'.format(current_user.id))
         flash('Your password has been successfully updated!', 'success')
 
-    return render_template('settings.html', title='Your settings', settings_form=settings_form,
+    return render_template('settings.html',
+                           title='Your settings',
+                           settings_form=settings_form,
                            password_form=password_form)
 
 

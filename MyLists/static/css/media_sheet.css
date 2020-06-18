@@ -3,9 +3,8 @@ ul {
     list-style-type: none;
 }
 
-.message-favorite {
+.test {
     position: absolute;
-    right: 10%;
     z-index: 9999;
 }
 
@@ -17,6 +16,7 @@ ul {
 .vertical_line {
     width: 5px;
     border-left: 2px solid darkgray;
+    /*noinspection CssInvalidPropertyValue*/
     height: 100wh;
 }
 

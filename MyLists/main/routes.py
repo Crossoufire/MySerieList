@@ -6,14 +6,14 @@ from flask_login import login_required, current_user
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
     add_element_to_user, add_element_in_db, load_media_sheet, save_new_cover, check_autorization_user
-from MyLists.models import User, Movies, MoviesActors, Series, SeriesList, \
-    SeriesEpisodesPerSeason, SeriesNetwork, Anime, AnimeActors, AnimeEpisodesPerSeason, AnimeNetwork, \
-    AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections
+from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesEpisodesPerSeason, SeriesNetwork, Anime, \
+    AnimeActors, AnimeEpisodesPerSeason, AnimeNetwork, AnimeList, ListType, SeriesActors, MoviesList, Status, \
+    MoviesCollections
 
 bp = Blueprint('main', __name__)
 
 
-@bp.route("/<media_list>/<user_name>", methods=['GET'])
+@bp.route("/<media_list>/<user_name>", methods=['GET', 'POST'])
 @login_required
 def mymedialist(media_list, user_name):
     # Check if the user can see this profile
@@ -67,7 +67,7 @@ def mymedialist(media_list, user_name):
                                target_user_id=str(user.id))
 
 
-@bp.route("/movies_collection/<user_name>", methods=['GET'])
+@bp.route("/movies_collection/<user_name>", methods=['GET', 'POST'])
 @login_required
 def movies_collection(user_name):
     # Check if the user can see this profile
@@ -104,492 +104,6 @@ def movies_collection(user_name):
                            length_ongoing=len(ongoing_collections),
                            target_user_name=user_name,
                            target_user_id=str(user.id))
-
-
-@bp.route('/update_element_season', methods=['POST'])
-@login_required
-def update_element_season():
-    try:
-        json_data = request.get_json()
-        new_season = int(json_data['season']) + 1
-        element_id = int(json_data['element_id'])
-        element_type = json_data['element_type']
-    except:
-        abort(400)
-
-    # Check if the media_list exist and is valid
-    try:
-        list_type = ListType(element_type)
-    except ValueError:
-        abort(400)
-
-    if list_type == ListType.SERIES:
-        # Check if the element is in the database (also used for watched_time and last_update)
-        series = Series.query.filter_by(id=element_id).first()
-        if series is None:
-            abort(400)
-
-        # Check if the element is in the current account's list
-        series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
-        if series_list is None:
-            abort(400)
-
-        # Check if the season number is between 1 and <last_season>
-        all_seasons = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id)\
-            .order_by(SeriesEpisodesPerSeason.season).all()
-        if 1 > new_season > all_seasons[-1].season:
-            abort(400)
-
-        # Set the new data
-        old_season = series_list.current_season
-        old_episode = series_list.last_episode_watched
-        series_list.current_season = new_season
-        series_list.last_episode_watched = 1
-        app.logger.info('[{}] Series season with ID {} updated: {}'
-                                .format(current_user.id, element_id, new_season))
-
-        # Commit the changes
-        db.session.commit()
-
-        # Set the last updates
-        set_last_update(media=series, media_type=list_type, old_season=old_season,
-                        new_season=new_season, old_episode=old_episode, new_episode=1)
-
-        # Compute the new time spent
-        compute_time_spent(cat_type="season", old_eps=old_episode, old_seas=old_season, new_seas=new_season,
-                           all_seas_data=all_seasons, media=series, list_type=list_type)
-    elif list_type == ListType.ANIME:
-        # Check if the element is in the database (also used for watched_time and last_update)
-        anime = Anime.query.filter_by(id=element_id).first()
-        if anime is None:
-            abort(400)
-
-        # Check if the element is in the current account's list
-        anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
-        if anime_list is None:
-            abort(400)
-
-        # Check if the season number is between 1 and <last_season>
-        all_seasons = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id)\
-            .order_by(AnimeEpisodesPerSeason.season).all()
-        if 1 > new_season > all_seasons[-1].season:
-            abort(400)
-
-        # Set the new data
-        old_season = anime_list.current_season
-        old_episode = anime_list.last_episode_watched
-        anime_list.current_season = new_season
-        anime_list.last_episode_watched = 1
-        app.logger.info("[{}] Anime season with ID {} updated: {}".format(current_user.id, element_id, new_season))
-
-        # Commit the changes
-        db.session.commit()
-
-        # Set the last update
-        set_last_update(media=anime, media_type=list_type, old_season=old_season,
-                        new_season=new_season, old_episode=old_episode, new_episode=1)
-
-        # Compute the new time spent
-        compute_time_spent(cat_type="season", old_eps=old_episode, old_seas=old_season, new_seas=new_season,
-                           all_seas_data=all_seasons, media=anime, list_type=list_type)
-
-    return '', 204
-
-
-@bp.route('/update_element_episode', methods=['POST'])
-@login_required
-def update_element_episode():
-    try:
-        json_data = request.get_json()
-        new_episode = int(json_data['episode'])+1
-        element_id = int(json_data['element_id'])
-        element_type = json_data['element_type']
-    except:
-        abort(400)
-
-    # Check if the media_list exist and is valid
-    try:
-        list_type = ListType(element_type)
-    except ValueError:
-        abort(400)
-
-    if list_type == ListType.SERIES:
-        # Check if the element is in the database (also used for watched_time and last_update)
-        series = Series.query.filter_by(id=element_id).first()
-        if series is None:
-            abort(400)
-
-        # Check if the element is in the current user's list
-        series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
-        if series_list is None:
-            abort(400)
-
-        # Check if the episode number is between 1 and <last_episode>
-        last_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=series_list.current_season)\
-            .first().episodes
-        if 1 > new_episode > last_episode:
-            abort(400)
-
-        # Set the new data
-        old_season = series_list.current_season
-        old_episode = series_list.last_episode_watched
-        series_list.last_episode_watched = new_episode
-        app.logger.info('[{}] Series episode with ID {} updated: {}'
-                                .format(current_user.id, element_id, new_episode))
-
-        # Commit the changes
-        db.session.commit()
-
-        # Set the last update
-        set_last_update(media=series, media_type=list_type, old_season=old_season, new_season=old_season,
-                        old_episode=old_episode, new_episode=new_episode)
-
-        # Compute the new time spent
-        compute_time_spent(cat_type='episode', new_eps=new_episode, old_eps=old_episode, media=series,
-                           list_type=list_type)
-    elif list_type == ListType.ANIME:
-        # Check if the element is in the database (also used for watched_time and last_update)
-        anime = Anime.query.filter_by(id=element_id).first()
-        if anime is None:
-            abort(400)
-
-        # Check if the element is in the current user's list
-        anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
-        if anime_list is None:
-            abort(400)
-
-        # Check if the episode number is between 1 and <last_episode>
-        last_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=anime_list.current_season) \
-            .first().episodes
-        if 1 > new_episode > last_episode:
-            abort(400)
-
-        # Set the new data
-        old_season = anime_list.current_season
-        old_episode = anime_list.last_episode_watched
-        anime_list.last_episode_watched = new_episode
-        app.logger.info('[{}] Anime episode with ID {} updated: {}'
-                                .format(current_user.id, element_id, new_episode))
-
-        # Commit the changes
-        db.session.commit()
-
-        # Set the last update
-        set_last_update(media=anime, media_type=list_type, old_season=old_season, new_season=old_season,
-                        old_episode=old_episode, new_episode=new_episode)
-
-        # Compute the new time spent
-        compute_time_spent(cat_type='episode', new_eps=new_episode, old_eps=old_episode, media=anime,
-                           list_type=list_type)
-
-    return '', 204
-
-
-@bp.route('/add_favorite', methods=['POST'])
-@login_required
-def add_favorite():
-    try:
-        json_data = request.get_json()
-        element_id = int(json_data['element_id'])
-        element_type = json_data['element_type']
-        favorite = bool(json_data['favorite'])
-    except:
-        abort(400)
-
-    # Check if the medialist exist and is valid
-    try:
-        list_type = ListType(element_type)
-    except ValueError:
-        abort(400)
-
-    # Check if favorite is boolean
-    if type(favorite) is not bool:
-        abort(400)
-
-    # Check if the element is in the current user's list
-    if list_type == ListType.ANIME:
-        element_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
-    elif list_type == ListType.SERIES:
-        element_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
-    elif list_type == ListType.MOVIES:
-        element_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
-
-    if element_list is None:
-        abort(400)
-
-    element_list.favorite = favorite
-
-    # Commit the changes
-    db.session.commit()
-
-    return '', 204
-
-
-@bp.route('/delete_element', methods=['POST'])
-@login_required
-def delete_element():
-    try:
-        json_data = request.get_json()
-        element_id = int(json_data['delete'])
-        element_type = json_data['element_type']
-    except:
-        abort(400)
-
-    # Check if the media_list exist and is valid
-    try:
-        list_type = ListType(element_type)
-    except ValueError:
-        abort(400)
-
-    if list_type == ListType.SERIES:
-        # Check if series exists in the database (also used for watched_time and last_update)
-        series = Series.query.filter_by(id=element_id).first()
-        if series is None:
-            abort(400)
-
-        # Check if series exists in the current user's list
-        series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
-        if series_list is None:
-            abort(400)
-
-        # Compute new time spent
-        old_episode = series_list.last_episode_watched
-        old_season = series_list.current_season
-        all_seasons = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id) \
-            .order_by(SeriesEpisodesPerSeason.season).all()
-        compute_time_spent(cat_type="delete", old_eps=old_episode, old_seas=old_season, all_seas_data=all_seasons,
-                           media=series, list_type=list_type)
-
-        # Delete the media from the user's list
-        SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).delete()
-        db.session.commit()
-        app.logger.info('[{}] Series with ID {} deleted'.format(current_user.id, element_id))
-    elif list_type == ListType.ANIME:
-        # Check if anime exists in the database (also used for watched_time and last_update)
-        anime = Anime.query.filter_by(id=element_id).first()
-        if anime is None:
-            abort(400)
-
-        # Check if anime exists in list of the current account
-        anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
-        if anime_list is None:
-            abort(400)
-
-        # Compute new time spent
-        old_episode = anime_list.last_episode_watched
-        old_season = anime_list.current_season
-        all_seasons = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id) \
-            .order_by(AnimeEpisodesPerSeason.season).all()
-        compute_time_spent(cat_type="delete", old_eps=old_episode, old_seas=old_season, all_seas_data=all_seasons,
-                           media=anime, list_type=list_type)
-
-        # Delete the media from the user's list
-        AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).delete()
-        db.session.commit()
-        app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.id, element_id))
-    elif list_type == ListType.MOVIES:
-        # Check if movie exists in the database (also used for watched_time and last_update)
-        movies = Movies.query.filter_by(id=element_id).first()
-        if movies is None:
-            abort(400)
-
-        # Check if movie exists in the account's list
-        movies_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
-        if movies_list is None:
-            abort(400)
-
-        # Compute the new time spent
-        compute_time_spent(cat_type="delete", media=movies, list_type=list_type)
-
-        # Delete the media from the user's list
-        MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).delete()
-        db.session.commit()
-        app.logger.info('[{}] Movie with ID {} deleted'.format(current_user.id, element_id))
-
-    return '', 204
-
-
-@bp.route('/change_element_category', methods=['POST'])
-@login_required
-def change_element_category():
-    try:
-        json_data = request.get_json()
-        element_new_category = json_data['status']
-        element_id = int(json_data['element_id'])
-        element_type = json_data['element_type']
-    except:
-        abort(400)
-
-    # Check if the <media_list> exist and is valid
-    try:
-        list_type = ListType(element_type)
-    except ValueError:
-        abort(400)
-
-    # Check if the status is valid compared to the list type
-    new_status = check_cat_type(list_type, element_new_category)
-    if new_status is None:
-        abort(400)
-
-    # Check if the element is in the user's list
-    if list_type == ListType.SERIES:
-        element = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
-        season_data = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).all()
-    elif list_type == ListType.ANIME:
-        element = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
-        season_data = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).all()
-    elif list_type == ListType.MOVIES:
-        element = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
-
-    if element is None:
-        abort(400)
-
-    old_status = element.status
-    element.status = new_status
-
-    if list_type != ListType.MOVIES:
-        current_season = element.current_season
-        last_episode_watched = element.last_episode_watched
-    if new_status == Status.COMPLETED:
-        # Set to the last seasons and episodes
-        if list_type == ListType.SERIES:
-            seasons_and_eps = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id) \
-                .order_by(SeriesEpisodesPerSeason.season).all()
-            element.current_season = len(seasons_and_eps)
-            element.last_episode_watched = seasons_and_eps[-1].episodes
-        elif list_type == ListType.ANIME:
-            seasons_and_eps = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id) \
-                .order_by(AnimeEpisodesPerSeason.season).all()
-            element.current_season = len(seasons_and_eps)
-            element.last_episode_watched = seasons_and_eps[-1].episodes
-    elif new_status == Status.RANDOM:
-        # Set to first season and episode
-        element.current_season = 1
-        element.last_episode_watched = 1
-    elif new_status == Status.PLAN_TO_WATCH:
-        # Set to first season and episode
-        if list_type != ListType.MOVIES:
-            element.current_season = 1
-            element.last_episode_watched = 1
-
-    # Compute total time spent and set last update
-    if list_type == ListType.SERIES:
-        series = Series.query.filter_by(id=element_id).first()
-        set_last_update(media=series, media_type=list_type, old_status=old_status, new_status=new_status)
-        compute_time_spent(cat_type="category", old_eps=last_episode_watched, old_seas=current_season, media=series,
-                           old_status=old_status, new_status=new_status, list_type=list_type, all_seas_data=season_data)
-    elif list_type == ListType.ANIME:
-        anime = Anime.query.filter_by(id=element_id).first()
-        set_last_update(media=anime, media_type=list_type, old_status=old_status, new_status=new_status)
-        compute_time_spent(cat_type="category", old_eps=last_episode_watched, old_seas=current_season, media=anime,
-                           old_status=old_status, new_status=new_status, list_type=list_type, all_seas_data=season_data)
-    elif list_type == ListType.MOVIES:
-        movie = Movies.query.filter_by(id=element_id).first()
-        set_last_update(media=movie, media_type=list_type, old_status=old_status, new_status=new_status)
-        compute_time_spent(cat_type="category", media=movie, old_status=old_status, new_status=new_status,
-                           list_type=list_type)
-
-    db.session.commit()
-    app.logger.info('[{}] Category of element ID {} ({}) changed from {} to {}.'
-                    .format(current_user.id, element_id, list_type.value, old_status.value, new_status.value))
-
-    return '', 204
-
-
-@bp.route('/add_element', methods=['POST'])
-@login_required
-def add_element():
-    try:
-        json_data = request.get_json()
-        element_id = json_data['element_id']
-        element_type = json_data['element_type']
-        element_cat = json_data['element_cat']
-    except:
-        abort(400)
-
-    # Check if the media_list exist and is valid
-    try:
-        list_type = ListType(element_type)
-    except ValueError:
-        abort(400)
-
-    # Check if the status is valid compared to the list type
-    new_status = check_cat_type(list_type, element_cat)
-    if new_status is None:
-        abort(400)
-
-    # Check if the element exist in the database
-    if list_type == ListType.SERIES:
-        element = Series.query.filter_by(id=element_id).first()
-    elif list_type == ListType.ANIME:
-        element = Anime.query.filter_by(id=element_id).first()
-    elif list_type == ListType.MOVIES:
-        element = Movies.query.filter_by(id=element_id).first()
-
-    # Check if the element is already in the current user's list
-    if list_type == ListType.SERIES:
-        if SeriesList.query.filter_by(user_id=current_user.id, series_id=element.id).first():
-            flash("This series is already in your list", "warning")
-    elif list_type == ListType.ANIME:
-        if AnimeList.query.filter_by(user_id=current_user.id, anime_id=element.id).first():
-            flash("This anime is already in your list", "warning")
-    elif list_type == ListType.MOVIES:
-        if MoviesList.query.filter_by(user_id=current_user.id, movies_id=element.id).first():
-            flash("This movie is already in your list", "warning")
-
-    try:
-        add_element_to_user(element, current_user.id, list_type, new_status)
-    except Exception as e:
-        app.logger.error("Exception occured: {}, Couldn't add media ID {} to user {}."
-                         .format(e, element_id, current_user.id))
-        return jsonify(data={'code': 500,
-                             'body': "Due to an unexpected error the Media was not added. Please try again later.",
-                             'category': 'warning'})
-
-    return jsonify(data={'code': 200})
-
-
-@bp.route('/lock_media', methods=['POST'])
-@login_required
-def lock_media():
-    try:
-        json_data = request.get_json()
-        element_id = json_data['element_id']
-        element_type = json_data['element_type']
-        lock_status = json_data['lock_status']
-    except:
-        abort(400)
-
-    # Check if the user is the admin
-    if current_user.id == 3 or current_user.id == 2 or current_user.id == 1:
-        pass
-    else:
-        abort(404)
-
-    # Check if the list_type exist and is valid
-    try:
-        list_type = ListType(element_type)
-    except ValueError:
-        abort(400)
-
-    # Check if the lock_status is boolean
-    if type(lock_status) is not bool:
-        abort(400)
-
-    if list_type == ListType.SERIES:
-        element = Series.query.filter_by(id=element_id).first()
-    elif list_type == ListType.ANIME:
-        element = Anime.query.filter_by(id=element_id).first()
-    elif list_type == ListType.MOVIES:
-        element = Movies.query.filter_by(id=element_id).first()
-
-    if element is None:
-        abort(400)
-
-    element.lock_status = lock_status
-    db.session.commit()
-
-    return '', 204
 
 
 @bp.route('/media_sheet/<media_type>/<media_id>', methods=['GET', 'POST'])
@@ -795,6 +309,492 @@ def media_sheet_form(media_type, media_id):
     return render_template('media_sheet_form.html', title='Media Form', form=form, media_type=media_type)
 
 
+@bp.route('/update_element_season', methods=['POST'])
+@login_required
+def update_element_season():
+    try:
+        json_data = request.get_json()
+        new_season = int(json_data['season']) + 1
+        element_id = int(json_data['element_id'])
+        element_type = json_data['element_type']
+    except:
+        return '', 400
+
+    # Check if the media_list exist and is valid
+    try:
+        list_type = ListType(element_type)
+    except ValueError:
+        return '', 400
+
+    if list_type == ListType.SERIES:
+        # Check if the element is in the database (also used for watched_time and last_update)
+        series = Series.query.filter_by(id=element_id).first()
+        if series is None:
+            return '', 400
+
+        # Check if the element is in the current account's list
+        series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
+        if series_list is None:
+            return '', 400
+
+        # Check if the season number is between 1 and <last_season>
+        all_seasons = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id)\
+            .order_by(SeriesEpisodesPerSeason.season).all()
+        if 1 > new_season > all_seasons[-1].season:
+            return '', 400
+
+        # Set the new data
+        old_season = series_list.current_season
+        old_episode = series_list.last_episode_watched
+        series_list.current_season = new_season
+        series_list.last_episode_watched = 1
+        app.logger.info('[{}] Series season with ID {} updated: {}'.format(current_user.id, element_id, new_season))
+
+        # Commit the changes
+        db.session.commit()
+
+        # Set the last updates
+        set_last_update(media=series, media_type=list_type, old_season=old_season,
+                        new_season=new_season, old_episode=old_episode, new_episode=1)
+
+        # Compute the new time spent
+        compute_time_spent(cat_type="season", old_eps=old_episode, old_seas=old_season, new_seas=new_season,
+                           all_seas_data=all_seasons, media=series, list_type=list_type)
+    elif list_type == ListType.ANIME:
+        # Check if the element is in the database (also used for watched_time and last_update)
+        anime = Anime.query.filter_by(id=element_id).first()
+        if anime is None:
+            return '', 400
+
+        # Check if the element is in the current account's list
+        anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
+        if anime_list is None:
+            return '', 400
+
+        # Check if the season number is between 1 and <last_season>
+        all_seasons = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id)\
+            .order_by(AnimeEpisodesPerSeason.season).all()
+        if 1 > new_season > all_seasons[-1].season:
+            return '', 400
+
+        # Set the new data
+        old_season = anime_list.current_season
+        old_episode = anime_list.last_episode_watched
+        anime_list.current_season = new_season
+        anime_list.last_episode_watched = 1
+        app.logger.info("[{}] Anime season with ID {} updated: {}".format(current_user.id, element_id, new_season))
+
+        # Commit the changes
+        db.session.commit()
+
+        # Set the last update
+        set_last_update(media=anime, media_type=list_type, old_season=old_season,
+                        new_season=new_season, old_episode=old_episode, new_episode=1)
+
+        # Compute the new time spent
+        compute_time_spent(cat_type="season", old_eps=old_episode, old_seas=old_season, new_seas=new_season,
+                           all_seas_data=all_seasons, media=anime, list_type=list_type)
+
+    return '', 204
+
+
+@bp.route('/update_element_episode', methods=['POST'])
+@login_required
+def update_element_episode():
+    try:
+        json_data = request.get_json()
+        new_episode = int(json_data['episode'])+1
+        element_id = int(json_data['element_id'])
+        element_type = json_data['element_type']
+    except:
+        return '', 400
+
+    # Check if the media_list exist and is valid
+    try:
+        list_type = ListType(element_type)
+    except ValueError:
+        return '', 400
+
+    if list_type == ListType.SERIES:
+        # Check if the element is in the database (also used for watched_time and last_update)
+        series = Series.query.filter_by(id=element_id).first()
+        if series is None:
+            return '', 400
+
+        # Check if the element is in the current user's list
+        series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
+        if series_list is None:
+            return '', 400
+
+        # Check if the episode number is between 1 and <last_episode>
+        last_episode = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id, season=series_list.current_season)\
+            .first().episodes
+        if 1 > new_episode > last_episode:
+            return '', 400
+
+        # Set the new data
+        old_season = series_list.current_season
+        old_episode = series_list.last_episode_watched
+        series_list.last_episode_watched = new_episode
+        app.logger.info('[{}] Series episode with ID {} updated: {}'.format(current_user.id, element_id, new_episode))
+
+        # Commit the changes
+        db.session.commit()
+
+        # Set the last update
+        set_last_update(media=series, media_type=list_type, old_season=old_season, new_season=old_season,
+                        old_episode=old_episode, new_episode=new_episode)
+
+        # Compute the new time spent
+        compute_time_spent(cat_type='episode', new_eps=new_episode, old_eps=old_episode, media=series,
+                           list_type=list_type)
+    elif list_type == ListType.ANIME:
+        # Check if the element is in the database (also used for watched_time and last_update)
+        anime = Anime.query.filter_by(id=element_id).first()
+        if anime is None:
+            return '', 400
+
+        # Check if the element is in the current user's list
+        anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
+        if anime_list is None:
+            return '', 400
+
+        # Check if the episode number is between 1 and <last_episode>
+        last_episode = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id, season=anime_list.current_season) \
+            .first().episodes
+        if 1 > new_episode > last_episode:
+            return '', 400
+
+        # Set the new data
+        old_season = anime_list.current_season
+        old_episode = anime_list.last_episode_watched
+        anime_list.last_episode_watched = new_episode
+        app.logger.info('[{}] Anime episode with ID {} updated: {}'.format(current_user.id, element_id, new_episode))
+
+        # Commit the changes
+        db.session.commit()
+
+        # Set the last update
+        set_last_update(media=anime, media_type=list_type, old_season=old_season, new_season=old_season,
+                        old_episode=old_episode, new_episode=new_episode)
+
+        # Compute the new time spent
+        compute_time_spent(cat_type='episode', new_eps=new_episode, old_eps=old_episode, media=anime,
+                           list_type=list_type)
+
+    return '', 204
+
+
+@bp.route('/add_favorite', methods=['POST'])
+@login_required
+def add_favorite():
+    try:
+        json_data = request.get_json()
+        element_id = int(json_data['element_id'])
+        element_type = json_data['element_type']
+        favorite = bool(json_data['favorite'])
+    except:
+        return '', 400
+
+    # Check if the medialist exist and is valid
+    try:
+        list_type = ListType(element_type)
+    except ValueError:
+        return '', 400
+
+    # Check if favorite is boolean
+    if type(favorite) is not bool:
+        return '', 400
+
+    # Check if the element is in the current user's list
+    if list_type == ListType.ANIME:
+        element_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
+    elif list_type == ListType.SERIES:
+        element_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
+    elif list_type == ListType.MOVIES:
+        element_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
+
+    if element_list is None:
+        return '', 400
+
+    element_list.favorite = favorite
+
+    # Commit the changes
+    db.session.commit()
+
+    return '', 204
+
+
+@bp.route('/delete_element', methods=['POST'])
+@login_required
+def delete_element():
+    try:
+        json_data = request.get_json()
+        element_id = int(json_data['delete'])
+        element_type = json_data['element_type']
+    except:
+        return '', 400
+
+    # Check if the media_list exist and is valid
+    try:
+        list_type = ListType(element_type)
+    except ValueError:
+        return '', 400
+
+    if list_type == ListType.SERIES:
+        # Check if series exists in the database (also used for watched_time and last_update)
+        series = Series.query.filter_by(id=element_id).first()
+        if series is None:
+            return '', 400
+
+        # Check if series exists in the current user's list
+        series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
+        if series_list is None:
+            return '', 400
+
+        # Compute new time spent
+        old_episode = series_list.last_episode_watched
+        old_season = series_list.current_season
+        all_seasons = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id) \
+            .order_by(SeriesEpisodesPerSeason.season).all()
+        compute_time_spent(cat_type="delete", old_eps=old_episode, old_seas=old_season, all_seas_data=all_seasons,
+                           media=series, list_type=list_type)
+
+        # Delete the media from the user's list
+        SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).delete()
+        db.session.commit()
+        app.logger.info('[{}] Series with ID {} deleted'.format(current_user.id, element_id))
+    elif list_type == ListType.ANIME:
+        # Check if anime exists in the database (also used for watched_time and last_update)
+        anime = Anime.query.filter_by(id=element_id).first()
+        if anime is None:
+            return '', 400
+
+        # Check if anime exists in list of the current account
+        anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
+        if anime_list is None:
+            return '', 400
+
+        # Compute new time spent
+        old_episode = anime_list.last_episode_watched
+        old_season = anime_list.current_season
+        all_seasons = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id) \
+            .order_by(AnimeEpisodesPerSeason.season).all()
+        compute_time_spent(cat_type="delete", old_eps=old_episode, old_seas=old_season, all_seas_data=all_seasons,
+                           media=anime, list_type=list_type)
+
+        # Delete the media from the user's list
+        AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).delete()
+        db.session.commit()
+        app.logger.info('[{}] Anime with ID {} deleted'.format(current_user.id, element_id))
+    elif list_type == ListType.MOVIES:
+        # Check if movie exists in the database (also used for watched_time and last_update)
+        movies = Movies.query.filter_by(id=element_id).first()
+        if movies is None:
+            return '', 400
+
+        # Check if movie exists in the account's list
+        movies_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
+        if movies_list is None:
+            return '', 400
+
+        # Compute the new time spent
+        compute_time_spent(cat_type="delete", media=movies, list_type=list_type)
+
+        # Delete the media from the user's list
+        MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).delete()
+        db.session.commit()
+        app.logger.info('[{}] Movie with ID {} deleted'.format(current_user.id, element_id))
+
+    return '', 204
+
+
+@bp.route('/change_element_category', methods=['POST'])
+@login_required
+def change_element_category():
+    try:
+        json_data = request.get_json()
+        element_new_category = json_data['status']
+        element_id = int(json_data['element_id'])
+        element_type = json_data['element_type']
+    except:
+        return '', 400
+
+    # Check if the <media_list> exist and is valid
+    try:
+        list_type = ListType(element_type)
+    except ValueError:
+        return '', 400
+
+    # Check if the status is valid compared to the list type
+    new_status = check_cat_type(list_type, element_new_category)
+    if new_status is None:
+        return '', 400
+
+    # Check if the element is in the user's list
+    if list_type == ListType.SERIES:
+        element = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
+        season_data = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).all()
+    elif list_type == ListType.ANIME:
+        element = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
+        season_data = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).all()
+    elif list_type == ListType.MOVIES:
+        element = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
+
+    if element is None:
+        return '', 400
+
+    old_status = element.status
+    element.status = new_status
+
+    if list_type != ListType.MOVIES:
+        current_season = element.current_season
+        last_episode_watched = element.last_episode_watched
+    if new_status == Status.COMPLETED:
+        # Set to the last seasons and episodes
+        if list_type == ListType.SERIES:
+            seasons_and_eps = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id) \
+                .order_by(SeriesEpisodesPerSeason.season).all()
+            element.current_season = len(seasons_and_eps)
+            element.last_episode_watched = seasons_and_eps[-1].episodes
+        elif list_type == ListType.ANIME:
+            seasons_and_eps = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id) \
+                .order_by(AnimeEpisodesPerSeason.season).all()
+            element.current_season = len(seasons_and_eps)
+            element.last_episode_watched = seasons_and_eps[-1].episodes
+    elif new_status == Status.RANDOM:
+        # Set to first season and episode
+        element.current_season = 1
+        element.last_episode_watched = 1
+    elif new_status == Status.PLAN_TO_WATCH:
+        # Set to first season and episode
+        if list_type != ListType.MOVIES:
+            element.current_season = 1
+            element.last_episode_watched = 1
+
+    # Compute total time spent and set last update
+    if list_type == ListType.SERIES:
+        series = Series.query.filter_by(id=element_id).first()
+        set_last_update(media=series, media_type=list_type, old_status=old_status, new_status=new_status)
+        compute_time_spent(cat_type="category", old_eps=last_episode_watched, old_seas=current_season, media=series,
+                           old_status=old_status, new_status=new_status, list_type=list_type, all_seas_data=season_data)
+    elif list_type == ListType.ANIME:
+        anime = Anime.query.filter_by(id=element_id).first()
+        set_last_update(media=anime, media_type=list_type, old_status=old_status, new_status=new_status)
+        compute_time_spent(cat_type="category", old_eps=last_episode_watched, old_seas=current_season, media=anime,
+                           old_status=old_status, new_status=new_status, list_type=list_type, all_seas_data=season_data)
+    elif list_type == ListType.MOVIES:
+        movie = Movies.query.filter_by(id=element_id).first()
+        set_last_update(media=movie, media_type=list_type, old_status=old_status, new_status=new_status)
+        compute_time_spent(cat_type="category", media=movie, old_status=old_status, new_status=new_status,
+                           list_type=list_type)
+
+    db.session.commit()
+    app.logger.info('[{}] Category of element ID {} ({}) changed from {} to {}.'
+                    .format(current_user.id, element_id, list_type.value, old_status.value, new_status.value))
+
+    return '', 204
+
+
+@bp.route('/add_element', methods=['POST'])
+@login_required
+def add_element():
+    try:
+        json_data = request.get_json()
+        element_id = json_data['element_id']
+        element_type = json_data['element_type']
+        element_cat = json_data['element_cat']
+    except:
+        return '', 400
+
+    # Check if the media_list exist and is valid
+    try:
+        list_type = ListType(element_type)
+    except ValueError:
+        return '', 400
+
+    # Check if the status is valid compared to the list type
+    new_status = check_cat_type(list_type, element_cat)
+    if new_status is None:
+        return '', 400
+
+    # Check if the element exist in the database
+    if list_type == ListType.SERIES:
+        element = Series.query.filter_by(id=element_id).first()
+    elif list_type == ListType.ANIME:
+        element = Anime.query.filter_by(id=element_id).first()
+    elif list_type == ListType.MOVIES:
+        element = Movies.query.filter_by(id=element_id).first()
+
+    if element is None:
+        return '', 400
+
+    # Check if the element is already in the current user's list
+    if list_type == ListType.SERIES:
+        if SeriesList.query.filter_by(user_id=current_user.id, series_id=element.id).first():
+            return '', 400
+    elif list_type == ListType.ANIME:
+        if AnimeList.query.filter_by(user_id=current_user.id, anime_id=element.id).first():
+            return '', 400
+    elif list_type == ListType.MOVIES:
+        if MoviesList.query.filter_by(user_id=current_user.id, movies_id=element.id).first():
+            return '', 400
+
+    try:
+        add_element_to_user(element, current_user.id, list_type, new_status)
+        app.logger.info('[{}] Added the Media ({}) "{}", with ID: {}'
+                        .format(current_user.id, list_type.value, element.name, element.id))
+    except Exception as e:
+        app.logger.error("Exception occured: {}, Couldn't add media ID {} to user {}."
+                         .format(e, element_id, current_user.id))
+        return '', 400
+
+    return '', 204
+
+
+@bp.route('/lock_media', methods=['POST'])
+@login_required
+def lock_media():
+    try:
+        json_data = request.get_json()
+        element_id = json_data['element_id']
+        element_type = json_data['element_type']
+        lock_status = json_data['lock_status']
+    except:
+        return '', 400
+
+    # Check if the user is the admin
+    if current_user.id == 3 or current_user.id == 2 or current_user.id == 1:
+        pass
+    else:
+        return '', 400
+
+    # Check if the list_type exist and is valid
+    try:
+        list_type = ListType(element_type)
+    except ValueError:
+        return '', 400
+
+    # Check if the lock_status is boolean
+    if type(lock_status) is not bool:
+        return '', 400
+
+    if list_type == ListType.SERIES:
+        element = Series.query.filter_by(id=element_id).first()
+    elif list_type == ListType.ANIME:
+        element = Anime.query.filter_by(id=element_id).first()
+    elif list_type == ListType.MOVIES:
+        element = Movies.query.filter_by(id=element_id).first()
+
+    if element is None:
+        return '', 400
+
+    element.lock_status = lock_status
+    db.session.commit()
+
+    return '', 204
+
+
 @bp.route('/search_media', methods=['GET'])
 @login_required
 def search_media():
@@ -829,7 +829,7 @@ def autocomplete():
     search = request.args.get('q')
     results = ApiData().autocomplete_search(search)
 
-    return jsonify(matching_results=results)
+    return jsonify(matching_results=results), 200
 
 
 @bp.route('/read_notifications', methods=['GET'])
@@ -856,4 +856,4 @@ def read_notifications():
                                 'episode': notif.episode,
                                 'release_date': notif.release_date})
 
-    return jsonify(results=results)
+    return jsonify(results=results), 200

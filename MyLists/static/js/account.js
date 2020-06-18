@@ -4,24 +4,28 @@ function follow_status(follow_id) {
     let status;
 
     if ($('.follow-btn')[0].innerText === 'UNFOLLOW') {
-        $('.follow-btn').text('Follow');
-        $('.follow-btn').addClass('btn-primary').removeClass('btn-dark');
         status = false;
     } else {
-        $('.follow-btn').text('Unfollow');
-        $('.follow-btn').removeClass('btn-primary').addClass('btn-dark');
         status = true;
     }
 
-    $body = $("body");
     $.ajax ({
         type: "POST",
         url: "/follow_status",
         contentType: "application/json",
         data: JSON.stringify({follow_id: follow_id, follow_status: status}),
         dataType: "json",
-        success: function(response) {
-            console.log("ok");
+        success: function() {
+            if ($('.follow-btn')[0].innerText === 'UNFOLLOW') {
+                $('.follow-btn').text('Follow');
+                $('.follow-btn').addClass('btn-primary').removeClass('btn-dark');
+            } else {
+                $('.follow-btn').text('Unfollow');
+                $('.follow-btn').removeClass('btn-primary').addClass('btn-dark');
+            }
+        },
+        error: function() {
+            error_ajax_message('Error updating the following status. Please try again later.');
         }
     });
 }
@@ -97,24 +101,13 @@ let ctx = document.getElementById('media-time').getContext('2d');
 let myPie = new Chart(ctx, config);
 
 
-// ------------------------------------------------------------------------
+// --- On docuent load --------------------------------------------
 $(document).ready(function() {
-    $body = $("body");
-    $body.addClass("loading");
-    $(document).click(function() {
-        $body.removeClass("loading");
-    });
-
     // Stats for the figure (series/anime/movies)
     $('.value').each(function() {
-        var text = $(this).attr('id');
+        let text = $(this).attr('id');
         $(this).parent().css('width', text);
     });
-
-    // Tooltip initialization
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
 
     // Levels animations for overview tab
     $(".xp-increase-fx-flicker").css("opacity", "1");
@@ -153,5 +146,3 @@ $(document).ready(function() {
         $("#xp-bar-fill-movies").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
     }, 2000);
 });
-
-

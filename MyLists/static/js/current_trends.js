@@ -1,15 +1,14 @@
 
-function showmore(show, media) {
-    var media = media;
-    var show = show;
 
+function showmore(show, media) {
     $('#'+show).text("Show less...");
     $('#'+show).attr("onclick", "showless(\"" + show + "\", \"" + media + "\")");
     $('.'+media).attr("style", "display: block;");
 }
 
+
 function showless(show, media) {
-    var i = 0;
+    let i = 0;
     $('.'+media).each(function () {
         i++;
         if (i > 6) {
@@ -21,4 +20,3 @@ function showless(show, media) {
     $('#'+show).text("Show more...");
     $('#'+show).attr("onclick", "showmore(\"" + show + "\", \"" + media + "\")");
 }
-
