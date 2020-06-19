@@ -55,7 +55,7 @@ def home():
             flash('Your account has been created. Check your e-mail address to activate your account.', 'info')
         except Exception as e:
             app.logger.error('[SYSTEM] Error "{}" sending register email to account with ID {}.'.format(e, user.id))
-            flash("There was an error while sending the register email. Admins were advertised. Try again later.")
+            flash("An error occured while sending your register e-mail. Admins were advised. Please try again later.")
         return redirect(url_for('auth.home'))
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.id).first()
@@ -95,8 +95,8 @@ def reset_password():
             app.logger.info('[{}] Reset password email sent'.format(user.id))
             flash('An email has been sent with instructions to reset your password.', 'info')
         except Exception as e:
-            app.logger.error('[SYSTEM] - Exception "{}" while sending reset password email to {}'.format(e, user.email))
-            flash("There was an error while sending the reset password email. Please try again later.")
+            app.logger.error('[SYSTEM] - Error "{}" while sending reset password email to {}'.format(e, user.email))
+            flash("An error occured while sending the reset password email. Please try again later.")
 
         return redirect(url_for('auth.home'))
 

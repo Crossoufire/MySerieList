@@ -63,6 +63,9 @@ class User(db.Model, UserMixin):
     activated_on = db.Column(db.DateTime)
     last_notif_read_time = db.Column(db.DateTime)
 
+    series_list = db.relationship('SeriesList', backref='user', lazy=True)
+    anime_list = db.relationship('AnimeList', backref='user', lazy=True)
+    movies_list = db.relationship('MoviesList', backref='user', lazy=True)
     followed = db.relationship('User',
                                secondary=followers,
                                primaryjoin=(followers.c.follower_id == id),

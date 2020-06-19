@@ -16,7 +16,10 @@ from MyLists.models import ListType, Status, AnimeList, Anime, AnimeEpisodesPerS
 
 
 def get_collection_movie(collection_id):
-    collection_data = ApiData().get_collection_data(collection_id)
+    try:
+        collection_data = ApiData().get_collection_data(collection_id)
+    except Exception as e:
+        app.logger.error('[SYSTEM] Error requesting the TMDB API for movies collection data: {}'.format(e))
 
     # Check the API response
     if collection_data is None:
@@ -27,9 +30,10 @@ def get_collection_movie(collection_id):
 
     if collection_cover_path:
         collection_cover_name = "{}.jpg".format(secrets.token_hex(8))
-        issuccess = ApiData().save_api_cover(collection_cover_path, collection_cover_name,
-                                             ListType.MOVIES, collection=True)
-        if issuccess is False:
+        try:
+            ApiData().save_api_cover(collection_cover_path, collection_cover_name, ListType.MOVIES, collection=True)
+        except Exception as e:
+            app.logger.error('[SYSTEM] Error trying to recover the poster: {}'.format(e))
             collection_cover_name = "default.jpg"
     else:
         collection_cover_name = "default.jpg"
@@ -44,7 +48,10 @@ def get_collection_movie(collection_id):
 
 
 def get_details(api_id, list_type):
-    details_data = ApiData().get_details_and_credits_data(api_id, list_type)
+    try:
+        details_data = ApiData().get_details_and_credits_data(api_id, list_type)
+    except Exception as e:
+        app.logger.error('[SYSTEM] Error requesting the TMDB API: {}'.format(e))
 
     # Check the API response
     if details_data is None:
@@ -55,8 +62,10 @@ def get_details(api_id, list_type):
 
     if media_cover_path:
         media_cover_name = "{}.jpg".format(secrets.token_hex(8))
-        is_success = ApiData().save_api_cover(media_cover_path, media_cover_name, list_type)
-        if is_success is False:
+        try:
+            ApiData().save_api_cover(media_cover_path, media_cover_name, list_type)
+        except Exception as e:
+            app.logger.error('[SYSTEM] Error trying to recover the poster: {}'.format(e))
             media_cover_name = "default.jpg"
     else:
         media_cover_name = "default.jpg"
@@ -147,7 +156,20 @@ def get_details(api_id, list_type):
         # Anime Genre from Jikan My AnimeList API
         a_genres_list = []
         if list_type == ListType.ANIME:
-            anime_genres = ApiData().get_anime_genres(details_data.get("name"))
+            try:
+                anime_search = ApiData().anime_search(details_data.get("name"))
+                mal_id = anime_search["results"][0]["mal_id"]
+            except Exception as e:
+                app.logger.error('[SYSTEM] Error requesting the Jikan search API: {}'.format(e))
+                mal_id = None
+
+            try:
+                anime_genres = ApiData().get_anime_genres(mal_id)
+                anime_genres = anime_genres["genres"]
+            except:
+                app.logger.error('[SYSTEM] Error requesting the Jikan genre API: {}'.format(e))
+                anime_genres = None
+
             if anime_genres:
                 for i in range(0, len(anime_genres)):
                     genres_dict = {'genre': anime_genres[i]['name'],
@@ -913,8 +935,14 @@ def scheduled_task():
         all_movies_tmdb_id = [m.themoviedb_id for m in db.session.query(Movies).filter(Movies.lock_status != True)]
 
         # Recover from API all the changed TV ID and Movies ID
-        all_id_tv_changes = ApiData().get_changed_data(list_type=ListType.SERIES)
-        all_id_movies_changes = ApiData().get_changed_data(list_type=ListType.MOVIES)
+        try:
+            all_id_tv_changes = ApiData().get_changed_data(list_type=ListType.SERIES)
+        except Exception as e:
+            app.logger.error('[SYSTEM] Error requesting the TMDB API: {}'.format(e))
+        try:
+            all_id_movies_changes = ApiData().get_changed_data(list_type=ListType.MOVIES)
+        except Exception as e:
+            app.logger.error('[SYSTEM] Error requesting the TMDB API: {}'.format(e))
 
         # Refresh series and anime
         if all_id_tv_changes:

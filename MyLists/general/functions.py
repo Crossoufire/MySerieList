@@ -17,23 +17,49 @@ def compute_media_time_spent(list_type):
     users = User.query.all()
 
     for user in users:
-        if list_type == ListType.ANIME:
-            element_data = db.session.query(AnimeList, Anime, func.group_concat(AnimeEpisodesPerSeason.episodes)) \
-                .join(Anime, Anime.id == AnimeList.anime_id) \
-                .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id) \
-                .filter(AnimeList.user_id == user.id).group_by(AnimeList.anime_id)
-        elif list_type == ListType.SERIES:
-            element_data = db.session.query(SeriesList, Series, func.group_concat(SeriesEpisodesPerSeason.episodes)) \
-                .join(Series, Series.id == SeriesList.series_id) \
-                .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id) \
-                .filter(SeriesList.user_id == user.id).group_by(SeriesList.series_id)
-        elif list_type == ListType.MOVIES:
-            element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id) \
-                .filter(MoviesList.user_id == user.id).group_by(MoviesList.movies_id)
+        # if list_type == ListType.ANIME:
+        #     element_data = db.session.query(AnimeList, Anime, func.group_concat(AnimeEpisodesPerSeason.episodes)) \
+        #         .join(Anime, Anime.id == AnimeList.anime_id) \
+        #         .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id) \
+        #         .filter(AnimeList.user_id == user.id).group_by(AnimeList.anime_id)
+        # elif list_type == ListType.SERIES:
+        #     element_data = db.session.query(SeriesList, Series, func.group_concat(SeriesEpisodesPerSeason.episodes)) \
+        #         .join(Series, Series.id == SeriesList.series_id) \
+        #         .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id) \
+        #         .filter(SeriesList.user_id == user.id).group_by(SeriesList.series_id)
+        # elif list_type == ListType.MOVIES:
+        #     element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id) \
+        #         .filter(MoviesList.user_id == user.id).group_by(MoviesList.movies_id)
+        #
+        # if list_type != ListType.MOVIES:
+        #     total_time = 0
+        #     for element in element_data:
+        #         if element[0].status == Status.COMPLETED:
+        #             try:
+        #                 total_time += element[1].episode_duration * element[1].total_episodes
+        #             except:
+        #                 pass
+        #         elif element[0].status != Status.PLAN_TO_WATCH or element[0].status != Status.RANDOM:
+        #             try:
+        #                 episodes = element[2].split(",")
+        #                 episodes = [int(x) for x in episodes]
+        #                 for i in range(1, element[0].current_season):
+        #                     total_time += element[1].episode_duration * episodes[i - 1]
+        #                 total_time += element[0].last_episode_watched * element[1].episode_duration
+        #             except:
+        #                 pass
+        # elif list_type == ListType.MOVIES:
+        #     total_time = 0
+        #     for element in element_data:
+        #         if element[0].status != Status.PLAN_TO_WATCH:
+        #             try:
+        #                 total_time += element[1].runtime
+        #             except:
+        #                 pass
 
         if list_type != ListType.MOVIES:
             total_time = 0
-            for element in element_data:
+            for element in user.series_list:
                 if element[0].status == Status.COMPLETED:
                     try:
                         total_time += element[1].episode_duration * element[1].total_episodes

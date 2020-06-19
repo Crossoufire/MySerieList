@@ -1,6 +1,6 @@
 from flask import Blueprint
 from datetime import datetime
-from MyLists import db, bcrypt
+from MyLists import db, bcrypt, app
 from sqlalchemy import func, text
 from MyLists.API_data import ApiData
 from flask_login import current_user, login_required
@@ -250,27 +250,28 @@ def global_stats():
 @bp.route("/current_trends", methods=['GET'])
 @login_required
 def current_trends():
-    # Recover the trending media data from the API
-    trending_data = ApiData().get_trending_media()
+    series_trends, anime_trends, movies_trends = [], [], []
 
-    series_trends = []
-    anime_trends = []
-    movies_trends = []
+    try:
+        series_data = ApiData().get_trending_media(ListType.SERIES, 'TMDB')
+        series_trends = get_trending_data(series_data, ListType.SERIES)
+    except Exception as e:
+        app.logger.error('Error getting trending data for the TV shows: {} .'.format(e))
+        flash('The current trends from TMDB TV shows are not available right now.', 'warning')
 
-    if trending_data['tmdb_error'] and not trending_data['jikan_error']:
-        flash('The current trends from TMDB are not available right now.', 'warning')
-        anime_trends = get_trending_data(trending_data['anime_data'], ListType.ANIME)
-    elif not trending_data['tmdb_error'] and trending_data['jikan_error']:
+    try:
+        anime_data = ApiData().get_trending_media(ListType.ANIME, 'Jikan')
+        anime_trends = get_trending_data(anime_data, ListType.ANIME)
+    except Exception as e:
+        app.logger.error('Error getting trending data for the anime: {} .'.format(e))
         flash('The current trends from Jikan (Anime) are not available right now.', 'warning')
-        series_trends = get_trending_data(trending_data['series_data'], ListType.SERIES)
-        movies_trends = get_trending_data(trending_data['movies_data'], ListType.MOVIES)
-    elif trending_data['tmdb_error'] and trending_data['jikan_error']:
-        flash('The current trends for TMDB and Jikan (Anime) are not available right now.', 'danger')
-        return redirect(url_for('users.account', user_name=current_user.username))
-    else:
-        series_trends = get_trending_data(trending_data['series_data'], ListType.SERIES)
-        anime_trends = get_trending_data(trending_data['anime_data'], ListType.ANIME)
-        movies_trends = get_trending_data(trending_data['movies_data'], ListType.MOVIES)
+
+    try:
+        movies_data = ApiData().get_trending_media(ListType.MOVIES, 'TMDB')
+        movies_trends = get_trending_data(movies_data, ListType.MOVIES)
+    except Exception as e:
+        app.logger.error('Error getting trending data for the movies: {} .'.format(e))
+        flash('The current trends from TMDB Movies are not available right now.', 'warning')
 
     platform = str(request.user_agent.platform)
     if platform == "iphone" or platform == "android" or platform is None or platform == 'None':
