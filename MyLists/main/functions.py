@@ -423,7 +423,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             current_media = db.session.query(MoviesList.movies_id).filter_by(user_id=current_user.id).all()
         current_list = [r[0] for r in current_media]
 
-    group = 'alphabet'
+    group = 'categories'
 
     category_tv_group = OrderedDict({'WATCHING': '',
                                      'COMPLETED': '',
@@ -551,7 +551,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
     except ZeroDivisionError:
         percentage = 0
 
-    data = {"grouping": alphabet_group,
+    data = {"grouping": category_tv_group,
             "common_elements": [common_elements, len(element_data), percentage]}
 
     return data

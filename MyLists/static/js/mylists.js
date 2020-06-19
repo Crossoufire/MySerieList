@@ -10,7 +10,7 @@ $(function() {
                 q: request.term,
             },
             function(data) {
-                response(data.matching_results);
+                response(data.search_results);
             });
         },
         select: function(event, ui) {
@@ -102,7 +102,7 @@ function display_notifications(data) {
                     '<a style="color: #359aff;" href="/media_sheet/Movies/'+resp[i]['media_id']+'">' +
                     resp[i]['name'] + '</a>' +
                     '<i class="fas fa-arrow-right"></i>' +
-                    '&nbsp;&nbsp;Airs the ' + resp[i]['release_date'] +
+                    '&nbsp;&nbsp;Airs the ' + resp[i]['first_air_date'] +
                     '&nbsp;&nbsp;&nbsp;&nbsp;' +
                     '</div>');
             }
@@ -115,7 +115,7 @@ function display_notifications(data) {
                     resp[i]['name'] + '</a>' +
                     'S0' + resp[i]['season']+'.E0'+resp[i]['episode'] +
                     ' <i class="fas fa-arrow-right"></i>' +
-                    '&nbsp;&nbsp;Airs the ' + resp[i]['release_date'] +
+                    '&nbsp;&nbsp;Airs the ' + resp[i]['first_air_date'] +
                     '&nbsp;&nbsp;&nbsp;&nbsp;' +
                     '</div>');
             }

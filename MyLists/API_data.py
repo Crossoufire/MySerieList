@@ -3,9 +3,9 @@ import requests
 import urllib.request
 
 from PIL import Image
+from flask import abort
 from MyLists import app
 from pathlib import Path
-from flask import url_for, abort
 from jikanpy import Jikan
 from MyLists.models import ListType
 
@@ -15,104 +15,14 @@ class ApiData:
         self.tmdb_api_key = app.config['THEMOVIEDB_API_KEY']
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
 
-    def autocomplete_search(self, element_name):
+    def TMDb_search(self, element_name):
         response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
                                 .format(self.tmdb_api_key, element_name))
 
         if response.status_code != 200:
             abort(response.status_code)
 
-        # Get the response in a json form
-        data = json.loads(response.text)
-
-        if data.get("total_results", 0) == 0:
-            return [{'nb_results': 0}]
-
-        # Recover 7 results without peoples
-        tmdb_results = []
-        for i, result in enumerate(data["results"]):
-            if i >= data["total_results"] or i > 19 or len(tmdb_results) >= 7:
-                break
-
-            if result.get('known_for_department'):
-                continue
-
-            media_data = {'name': result.get('original_title') or result.get('original_name'),
-                          "first_air_date": result.get('first_air_date') or result.get('release_date'),
-                          'tmdb_id': result["id"]}
-
-            if media_data['first_air_date'] == '':
-                media_data['first_air_date'] = 'Unknown'
-
-            if result['media_type'] == 'tv':
-                if result['origin_country'] == 'JP' or result['original_language'] == 'ja' \
-                        and 16 in result['genre_ids']:
-                    media_data['media_type'] = ListType.ANIME.value
-                    media_data['name'] = result['name']
-                else:
-                    media_data['media_type'] = ListType.SERIES.value
-            elif result['media_type'] == 'movie':
-                media_data['media_type'] = ListType.MOVIES.value
-                if result['original_language'] == 'ja' and 16 in result['genre_ids']:
-                    media_data['name'] = result['title']
-
-            if result["poster_path"]:
-                media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
-            else:
-                media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
-            tmdb_results.append(media_data)
-
-        return tmdb_results
-
-    def media_search(self, element_name):
-        response_tv = requests.get("https://api.themoviedb.org/3/search/tv?api_key={0}&query={1}"
-                                   .format(self.tmdb_api_key, element_name))
-        response_movies = requests.get("https://api.themoviedb.org/3/search/movie?api_key={0}&query={1}"
-                                       .format(self.tmdb_api_key, element_name))
-
-        data_tv = self.check_response_status(response_tv)
-        data_movies = self.check_response_status(response_movies)
-        if not data_tv and not data_movies:
-            return None
-
-        if data_tv.get("total_results", 0) == 0 and data_movies.get("total_results", 0) == 0:
-            return None
-
-        # Recover movies results
-        movies_results = []
-        for result in data_movies['results']:
-            media_data = {'name': result['original_title'],
-                          'overview': result['overview'],
-                          'tmdb_id': result["id"],
-                          "first_air_date": result.get('release_date', 'Unknown') or 'Unknown',
-                          'url': f"https://www.themoviedb.org/movie/{result['id']}"}
-
-            if result["poster_path"]:
-                media_data["poster_path"] = f"{self.tmdb_poster_base_url}{result['poster_path']}"
-            else:
-                media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
-            movies_results.append(media_data)
-
-        # Recover anime and series results
-        series_results, anime_results = [], []
-        for result in data_tv['results']:
-            media_data = {'name': result['original_name'],
-                          'overview': result['overview'],
-                          'tmdb_id': result["id"],
-                          "first_air_date": result.get('first_air_date', 'Unknown') or 'Unknown',
-                          'url': f"https://www.themoviedb.org/tv/{result['id']}"}
-
-            if result["poster_path"]:
-                media_data["poster_path"] = f"{self.tmdb_poster_base_url}{result['poster_path']}"
-            else:
-                media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
-
-            if result['origin_country'] == 'JP' or result['original_language'] == 'ja' and 16 in result['genre_ids']:
-                anime_results.append(media_data)
-            else:
-                series_results.append(media_data)
-
-        return [series_results, anime_results, movies_results]
+        return json.loads(response.text)
 
     def get_details_and_credits_data(self, api_id, list_type):
         try:

@@ -620,73 +620,54 @@ def change_element_category():
     except:
         return '', 400
 
-    # Check if the <media_list> exist and is valid
+    # Check the <media_list> parameter
     try:
         list_type = ListType(element_type)
     except ValueError:
         return '', 400
 
-    # Check if the status is valid compared to the list type
+    # Check if the <status> parameter
     new_status = check_cat_type(list_type, element_new_category)
     if new_status is None:
         return '', 400
 
-    # Check if the element is in the user's list
+    # Recover the media
     if list_type == ListType.SERIES:
-        element = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
-        season_data = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id).all()
+        element = Series.query.filter_by(id=element_id).first()
     elif list_type == ListType.ANIME:
-        element = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
-        season_data = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id).all()
+        element = Anime.query.filter_by(id=element_id).first()
     elif list_type == ListType.MOVIES:
-        element = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
+        element = Movies.query.filter_by(id=element_id).first()
 
-    if element is None:
+    element_in_list = element.list_info.first()
+    season_data = element.eps_per_season
+
+    # Check if media in user's list
+    if not element_in_list:
         return '', 400
 
-    old_status = element.status
-    element.status = new_status
+    old_status = element_in_list.status
+    element_in_list.status = new_status
 
+    # Set <last_episode_watched> and <current_season>
     if list_type != ListType.MOVIES:
-        current_season = element.current_season
-        last_episode_watched = element.last_episode_watched
-    if new_status == Status.COMPLETED:
-        # Set to the last seasons and episodes
-        if list_type == ListType.SERIES:
-            seasons_and_eps = SeriesEpisodesPerSeason.query.filter_by(series_id=element_id) \
-                .order_by(SeriesEpisodesPerSeason.season).all()
-            element.current_season = len(seasons_and_eps)
-            element.last_episode_watched = seasons_and_eps[-1].episodes
-        elif list_type == ListType.ANIME:
-            seasons_and_eps = AnimeEpisodesPerSeason.query.filter_by(anime_id=element_id) \
-                .order_by(AnimeEpisodesPerSeason.season).all()
-            element.current_season = len(seasons_and_eps)
-            element.last_episode_watched = seasons_and_eps[-1].episodes
-    elif new_status == Status.RANDOM:
-        # Set to first season and episode
-        element.current_season = 1
-        element.last_episode_watched = 1
-    elif new_status == Status.PLAN_TO_WATCH:
-        # Set to first season and episode
-        if list_type != ListType.MOVIES:
-            element.current_season = 1
-            element.last_episode_watched = 1
+        if new_status == Status.COMPLETED:
+            element_in_list.current_season = len(season_data)
+            element_in_list.last_episode_watched = season_data[-1].episodes
+        elif new_status == Status.RANDOM or new_status == Status.PLAN_TO_WATCH:
+            element_in_list.current_season = 1
+            element_in_list.last_episode_watched = 1
+        else:
+            current_season = element_in_list.current_season
+            last_episode_watched = element_in_list.last_episode_watched
 
-    # Compute total time spent and set last update
-    if list_type == ListType.SERIES:
-        series = Series.query.filter_by(id=element_id).first()
-        set_last_update(media=series, media_type=list_type, old_status=old_status, new_status=new_status)
-        compute_time_spent(cat_type="category", old_eps=last_episode_watched, old_seas=current_season, media=series,
+    # Compute <total_time_spent> and set <last_update>
+    set_last_update(media=element, media_type=list_type, old_status=old_status, new_status=new_status)
+    if list_type != ListType.MOVIES:
+        compute_time_spent(cat_type="category", old_eps=last_episode_watched, old_seas=current_season, media=element,
                            old_status=old_status, new_status=new_status, list_type=list_type, all_seas_data=season_data)
-    elif list_type == ListType.ANIME:
-        anime = Anime.query.filter_by(id=element_id).first()
-        set_last_update(media=anime, media_type=list_type, old_status=old_status, new_status=new_status)
-        compute_time_spent(cat_type="category", old_eps=last_episode_watched, old_seas=current_season, media=anime,
-                           old_status=old_status, new_status=new_status, list_type=list_type, all_seas_data=season_data)
-    elif list_type == ListType.MOVIES:
-        movie = Movies.query.filter_by(id=element_id).first()
-        set_last_update(media=movie, media_type=list_type, old_status=old_status, new_status=new_status)
-        compute_time_spent(cat_type="category", media=movie, old_status=old_status, new_status=new_status,
+    else:
+        compute_time_spent(cat_type="category", media=element, old_status=old_status, new_status=new_status,
                            list_type=list_type)
 
     db.session.commit()
@@ -745,7 +726,7 @@ def add_element():
         app.logger.info('[{}] Added the Media ({}) "{}", with ID: {}'
                         .format(current_user.id, list_type.value, element.name, element.id))
     except Exception as e:
-        app.logger.error("Exception occured: {}, Couldn't add media ID {} to user {}."
+        app.logger.error("Error occured: {}. Couldn't add media ID {} to user {}."
                          .format(e, element_id, current_user.id))
         return '', 400
 
@@ -805,10 +786,56 @@ def search_media():
         return redirect(request.referrer)
 
     try:
-        results = ApiData().autocomplete_search(search)
+        data = ApiData().TMDb_search(search)
     except Exception as e:
         app.logger.error('[SYSTEM] Error requesting themoviedb API: {}'.format(e))
+        flash('Sorry, an error occured, the API is not reachable.', 'warning')
+        return redirect(request.referrer)
 
+    if data.get("total_results", 0) == 0:
+        flash('Sorry, no results found for your query.', 'warning')
+        return redirect(request.referrer)
+
+    # Recover 1 page of results (20 max) without peoples
+    series_results, anime_results, movies_results = [], [], []
+    for result in data["results"]:
+        if result.get('known_for_department'):
+            continue
+
+        media_data = {'name': result.get('original_title') or result.get('original_name'),
+                      'overview': result.get('overview'),
+                      'first_air_date': result.get('first_air_date') or result.get('release_date'),
+                      'tmdb_id': result['id']}
+
+        # Modify the first_air_date / release_date format
+        if media_data['first_air_date'] == '':
+            media_data['first_air_date'] = 'Unknown'
+
+        # Recover the poster_path or take a default image
+        if result["poster_path"]:
+            media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
+        else:
+            media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
+
+        # Put data in different lists in function of media type
+        if result['media_type'] == 'tv':
+            media_data['url'] = f"https://www.themoviedb.org/tv/{result['id']}"
+            if result['origin_country'] == 'JP' or result['original_language'] == 'ja' \
+                    and 16 in result['genre_ids']:
+                media_data['media_type'] = ListType.ANIME.value
+                media_data['name'] = result['name']
+                anime_results.append(media_data)
+            else:
+                media_data['media_type'] = ListType.SERIES.value
+                series_results.append(media_data)
+        elif result['media_type'] == 'movie':
+            media_data['media_type'] = ListType.MOVIES.value
+            media_data['url'] = f"https://www.themoviedb.org/movie/{result['id']}"
+            if result['original_language'] == 'ja' and 16 in result['genre_ids']:
+                media_data['name'] = result['title']
+            movies_results.append(media_data)
+
+    # Get the proper plateform to display the template
     platform = str(request.user_agent.platform)
     if platform == "iphone" or platform == "android" or platform is None or platform == 'None':
         template = 'media_search_mobile.html'
@@ -817,7 +844,9 @@ def search_media():
 
     return render_template(template,
                            title="Media search",
-                           search_results=results,
+                           series_results=series_results,
+                           anime_results=anime_results,
+                           movies_results=movies_results,
                            search=search)
 
 
@@ -827,12 +856,49 @@ def autocomplete():
     search = request.args.get('q')
 
     try:
-        results = ApiData().autocomplete_search(search)
+        data = ApiData().TMDb_search(search)
     except Exception as e:
         app.logger.error('[SYSTEM] Error requesting the TMDB API: {}'.format(e))
-        results = [{'nb_results': 0}]
+        return jsonify(search_results=[{'nb_results': 0}]), 200
 
-    return jsonify(matching_results=results), 200
+    if data.get("total_results", 0) == 0:
+        return jsonify(search_results=[{'nb_results': 0}]), 200
+
+    # Recover 7 results without peoples
+    results = []
+    for i, result in enumerate(data["results"]):
+        if i >= data["total_results"] or i > 19 or len(results) >= 7:
+            break
+
+        if result.get('known_for_department'):
+            continue
+
+        media_data = {'name': result.get('original_title') or result.get('original_name'),
+                      "first_air_date": result.get('first_air_date') or result.get('release_date'),
+                      'tmdb_id': result["id"]}
+
+        if media_data['first_air_date'] == '':
+            media_data['first_air_date'] = 'Unknown'
+
+        if result['media_type'] == 'tv':
+            if result['origin_country'] == 'JP' or result['original_language'] == 'ja' \
+                    and 16 in result['genre_ids']:
+                media_data['media_type'] = ListType.ANIME.value
+                media_data['name'] = result['name']
+            else:
+                media_data['media_type'] = ListType.SERIES.value
+        elif result['media_type'] == 'movie':
+            media_data['media_type'] = ListType.MOVIES.value
+            if result['original_language'] == 'ja' and 16 in result['genre_ids']:
+                media_data['name'] = result['title']
+
+        if result["poster_path"]:
+            media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
+        else:
+            media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
+        results.append(media_data)
+
+    return jsonify(search_results=results), 200
 
 
 @bp.route('/read_notifications', methods=['GET'])
@@ -845,18 +911,12 @@ def read_notifications():
 
     results = []
     if notifications:
-        for notif in notifications:
-            if notif.media_type == 'movieslist':
-                results.append({'name': notif.media_name,
-                                'media_type': notif.media_type,
-                                'media_id': notif.media_id,
-                                'release_date': notif.release_date})
-            else:
-                results.append({'name': notif.media_name,
-                                'media_type': notif.media_type,
-                                'media_id': notif.media_id,
-                                'season': notif.season,
-                                'episode': notif.episode,
-                                'release_date': notif.release_date})
+        for info in notifications:
+            results.append({'name': info.media_name,
+                            'media_type': info.media_type,
+                            'media_id': info.media_id,
+                            'first_air_date': info.release_date,
+                            'season': info.season,
+                            'episode': info.episode})
 
     return jsonify(results=results), 200

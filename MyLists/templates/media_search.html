@@ -26,7 +26,7 @@
     <div class="tab-content" id="media-search">
         <div id="series" class="tab-pane fade show active">
             <div class="d-flex flex-wrap justify-content-center m-t-30">
-                {% for media in search_results %}
+                {% for media in series_results %}
                     {% if media['media_type'] == 'serieslist' %}
                         <a class="card mb-4" style="background: #216c7d; width: 700px; border-radius: 0;"
                            href="/check_media/serieslist/{{ media['tmdb_id'] }}">
