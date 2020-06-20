@@ -47,18 +47,22 @@ class ApiData:
 
         return json.loads(response.text)
 
-    def get_trending_media(self, list_type, api_name):
+    def get_trending_media(self, api_name):
         if api_name == 'TMDB':
-            if list_type != ListType.MOVIES:
-                response = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
-                                        .format(self.tmdb_api_key))
-            elif list_type == ListType.MOVIES:
-                response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
-                                        .format(self.tmdb_api_key))
+            response = requests.get("https://api.themoviedb.org/3/trending/all/week?api_key={}"
+                                    .format(self.tmdb_api_key))
+            response_2 = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
+                                      .format(self.tmdb_api_key))
         elif api_name == 'Jikan':
-            response = Jikan().top(type='anime', page=1, subtype='airing')
+            response = requests.get("https://api.jikan.moe/v3/top/anime/1/airing")
 
         self.status_code(response.status_code)
+
+        if api_name == 'TMDB':
+            self.status_code(response_2.status_code)
+            a = json.loads(response.text)
+            b = json.loads(response_2.text)
+            return a, b
 
         return json.loads(response.text)
 

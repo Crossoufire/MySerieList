@@ -13,17 +13,8 @@ bp = Blueprint('users', __name__)
 @bp.route('/account/<user_name>', methods=['GET', 'POST'])
 @login_required
 def account(user_name):
-    user = User.query.filter_by(username=user_name).first()
-
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
+    # Check if the user can see the <media_list>
+    user = current_user.check_autorization(user_name)
 
     # Add follows form
     follow_form = AddFollowForm()
@@ -74,17 +65,8 @@ def account(user_name):
 @bp.route("/all_history/<user_name>", methods=['GET', 'POST'])
 @login_required
 def all_history(user_name):
-    user = User.query.filter_by(username=user_name).first()
-
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
+    # Check if the user can see the <media_list>
+    user = current_user.check_autorization(user_name)
 
     updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
     media_updates = get_updates(updates)
@@ -96,17 +78,8 @@ def all_history(user_name):
 @bp.route("/all_follows/<user_name>", methods=['GET', 'POST'])
 @login_required
 def all_follows(user_name):
-    user = User.query.filter_by(username=user_name).first()
-
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
+    # Check if the user can see the <media_list>
+    user = current_user.check_autorization(user_name)
 
     all_follows = get_all_follows_data(user)
     user_data = get_user_data(user)
@@ -117,17 +90,8 @@ def all_follows(user_name):
 @bp.route("/more_stats/<user_name>", methods=['GET', 'POST'])
 @login_required
 def more_stats(user_name):
-    user = User.query.filter_by(username=user_name).first()
-
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
+    # Check if the user can see the <media_list>
+    user = current_user.check_autorization(user_name)
 
     stats = get_more_stats(user)
     user_data = get_user_data(user)
@@ -177,20 +141,6 @@ def hall_of_fame():
     return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
 
 
-@bp.route("/level_grade_data", methods=['GET', 'POST'])
-@login_required
-def level_grade_data():
-    ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
-    return render_template('level_grade_data.html', title='Level grade data', data=ranks)
-
-
-@bp.route("/knowledge_frame_data", methods=['GET', 'POST'])
-@login_required
-def knowledge_frame_data():
-    ranks = Frames.query.all()
-    return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
-
-
 @bp.route("/follow_status", methods=['POST'])
 @login_required
 def follow_status():
@@ -217,3 +167,19 @@ def follow_status():
         app.logger.info('[{}] Unfollowed the account with ID {} '.format(current_user.id, follow_id))
 
     return '', 204
+
+
+@bp.route("/level_grade_data", methods=['GET'])
+@login_required
+def level_grade_data():
+    ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
+
+    return render_template('level_grade_data.html', title='Level grade data', data=ranks)
+
+
+@bp.route("/knowledge_frame_data", methods=['GET'])
+@login_required
+def knowledge_frame_data():
+    ranks = Frames.query.all()
+
+    return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)

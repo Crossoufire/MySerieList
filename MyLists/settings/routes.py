@@ -43,12 +43,13 @@ def settings():
             current_user.transition_email = settings_form.email.data
             app.logger.info('[{}] Settings updated : Old email = {}. New email = {}'
                             .format(current_user.id, old_email, current_user.transition_email))
-            if send_email_update_email(current_user):
+            try:
+                send_email_update_email(current_user)
                 flash("Your account has been updated! Please click on the link to validate your new email address.",
                       'success')
-            else:
+            except Exception as e:
                 flash("There was an error. Please contact an administrator.", 'danger')
-                app.logger.error('[SYSTEM] Error while sending the email update email to {}'.format(current_user.email))
+                app.logger.error('[SYSTEM] Error: {}. Sending the email update to {}'.format(e, current_user.email))
         else:
             flash("Your settings has been updated!", 'success')
 

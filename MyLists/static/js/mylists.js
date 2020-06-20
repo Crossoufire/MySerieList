@@ -16,7 +16,7 @@ $(function() {
         select: function(event, ui) {
             let form = document.createElement("form");
             form.method = "POST";
-            form.action = "/check_media/"+ui.item.media_type+"/"+ui.item.tmdb_id;
+            form.action = "/media_sheet/"+ui.item.media_type+"/"+ui.item.tmdb_id+"?search=True";
             document.body.appendChild(form);
             form.submit();
         }
@@ -31,10 +31,14 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
 
         if (item.media_type === "serieslist") {
             media = 'TV Show';
+            item.media_type = 'Series';
+
         } else if (item.media_type === "animelist") {
             media = 'Anime';
+            item.media_type = 'Anime';
         } else {
             media = 'Movie';
+            item.media_type = 'Movies';
         }
 
         if (item.nb_results === 0) {

@@ -5,7 +5,7 @@ from MyLists.main.forms import EditMediaData
 from flask_login import login_required, current_user
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
-    add_element_to_user, add_element_in_db, load_media_sheet, save_new_cover, check_autorization_user
+    add_element_to_user, add_element_in_db, load_media_sheet, save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesEpisodesPerSeason, SeriesNetwork, Anime, \
     AnimeActors, AnimeEpisodesPerSeason, AnimeNetwork, AnimeList, ListType, SeriesActors, MoviesList, Status, \
     MoviesCollections
@@ -13,19 +13,22 @@ from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesEpiso
 bp = Blueprint('main', __name__)
 
 
-@bp.route("/<media_list>/<user_name>", methods=['GET', 'POST'])
+@bp.route("/<string:media_list>/<string:user_name>", methods=['GET', 'POST'])
 @login_required
 def mymedialist(media_list, user_name):
-    # Check if the user can see this profile
-    user = check_autorization_user(user_name)
+    # Check if the user can see the <media_list>
+    user = current_user.check_autorization(user_name)
 
     # Check if <media_list> is valid
     try:
         list_type = ListType(media_list)
     except ValueError:
-        return abort(404)
+        abort(404)
 
-    # Retrieve the media data
+    # Add views_count to the profile
+    current_user.add_view_count(user, list_type)
+
+    # Retrieve the <media_data>
     if list_type == ListType.SERIES:
         series_data = SeriesList.get_series_info(user.id)
         covers_path = url_for('static', filename='covers/series_covers/')
@@ -38,16 +41,6 @@ def mymedialist(media_list, user_name):
         movies_data = MoviesList.get_movies_info(user.id)
         covers_path = url_for('static', filename='covers/movies_covers/')
         media_data = get_medialist_data(movies_data, list_type, covers_path, user.id)
-
-    # View count of the media lists
-    if current_user.id != 1 and user.id != current_user.id:
-        if media_list == ListType.SERIES:
-            user.series_views += 1
-        elif media_list == ListType.ANIME:
-            user.anime_views += 1
-        elif media_list == ListType.MOVIES:
-            user.movies_views += 1
-        db.session.commit()
 
     if list_type != ListType.MOVIES:
         return render_template('medialist_tv.html',
@@ -67,11 +60,11 @@ def mymedialist(media_list, user_name):
                                target_user_id=str(user.id))
 
 
-@bp.route("/movies_collection/<user_name>", methods=['GET', 'POST'])
+@bp.route("/movies_collection/<string:user_name>", methods=['GET', 'POST'])
 @login_required
 def movies_collection(user_name):
-    # Check if the user can see this profile
-    user = check_autorization_user(user_name)
+    # Check if the user can see the <movie_collection_list>
+    user = current_user.check_autorization(user_name)
 
     collection_movie = MoviesCollections.get_collection_movies(user.id)
 
@@ -106,7 +99,7 @@ def movies_collection(user_name):
                            target_user_id=str(user.id))
 
 
-@bp.route('/media_sheet/<media_type>/<media_id>', methods=['GET', 'POST'])
+@bp.route('/media_sheet/<string:media_type>/<int:media_id>', methods=['GET', 'POST'])
 @login_required
 def media_sheet(media_type, media_id):
     if media_type == 'Series':
@@ -115,47 +108,41 @@ def media_sheet(media_type, media_id):
         list_type = ListType.ANIME
     elif media_type == 'Movies':
         list_type = ListType.MOVIES
+    else:
+        abort(404)
 
-    element_sheet = load_media_sheet(media_id, current_user.id, list_type)
+    # Check if <media_id> came from TMDB and if in local DB
+    tmdb_id = request.args.get('search')
+    if tmdb_id:
+        searching = {'themoviedb_id': media_id}
+    else:
+        searching = {'id': media_id}
+
+    if list_type == ListType.SERIES:
+        media = Series.query.filter_by(**searching).first()
+    elif list_type == ListType.ANIME:
+        media = Anime.query.filter_by(**searching).first()
+    elif list_type == ListType.MOVIES:
+        media = Movies.query.filter_by(**searching).first()
+
+    # If <media> is None and a TMDB ID was provived add the media to the local DB else abort.
+    if not media:
+        if tmdb_id:
+            media = add_element_in_db(media_id, list_type)
+        else:
+            abort(404)
+
+    # If <media> exist and a TMDB ID was provived redirect to get a nice URL.
+    if media and tmdb_id:
+        return redirect(url_for('main.media_sheet', media_type=media_type, media_id=media.id))
+
+    element_sheet = load_media_sheet(media, current_user.id, list_type)
     title = element_sheet['original_name']
 
     return render_template('media_sheet.html', title=title, data=element_sheet, media_list=list_type.value)
 
 
-@bp.route('/check_media/<list_type>/<media_id>', methods=['GET', 'POST'])
-@login_required
-def check_media(list_type, media_id):
-    # Check if the media_list exist and is valid
-    try:
-        list_type = ListType(list_type)
-    except ValueError:
-        abort(404)
-
-    # Check if the element ID exist in the database
-    if list_type == ListType.SERIES:
-        element = Series.query.filter_by(themoviedb_id=media_id).first()
-    elif list_type == ListType.ANIME:
-        element = Anime.query.filter_by(themoviedb_id=media_id).first()
-    elif list_type == ListType.MOVIES:
-        element = Movies.query.filter_by(themoviedb_id=media_id).first()
-
-    # If media ID exists, load the media sheet wihout API call
-    if element:
-        element_id = element.id
-    else:
-        element_id = add_element_in_db(media_id, list_type)
-
-    if list_type == ListType.SERIES:
-        media_type = 'Series'
-    elif list_type == ListType.ANIME:
-        media_type = 'Anime'
-    elif list_type == ListType.MOVIES:
-        media_type = 'Movies'
-
-    return redirect(url_for('main.media_sheet', media_type=media_type, media_id=element_id))
-
-
-@bp.route("/media_sheet_form/<media_type>/<media_id>", methods=['GET', 'POST'])
+@bp.route("/media_sheet_form/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
 @login_required
 def media_sheet_form(media_type, media_id):
     if current_user.id == 3 or current_user.id == 2 or current_user.id == 1:

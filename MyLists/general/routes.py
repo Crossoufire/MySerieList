@@ -1,16 +1,12 @@
 from flask import Blueprint
 from datetime import datetime
 from MyLists import db, bcrypt, app
-from sqlalchemy import func, text
 from MyLists.API_data import ApiData
-from flask_login import current_user, login_required
-from flask import render_template, url_for, flash, redirect, request
-from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, get_trending_data, add_ranks_to_db, \
-    add_frames_to_db, refresh_db_frames, refresh_db_badges, refresh_db_ranks
-from MyLists.models import Series, SeriesList, SeriesEpisodesPerSeason, Status, ListType, SeriesGenre, Anime, User, \
-    AnimeList, AnimeEpisodesPerSeason, AnimeGenre, MoviesGenre, MoviesList, MoviesActors, SeriesActors, Movies, \
-    AnimeActors
-
+from flask_login import login_required
+from flask import render_template, url_for, flash, request
+from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
+    refresh_db_frames, refresh_db_badges, refresh_db_ranks
+from MyLists.models import Status, ListType, User, GlobalStats
 
 bp = Blueprint('general', __name__)
 
@@ -50,11 +46,9 @@ def admin():
 @bp.route("/global_stats", methods=['GET'])
 @login_required
 def global_stats():
-    # Total time spent for each media
-    times_spent = db.session.query(User, func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
-                                   func.sum(User.time_spent_movies))\
-        .filter(User.id >= '2', User.active == True).all()
+    stats = GlobalStats()
 
+    times_spent = stats.get_total_time_spent()
     if times_spent[0][0]:
         total_time = {"total": int((times_spent[0][1] / 60) + (times_spent[0][2] / 60) + (times_spent[0][3] / 60)),
                       "series": int(times_spent[0][1] / 60),
@@ -63,148 +57,76 @@ def global_stats():
     else:
         total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0}
 
-    # Top media in users' lists
-    top_series = db.session.query(Series, SeriesList, func.count(SeriesList.series_id == Series.id).label("count"))\
-        .join(SeriesList, SeriesList.series_id == Series.id).group_by(SeriesList.series_id)\
-        .filter(SeriesList.user_id >= '2').order_by(text("count desc")).limit(5).all()
-    top_anime = db.session.query(Anime, AnimeList, func.count(AnimeList.anime_id == Anime.id).label("count"))\
-        .join(AnimeList, AnimeList.anime_id == Anime.id).group_by(AnimeList.anime_id)\
-        .filter(AnimeList.user_id >= '2').order_by(text("count desc")).limit(5).all()
-    top_movies = db.session.query(Movies, MoviesList, func.count(MoviesList.movies_id == Movies.id).label("count"))\
-        .join(MoviesList, MoviesList.movies_id == Movies.id).group_by(MoviesList.movies_id)\
-        .filter(MoviesList.user_id >= '2').order_by(text("count desc")).limit(5).all()
-
+    top_series, top_anime, top_movies = stats.get_top_media()
     top_all_series, top_all_anime, top_all_movies = [], [], []
     for i in range(0, 5):
         try:
-            tmp_series = {"name": top_series[i][0].name, "quantity": top_series[i][2]}
+            top_all_series.append({"name": top_series[i][0].name, "quantity": top_series[i][2]})
         except:
-            tmp_series = {"name": "-", "quantity": "-"}
+            top_all_series.append({"name": "-", "quantity": "-"})
         try:
-            tmp_anime = {"name": top_anime[i][0].name, "quantity": top_anime[i][2]}
+            top_all_anime.append({"name": top_anime[i][0].name, "quantity": top_anime[i][2]})
         except:
-            tmp_anime = {"name": "-", "quantity": "-"}
+            top_all_anime.append({"name": "-", "quantity": "-"})
         try:
-            tmp_movies = {"name": top_movies[i][0].name, "quantity": top_movies[i][2]}
+            top_all_movies.append({"name": top_movies[i][0].name, "quantity": top_movies[i][2]})
         except:
-            tmp_movies = {"name": "-", "quantity": "-"}
+            top_all_movies.append({"name": "-", "quantity": "-"})
 
-        top_all_series.append(tmp_series)
-        top_all_anime.append(tmp_anime)
-        top_all_movies.append(tmp_movies)
+    most_present_media = {"series": top_all_series, "anime": top_all_anime, "movies": top_all_movies}
 
-    most_present_media = {"series": top_all_series,
-                          "anime": top_all_anime,
-                          "movies": top_all_movies}
-
-    # Top genre in users' lists
-    series_genres = db.session.query(SeriesList, SeriesGenre, func.count(SeriesGenre.genre).label('count'))\
-        .join(SeriesGenre, SeriesGenre.series_id == SeriesList.series_id)\
-        .group_by(SeriesGenre.genre).filter(SeriesList.user_id >= '2').order_by(text('count desc')).limit(5).all()
-    anime_genres = db.session.query(AnimeList, AnimeGenre, func.count(AnimeGenre.genre).label('count'))\
-        .join(AnimeGenre, AnimeGenre.anime_id == AnimeList.anime_id)\
-        .group_by(AnimeGenre.genre).filter(AnimeList.user_id >= '2').order_by(text('count desc')).limit(5).all()
-    movies_genres = db.session.query(MoviesList, MoviesGenre, func.count(MoviesGenre.genre).label('count'))\
-        .join(MoviesGenre, MoviesGenre.movies_id == MoviesList.movies_id)\
-        .group_by(MoviesGenre.genre).filter(MoviesList.user_id >= '2').order_by(text('count desc')).limit(5).all()
-
+    series_genres, anime_genres, movies_genres = stats.get_top_genres()
     all_series_genres, all_anime_genres, all_movies_genres = [], [], []
     for i in range(5):
         try:
-            tmp_series = {"genre": series_genres[i][1].genre, "quantity": series_genres[i][2]}
+            all_series_genres.append({"genre": series_genres[i][1].genre, "quantity": series_genres[i][2]})
         except:
-            tmp_series = {"genre": "-", "quantity": "-"}
+            all_series_genres.append({"genre": "-", "quantity": "-"})
         try:
-            tmp_anime = {"genre": anime_genres[i][1].genre, "quantity": anime_genres[i][2]}
+            all_anime_genres.append({"genre": anime_genres[i][1].genre, "quantity": anime_genres[i][2]})
         except:
-            tmp_anime = {"genre": "-", "quantity": "-"}
+            all_anime_genres.append({"genre": "-", "quantity": "-"})
         try:
-            tmp_movies = {"genre": movies_genres[i][1].genre, "quantity": movies_genres[i][2]}
+            all_movies_genres.append({"genre": movies_genres[i][1].genre, "quantity": movies_genres[i][2]})
         except:
-            tmp_movies = {"genre": "-", "quantity": "-"}
+            all_movies_genres.append({"genre": "-", "quantity": "-"})
 
-        all_series_genres.append(tmp_series)
-        all_anime_genres.append(tmp_anime)
-        all_movies_genres.append(tmp_movies)
+    most_genres_media = {"series": all_series_genres, "anime": all_anime_genres, "movies": all_movies_genres}
 
-    most_genres_media = {"series": all_series_genres,
-                         "anime": all_anime_genres,
-                         "movies": all_movies_genres}
-
-    # Top actors in the users' lists
-    series_actors = db.session.query(SeriesList, SeriesActors, func.count(SeriesActors.name).label('count'))\
-        .join(SeriesActors, SeriesActors.series_id == SeriesList.series_id)\
-        .filter(SeriesActors.name != "Unknown").group_by(SeriesActors.name).filter(SeriesList.user_id >= '2')\
-        .order_by(text('count desc')).limit(5).all()
-    anime_actors = db.session.query(AnimeList, AnimeActors, func.count(AnimeActors.name).label('count'))\
-        .join(AnimeActors, AnimeActors.anime_id == AnimeList.anime_id)\
-        .filter(AnimeActors.name != "Unknown").group_by(AnimeActors.name).filter(AnimeList.user_id >= '2')\
-        .order_by(text('count desc')).limit(5).all()
-    movies_actors = db.session.query(MoviesList, MoviesActors, func.count(MoviesActors.name).label('count'))\
-        .join(MoviesActors, MoviesActors.movies_id == MoviesList.movies_id)\
-        .filter(MoviesActors.name != "Unknown").group_by(MoviesActors.name).filter(MoviesList.user_id >= '2')\
-        .order_by(text('count desc')).limit(5).all()
-
+    series_actors, anime_actors, movies_actors = stats.get_top_actors()
     all_series_actors, all_anime_actors, all_movies_actors = [], [], []
     for i in range(5):
         try:
-            tmp_series = {"name": series_actors[i][1].name, "quantity": series_actors[i][2]}
+            all_series_actors.append({"name": series_actors[i][1].name, "quantity": series_actors[i][2]})
         except:
-            tmp_series = {"name": "-", "quantity": "-"}
+            all_series_actors.append({"name": "-", "quantity": "-"})
         try:
-            tmp_anime = {"name": anime_actors[i][1].name, "quantity": anime_actors[i][2]}
+            all_anime_actors.append({"name": anime_actors[i][1].name, "quantity": anime_actors[i][2]})
         except:
-            tmp_anime = {"name": "-", "quantity": "-"}
+            all_anime_actors.append({"name": "-", "quantity": "-"})
         try:
-            tmp_movies = {"name": movies_actors[i][1].name, "quantity": movies_actors[i][2]}
+            all_movies_actors.append({"name": movies_actors[i][1].name, "quantity": movies_actors[i][2]})
         except:
-            tmp_movies = {"name": "-", "quantity": "-"}
+            all_movies_actors.append({"name": "-", "quantity": "-"})
 
-        all_series_actors.append(tmp_series)
-        all_anime_actors.append(tmp_anime)
-        all_movies_actors.append(tmp_movies)
+    most_actors_media = {"series": all_series_actors, "anime": all_anime_actors, "movies": all_movies_actors}
 
-    most_actors_media = {"series": all_series_actors,
-                         "anime": all_anime_actors,
-                         "movies": all_movies_actors}
-
-    # Top dropped media in the users' lists
-    series_dropped = db.session.query(Series, SeriesList, func.count(SeriesList.series_id == Series.id).label('count'))\
-        .join(SeriesList, SeriesList.series_id == Series.id).filter_by(status=Status.DROPPED)\
-        .group_by(SeriesList.series_id).filter(SeriesList.user_id >= '2').order_by(text('count desc')).limit(5).all()
-    anime_dropped = db.session.query(Anime, AnimeList, func.count(AnimeList.anime_id == Anime.id).label('count'))\
-        .join(AnimeList, AnimeList.anime_id == Anime.id).filter_by(status=Status.DROPPED).group_by(AnimeList.anime_id)\
-        .filter(AnimeList.user_id >= '2').order_by(text('count desc')).limit(5).all()
-
+    series_dropped, anime_dropped = stats.get_top_dropped()
     top_series_dropped, top_anime_dropped = [], []
     for i in range(5):
         try:
-            tmp_series = {"name": series_dropped[i][0].name, "quantity": series_dropped[i][2]}
+            top_series_dropped.append({"name": series_dropped[i][0].name, "quantity": series_dropped[i][2]})
         except:
-            tmp_series = {"name": "-", "quantity": "-"}
+            top_series_dropped.append({"name": "-", "quantity": "-"})
         try:
-            tmp_anime = {"name": anime_dropped[i][0].name, "quantity": anime_dropped[i][2]}
+            top_anime_dropped.append({"name": anime_dropped[i][0].name, "quantity": anime_dropped[i][2]})
         except:
-            tmp_anime = {"name": "-", "quantity": "-"}
+            top_anime_dropped.append({"name": "-", "quantity": "-"})
 
-        top_series_dropped.append(tmp_series)
-        top_anime_dropped.append(tmp_anime)
+    top_dropped_media = {"series": top_series_dropped, "anime": top_anime_dropped}
 
-    top_dropped_media = {"series": top_series_dropped,
-                         "anime": top_anime_dropped}
-
-    # Total number of seasons/episodes watched for the series and anime
-    total_series_eps_seasons = db.session.query(SeriesList, SeriesEpisodesPerSeason,
-                                                func.group_concat(SeriesEpisodesPerSeason.episodes))\
-        .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id)\
-        .group_by(SeriesList.id).filter(SeriesList.user_id >= '2').all()
-    total_anime_eps_seasons = db.session.query(AnimeList, AnimeEpisodesPerSeason,
-                                               func.group_concat(AnimeEpisodesPerSeason.episodes))\
-        .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id)\
-        .group_by(AnimeList.id).filter(AnimeList.user_id >= '2').all()
-
-    total_series_seas_watched = 0
-    total_series_eps_watched = 0
+    total_series_eps_seasons, total_anime_eps_seasons = stats.get_total_eps_seasons()
+    total_series_seas_watched, total_series_eps_watched = 0, 0
     for element in total_series_eps_seasons:
         if element[0].status != Status.PLAN_TO_WATCH:
             episodes = element[2].split(",")
@@ -217,8 +139,7 @@ def global_stats():
                 total_series_eps_watched += episodes[i - 1]
             total_series_eps_watched += element[0].last_episode_watched
 
-    total_anime_seas_watched = 0
-    total_anime_eps_watched = 0
+    total_anime_seas_watched, total_anime_eps_watched = 0, 0
     for element in total_anime_eps_seasons:
         if element[0].status != Status.PLAN_TO_WATCH:
             episodes = element[2].split(",")
@@ -231,10 +152,8 @@ def global_stats():
                 total_anime_eps_watched += episodes[i - 1]
             total_anime_eps_watched += element[0].last_episode_watched
 
-    total_seasons_media = {"series": total_series_seas_watched,
-                           "anime": total_anime_seas_watched}
-    total_episodes_media = {"series": total_series_eps_watched,
-                            "anime": total_anime_eps_watched}
+    total_seasons_media = {"series": total_series_seas_watched, "anime": total_anime_seas_watched}
+    total_episodes_media = {"series": total_series_eps_watched, "anime": total_anime_eps_watched}
 
     return render_template("global_stats.html",
                            title='Global Stats',
@@ -250,28 +169,88 @@ def global_stats():
 @bp.route("/current_trends", methods=['GET'])
 @login_required
 def current_trends():
-    series_trends, anime_trends, movies_trends = [], [], []
-
     try:
-        series_data = ApiData().get_trending_media(ListType.SERIES, 'TMDB')
-        series_trends = get_trending_data(series_data, ListType.SERIES)
+        tmdb_data_page_1, tmdb_data_page_2 = ApiData().get_trending_media('TMDB')
+        tmdb_data = tmdb_data_page_1['results'] + tmdb_data_page_2['results']
     except Exception as e:
         app.logger.error('Error getting trending data for the TV shows: {} .'.format(e))
-        flash('The current trends from TMDB TV shows are not available right now.', 'warning')
+        flash('The current trends from TMDB are not available right now.', 'warning')
+        tmdb_data = []
 
     try:
-        anime_data = ApiData().get_trending_media(ListType.ANIME, 'Jikan')
-        anime_trends = get_trending_data(anime_data, ListType.ANIME)
+        anime_data = ApiData().get_trending_media('Jikan')
     except Exception as e:
         app.logger.error('Error getting trending data for the anime: {} .'.format(e))
         flash('The current trends from Jikan (Anime) are not available right now.', 'warning')
+        anime_data = {'top': []}
 
-    try:
-        movies_data = ApiData().get_trending_media(ListType.MOVIES, 'TMDB')
-        movies_trends = get_trending_data(movies_data, ListType.MOVIES)
-    except Exception as e:
-        app.logger.error('Error getting trending data for the movies: {} .'.format(e))
-        flash('The current trends from TMDB Movies are not available right now.', 'warning')
+    # Recover 12 results without peoples for series and movies
+    series_results, movies_results = [], []
+    for i, result in enumerate(tmdb_data):
+        if len(series_results) >= 12:
+            if result["media_type"] == 'tv':
+                continue
+
+        if len(movies_results) >= 12:
+            if result["media_type"] == 'movie':
+                continue
+
+        if result.get('known_for_department'):
+            continue
+
+        media_data = {'name': result.get('original_title') or result.get('original_name'),
+                      'first_air_date': result.get('first_air_date') or result.get('release_date'),
+                      'overview': result.get('overview'),
+                      'tmdb_id': result['id']}
+
+        # Modify the overview if no data
+        if media_data["overview"] == '':
+            media_data['overview'] = "There is no overview available for this media."
+
+        # Modify the first_air_date / release_date format
+        if media_data["first_air_date"] == '':
+            media_data["first_air_date"] = 'Not available'
+        else:
+            media_data["first_air_date"] = datetime.strptime(media_data["first_air_date"], '%Y-%m-%d')\
+                .strftime("%d %b %Y")
+
+        # Recover the poster_path or take a default image
+        if result["poster_path"]:
+            media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
+        else:
+            media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
+
+        # Put data in different lists in function of <media_type>
+        if result['media_type'] == 'tv':
+            media_data['tmdb_link'] = f"https://www.themoviedb.org/tv/{result['id']}"
+            media_data['media_type'] = ListType.SERIES.value
+            series_results.append(media_data)
+        elif result['media_type'] == 'movie':
+            media_data['tmdb_link'] = f"https://www.themoviedb.org/movie/{result['id']}"
+            media_data['media_type'] = ListType.MOVIES.value
+            if result['original_language'] == 'ja' and 16 in result['genre_ids']:
+                media_data['name'] = result['title']
+            movies_results.append(media_data)
+
+    # Recover 12 results without peoples for anime
+    anime_results = []
+    for i, data in enumerate(anime_data['top']):
+        if i == 12:
+            break
+
+        anime = {"name": data.get("title", "Unknown") or "Unknown"}
+
+        media_cover_path = data.get("image_url") or None
+        if media_cover_path:
+            anime["poster_path"] = media_cover_path
+        else:
+            anime["poster_path"] = url_for('static', filename='covers/default.jpg')
+
+        anime["first_air_date"] = data.get("start_date", 'Unknown') or "Unknown"
+        anime["overview"] = "There is no overview from this API. " \
+                            "You can check it on MyAnimeList by clicking on the title."
+        anime["tmdb_link"] = data.get("url")
+        anime_results.append(anime)
 
     platform = str(request.user_agent.platform)
     if platform == "iphone" or platform == "android" or platform is None or platform == 'None':
@@ -281,6 +260,6 @@ def current_trends():
 
     return render_template(template,
                            title="Current trends",
-                           series_trends=series_trends,
-                           anime_trends=anime_trends,
-                           movies_trends=movies_trends)
+                           series_trends=series_results,
+                           anime_trends=anime_results,
+                           movies_trends=movies_results)

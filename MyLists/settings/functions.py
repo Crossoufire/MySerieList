@@ -21,12 +21,7 @@ def send_email_update_email(user):
     email_template = email_template.replace("{2}", url_for('email_update_token', token=token, _external=True))
     msg.html = email_template
 
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised sending email update email to account ID {}: {}'.format(user.id, e))
-        return False
+    mail.send(msg)
 
 
 def save_profile_picture(form_picture, old_picture):
