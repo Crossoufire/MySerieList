@@ -128,7 +128,13 @@ def media_sheet(media_type, media_id):
     # If <media> is None and a TMDB ID was provived add the media to the local DB else abort.
     if not media:
         if tmdb_id:
-            media = add_element_in_db(media_id, list_type)
+            try:
+                media = add_element_in_db(media_id, list_type)
+            except Exception as e:
+                app.logger.error('[SYSYEM] - Error occured trying to add media ({}) ID {} to local DB: {}'
+                                 .format(list_type, media_id, e))
+                flash('Sorry, a problem occured trying to load the media info. Please try again later.')
+                return redirect(request.referrer)
         else:
             abort(404)
 
@@ -146,7 +152,7 @@ def media_sheet(media_type, media_id):
 @login_required
 def media_sheet_form(media_type, media_id):
     if current_user.role != RoleType.ADMIN and current_user.role != RoleType.MANAGER:
-        abort(404)
+        abort(403)
 
     form = EditMediaData()
 
@@ -619,13 +625,14 @@ def change_element_category():
     # Recover the media
     if list_type == ListType.SERIES:
         element = Series.query.filter_by(id=element_id).first()
+        season_data = element.eps_per_season
     elif list_type == ListType.ANIME:
         element = Anime.query.filter_by(id=element_id).first()
+        season_data = element.eps_per_season
     elif list_type == ListType.MOVIES:
         element = Movies.query.filter_by(id=element_id).first()
 
     element_in_list = element.list_info.first()
-    season_data = element.eps_per_season
 
     # Check if media in user's list
     if not element_in_list:
@@ -634,7 +641,7 @@ def change_element_category():
     old_status = element_in_list.status
     element_in_list.status = new_status
 
-    # Set <last_episode_watched> and <current_season>
+    # Set and change accordingly <last_episode_watched> and <current_season>
     if list_type != ListType.MOVIES:
         current_season = element_in_list.current_season
         last_episode_watched = element_in_list.last_episode_watched
@@ -650,7 +657,7 @@ def change_element_category():
     if list_type != ListType.MOVIES:
         compute_time_spent(cat_type="category", old_eps=last_episode_watched, old_seas=current_season, media=element,
                            old_status=old_status, new_status=new_status, list_type=list_type, all_seas_data=season_data)
-    else:
+    elif list_type == ListType.MOVIES:
         compute_time_spent(cat_type="category", media=element, old_status=old_status, new_status=new_status,
                            list_type=list_type)
 
@@ -710,7 +717,7 @@ def add_element():
         app.logger.info('[{}] Added the Media ({}) "{}", with ID: {}'
                         .format(current_user.id, list_type.value, element.name, element.id))
     except Exception as e:
-        app.logger.error("Error occured: {}. Couldn't add media ID {} to user {}."
+        app.logger.error("Error occured: {}. Could not add media with ID {} to user {}."
                          .format(e, element_id, current_user.id))
         return '', 400
 
@@ -730,7 +737,7 @@ def lock_media():
 
     # Check if the user is admin or manager
     if current_user.role != RoleType.ADMIN and current_user.role != RoleType.MANAGER:
-        return '', 400
+        return '', 403
 
     # Check if the list_type exist and is valid
     try:
