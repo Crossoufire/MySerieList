@@ -6,6 +6,7 @@ function follow_status(follow_id, button, index) {
 
     status = $(button).prop('value') !== '1';
     $('#loading-follow-'+index).show();
+    $(button).addClass('disabled');
 
     $.ajax ({
         type: "POST",
@@ -18,10 +19,12 @@ function follow_status(follow_id, button, index) {
                 $(button).text('Follow');
                 $(button).prop('value', '0');
                 $(button).addClass('btn-primary').removeClass('btn-dark btn-smaller');
+                $(button).removeClass('disabled');
             } else {
                 $(button).text('Unfollow');
                 $(button).prop('value', '1');
                 $(button).removeClass('btn-primary').addClass('btn-dark btn-smaller');
+                $(button).removeClass('disabled');
             }
         },
         error: function () {

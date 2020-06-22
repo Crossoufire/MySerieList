@@ -106,6 +106,8 @@
                                     '{{ media_list }}')">
                                 <i class="fas fa-ban"></i>&nbsp; Remove from list
                             </button>
+                            <img id="loading-remove-list" class="d-none" height="20" width="20"
+                             src="/static/img/loading.webp" alt=""/>
                         </div>
                     </div>
                     <div class="text-center">
@@ -114,6 +116,8 @@
                                 '{{ media_list }}')">
                             <i class="fas fa-plus"></i>&nbsp; Add to your list
                         </button>
+                        <img id="loading-add-list" class="d-none" height="20" width="20"
+                             src="/static/img/loading.webp" alt=""/>
                     </div>
                     <div id="add-media" class="alert alert-success p-2" style="display: none;">
                         Media added to your list
@@ -351,7 +355,7 @@
                 </div>
                 <h4><i class="fas fa-book-open m-t-15"></i>&nbsp&nbsp <b>Synopsis</b></h4>
                 <hr>
-                <p class="m-0 p-b-10 fs-18 text-justify">{{ data['synopsis'] }}</p>
+                <p class="m-0 p-b-30 fs-18 text-justify">{{ data['synopsis'] }}</p>
                 {% if current_user.role.value == "admin" or current_user.role.value == "manager" %}
                     <hr>
                     <div class="m-b-20 text-right">

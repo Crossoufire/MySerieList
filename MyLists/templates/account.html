@@ -34,15 +34,14 @@
                 <b>Followers: {{ user_data['followers'] }}</b>
             </div>
         </div>
-        <div class="header-profile-data-mobile">
-            <h4 class="p-0 m-0"><b>{{ user_data['username'] }}</b></h4>
+        <div class="header-profile-data-mobile text-center">
+            <h4 class="p-0 m-0"><b>{{ user_data['username'] }}&nbsp;</b></h4>
             <div class="header-join-follow">
                 <b>Joined: {{ user_data['register'] }}</b><br>
                 <b>Followers: {{ user_data['followers'] }}</b>
             </div>
         </div>
     </div>
-
     <div class="account-wrapper">
         {% if user_data['id'] != current_user.get_id() %}
             <div class="follow-btn-mobile d-flex">

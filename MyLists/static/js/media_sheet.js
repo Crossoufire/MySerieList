@@ -3,7 +3,8 @@
 // --- Add the media to the user ---------------------------------------
 function addToUser(element_id, media_type) {
     let category = media_type === 'movieslist' ? 'Plan to Watch' : 'Watching';
-
+    $('#your-medialist-data').addClass('disabled');
+    $('#loading-add-list').hide();
     $.ajax ({
         type: "POST",
         url: "/add_element",
@@ -14,9 +15,13 @@ function addToUser(element_id, media_type) {
             $('#your-medialist-data').slideDown(300);
             $('#add-to-list').hide();
             $('#add-media').show('slow').delay(2000).fadeOut();
+            $('#your-medialist-data').removeClass('disabled');
         },
         error: function() {
             error_ajax_message('Error: The media could not be added. Please try again later.');
+        },
+        complete: function() {
+            $('#loading-add-list').hide();
         }
     });
 }
@@ -24,6 +29,9 @@ function addToUser(element_id, media_type) {
 
 // --- Remove the media to the user ------------------------------------
 function removeFromUser(element_id, media_type) {
+    $('#your-medialist-data').addClass('disabled');
+    $('#loading-remove-list').show();
+
     $.ajax ({
         type: "POST",
         url: "/delete_element",
@@ -33,10 +41,20 @@ function removeFromUser(element_id, media_type) {
         success: function() {
             $('#your-medialist-data').slideUp(300);
             $('#add-to-list').show();
-            $('#remove-media').show('slow').delay(2000).fadeOut();
+            setTimeout(function() {
+                $('#your-medialist-data').removeClass('disabled');
+                $('#remove-media').show('slow').delay(2000).fadeOut();
+                $('#favorite').addClass('far').removeClass('fas');
+                $('#category-dropdown').val("Watching");
+                $('#season-dropdown').val("0");
+                $('#episode-dropdown').val("0");
+            }, 300);
         },
         error: function() {
             error_ajax_message('Error: The media could not be removed from your list. Please try again later.');
+        },
+        complete: function() {
+            $('#loading-remove-list').hide();
         }
     });
 }
@@ -45,8 +63,8 @@ function removeFromUser(element_id, media_type) {
 // --- Set media to favorite -------------------------------------------
 function addFavorite(element_id, media_type) {
     let favorite;
-
     favorite = !!$('#favorite').hasClass('far');
+    $('#favorite').addClass('disabled');
 
     $.ajax ({
         type: "POST",
@@ -58,9 +76,11 @@ function addFavorite(element_id, media_type) {
             if (favorite === true) {
                 $('#favorite').addClass('fas').removeClass('far');
                 $('#add-fav').show('slow').delay(2000).fadeOut();
+                $('#favorite').removeClass('disabled');
             } else {
                 $('#favorite').addClass('far').removeClass('fas');
                 $('#remove-fav').show('slow').delay(2000).fadeOut();
+                $('#favorite').removeClass('disabled');
             }
         },
         error: function() {
@@ -73,35 +93,7 @@ function addFavorite(element_id, media_type) {
 // --- Change the TV category ------------------------------------------
 function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
     let new_cat, season_data, episode_drop, seasons_length, seasons_index, opt, i;
-
     new_cat = cat_selector.options[cat_selector.selectedIndex].value;
-
-    $('#season-row').show();
-    $('#episode-row').show();
-
-    if (new_cat === 'Completed') {
-        season_data = JSON.parse("["+seas_data+"]");
-        episode_drop = document.getElementById('episode-dropdown');
-        seasons_length = $('#season-dropdown').children('option').length;
-        seasons_index = (seasons_length - 1);
-        $('#season-dropdown').prop('selectedIndex', seasons_index);
-
-        episode_drop.length = 1;
-
-        for (i = 2; i <= season_data[0][seasons_index]; i++) {
-            opt = document.createElement("option");
-            opt.className = "";
-            opt.innerHTML = '&nbsp;'+i+'&nbsp;';
-            episode_drop.appendChild(opt);
-        }
-        $('#episode-dropdown').prop('selectedIndex', season_data[0][seasons_index]-1);
-    }
-    else if (new_cat === 'Random' || new_cat === 'Plan to Watch') {
-        $('#season-dropdown').val("0");
-        $('#episode-dropdown').val("0");
-        $('#season-row').hide();
-        $('#episode-row').hide();
-    }
 
     $.ajax ({
         type: "POST",
@@ -109,8 +101,33 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
         contentType: "application/json",
         data: JSON.stringify({status: new_cat, element_id: element_id, element_type: media_list }),
         dataType: "json",
-        success: function() {
+        success: function() { 
+            $('#season-row').show();
+            $('#episode-row').show();
 
+            if (new_cat === 'Completed') {
+            season_data = JSON.parse("["+seas_data+"]");
+            episode_drop = document.getElementById('episode-dropdown');
+            seasons_length = $('#season-dropdown').children('option').length;
+            seasons_index = (seasons_length - 1);
+            $('#season-dropdown').prop('selectedIndex', seasons_index);
+
+            episode_drop.length = 1;
+
+            for (i = 2; i <= season_data[0][seasons_index]; i++) {
+                opt = document.createElement("option");
+                opt.className = "";
+                opt.innerHTML = '&nbsp;'+i+'&nbsp;';
+                episode_drop.appendChild(opt);
+            }
+            $('#episode-dropdown').prop('selectedIndex', season_data[0][seasons_index]-1);
+        }
+            else if (new_cat === 'Random' || new_cat === 'Plan to Watch') {
+            $('#season-dropdown').val("0");
+            $('#episode-dropdown').val("0");
+            $('#season-row').hide();
+            $('#episode-row').hide();
+        }
         },
         error: function() {
             error_ajax_message('Error changing your media status. Please try again later.');
