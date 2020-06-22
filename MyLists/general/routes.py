@@ -2,11 +2,11 @@ from flask import Blueprint
 from datetime import datetime
 from MyLists import db, bcrypt, app
 from MyLists.API_data import ApiData
-from flask_login import login_required
-from flask import render_template, url_for, flash, request
+from flask_login import login_required, current_user
+from flask import render_template, url_for, flash, request, abort
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
     refresh_db_frames, refresh_db_badges, refresh_db_ranks
-from MyLists.models import Status, ListType, User, GlobalStats
+from MyLists.models import Status, ListType, User, GlobalStats, RoleType
 
 bp = Blueprint('general', __name__)
 
@@ -16,15 +16,36 @@ def create_user():
     db.create_all()
     if User.query.filter_by(id='1').first() is None:
         # noinspection PyArgumentList
-        new_admin = User(username='admin',
+        admin1 = User(username='admin',
                          email='admin@admin.com',
                          password=bcrypt.generate_password_hash("password").decode('utf-8'),
                          image_file='default.jpg',
                          active=True,
                          private=True,
                          registered_on=datetime.utcnow(),
-                         activated_on=datetime.utcnow())
-        db.session.add(new_admin)
+                         activated_on=datetime.utcnow(),
+                         role=RoleType.ADMIN)
+        manager1 = User(username='manager',
+                        email='manager@manager.com',
+                        password=bcrypt.generate_password_hash("password").decode('utf-8'),
+                        image_file='default.jpg',
+                        active=True,
+                        private=False,
+                        registered_on=datetime.utcnow(),
+                        activated_on=datetime.utcnow(),
+                        role=RoleType.MANAGER)
+        user1 = User(username='user',
+                     email='user@user.com',
+                     password=bcrypt.generate_password_hash("password").decode('utf-8'),
+                     image_file='default.jpg',
+                     active=True,
+                     private=False,
+                     registered_on=datetime.utcnow(),
+                     activated_on=datetime.utcnow(),
+                     role=RoleType.USER)
+        db.session.add(admin1)
+        db.session.add(manager1)
+        db.session.add(user1)
         add_frames_to_db()
         add_badges_to_db()
         add_ranks_to_db()
@@ -40,6 +61,8 @@ def create_user():
 @bp.route("/admin", methods=['GET'])
 @login_required
 def admin():
+    if current_user.role != RoleType.ADMIN:
+        abort(403)
     return render_template('admin/index.html')
 
 

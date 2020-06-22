@@ -8,7 +8,7 @@ from MyLists.main.functions import get_medialist_data, set_last_update, compute_
     add_element_to_user, add_element_in_db, load_media_sheet, save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesEpisodesPerSeason, SeriesNetwork, Anime, \
     AnimeActors, AnimeEpisodesPerSeason, AnimeNetwork, AnimeList, ListType, SeriesActors, MoviesList, Status, \
-    MoviesCollections
+    MoviesCollections, RoleType
 
 bp = Blueprint('main', __name__)
 
@@ -145,9 +145,7 @@ def media_sheet(media_type, media_id):
 @bp.route("/media_sheet_form/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
 @login_required
 def media_sheet_form(media_type, media_id):
-    if current_user.id == 3 or current_user.id == 2 or current_user.id == 1:
-        pass
-    else:
+    if current_user.role != RoleType.ADMIN and current_user.role != RoleType.MANAGER:
         abort(404)
 
     form = EditMediaData()
@@ -730,10 +728,8 @@ def lock_media():
     except:
         return '', 400
 
-    # Check if the user is the admin
-    if current_user.id == 3 or current_user.id == 2 or current_user.id == 1:
-        pass
-    else:
+    # Check if the user is admin or manager
+    if current_user.role != RoleType.ADMIN and current_user.role != RoleType.MANAGER:
         return '', 400
 
     # Check if the list_type exist and is valid

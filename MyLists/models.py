@@ -37,6 +37,12 @@ class HomePage(enum.Enum):
     MYMOVIESLIST = "movieslist"
 
 
+class RoleType(enum.Enum):
+    ADMIN = "admin"         # Can access to the admin dashboard (/admin)
+    MANAGER = "manager"     # Can lock and edit media (/lock_media & /media_sheet_form)
+    USER = "user"           # Standard user
+
+
 followers = db.Table('followers',
                      db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
                      db.Column('followed_id', db.Integer, db.ForeignKey('user.id')))
@@ -63,6 +69,7 @@ class User(db.Model, UserMixin):
     transition_email = db.Column(db.String(120))
     activated_on = db.Column(db.DateTime)
     last_notif_read_time = db.Column(db.DateTime)
+    role = db.Column(db.Enum(RoleType), nullable=False, default=RoleType.USER)
 
     series_list = db.relationship('SeriesList', backref='user', lazy=True)
     anime_list = db.relationship('AnimeList', backref='user', lazy=True)
