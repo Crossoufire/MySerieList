@@ -166,7 +166,7 @@ def get_details(api_id, list_type):
             try:
                 anime_genres = ApiData().get_anime_genres(mal_id)
                 anime_genres = anime_genres["genres"]
-            except:
+            except Exception as e:
                 app.logger.error('[SYSTEM] Error requesting the Jikan genre API: {}'.format(e))
                 anime_genres = None
 

@@ -638,15 +638,14 @@ def change_element_category():
 
     # Set <last_episode_watched> and <current_season>
     if list_type != ListType.MOVIES:
+        current_season = element_in_list.current_season
+        last_episode_watched = element_in_list.last_episode_watched
         if new_status == Status.COMPLETED:
             element_in_list.current_season = len(season_data)
             element_in_list.last_episode_watched = season_data[-1].episodes
         elif new_status == Status.RANDOM or new_status == Status.PLAN_TO_WATCH:
             element_in_list.current_season = 1
             element_in_list.last_episode_watched = 1
-        else:
-            current_season = element_in_list.current_season
-            last_episode_watched = element_in_list.last_episode_watched
 
     # Compute <total_time_spent> and set <last_update>
     set_last_update(media=element, media_type=list_type, old_status=old_status, new_status=new_status)

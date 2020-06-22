@@ -19,12 +19,14 @@
             <h2 class="profile-name"><b>{{ user_data['username'] }}</b>
                 {% if user_data['id'] != current_user.get_id() %}
                     {% if user_data["isfollowing"] %}
-                        <button class="btn btn-sm btn-dark follow-btn"
+                        <button class="btn btn-sm btn-dark follow-btn" value="1"
                                 onclick="follow_status('{{ user_data['id'] }}')">Unfollow</button>
                     {% else %}
-                        <button class="btn btn-sm btn-primary follow-btn"
+                        <button class="btn btn-sm btn-primary follow-btn" value="0"
                                 onclick="follow_status('{{ user_data['id'] }}')">Follow</button>
                     {% endif %}
+                    <img class="loading-follow" style="display: none;" height="20" width="20"
+                         src="/static/img/loading.webp" alt=""/>
                 {% endif %}
             </h2>
             <div>
@@ -43,14 +45,16 @@
 
     <div class="account-wrapper">
         {% if user_data['id'] != current_user.get_id() %}
-            <div class="follow-btn-mobile d-flex" style="justify-content: flex-end;">
+            <div class="follow-btn-mobile d-flex">
                 {% if user_data["isfollowing"] %}
-                    <button class="btn btn-sm btn-dark follow-btn text-right"
+                    <button class="btn btn-sm btn-dark follow-btn" value="1"
                             onclick="follow_status('{{ user_data['id'] }}')">Unfollow</button>
                 {% else %}
-                    <button class="btn btn-sm btn-primary follow-btn text-right"
+                    <button class="btn btn-sm btn-primary follow-btn" value="0"
                             onclick="follow_status('{{ user_data['id'] }}')">Follow</button>
                 {% endif %}
+                <img class="loading-follow m-t-11" style="display: none;" height="20" width="20"
+                     src="/static/img/loading.webp" alt=""/>
             </div>
         {% endif %}
         <div class="row m-t-15">

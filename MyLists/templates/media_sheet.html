@@ -28,23 +28,11 @@
                     <img class="media-cover" src="/static/covers/{{ data['cover'] }}" alt=""/>
                 </div>
                 <div class="m-b-10 m-t-10">
-                    <div id="medialist-info" class="text-center">
-                        <div id='removeList' class="btn btn-smaller btn-danger"
-                                {% if not data['in_user_list'] %} style="display: none;" {% endif %}
-                             onclick="removeFromUser('{{ data['id'] }}', '{{ media_list }}')">
-                            <i class="fas fa-ban"></i>&nbsp; Remove from list
-                        </div>
-                        <div id='addlist' class="btn btn-smaller btn-info"
-                                {% if data['in_user_list'] %} style="display: none;" {% endif %}
-                             onclick="addToUser('{{ data['id'] }}', '{{ media_list }}')">
-                            <i class="fas fa-plus"></i>&nbsp; Add to your list
-                        </div>
-                    </div>
                     <div id="your-medialist-data" class="m-t-5 p-2" {% if not data['in_user_list'] %}
                          style="display: none;" {% endif %}>
                         <h4 class="m-l-15 m-r-15">
                             <i class="fas fa-list m-t-10"></i>&nbsp&nbsp <b>List Info</b>
-                            <i id="favorite" class="favorite-css {% if data['favorite'] %} fas {% else %} far {% endif %}
+                            <i id="favorite" class="favorite-css {% if data['favorite'] %} fas{% else %} far {% endif %}
                             fa-star m-t-10" onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></i>
                         </h4>
                         <hr class="m-l-15 m-r-15 m-b-8">
@@ -113,6 +101,31 @@
                                 </div>
                             </div>
                         {% endif %}
+                        <div class="text-center">
+                            <button class="btn btn-smaller btn-danger" onclick="removeFromUser('{{ data['id'] }}',
+                                    '{{ media_list }}')">
+                                <i class="fas fa-ban"></i>&nbsp; Remove from list
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button id="add-to-list" class="btn btn-smaller btn-info"{% if data['in_user_list'] %}
+                             style="display: none;" {% endif %} onclick="addToUser('{{ data['id'] }}',
+                                '{{ media_list }}')">
+                            <i class="fas fa-plus"></i>&nbsp; Add to your list
+                        </button>
+                    </div>
+                    <div id="add-media" class="alert alert-success p-2" style="display: none;">
+                        Media added to your list
+                    </div>
+                    <div id="remove-media" class="alert alert-warning p-2" style="display: none;">
+                        Media removed from your list
+                    </div>
+                    <div id="add-fav" class="alert alert-success p-2" style="display: none;">
+                        Media added to your favorite
+                    </div>
+                    <div id="remove-fav" class="alert alert-warning p-2" style="display: none;">
+                        Media removed from your favorite
                     </div>
                 </div>
                 <h4 class="m-l-21 m-r-15"><i class="fas fa-user-check m-t-8"></i>&nbsp&nbsp <b>In follow's list</b></h4>

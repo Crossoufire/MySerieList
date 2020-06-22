@@ -11,17 +11,9 @@ function addToUser(element_id, media_type) {
         data: JSON.stringify({element_id: element_id, element_type: media_type, element_cat: category}),
         dataType: "json",
         success: function() {
-            $('#medialist-info').prepend(
-                '<div class="alert alert-success m-t-15">' +
-                    'Media added to your list' +
-                '</div>'
-            );
-
-            $('#your-medialist-data').show();
-            $('#addlist').hide();
-            $('#removeList').show();
-
-            $('.alert').delay(2000).fadeOut(300, function() { $(this).remove(); });
+            $('#your-medialist-data').slideDown(300);
+            $('#add-to-list').hide();
+            $('#add-media').show('slow').delay(2000).fadeOut();
         },
         error: function() {
             error_ajax_message('Error: The media could not be added. Please try again later.');
@@ -39,25 +31,9 @@ function removeFromUser(element_id, media_type) {
         data: JSON.stringify({ delete: element_id, element_type: media_type }),
         dataType: "json",
         success: function() {
-            $('#medialist-info').prepend(
-                '<div class="alert alert-warning m-t-15">' +
-                    'Media removed from your list' +
-                '</div>'
-            );
-
-            if (media_type === 'movieslist') {
-                $('#category-dropdown').val('Plan to Watch');
-            } else {
-                $('#category-dropdown').val('Watching');
-                $('#season-dropdown').val("0");
-                $('#episode-dropdown').val("0");
-            }
-
-            $('#your-medialist-data').hide();
-            $('#removeList').hide();
-            $('#addlist').show();
-
-            $('.alert').delay(2000).fadeOut(300, function() { $(this).remove(); });
+            $('#your-medialist-data').slideUp(300);
+            $('#add-to-list').show();
+            $('#remove-media').show('slow').delay(2000).fadeOut();
         },
         error: function() {
             error_ajax_message('Error: The media could not be removed from your list. Please try again later.');
@@ -81,20 +57,11 @@ function addFavorite(element_id, media_type) {
         success: function() {
             if (favorite === true) {
                 $('#favorite').addClass('fas').removeClass('far');
-                $('#medialist-info').prepend(
-                    '<div class="alert alert-success m-t-15">' +
-                    'Added to your favorite' +
-                    '</div>'
-                );
+                $('#add-fav').show('slow').delay(2000).fadeOut();
             } else {
                 $('#favorite').addClass('far').removeClass('fas');
-                $('#medialist-info').prepend(
-                    '<div class="alert alert-warning m-t-15">' +
-                    'Removed from your favorite' +
-                    '</div>'
-                );
+                $('#remove-fav').show('slow').delay(2000).fadeOut();
             }
-            $('.alert').delay(2000).fadeOut(300, function() { $(this).remove(); });
         },
         error: function() {
             error_ajax_message('Error updating your favorite status. Please try again later.');
@@ -143,7 +110,7 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
         data: JSON.stringify({status: new_cat, element_id: element_id, element_type: media_list }),
         dataType: "json",
         success: function() {
-            console.log("ok");
+
         },
         error: function() {
             error_ajax_message('Error changing your media status. Please try again later.');

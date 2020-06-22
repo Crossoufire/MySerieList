@@ -4,7 +4,9 @@
 function follow_status(follow_id) {
     let status;
 
-    status = $('.follow-btn')[0].innerText !== 'UNFOLLOW';
+    status = $('.follow-btn').prop('value') !== '1';
+    $('.loading-follow').show();
+
     $.ajax ({
         type: "POST",
         url: "/follow_status",
@@ -14,14 +16,19 @@ function follow_status(follow_id) {
         success: function() {
             if (status === false) {
                 $('.follow-btn').text('Follow');
+                $('.follow-btn').prop('value', '0');
                 $('.follow-btn').addClass('btn-primary').removeClass('btn-dark');
             } else {
                 $('.follow-btn').text('Unfollow');
+                $('.follow-btn').prop('value', '1');
                 $('.follow-btn').removeClass('btn-primary').addClass('btn-dark');
             }
         },
         error: function() {
             error_ajax_message('Error updating the following status. Please try again later.');
+        },
+        complete: function() {
+            $('.loading-follow').hide();
         }
     });
 }

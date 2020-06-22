@@ -1,4 +1,5 @@
 import json
+import time
 import requests
 import urllib.request
 
@@ -6,7 +7,6 @@ from PIL import Image
 from flask import abort
 from MyLists import app
 from pathlib import Path
-from jikanpy import Jikan
 from MyLists.models import ListType
 
 
@@ -80,6 +80,8 @@ class ApiData:
         response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(anime_name))
 
         self.status_code(response.status_code)
+
+        time.sleep(2)
 
         return json.loads(response.text)
 
