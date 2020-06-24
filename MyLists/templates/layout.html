@@ -6,7 +6,9 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-146580264-1"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        function gtag() {
+            dataLayer.push(arguments);
+        }
         gtag('js', new Date());
         gtag('config', 'UA-146580264-1');
     </script>
@@ -17,14 +19,14 @@
     <meta name="description" content="Create your TV shows/anime/movies list, see how much time you spent and gain
     levels and badges." />
 
-    <link href="https://use.fontawesome.com/releases/v5.12.0/css/all.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/css/mdb.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="Stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/css/mdb.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
 
-    <link href="{{ url_for('static', filename='img/favicon.ico') }}" rel='icon' type='image/gif'>
-	<link href="{{ url_for('static', filename='css/mylists.css') }}" rel="stylesheet">
-	<link href="{{ url_for('static', filename='css/util.css') }}" rel="stylesheet">
+    <link rel='icon' type='image/gif' href="{{ url_for('static', filename='img/favicon.ico') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/mylists.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
     {% block css %}
     {% endblock %}
 
@@ -37,115 +39,118 @@
 
 <body>
     <header class="site-header">
-        <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top p-t-2 p-b-0" style="white-space: nowrap;">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top p-b-0 p-t-5">
             <div class="container">
                 {% if current_user.is_authenticated %}
-                    <div class="navbar-brand nav-item dropdown m-l-10">
-                        <a class="dropdown-toggle" data-toggle="dropdown" style="color: #ffffffe6;" href="#">
-                            MyLists<span class="caret"></span>
-                        </a>
-                        <div class="dropdown-menu dropdown-mylist">
-                            <a class="nav-item drop-item text-light"
-                               href="{{ url_for('main.mymedialist', media_list='serieslist',
-                               user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> &nbsp;SeriesList
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle fs-18" data-toggle="dropdown">
+                                MyLists
                             </a>
-                            <a class="nav-item drop-item text-light"
-                               href="{{ url_for('main.mymedialist', media_list='animelist',
-                               user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> &nbsp;AnimeList
-                            </a>
-                            <a class="nav-item drop-item text-light"
-                               href="{{ url_for('main.mymedialist', media_list='movieslist',
-                               user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> &nbsp;MoviesList
-                            </a>
-                        </div>
-                    </div>
-                    <div class="m-l-10 m-r-20">
-                        <form action="{{ url_for('main.search_media') }}">
-                            <input id="autocomplete" name='search' class="form-control modded-form"
-                                   placeholder="Search and add media">
-                        </form>
-                    </div>
-                {% else %}
-                    <a class="navbar-brand" href="{{ url_for('auth.home') }}">MyLists</a>
-                {% endif %}
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle">
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{{ url_for('main.mymedialist', media_list='serieslist',
+                                user_name=current_user.username) }}">
+                                    <i class="fas fa-tv"></i>&nbsp;MySeriesList
+                                </a>
+                                <a class="dropdown-item" href="{{ url_for('main.mymedialist', media_list='animelist',
+                                user_name=current_user.username) }}">
+                                    <i class="fas fa-torii-gate"></i>&nbsp;MyAnimeList
+                                </a>
+                                <a class="dropdown-item" href="{{ url_for('main.mymedialist', media_list='movieslist',
+                                user_name=current_user.username) }}">
+                                    <i class="fas fa-film"></i>&nbsp;MyMoviesList
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse" id="navbarToggle">
-                    <div class="navbar-nav mr-auto">
-                    {% if current_user.is_authenticated %}
-                        <a class="nav-item nav-link text-center text-light" href="{{ url_for('users.hall_of_fame') }}">
-                            <i class="fas fa-lg fa-trophy" style="color: goldenrod;"></i><br>
-                            <div class="fs-14">Hall of Fame</div>
-                        </a>
-                        <a class="nav-item nav-link text-center text-light" href="{{ url_for('general.global_stats') }}">
-                            <i class="far fa-lg fa-chart-bar" style="color: darkorange;"></i><br>
-                            <div class="fs-14">General Stats</div>
-                        </a>
-                        <a class="nav-item nav-link text-center text-light" href="{{ url_for('general.current_trends') }}">
-                            <i class="fas fa-lg fa-fire-alt" style="color: orangered;"></i><br>
-                            <div class="fs-14">Trends</div>
-                        </a>
-                    {% endif %}
-                    </div>
-                    <div class="navbar-nav">
-                    {% if current_user.is_authenticated %}
-
-                        <div class="nav-item dropdown m-l-10 p-t-7 m-r-20">
-                            <a id="ajax-notif" class="my-dropdown-toggle text-center" data-toggle="dropdown"
-                               style="color: #ffffffe6;" href="#">
-                                <i class="fas fa-lg fa-bell"></i>
-                                {% set notif_count = current_user.count_notifications() %}
-                                <span class="badge" {% if notif_count == 0 %} style="background-color: grey;"
-                                {% endif %}>
-                                    {{ notif_count }}
-                                </span>
-                                <div class="fs-14">Notifications</div>
-                            </a>
-                            <div class="dropdown-menu dropdown-mylist dropdown-menu-right">
-                                <a id="notification-items" class="nav-link text-light">
+                    <div class="collapse navbar-collapse" id="nav-collapse">
+                        <form class="form-inline m-l-15">
+                            <label for="autocomplete"></label>
+                            <input id="autocomplete" class="form-control" type="search" placeholder="Search Media">
+                        </form>
+                        <ul class="navbar-nav mr-auto m-l-20">
+                            <li class="nav-item">
+                                <a class="nav-link text-center m-l-15 m-r-15" href="{{ url_for('users.hall_of_fame') }}">
+                                    <i class="fas fa-lg fa-trophy" style="color: goldenrod;"></i>
+                                    <div class="fs-14">Hall of Fame</div>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-center m-l-15 m-r-15" href="{{ url_for('general.global_stats') }}">
+                                    <i class="far fa-lg fa-chart-bar" style="color: darkorange;"></i>
+                                    <div class="fs-14">General Stats</div>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-center m-l-15 m-r-15" href="{{ url_for('general.current_trends') }}">
+                                    <i class="fas fa-lg fa-fire-alt" style="color: orangered;"></i>
+                                    <div class="fs-14">Trends</div>
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item dropdown">
+                                <a id="notif" class="nav-link my-dropdown-toggle text-center" data-toggle="dropdown">
+                                    <i class="fas fa-lg fa-bell"></i>
+                                    {% set notif_count = current_user.count_notifications() %}
+                                    <span class="badge" {% if notif_count == 0 %} style="background-color: grey;"
+                                    {% endif %}>
+                                        {{ notif_count }}
+                                    </span>
+                                    <div class="fs-14">Notifications</div>
+                                </a>
+                                <div id="notif-dropdown" class="dropdown-menu dropdown-menu-right">
                                     <img id="loading-image" height="30" width="30"
-                                         src="https://i.giphy.com/media/L05HgB2h6qICDs5Sms/giphy.webp"/>
+                                             src="https://i.giphy.com/media/L05HgB2h6qICDs5Sms/giphy.webp"/>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-center" data-toggle="dropdown">
+                                    <img style="border-radius: 50%;" height="40" width="40"
+                                         src="/static/profile_pics/default.jpg" alt=""/>
                                 </a>
-                            </div>
-                        </div>
-
-                        <div class="nav-item dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" style="color: #ffffffe6;" href="#">
-                                <img class="nav-pic" src="/static/profile_pics/{{ current_user.image_file }}" alt=""/>
-                                <span class="caret"></span>
-                            </a>
-                            <div class="dropdown-menu dropdown-mylist">
-                                <a class="nav-link text-light text-center" href="{{ url_for('users.account',
-                                user_name=current_user.username) }}">
-                                    <i class="fas fa-user"></i>
-                                    <div>Profile</div>
-                                </a>
-                                {% if current_user.get_id() == '1' %}
-                                    <a class="nav-link text-light text-center" href="{{ url_for('general.admin') }}">
-                                        <i class="fas fa-database"></i>
-                                        <div>Dashboard</div>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{{ url_for('users.account',
+                                    user_name=current_user.username) }}">
+                                        <i class="fas fa-user"></i>&nbsp;Profile
                                     </a>
-                                {% endif %}
-                                <a class="nav-link text-light text-center" href="{{ url_for('settings.settings') }}">
-                                    <i class="fas fa-cog"></i>
-                                    <div>Settings</div>
-                                </a>
-                                <a class="nav-link text-light text-center" href="{{ url_for('auth.logout') }}">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                    <div>Logout</div>
-                                </a>
-                            </div>
-                        </div>
-
-                    {% elif not current_user.is_authenticated and request.path == '/' %}
-                        <a type="button" class="btn btn-sm btn-light text-dark" data-toggle="modal"
-                           data-target="#modalLoginForm">Login</a>
-                        <a type="button" class="btn btn-sm btn-danger m-r-0" data-toggle="modal"
-                           data-target="#modalRegisterForm">Register</a>
-                    {% endif %}
+                                    <a class="dropdown-item" href="{{ url_for('settings.settings') }}">
+                                        <i class="fas fa-cog"></i>&nbsp;Settings
+                                    </a>
+                                    <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                        <i class="fas fa-sign-out-alt"></i>&nbsp;Logout
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
-                </div>
+                {% else %}
+                    <a class="navbar-brand mr-auto" href="{{ url_for('auth.home') }}">MyLists</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                    {% if request.path == '/' %}
+                        <div class="collapse navbar-collapse" id="nav-collapse">
+                            <ul class="navbar-nav ml-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link">
+                                        <button class="btn btn-sm btn-light text-dark" data-toggle="modal"
+                                                data-target="#modalLoginForm">Login</button>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link">
+                                        <button class="btn btn-sm btn-danger m-r-0" data-toggle="modal"
+                                                data-target="#modalRegisterForm">Register</button>
+                                    </a>
+                            </li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                {% endif %}
             </div>
         </nav>
     </header>
@@ -159,7 +164,7 @@
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
-                                {{message}}
+                            {{message}}
                         </div>
                     {% endfor %}
                 {% endif %}
@@ -187,18 +192,27 @@
 
     {% block script %}
     {% endblock %}
-
     <script type="text/javascript" src="{{ url_for('static', filename='js/mylists.js') }}" ></script>
 
 <footer class="page-footer font-small">
     <div class="footer-copyright text-center py-3">
         <div class="d-flex flex-wrap" style="justify-content: center;">
-            <a href="https://developers.themoviedb.org/3/getting-started/introduction"
-               target="_blank">TMDb API</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="https://www.palletsprojects.com/p/flask/" target="_blank">Flask</a>&nbsp;&nbsp;|&nbsp;
-            © 2020 Copyright:&nbsp;<a href="https://MyLists.info" target="_blank">Mylists.info</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="#!" target="_blank">Contact</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="https://github.com/Crossoufire/MyLists" target="_blank">Github</a>
+            <a href="https://developers.themoviedb.org/3/getting-started/introduction" target="_blank">
+                TMDb API
+            </a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="https://www.palletsprojects.com/p/flask/" target="_blank">
+                Flask
+            </a>&nbsp;&nbsp;|&nbsp;
+            © 2020 Copyright:&nbsp;
+            <a href="https://MyLists.info" target="_blank">
+            Mylists.info
+            </a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="#!" target="_blank">
+                Contact
+            </a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="https://github.com/Crossoufire/MyLists" target="_blank">
+                Github
+            </a>
         </div>
     </div>
 </footer>

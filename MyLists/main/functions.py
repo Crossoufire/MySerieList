@@ -453,15 +453,6 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
 
     group = 'categories'
 
-    category_tv_group = OrderedDict({'WATCHING': '',
-                                     'COMPLETED': '',
-                                     'ON HOLD': '',
-                                     'RANDOM': '',
-                                     'DROPPED': '',
-                                     'PLAN TO WATCH': ''})
-    category_movies_group = OrderedDict({'COMPLETED': '',
-                                         'COMPLETED ANIMATION': '',
-                                         'PLAN TO WATCH': ''})
     alphabet_group = {}
     genres_group = {}
     releases_group = {}
@@ -469,6 +460,12 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
     tmdb_scores_intervals = [[0, 2], [2, 4], [4, 6], [6, 8], [8, 11]]
     common_elements = 0
     if list_type != ListType.MOVIES:
+        category = OrderedDict({'WATCHING': '',
+                                'COMPLETED': '',
+                                'ON HOLD': '',
+                                'RANDOM': '',
+                                'DROPPED': '',
+                                'PLAN TO WATCH': ''})
         for element in element_data:
             # Get episodes per season
             nb_season = len(element[4].split(","))
@@ -495,10 +492,10 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                 common_elements += 1
 
             if group == 'categories':
-                if category_tv_group[element[1].status.value.upper()] == '':
-                    category_tv_group[element[1].status.value.upper()] = [element_info]
+                if category[element[1].status.value.upper()] == '':
+                    category[element[1].status.value.upper()] = [element_info]
                 else:
-                    category_tv_group[element[1].status.value.upper()].append(element_info)
+                    category[element[1].status.value.upper()].append(element_info)
             elif group == 'alphabet':
                 try:
                     if 0 <= int(element[0].name[0]) <= 9:
@@ -538,6 +535,9 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             tmdb_score_group[f'{interval[0]}-{interval[1]}'] = [element_info]
                             break
     elif list_type == ListType.MOVIES:
+        category = OrderedDict({'COMPLETED': '',
+                                'COMPLETED ANIMATION': '',
+                                'PLAN TO WATCH': ''})
         for element in element_data:
             element_info = {"id": element[0].id,
                             "tmdb_id": element[0].themoviedb_id,
@@ -557,10 +557,10 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                 common_elements += 1
 
             if group == 'categories':
-                if category_movies_group[element[1].status.value.upper()] == '':
-                    category_movies_group[element[1].status.value.upper()] = [element_info]
+                if category[element[1].status.value.upper()] == '':
+                    category[element[1].status.value.upper()] = [element_info]
                 else:
-                    category_movies_group[element[1].status.value.upper()].append(element_info)
+                    category[element[1].status.value.upper()].append(element_info)
             elif group == 'alphabet':
                 try:
                     if 0 <= int(element[0].name[0]) <= 9:
@@ -579,7 +579,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
     except ZeroDivisionError:
         percentage = 0
 
-    data = {"grouping": category_tv_group,
+    data = {"grouping": category,
             "common_elements": [common_elements, len(element_data), percentage]}
 
     return data
