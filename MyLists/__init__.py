@@ -6,6 +6,7 @@ import configparser
 
 from flask import Flask
 from flask_mail import Mail
+from flask_minify import minify
 from flask_bcrypt import Bcrypt
 from flask_compress import Compress
 from flask_login import LoginManager
@@ -28,6 +29,7 @@ except Exception as e:
     sys.exit()
 
 app = Flask(__name__)
+# minify(app=app, html=True, js=True, cssless=True)
 Compress(app)
 
 app.config['SECRET_KEY'] = flask_secret

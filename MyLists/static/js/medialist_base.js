@@ -1,8 +1,13 @@
 
 
 // --- Delete element --------------------------------------------------
-function deleteElement(element_id, card_id, media_list) {
-    if (!confirm('Delete this media from your list?')) {
+function deleteElement(card, media_list) {
+    let element_id = $(card)[0].id.split('_')[1];
+    let name = $(card).find('.font-mask').html();
+    $(card).find('.loading-medialist').show();
+
+    if (!confirm('Delete "' + name  + '" from your list?')) {
+        $(card).find('.loading-medialist').hide();
         return false;
     }
 
@@ -13,10 +18,13 @@ function deleteElement(element_id, card_id, media_list) {
         data: JSON.stringify({ delete: element_id, element_type: media_list }),
         dataType: "json",
         success: function() {
-            $("#"+card_id).remove();
+            $(card).remove();
         },
         error: function () {
             error_ajax_message('Error trying to remove the media. Please try again later.')
+        },
+        complete: function () {
+            $(card).find('.loading-medialist').show();
         }
     });
 
@@ -45,7 +53,7 @@ function removeCat() {
 }
 
 
-// --- Search by Title or Actor ----------------------------------------
+// --- Search in medialist ---------------------------------------------
 function searchElement() {
     let input, cat, filter, cards, cardContainer, title, i, l;
 
@@ -87,7 +95,7 @@ function searchElement() {
 
 // --- Add media to favorite -------------------------------------------
 function addFavorite(element_id, media_type) {
-    let favorite
+    let favorite;
 
     favorite = !!$('#fav-' + element_id).hasClass('far');
 
@@ -99,15 +107,15 @@ function addFavorite(element_id, media_type) {
         dataType: "json",
         success: function() {
             if (favorite === true) {
-                $('#fav-'+element_id).removeClass('far card-btn-bottom-left').addClass('fas card-favorite')
-                $('#fav-'+element_id).attr('style', 'color: darkgoldenrod;')
+                $('#fav-'+element_id).removeClass('far card-btn-bottom-left').addClass('fas card-favorite');
+                $('#fav-'+element_id).attr('style', 'color: darkgoldenrod;');
             } else {
-                $('#fav-'+element_id).removeClass('fas card-favorite').addClass('far card-btn-bottom-left')
-                $('#fav-'+element_id).attr('style', 'color: white;')
+                $('#fav-'+element_id).removeClass('fas card-favorite').addClass('far card-btn-bottom-left');
+                $('#fav-'+element_id).attr('style', 'color: white;');
             }
         },
         error: function() {
-            error_ajax_message('Error trying to add the media to you favorite. Please try again later.')
+            error_ajax_message('Error trying to favorite the media. Please try again later.')
         }
     });
 }
@@ -161,7 +169,7 @@ function AddCatUser(cat, card_id, media_id, media_type) {
             $("#"+card_id).children().children().children().remove(".card-btn-top-left.fas.fa-plus.text-light");
         },
         error: function () {
-            error_ajax_message('Error trying to add the media. Please try again later.')
+            error_ajax_message('Error trying to add the media to your list. Please try again later.')
         }
     });
 }
@@ -180,7 +188,9 @@ $("img.lazyload").lazyload({
 });
 $('.filters-button-group').on('click', 'button', function() {
     let filterValue = $(this).attr('data-filter');
-    $categories.isotope({ filter: filterValue });
+    $categories.isotope({
+        filter: filterValue
+    });
 });
 $('.filters-button-group').each(function(i, buttonGroup) {
     let $buttonGroup = $(buttonGroup);
@@ -191,22 +201,17 @@ $('.filters-button-group').each(function(i, buttonGroup) {
         $(this).removeClass('btn-header');
     });
 });
-$categories.isotope('layout');
 
 
 // --- Row gutters -----------------------------------------------------
-(function($) {
-    let $window = $(window),
-        $row = $('.row');
-
-    function resize() {
-        if ($window.width() < 1025) {
-            return $row.addClass('no-gutters');
+$(document).ready(function() {
+    function a() {
+        if ($(window).width() < 1025) {
+            return $('.row').addClass('no-gutters');
         }
-        $row.removeClass('no-gutters');
+        $('.row').removeClass('no-gutters');
     }
-    $window.resize(resize).trigger('resize');
-    $categories.isotope('layout');
-})(jQuery);
 
-$categories.isotope('layout');
+    $(window).resize(a).trigger('resize');
+    $categories.isotope('layout');
+});

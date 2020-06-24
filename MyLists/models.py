@@ -2,8 +2,8 @@ import enum
 
 from flask import abort
 from datetime import datetime
-from flask_login import UserMixin
-from sqlalchemy import func, desc, text
+from flask_login import UserMixin, current_user
+from sqlalchemy import func, desc, text, and_
 from MyLists import app, db, login_manager
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
@@ -215,8 +215,8 @@ class Series(db.Model):
     genres = db.relationship('SeriesGenre', backref='series', lazy=True)
     actors = db.relationship('SeriesActors', backref='series', lazy=True)
     eps_per_season = db.relationship('SeriesEpisodesPerSeason', backref='series', lazy=True)
-    list_info = db.relationship('SeriesList', backref='series', lazy='dynamic')
     networks = db.relationship('SeriesNetwork', backref='series', lazy=True)
+    list_info = db.relationship('SeriesList', backref='series', lazy="dynamic")
 
     def get_same_genres(self, genres_list, genre_str):
         same_genres = db.session.query(Series, SeriesGenre) \

@@ -65,26 +65,6 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
 });
 
 
-// --- AJAX Notification ----------------------------------------------------
-$('#notif').click(function() {
-    $(".notif-items").remove();
-    $('#loading-image').show();
-
-    $.ajax ({
-        type: "GET",
-        url: "/read_notifications",
-        contentType: "application/json",
-        dataType: "json",
-        success: function(data) {
-            display_notifications(data);
-        },
-        complete: function() {
-            $('#loading-image').hide();
-        }
-    });
-});
-
-
 // --- Notification ---------------------------------------------------------
 function display_notifications(data) {
     let resp = data.results;
@@ -98,11 +78,9 @@ function display_notifications(data) {
         for (let i = 0; i < resp.length; i++) {
             if (resp[i]['media_type'] === 'movieslist') {
                 $("#notif-dropdown").append(
-                    '<a class="dropdown-item notif-items">' +
+                    '<a class="dropdown-item notif-items text-light" href="/media_sheet/Movies/'+resp[i]['media_id']+'">' +
                         '<i class="fas fa-film" style="color: #8c7821;"></i>' +
-                        '&nbsp;&nbsp;' +
-                        '<a style="color: #359aff;" href="/media_sheet/Movies/'+resp[i]['media_id']+'">' +
-                        resp[i]['name'] + '</a>' +
+                        '&nbsp;&nbsp;' + resp[i]['name'] +
                         '<i class="fas fa-arrow-right"></i>' +
                         '&nbsp;&nbsp;Airs the ' + resp[i]['first_air_date'] +
                         '&nbsp;&nbsp;&nbsp;&nbsp;' +
@@ -110,11 +88,9 @@ function display_notifications(data) {
             }
             else if (resp[i]['media_type'] === 'serieslist') {
                 $("#notif-dropdown").append(
-                    '<a class="dropdown-item notif-items">' +
+                    '<a class="dropdown-item notif-items text-light" href="/media_sheet/Series/'+resp[i]['media_id']+'">' +
                         '<i class="fas fa-tv" style="color: #216e7d;"></i>' +
-                        '&nbsp;&nbsp;' +
-                        '<a style="color: #359aff;" href="/media_sheet/Series/'+resp[i]['media_id']+'">' +
-                        resp[i]['name'] + '</a>' +
+                        '&nbsp;&nbsp;' + resp[i]['name'] +
                         'S0' + resp[i]['season']+'.E0'+resp[i]['episode'] +
                         ' <i class="fas fa-arrow-right"></i>' +
                         '&nbsp;&nbsp;Airs the ' + resp[i]['first_air_date'] +
@@ -123,11 +99,9 @@ function display_notifications(data) {
             }
             else {
                 $("#notif-dropdown").append(
-                    '<a class="dropdown-item notif-items">' +
+                    '<a class="dropdown-item notif-items text-light" href="/media_sheet/Anime/'+resp[i]['media_id']+'">' +
                         '<i class="fas fa-torii-gate" style="color: #945141;"></i>' +
-                        '&nbsp;&nbsp;' +
-                        '<a style="color: #359aff;" href="/media_sheet/Anime/'+resp[i]['media_id']+'">' +
-                        resp[i]['name'] + '</a>' +
+                        '&nbsp;&nbsp;' + resp[i]['name'] +
                         'S0' + resp[i]['season']+'.E0'+resp[i]['episode'] +
                         ' <i class="fas fa-arrow-right"></i>' +
                         '&nbsp;&nbsp;Airs the ' + resp[i]['release_date'] +
@@ -137,12 +111,6 @@ function display_notifications(data) {
         }
     }
 }
-
-
-// --- Tooltip initialization -----------------------------------------------
-$(function () {
-    $('[data-toggle="tooltip"]').tooltip()
-});
 
 
 // --- Ajax error handling --------------------------------------------------
@@ -157,10 +125,28 @@ function error_ajax_message(message) {
 }
 
 
-// --- MyList dropdown effect slideDown slideUp -----------------------------
-$('.dropdown').on('show.bs.dropdown', function(e){
-  $(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
-});
-$('.dropdown').on('hide.bs.dropdown', function(e){
-  $(this).find('.dropdown-menu').first().stop(true, true).slideUp(300);
+$(document).ready(function() {
+    // --- Tooltip initialization -----------------------------------
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    });
+
+    // --- AJAX Notification ----------------------------------------
+    $('#notif').click(function() {
+        $(".notif-items").remove();
+        $('#loading-image').show();
+
+        $.ajax ({
+            type: "GET",
+            url: "/read_notifications",
+            contentType: "application/json",
+            dataType: "json",
+            success: function(data) {
+                display_notifications(data);
+            },
+            complete: function() {
+                $('#loading-image').hide();
+            }
+        });
+    });
 });

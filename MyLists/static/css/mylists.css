@@ -1,13 +1,5 @@
 
-/* ----------------- General CSS ---------------------- */
-.bg-dark {
-    background-color: #2c3946 !important;
-}
-
-.container {
-    max-width: 1350px;
-}
-
+/* --- General ------------------------------------------------ */
 body {
     padding: 0;
     display: flex;
@@ -20,28 +12,35 @@ body {
 }
 
 main {
-  flex: 1 0 auto;
+    flex: 1 0 auto;
 }
 
 hr {
     border-top: 1px solid rgba(255, 255, 255, 0.9);
 }
 
-.dropdown-mylist {
-    z-index: 500;
-    min-width: 100%;
-    padding: 0;
-    border-radius: 0;
-    background: #2a2b2d;
+.bg-dark {
+    background-color: #2c3946 !important;
 }
 
-.drop-item {
-    display: block;
+.container {
+    max-width: 1350px;
 }
 
 .btn.btn-sm {
     padding-left: 15px;
     padding-right: 15px;
+}
+
+.form-control {
+    background-color: #2a2b2d;
+    border-color: darkgray;
+}
+
+.form-control:focus {
+    background-color: #2a2b2d;
+    border-color: darkgray;
+    color: antiquewhite;
 }
 
 /*.form-control {*/
@@ -62,50 +61,59 @@ hr {
 /*    box-shadow: 0 0 0 0;*/
 /*    color: #fff;*/
 /*}*/
-
-.form-control {
-    background-color: #2a2b2d;
-    border-color: darkgray;
+@media (max-width: 991px) {
+    body {
+    min-height: calc(100vh - 43px);
+    margin: 43px 0 0;
 }
-
-.form-control:focus {
-    background-color: #2a2b2d;
-    border-color: darkgray;
-    color: antiquewhite;
 }
-
-
 @media (max-width: 490px) {
     .container {
         padding-left: 0;
         padding-right: 0;
     }
 }
-@media (max-width: 450px) {
-    .modded-form {
-        width: 100px;
-    }
-}
-@media (max-width: 320px) {
-    .modded-form {
-        width: 90px;
-    }
-}
-/* ---------------------------------------------------------- */
+/*@media (max-width: 450px) {*/
+/*    .modded-form {*/
+/*        width: 100px;*/
+/*    }*/
+/*}*/
+/*@media (max-width: 320px) {*/
+/*    .modded-form {*/
+/*        width: 90px;*/
+/*    }*/
+/*}*/
 
 
-/* ------------------ Navigation bar CSS -------------------- */
-.dropdown_mylist > .nav-item::after {
-    content: '';
-    display: block;
-    width: 0;
-    height: 1px;
-    background: #fec400;
-    transition: 0.4s;
+/* --- Website Scrollbar ----------------------------------------- */
+::-webkit-scrollbar {
+    width: 10px;
 }
 
-.dropdown_mylist .nav-item:hover::after {
-    width: 100%;
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+
+/* --- Navbar modifications ---------------------------------------- */
+.medialist-dropdown {
+    z-index: 500;
+    padding: 0;
+    border-radius: 0;
+    background: #2a2b2d;
+    min-width: 130%;
+}
+
+.medialist-dropdown .dropdown-item:hover {
+    background-color: black;
 }
 
 /*#autocomplete.ui-autocomplete-loading {*/
@@ -119,58 +127,18 @@ hr {
     border: solid white 1px;
 }
 
-/* width */
-::-webkit-scrollbar {
-    width: 10px;
+.my-drop-toggle::after {
+    content: none;
 }
 
-/* Track */
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #888;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-.notif-badge {
-    border-radius: 50%;
-    padding: 0 6px 0 6px;
-    background: darkred;
-    color: white;
-}
-
-.notif-dropdown .dropdown-toggle:after {
-    display: none;
-}
-
-.notif-dropdown-items {
-    z-index: 9999;
-    min-width: 100%;
-    padding: 10px;
-    border-radius: 0;
-    background: #2a2b2d;
-}
-
-.notif-item-container {
-    position: relative;
-    border-bottom: solid 1px black;
-}
-
-.nav-pic {
+.navbar-pic {
     height: 45px;
     width: 45px;
-    border-radius: 50%;
-    /*border: 2px darkgrey solid;*/
-    padding-top: 5px;
+    /*border-radius: 50%;*/
+    /*border: 1px black solid;*/
 }
 
-.my-dropdown-toggle::after {
-    content: none;
+#loading-image {
+    height: 30px;
+    width: 30px;
 }

@@ -6,16 +6,16 @@ function chargeButtons(card, element_id, genres, media_list) {
 
     removeCat();
 
+    display_completed = "block;";
+    display_plan_to_watch = "block;";
+
     if ($('#'+card.id).parent().hasClass('category-COMPLETED')) {
         display_completed = "none;";
-        display_plan_to_watch = "block;";
     }
     else if ($('#'+card.id).parent().hasClass('category-ANIMATION')) {
         display_completed = "none;";
-        display_plan_to_watch = "block;";
     }
     else {
-        display_completed = "block;";
         display_plan_to_watch = "none;";
     }
 
@@ -74,7 +74,10 @@ function changeCategory(new_category, element_id, card_id, genres, media_list) {
             $categories.isotope('layout');
         },
         error: function () {
-            error_ajax_message('Error changing the category of the media. Please try again later.');
+            error_ajax_message('Error changing the media category. Please try again later.');
+        },
+        complete: function () {
+
         }
     });
 }

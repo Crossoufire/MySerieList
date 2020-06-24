@@ -1,3 +1,5 @@
+import time
+
 from MyLists import db, app
 from datetime import datetime
 from MyLists.API_data import ApiData
@@ -626,31 +628,32 @@ def change_element_category():
     if list_type == ListType.SERIES:
         element = Series.query.filter_by(id=element_id).first()
         season_data = element.eps_per_season
+        element_list = db.session.query(SeriesList).filter_by(user_id=current_user.id, series_id=element.id).first()
     elif list_type == ListType.ANIME:
         element = Anime.query.filter_by(id=element_id).first()
+        element_list = db.session.query(AnimeList).filter_by(user_id=current_user.id, anime_id=element.id).first()
         season_data = element.eps_per_season
     elif list_type == ListType.MOVIES:
         element = Movies.query.filter_by(id=element_id).first()
-
-    element_in_list = element.list_info.first()
+        element_list = db.session.query(MoviesList).filter_by(user_id=current_user.id, movies_id=element.id).first()
 
     # Check if media in user's list
-    if not element_in_list:
+    if not element_list:
         return '', 400
 
-    old_status = element_in_list.status
-    element_in_list.status = new_status
+    old_status = element_list.status
+    element_list.status = new_status
 
     # Set and change accordingly <last_episode_watched> and <current_season>
     if list_type != ListType.MOVIES:
-        current_season = element_in_list.current_season
-        last_episode_watched = element_in_list.last_episode_watched
+        current_season = element_list.current_season
+        last_episode_watched = element_list.last_episode_watched
         if new_status == Status.COMPLETED:
-            element_in_list.current_season = len(season_data)
-            element_in_list.last_episode_watched = season_data[-1].episodes
+            element_list.current_season = len(season_data)
+            element_list.last_episode_watched = season_data[-1].episodes
         elif new_status == Status.RANDOM or new_status == Status.PLAN_TO_WATCH:
-            element_in_list.current_season = 1
-            element_in_list.last_episode_watched = 1
+            element_list.current_season = 1
+            element_list.last_episode_watched = 1
 
     # Compute <total_time_spent> and set <last_update>
     set_last_update(media=element, media_type=list_type, old_status=old_status, new_status=new_status)

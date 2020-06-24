@@ -39,53 +39,74 @@
 
 <body>
     <header class="site-header">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top p-b-0 p-t-5">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top p-0">
             <div class="container">
                 {% if current_user.is_authenticated %}
-                    <ul class="navbar-nav mr-auto">
+                    <ul class="navbar-nav mr-auto m-l-10">
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle fs-18" data-toggle="dropdown">
                                 MyLists
                             </a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{{ url_for('main.mymedialist', media_list='serieslist',
-                                user_name=current_user.username) }}">
-                                    <i class="fas fa-tv"></i>&nbsp;MySeriesList
+                            <div class="dropdown-menu medialist-dropdown">
+                                <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
+                                media_list='serieslist', user_name=current_user.username) }}">
+                                    <div class="row">
+                                        <div class="col-3" style="margin-right: -5px;">
+                                            <i class="fas fa-tv" style="color: #216e7d;"></i>
+                                        </div>
+                                        <div class="col-9">
+                                            SeriesList
+                                        </div>
+                                    </div>
                                 </a>
-                                <a class="dropdown-item" href="{{ url_for('main.mymedialist', media_list='animelist',
-                                user_name=current_user.username) }}">
-                                    <i class="fas fa-torii-gate"></i>&nbsp;MyAnimeList
+                                <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
+                                media_list='animelist', user_name=current_user.username) }}">
+                                    <div class="row">
+                                        <div class="col-3" style="margin-right: -5px;">
+                                            <i class="fas fa-torii-gate" style="color: #945141;"></i>
+                                        </div>
+                                        <div class="col-9">
+                                            AnimeList
+                                        </div>
+                                    </div>
                                 </a>
-                                <a class="dropdown-item" href="{{ url_for('main.mymedialist', media_list='movieslist',
-                                user_name=current_user.username) }}">
-                                    <i class="fas fa-film"></i>&nbsp;MyMoviesList
+                                <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
+                                media_list='movieslist', user_name=current_user.username) }}">
+                                    <div class="row">
+                                        <div class="col-3" style="margin-right: -5px;">
+                                            <i class="fas fa-film" style="color: #8c7821;"></i>
+                                        </div>
+                                        <div class="col-9">
+                                            MoviesList
+                                        </div>
+                                    </div>
                                 </a>
                             </div>
                         </li>
                     </ul>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-collapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
                     <div class="collapse navbar-collapse" id="nav-collapse">
                         <form class="form-inline m-l-15">
                             <label for="autocomplete"></label>
                             <input id="autocomplete" class="form-control" type="search" placeholder="Search Media">
                         </form>
-                        <ul class="navbar-nav mr-auto m-l-20">
+                        <ul class="navbar-nav mr-auto m-l-5">
                             <li class="nav-item">
-                                <a class="nav-link text-center m-l-15 m-r-15" href="{{ url_for('users.hall_of_fame') }}">
+                                <a class="nav-link text-center m-l-15 m-r-10" href="{{ url_for('users.hall_of_fame') }}">
                                     <i class="fas fa-lg fa-trophy" style="color: goldenrod;"></i>
                                     <div class="fs-14">Hall of Fame</div>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-center m-l-15 m-r-15" href="{{ url_for('general.global_stats') }}">
+                                <a class="nav-link text-center m-l-10 m-r-10" href="{{ url_for('general.global_stats') }}">
                                     <i class="far fa-lg fa-chart-bar" style="color: darkorange;"></i>
                                     <div class="fs-14">General Stats</div>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-center m-l-15 m-r-15" href="{{ url_for('general.current_trends') }}">
+                                <a class="nav-link text-center m-l-10 m-r-10" href="{{ url_for('general.current_trends') }}">
                                     <i class="fas fa-lg fa-fire-alt" style="color: orangered;"></i>
                                     <div class="fs-14">Trends</div>
                                 </a>
@@ -93,7 +114,7 @@
                         </ul>
                         <ul class="navbar-nav ml-auto">
                             <li class="nav-item dropdown">
-                                <a id="notif" class="nav-link my-dropdown-toggle text-center" data-toggle="dropdown">
+                                <a id="notif" class="nav-link my-drop-toggle text-center m-r-10" data-toggle="dropdown">
                                     <i class="fas fa-lg fa-bell"></i>
                                     {% set notif_count = current_user.count_notifications() %}
                                     <span class="badge" {% if notif_count == 0 %} style="background-color: grey;"
@@ -102,26 +123,24 @@
                                     </span>
                                     <div class="fs-14">Notifications</div>
                                 </a>
-                                <div id="notif-dropdown" class="dropdown-menu dropdown-menu-right">
-                                    <img id="loading-image" height="30" width="30"
-                                             src="https://i.giphy.com/media/L05HgB2h6qICDs5Sms/giphy.webp"/>
+                                <div id="notif-dropdown" class="dropdown-menu dropdown-menu-right medialist-dropdown">
+                                    <img id="loading-image" src="/static/img/loading.webp"/>
                                 </div>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-center" data-toggle="dropdown">
-                                    <img style="border-radius: 50%;" height="40" width="40"
-                                         src="/static/profile_pics/default.jpg" alt=""/>
+                            <li class="nav-item dropdown notif-drop">
+                                <a class="nav-link dropdown-toggle text-center " data-toggle="dropdown">
+                                    <img class="navbar-pic" src="/static/profile_pics/{{ current_user.image_file }}"/>
                                 </a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="{{ url_for('users.account',
+                                <div class="dropdown-menu medialist-dropdown">
+                                    <a class="dropdown-item text-light" href="{{ url_for('users.account',
                                     user_name=current_user.username) }}">
-                                        <i class="fas fa-user"></i>&nbsp;Profile
+                                        <i class="fas fa-user"></i>&nbsp;&nbsp;&nbsp;&nbsp;Profile
                                     </a>
-                                    <a class="dropdown-item" href="{{ url_for('settings.settings') }}">
-                                        <i class="fas fa-cog"></i>&nbsp;Settings
+                                    <a class="dropdown-item text-light" href="{{ url_for('settings.settings') }}">
+                                        <i class="fas fa-cog"></i>&nbsp;&nbsp;&nbsp;&nbsp;Settings
                                     </a>
-                                    <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
-                                        <i class="fas fa-sign-out-alt"></i>&nbsp;Logout
+                                    <a class="dropdown-item text-light" href="{{ url_for('auth.logout') }}">
+                                        <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;&nbsp;Logout
                                     </a>
                                 </div>
                             </li>

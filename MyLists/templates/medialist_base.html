@@ -85,6 +85,9 @@
                         <div id="card_{{ data['id'] }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
                             <div class="card bg-transparent">
                                 <div class="view overlay">
+                                    <div class="loading-medialist" style="display: none;">
+                                        <img class="img-loading-medialist" src="/static/img/loading.webp">
+                                    </div>
                                     <img class="card-img-top lazyload" data-src="{{ data['cover'] }}" height="300"
                                          width="200" style="height: auto;"/>
                                     <a class="mask flex-center rgba-black-strong" {% if media_list == 'serieslist' %}
@@ -113,8 +116,8 @@
                                     {% if target_user_id == current_user.get_id() %}
                                         {% block card_top_left_1 scoped %}
                                         {% endblock card_top_left_1 %}
-                                        <a class="card-btn-top-right fas fa-trash text-light" onclick="deleteElement(
-                                                '{{ data['id'] }}', 'card_{{ data['id'] }}', '{{ media_list }}')">
+                                        <a class="card-btn-top-right fas fa-trash text-light"
+                                           onclick="deleteElement(card_{{ data['id'] }}, '{{ media_list }}')">
                                         </a>
                                         <a id="fav-{{ data['id'] }}" {% if data['favorite'] %}
                                         class="card-favorite fas fa-star" style="color: darkgoldenrod;"
