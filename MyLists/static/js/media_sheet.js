@@ -2,9 +2,10 @@
 
 // --- Add the media to the user ---------------------------------------
 function addToUser(element_id, media_type) {
-    let category = media_type === 'movieslist' ? 'Plan to Watch' : 'Watching';
+    let category = media_type === 'movieslist' ? 'Completed' : 'Watching';
     $('#your-medialist-data').addClass('disabled');
     $('#loading-add-list').hide();
+
     $.ajax ({
         type: "POST",
         url: "/add_element",
@@ -64,7 +65,7 @@ function removeFromUser(element_id, media_type) {
 function addFavorite(element_id, media_type) {
     let favorite;
     favorite = !!$('#favorite').hasClass('far');
-    $('#favorite').addClass('disabled');
+    $('#fav-title').addClass('disabled');
 
     $.ajax ({
         type: "POST",
@@ -73,14 +74,14 @@ function addFavorite(element_id, media_type) {
         data: JSON.stringify({ element_id: element_id, element_type: media_type, favorite: favorite }),
         dataType: "json",
         success: function() {
+            $('#fav-title').removeClass('disabled');
+
             if (favorite === true) {
                 $('#favorite').addClass('fas').removeClass('far');
                 $('#add-fav').show('slow').delay(2000).fadeOut();
-                $('#favorite').removeClass('disabled');
             } else {
                 $('#favorite').addClass('far').removeClass('fas');
                 $('#remove-fav').show('slow').delay(2000).fadeOut();
-                $('#favorite').removeClass('disabled');
             }
         },
         error: function() {
@@ -94,6 +95,8 @@ function addFavorite(element_id, media_type) {
 function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
     let new_cat, season_data, episode_drop, seasons_length, seasons_index, opt, i;
     new_cat = cat_selector.options[cat_selector.selectedIndex].value;
+    $('#cat-loading').show();
+    $('#your-medialist-data').addClass('disabled');
 
     $.ajax ({
         type: "POST",
@@ -104,6 +107,8 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
         success: function() { 
             $('#season-row').show();
             $('#episode-row').show();
+            $('#cat-check').show().delay(1500).fadeOut();
+            $('#your-medialist-data').removeClass('disabled');
 
             if (new_cat === 'Completed') {
             season_data = JSON.parse("["+seas_data+"]");
@@ -131,6 +136,9 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
         },
         error: function() {
             error_ajax_message('Error changing your media status. Please try again later.');
+        },
+        complete: function () {
+            $('#cat-loading').hide();
         }
     });
 }
@@ -139,6 +147,8 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
 // --- Change the Movie category ---------------------------------------
 function changeCategoryMovies(element_id, cat_selector, genres) {
     let new_cat;
+    $('#cat-loading').show();
+    $('#your-medialist-data').addClass('disabled');
 
     new_cat = cat_selector.options[cat_selector.selectedIndex].value;
     if (new_cat === 'Completed' && genres.includes("Animation")) {
@@ -152,10 +162,14 @@ function changeCategoryMovies(element_id, cat_selector, genres) {
         data: JSON.stringify({status: new_cat, element_id: element_id, element_type: 'movieslist' }),
         dataType: "json",
         success: function() {
-            console.log('ok');
+            $('#cat-check').show().delay(1500).fadeOut();
+            $('#your-medialist-data').removeClass('disabled');
         },
         error: function() {
             error_ajax_message('Error changing your media status. Please try again later.');
+        },
+        complete: function () {
+            $('#cat-loading').hide();
         }
     });
 }
@@ -164,17 +178,10 @@ function changeCategoryMovies(element_id, cat_selector, genres) {
 // --- Update season ---------------------------------------------------
 function updateSeason(element_id, value, seas_data, media_list) {
     let season_data, selected_season, i, opt;
+    $('#season-loading').show();
+    $('#your-medialist-data').addClass('disabled');
 
-    season_data = JSON.parse("["+seas_data+"]");
     selected_season = value.selectedIndex;
-    $('#episode-dropdown').length = 1;
-
-    for (i = 2; i <= season_data[0][selected_season]; i++) {
-        opt = document.createElement("option");
-        opt.className = "";
-        opt.innerHTML = '&nbsp;'+i+'&nbsp;';
-        $('#episode-dropdown').appendChild(opt);
-    }
 
     $.ajax ({
         type: "POST",
@@ -183,10 +190,25 @@ function updateSeason(element_id, value, seas_data, media_list) {
         data: JSON.stringify({season: selected_season, element_id: element_id, element_type: media_list }),
         dataType: "json",
         success: function() {
-            console.log("ok");
+            $('#season-check').show().delay(1500).fadeOut();
+            $('#your-medialist-data').removeClass('disabled');
+
+            season_data = JSON.parse("["+seas_data+"]");
+            selected_season = value.selectedIndex;
+            $('#episode-dropdown').length = 1;
+
+            for (i = 2; i <= season_data[0][selected_season]; i++) {
+                opt = document.createElement("option");
+                opt.className = "";
+                opt.innerHTML = '&nbsp;'+i+'&nbsp;';
+                document.getElementById('episode-dropdown').appendChild(opt);
+            }
         },
         error: function() {
             error_ajax_message('Error updating the season of the media. Please try again later.');
+        },
+        complete: function () {
+            $('#season-loading').hide();
         }
     });
 }
@@ -194,6 +216,9 @@ function updateSeason(element_id, value, seas_data, media_list) {
 
 // --- Update episode --------------------------------------------------
 function updateEpisode(element_id, episode, media_list) {
+    $('#eps-loading').show();
+    $('#your-medialist-data').addClass('disabled');
+
     $.ajax ({
         type: "POST",
         url: "/update_element_episode",
@@ -201,10 +226,14 @@ function updateEpisode(element_id, episode, media_list) {
         data: JSON.stringify({episode: episode.selectedIndex, element_id: element_id, element_type: media_list }),
         dataType: "json",
         success: function() {
-            console.log("ok");
+            $('#eps-check').show().delay(1500).fadeOut();
+            $('#your-medialist-data').removeClass('disabled');
         },
         error: function() {
             error_ajax_message('Error updating the episode of the media. Please try again later.');
+        },
+        complete: function () {
+            $('#eps-loading').hide();
         }
     });
 }

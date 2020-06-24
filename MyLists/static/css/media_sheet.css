@@ -5,7 +5,7 @@ ul {
 
 .eps-per-season {
     overflow-y : auto;
-    max-height: 250px;
+    max-height: 270px;
 }
 
 .vertical_line {
@@ -28,10 +28,8 @@ ul {
 .cat-drop {
     background: #131418;
     border: transparent;
-    -webkit-appearance: none;
-    appearance: none;
     cursor: pointer;
-    width: 110px;
+    width: 125px;
 }
 
 .wrapper {
@@ -43,6 +41,15 @@ ul {
 .box {
     width: 53px;
     height: 75px;
+}
+
+.loading-img {
+    height: 20px;
+    width: 20px;
+}
+
+.fas.fa-check {
+    color: green;
 }
 
 @media (max-width: 1100px) {

@@ -30,17 +30,17 @@
                 <div class="m-b-10 m-t-10">
                     <div id="your-medialist-data" class="m-t-5 p-2" {% if not data['in_user_list'] %}
                          style="display: none;" {% endif %}>
-                        <h4 class="m-l-15 m-r-15">
+                        <h4 id="fav-title" class="m-l-15 m-r-15">
                             <i class="fas fa-list m-t-10"></i>&nbsp&nbsp <b>List Info</b>
                             <i id="favorite" class="favorite-css {% if data['favorite'] %} fas{% else %} far {% endif %}
                             fa-star m-t-10" onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></i>
                         </h4>
                         <hr class="m-l-15 m-r-15 m-b-8">
                         <div class="row m-l-30 m-r-25">
-                            <div class="col-5">
+                            <div class="col-4">
                                 <b>Status:</b>
                             </div>
-                            <div class="col-7">
+                            <div class="col-8">
                                 {% if media_list != 'movieslist' %}
                                     <select id="category-dropdown" class="text-light text-center cat-drop"
                                     onchange="changeCategoryTV('{{ data['id'] }}', this, '{{ data['eps_per_season'] }}',
@@ -60,15 +60,18 @@
                                     <option {% if data['status'] == 'Plan to Watch' %} selected="selected" {% endif %}>Plan to Watch</option>
                                 </select>
                                 {% endif %}
+                                <img id="cat-loading" class="loading-img" style="display: none;"
+                                     src="/static/img/loading.webp" alt=""/>
+                                &nbsp;<i id="cat-check" class="fas fa-check" style="display: none;"></i>
                             </div>
                         </div>
                         {% if media_list != 'movieslist' %}
                             <div id="season-row" class="row m-l-30 m-r-25" {% if data['status'] == 'Plan to Watch'
                             or data['status'] == 'Random' %} style="display: none;" {% endif %}>
-                                <div class="col-5">
+                                <div class="col-4">
                                     <b>Season:</b>
                                 </div>
-                                <div class="col-7">
+                                <div class="col-8">
                                     <select id="season-dropdown" class="text-light text-center cat-drop"
                                             onchange="updateSeason('{{ data['id'] }}', this, '{{ data['eps_per_season'] }}',
                                                     '{{ media_list }}')">
@@ -80,14 +83,17 @@
                                             {% endif %}
                                         {% endfor %}
                                     </select>
+                                    <img id="season-loading" class="loading-img" style="display: none;"
+                                     src="/static/img/loading.webp" alt=""/>
+                                    &nbsp;<i id="season-check" class="fas fa-check" style="display: none;"></i>
                                 </div>
                             </div>
                             <div id="episode-row" class="row m-l-30 m-r-25" {% if data['status'] == 'Plan to Watch'
                             or data['status'] == 'Random' %} style="display: none;" {% endif %}>
-                                <div class="col-5">
+                                <div class="col-4">
                                     <b>Episode:</b>
                                 </div>
-                                <div class="col-7">
+                                <div class="col-8">
                                     <select id="episode-dropdown" class="text-light text-center cat-drop"
                                             onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
                                         {% for i in range(data['eps_per_season'][data['current_season'] - 1]) %}
@@ -98,6 +104,9 @@
                                             {% endif %}
                                         {% endfor %}
                                     </select>
+                                    <img id="eps-loading" class="loading-img" style="display: none;"
+                                         src="/static/img/loading.webp" alt=""/>
+                                    &nbsp;<i id="eps-check" class="fas fa-check" style="display: none;"></i>
                                 </div>
                             </div>
                         {% endif %}
@@ -155,19 +164,19 @@
                         <b>{{ data['collection_data'][0].name }}</b>
                     </h4>
                     <hr class="m-l-20 m-r-24">
-                    <div class="m-b-30">
-                        {% set release = data['collection_data'][0].releases_dates.split(',') %}
-                        {% for name in data['collection_data'][0].movies_names.split(',') %}
-                            <div class="row m-l-5 m-r-5">
-                                <div class="col-9">
-                                    <b>{{ name }}</b>
-                                </div>
-                                <div class="col-3">
-                                    <b>{{ release[loop.index0].split('-')[0] }}</b>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
+{#                    <div class="m-b-30">#}
+{#                        {% set release = data['collection_data'][0].releases_dates.split(',') %}#}
+{#                        {% for name in data['collection_data'][0].movies_names.split(',') %}#}
+{#                            <div class="row m-l-5 m-r-5">#}
+{#                                <div class="col-9">#}
+{#                                    <b>{{ name }}</b>#}
+{#                                </div>#}
+{#                                <div class="col-3">#}
+{#                                    <b>{{ release[loop.index0].split('-')[0] }}</b>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        {% endfor %}#}
+{#                    </div>#}
                 {% endif %}
             </div>
             <div class="col-lg-8 col-md-7 col-sm-12" style="margin-top: -10px;">

@@ -182,7 +182,7 @@ option {
     font-size: 17pt;
 }
 
-.fas {
+.fas.fa-star .fas.fa-trash .fas.fa-bars .far.fa-star {
     text-shadow: 0 0 4px #000;
 }
 

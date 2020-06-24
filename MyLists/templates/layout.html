@@ -37,32 +37,36 @@
 
 <body>
     <header class="site-header">
-        <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top" style="white-space: nowrap;">
+        <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top p-t-2 p-b-0" style="white-space: nowrap;">
             <div class="container">
                 {% if current_user.is_authenticated %}
-                <div class="navbar-brand nav-item dropdown m-l-10">
-                    <a class="dropdown-toggle" data-toggle="dropdown" style="color: #ffffffe6;" href="#">MyLists<span
-                            class="caret"></span></a>
-                    <div class="dropdown-menu dropdown-mylist">
-                        <a class="nav-item drop-item text-light"
-                           href="{{ url_for('main.mymedialist', media_list='serieslist',
-                           user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> &nbsp;SeriesList</a>
-                        <a class="nav-item drop-item text-light"
-                           href="{{ url_for('main.mymedialist', media_list='animelist',
-                           user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> &nbsp;AnimeList</a>
-                        <a class="nav-item drop-item text-light"
-                           href="{{ url_for('main.mymedialist', media_list='movieslist',
-                           user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> &nbsp;MoviesList</a>
+                    <div class="navbar-brand nav-item dropdown m-l-10">
+                        <a class="dropdown-toggle" data-toggle="dropdown" style="color: #ffffffe6;" href="#">
+                            MyLists<span class="caret"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-mylist">
+                            <a class="nav-item drop-item text-light"
+                               href="{{ url_for('main.mymedialist', media_list='serieslist',
+                               user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> &nbsp;SeriesList
+                            </a>
+                            <a class="nav-item drop-item text-light"
+                               href="{{ url_for('main.mymedialist', media_list='animelist',
+                               user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> &nbsp;AnimeList
+                            </a>
+                            <a class="nav-item drop-item text-light"
+                               href="{{ url_for('main.mymedialist', media_list='movieslist',
+                               user_name=current_user.username) }}"><i class="fas fa-angle-right"></i> &nbsp;MoviesList
+                            </a>
+                        </div>
                     </div>
-                </div>
-                <div class="m-l-10 m-r-20">
-                    <form action="{{ url_for('main.search_media') }}">
-                        <input id="autocomplete" name='search' class="form-control modded-form"
-                               placeholder="Search and add media">
-                    </form>
-                </div>
+                    <div class="m-l-10 m-r-20">
+                        <form action="{{ url_for('main.search_media') }}">
+                            <input id="autocomplete" name='search' class="form-control modded-form"
+                                   placeholder="Search and add media">
+                        </form>
+                    </div>
                 {% else %}
-                <a class="navbar-brand" href="{{ url_for('auth.home') }}">MyLists</a>
+                    <a class="navbar-brand" href="{{ url_for('auth.home') }}">MyLists</a>
                 {% endif %}
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle">
                     <span class="navbar-toggler-icon"></span>
@@ -70,43 +74,70 @@
                 <div class="collapse navbar-collapse" id="navbarToggle">
                     <div class="navbar-nav mr-auto">
                     {% if current_user.is_authenticated %}
-                        <a class="nav-item nav-link text-light"
-                           href="{{ url_for('users.hall_of_fame') }}">Hall of Fame</a>
-                        <a class="nav-item nav-link text-light"
-                           href="{{ url_for('general.global_stats') }}">Stats</a>
-                        <a class="nav-item nav-link text-light"
-                           href="{{ url_for('general.current_trends') }}">Trends</a>
+                        <a class="nav-item nav-link text-center text-light" href="{{ url_for('users.hall_of_fame') }}">
+                            <i class="fas fa-lg fa-trophy" style="color: goldenrod;"></i><br>
+                            <div class="fs-14">Hall of Fame</div>
+                        </a>
+                        <a class="nav-item nav-link text-center text-light" href="{{ url_for('general.global_stats') }}">
+                            <i class="far fa-lg fa-chart-bar" style="color: darkorange;"></i><br>
+                            <div class="fs-14">General Stats</div>
+                        </a>
+                        <a class="nav-item nav-link text-center text-light" href="{{ url_for('general.current_trends') }}">
+                            <i class="fas fa-lg fa-fire-alt" style="color: orangered;"></i><br>
+                            <div class="fs-14">Trends</div>
+                        </a>
                     {% endif %}
                     </div>
                     <div class="navbar-nav">
                     {% if current_user.is_authenticated %}
 
-                        <li class="nav-item dropdown notif-dropdown">
-                            <a id="ajax-notif" class="nav-link dropdown-toggle" data-toggle="dropdown">
-                                <i class="fas fa-bell"></i>
+                        <div class="nav-item dropdown m-l-10 p-t-7 m-r-20">
+                            <a id="ajax-notif" class="my-dropdown-toggle text-center" data-toggle="dropdown"
+                               style="color: #ffffffe6;" href="#">
+                                <i class="fas fa-lg fa-bell"></i>
                                 {% set notif_count = current_user.count_notifications() %}
-                                <span class="notif-badge" {% if notif_count == 0 %} style="background-color: grey;"
-                                      {% endif %}>{{ notif_count }}
-                               </span>
+                                <span class="badge" {% if notif_count == 0 %} style="background-color: grey;"
+                                {% endif %}>
+                                    {{ notif_count }}
+                                </span>
+                                <div class="fs-14">Notifications</div>
                             </a>
-
-                            <div class="dropdown-menu notif-dropdown-items dropdown-menu-right">
-                                <div id="notification-items" class="nav-item drop-item text-light">
+                            <div class="dropdown-menu dropdown-mylist dropdown-menu-right">
+                                <a id="notification-items" class="nav-link text-light">
                                     <img id="loading-image" height="30" width="30"
-                                         src="https://i.giphy.com/media/L05HgB2h6qICDs5Sms/giphy.webp">
-                                </img>
+                                         src="https://i.giphy.com/media/L05HgB2h6qICDs5Sms/giphy.webp"/>
+                                </a>
                             </div>
-                        </li>
+                        </div>
 
-                        <a class="nav-item nav-link text-light" href="{{ url_for('users.account',
-                         user_name=current_user.username) }}">Profile</a>
-                        {% if current_user.get_id() == '1' %}
-                        <a class="nav-item nav-link text-light" href="{{ url_for('general.admin') }}">Dashboard</a>
-                        {% endif %}
-                        <a class="nav-link text-light" href="{{ url_for('settings.settings') }}">
-                            <i class="fas fa-sm fa-cog"></i></a>
-                        <a class="nav-link text-light" href="{{ url_for('auth.logout') }}">
-                            <i class="fas fa-sm fa-sign-out-alt"></i></a>
+                        <div class="nav-item dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" style="color: #ffffffe6;" href="#">
+                                <img class="nav-pic" src="/static/profile_pics/{{ current_user.image_file }}" alt=""/>
+                                <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu dropdown-mylist">
+                                <a class="nav-link text-light text-center" href="{{ url_for('users.account',
+                                user_name=current_user.username) }}">
+                                    <i class="fas fa-user"></i>
+                                    <div>Profile</div>
+                                </a>
+                                {% if current_user.get_id() == '1' %}
+                                    <a class="nav-link text-light text-center" href="{{ url_for('general.admin') }}">
+                                        <i class="fas fa-database"></i>
+                                        <div>Dashboard</div>
+                                    </a>
+                                {% endif %}
+                                <a class="nav-link text-light text-center" href="{{ url_for('settings.settings') }}">
+                                    <i class="fas fa-cog"></i>
+                                    <div>Settings</div>
+                                </a>
+                                <a class="nav-link text-light text-center" href="{{ url_for('auth.logout') }}">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <div>Logout</div>
+                                </a>
+                            </div>
+                        </div>
+
                     {% elif not current_user.is_authenticated and request.path == '/' %}
                         <a type="button" class="btn btn-sm btn-light text-dark" data-toggle="modal"
                            data-target="#modalLoginForm">Login</a>

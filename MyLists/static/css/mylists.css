@@ -13,9 +13,9 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: calc(100vh - 56px);
+    min-height: calc(100vh - 61px);
     background: #131418;
-    margin: 56px 0 0;
+    margin: 61px 0 0;
     color: #e2e2e2;
 }
 
@@ -96,25 +96,8 @@ hr {
     width: 100%;
 }
 
-.navbar-nav > .nav-item::after {
-    content: '';
-    display: block;
-    width: 0;
-    height: 1px;
-    background: #fec400;
-    transition: 0.4s;
-}
-
-.navbar-nav .nav-item:hover::after {
-    width: 100%;
-}
-
-.navbar .nav {
-    white-space: nowrap;
-}
-
 #autocomplete.ui-autocomplete-loading {
-    background-image: url('/static/img/add_loader_2.webp');
+    background-image: url('/static/img/loading.webp');
     background-position: right 7% bottom 50%;
     background-repeat: no-repeat;
 }
@@ -146,7 +129,7 @@ hr {
 
 .notif-badge {
     border-radius: 50%;
-    padding: 0 5px 0 5px;
+    padding: 0 6px 0 6px;
     background: darkred;
     color: white;
 }
@@ -166,4 +149,16 @@ hr {
 .notif-item-container {
     position: relative;
     border-bottom: solid 1px black;
+}
+
+.nav-pic {
+    height: 45px;
+    width: 45px;
+    border-radius: 50%;
+    /*border: 2px darkgrey solid;*/
+    padding-top: 5px;
+}
+
+.my-dropdown-toggle::after {
+    content: none;
 }
