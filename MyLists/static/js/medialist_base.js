@@ -96,7 +96,6 @@ function searchElement() {
 // --- Add media to favorite -------------------------------------------
 function addFavorite(element_id, media_type) {
     let favorite;
-
     favorite = !!$('#fav-' + element_id).hasClass('far');
 
     $.ajax ({
@@ -156,20 +155,27 @@ function ShowFavorites() {
 
 
 // --- Add the category to the user (from other list) ------------------
-function AddCatUser(cat, card_id, media_id, media_type) {
+function AddCatUser(category, card_id) {
+    let media_list = $('#'+card_id).attr('values').split('-')[1];
+    let element_id = $('#'+card_id).attr('values').split('-')[2];
+    $('#'+card_id).find('.loading-medialist').show();
+
     $.ajax ({
         type: "POST",
         url: "/add_element",
         contentType: "application/json",
-        data: JSON.stringify({element_cat: cat.childNodes[0].data, element_id: media_id, element_type: media_type}),
+        data: JSON.stringify({element_cat: category, element_id: element_id, element_type: media_list}),
         dataType: "json",
         success: function() {
-            removeCat();
-            $("#"+card_id).children().children('div[class="view overlay"]').append("<div class='card-ribbon'></div>");
-            $("#"+card_id).children().children().children().remove(".card-btn-top-left.fas.fa-plus.text-light");
+            $("#"+card_id).find('.view.overlay').append('<div class="card-ribbon"></div>');
+            $("#"+card_id).find('.card-btn-top-left.fas.fa-plus.text-light').remove();
         },
         error: function () {
             error_ajax_message('Error trying to add the media to your list. Please try again later.')
+        },
+        complete: function () {
+            removeCat();
+            $('#'+card_id).find('.loading-medialist').hide();
         }
     });
 }

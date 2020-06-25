@@ -6,7 +6,6 @@ import configparser
 
 from flask import Flask
 from flask_mail import Mail
-from flask_minify import minify
 from flask_bcrypt import Bcrypt
 from flask_compress import Compress
 from flask_login import LoginManager

@@ -109,7 +109,7 @@ hr {
     padding: 0;
     border-radius: 0;
     background: #2a2b2d;
-    min-width: 130%;
+    min-width: 100%;
 }
 
 .medialist-dropdown .dropdown-item:hover {
@@ -141,4 +141,55 @@ hr {
 #loading-image {
     height: 30px;
     width: 30px;
+}
+
+
+
+.nav-form {
+    margin-left: 15px;
+}
+
+.nav-ul-1 {
+    margin-left: 5px;
+    text-align: center;
+}
+
+.nav-li-1 {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.nav-text {
+    display: block;
+}
+
+.nav-notif-center {
+    display: none;
+}
+
+.nav-notif-pc {
+    display: block;
+}
+
+@media (max-width: 991px) {
+    .nav-form {
+        margin-left: 0;
+    }
+    .nav-ul-1 {
+        text-align: left;
+    }
+    .nav-li-1 {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .nav-text {
+        display: inline-block;
+    }
+    .nav-notif-center {
+        display: block;
+        text-align: center;
+    }
+    .nav-notif-pc {
+        display: none;
+    }
 }

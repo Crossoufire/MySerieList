@@ -84,51 +84,50 @@
                             </div>
                         </li>
                     </ul>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-collapse">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
                     <div class="collapse navbar-collapse" id="nav-collapse">
-                        <form class="form-inline m-l-15">
+                        <form class="form-inline my-2 my-lg-0 nav-form">
                             <label for="autocomplete"></label>
                             <input id="autocomplete" class="form-control" type="search" placeholder="Search Media">
                         </form>
-                        <ul class="navbar-nav mr-auto m-l-5">
-                            <li class="nav-item">
-                                <a class="nav-link text-center m-l-15 m-r-10" href="{{ url_for('users.hall_of_fame') }}">
+                        <ul class="navbar-nav mr-auto nav-ul-1">
+                            <li class="nav-item nav-li-1">
+                                <a class="nav-link" href="{{ url_for('users.hall_of_fame') }}">
                                     <i class="fas fa-lg fa-trophy" style="color: goldenrod;"></i>
-                                    <div class="fs-14">Hall of Fame</div>
+                                    <div class="info-nav fs-14 nav-text">Hall of Fame</div>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-center m-l-10 m-r-10" href="{{ url_for('general.global_stats') }}">
+                            <li class="nav-item nav-li-1">
+                                <a class="nav-link" href="{{ url_for('general.global_stats') }}">
                                     <i class="far fa-lg fa-chart-bar" style="color: darkorange;"></i>
-                                    <div class="fs-14">General Stats</div>
+                                    <div class="info-nav fs-14 nav-text">General Stats</div>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-center m-l-10 m-r-10" href="{{ url_for('general.current_trends') }}">
+                            <li class="nav-item nav-li-1">
+                                <a class="nav-link" href="{{ url_for('general.current_trends') }}">
                                     <i class="fas fa-lg fa-fire-alt" style="color: orangered;"></i>
-                                    <div class="fs-14">Trends</div>
+                                    <div class="info-nav fs-14 nav-text">Trends</div>
                                 </a>
                             </li>
                         </ul>
-                        <ul class="navbar-nav ml-auto">
+                    </div>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a id="notif" class="nav-link my-drop-toggle m-r-10" data-toggle="dropdown">
+                                <i class="fas fa-lg fa-bell"></i>
+                                {% set notif_count = current_user.count_notifications() %}
+                                <span class="badge" {% if notif_count == 0 %} style="background-color: grey;"
+                                {% endif %}>
+                                    {{ notif_count }}
+                                </span>
+                            </a>
+                            <div id="notif-dropdown" class="dropdown-menu dropdown-menu-right medialist-dropdown">
+                                <img id="loading-image" src="/static/img/loading.webp"/>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ml-auto">
                             <li class="nav-item dropdown">
-                                <a id="notif" class="nav-link my-drop-toggle text-center m-r-10" data-toggle="dropdown">
-                                    <i class="fas fa-lg fa-bell"></i>
-                                    {% set notif_count = current_user.count_notifications() %}
-                                    <span class="badge" {% if notif_count == 0 %} style="background-color: grey;"
-                                    {% endif %}>
-                                        {{ notif_count }}
-                                    </span>
-                                    <div class="fs-14">Notifications</div>
-                                </a>
-                                <div id="notif-dropdown" class="dropdown-menu dropdown-menu-right medialist-dropdown">
-                                    <img id="loading-image" src="/static/img/loading.webp"/>
-                                </div>
-                            </li>
-                            <li class="nav-item dropdown notif-drop">
-                                <a class="nav-link dropdown-toggle text-center " data-toggle="dropdown">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown">
                                     <img class="navbar-pic" src="/static/profile_pics/{{ current_user.image_file }}"/>
                                 </a>
                                 <div class="dropdown-menu medialist-dropdown">
@@ -145,7 +144,9 @@
                                 </div>
                             </li>
                         </ul>
-                    </div>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-collapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
                 {% else %}
                     <a class="navbar-brand mr-auto" href="{{ url_for('auth.home') }}">MyLists</a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-collapse">

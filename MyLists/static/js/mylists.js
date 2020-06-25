@@ -125,28 +125,30 @@ function error_ajax_message(message) {
 }
 
 
-$(document).ready(function() {
-    // --- Tooltip initialization -----------------------------------
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    });
+// --- AJAX Notification ----------------------------------------------------
+function notifications() {
+    $('.notif-items').remove();
+    $('#loading-image').show();
 
-    // --- AJAX Notification ----------------------------------------
-    $('#notif').click(function() {
-        $(".notif-items").remove();
-        $('#loading-image').show();
-
-        $.ajax ({
-            type: "GET",
-            url: "/read_notifications",
-            contentType: "application/json",
-            dataType: "json",
-            success: function(data) {
-                display_notifications(data);
-            },
-            complete: function() {
-                $('#loading-image').hide();
-            }
-        });
+    $.ajax ({
+        type: "GET",
+        url: "/read_notifications",
+        contentType: "application/json",
+        dataType: "json",
+        success: function(data) {
+            display_notifications(data);
+        },
+        error: function() {
+            error_ajax_message('Error trying to recover the notifications. Please try again later.')
+        },
+        complete: function() {
+            $('#loading-image').hide();
+        }
     });
+}
+
+
+// --- Tooltip initialization -----------------------------------------------
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
 });
