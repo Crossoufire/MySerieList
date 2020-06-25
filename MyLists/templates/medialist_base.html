@@ -61,21 +61,26 @@
             </div>
         </div>
         <div class="center-mobile d-flex flex-wrap filters-button-group m-t-10">
-            {% block cat_button %}
-            {% endblock cat_button %}
+            <button class="btn btn-sm btn-selected" data-filter="*">Show all</button>
+            {% for key in media_data %}
+                <button class="btn btn-sm btn-header" data-filter=".categories.{% if key == 'COMPLETED ANIMATION' %}
+                ANIMATION{% else %}{{ key }}{% endif %}">
+                    {{ key }}
+                </button>
+            {% endfor %}
         </div>
     </div>
     <div class="m-t-10">
-            <div class="custom-control custom-switch m-b-10"
-                    {% if target_user_id == current_user.get_id() %} style="display: none;" {% endif %}>
-                <input id="SharedMedia" type="checkbox" class="custom-control-input" onchange="HideCommon()">
-                <label class="custom-control-label" for="SharedMedia"><b>Hide shared media</b></label>
-            </div>
-            <div class="custom-control custom-switch">
-                <input id="ShowFavorites" type="checkbox" class="custom-control-input" onchange="ShowFavorites()">
-                <label class="custom-control-label" for="ShowFavorites"><b>Show only favorites</b></label>
-            </div>
+        <div class="custom-control custom-switch m-b-10" {% if target_user_id == current_user.get_id() %}
+        style="display: none;" {% endif %}>
+            <input id="SharedMedia" type="checkbox" class="custom-control-input" onchange="HideCommon()">
+            <label class="custom-control-label" for="SharedMedia"><b>Hide shared media</b></label>
         </div>
+        <div class="custom-control custom-switch">
+            <input id="ShowFavorites" type="checkbox" class="custom-control-input" onchange="ShowFavorites()">
+            <label class="custom-control-label" for="ShowFavorites"><b>Show only favorites</b></label>
+        </div>
+    </div>
     <div id="categories-iso" class="categories-iso p-t-30">
         {% for key in media_data %}
             <div class="categories {% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key }}{% endif %}">
@@ -87,7 +92,7 @@
                             <div class="card bg-transparent">
                                 <div class="view overlay">
                                     <div class="loading-medialist" style="display: none;">
-                                        <img class="img-loading-medialist" src="/static/img/loading.webp">
+                                        <img class="img-loading-medialist" src="/static/img/loading.webp" alt="">
                                     </div>
                                     <img class="card-img-top lazyload" data-src="{{ data['cover'] }}" height="300"
                                          width="200" style="height: auto;"/>
@@ -115,26 +120,28 @@
                                         <span class="by-director" style="display: none;" >{{ data['director'] }}</span>
                                     </a>
                                     {% if target_user_id == current_user.get_id() %}
-                                        {% block card_top_left_1 scoped %}
-                                        {% endblock card_top_left_1 %}
+                                        <a class="card-btn-top-left fas fa-bars text-light"
+                                           onclick="chargeButtons(card_{{ data['id'] }})">
+                                        </a>
                                         <a class="card-btn-top-right fas fa-trash text-light"
                                            onclick="deleteElement(card_{{ data['id'] }}, '{{ media_list }}')">
                                         </a>
                                         <a id="fav-{{ data['id'] }}" {% if data['favorite'] %}
-                                        class="card-favorite fas fa-star" style="color: darkgoldenrod;"
-                                        {% else %} class="card-btn-bottom-left far fa-star" {% endif %}
-                                        onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')">
+                                            class="card-favorite fas fa-star" style="color: darkgoldenrod;"
+                                            {% else %} class="card-btn-bottom-left far fa-star" {% endif %}
+                                            onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')">
                                         </a>
                                     {% else %}
                                         <a {% if data['favorite'] %} class="card-favorite fas fa-star"
-                                        style="color: darkgoldenrod;" {% else %} class="card-btn-bottom-left far
-                                        fa-star"> {% endif %}
+                                            style="color: darkgoldenrod;" {% else %} class="card-btn-bottom-left far
+                                            fa-star"> {% endif %}
                                         </a>
                                         {% if data['common'] %}
                                             <div class="card-ribbon"></div>
                                         {% else %}
-                                            {% block card_top_left_2 scoped %}
-                                            {% endblock card_top_left_2 %}
+                                            <a class="card-btn-top-left fas fa-plus text-light"
+                                               onclick="ChargeButtonsOther(card_{{ data['id'] }})">
+                                            </a>
                                         {% endif %}
                                     {% endif %}
                                 </div>

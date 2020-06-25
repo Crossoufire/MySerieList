@@ -32,7 +32,7 @@ function deleteElement(card, media_list) {
 }
 
 
-// --- Remove the category list ----------------------------------------
+// --- Remove the category buttons -------------------------------------
 function removeCat() {
     $('.card-cat-buttons').remove();
     $('.card-btn-top-right-2').remove();

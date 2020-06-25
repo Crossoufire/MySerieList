@@ -1,27 +1,9 @@
 {% extends 'medialist_base.html' %}
 
 
-
-{% block cat_button %}
-    <button class="btn btn-sm btn-selected" data-filter="*">Show all</button>
-    <button class="btn btn-sm btn-header" data-filter=".categories.COMPLETED">Completed</button>
-    <button class="btn btn-sm btn-header" data-filter=".categories.ANIMATION">Completed Animation</button>
-    <button class="btn btn-sm btn-header" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
-{% endblock cat_button %}
-
 {% block data %}
     {{ data['genres'] }}-{{ media_list }}-{{ data['id'] }}
 {% endblock data %}
-
-
-{% block card_top_left_1 %}
-    <a class="card-btn-top-left fas fa-bars text-light" onclick="chargeButtons(card_{{ data['id'] }})"></a>
-{% endblock card_top_left_1 %}
-
-
-{% block card_top_left_2 %}
-    <a class="card-btn-top-left fas fa-plus text-light" onclick="ChargeButtonsMovies(card_{{ data['id'] }})"></a>
-{% endblock card_top_left_2 %}
 
 
 {% block select_box %}

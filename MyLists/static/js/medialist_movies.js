@@ -3,7 +3,6 @@
 // --- Create the cat buttons list -----------------------------------------
 function chargeButtons(card) {
     removeCat();
-
     let completed = "block;";
     let plan_to_watch = "block;";
     let parent_category = $('#'+card.id).parent();
@@ -76,7 +75,7 @@ function changeCategory(new_category, card_id) {
 
 
 // --- Charge the categories buttons from other lists ----------------------
-function ChargeButtonsMovies(card) {
+function ChargeButtonsOther(card) {
     removeCat();
 
     $(card).find('.view.overlay').prepend(
