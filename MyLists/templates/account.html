@@ -10,8 +10,8 @@
     <div class="header-container">
         <div class="header-profile-container" {% if user_data['knowledge_info']['frame_level'] < 36 %}
             style="left: -10px; {% endif %}">
-            <img class="header-profile-img" src="{{ user_data['profile_picture'] }}"/>
-            <img class="header-profile-frame" src="{{ user_data['knowledge_info']['frame_id'] }}.png"/>
+            <img class="header-profile-img" src="{{ user_data['profile_picture'] }}" alt=""/>
+            <img class="header-profile-frame" src="{{ user_data['knowledge_info']['frame_id'] }}.png" alt=""/>
             <div class="header-knowledge-level text-center">{{ user_data['knowledge_info']['level'] }}</div>
         </div>
         <div class="header-profile-data"  {% if user_data['knowledge_info']['frame_level'] < 36 %}
@@ -19,11 +19,11 @@
             <h2 class="profile-name"><b>{{ user_data['username'] }}</b>
                 {% if user_data['id'] != current_user.get_id() %}
                     {% if user_data["isfollowing"] %}
-                        <button class="btn btn-sm btn-dark follow-btn" value="1"
-                                onclick="follow_status('{{ user_data['id'] }}')">Unfollow</button>
+                        <button class="btn btn-sm btn-dark follow-btn" value="1" onclick="follow_status(
+                            '{{ user_data['id'] }}')">Unfollow</button>
                     {% else %}
-                        <button class="btn btn-sm btn-primary follow-btn" value="0"
-                                onclick="follow_status('{{ user_data['id'] }}')">Follow</button>
+                        <button class="btn btn-sm btn-primary follow-btn" value="0" onclick="follow_status(
+                            '{{ user_data['id'] }}')">Follow</button>
                     {% endif %}
                     <img class="loading-follow" style="display: none;" height="20" width="20"
                          src="/static/img/loading.webp" alt=""/>
@@ -94,11 +94,15 @@
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
-                                         title="{{ media_data['anime']['media_levels']['grade_title'] }}" src="{{ media_data['anime']['media_levels']['grade_id'] }}.png"/>
+                                         title="{{ media_data['anime']['media_levels']['grade_title'] }}"
+                                         src="{{ media_data['anime']['media_levels']['grade_id'] }}.png"/>
                                     <div class='account-bar-name'>Anime</div>
-                                    <div id="anime_level" class='account-bar-level'>Level {{ '%02d' | format(media_data['anime']['media_levels']['level']) }}</div>
-                                    <div class='xp-bar' data-toggle="tooltip" title="{{ media_data['anime']['media_levels']['level_percent'] }}%">
-                                        <div id='xp-bar-fill-anime' data-percentage="{{ media_data['anime']['media_levels']['level_percent'] }}">
+                                    <div id="anime_level" class='account-bar-level'>
+                                        Level {{ '%02d' | format(media_data['anime']['media_levels']['level']) }}</div>
+                                    <div class='xp-bar' data-toggle="tooltip"
+                                         title="{{ media_data['anime']['media_levels']['level_percent'] }}%">
+                                        <div id='xp-bar-fill-anime'
+                                             data-percentage="{{ media_data['anime']['media_levels']['level_percent'] }}">
                                             <div class='xp-increase-fx'>
                                                 <div class='xp-increase-fx-flicker'>
                                                     <div class='xp-increase-glow1'></div>
@@ -109,7 +113,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['anime']['media_levels']['level'] | int + 1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' |
+                                    format(media_data['anime']['media_levels']['level'] | int + 1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -117,11 +122,15 @@
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
-                                         title="{{ media_data['movies']['media_levels']['grade_title'] }}" src="{{ media_data['movies']['media_levels']['grade_id'] }}.png"/>
+                                         title="{{ media_data['movies']['media_levels']['grade_title'] }}"
+                                         src="{{ media_data['movies']['media_levels']['grade_id'] }}.png"/>
                                     <span class='account-bar-name'>Movies</span>
-                                    <div id="movies_level" class='account-bar-level'>Level {{ '%02d' | format(media_data['movies']['media_levels']['level']) }}</div>
-                                    <div class='xp-bar' data-toggle="tooltip" title="{{ media_data['movies']['media_levels']['level_percent'] }}%">
-                                        <div id='xp-bar-fill-movies' data-percentage="{{ media_data['movies']['media_levels']['level_percent'] }}">
+                                    <div id="movies_level" class='account-bar-level'>Level {{ '%02d' |
+                                    format(media_data['movies']['media_levels']['level']) }}</div>
+                                    <div class='xp-bar' data-toggle="tooltip"
+                                         title="{{ media_data['movies']['media_levels']['level_percent'] }}%">
+                                        <div id='xp-bar-fill-movies'
+                                             data-percentage="{{ media_data['movies']['media_levels']['level_percent'] }}">
                                             <div class='xp-increase-fx'>
                                                 <div class='xp-increase-fx-flicker'>
                                                     <div class='xp-increase-glow1'></div>
@@ -132,7 +141,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['movies']['media_levels']['level'] | int + 1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' |
+                                    format(media_data['movies']['media_levels']['level'] | int + 1) }}</div>
                                 </div>
                             </div>
                         </div>
