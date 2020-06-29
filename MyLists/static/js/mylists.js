@@ -71,7 +71,7 @@ function display_notifications(data) {
     let resp = data.results;
     if (resp.length === 0) {
         $("#notif-dropdown").append(
-            '<a class="dropdown-item notif-items">' +
+            '<a class="dropdown-item notif-items text-light">' +
                 '<i>You do not have notifications for now.</i>' +
             '</a>'
         );
@@ -182,4 +182,20 @@ function notifications() {
 // --- Tooltip initialization -----------------------------------------------
 $(function () {
     $('[data-toggle="tooltip"]').tooltip()
+});
+
+
+// --- Left dropdown for notifictaions on mobile  ---------------------------
+$(document).ready(function() {
+    function a() {
+        if ($(window).width() < 991) {
+            $('#profile-dropdown').removeClass('dropdown-menu-right');
+            return $('#notif-dropdown').removeClass('dropdown-menu-right');
+        }
+        $('#profile-dropdown').addClass('dropdown-menu-right');
+        $('#notif-dropdown').addClass('dropdown-menu-right');
+    }
+
+    $(window).resize(a).trigger('resize');
+    $categories.isotope('layout');
 });

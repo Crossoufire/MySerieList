@@ -115,7 +115,7 @@
                                 {% endif %}>{{ notif_count }}</span>
                                 <div class="fs-14 nav-text">Notifications</div>
                             </a>
-                            <div id="notif-dropdown" class="dropdown-menu dropdown-menu-right notification-dropdown">
+                            <div id="notif-dropdown" class="dropdown-menu notification-dropdown">
                                 <img id="loading-image" src="/static/img/loading.webp"/>
                             </div>
                         </li>
@@ -125,7 +125,7 @@
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown">
                                 <img class="navbar-pic" src="/static/profile_pics/{{ current_user.image_file }}"/>
                             </a>
-                            <div class="dropdown-menu medialist-dropdown dropdown-menu-right">
+                            <div id="profile-dropdown" class="dropdown-menu medialist-dropdown">
                                 <a class="dropdown-item text-light" href="{{ url_for('users.account',
                                 user_name=current_user.username) }}">
                                     <i class="fas fa-user"></i>&nbsp;&nbsp;&nbsp;&nbsp;Profile
