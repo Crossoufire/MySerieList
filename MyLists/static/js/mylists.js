@@ -87,15 +87,15 @@ function display_notifications(data) {
             if (resp[i]['media_type'] === 'serieslist') {
                 $("#notif-dropdown").append(
                     '<a class="dropdown-item notif-items text-light" href="/media_sheet/Series/' +
-                    resp[i]['media_id']+'">' +
+                     resp[i]['media_id']+'">' +
                         '<div class="row no-gutters">' +
                             '<div class="col-2">' +
                                 '<i class="fas fa-tv text-series"></i>' +
                             '</div>' +
                             '<div class="col-10 ellipsis-notif">' +
-                                '<span><b>' + resp[i]['name'] + '</b></span>' +
-                                '<div class="fs-14" style="color: darkgrey;">S0' + resp[i]['season'] + '.E0' +
-                                resp[i]['episode'] + ' will begin on ' + resp[i]['first_air_date'] + '</div>' +
+                                '<span><b>' + resp[i]['payload']['name'] + '</b></span>' +
+                                '<div class="fs-14" style="color: darkgrey;">S0' + resp[i]['payload']['season'] + '.E0' +
+                                resp[i]['payload']['episode'] + ' will begin on ' + resp[i]['payload']['release_date'] + '</div>' +
                             '</div>' +
                         '</div>' +
                     '</a>' +
@@ -111,9 +111,9 @@ function display_notifications(data) {
                                 '<i class="fas fa-torii-gate text-anime"></i>' +
                             '</div>' +
                             '<div class="col-10 ellipsis-notif">' +
-                                '<span><b>' + resp[i]['name'] + '</b></span>' +
-                                '<div class="fs-14" style="color: darkgrey;">S0' + resp[i]['season'] + '.E0' +
-                                resp[i]['episode'] + ' will begin on ' + resp[i]['first_air_date'] + '</div>' +
+                                '<span><b>' + resp[i]['payload']['name'] + '</b></span>' +
+                                '<div class="fs-14" style="color: darkgrey;">S0' + resp[i]['payload']['season'] + '.E0' +
+                                resp[i]['payload']['episode'] + ' will begin on ' + resp[i]['payload']['release_date'] + '</div>' +
                             '</div>' +
                         '</div>' +
                     '</a>' +
@@ -129,9 +129,9 @@ function display_notifications(data) {
                                 '<i class="fas fa-film text-movies"></i>' +
                             '</div>' +
                             '<div class="col-10 ellipsis-notif">' +
-                                '<span><b>' + resp[i]['name'] + '</b></span>' +
+                                '<span><b>' + resp[i]['payload']['name'] + '</b></span>' +
                                 '<div class="fs-14" style="color: darkgrey;">Will be available on ' +
-                                resp[i]['first_air_date'] + '</div>' +
+                                resp[i]['payload']['release_date'] + '</div>' +
                             '</div>' +
                             '</div>' +
                         '</div>' +
@@ -167,6 +167,7 @@ function notifications() {
         contentType: "application/json",
         dataType: "json",
         success: function(data) {
+            $("#notif-badge").removeClass('badge-danger').addClass('badge-light').text(0);
             display_notifications(data);
         },
         error: function() {

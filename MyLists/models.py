@@ -2,8 +2,8 @@ import enum
 
 from flask import abort
 from datetime import datetime
-from flask_login import UserMixin, current_user
-from sqlalchemy import func, desc, text, and_
+from flask_login import UserMixin
+from sqlalchemy import func, desc, text
 from MyLists import app, db, login_manager
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
@@ -120,11 +120,11 @@ class User(db.Model, UserMixin):
             abort(404)
 
         # Protection of the admin account
-        if self.id != 1 and user.id == 1:
+        if self.role != RoleType.ADMIN and user.role == RoleType.ADMIN:
             abort(404)
 
         # Check if the current account can see the target account's movies collection
-        if self.id == user.id or self.id == 1:
+        if self.id == user.id or self.role == RoleType.ADMIN:
             pass
         elif user.private and self.is_following(user) is False:
             abort(404)
@@ -133,7 +133,7 @@ class User(db.Model, UserMixin):
 
     def add_view_count(self, user, list_type):
         # View count of the media lists
-        if self.id != 1 and user.id != self.id:
+        if self.role != RoleType.ADMIN and user.id != self.id:
             if list_type == ListType.SERIES:
                 user.series_views += 1
             elif list_type == ListType.ANIME:
@@ -176,10 +176,7 @@ class Notifications(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     media_type = db.Column(db.String(50))
     media_id = db.Column(db.Integer)
-    media_name = db.Column(db.String(100))
-    release_date = db.Column(db.String(30))
-    season = db.Column(db.Integer)
-    episode = db.Column(db.Integer)
+    payload_json = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 
@@ -192,7 +189,7 @@ class Series(db.Model):
     original_name = db.Column(db.String(50), nullable=False)
     first_air_date = db.Column(db.String(30))
     last_air_date = db.Column(db.String(30))
-    next_episode_to_air = db.Column(db.String(30))
+    next_episode_to_air = db.Column(db.String(30), default=None)
     season_to_air = db.Column(db.Integer, default=None)
     episode_to_air = db.Column(db.Integer, default=None)
     homepage = db.Column(db.String(200))
@@ -307,7 +304,7 @@ class Anime(db.Model):
     original_name = db.Column(db.String(50), nullable=False)
     first_air_date = db.Column(db.String(30))
     last_air_date = db.Column(db.String(30))
-    next_episode_to_air = db.Column(db.String(30))
+    next_episode_to_air = db.Column(db.String(30), default=None)
     season_to_air = db.Column(db.Integer, default=None)
     episode_to_air = db.Column(db.Integer, default=None)
     homepage = db.Column(db.String(200))
@@ -564,7 +561,7 @@ class GlobalStats:
     def get_total_time_spent():
         times_spent = db.session.query(User, func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
                                        func.sum(User.time_spent_movies)) \
-            .filter(User.id >= '2', User.active == True).all()
+            .filter(User.role != RoleType.ADMIN, User.active == True).all()
         return times_spent
 
     # Top media in users' lists

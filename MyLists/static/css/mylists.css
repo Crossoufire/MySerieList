@@ -105,6 +105,7 @@ hr {
 .notification-dropdown {
     padding: 0;
     border-radius: 0;
+    border: 1px solid grey;
     background: #171819;
     width: 300px;
 }

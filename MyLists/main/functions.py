@@ -1,4 +1,5 @@
 import os
+import json
 import secrets
 from collections import OrderedDict
 
@@ -1231,11 +1232,16 @@ class ScheduledTask:
             if not bool(Notifications.query.filter_by(user_id=info[1].user_id,
                                                       media_type='movieslist',
                                                       media_id=info[0].id).first()):
+
+                release_date = datetime.strptime(info[0].release_date, '%Y-%m-%d').strftime("%b %d")
+
+                payload = {'name': info[0].name,
+                           'release_date': release_date}
+
                 data = Notifications(user_id=info[1].user_id,
                                      media_type='movieslist',
                                      media_id=info[0].id,
-                                     media_name=info[0].name,
-                                     release_date=info[0].release_date)
+                                     payload_json=json.dumps(payload))
                 db.session.add(data)
 
         db.session.commit()
@@ -1263,13 +1269,18 @@ class ScheduledTask:
             if not bool(Notifications.query.filter_by(user_id=info[1].user_id,
                                                       media_type='serieslist',
                                                       media_id=info[0].id).first()):
+
+                release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
+
+                payload = {'name': info[0].name,
+                           'release_date': release_date,
+                           'season': info[0].season_to_air,
+                           'episode': info[0].episode_to_air}
+
                 data = Notifications(user_id=info[1].user_id,
                                      media_type='serieslist',
                                      media_id=info[0].id,
-                                     media_name=info[0].name,
-                                     release_date=info[0].next_episode_to_air,
-                                     season=info[0].season_to_air,
-                                     episode=info[0].episode_to_air)
+                                     payload_json=json.dumps(payload))
                 db.session.add(data)
 
         db.session.commit()
@@ -1297,13 +1308,18 @@ class ScheduledTask:
             if not bool(Notifications.query.filter_by(user_id=info[1].user_id,
                                                       media_type='animelist',
                                                       media_id=info[0].id).first()):
+
+                release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
+
+                payload = {'name': info[0].name,
+                           'release_date': release_date,
+                           'season': info[0].season_to_air,
+                           'episode': info[0].episode_to_air}
+
                 data = Notifications(user_id=info[1].user_id,
                                      media_type='animelist',
                                      media_id=info[0].id,
-                                     media_name=info[0].name,
-                                     release_date=info[0].next_episode_to_air,
-                                     season=info[0].season_to_air,
-                                     episode=info[0].episode_to_air)
+                                     payload_json=json.dumps(payload))
                 db.session.add(data)
 
         db.session.commit()

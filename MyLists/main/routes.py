@@ -1,4 +1,4 @@
-import time
+import json
 
 from MyLists import db, app
 from datetime import datetime
@@ -904,12 +904,8 @@ def read_notifications():
     results = []
     if notifications:
         for info in notifications:
-            release = datetime.strptime(info.release_date, '%Y-%m-%d').strftime("%b %d")
-            results.append({'name': info.media_name,
-                            'media_type': info.media_type,
+            results.append({'media_type': info.media_type,
                             'media_id': info.media_id,
-                            'first_air_date': release,
-                            'season': info.season,
-                            'episode': info.episode})
+                            'payload': json.loads(info.payload_json)})
 
     return jsonify(results=results), 200

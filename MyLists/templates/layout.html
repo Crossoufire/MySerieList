@@ -110,9 +110,11 @@
                             <a id="notif" class="nav-link my-drop-toggle notif-li m-r-10" data-toggle="dropdown"
                                onclick="notifications()">
                                 <i class="fas fa-lg fa-bell"></i>
-                                {% set notif_count = current_user.count_notifications() %}
-                                <span class="badge" {% if notif_count == 0 %} style="background-color: grey;"
-                                {% endif %}>{{ notif_count }}</span>
+                                {% set count = current_user.count_notifications() %}
+                                <span id="notif-badge" class="badge {% if count == 0 %} badge-light {% else %}
+                                badge-danger{% endif %}">
+                                    {{ count }}
+                                </span>
                                 <div class="fs-14 nav-text">Notifications</div>
                             </a>
                             <div id="notif-dropdown" class="dropdown-menu notification-dropdown">
@@ -130,6 +132,11 @@
                                 user_name=current_user.username) }}">
                                     <i class="fas fa-user"></i>&nbsp;&nbsp;&nbsp;&nbsp;Profile
                                 </a>
+                                {% if current_user.role.value == 'admin' %}
+                                    <a class="dropdown-item text-light" href="{{ url_for('admin.index') }}">
+                                        <i class="fas fa-database"></i>&nbsp;&nbsp;&nbsp;&nbsp;Dashboard
+                                    </a>
+                                {% endif %}
                                 <a class="dropdown-item text-light" href="{{ url_for('settings.settings') }}">
                                     <i class="fas fa-cog"></i>&nbsp;&nbsp;&nbsp;&nbsp;Settings
                                 </a>

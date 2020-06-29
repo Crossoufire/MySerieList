@@ -1,7 +1,7 @@
 from MyLists import app, db
 from MyLists.users.forms import AddFollowForm
 from flask_login import login_required, current_user
-from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate
+from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
     get_knowledge_frame, get_updates, get_favorites, get_all_follows_data
@@ -151,9 +151,9 @@ def follow_status():
     except:
         return '', 400
 
-    # Check if the follow ID exist in the User database and status is boolean
+    # Check follow ID exist in User table and status is bool
     user = User.query.filter_by(id=follow_id).first()
-    if user is None or type(follow_condition) is not bool:
+    if not user or type(follow_condition) is not bool:
         return '', 400
 
     # Check the status of the follow
