@@ -13,20 +13,20 @@
                 <a class="fas fa-lg fa-user m-r-8 return-icon" href="/account/{{ target_user_name }}"
                    data-toggle="tooltip" title="{{ target_user_name }}" style="color: grey;"></a>
                 {% if media_list == 'serieslist' %}
-                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon" href="/animelist/{{ target_user_name }}"
-                       data-toggle="tooltip" title="Anime list" style="color: #945141;"></a>
-                    <a class="fas fa-lg fa-film m-r-8 return-icon" href="/movieslist/{{ target_user_name }}"
-                       data-toggle="tooltip" title="Movies list" style="color: #8c7821;"></a>
+                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon text-anime" data-toggle="tooltip"
+                       href="/animelist/{{ target_user_name }}" title="Anime list"></a>
+                    <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
+                       href="/movieslist/{{ target_user_name }}" title="Movies list"></a>
                 {% elif media_list == 'animelist' %}
-                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv" href="/serieslist/{{ target_user_name }}"
-                       data-toggle="tooltip" title="Series list" style="color: #216e7d;"></a>
-                    <a class="fas fa-lg fa-film m-r-8 return-icon" href="/movieslist/{{ target_user_name }}"
-                       data-toggle="tooltip" title="Movies list" style="color: #8c7821;"></a>
+                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
+                       href="/serieslist/{{ target_user_name }}" title="Series list"></a>
+                    <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
+                       href="/movieslist/{{ target_user_name }}" title="Movies list"></a>
                 {% else %}
-                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv" href="/serieslist/{{ target_user_name }}"
-                       data-toggle="tooltip" title="Series list" style="color: #216e7d;"></a>
-                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon" href="/animelist/{{ target_user_name }}"
-                       data-toggle="tooltip" title="Anime list" style="color: #945141;"></a>
+                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
+                       href="/serieslist/{{ target_user_name }}" title="Series list"></a>
+                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon text-anime" data-toggle="tooltip"
+                       href="/animelist/{{ target_user_name }}" title="Anime list"></a>
                 {% endif %}
             </div>
             {% if target_user_id != current_user.get_id() %}
@@ -45,7 +45,7 @@
             <div class="ml-auto mr-auto">
                 <i class="fas fa-search text-dark" style="text-shadow: 0 0 0 #000 !important;"></i>
                 <label for="searchInput"></label>
-                <input id="searchInput" class='modded-input text-light' placeholder="Search title / actor / genre"
+                <input id="searchInput" class='modded-input text-light' placeholder="Search..."
                        onkeyup="searchElement()">
                 <label>
                     <select class="search-select m-l-10">
@@ -64,7 +64,7 @@
             <button class="btn btn-sm btn-selected" data-filter="*">Show all</button>
             {% for key in media_data %}
                 <button class="btn btn-sm btn-header" data-filter=".categories.{% if key == 'COMPLETED ANIMATION' %}
-                ANIMATION{% else %}{{ key }}{% endif %}">
+                ANIMATION{% else %}{{ key|replace(' ', '.') }}{% endif %}">
                     {{ key }}
                 </button>
             {% endfor %}
@@ -95,24 +95,38 @@
                                         <img class="img-loading-medialist" src="/static/img/loading.webp" alt="">
                                     </div>
                                     <img class="card-img-top lazyload" data-src="{{ data['cover'] }}" height="300"
-                                         width="200" style="height: auto;"/>
+                                         width="200" style="height: auto;" alt=""/>
                                     <a class="mask flex-center rgba-black-strong" {% if media_list == 'serieslist' %}
                                        href="/media_sheet/Series/{{ data['id'] }}" {% elif media_list == 'animelist' %}
                                        href="/media_sheet/Anime/{{ data['id'] }}" {% else %}
                                        href="/media_sheet/Movies/{{ data['id'] }}" {% endif %}>
                                         {% if media_list == 'serieslist' %}
-                                            <span class="font-mask text-center text-light">{{ data['original_name'] }}</span>
-                                            <span class="by-original-title" style="display: none;" >{{ data['name'] }}</span>
+                                            <span class="font-mask text-center text-light">
+                                                {{ data['original_name'] }}
+                                            </span>
+                                            <span class="by-original-title" style="display: none;" >
+                                                {{ data['name'] }}
+                                            </span>
                                         {% elif media_list == 'animelist' %}
                                             <span class="font-mask text-center text-light">{{ data['name'] }}</span>
-                                            <span class="by-original-title" style="display: none;" >{{ data['original_name'] }}</span>
+                                            <span class="by-original-title" style="display: none;" >
+                                                {{ data['original_name'] }}
+                                            </span>
                                         {% elif media_list == 'movieslist' %}
                                             {% if data['original_language'] == 'ja' %}
-                                                <span class="font-mask text-center text-light">{{ data['name'] }}</span>
-                                                <span class="by-original-title" style="display: none;" >{{ data['original_name'] }}</span>
+                                                <span class="font-mask text-center text-light">
+                                                    {{ data['name'] }}
+                                                </span>
+                                                <span class="by-original-title" style="display: none;" >
+                                                    {{ data['original_name'] }}
+                                                </span>
                                             {% else %}
-                                                <span class="font-mask text-center text-light">{{ data['original_name'] }}</span>
-                                                <span class="by-original-title" style="display: none;" >{{ data['name'] }}</span>
+                                                <span class="font-mask text-center text-light">
+                                                    {{ data['original_name'] }}
+                                                </span>
+                                                <span class="by-original-title" style="display: none;" >
+                                                    {{ data['name'] }}
+                                                </span>
                                             {% endif %}
                                         {% endif %}
                                         <span class="by-actor" style="display: none;" >{{ data['actors'] }}</span>

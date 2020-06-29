@@ -904,10 +904,11 @@ def read_notifications():
     results = []
     if notifications:
         for info in notifications:
+            release = datetime.strptime(info.release_date, '%Y-%m-%d').strftime("%b %d")
             results.append({'name': info.media_name,
                             'media_type': info.media_type,
                             'media_id': info.media_id,
-                            'first_air_date': info.release_date,
+                            'first_air_date': release,
                             'season': info.season,
                             'episode': info.episode})
 

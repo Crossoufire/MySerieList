@@ -25,7 +25,7 @@ $(function() {
 
 $.widget("custom.catcomplete", $.ui.autocomplete, {
     _renderItem: function(ul, item) {
-        ul.attr('style', 'padding-top: 11px;');
+        ul.addClass('autocomplete-ul');
 
         let media, $li;
 
@@ -67,46 +67,77 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
 
 // --- Notification ---------------------------------------------------------
 function display_notifications(data) {
+    let tata;
     let resp = data.results;
     if (resp.length === 0) {
         $("#notif-dropdown").append(
             '<a class="dropdown-item notif-items">' +
                 '<i>You do not have notifications for now.</i>' +
-            '</a>');
+            '</a>'
+        );
     }
     else {
         for (let i = 0; i < resp.length; i++) {
-            if (resp[i]['media_type'] === 'movieslist') {
-                $("#notif-dropdown").append(
-                    '<a class="dropdown-item notif-items text-light" href="/media_sheet/Movies/'+resp[i]['media_id']+'">' +
-                        '<i class="fas fa-film" style="color: #8c7821;"></i>' +
-                        '&nbsp;&nbsp;' + resp[i]['name'] +
-                        '<i class="fas fa-arrow-right"></i>' +
-                        '&nbsp;&nbsp;Airs the ' + resp[i]['first_air_date'] +
-                        '&nbsp;&nbsp;&nbsp;&nbsp;' +
-                    '</a>');
+            if (i + 1 === resp.length) {
+                tata = '';
+            } else {
+                tata = '<hr class="p-0 m-t-0 m-b-0 m-l-15 m-r-15">';
             }
-            else if (resp[i]['media_type'] === 'serieslist') {
+
+            if (resp[i]['media_type'] === 'serieslist') {
                 $("#notif-dropdown").append(
-                    '<a class="dropdown-item notif-items text-light" href="/media_sheet/Series/'+resp[i]['media_id']+'">' +
-                        '<i class="fas fa-tv" style="color: #216e7d;"></i>' +
-                        '&nbsp;&nbsp;' + resp[i]['name'] +
-                        'S0' + resp[i]['season']+'.E0'+resp[i]['episode'] +
-                        ' <i class="fas fa-arrow-right"></i>' +
-                        '&nbsp;&nbsp;Airs the ' + resp[i]['first_air_date'] +
-                        '&nbsp;&nbsp;&nbsp;&nbsp;' +
-                    '</a>');
+                    '<a class="dropdown-item notif-items text-light" href="/media_sheet/Series/' +
+                    resp[i]['media_id']+'">' +
+                        '<div class="row no-gutters">' +
+                            '<div class="col-2">' +
+                                '<i class="fas fa-tv text-series"></i>' +
+                            '</div>' +
+                            '<div class="col-10 ellipsis-notif">' +
+                                '<span><b>' + resp[i]['name'] + '</b></span>' +
+                                '<div class="fs-14" style="color: darkgrey;">S0' + resp[i]['season'] + '.E0' +
+                                resp[i]['episode'] + ' will begin on ' + resp[i]['first_air_date'] + '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</a>' +
+                    '<div class="notif-items">' + tata + '</div>'
+                );
+            }
+            else if (resp[i]['media_type'] === 'animelist') {
+                $("#notif-dropdown").append(
+                    '<a class="dropdown-item notif-items text-light" href="/media_sheet/Anime/' +
+                    resp[i]['media_id']+'">' +
+                        '<div class="row no-gutters">' +
+                            '<div class="col-2">' +
+                                '<i class="fas fa-torii-gate text-anime"></i>' +
+                            '</div>' +
+                            '<div class="col-10 ellipsis-notif">' +
+                                '<span><b>' + resp[i]['name'] + '</b></span>' +
+                                '<div class="fs-14" style="color: darkgrey;">S0' + resp[i]['season'] + '.E0' +
+                                resp[i]['episode'] + ' will begin on ' + resp[i]['first_air_date'] + '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</a>' +
+                    '<div class="notif-items">' + tata + '</div>'
+                );
             }
             else {
                 $("#notif-dropdown").append(
-                    '<a class="dropdown-item notif-items text-light" href="/media_sheet/Anime/'+resp[i]['media_id']+'">' +
-                        '<i class="fas fa-torii-gate" style="color: #945141;"></i>' +
-                        '&nbsp;&nbsp;' + resp[i]['name'] +
-                        'S0' + resp[i]['season']+'.E0'+resp[i]['episode'] +
-                        ' <i class="fas fa-arrow-right"></i>' +
-                        '&nbsp;&nbsp;Airs the ' + resp[i]['release_date'] +
-                        '&nbsp;&nbsp;&nbsp;&nbsp;' +
-                    '</a>');
+                    '<a class="dropdown-item notif-items text-light" href="/media_sheet/Movies/' +
+                    resp[i]['media_id']+'">' +
+                        '<div class="row no-gutters">' +
+                            '<div class="col-2">' +
+                                '<i class="fas fa-film text-movies"></i>' +
+                            '</div>' +
+                            '<div class="col-10 ellipsis-notif">' +
+                                '<span><b>' + resp[i]['name'] + '</b></span>' +
+                                '<div class="fs-14" style="color: darkgrey;">Will be available on ' +
+                                resp[i]['first_air_date'] + '</div>' +
+                            '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</a>' +
+                    '<div class="notif-items">' + tata + '</div>'
+                );
             }
         }
     }

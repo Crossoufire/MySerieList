@@ -11,8 +11,8 @@
     <div class="header-container">
         <div class="header-profile-container" {% if user_data['knowledge_info']['frame_level'] < 36 %}
             style="left: -10px; {% endif %}">
-            <img class="header-profile-img" src="{{ user_data['profile_picture'] }}"/>
-            <img class="header-profile-frame" src="{{ user_data['knowledge_info']['frame_id'] }}.png"/>
+            <img class="header-profile-img" src="{{ user_data['profile_picture'] }}" alt=""/>
+            <img class="header-profile-frame" src="{{ user_data['knowledge_info']['frame_id'] }}.png" alt=""/>
             <div class="header-knowledge-level text-center">{{ user_data['knowledge_info']['level'] }}</div>
         </div>
         <div class="header-profile-data"  {% if user_data['knowledge_info']['frame_level'] < 36 %}
@@ -41,9 +41,9 @@
             </div>
         </div>
     </div>
-    <h4><i class="fas fa-chart-pie m-t-15"></i>&nbsp&nbspMore Statistics</h4><hr>
+    <h4><i class="fas fa-chart-pie m-t-15"></i>&nbsp;&nbsp;More Statistics</h4><hr>
     <a class="text-light" href="/account/{{ user_data['username'] }}">
-        <i class="fas fa-caret-left"></i>&nbsp&nbsp <b>Return to account</b>
+        <i class="fas fa-caret-left"></i>&nbsp;&nbsp; <b>Return to account</b>
     </a>
     <ul id="media-tab" class="nav nav-tabs md-tabs m-t-25">
         <li class="nav-item">
@@ -74,8 +74,8 @@
                         <div class="series-container">
                             <canvas id="episodes-series"></canvas>
                             <span id="episodes-series-bar"
-                                  values-y="{% for key in stats['Series_episodes'].keys() %} {{ key }}, {% endfor %}"
-                                  values-x="{% for value in stats['Series_episodes'].values() %}{{ value }}, {% endfor %}">
+                              values-y="{% for key in stats['Series_episodes'].keys() %} {{ key }}, {% endfor %}"
+                              values-x="{% for value in stats['Series_episodes'].values() %}{{ value }}, {% endfor %}">
                             </span>
                         </div>
                     {% else %}
@@ -138,8 +138,8 @@
                         <div class="anime-container">
                             <canvas id="episodes-anime"></canvas>
                             <span id="episodes-anime-bar"
-                                  values-y="{% for key in stats['Anime_episodes'].keys() %} {{ key }}, {% endfor %}"
-                                  values-x="{% for value in stats['Anime_episodes'].values() %}{{ value }}, {% endfor %}">
+                              values-y="{% for key in stats['Anime_episodes'].keys() %} {{ key }}, {% endfor %}"
+                              values-x="{% for value in stats['Anime_episodes'].values() %}{{ value }}, {% endfor %}">
                             </span>
                         </div>
                     {% else %}
@@ -160,8 +160,8 @@
                         <div class="anime-container">
                             <canvas id="periods-anime"></canvas>
                             <span id="periods-anime-bar"
-                                  values-y="{% for key in stats['Anime_periods'].keys() %} {{ key }}, {% endfor %}"
-                                  values-x="{% for value in stats['Anime_periods'].values() %}{{ value }}, {% endfor %}">
+                              values-y="{% for key in stats['Anime_periods'].keys() %} {{ key }}, {% endfor %}"
+                              values-x="{% for value in stats['Anime_periods'].values() %}{{ value }}, {% endfor %}">
                             </span>
                         </div>
                     {% else %}
@@ -224,8 +224,8 @@
                         <div class="movies-container">
                             <canvas id="periods-movies"></canvas>
                             <span id="periods-movies-bar"
-                                  values-y="{% for key in stats['Movies_periods'].keys() %} {{ key }}, {% endfor %}"
-                                  values-x="{% for value in stats['Movies_periods'].values() %}{{ value }}, {% endfor %}">
+                              values-y="{% for key in stats['Movies_periods'].keys() %} {{ key }}, {% endfor %}"
+                              values-x="{% for value in stats['Movies_periods'].values() %}{{ value }}, {% endfor %}">
                             </span>
                         </div>
                     {% else %}

@@ -186,7 +186,7 @@ hr {
     min-width: 105px;
 }
 
-.tata {
+.update-box {
     padding: 0 8px 8px 8px;
 }
 
@@ -363,4 +363,14 @@ hr {
     position: absolute;
     top: -8px;
     right: 5px;
+}
+
+.favorite-img {
+    height: 90px;
+    width: 60px;
+}
+
+.follow-img {
+    height: 60px;
+    width: 60px;
 }

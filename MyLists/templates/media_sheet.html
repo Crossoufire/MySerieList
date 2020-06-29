@@ -110,7 +110,7 @@
                                 </div>
                             </div>
                         {% endif %}
-                        <div class="text-center">
+                        <div class="text-center m-t-15">
                             <button class="btn btn-smaller btn-danger" onclick="removeFromUser('{{ data['id'] }}',
                                     '{{ media_list }}')">
                                 <i class="fas fa-ban"></i>&nbsp; Remove from list
@@ -148,8 +148,7 @@
                         <a class="m-r-10" href="/account/{{ follow[0].username }}">
                             <div class="text-center m-b-10" style="display: inline-block;">
                                 <img height="55" width="55" data-toggle="tooltip" title="{{ follow[0].username }}"
-                                     src="/static/profile_pics/{{ follow[0].image_file }}" alt=""/>
-                                <br>
+                                     src="/static/profile_pics/{{ follow[0].image_file }}" alt=""/><br>
                                 {% if follow[1].favorite %}
                                     <i class="fas fa-sm fa-star" style="color: darkgoldenrod;"></i>
                                 {% else %}
@@ -159,11 +158,12 @@
                         </a>
                     {% endfor %}
                 </div>
-                {% if media_list == 'movieslist' and data['collection_data'][0] %}
-                    <h4 class="m-l-21 m-r-15"><i class="fas fa-box-open m-t-8"></i>&nbsp;&nbsp;
-                        <b>{{ data['collection_data'][0].name }}</b>
-                    </h4>
-                    <hr class="m-l-20 m-r-24">
+
+{#                {% if media_list == 'movieslist' and data['collection_data'][0] %}#}
+{#                    <h4 class="m-l-21 m-r-15"><i class="fas fa-box-open m-t-8"></i>&nbsp;&nbsp;#}
+{#                        <b>{{ data['collection_data'][0].name }}</b>#}
+{#                    </h4>#}
+{#                    <hr class="m-l-20 m-r-24">#}
 {#                    <div class="m-b-30">#}
 {#                        {% set release = data['collection_data'][0].releases_dates.split(',') %}#}
 {#                        {% for name in data['collection_data'][0].movies_names.split(',') %}#}
@@ -177,7 +177,8 @@
 {#                            </div>#}
 {#                        {% endfor %}#}
 {#                    </div>#}
-                {% endif %}
+{#                {% endif %}#}
+
             </div>
             <div class="col-lg-8 col-md-7 col-sm-12" style="margin-top: -10px;">
                 <div class="media-title-pc">

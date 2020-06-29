@@ -226,6 +226,12 @@ def current_trends():
                       'overview': result.get('overview'),
                       'tmdb_id': result['id']}
 
+        try:
+            if media_data['name'] in [m['name'] for m in series_results]:
+                continue
+        except:
+            pass
+
         # Modify the overview if no data
         if media_data["overview"] == '':
             media_data['overview'] = "There is no overview available for this media."
