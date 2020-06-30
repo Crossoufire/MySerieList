@@ -3,10 +3,10 @@
 // --- Datatable functions ------------------------------------------
 $(document).ready(function () {
     $('#all_history').DataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-        "bFilter": false,
-        "bInfo": false,
+        "bPaginate": true,
+        "bLengthChange": true,
+        "bFilter": true,
+        "bInfo": true,
         "bAutoWidth": false,
         "searching": true,
         columnDefs: [

@@ -63,8 +63,7 @@
         <div class="center-mobile d-flex flex-wrap filters-button-group m-t-10">
             <button class="btn btn-sm btn-selected" data-filter="*">Show all</button>
             {% for key in media_data %}
-                <button class="btn btn-sm btn-header" data-filter=".categories.{% if key == 'COMPLETED ANIMATION' %}
-                ANIMATION{% else %}{{ key|replace(' ', '.') }}{% endif %}">
+                <button class="btn btn-sm btn-header" data-filter=".categories.{% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key|replace(' ', '.') }}{% endif %}">
                     {{ key }}
                 </button>
             {% endfor %}
@@ -109,7 +108,7 @@
                                             </span>
                                         {% elif media_list == 'animelist' %}
                                             <span class="font-mask text-center text-light">{{ data['name'] }}</span>
-                                            <span class="by-original-title" style="display: none;" >
+                                            <span class="by-original-title" style="display: none;">
                                                 {{ data['original_name'] }}
                                             </span>
                                         {% elif media_list == 'movieslist' %}
@@ -117,14 +116,14 @@
                                                 <span class="font-mask text-center text-light">
                                                     {{ data['name'] }}
                                                 </span>
-                                                <span class="by-original-title" style="display: none;" >
+                                                <span class="by-original-title" style="display: none;">
                                                     {{ data['original_name'] }}
                                                 </span>
                                             {% else %}
                                                 <span class="font-mask text-center text-light">
                                                     {{ data['original_name'] }}
                                                 </span>
-                                                <span class="by-original-title" style="display: none;" >
+                                                <span class="by-original-title" style="display: none;">
                                                     {{ data['name'] }}
                                                 </span>
                                             {% endif %}
@@ -148,7 +147,7 @@
                                     {% else %}
                                         <a {% if data['favorite'] %} class="card-favorite fas fa-star"
                                             style="color: darkgoldenrod;" {% else %} class="card-btn-bottom-left far
-                                            fa-star"> {% endif %}
+                                            fa-star" {% endif %}>
                                         </a>
                                         {% if data['common'] %}
                                             <div class="card-ribbon"></div>

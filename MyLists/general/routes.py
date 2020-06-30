@@ -11,20 +11,20 @@ from MyLists.models import Status, ListType, User, GlobalStats, RoleType
 bp = Blueprint('general', __name__)
 
 
+# noinspection PyArgumentList
 @bp.before_app_first_request
 def create_user():
     db.create_all()
     if User.query.filter_by(id='1').first() is None:
-        # noinspection PyArgumentList
         admin1 = User(username='admin',
-                         email='admin@admin.com',
-                         password=bcrypt.generate_password_hash("password").decode('utf-8'),
-                         image_file='default.jpg',
-                         active=True,
-                         private=True,
-                         registered_on=datetime.utcnow(),
-                         activated_on=datetime.utcnow(),
-                         role=RoleType.ADMIN)
+                      email='admin@admin.com',
+                      password=bcrypt.generate_password_hash("password").decode('utf-8'),
+                      image_file='default.jpg',
+                      active=True,
+                      private=True,
+                      registered_on=datetime.utcnow(),
+                      activated_on=datetime.utcnow(),
+                      role=RoleType.ADMIN)
         manager1 = User(username='manager',
                         email='manager@manager.com',
                         password=bcrypt.generate_password_hash("password").decode('utf-8'),

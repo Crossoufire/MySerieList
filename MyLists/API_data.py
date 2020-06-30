@@ -81,7 +81,7 @@ class ApiData:
 
         self.status_code(response.status_code)
 
-        time.sleep(2)
+        time.sleep(1)
 
         return json.loads(response.text)
 

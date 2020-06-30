@@ -1326,35 +1326,38 @@ app.apscheduler.add_job(func=ScheduledTask, trigger='cron', id='scheduled_task',
 
 
 def refresh_element_data(api_id, list_type):
-    data = get_details(api_id, list_type)
-    if data is None:
+    try:
+        data = get_details(api_id, list_type)
+
+        # Update the main details data
+        if list_type == ListType.SERIES:
+            Series.query.filter_by(themoviedb_id=api_id).update(data['tv_data'])
+        elif list_type == ListType.ANIME:
+            Anime.query.filter_by(themoviedb_id=api_id).update(data['tv_data'])
+
+        db.session.commit()
+
+        return True
+    except Exception as e:
+        print(e)
         return None
-
-    # Update the main details data
-    if list_type == ListType.SERIES:
-        Series.query.filter_by(themoviedb_id=api_id).update(data['tv_data'])
-    elif list_type == ListType.ANIME:
-        Anime.query.filter_by(themoviedb_id=api_id).update(data['tv_data'])
-
-    db.session.commit()
-
-    return True
 
 
 def add_next_episode_to_air():
-    all_series = Series.query.filter(Series.lock_status == False, Series.episode_to_air != None).all()
-    all_anime = Anime.query.filter(Anime.lock_status == False, Anime.episode_to_air != None).all()
+    all_series = Series.query.filter(Series.lock_status == False).all()
+    all_anime = Anime.query.filter(Anime.lock_status == False).all()
 
-    for series in all_series:
+    for index, series in enumerate(all_series):
         yes = refresh_element_data(series.themoviedb_id, ListType.SERIES)
         if yes is None:
             print(series.themoviedb_id, series.name)
-        print(yes)
-    for anime in all_anime:
+        print(index)
+
+    for index, anime in enumerate(all_anime):
         yes = refresh_element_data(anime.themoviedb_id, ListType.ANIME)
         if yes is None:
             print(anime.themoviedb_id, anime.name)
-        print(yes)
+        print(index)
 
 
 def add_media_id_to_userlastupdates():

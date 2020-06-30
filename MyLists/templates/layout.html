@@ -152,11 +152,11 @@
                     <a class="navbar-brand m-l-10" href="{{ url_for('auth.home') }}">MyLists</a>
                     {% if request.path == '/' %}
                         <a class="nav-link ml-auto">
-                            <button class="btn btn-sm btn-outline-success my-2 my-sm-0" data-toggle="modal"
+                            <button class="btn btn-sm btn-primary my-2 my-sm-0" data-toggle="modal"
                              data-target="#modalLoginForm">Login</button>
                         </a>
                         <a class="nav-link">
-                            <button class="btn btn-sm btn-outline-danger my-2 my-sm-0" data-toggle="modal"
+                            <button class="btn btn-sm btn-danger my-2 my-sm-0" data-toggle="modal"
                              data-target="#modalRegisterForm">Register</button>
                         </a>
                     {% endif %}
