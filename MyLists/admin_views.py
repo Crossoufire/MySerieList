@@ -4,14 +4,14 @@ from flask_admin.contrib.sqla import ModelView
 from flask_admin import Admin, expose, AdminIndexView
 from MyLists.models import User, UserLastUpdate, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, \
     SeriesNetwork, SeriesActors, Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork, AnimeActors, \
-    Movies, MoviesGenre, MoviesList, MoviesActors
+    Movies, MoviesGenre, MoviesList, MoviesActors, RoleType
 
 
 # ------------------------------------------------------- USER ------------------------------------------------------- #
 
 class UserAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('id', 'username', 'email', 'active', 'private')
     column_searchable_list = ('username', 'email')
@@ -20,7 +20,7 @@ class UserAdminView(ModelView):
 
 class LastUpdateAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('user_id', 'media_name', 'media_type', 'old_status', 'new_status', 'old_season', 'new_season',
                    'old_episode', 'new_episode', 'date')
@@ -32,7 +32,7 @@ class LastUpdateAdminView(ModelView):
 
 class SeriesAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_display_pk = True
     column_exclude_list = ('original_name', 'homepage', 'synopsis', 'image_cover', 'in_production')
@@ -41,7 +41,7 @@ class SeriesAdminView(ModelView):
 
 class SeriesListAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('user_id', 'series_id', 'current_season', 'last_episode_watched', 'status', 'score')
     column_searchable_list = ('user_id', 'series_id', 'status')
@@ -50,7 +50,7 @@ class SeriesListAdminView(ModelView):
 
 class SeriesEpisodesPerSeasonAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('series_id', 'season', 'episodes')
     column_searchable_list = ['series_id']
@@ -59,7 +59,7 @@ class SeriesEpisodesPerSeasonAdminView(ModelView):
 
 class SeriesGenreAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('series_id', 'genre')
     column_searchable_list = ['series_id']
@@ -68,7 +68,7 @@ class SeriesGenreAdminView(ModelView):
 
 class SeriesNetworkAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('series_id', 'network')
     column_searchable_list = ('series_id', 'network')
@@ -77,7 +77,7 @@ class SeriesNetworkAdminView(ModelView):
 
 class SeriesActorsAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('series_id', 'name')
     column_searchable_list = ('series_id', 'name')
@@ -88,7 +88,7 @@ class SeriesActorsAdminView(ModelView):
 
 class AnimeAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_display_pk = True
     column_exclude_list = ('homepage', 'synopsis', 'image_cover', 'themoviedb_id')
@@ -100,7 +100,7 @@ class AnimeAdminView(ModelView):
 
 class AnimeListAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('user_id', 'anime_id', 'current_season', 'last_episode_watched', 'status', 'score')
     column_searchable_list = ('user_id', 'anime_id', 'status')
@@ -109,7 +109,7 @@ class AnimeListAdminView(ModelView):
 
 class AnimeEpisodesPerSeasonAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('anime_id', 'season', 'episodes')
     column_searchable_list = ['anime_id']
@@ -118,7 +118,7 @@ class AnimeEpisodesPerSeasonAdminView(ModelView):
 
 class AnimeGenreAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('anime_id', 'genre')
     column_searchable_list = ('anime_id', 'genre')
@@ -127,7 +127,7 @@ class AnimeGenreAdminView(ModelView):
 
 class AnimeNetworkAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('anime_id', 'network')
     column_searchable_list = ('anime_id', 'network')
@@ -136,7 +136,7 @@ class AnimeNetworkAdminView(ModelView):
 
 class AnimeActorsAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('anime_id', 'name')
     column_searchable_list = ('anime_id', 'name')
@@ -147,7 +147,7 @@ class AnimeActorsAdminView(ModelView):
 
 class MoviesAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_display_pk = True
     column_exclude_list = ('homepage', 'released', 'synopsis', 'tagline', 'image_cover', 'themoviedb_id')
@@ -158,7 +158,7 @@ class MoviesAdminView(ModelView):
 
 class MoviesGenreAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('movies_id', 'genre')
     column_searchable_list = ['movies_id']
@@ -167,7 +167,7 @@ class MoviesGenreAdminView(ModelView):
 
 class MoviesListAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('user_id', 'movies_id', 'status', 'score')
     column_searchable_list = ('user_id', 'movies_id', 'status')
@@ -176,7 +176,7 @@ class MoviesListAdminView(ModelView):
 
 class MoviesActorsAdminView(ModelView):
     def is_accessible(self):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
     column_list = ('movies_id', 'name')
     column_searchable_list = ('movies_id', 'name')
@@ -193,7 +193,7 @@ class MyHomeAdminView(AdminIndexView):
 
     @staticmethod
     def is_accessible(**kwargs):
-        return current_user.get_id() == '1'
+        return current_user.role == RoleType.ADMIN
 
 
 # Create the /admin index view:

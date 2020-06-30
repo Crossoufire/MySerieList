@@ -22,31 +22,34 @@
                  href="#movies"><b>Movies ({{ movies_results|length }})</b></div>
         </li>
     </ul>
+
     <div class="tab-content" id="media-search">
         <div id="series" class="tab-pane fade show active">
             <div class="d-flex flex-wrap justify-content-center m-t-30">
                 {% for media in series_results %}
-                    <a class="card mb-4" style="background: #216c7d; width: 700px; border-radius: 0;"
-                       href="/check_media/serieslist/{{ media['tmdb_id'] }}">
-                        <div class="row no-gutters">
-                            <div class="col-3 p-3">
-                                <img width="150" style="min-height: 225px;" src="{{ media['poster_path'] }}" alt=""/>
-                            </div>
-                            <div class="col-9">
-                                <div class="card-body p-3">
-                                    <h5 class="card-title">
-                                        <div class="text-light fs-20 giveMeEllipsis2">{{ media['name'] }}</div>
-                                        <div class="fs-15 text-grey"><i>{{ media['first_air_date'] }}</i></div>
-                                    </h5>
-                                    {% if media['overview'] %}
-                                        <p class="fs-15 text-light giveMeEllipsis-3 m-b-0">{{ media['overview'] }}</p>
-                                    {% else %}
-                                        <p class="fs-15 text-light m-b-0"><i>No overview avalaible for this content.</i></p>
-                                    {% endif %}
+                    {% if media['media_type'] == 'serieslist' %}
+                        <a class="card mb-4" style="background: #216c7d; width: 700px; border-radius: 0;"
+                           href="/media_sheet/Series/{{ media['tmdb_id'] }}?search=True">
+                            <div class="row no-gutters">
+                                <div class="col-3 p-3">
+                                    <img width="150" style="min-height: 225px;" src="{{ media['poster_path'] }}" alt=""/>
+                                </div>
+                                <div class="col-9">
+                                    <div class="card-body p-3">
+                                        <h5 class="card-title">
+                                            <div class="text-light fs-20 giveMeEllipsis2">{{ media['name'] }}</div>
+                                            <div class="fs-15 text-grey"><i>{{ media['first_air_date'] }}</i></div>
+                                        </h5>
+                                        {% if media['overview'] %}
+                                            <p class="fs-15 text-light giveMeEllipsis-3 m-b-0">{{ media['overview'] }}</p>
+                                        {% else %}
+                                            <p class="fs-15 text-light m-b-0"><i>No overview avalaible for this content.</i></p>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -54,7 +57,7 @@
             <div class="d-flex flex-wrap justify-content-center m-t-30">
                 {% for media in anime_results %}
                     <a class="card mb-4" style="background: #945141; width: 700px; border-radius: 0;"
-                       href="/check_media/animelist/{{ media['tmdb_id'] }}">
+                       href="/media_sheet/Anime/{{ media['tmdb_id'] }}?search=True">
                         <div class="row no-gutters">
                             <div class="col-3 p-3">
                                 <img width="150" src="{{ media['poster_path'] }}" alt=""/>
@@ -83,7 +86,7 @@
             <div class="d-flex flex-wrap justify-content-center m-t-30">
                 {% for media in movies_results %}
                     <a class="card mb-4" style="background: #8c7821; width: 700px; border-radius: 0;"
-                       href="/check_media/movieslist/{{ media['tmdb_id'] }}">
+                       href="/media_sheet/Movies/{{ media['tmdb_id'] }}?search=True">
                         <div class="row no-gutters">
                             <div class="col-3 p-3">
                                 <img width="150" src="{{ media['poster_path'] }}" alt=""/>

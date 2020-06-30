@@ -1,62 +1,36 @@
 {% extends 'medialist_base.html' %}
 
 
-{% block cat_button %}
-    <button class="btn btn-sm btn-selected" data-filter="*">Show all</button>
-    <button class="btn btn-sm btn-header" data-filter=".categories.WATCHING">Watching</button>
-    <button class="btn btn-sm btn-header" data-filter=".categories.COMPLETED">Completed</button>
-    <button class="btn btn-sm btn-header" data-filter=".categories.ON.HOLD">On Hold</button>
-    <button class="btn btn-sm btn-header" data-filter=".categories.RANDOM">Random</button>
-    <button class="btn btn-sm btn-header" data-filter=".categories.DROPPED">Dropped</button>
-    <button class="btn btn-sm btn-header" data-filter=".categories.PLAN.TO.WATCH">Plan to Watch</button>
-{% endblock cat_button %}
-
-
-{% block card_top_left_1 %}
-    <a class="card-btn-top-left fas fa-bars text-light" onclick="chargeButtons(card_{{ data['id'] }},
-    '{{ data['id'] }}', 'S_{{ data['id'] }}', 'E_{{ data['id'] }}', '{{ data['eps_per_season'] }}',
-    '{{ media_list }}')"></a>
-{% endblock card_top_left_1 %}
-
-
-{% block card_top_left_2 %}
-    <a class="card-btn-top-left fas fa-plus text-light" onclick="ChargeButtonsTV('card_{{ data['id'] }}',
-    '{{ data['id'] }}', '{{ media_list }}')"></a>
-{% endblock card_top_left_2 %}
+{% block data %}
+    {{ data['eps_per_season'] }}-{{ media_list }}-{{ data['id'] }}
+{% endblock data %}
 
 
 {% block select_box %}
-    <div class="seas-eps-box" {% if category[1] == 'PLAN TO WATCH' %}style="display: none;"{% endif %}>
+    <div class="seas-eps-box" {% if data['category'].value == "PLAN_TO_WATCH" %}style="display: none;"{% endif %}>
         <div style="display: inline-block;">
-            {% if target_user_id == current_user.get_id() %}
-            <select id="S_{{ data['id'] }}" class="text-light text-center select-box"
-                    onchange="updateSeason('{{ data['id'] }}', this, '{{ data['eps_per_season'] }}',
-                    'E_{{ data['id'] }}', '{{ media_list }}')">
-            {% else %}
-            <select id="S_{{ data['id'] }}" class="disabled text-light text-center select-box">
-            {% endif %}
+            <select id="S_{{ data['id'] }}" class="text-light text-center select-box
+             {% if target_user_id != current_user.get_id() %} disabled{% endif %}" onchange="updateSeason(
+             '{{ data['id'] }}', this)">
                 {% for i in range(data['eps_per_season']|length) %}
-                    {% if i+ 1 == data['current_season'] %}
-                    <option class="card-opt-box" selected="selected">&nbsp{{ "S{:02}".format(i+ 1) }}&nbsp</option>
+                    {% if i + 1 == data['current_season'] %}
+                        <option class="card-opt-box" selected="selected">&nbsp;{{ "S{:02}".format(i+1) }}&nbsp;</option>
                     {% else %}
-                    <option class="card-opt-box">&nbsp{{ "S{:02}".format(i+ 1) }}&nbsp</option>
+                        <option class="card-opt-box">&nbsp;{{ "S{:02}".format(i + 1) }}&nbsp;</option>
                     {% endif %}
                 {% endfor %}
             </select>
         </div>
         <div style="display: inline-block;">|</div>
         <div style="display: inline-block;">
-            {% if target_user_id == current_user.get_id() %}
-            <select id="E_{{ data['id'] }}" class="text-light text-center p-0 select-box"
-                    onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
-            {% else %}
-            <select id="E_{{ data['id'] }}" class="disabled text-light text-center p-0 select-box">
-            {% endif %}
-                {% for i in range(data['eps_per_season'][data['current_season']- 1]) %}
-                    {% if i+ 1 == data['last_episode_watched'] %}
-                    <option class="card-opt-box" selected="selected">&nbsp{{ "E{:02}".format(i+ 1) }}&nbsp</option>
+            <select id="E_{{ data['id'] }}" class="text-light text-center p-0 select-box
+             {% if target_user_id != current_user.get_id() %} disabled{% endif %}" onchange="updateEpisode(
+             '{{ data['id'] }}', this, '{{ media_list }}')">
+                {% for i in range(data['eps_per_season'][data['current_season'] - 1]) %}
+                    {% if i + 1 == data['last_episode_watched'] %}
+                        <option class="card-opt-box" selected="selected">&nbsp;{{ "E{:02}".format(i+1) }}&nbsp;</option>
                     {% else %}
-                    <option class="card-opt-box">&nbsp{{ "E{:02}".format(i+ 1) }}&nbsp</option>
+                        <option class="card-opt-box">&nbsp;{{ "E{:02}".format(i+ 1) }}&nbsp;</option>
                     {% endif %}
                 {% endfor %}
             </select>

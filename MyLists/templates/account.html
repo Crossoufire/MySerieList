@@ -1,56 +1,19 @@
-{% extends "layout.html" %}
+{% extends "header_account.html" %}
 
 
-{% block css %}
-    <link href="{{ url_for('static', filename='css/account.css') }}" rel="stylesheet">
-{% endblock css %}
-
-
-{% block content %}
-    <div class="header-container">
-        <div class="header-profile-container" {% if user_data['knowledge_info']['frame_level'] < 36 %}
-            style="left: -10px; {% endif %}">
-            <img class="header-profile-img" src="{{ user_data['profile_picture'] }}"/>
-            <img class="header-profile-frame" src="{{ user_data['knowledge_info']['frame_id'] }}.png"/>
-            <div class="header-knowledge-level text-center">{{ user_data['knowledge_info']['level'] }}</div>
-        </div>
-        <div class="header-profile-data"  {% if user_data['knowledge_info']['frame_level'] < 36 %}
-            style="left: 200px; {% endif %}">
-            <h2 class="profile-name"><b>{{ user_data['username'] }}</b>
-                {% if user_data['id'] != current_user.get_id() %}
-                    {% if user_data["isfollowing"] %}
-                        <button class="btn btn-sm btn-dark follow-btn"
-                                onclick="follow_status('{{ user_data['id'] }}')">Unfollow</button>
-                    {% else %}
-                        <button class="btn btn-sm btn-primary follow-btn"
-                                onclick="follow_status('{{ user_data['id'] }}')">Follow</button>
-                    {% endif %}
-                {% endif %}
-            </h2>
-            <div>
-                <b>Joined: {{ user_data['register'] }}</b><br>
-                <b>Followers: {{ user_data['followers'] }}</b>
-            </div>
-        </div>
-        <div class="header-profile-data-mobile">
-            <h4 class="p-0 m-0"><b>{{ user_data['username'] }}</b></h4>
-            <div class="header-join-follow">
-                <b>Joined: {{ user_data['register'] }}</b><br>
-                <b>Followers: {{ user_data['followers'] }}</b>
-            </div>
-        </div>
-    </div>
-
+{% block data %}
     <div class="account-wrapper">
         {% if user_data['id'] != current_user.get_id() %}
-            <div class="follow-btn-mobile d-flex" style="justify-content: flex-end;">
+            <div class="follow-btn-mobile d-flex">
                 {% if user_data["isfollowing"] %}
-                    <button class="btn btn-sm btn-dark follow-btn text-right"
+                    <button class="btn btn-sm btn-dark follow-btn" value="1"
                             onclick="follow_status('{{ user_data['id'] }}')">Unfollow</button>
                 {% else %}
-                    <button class="btn btn-sm btn-primary follow-btn text-right"
+                    <button class="btn btn-sm btn-primary follow-btn" value="0"
                             onclick="follow_status('{{ user_data['id'] }}')">Follow</button>
                 {% endif %}
+                <img class="loading-follow m-t-11" style="display: none;" height="20" width="20"
+                     src="/static/img/loading.webp" alt=""/>
             </div>
         {% endif %}
         <div class="row m-t-15">
@@ -72,7 +35,8 @@
                                     <div class='xp-bar' data-toggle="tooltip"
                                          title="{{ media_data['series']['media_levels']['level_percent'] }}%">
                                         <div id='xp-bar-fill-series'
-                                             data-percentage="{{ media_data['series']['media_levels']['level_percent'] }}">
+                                             data-percentage="{{ media_data['series']['media_levels']
+                                             ['level_percent'] }}">
                                             <div class='xp-increase-fx'>
                                                 <div class='xp-increase-fx-flicker'>
                                                     <div class='xp-increase-glow1'></div>
@@ -83,7 +47,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['series']['media_levels']['level'] | int + 1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['series']
+                                    ['media_levels']['level'] | int + 1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -91,11 +56,16 @@
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
-                                         title="{{ media_data['anime']['media_levels']['grade_title'] }}" src="{{ media_data['anime']['media_levels']['grade_id'] }}.png"/>
+                                         title="{{ media_data['anime']['media_levels']['grade_title'] }}"
+                                         src="{{ media_data['anime']['media_levels']['grade_id'] }}.png"/>
                                     <div class='account-bar-name'>Anime</div>
-                                    <div id="anime_level" class='account-bar-level'>Level {{ '%02d' | format(media_data['anime']['media_levels']['level']) }}</div>
-                                    <div class='xp-bar' data-toggle="tooltip" title="{{ media_data['anime']['media_levels']['level_percent'] }}%">
-                                        <div id='xp-bar-fill-anime' data-percentage="{{ media_data['anime']['media_levels']['level_percent'] }}">
+                                    <div id="anime_level" class='account-bar-level'>
+                                        Level {{ '%02d' | format(media_data['anime']['media_levels']['level']) }}</div>
+                                    <div class='xp-bar' data-toggle="tooltip"
+                                         title="{{ media_data['anime']['media_levels']['level_percent'] }}%">
+                                        <div id='xp-bar-fill-anime'
+                                             data-percentage="{{ media_data['anime']['media_levels']
+                                             ['level_percent'] }}">
                                             <div class='xp-increase-fx'>
                                                 <div class='xp-increase-fx-flicker'>
                                                     <div class='xp-increase-glow1'></div>
@@ -106,7 +76,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['anime']['media_levels']['level'] | int + 1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' |
+                                    format(media_data['anime']['media_levels']['level'] | int + 1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -114,11 +85,16 @@
                             <div class='account-bar-wrapper'>
                                 <div class='account-bar'>
                                     <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
-                                         title="{{ media_data['movies']['media_levels']['grade_title'] }}" src="{{ media_data['movies']['media_levels']['grade_id'] }}.png"/>
+                                         title="{{ media_data['movies']['media_levels']['grade_title'] }}"
+                                         src="{{ media_data['movies']['media_levels']['grade_id'] }}.png"/>
                                     <span class='account-bar-name'>Movies</span>
-                                    <div id="movies_level" class='account-bar-level'>Level {{ '%02d' | format(media_data['movies']['media_levels']['level']) }}</div>
-                                    <div class='xp-bar' data-toggle="tooltip" title="{{ media_data['movies']['media_levels']['level_percent'] }}%">
-                                        <div id='xp-bar-fill-movies' data-percentage="{{ media_data['movies']['media_levels']['level_percent'] }}">
+                                    <div id="movies_level" class='account-bar-level'>Level {{ '%02d' |
+                                    format(media_data['movies']['media_levels']['level']) }}</div>
+                                    <div class='xp-bar' data-toggle="tooltip"
+                                         title="{{ media_data['movies']['media_levels']['level_percent'] }}%">
+                                        <div id='xp-bar-fill-movies'
+                                             data-percentage="{{ media_data['movies']['media_levels']
+                                             ['level_percent'] }}">
                                             <div class='xp-increase-fx'>
                                                 <div class='xp-increase-fx-flicker'>
                                                     <div class='xp-increase-glow1'></div>
@@ -129,7 +105,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['movies']['media_levels']['level'] | int + 1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' |
+                                    format(media_data['movies']['media_levels']['level'] | int + 1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -137,11 +114,7 @@
                     <li class="m-b-20">
                         <h4>
                             <i class="fas fa-highlighter text-light"></i>
-                            {% if current_user.get_id() != user_data['id'] %}
-                            &nbsp&nbspHis Updates
-                            {% else %}
-                            &nbsp&nbspMy Updates
-                            {% endif %}
+                            &nbsp;&nbsp;Updates
                             <a class='fs-15 m-t-10 m-r-2' href="{{ url_for('users.all_history',
                             user_name=user_data['username']) }}" style='float: right; color: grey;'>
                                 <u><i>All history</i></u>
@@ -149,28 +122,33 @@
                         </h4>
                         <hr class='m-b-8'>
                         {% for update in user_data['media_update'] %}
-                        {% if update['category'] == 'series' %}
-                            <div class="tata m-b-5" style="border-bottom: solid 1px #216e7d;">
-                            <div style="font-size: 12pt;">
-                            <i style="color: #216e7d;" class="fas fa-tv m-r-10" data-toggle="tooltip" title="Series"></i>
-                            <a class="text-light" href="/media_sheet/Series/{{ update['media_name']|replace('/', '-') }}">{{ update['media_name'] }}</a>
-                        {% elif update['category'] == 'anime' %}
-                            <div class="tata m-b-5" style="border-bottom: solid 1px #945141;">
-                            <div style="font-size: 12pt;">
-                            <i style="color: #945141;" class="fas fa-torii-gate m-r-14" data-toggle="tooltip" title="Anime"></i>
-                            <a class="text-light" href="/media_sheet/Anime/{{ update['media_name']|replace('/', '-') }}">{{ update['media_name'] }}</a>
-                        {% elif update['category'] == 'movie' %}
-                            <div class="tata m-b-5" style="border-bottom: solid 1px #8c7821;">
-                            <div style="font-size: 12pt;">
-                            <i style="color: #8c7821;" class="fas fa-film m-r-12" data-toggle="tooltip" title="Movie"></i>
-                            <a class="text-light" href="/media_sheet/Movies/{{ update['media_name']|replace('/', '-') }}">{{ update['media_name'] }}</a>
-                        {% endif %}
+                            {% if update['category'] == 'series' %}
+                                <div class="update-box m-b-5" style="border-bottom: solid 1px #216e7d;">
+                                <div style="font-size: 12pt;">
+                                <i class="fas fa-tv text-series m-r-10" data-toggle="tooltip" title="Series"></i>
+                                <a class="text-light" href="/media_sheet/Series/{{ update['media_id'] }}">
+                                    {{ update['media_name'] }}
+                                </a>
+                            {% elif update['category'] == 'anime' %}
+                                <div class="update-box m-b-5" style="border-bottom: solid 1px #945141;">
+                                <div style="font-size: 12pt;">
+                                <i class="fas fa-torii-gate text-anime m-r-14" data-toggle="tooltip" title="Anime"></i>
+                                <a class="text-light" href="/media_sheet/Anime/{{ update['media_id'] }}">
+                                    {{ update['media_name'] }}
+                                </a>
+                            {% elif update['category'] == 'movie' %}
+                                <div class="update-box m-b-5" style="border-bottom: solid 1px #8c7821;">
+                                <div style="font-size: 12pt;">
+                                <i class="fas fa-film text-movies m-r-12" data-toggle="tooltip" title="Movie"></i>
+                                <a class="text-light" href="/media_sheet/Movies/{{ update['media_id'] }}">
+                                    {{ update['media_name'] }}
+                                </a>
+                            {% endif %}
                         </div>
 
                         <div class="m-l-35" style="font-size: 11pt;">
                             {% if update['update']|length == 2 %}
-                                {{ update['update'][0] }}
-                                <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
+                                {{ update['update'][0] }} <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
                                 {{ update['update'][1] }}
                             {% else %}
                                 {{ update['update'][0] }}
@@ -178,29 +156,18 @@
                         </div>
 
                         <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
-                                    <script>
-                                        var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-                                        var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB", {timeZone: tz});
-                                        var d = new Date("{{ update['date'] }}")
-                                        var month = new Array();
-                                        month[0] = "Jan";
-                                        month[1] = "Feb";
-                                        month[2] = "Mar";
-                                        month[3] = "Apr";
-                                        month[4] = "May";
-                                        month[5] = "Jun";
-                                        month[6] = "Jul";
-                                        month[7] = "Aug";
-                                        month[8] = "Sep";
-                                        month[9] = "Oct";
-                                        month[10] = "Nov";
-                                        month[11] = "Dec";
-                                        var date_month = month[d.getMonth()];
-                                        var date_day = localdate.slice(0,2);
-                                        var date_time = localdate.slice(11,17)
-                                        document.write(date_day + " " + date_month + " at " + date_time)
-                                    </script>
-                                </span>
+                            <script type="text/javascript">
+                                var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+                                var localdate = new Date("{{update['date']}}").toLocaleString("en-GB", {timeZone: tz});
+                                var d = new Date("{{ update['date'] }}")
+                                var month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
+                                    "Nov", "Dec"];
+                                var date_month = month[d.getMonth()];
+                                var date_day = localdate.slice(0,2);
+                                var date_time = localdate.slice(11,17)
+                                document.write(date_day + " " + date_month + " at " + date_time)
+                            </script>
+                        </span>
                         </div>
                         {% endfor %}
                     </li>
@@ -210,55 +177,41 @@
                         <ul class="text-left" style="list-style-type: disc; font-size: 13pt;">
                             <li class="m-b-10">
                                 <div class="row">
-                                    <div  class="col-9">
-                                        Profile views:
-                                    </div>
-                                    <div  class="col-2">
-                                        {{ user_data['view_count']["profile"] }}
-                                    </div>
+                                    <div  class="col-9">Profile views:</div>
+                                    <div  class="col-2">{{ user_data['view_count']["profile"] }}</div>
                                 </div>
                             </li>
                             <li class="m-b-10">
                                 <div class="row">
-                                    <div  class="col-9">
-                                        SeriesList views:
-                                    </div>
-                                    <div  class="col-2">
-                                        {{ user_data['view_count']["series"] }}
-                                    </div>
+                                    <div  class="col-9">SeriesList views:</div>
+                                    <div  class="col-2">{{ user_data['view_count']["series"] }}</div>
                                 </div>
                             </li>
                             <li class="m-b-10">
                                 <div class="row">
-                                    <div  class="col-9">
-                                        AnimeList views:
-                                    </div>
-                                    <div  class="col-2">
-                                        {{ user_data['view_count']["anime"] }}
-                                    </div>
+                                    <div  class="col-9">AnimeList views:</div>
+                                    <div  class="col-2">{{ user_data['view_count']["anime"] }}</div>
                                 </div>
                             </li>
                             <li class="m-b-10">
                                 <div class="row">
-                                    <div  class="col-9">
-                                        MoviesList views:
-                                    </div>
-                                    <div  class="col-2">
-                                        {{ user_data['view_count']["movies"] }}
-                                    </div>
+                                    <div  class="col-9">MoviesList views:</div>
+                                    <div  class="col-2">{{ user_data['view_count']["movies"] }}</div>
                                 </div>
                             </li>
                             {% if user_data['id'] == current_user.get_id() %}
-                            <li class="m-b-10">
-                                <a class="text-light" href="{{ url_for('users.level_grade_data') }}" target="_blank">
-                                    <u>Grades and levels data</u>
-                                </a>
-                            </li>
-                            <li class="m-b-10">
-                                <a class="text-light" href="{{ url_for('users.knowledge_frame_data') }}" target="_blank">
-                                    <u>Knowledge frame data</u>
-                                </a>
-                            </li>
+                                <li class="m-b-10">
+                                    <a class="text-light" href="{{ url_for('users.level_grade_data') }}"
+                                       target="_blank">
+                                        <u>Grades and levels data</u>
+                                    </a>
+                                </li>
+                                <li class="m-b-10">
+                                    <a class="text-light" href="{{ url_for('users.knowledge_frame_data') }}"
+                                       target="_blank">
+                                        <u>Knowledge frame data</u>
+                                    </a>
+                                </li>
                             {% endif %}
                         </ul>
                     </li>
@@ -268,7 +221,8 @@
             <div class="col-xl col-lg-5 col-md-12">
                 <ul class="p-l-0">
                     <h4>
-                        <i class="fas fa-chart-pie"></i>&nbsp&nbspStatistics
+                        <i class="fas fa-chart-pie"></i>
+                        &nbsp;&nbsp;Statistics
                         <a class='fs-15 m-t-10 m-r-2' href="{{ url_for('users.more_stats',
                         user_name=user_data['username']) }}" style='float: right; color: grey;'>
                             <u><i>More stats</i></u>
@@ -279,25 +233,30 @@
                         <div class="row">
                             <div class="col-7 media-container">
                                 <canvas id="media-time"></canvas>
-                                <span id="time-spent-pie" values="{{ media_data['series']['time_spent_hour'] }}, {{ media_data['anime']['time_spent_hour'] }}, {{ media_data['movies']['time_spent_hour'] }}"></span>
+                                <span id="time-spent-pie" values="{{ media_data['series']['time_spent_hour'] }}
+                                      , {{ media_data['anime']['time_spent_hour'] }}
+                                      , {{ media_data['movies']['time_spent_hour'] }}"></span>
                             </div>
                             <div class="col-5 text-center m-t-10">
                                 <div>
                                     <div class="m-b-10">
                                         <b class="mobile-time">Total media time</b>
-                                        <br>
-                                        &nbsp;&nbsp;{{ media_data['series']['time_spent_hour'] +
-                                        media_data['anime']['time_spent_hour'] + media_data['movies']['time_spent_hour'] }} h
+                                        <div>&nbsp;&nbsp;{{ media_data['series']['time_spent_hour']+
+                                        media_data['anime']['time_spent_hour']+
+                                        media_data['movies']['time_spent_hour'] }} h
+                                        </div>
                                     </div>
                                     <div class="m-b-10">
                                         <b class="mobile-time">Total media time</b>
-                                        <br>
-                                        &nbsp;&nbsp;{{ ((media_data['series']['time_spent_hour'] + media_data['anime']['time_spent_hour'] + media_data['movies']['time_spent_hour'])/24)|round(2) }} days
+                                        <div>&nbsp;&nbsp;{{ ((media_data['series']['time_spent_hour'] +
+                                        media_data['anime']['time_spent_hour'] +
+                                        media_data['movies']['time_spent_hour'])/24)|round(2) }} days
+                                        </div>
                                     </div>
                                     <div>
                                         <b class="mobile-time">Total episodes</b>
-                                        <br>
-                                        &nbsp;&nbsp;{{ media_data['series']['media_total_eps'] + media_data['anime']['media_total_eps'] }}
+                                        <div>&nbsp;&nbsp;{{ media_data['series']['media_total_eps']
+                                         + media_data['anime']['media_total_eps'] }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -305,7 +264,6 @@
                     </li>
                     <hr>
                     <li class="m-b-20">
-                        <!------------------------ Series statistics --------------------------->
                         <div class="stats-size">
                             <h5 class="text-center mb-2">
                                 <a class="text-light" href="{{ url_for('main.mymedialist', media_list='serieslist',
@@ -315,33 +273,50 @@
                             </h5>
                             <div id="SERIES" class="m-b-8">
                                 <div class="m-b-5">
-                                    <span class="stat-text"><b>Days:</b> {{ media_data['series']['time_spent_day'] }}</span>
-                                    <span class="stat-text float-right"><b>Hours:</b> {{ media_data['series']['time_spent_hour'] }}</span>
+                                    <span class="stat-text"><b>Days:</b>
+                                        {{ media_data['series']['time_spent_day'] }}
+                                    </span>
+                                    <span class="stat-text float-right"><b>Hours:</b>
+                                        {{ media_data['series']['time_spent_hour'] }}
+                                    </span>
                                 </div>
                                 <figure class="d-flex">
                                     {% if media_data['series']['media_count']['nodata'] %}
-                                    <span class="block-no-data" data-toggle="tooltip" title="No data">
-                                        <span id="100%" class="value"></span>
-                                    </span>
+                                        <span class="block-no-data" data-toggle="tooltip" title="No data">
+                                            <span id="100%" class="value"></span>
+                                        </span>
                                     {% else %}
-                                    <span class="block" data-toggle="tooltip" title="Watching">
-                                        <span id="{{ media_data['series']['media_count']['Watching']['percent'] }}%" class="value"></span>
-                                    </span>
-                                    <span class="block" data-toggle="tooltip" title="Completed">
-                                        <span id="{{ media_data['series']['media_count']['Completed']['percent'] }}%" class="value"></span>
-                                    </span>
-                                    <span class="block" data-toggle="tooltip" title="On Hold">
-                                        <span id="{{ media_data['series']['media_count']['On Hold']['percent'] }}%" class="value"></span>
-                                    </span>
-                                    <span class="block" data-toggle="tooltip" title="Random">
-                                        <span id="{{ media_data['series']['media_count']['Random']['percent'] }}%" class="value"></span>
-                                    </span>
-                                    <span class="block" data-toggle="tooltip" title="Dropped">
-                                        <span id="{{ media_data['series']['media_count']['Dropped']['percent'] }}%" class="value"></span>
-                                    </span>
-                                    <span class="block" data-toggle="tooltip" title="Plan to Watch">
-                                        <span id="{{ media_data['series']['media_count']['Plan to Watch']['percent'] }}%" class="value"></span>
-                                    </span>
+                                        <span class="block" data-toggle="tooltip" title="Watching">
+                                            <span id="{{ media_data['series']['media_count']['Watching']['percent'] }}%"
+                                                  class="value">
+                                            </span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="Completed">
+                                            <span id="{{ media_data['series']['media_count']['Completed']
+                                            ['percent'] }}%"
+                                                  class="value">
+                                            </span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="On Hold">
+                                            <span id="{{ media_data['series']['media_count']['On Hold']['percent'] }}%"
+                                                  class="value">
+                                            </span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="Random">
+                                            <span id="{{ media_data['series']['media_count']['Random']['percent'] }}%"
+                                                  class="value">
+                                            </span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="Dropped">
+                                            <span id="{{ media_data['series']['media_count']['Dropped']['percent'] }}%"
+                                                  class="value">
+                                            </span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="Plan to Watch">
+                                            <span id="{{ media_data['series']['media_count']['Plan to Watch']
+                                            ['percent'] }}%" class="value">
+                                            </span>
+                                        </span>
                                     {% endif %}
                                 </figure>
                                 <div class="m-t-10">
@@ -350,13 +325,15 @@
                                             <span class="stat-text">Watching:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ media_data['series']['media_count']['Watching']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['media_count']['Watching']
+                                            ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Dropped:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ media_data['series']['media_count']['Dropped']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['media_count']['Dropped']
+                                            ['count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -364,13 +341,15 @@
                                             <span class="stat-text">Completed:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ media_data['series']['media_count']['Completed']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['media_count']['Completed']
+                                            ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Plan to Watch:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ media_data['series']['media_count']['Plan to Watch']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['media_count']
+                                            ['Plan to Watch']['count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -378,13 +357,16 @@
                                             <span class="stat-text">On Hold:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ media_data['series']['media_count']['On Hold']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['media_count']['On Hold']
+                                            ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">Total Series:</span>
+                                            <span class="stat-text" data-toggle="tooltip" title="- plan to watch">
+                                                Total Series:
+                                            </span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">
+                                            <span class="stat-text" data-toggle="tooltip" title="- plan to watch">
                                                 {{ media_data['series']['media_count']['total'] }}</span>
                                         </div>
                                     </div>
@@ -393,13 +375,16 @@
                                             <span class="stat-text">Random:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ media_data['series']['media_count']['Random']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['series']['media_count']['Random']
+                                            ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Episodes:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ media_data['series']['media_total_eps'] }}</span>
+                                            <span class="stat-text">
+                                                {{ media_data['series']['media_total_eps'] }}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -410,7 +395,8 @@
                                     {% for favorite in favorites[0] %}
                                         {% if loop.index < 11 %}
                                             <a href="/media_sheet/Series/{{ favorite[0].id }}">
-                                                <img height="90" width="60" data-toggle="tooltip" title="{{ favorite[0].name }}"
+                                                <img class="favorite-img" title="{{ favorite[0].name }}"
+                                                     data-toggle="tooltip"
                                                      src="/static/covers/series_covers/{{ favorite[0].image_cover }}"/>
                                             </a>
                                         {% endif %}
@@ -419,42 +405,51 @@
                             </div>
                         </div>
                         <hr>
-                        <!------------------------- Anime statistics --------------------------->
                         <div class="stats-size">
                             <h5 class="text-center mb-2">
-                                <a class="text-light" href="{{ url_for('main.mymedialist', media_list='animelist', user_name=user_data['username']) }}">
+                                <a class="text-light" href="{{ url_for('main.mymedialist', media_list='animelist',
+                                user_name=user_data['username']) }}">
                                     <b>Anime </b><i class="fas fa-xs fa-external-link-square-alt"></i>
                                 </a>
                             </h5>
                             <div id="ANIME" class="m-b-8">
                                 <div class="m-b-5">
-                                    <span class="stat-text"><b>Days:</b> {{ media_data['anime']['time_spent_day'] }}</span>
-                                    <span class="stat-text float-right"><b>Hours:</b> {{ media_data['anime']['time_spent_hour'] }}</span>
+                                    <span class="stat-text"><b>Days:</b>
+                                        {{ media_data['anime']['time_spent_day'] }}
+                                    </span>
+                                    <span class="stat-text float-right"><b>Hours:</b> {{ media_data['anime']
+                                    ['time_spent_hour'] }}</span>
                                 </div>
                                 <figure class="d-flex">
                                     {% if media_data['anime']['media_count']['nodata'] %}
-                                    <span class="block-no-data" data-toggle="tooltip" title="No data">
-                                        <span id="100%" class="value"></span>
-                                    </span>
+                                        <span class="block-no-data" data-toggle="tooltip" title="No data">
+                                            <span id="100%" class="value"></span>
+                                        </span>
                                     {% else %}
-                                    <span class="block" data-toggle="tooltip" title="Watching">
-                                        <span id="{{ media_data['anime']['media_count']['Watching']['percent'] }}%" class="value"></span>
-                                    </span>
-                                    <span class="block" data-toggle="tooltip" title="Completed">
-                                        <span id="{{ media_data['anime']['media_count']['Completed']['percent'] }}%" class="value"></span>
-                                    </span>
-                                    <span class="block" data-toggle="tooltip" title="On Hold">
-                                        <span id="{{ media_data['anime']['media_count']['On Hold']['percent'] }}%" class="value"></span>
-                                    </span>
-                                    <span class="block" data-toggle="tooltip" title="Random">
-                                        <span id="{{ media_data['anime']['media_count']['Random']['percent'] }}%" class="value"></span>
-                                    </span>
-                                    <span class="block" data-toggle="tooltip" title="Dropped">
-                                        <span id="{{ media_data['anime']['media_count']['Dropped']['percent'] }}%" class="value"></span>
-                                    </span>
-                                    <span class="block" data-toggle="tooltip" title="Plan to Watch">
-                                        <span id="{{ media_data['anime']['media_count']['Plan to Watch']['percent'] }}%" class="value"></span>
-                                    </span>
+                                        <span class="block" data-toggle="tooltip" title="Watching">
+                                            <span id="{{ media_data['anime']['media_count']['Watching']['percent'] }}%"
+                                                  class="value"></span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="Completed">
+                                            <span id="{{ media_data['anime']['media_count']['Completed']
+                                            ['percent'] }}%" class="value"></span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="On Hold">
+                                            <span id="{{ media_data['anime']['media_count']['On Hold']['percent'] }}%"
+                                                  class="value"></span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="Random">
+                                            <span id="{{ media_data['anime']['media_count']['Random']['percent'] }}%"
+                                                  class="value"></span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="Dropped">
+                                            <span id="{{ media_data['anime']['media_count']['Dropped']['percent'] }}%"
+                                                  class="value"></span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="Plan to Watch">
+                                            <span id="{{ media_data['anime']['media_count']['Plan to Watch']
+                                            ['percent'] }}%" class="value"></span>
+                                        </span>
                                     {% endif %}
                                 </figure>
                                 <div class="m-t-10">
@@ -463,13 +458,15 @@
                                             <span class="stat-text">Watching:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ media_data['anime']['media_count']['Watching']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['media_count']['Watching']
+                                            ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Dropped:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ media_data['anime']['media_count']['Dropped']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['media_count']['Dropped']
+                                            ['count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -477,13 +474,15 @@
                                             <span class="stat-text">Completed:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ media_data['anime']['media_count']['Completed']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['media_count']['Completed']
+                                            ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Plan to Watch:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ media_data['anime']['media_count']['Plan to Watch']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['media_count']
+                                            ['Plan to Watch']['count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -491,10 +490,13 @@
                                             <span class="stat-text">On Hold:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ media_data['anime']['media_count']['On Hold']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['media_count']['On Hold']
+                                            ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">Total Anime:</span>
+                                            <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">
+                                                Total Anime:
+                                            </span>
                                         </div>
                                         <div class="col p-l-0 position">
                                             <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">
@@ -506,7 +508,8 @@
                                             <span class="stat-text">Random:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ media_data['anime']['media_count']['Random']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['anime']['media_count']['Random']
+                                            ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Episodes:</span>
@@ -523,7 +526,8 @@
                                     {% for favorite in favorites[1] %}
                                         {% if loop.index < 11 %}
                                             <a href="/media_sheet/Anime/{{ favorite[0].id }}">
-                                                <img height="90" width="60" data-toggle="tooltip" title="{{ favorite[0].name }}"
+                                                <img class="favorite-img" data-toggle="tooltip"
+                                                     title="{{ favorite[0].name }}"
                                                      src="/static/covers/anime_covers/{{ favorite[0].image_cover }}"/>
                                             </a>
                                         {% endif %}
@@ -532,33 +536,39 @@
                             </div>
                         </div>
                         <hr>
-                        <!------------------------ Movies statistics --------------------------->
                         <div class="stats-size m-b-50">
                             <h5 class="text-center mb-2">
-                                <a class="text-light" href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=user_data['username']) }}">
+                                <a class="text-light" href="{{ url_for('main.mymedialist', media_list='movieslist',
+                                user_name=user_data['username']) }}">
                                     <b>Movies </b><i class="fas fa-xs fa-external-link-square-alt"></i>
                                 </a>
                             </h5>
                             <div id="MOVIES" class="m-b-8">
                                 <div class="m-b-16">
-                                    <span class="stat-text"><b>Days:</b> {{ media_data['movies']['time_spent_day'] }}</span>
-                                    <span class="stat-text float-right"><b>Hours:</b> {{ media_data['movies']['time_spent_hour'] }}</span>
+                                    <span class="stat-text"><b>Days:</b>
+                                        {{ media_data['movies']['time_spent_day'] }}
+                                    </span>
+                                    <span class="stat-text float-right"><b>Hours:</b> {{ media_data['movies']
+                                    ['time_spent_hour'] }}</span>
                                 </div>
                                 <figure class="d-flex">
                                     {% if media_data['movies']['media_count']['nodata'] %}
-                                    <span class="block-no-data" data-toggle="tooltip" title="No data">
-                                        <span id="100%" class="value"></span>
-                                    </span>
-                                    {% else %}
-                                    <span class="block" data-toggle="tooltip" title="Completed">
-                                        <span id="{{ media_data['movies']['media_count']['Completed']['percent'] }}%" class="value"></span>
-                                    </span>
-                                    <span class="block" data-toggle="tooltip" title="Completed Animation">
-                                        <span id="{{ media_data['movies']['media_count']['Completed Animation']['percent'] }}%" class="value"></span>
-                                    </span>
-                                    <span class="block" data-toggle="tooltip" title="Plan to Watch">
-                                        <span id="{{ media_data['movies']['media_count']['Plan to Watch']['percent'] }}%" class="value"></span>
-                                    </span>
+                                        <span class="block-no-data" data-toggle="tooltip" title="No data">
+                                            <span id="100%" class="value"></span>
+                                        </span>
+                                        {% else %}
+                                        <span class="block" data-toggle="tooltip" title="Completed">
+                                            <span id="{{ media_data['movies']['media_count']['Completed']
+                                            ['percent'] }}%" class="value"></span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="Completed Animation">
+                                            <span id="{{ media_data['movies']['media_count']['Completed Animation']
+                                            ['percent'] }}%" class="value"></span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="Plan to Watch">
+                                            <span id="{{ media_data['movies']['media_count']['Plan to Watch']
+                                            ['percent'] }}%" class="value"></span>
+                                        </span>
                                     {% endif %}
                                 </figure>
                                 <div class="m-t-10">
@@ -567,13 +577,15 @@
                                             <span class="stat-text">Completed:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ media_data['movies']['media_count']['Completed']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['movies']['media_count']['Completed']
+                                            ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
                                             <span class="stat-text">Plan to Watch:</span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text">{{ media_data['movies']['media_count']['Plan to Watch']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['movies']['media_count']
+                                            ['Plan to Watch']['count'] }}</span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -581,10 +593,13 @@
                                             <span class="stat-text">Completed Anime:</span>
                                         </div>
                                         <div class="col p-0 position">
-                                            <span class="stat-text">{{ media_data['movies']['media_count']['Completed Animation']['count'] }}</span>
+                                            <span class="stat-text">{{ media_data['movies']['media_count']
+                                            ['Completed Animation']['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">Total movies:</span>
+                                            <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">
+                                                Total movies:
+                                            </span>
                                         </div>
                                         <div class="col p-l-0 position">
                                             <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">
@@ -599,7 +614,8 @@
                                     {% for favorite in favorites[2] %}
                                        {% if loop.index < 11 %}
                                            <a href="/media_sheet/Movies/{{ favorite[0].id }}">
-                                               <img height="90" width="60" data-toggle="tooltip" title="{{ favorite[0].name }}"
+                                               <img class="favorite-img" data-toggle="tooltip"
+                                                    title="{{ favorite[0].name }}"
                                                     src="/static/covers/movies_covers/{{ favorite[0].image_cover }}"/>
                                            </a>
                                        {% endif %}
@@ -615,7 +631,7 @@
                 <ul class="p-l-0 p-r-0">
                     <li class="m-b-20">
                         <h4>
-                            <i class="fas fa-user-check"></i>&nbsp&nbsp Follows
+                            <i class="fas fa-user-check"></i>&nbsp;&nbsp; Follows
                             <a class='fs-15 m-t-10 m-r-2' href="{{ url_for('users.all_follows',
                             user_name=user_data['username']) }}" style='float: right; color: grey;'>
                                 <u><i>All ({{ follows_list|length }})</i></u>
@@ -626,8 +642,9 @@
                             <form method="POST" action="" enctype="multipart/form-data">
                             {{ follow_form.hidden_tag() }}
                             <div class="d-flex m-l-10 m-b-10" style="margin-top: -10px;">
-                                {{ follow_form.follow_to_add(style="max-width: 120px;", class='form-control', placeholder='Username') }}
-                                {{ follow_form.submit_follow(class="btn btn-sm btn-dark m-t-8 m-l-15 p-2") }}
+                                {{ follow_form.follow_to_add(style="max-width: 120px;", class='form-control',
+                                placeholder='Username') }}
+                                {{ follow_form.submit_follow(class="btn btn-sm btn-dark m-t-4 m-l-15 p-2") }}
                             </div>
                         </form>
                         {% endif %}
@@ -637,7 +654,7 @@
                                     {% for follow in follows_list %}
                                         <div class="col-3 m-b-15">
                                             <a href="{{ follow.username }}">
-                                            <img width='60' height='60' data-toggle="tooltip"
+                                            <img class="follow-img" data-toggle="tooltip"
                                                  title="{{ follow.username }}"
                                                  src="/static/profile_pics/{{ follow.image_file }}">
                                             </a>
@@ -673,27 +690,36 @@
                         <div>
                             <h4>
                                 <i class="fas fa-bell text-light"></i>
-                                &nbsp&nbspFollows' Updates
+                                &nbsp;&nbsp;Follows' Updates
                             </h4>
                         </div>
                         <hr class='m-b-8'>
                         {% if follows_update_list %}
                             {% for update in follows_update_list %}
                                 {% if update['category'] == 'series' %}
-                                    <div class="tata m-b-5" style="border-bottom: solid 1px #216e7d;">
+                                    <div class="update-box m-b-5" style="border-bottom: solid 1px #216e7d;">
                                     <div style="font-size: 12pt;">
-                                    <i style="color: #216e7d;" class="fas fa-tv m-r-10" data-toggle="tooltip" title="Series"></i>
-                                    <a class="text-light" href="/media_sheet/Series/{{ update['media_name']|replace('/', '-') }}">{{ update['media_name'] }}</a>
+                                    <i style="color: #216e7d;" class="fas fa-tv m-r-10" data-toggle="tooltip"
+                                       title="Series"></i>
+                                    <a class="text-light" href="/media_sheet/Series/{{ update['media_id'] }}">
+                                        {{ update['media_name'] }}
+                                    </a>
                                 {% elif update['category'] == 'anime' %}
-                                    <div class="tata m-b-5" style="border-bottom: solid 1px #945141;">
+                                    <div class="update-box m-b-5" style="border-bottom: solid 1px #945141;">
                                     <div style="font-size: 12pt;">
-                                    <i style="color: #945141;" class="fas fa-torii-gate m-r-14" data-toggle="tooltip" title="Anime"></i>
-                                    <a class="text-light" href="/media_sheet/Anime/{{ update['media_name'] }}">{{ update['media_name'] }}</a>
+                                    <i style="color: #945141;" class="fas fa-torii-gate m-r-14" data-toggle="tooltip"
+                                       title="Anime"></i>
+                                    <a class="text-light" href="/media_sheet/Anime/{{ update['media_id'] }}">
+                                        {{ update['media_name'] }}
+                                    </a>
                                 {% elif update['category'] == 'movie' %}
-                                    <div class="tata m-b-5" style="border-bottom: solid 1px #8c7821;">
+                                    <div class="update-box m-b-5" style="border-bottom: solid 1px #8c7821;">
                                     <div style="font-size: 12pt;">
-                                    <i style="color: #8c7821;" class="fas fa-film m-r-12" data-toggle="tooltip" title="Movie"></i>
-                                    <a class="text-light" href="/media_sheet/Movies/{{ update['media_name'] }}">{{ update['media_name'] }}</a>
+                                    <i style="color: #8c7821;" class="fas fa-film m-r-12" data-toggle="tooltip"
+                                       title="Movie"></i>
+                                    <a class="text-light" href="/media_sheet/Movies/{{ update['media_id'] }}">
+                                        {{ update['media_name'] }}
+                                    </a>
                                 {% endif %}
                             </div>
                             <div class="m-l-35" style="font-size: 11pt;">
@@ -706,30 +732,31 @@
                                 {% endif %}
                             </div>
                             <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
-                                    <script>
-                                        var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-                                        var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB", {timeZone: tz});
-                                        var d = new Date("{{ update['date'] }}")
-                                        var month = new Array();
-                                        month[0] = "Jan";
-                                        month[1] = "Feb";
-                                        month[2] = "Mar";
-                                        month[3] = "Apr";
-                                        month[4] = "May";
-                                        month[5] = "Jun";
-                                        month[6] = "Jul";
-                                        month[7] = "Aug";
-                                        month[8] = "Sep";
-                                        month[9] = "Oct";
-                                        month[10] = "Nov";
-                                        month[11] = "Dec";
-                                        var date_month = month[d.getMonth()];
-                                        var date_day = localdate.slice(0,2);
-                                        var date_time = localdate.slice(11,17)
-                                        document.write(date_day + " " + date_month + " at " + date_time)
-                                    </script>
-                                    by
-                                </span>
+                                <script>
+                                    var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+                                    var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB",
+                                        {timeZone: tz});
+                                    var d = new Date("{{ update['date'] }}")
+                                    var month = new Array();
+                                    month[0] = "Jan";
+                                    month[1] = "Feb";
+                                    month[2] = "Mar";
+                                    month[3] = "Apr";
+                                    month[4] = "May";
+                                    month[5] = "Jun";
+                                    month[6] = "Jul";
+                                    month[7] = "Aug";
+                                    month[8] = "Sep";
+                                    month[9] = "Oct";
+                                    month[10] = "Nov";
+                                    month[11] = "Dec";
+                                    var date_month = month[d.getMonth()];
+                                    var date_day = localdate.slice(0,2);
+                                    var date_time = localdate.slice(11,17)
+                                    document.write(date_day + " " + date_month + " at " + date_time)
+                                </script>
+                                by
+                            </span>
                             <a href="{{ url_for('users.account', user_name=update['username']) }}"
                                style="color: #359aff; font-size: 11pt;">{{ update['username'] }}
                             </a>
@@ -752,11 +779,13 @@
 {#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
 {#                            <div class="col-3">#}
 {#                                <img height='100' width='95' style="border-radius: 50%;"#}
-{#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ1kPZoy5MDOZbuDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>#}
+{#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3
+AANd9GcQ1kPZoy5MDOZbuDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>#}
 {#                            </div>#}
 {#                            <div class="col-9 m-t-8">#}
 {#                                <div class="relative-medal">#}
-{#                                    <img height='30' width='30' src="https://image.flaticon.com/icons/svg/179/179249.svg" alt=""/>#}
+{#                                    <img height='30' width='30' src="https://image.flaticon.com/
+icons/svg/179/179249.svg" alt=""/>#}
 {#                                </div>#}
 {#                                <h5><b>You're goddamn right</b></h5>#}
 {#                                You've watched 6 series with the actor Bryan Cranston#}
@@ -767,7 +796,8 @@
 {#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
 {#                            <div class="col-3">#}
 {#                                <img height='100' width='95' style="border-radius: 50%;"#}
-{#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon-linear-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>#}
+{#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon
+-linear-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>#}
 {#                            </div>#}
 {#                            <div class="col-9 m-t-8">#}
 {#                                <h5><b>Short is good too</b></h5>#}
@@ -786,11 +816,13 @@
 {#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
 {#                            <div class="col-3">#}
 {#                                <img height='100' width='95' style="border-radius: 50%;"#}
-{#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ1kPZoy5MDOZbuDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>#}
+{#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ1kPZoy5MDO
+ZbuDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>#}
 {#                            </div>#}
 {#                            <div class="col-9 m-t-8">#}
 {#                                <div class="relative-medal">#}
-{#                                    <img height='30' width='30' src="https://image.flaticon.com/icons/svg/179/179249.svg" alt=""/>#}
+{#                                    <img height='30' width='30' src="https://image.flaticon.com/icons/svg
+/179/179249.svg" alt=""/>#}
 {#                                </div>#}
 {#                                <h5><b>You're goddamn right</b></h5>#}
 {#                                You've watched 6 series with the actor Bryan Cranston#}
@@ -801,7 +833,8 @@
 {#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
 {#                            <div class="col-3">#}
 {#                                <img height='100' width='95' style="border-radius: 50%;"#}
-{#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon-linear-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>#}
+{#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon-li
+near-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>#}
 {#                            </div>#}
 {#                            <div class="col-9 m-t-8">#}
 {#                                <h5><b>Short is good too</b></h5>#}
@@ -820,11 +853,13 @@
 {#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
 {#                            <div class="col-3">#}
 {#                                <img height='100' width='95' style="border-radius: 50%;"#}
-{#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ1kPZoy5MDOZbuDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>#}
+{#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ1kPZoy5MDOZ
+buDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>#}
 {#                            </div>#}
 {#                            <div class="col-9 m-t-8">#}
 {#                                <div class="relative-medal">#}
-{#                                    <img height='30' width='30' src="https://image.flaticon.com/icons/svg/179/179249.svg" alt=""/>#}
+{#                                    <img height='30' width='30' src="https://image.flaticon.com/icons/svg
+/179/179249.svg" alt=""/>#}
 {#                                </div>#}
 {#                                <h5><b>You're goddamn right</b></h5>#}
 {#                                You've watched 6 series with the actor Bryan Cranston#}
@@ -835,7 +870,8 @@
 {#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
 {#                            <div class="col-3">#}
 {#                                <img height='100' width='95' style="border-radius: 50%;"#}
-{#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon-linear-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>#}
+{#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon-lin
+ear-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>#}
 {#                            </div>#}
 {#                            <div class="col-9 m-t-8">#}
 {#                                <h5><b>Short is good too</b></h5>#}
@@ -850,9 +886,4 @@
 {#            </div>#}
 {#        </div>#}
     </div>
-{% endblock content %}
-
-
-{% block script %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/account.js') }}" ></script>
-{% endblock script %}
+{% endblock data %}

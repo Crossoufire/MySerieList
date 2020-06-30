@@ -1,18 +1,12 @@
 
 
-// ------------------------ Follow status ---------------------------------
-function follow_status(follow_id, button) {
+// --- Follow status -----------------------------------------------
+function follow_status(follow_id, button, index) {
     let status;
 
-    if ($(button)[0].innerText === 'UNFOLLOW') {
-        $(button).text('Follow');
-        $(button).addClass('btn-primary').removeClass('btn-dark btn-smaller');
-        status = false;
-    } else {
-        $(button).text('Unfollow');
-        $(button).removeClass('btn-primary').addClass('btn-dark btn-smaller');
-        status = true;
-    }
+    status = $(button).prop('value') !== '1';
+    $('#loading-follow-'+index).show();
+    $(button).addClass('disabled');
 
     $.ajax ({
         type: "POST",
@@ -21,14 +15,30 @@ function follow_status(follow_id, button) {
         data: JSON.stringify({follow_id: follow_id, follow_status: status}),
         dataType: "json",
         success: function() {
-            console.log("ok"); }
+            if (status === false) {
+                $(button).text('Follow');
+                $(button).prop('value', '0');
+                $(button).addClass('btn-primary').removeClass('btn-dark btn-smaller');
+                $(button).removeClass('disabled');
+            } else {
+                $(button).text('Unfollow');
+                $(button).prop('value', '1');
+                $(button).removeClass('btn-primary').addClass('btn-dark btn-smaller');
+                $(button).removeClass('disabled');
+            }
+        },
+        error: function () {
+            error_ajax_message('Error updating the following status. Please try again later.');
+        },
+        complete: function() {
+            $('#loading-follow-'+index).hide();
+        }
     });
 }
 
 
-// -------------------- Tooltip and Datatable -----------------------------
+// --- Datatable ---------------------------------------------------
 $(document).ready(function () {
-    // --- Hall of Fame datatable functions ------------------
     $('#hall_of_fame').DataTable({
         "order": [[ 0, "desc" ]],
         columnDefs: [
@@ -37,10 +47,7 @@ $(document).ready(function () {
         ],
         "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
     });
-    $('.dataTables_length').addClass('bs-select');
 
-
-    // --- More stats datatable functions --------------------
     $('#more_stats').DataTable({
         "bFilter": false,
         "bInfo": false,
@@ -54,11 +61,6 @@ $(document).ready(function () {
         ],
         "lengthMenu": [[-1], ["All"]],
     });
-    $('.dataTables_length').addClass('bs-select');
 
-    // Tooltip init
-    $('.tooltip').tooltip();
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
+    $('.dataTables_length').addClass('bs-select');
 });

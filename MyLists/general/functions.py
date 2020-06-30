@@ -5,120 +5,22 @@ import urllib.request
 
 from PIL import Image
 from pathlib import Path
-from flask import url_for
 from MyLists import db, app
-from sqlalchemy import func
 from datetime import datetime
-from MyLists.models import ListType, Status, User, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason,\
-    SeriesList, Series, MoviesList, Movies, Badges, MoviesCollections, Ranks, Frames
-
-
-def get_trending_data(trends_data, list_type):
-    trending_list = []
-    tmdb_posters_path = "http://image.tmdb.org/t/p/w300"
-
-    i = 0
-    if list_type == ListType.SERIES:
-        trends_data = trends_data.get("results")
-        if trends_data is None:
-            return None
-
-        for data in trends_data:
-            series = {"title": data.get("original_name", "Unknown") or "Unknown"}
-
-            media_cover_path = data.get("poster_path") or None
-            if media_cover_path:
-                series["poster_path"] = tmdb_posters_path + media_cover_path
-            else:
-                series["poster_path"] = url_for('static', filename='covers/series_covers/default.jpg')
-
-            series["first_air_date"] = data.get("first_air_date") or None
-            if series["first_air_date"]:
-                series["first_air_date"] = datetime.strptime(series["first_air_date"], '%Y-%m-%d').strftime("%d %b %Y")
-            else:
-                series["first_air_date"] = 'Not avalaible'
-
-            series["overview"] = data.get("overview", "There is no overview for this series.") or "There is no overv" \
-                                                                                                  "iew for this series."
-            series["tmdb_link"] = "https://www.themoviedb.org/tv/{}".format(data.get("id"))
-            trending_list.append(series)
-            i += 1
-            if i > 11:
-                break
-
-        return trending_list
-    elif list_type == ListType.ANIME:
-        trends_data = trends_data.get("top")
-        if trends_data is None:
-            return None
-
-        for data in trends_data:
-            anime = {"title": data.get("title", "Unknown") or "Unknown"}
-
-            media_cover_path = data.get("image_url") or None
-            if media_cover_path:
-                anime["poster_path"] = media_cover_path
-            else:
-                anime["poster_path"] = url_for('static', filename='covers/default.jpg')
-
-            anime["first_air_date"] = data.get("start_date", 'Unknown') or "Unknown"
-            anime["overview"] = "There is no overview from this API. " \
-                                "You can check it on MyAnimeList by clicking on the title"
-            anime["tmdb_link"] = data.get("url")
-            trending_list.append(anime)
-            i += 1
-            if i > 11:
-                break
-
-        return trending_list
-    elif list_type == ListType.MOVIES:
-        trends_data = trends_data.get("results")
-        if trends_data is None:
-            return None
-
-        for data in trends_data:
-            movies = {"title": data.get("title", "Unknown") or "Unknown"}
-
-            media_cover_path = data.get("poster_path") or None
-            if media_cover_path:
-                movies["poster_path"] = tmdb_posters_path + media_cover_path
-            else:
-                movies["poster_path"] = url_for('static', filename='covers/default.jpg')
-
-            movies["release_date"] = data.get("release_date") or None
-            if movies["release_date"]:
-                movies["release_date"] = datetime.strptime(movies["release_date"], '%Y-%m-%d').strftime("%d %b %Y")
-            else:
-                movies["release_date"] = "Not avalaible"
-
-            movies["overview"] = data.get("overview", "No overview available for this movie.") or 'No overview avail' \
-                                                                                                  'able for this movie.'
-            movies["tmdb_link"] = "https://www.themoviedb.org/movie/{}".format(data.get("id"))
-            trending_list.append(movies)
-            i += 1
-            if i > 11:
-                break
-
-        return trending_list
+from MyLists.models import ListType, Status, User, AnimeList, SeriesList, MoviesList, Movies, Badges, Ranks, Frames, \
+    MoviesCollections
 
 
 def compute_media_time_spent(list_type):
     users = User.query.all()
 
     for user in users:
-        if list_type == ListType.ANIME:
-            element_data = db.session.query(AnimeList, Anime, func.group_concat(AnimeEpisodesPerSeason.episodes)) \
-                .join(Anime, Anime.id == AnimeList.anime_id) \
-                .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id) \
-                .filter(AnimeList.user_id == user.id).group_by(AnimeList.anime_id)
-        elif list_type == ListType.SERIES:
-            element_data = db.session.query(SeriesList, Series, func.group_concat(SeriesEpisodesPerSeason.episodes)) \
-                .join(Series, Series.id == SeriesList.series_id) \
-                .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id) \
-                .filter(SeriesList.user_id == user.id).group_by(SeriesList.series_id)
+        if list_type == ListType.SERIES:
+            element_data = SeriesList.get_total_time(user.id)
+        elif list_type == ListType.ANIME:
+            element_data = AnimeList.get_total_time(user.id)
         elif list_type == ListType.MOVIES:
-            element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id) \
-                .filter(MoviesList.user_id == user.id).group_by(MoviesList.movies_id)
+            element_data = MoviesList.get_total_time(user.id)
 
         if list_type != ListType.MOVIES:
             total_time = 0
@@ -260,8 +162,10 @@ def refresh_db_frames():
 def add_collections_movies():
     print('Started.')
     local_covers_path = Path(app.root_path, "static/covers/movies_collection_covers/")
+
     all_movies = Movies.query.filter_by().all()
-    for movie in all_movies:
+    for index, movie in enumerate(all_movies):
+        print("Movie: {}/{}".format(index + 1, len(all_movies)))
         tmdb_movies_id = movie.themoviedb_id
 
         try:
@@ -318,40 +222,17 @@ def add_collections_movies():
 
             db.session.add(add_collection)
             db.session.commit()
-            print('And... ANOTHER ONE')
         except:
             continue
-        print('Finished.')
-
-
-def add_director_movies():
-    print('Started')
-    all_movies = Movies.query.all()
-    for movie in all_movies:
-        tmdb_movies_id = movie.themoviedb_id
-        response = requests.get("https://api.themoviedb.org/3/movie/{0}/credits?api_key={1}"
-                                .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']))
-        element_cast = json.loads(response.text)
-
-        try:
-            for data in element_cast['crew']:
-                if data['job'] == "Director":
-                    director_name = data['name']
-                    break
-        except:
-            director_name = "Unknown"
-
-        movie.director_name = director_name
-        db.session.commit()
-
-        print('Added one', director_name)
+    print('Finished.')
 
 
 def refresh_collections_movies():
     print('Started.')
 
     all_collection_movies = MoviesCollections.query.filter_by().all()
-    for collection in all_collection_movies:
+    for index, collection in enumerate(all_collection_movies):
+        print("Movie: {}/{}".format(index + 1, len(all_collection_movies)))
         try:
             response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
                                     .format(collection.collection_id, app.config['THEMOVIEDB_API_KEY']))
@@ -371,10 +252,10 @@ def refresh_collections_movies():
                     remove += 1
 
             collection.parts = len(data["parts"]) - remove
+            collection.movies_names = ', '.join([part['title'] for part in data["parts"]])
+            collection.releases_dates = ', '.join([part['release_date'] for part in data["parts"]])
 
             db.session.commit()
-            print('And... ANOTHER ONE')
         except:
             continue
-
     print('Finished.')

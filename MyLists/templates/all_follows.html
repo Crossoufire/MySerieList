@@ -1,45 +1,7 @@
-{% extends "layout.html" %}
+{% extends "header_account.html" %}
 
 
-{% block css %}
-    <link href="{{ url_for('static', filename='css/account.css') }}" rel="stylesheet">
-{% endblock css %}
-
-
-{% block content %}
-    <div class="header-container">
-        <div class="header-profile-container" {% if user_data['knowledge_info']['frame_level'] < 36 %}
-            style="left: -10px; {% endif %}">
-            <img class="header-profile-img" src="{{ user_data['profile_picture'] }}"/>
-            <img class="header-profile-frame" src="{{ user_data['knowledge_info']['frame_id'] }}.png"/>
-            <div class="header-knowledge-level text-center">{{ user_data['knowledge_info']['level'] }}</div>
-        </div>
-        <div class="header-profile-data"  {% if user_data['knowledge_info']['frame_level'] < 36 %}
-            style="left: 200px; {% endif %}">
-            <h2 class="profile-name"><b>{{ user_data['username'] }}</b>
-                {% if user_data['id'] != current_user.get_id() %}
-                    {% if user_data["isfollowing"] %}
-                        <button class="btn btn-sm btn-dark follow-btn"
-                                onclick="follow_status('{{ user_data['id'] }}')">Unfollow</button>
-                    {% else %}
-                        <button class="btn btn-sm btn-primary follow-btn"
-                                onclick="follow_status('{{ user_data['id'] }}')">Follow</button>
-                    {% endif %}
-                {% endif %}
-            </h2>
-            <div>
-                <b>Joined: {{ user_data['register'] }}</b><br>
-                <b>Followers: {{ user_data['followers'] }}</b>
-            </div>
-        </div>
-        <div class="header-profile-data-mobile">
-            <h4 class="p-0 m-0"><b>{{ user_data['username'] }}</b></h4>
-            <div class="header-join-follow">
-                <b>Joined: {{ user_data['register'] }}</b><br>
-                <b>Followers: {{ user_data['followers'] }}</b>
-            </div>
-        </div>
-    </div>
+{% block data %}
     <div class="account-wrapper m-b-30">
         <h4 class="m-t-15"><i class="fas fa-user-check"></i>&nbsp&nbsp All Follows</h4><hr>
         <a class="text-light" href="/account/{{ user_data['username'] }}">
@@ -55,8 +17,4 @@
             {% endfor %}
         </div>
     </div>
-{% endblock content %}
-
-
-{% block script %}
-{% endblock script %}
+{% endblock data %}

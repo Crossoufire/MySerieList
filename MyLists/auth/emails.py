@@ -17,12 +17,7 @@ def send_reset_email(user):
     email_template = email_template.replace("{2}", url_for('auth.reset_password_token', token=token, _external=True))
     msg.html = email_template
 
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        app.logger.error('[SYSTEM] - Exception sending password reset email to account ID {}: {}'.format(user.id, e))
-        return False
+    mail.send(msg)
 
 
 def send_register_email(user):
@@ -38,10 +33,4 @@ def send_register_email(user):
     email_template = email_template.replace("{2}", url_for('auth.register_account_token', token=token, _external=True))
     msg.html = email_template
 
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        app.logger.error('[SYSTEM] Exception raised when sending register email to account with the ID {} : {}'
-                         .format(user.id, e))
-        return False
+    mail.send(msg)

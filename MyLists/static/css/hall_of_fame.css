@@ -55,7 +55,7 @@ table.table a {
 
 .profile-picture {
     position: absolute;
-    z-index: 101;
+    z-index: 5;
     left: 50%;
     top: 8px;
     transform: translate(-50%, -50%);
@@ -77,7 +77,7 @@ table.table a {
 
 .frame-level {
     position: absolute;
-    z-index: 102;
+    z-index: 6;
     left: 50%;
     top: 50px;
     transform: translate(-50%, -50%);

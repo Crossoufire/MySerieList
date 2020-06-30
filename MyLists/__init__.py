@@ -1,7 +1,7 @@
 import sys
-import email as em
 import logging
 import smtplib
+import email as em
 import configparser
 
 from flask import Flask
@@ -24,12 +24,11 @@ try:
     port = int(config['Mail']['port'])
     themoviedb_key = config['TheMovieDB']['api_key']
 except Exception as e:
-    print("Config file error. Please read the README to configure the config.ini file properly. Exit.")
-    print('Error is: {}'.format(e))
+    print("Config file error: {}. Please read the README to configure the config.ini file properly.\nExit.".format(e))
     sys.exit()
 
-
 app = Flask(__name__)
+# minify(app=app, html=True, js=True, cssless=True)
 Compress(app)
 
 app.config['SECRET_KEY'] = flask_secret
@@ -59,6 +58,7 @@ scheduler.start()
 login_manager = LoginManager(app)
 login_manager.login_view = 'auth.home'
 login_manager.login_message_category = 'info'
+app.url_map.strict_slashes = False
 
 
 from MyLists.auth.routes import bp as auth_bp

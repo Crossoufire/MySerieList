@@ -5,11 +5,10 @@ from _collections import OrderedDict
 
 from MyLists import db
 from flask import url_for
-from sqlalchemy import func, or_
+from sqlalchemy import func
 from flask_login import current_user
 from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
-    AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, SeriesGenre, AnimeGenre, MoviesGenre, Movies, Badges, Ranks, \
-    followers, Frames
+    AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, Movies, Ranks, followers, Frames
 
 
 def get_media_count(user_id, list_type):
@@ -178,6 +177,7 @@ def get_updates(last_update):
         # Update date and add media name
         element_data["date"] = element.date.replace(tzinfo=pytz.UTC).isoformat()
         element_data["media_name"] = element.media_name
+        element_data["media_id"] = element.media_id
 
         if element.media_type == ListType.SERIES:
             element_data["category"] = "series"
@@ -351,7 +351,7 @@ def get_more_stats(user):
                                     '2010-2019': 0, '2020+': 0})
         episodes_time = OrderedDict({'1-19': 0, '20-49': 0, '50-99': 0, '100-149': 0, '150-199': 0, '200-299': 0,
                                      '300-399': 0, '400-499': 0, '500+': 0})
-        movies_time = OrderedDict({'>1h': 0, '1h-1h29': 0, '1h30-1h59': 0, '2h00-2h29': 0, '2h30-2h59': 0, '3h+': 0})
+        movies_time = OrderedDict({'<1h': 0, '1h-1h29': 0, '1h30-1h59': 0, '2h00-2h29': 0, '2h30-2h59': 0, '3h+': 0})
         for element in media:
             # Number of episodes and the time watched by element
             episodes_watched, time_watched = get_episodes_and_time(element)

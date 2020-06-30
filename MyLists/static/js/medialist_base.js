@@ -1,21 +1,30 @@
 
 
 // --- Delete element --------------------------------------------------
-function deleteElement(element_id, card_id, media_list) {
-    if (!confirm("Are you sure you want to delete this from your list?")) {
+function deleteElement(card, media_list) {
+    let element_id = $(card)[0].id.split('_')[1];
+    let name = $(card).find('.font-mask').html();
+    $(card).find('.loading-medialist').show();
+
+    if (!confirm('Delete "' + name  + '" from your list?')) {
+        $(card).find('.loading-medialist').hide();
         return false;
     }
 
-    $("#"+card_id).remove();
-    $body = $("body");
     $.ajax ({
         type: "POST",
         url: "/delete_element",
         contentType: "application/json",
         data: JSON.stringify({ delete: element_id, element_type: media_list }),
         dataType: "json",
-        success: function(response) {
-            console.log("ok");
+        success: function() {
+            $(card).remove();
+        },
+        error: function () {
+            error_ajax_message('Error trying to remove the media. Please try again later.')
+        },
+        complete: function () {
+            $(card).find('.loading-medialist').show();
         }
     });
 
@@ -23,7 +32,7 @@ function deleteElement(element_id, card_id, media_list) {
 }
 
 
-// --- Remove the category list ----------------------------------------
+// --- Remove the category buttons -------------------------------------
 function removeCat() {
     $('.card-cat-buttons').remove();
     $('.card-btn-top-right-2').remove();
@@ -33,7 +42,8 @@ function removeCat() {
     $('.seas-eps-box').each(function () {
         if ($(this).parent().parent().parent()[0].className === 'row category-PLAN TO WATCH') {
             $(this).attr('style', 'display: none;');
-        } else {
+        }
+        else {
             $(this).attr('style', 'display: inline-block;');
         }
     });
@@ -43,9 +53,10 @@ function removeCat() {
 }
 
 
-// --- Search by Title or Actor ----------------------------------------
+// --- Search in medialist ---------------------------------------------
 function searchElement() {
     let input, cat, filter, cards, cardContainer, title, i, l;
+
     input = document.getElementById("searchInput");
     cat = document.getElementsByClassName("search-select")[0].value;
     filter = input.value.toUpperCase();
@@ -54,21 +65,26 @@ function searchElement() {
     l = cards.length;
     for (i = 0; i < l; i++) {
         title = cards[i].querySelector(".font-mask");
-        original_title = cards[i].querySelector(".by-original-title");
-        actors = cards[i].querySelector(".by-actor");
-        genres = cards[i].querySelector(".by-genre");
-        director = cards[i].querySelector(".by-director");
+        let original_title = cards[i].querySelector(".by-original-title");
+        let actors = cards[i].querySelector(".by-actor");
+        let genres = cards[i].querySelector(".by-genre");
+        let director = cards[i].querySelector(".by-director");
         if (title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
             cards[i].style.display = "";
-        } else if (original_title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
+        }
+        else if (original_title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
             cards[i].style.display = "";
-        } else if (actors.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Actors' || cat === 'All')) {
+        }
+        else if (actors.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Actors' || cat === 'All')) {
             cards[i].style.display = "";
-        } else if (genres.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Genres' || cat === 'All')) {
+        }
+        else if (genres.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Genres' || cat === 'All')) {
             cards[i].style.display = "";
-        } else if (director.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Director' || cat === 'All')) {
+        }
+        else if (director.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Director' || cat === 'All')) {
             cards[i].style.display = "";
-        } else {
+        }
+        else {
             cards[i].style.display = "none";
         }
     }
@@ -79,27 +95,26 @@ function searchElement() {
 
 // --- Add media to favorite -------------------------------------------
 function addFavorite(element_id, media_type) {
-    let favorite
+    let favorite;
+    favorite = !!$('#fav-' + element_id).hasClass('far');
 
-    if ($('#fav-'+element_id).hasClass('far')) {
-        $('#fav-'+element_id).removeClass('far card-btn-bottom-left').addClass('fas card-favorite')
-        $('#fav-'+element_id).attr('style', 'color: darkgoldenrod;')
-        favorite = true
-    } else {
-        $('#fav-'+element_id).removeClass('fas card-favorite').addClass('far card-btn-bottom-left')
-        $('#fav-'+element_id).attr('style', 'color: white;')
-        favorite = false
-    }
-
-    $body = $("body");
     $.ajax ({
         type: "POST",
         url: "/add_favorite",
         contentType: "application/json",
         data: JSON.stringify({ element_id: element_id, element_type: media_type, favorite: favorite }),
         dataType: "json",
-        success: function(response) {
-            console.log("ok");
+        success: function() {
+            if (favorite === true) {
+                $('#fav-'+element_id).removeClass('far card-btn-bottom-left').addClass('fas card-favorite');
+                $('#fav-'+element_id).attr('style', 'color: darkgoldenrod;');
+            } else {
+                $('#fav-'+element_id).removeClass('fas card-favorite').addClass('far card-btn-bottom-left');
+                $('#fav-'+element_id).attr('style', 'color: white;');
+            }
+        },
+        error: function() {
+            error_ajax_message('Error trying to favorite the media. Please try again later.')
         }
     });
 }
@@ -107,26 +122,31 @@ function addFavorite(element_id, media_type) {
 
 // --- Show/Hide common media ------------------------------------------
 function HideCommon() {
-    if ($('#SharedMedia').prop("checked") == true) {
+    if ($('#SharedMedia').prop("checked") === true) {
         $('.card-ribbon').parent().parent().parent().hide();
-    } else if ($('#SharedMedia').prop("checked") == false && $('#ShowFavorites').prop("checked") == true) {
+    }
+    else if ($('#SharedMedia').prop("checked") === false && $('#ShowFavorites').prop("checked") === true) {
         $('.card-ribbon').parent().parent().parent().show();
         $('.far.fa-star').parent().parent().parent().hide();
-    } else if ($('#SharedMedia').prop("checked") == false && $('#ShowFavorites').prop("checked") == false) {
+    }
+    else if ($('#SharedMedia').prop("checked") === false && $('#ShowFavorites').prop("checked") === false) {
         $('.card-ribbon').parent().parent().parent().show();
     }
+
     $categories.isotope('layout');
 }
 
 
 // --- Show/Hide favorites media ---------------------------------------
 function ShowFavorites() {
-    if ($('#ShowFavorites').prop("checked") == true) {
+    if ($('#ShowFavorites').prop("checked") === true) {
         $('.far.fa-star').parent().parent().parent().hide();
-    } else if ($('#ShowFavorites').prop("checked") == false && $('#SharedMedia').prop("checked") == true) {
+    }
+    else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === true) {
         $('.far.fa-star').parent().parent().parent().show();
         $('.card-ribbon').parent().parent().parent().hide();
-    } else if ($('#ShowFavorites').prop("checked") == false && $('#SharedMedia').prop("checked") == false) {
+    }
+    else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === false) {
         $('.far.fa-star').parent().parent().parent().show();
     }
 
@@ -135,35 +155,30 @@ function ShowFavorites() {
 
 
 // --- Add the category to the user (from other list) ------------------
-function AddCatUser(cat, card_id, element_id, media_type) {
-    var add_cat = cat.childNodes[0].data
+function AddCatUser(category, card_id) {
+    let media_list = $('#'+card_id).attr('values').split('-')[1];
+    let element_id = $('#'+card_id).attr('values').split('-')[2];
+    $('#'+card_id).find('.loading-medialist').show();
 
-    $body = $("body");
     $.ajax ({
         type: "POST",
         url: "/add_element",
         contentType: "application/json",
-        data: JSON.stringify({element_cat: add_cat, element_id: element_id, element_type: media_type}),
+        data: JSON.stringify({element_cat: category, element_id: element_id, element_type: media_list}),
         dataType: "json",
-        success: function(response) {
-            console.log("ok");
+        success: function() {
+            $("#"+card_id).find('.view.overlay').append('<div class="card-ribbon"></div>');
+            $("#"+card_id).find('.card-btn-top-left.fas.fa-plus.text-light').remove();
+        },
+        error: function () {
+            error_ajax_message('Error trying to add the media to your list. Please try again later.')
+        },
+        complete: function () {
+            removeCat();
+            $('#'+card_id).find('.loading-medialist').hide();
         }
     });
-
-    removeCat();
-    $("#"+card_id).children().children('div[class="view overlay"]').append("<div class='card-ribbon'></div>");
-    $("#"+card_id).children().children().children().remove(".card-btn-top-left.fas.fa-plus.text-light");
 }
-
-
-// --- Tooltip ---------------------------------------------------------
-$(document).ready(function() {
-    $body = $("body");
-    $body.tooltip();
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
-});
 
 
 // --- Isotopes --------------------------------------------------------
@@ -177,14 +192,14 @@ let $categories = $('.categories-iso').isotope({
 $("img.lazyload").lazyload({
     failure_limit : Math.max($("img.lazyload").length-1, 0)
 });
-
 $('.filters-button-group').on('click', 'button', function() {
-    var filterValue = $(this).attr('data-filter');
-    $categories.isotope({ filter: filterValue });
+    let filterValue = $(this).attr('data-filter');
+    $categories.isotope({
+        filter: filterValue
+    });
 });
-
 $('.filters-button-group').each(function(i, buttonGroup) {
-    var $buttonGroup = $(buttonGroup);
+    let $buttonGroup = $(buttonGroup);
     $buttonGroup.on('click', 'button', function() {
         $buttonGroup.find('.btn-selected').addClass('btn-header');
         $buttonGroup.find('.btn-selected').removeClass('btn-selected');
@@ -192,23 +207,17 @@ $('.filters-button-group').each(function(i, buttonGroup) {
         $(this).removeClass('btn-header');
     });
 });
-$categories.isotope('layout');
 
 
 // --- Row gutters -----------------------------------------------------
-(function($) {
-    var $window = $(window),
-        $row = $('.row');
-
-    function resize() {
-        if ($window.width() < 1025) {
-            return $row.addClass('no-gutters');
+$(document).ready(function() {
+    function a() {
+        if ($(window).width() < 1025) {
+            return $('.row').addClass('no-gutters');
         }
-        $row.removeClass('no-gutters');
+        $('.row').removeClass('no-gutters');
     }
-    $window.resize(resize).trigger('resize');
+
+    $(window).resize(a).trigger('resize');
     $categories.isotope('layout');
-})(jQuery);
-
-
-$categories.isotope('layout');
+});

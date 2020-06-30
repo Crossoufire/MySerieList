@@ -14,12 +14,12 @@
             <div class="card mb-3" style="background: #216c7d;">
                 <div class="row no-gutters">
                     <div class="col-md-5">
-                        <img src="{{ series['poster_path'] }}" class="card-img" alt="{{ series['title'] }}">
+                        <img src="{{ series['poster_path'] }}" class="card-img" alt="{{ series['name'] }}">
                     </div>
                     <div class="col-md-7">
                         <div class="card-body p-3">
                             <h5 class="card-title">
-                                <a class="text-light giveMeEllipsis2" href="{{ series['tmdb_link'] }}" target="_blank">{{ series['title'] }}</a>
+                                <a class="text-light giveMeEllipsis2" href="{{ series['tmdb_link'] }}" target="_blank">{{ series['name'] }}</a>
                                 <hr class="mt-1 mb-1" style="border-top: 1px solid #bfbfbf;">
                                 <div class="fs-13 text-grey"><i>{{ series['first_air_date'] }}</i></div>
                             </h5>
@@ -45,7 +45,7 @@
             <div class="card card-anime mb-3" style="background: #945141;">
                 <div class="row no-gutters">
                     <div class="col-md-5">
-                        <img src="{{ anime['poster_path'] }}" class="card-img img-anime" alt="{{ anime['title'] }}">
+                        <img src="{{ anime['poster_path'] }}" class="card-img img-anime" alt="{{ anime['name'] }}">
                     </div>
                     <div class="col-md-7">
                         <div class="card-body p-3">
@@ -53,8 +53,8 @@
                                 <a class="text-light giveMeEllipsis2"
                                    href="{{ anime['tmdb_link'] }}"
                                    data-toggle="tooltip"
-                                   title="{{ anime['title'] }}"
-                                   target="_blank">{{ anime['title'] }}</a>
+                                   title="{{ anime['name'] }}"
+                                   target="_blank">{{ anime['name'] }}</a>
                                 <hr class="mt-1 mb-1" style="border-top: 1px solid #bfbfbf;">
                                 <div class="fs-13 text-grey"><i>{{ anime['first_air_date'] }}</i></div>
                             </h5>
@@ -79,12 +79,12 @@
             <div class="card mb-3" style="background: #8c7821;">
                 <div class="row no-gutters">
                     <div class="col-md-5">
-                        <img src="{{ movies['poster_path'] }}" class="card-img" alt="{{ movies['title'] }}">
+                        <img src="{{ movies['poster_path'] }}" class="card-img" alt="{{ movies['name'] }}">
                     </div>
                     <div class="col-md-7">
                         <div class="card-body p-3">
                             <h5 class="card-title">
-                                <a class="text-light giveMeEllipsis2" href="{{ movies['tmdb_link'] }}" target="_blank">{{ movies['title'] }}</a>
+                                <a class="text-light giveMeEllipsis2" href="{{ movies['tmdb_link'] }}" target="_blank">{{ movies['name'] }}</a>
                                 <hr class="mt-1 mb-1" style="border-top: 1px solid #bfbfbf;">
                                 <div class="fs-13 text-grey"><i>{{ movies['release_date'] }}</i></div>
                             </h5>

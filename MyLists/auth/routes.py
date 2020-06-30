@@ -1,7 +1,7 @@
 from datetime import datetime
 from MyLists import app, bcrypt, db
 from MyLists.models import User, HomePage
-from MyLists.auth.functions import send_register_email, send_reset_email
+from MyLists.auth.emails import send_register_email, send_reset_email
 from flask_login import login_user, current_user, logout_user, login_required
 from flask import Blueprint, flash, request, redirect, url_for, abort, render_template
 from MyLists.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
@@ -41,20 +41,22 @@ def home():
             flash('Login Failed. Please check username and password.', 'warning')
     if register_form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(register_form.register_password.data).decode('utf-8')
+        # noinspection PyArgumentList
         user = User(username=register_form.register_username.data,
                     email=register_form.register_email.data,
                     password=hashed_password,
                     registered_on=datetime.utcnow())
         db.session.add(user)
         db.session.commit()
-        app.logger.info('[{}] New account registration: Username = {}, email = {}'
+        app.logger.info('[{}] New account registration: Username: {}, email: {}'
                         .format(user.id, register_form.register_username.data, register_form.register_email.data))
-        if send_register_email(user):
+        try:
+            send_register_email(user)
             flash('Your account has been created. Check your e-mail address to activate your account.', 'info')
-            return redirect(url_for('auth.home'))
-        else:
-            app.logger.error('[SYSTEM] Error while sending the registration email to {}'.format(user.email))
-            abort(500)
+        except Exception as e:
+            app.logger.error('[SYSTEM] Error "{}" sending register email to account with ID {}.'.format(e, user.id))
+            flash("An error occured while sending your register e-mail. Admins were advised. Please try again later.")
+        return redirect(url_for('auth.home'))
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.id).first()
         if user.homepage != HomePage.ACCOUNT or user.homepage != HomePage.HALL_OF_FAME:
@@ -88,14 +90,15 @@ def reset_password():
 
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if send_reset_email(user):
+        try:
+            send_reset_email(user)
             app.logger.info('[{}] Reset password email sent'.format(user.id))
             flash('An email has been sent with instructions to reset your password.', 'info')
-            return redirect(url_for('auth.home'))
-        else:
-            app.logger.error('[SYSTEM] Error while sending the reset password email to {}'.format(user.email))
-            flash("There was an error while sending the reset password email. Please try again later.")
-            return redirect(url_for('auth.home'))
+        except Exception as e:
+            app.logger.error('[SYSTEM] - Error "{}" while sending reset password email to {}'.format(e, user.email))
+            flash("An error occured while sending the reset password email. Please try again later.")
+
+        return redirect(url_for('auth.home'))
 
     return render_template('reset_password.html', title='Reset Password', form=form)
 
@@ -107,7 +110,7 @@ def reset_passord_token(token):
 
     user = User.verify_reset_token(token)
     if user is None:
-        flash('That is an invalid or expired token', 'warning')
+        flash('That is an invalid or an expired token', 'warning')
         return redirect(url_for('auth.reset_password'))
 
     form = ResetPasswordForm()
@@ -129,7 +132,7 @@ def register_account_token(token):
 
     user = User.verify_reset_token(token)
     if user is None or user.active:
-        flash('That is an invalid or expired token.', 'warning')
+        flash('That is an invalid or an expired token.', 'warning')
         return redirect(url_for('auth.reset_password'))
 
     user.active = True

@@ -1,7 +1,9 @@
+import json
+
 from MyLists import app, db
 from MyLists.users.forms import AddFollowForm
 from flask_login import login_required, current_user
-from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate
+from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications, RoleType
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
     get_knowledge_frame, get_updates, get_favorites, get_all_follows_data
@@ -13,17 +15,8 @@ bp = Blueprint('users', __name__)
 @bp.route('/account/<user_name>', methods=['GET', 'POST'])
 @login_required
 def account(user_name):
-    user = User.query.filter_by(username=user_name).first()
-
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
+    # Check if the user can see the <media_list>
+    user = current_user.check_autorization(user_name)
 
     # Add follows form
     follow_form = AddFollowForm()
@@ -31,7 +24,7 @@ def account(user_name):
         follow_username = follow_form.follow_to_add.data
         follow = User.query.filter_by(username=follow_username).first()
 
-        if follow is None or follow.id == 1:
+        if follow is None or follow.role == RoleType.ADMIN:
             app.logger.info('[{}] Attempt to follow account {}'.format(current_user.id, follow_username))
             flash('Sorry, this account does not exist', 'warning')
             return redirect(url_for('users.account', user_name=current_user.username))
@@ -40,8 +33,15 @@ def account(user_name):
             return redirect(url_for('users.account', user_name=current_user.username))
 
         current_user.add_follow(follow)
-        db.session.commit()
 
+        # Notify the followed user
+        payload = {'username': current_user.username,
+                   'message': '{} is following you.'.format(current_user.username)}
+        notif = Notifications(user_id=follow.id,
+                              payload_json=json.dumps(payload))
+        db.session.add(notif)
+
+        db.session.commit()
         app.logger.info('[{}] is following the account with ID {}'.format(current_user.id, follow.id))
         flash("You are now following: {}.".format(follow.username), 'success')
         return redirect(url_for('users.account', user_name=current_user.username))
@@ -55,7 +55,11 @@ def account(user_name):
     # Recover the Favorites
     favorites = get_favorites(user.id)
 
-    # check_episodes_quantities()
+    # from MyLists.main.functions import add_media_id_to_userlastupdates
+    # add_media_id_to_userlastupdates()
+
+    # from MyLists.main.functions import add_next_episode_to_air
+    # add_next_episode_to_air()
 
     return render_template('account.html',
                            title=user.username+"'s account",
@@ -67,7 +71,44 @@ def account(user_name):
                            follows_update_list=follows_update_list)
 
 
-@bp.route("/hall_of_fame", methods=['GET'])
+@bp.route("/account/all_history/<user_name>", methods=['GET', 'POST'])
+@login_required
+def all_history(user_name):
+    # Check if the user can see the <media_list>
+    user = current_user.check_autorization(user_name)
+
+    updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
+    media_updates = get_updates(updates)
+    user_data = get_user_data(user)
+
+    return render_template('all_history.html', title='Media History', media_updates=media_updates, user_data=user_data)
+
+
+@bp.route("/account/all_follows/<user_name>", methods=['GET', 'POST'])
+@login_required
+def all_follows(user_name):
+    # Check if the user can see the <media_list>
+    user = current_user.check_autorization(user_name)
+
+    all_follows = get_all_follows_data(user)
+    user_data = get_user_data(user)
+
+    return render_template('all_follows.html', title='Follows', all_follows=all_follows, user_data=user_data)
+
+
+@bp.route("/account/more_stats/<user_name>", methods=['GET', 'POST'])
+@login_required
+def more_stats(user_name):
+    # Check if the user can see the <media_list>
+    user = current_user.check_autorization(user_name)
+
+    stats = get_more_stats(user)
+    user_data = get_user_data(user)
+
+    return render_template('more_stats.html', title='More stats', stats=stats, user_data=user_data)
+
+
+@bp.route("/hall_of_fame", methods=['GET', 'POST'])
 @login_required
 def hall_of_fame():
     users = User.query.filter(User.id >= "2", User.active == True).order_by(User.username.asc()).all()
@@ -109,20 +150,6 @@ def hall_of_fame():
     return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
 
 
-@bp.route("/level_grade_data", methods=['GET'])
-@login_required
-def level_grade_data():
-    ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
-    return render_template('level_grade_data.html', title='Level grade data', data=ranks)
-
-
-@bp.route("/knowledge_frame_data", methods=['GET'])
-@login_required
-def knowledge_frame_data():
-    ranks = Frames.query.all()
-    return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
-
-
 @bp.route("/follow_status", methods=['POST'])
 @login_required
 def follow_status():
@@ -131,85 +158,55 @@ def follow_status():
         follow_id = int(json_data['follow_id'])
         follow_condition = json_data['follow_status']
     except:
-        abort(400)
+        return '', 400
 
-    # Check if the follow ID exist in the User database and status is boolean
+    # Check follow ID exist in User table and status is bool
     user = User.query.filter_by(id=follow_id).first()
-    if user is None or type(follow_condition) is not bool:
-        abort(400)
+    if not user or type(follow_condition) is not bool:
+        return '', 400
 
     # Check the status of the follow
     if follow_condition:
+        # Add the follow
         current_user.add_follow(user)
+
+        # Notify the followed user
+        payload = {'username': current_user.username,
+                   'message': '{} is following you.'.format(current_user.username)}
+        notif = Notifications(user_id=user.id,
+                              payload_json=json.dumps(payload))
+        db.session.add(notif)
+
         db.session.commit()
         app.logger.info('[{}] Follow the account with ID {}'.format(current_user.id, follow_id))
     else:
+        # Remove the follow
         current_user.remove_follow(user)
+
+        # Notify the followed user
+        payload = {'username': current_user.username,
+                   'message': '{} stopped following you.'.format(current_user.username)}
+        notif = Notifications(user_id=user.id,
+                              payload_json=json.dumps(payload))
+        db.session.add(notif)
+
         db.session.commit()
-        app.logger.info('[{}] Follow with ID {} unfollowed'.format(current_user.id, follow_id))
+        app.logger.info('[{}] Unfollowed the account with ID {} '.format(current_user.id, follow_id))
 
     return '', 204
 
 
-@bp.route("/all_history/<user_name>", methods=['GET'])
+@bp.route("/level_grade_data", methods=['GET'])
 @login_required
-def all_history(user_name):
-    user = User.query.filter_by(username=user_name).first()
+def level_grade_data():
+    ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
 
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
-
-    updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
-    media_updates = get_updates(updates)
-    user_data = get_user_data(user)
-
-    return render_template('all_history.html', title='Media History', media_updates=media_updates, user_data=user_data)
+    return render_template('level_grade_data.html', title='Level grade data', data=ranks)
 
 
-@bp.route("/all_follows/<user_name>", methods=['GET'])
+@bp.route("/knowledge_frame_data", methods=['GET'])
 @login_required
-def all_follows(user_name):
-    user = User.query.filter_by(username=user_name).first()
+def knowledge_frame_data():
+    ranks = Frames.query.all()
 
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
-
-    all_follows = get_all_follows_data(user)
-    user_data = get_user_data(user)
-
-    return render_template('all_follows.html', title='Follows', all_follows=all_follows, user_data=user_data)
-
-
-@bp.route("/more_stats/<user_name>", methods=['GET'])
-@login_required
-def more_stats(user_name):
-    user = User.query.filter_by(username=user_name).first()
-
-    # No account with this username and protection of the admin account
-    if user is None or user.id == 1 and current_user.id != 1:
-        abort(404)
-
-    # Check if the account is private or in the follow list
-    if current_user.id == user.id or current_user.id == 1:
-        pass
-    elif user.private and not current_user.is_following(user):
-        abort(404)
-
-    stats = get_more_stats(user)
-    user_data = get_user_data(user)
-
-    return render_template('more_stats.html', title='More stats', stats=stats, user_data=user_data)
+    return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)

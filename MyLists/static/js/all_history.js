@@ -1,13 +1,14 @@
-// -------------------- Tooltip and Datatable -----------------------------
+
+
+// --- Datatable functions ------------------------------------------
 $(document).ready(function () {
-    // Datatable functions
     $('#all_history').DataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-        "bFilter": false,
-        "bInfo": false,
+        "bPaginate": true,
+        "bLengthChange": true,
+        "bFilter": true,
+        "bInfo": true,
         "bAutoWidth": false,
-        "searching": false,
+        "searching": true,
         columnDefs: [
             {orderable: false, targets: 0},
             {orderable: true, targets: 1},
@@ -16,10 +17,4 @@ $(document).ready(function () {
         ],
     });
     $('.dataTables_length').addClass('bs-select');
-
-    // Tooltip init
-    $('.tooltip').tooltip();
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
 });
