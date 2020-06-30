@@ -1234,7 +1234,6 @@ class ScheduledTask:
                                                       media_id=info[0].id).first()):
 
                 release_date = datetime.strptime(info[0].release_date, '%Y-%m-%d').strftime("%b %d")
-
                 payload = {'name': info[0].name,
                            'release_date': release_date}
 
@@ -1271,7 +1270,6 @@ class ScheduledTask:
                                                       media_id=info[0].id).first()):
 
                 release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
-
                 payload = {'name': info[0].name,
                            'release_date': release_date,
                            'season': info[0].season_to_air,
@@ -1310,7 +1308,6 @@ class ScheduledTask:
                                                       media_id=info[0].id).first()):
 
                 release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
-
                 payload = {'name': info[0].name,
                            'release_date': release_date,
                            'season': info[0].season_to_air,

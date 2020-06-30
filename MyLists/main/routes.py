@@ -1,5 +1,7 @@
 import json
 
+import pytz
+
 from MyLists import db, app
 from datetime import datetime
 from MyLists.API_data import ApiData
@@ -904,8 +906,10 @@ def read_notifications():
     results = []
     if notifications:
         for info in notifications:
+            timestamp = info.timestamp.replace(tzinfo=pytz.UTC).isoformat()
             results.append({'media_type': info.media_type,
                             'media_id': info.media_id,
+                            'timestamp': timestamp,
                             'payload': json.loads(info.payload_json)})
 
     return jsonify(results=results), 200

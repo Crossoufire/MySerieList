@@ -108,6 +108,8 @@ hr {
     border: 1px solid grey;
     background: #171819;
     width: 300px;
+    overflow-y : auto;
+    max-height: 255px;
 }
 
 .ellipsis-notif {

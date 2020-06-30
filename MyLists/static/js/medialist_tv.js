@@ -82,11 +82,11 @@ function changeCategory(new_category, card_id) {
         contentType: "application/json",
         data: JSON.stringify({status: new_category, element_id: element_id, element_type: media_list }),
         dataType: "json",
-        success: function(response) {
-            if (new_category == 'Watching') {
+        success: function() {
+            if (new_category === 'Watching') {
                 $("#"+card_id).prependTo(".category-WATCHING");
             }
-            else if (new_category == 'Completed') {
+            else if (new_category === 'Completed') {
                 $("#"+card_id).prependTo(".category-COMPLETED");
 
                 var season_data = JSON.parse("[" + seas_data + "]");
@@ -109,13 +109,13 @@ function changeCategory(new_category, card_id) {
                 }
                 $('#E_'+element_id).prop('selectedIndex', season_data[0][seasons_index]-1);
             }
-            else if (new_category == 'On Hold') {
+            else if (new_category === 'On Hold') {
                 $("#"+card_id).prependTo(".category-ON.HOLD");
             }
-            else if (new_category == 'Random') {
+            else if (new_category === 'Random') {
                 $("#"+card_id).prependTo(".category-RANDOM");
             }
-            else if (new_category == 'Dropped') {
+            else if (new_category === 'Dropped') {
                 $("#"+card_id).prependTo(".category-DROPPED");
             }
             else {

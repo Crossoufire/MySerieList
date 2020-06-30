@@ -24,7 +24,7 @@ $(function() {
 });
 
 $.widget("custom.catcomplete", $.ui.autocomplete, {
-    _renderItem: function(ul, item) {
+    "_renderItem": function(ul, item) {
         ul.addClass('autocomplete-ul');
 
         let media, $li;
@@ -48,17 +48,17 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
             $li = $('<li class="bg-dark p-t-2 p-b-2" style="border-bottom: solid black 1px;">');
 
             $li.append(
-                "<div class='row'>" +
-                    "<div class='col' style='min-width: 60px; max-width: 60px;'>" +
-                        "<img src="+item.poster_path+" alt="+item.name+" style='width: 50px; height: 75px;'>" +
-                    "</div>" +
-                    "<div class='col'>" +
-                        "<a class='text-light'>" + item.name +
-                            "<br>" +
-                            "<span style='font-size: 10pt;'>" + media + " | " + item.first_air_date + "</span>" +
-                        "</a>" +
-                    "</div>" +
-                "</div>");
+                '<div class="row">' +
+                    '<div class="col" style="min-width: 60px; max-width: 60px;">' +
+                        '<img src="'+item.poster_path+'" alt="'+item.name+'" style="width: 50px; height: 75px;">' +
+                    '</div>' +
+                    '<div class="col">' +
+                        '<a class="text-light">' + item.name +
+                            '<br>' +
+                            '<span style="font-size: 10pt;">' + media + ' | ' + item.first_air_date + '</span>' +
+                        '</a>' +
+                    '</div>' +
+                '</div>');
         }
         return $li.appendTo(ul);
     }
@@ -67,7 +67,7 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
 
 // --- Notification ---------------------------------------------------------
 function display_notifications(data) {
-    let tata;
+    let add_hr;
     let resp = data.results;
     if (resp.length === 0) {
         $("#notif-dropdown").append(
@@ -78,10 +78,18 @@ function display_notifications(data) {
     }
     else {
         for (let i = 0; i < resp.length; i++) {
+            // Add the time and date for the follow
+            let tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+            let localdate = new Date(resp[i]['timestamp']).toLocaleString("en-GB", {timeZone: tz});
+            let d = new Date(resp[i]['timestamp'])
+            let month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            let timestamp = localdate.slice(0, 2) + " " + month[d.getMonth()] + " at " + localdate.slice(11, 17)
+
+            // Add H-line between notifications except for the last one
             if (i + 1 === resp.length) {
-                tata = '';
+                add_hr = '';
             } else {
-                tata = '<hr class="p-0 m-t-0 m-b-0 m-l-15 m-r-15">';
+                add_hr = '<hr class="p-0 m-t-0 m-b-0 m-l-15 m-r-15">';
             }
 
             if (resp[i]['media_type'] === 'serieslist') {
@@ -99,7 +107,7 @@ function display_notifications(data) {
                             '</div>' +
                         '</div>' +
                     '</a>' +
-                    '<div class="notif-items">' + tata + '</div>'
+                    '<div class="notif-items">' + add_hr + '</div>'
                 );
             }
             else if (resp[i]['media_type'] === 'animelist') {
@@ -117,10 +125,10 @@ function display_notifications(data) {
                             '</div>' +
                         '</div>' +
                     '</a>' +
-                    '<div class="notif-items">' + tata + '</div>'
+                    '<div class="notif-items">' + add_hr + '</div>'
                 );
             }
-            else {
+            else if (resp[i]['media_type'] === 'movieslist') {
                 $("#notif-dropdown").append(
                     '<a class="dropdown-item notif-items text-light" href="/media_sheet/Movies/' +
                     resp[i]['media_id']+'">' +
@@ -133,10 +141,28 @@ function display_notifications(data) {
                                 '<div class="fs-14" style="color: darkgrey;">Will be available on ' +
                                 resp[i]['payload']['release_date'] + '</div>' +
                             '</div>' +
+                        '</div>' +
+                    '</a>' +
+                    '<div class="notif-items">' + add_hr + '</div>'
+                );
+            }
+            else {
+                $("#notif-dropdown").append(
+                    '<a class="dropdown-item notif-items text-light" href="/account/' +
+                    resp[i]['payload']['username']+'">' +
+                        '<div class="row no-gutters">' +
+                            '<div class="col-2">' +
+                                '<i class="fas fa-user" style="color: #45B29D;"></i>' +
+                            '</div>' +
+                            '<div class="col-10 ellipsis-notif">' +
+                                '<span><b>' + resp[i]['payload']['message'] + '</b></span>' +
+                                '<div class="fs-14" style="color: darkgrey;">' +
+                                    timestamp +
+                                '</div>' +
                             '</div>' +
                         '</div>' +
                     '</a>' +
-                    '<div class="notif-items">' + tata + '</div>'
+                    '<div class="notif-items">' + add_hr + '</div>'
                 );
             }
         }
@@ -198,5 +224,4 @@ $(document).ready(function() {
     }
 
     $(window).resize(a).trigger('resize');
-    $categories.isotope('layout');
 });

@@ -1,7 +1,9 @@
+import json
+
 from MyLists import app, db
 from MyLists.users.forms import AddFollowForm
 from flask_login import login_required, current_user
-from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications
+from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications, RoleType
 from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
     get_knowledge_frame, get_updates, get_favorites, get_all_follows_data
@@ -22,7 +24,7 @@ def account(user_name):
         follow_username = follow_form.follow_to_add.data
         follow = User.query.filter_by(username=follow_username).first()
 
-        if follow is None or follow.id == 1:
+        if follow is None or follow.role == RoleType.ADMIN:
             app.logger.info('[{}] Attempt to follow account {}'.format(current_user.id, follow_username))
             flash('Sorry, this account does not exist', 'warning')
             return redirect(url_for('users.account', user_name=current_user.username))
@@ -31,8 +33,15 @@ def account(user_name):
             return redirect(url_for('users.account', user_name=current_user.username))
 
         current_user.add_follow(follow)
-        db.session.commit()
 
+        # Notify the followed user
+        payload = {'username': current_user.username,
+                   'message': '{} is following you.'.format(current_user.username)}
+        notif = Notifications(user_id=follow.id,
+                              payload_json=json.dumps(payload))
+        db.session.add(notif)
+
+        db.session.commit()
         app.logger.info('[{}] is following the account with ID {}'.format(current_user.id, follow.id))
         flash("You are now following: {}.".format(follow.username), 'success')
         return redirect(url_for('users.account', user_name=current_user.username))
@@ -62,7 +71,7 @@ def account(user_name):
                            follows_update_list=follows_update_list)
 
 
-@bp.route("/all_history/<user_name>", methods=['GET', 'POST'])
+@bp.route("/account/all_history/<user_name>", methods=['GET', 'POST'])
 @login_required
 def all_history(user_name):
     # Check if the user can see the <media_list>
@@ -75,7 +84,7 @@ def all_history(user_name):
     return render_template('all_history.html', title='Media History', media_updates=media_updates, user_data=user_data)
 
 
-@bp.route("/all_follows/<user_name>", methods=['GET', 'POST'])
+@bp.route("/account/all_follows/<user_name>", methods=['GET', 'POST'])
 @login_required
 def all_follows(user_name):
     # Check if the user can see the <media_list>
@@ -87,7 +96,7 @@ def all_follows(user_name):
     return render_template('all_follows.html', title='Follows', all_follows=all_follows, user_data=user_data)
 
 
-@bp.route("/more_stats/<user_name>", methods=['GET', 'POST'])
+@bp.route("/account/more_stats/<user_name>", methods=['GET', 'POST'])
 @login_required
 def more_stats(user_name):
     # Check if the user can see the <media_list>
@@ -158,11 +167,29 @@ def follow_status():
 
     # Check the status of the follow
     if follow_condition:
+        # Add the follow
         current_user.add_follow(user)
+
+        # Notify the followed user
+        payload = {'username': current_user.username,
+                   'message': '{} is following you.'.format(current_user.username)}
+        notif = Notifications(user_id=user.id,
+                              payload_json=json.dumps(payload))
+        db.session.add(notif)
+
         db.session.commit()
         app.logger.info('[{}] Follow the account with ID {}'.format(current_user.id, follow_id))
     else:
+        # Remove the follow
         current_user.remove_follow(user)
+
+        # Notify the followed user
+        payload = {'username': current_user.username,
+                   'message': '{} stopped following you.'.format(current_user.username)}
+        notif = Notifications(user_id=user.id,
+                              payload_json=json.dumps(payload))
+        db.session.add(notif)
+
         db.session.commit()
         app.logger.info('[{}] Unfollowed the account with ID {} '.format(current_user.id, follow_id))
 
