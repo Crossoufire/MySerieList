@@ -29,7 +29,7 @@
                 </div>
                 <div class="m-b-10 m-t-10">
                     <div id="your-medialist-data" class="m-t-5 p-2" {% if not data['in_user_list'] %}
-                         style="display: none;" {% endif %}>
+                    style="display: none;" {% endif %}>
                         <h4 id="fav-title" class="m-l-15 m-r-15">
                             <i class="fas fa-list m-t-10"></i>&nbsp&nbsp <b>List Info</b>
                             <i id="favorite" class="favorite-css {% if data['favorite'] %} fas{% else %} far {% endif %}
@@ -42,15 +42,29 @@
                             </div>
                             <div class="col-8">
                                 {% if media_list != 'movieslist' %}
+                                    <label for="category-dropdown"></label>
                                     <select id="category-dropdown" class="text-light text-center cat-drop"
-                                    onchange="changeCategoryTV('{{ data['id'] }}', this, '{{ data['eps_per_season'] }}',
+                                    onchange="changeCategoryTV('{{ data['id'] }}', this,'{{ data['eps_per_season'] }}',
                                     '{{ media_list }}')">
-                                        <option {% if data['status'] == 'Watching' %} selected="selected" {% endif %}>Watching</option>
-                                        <option {% if data['status'] == 'Completed' %} selected="selected" {% endif %}>Completed</option>
-                                        <option {% if data['status'] == 'On Hold' %} selected="selected" {% endif %}>On Hold</option>
-                                        <option {% if data['status'] == 'Random' %} selected="selected" {% endif %}>Random</option>
-                                        <option {% if data['status'] == 'Dropped' %} selected="selected" {% endif %}>Dropped</option>
-                                        <option {% if data['status'] == 'Plan to Watch' %} selected="selected" {% endif %}>Plan to Watch</option>
+                                        <option {% if data['status'] == 'Watching' %} selected="selected" {% endif %}>
+                                            Watching
+                                        </option>
+                                        <option {% if data['status'] == 'Completed' %} selected="selected" {% endif %}>
+                                            Completed
+                                        </option>
+                                        <option {% if data['status'] == 'On Hold' %} selected="selected" {% endif %}>
+                                            On Hold
+                                        </option>
+                                        <option {% if data['status'] == 'Random' %} selected="selected" {% endif %}>
+                                            Random
+                                        </option>
+                                        <option {% if data['status'] == 'Dropped' %} selected="selected" {% endif %}>
+                                            Dropped
+                                        </option>
+                                        <option {% if data['status'] == 'Plan to Watch' %} selected="selected"
+                                        {% endif %}>
+                                            Plan to Watch
+                                        </option>
                                     </select>
                                 {% else %}
                                     <select id="category-dropdown" class="text-light text-center cat-drop"
@@ -72,12 +86,15 @@
                                     <b>Season:</b>
                                 </div>
                                 <div class="col-8">
+                                    <label for="season-dropdown"></label>
                                     <select id="season-dropdown" class="text-light text-center cat-drop"
-                                            onchange="updateSeason('{{ data['id'] }}', this, '{{ data['eps_per_season'] }}',
-                                                    '{{ media_list }}')">
+                                    onchange="updateSeason('{{ data['id'] }}', this, '{{ data['eps_per_season'] }}',
+                                    '{{ media_list }}')">
                                         {% for eps in range(0, data['eps_per_season']|length) %}
                                             {% if eps + 1 == data['current_season'] %}
-                                                <option selected="selected" value="{{ eps }}">&nbsp{{ eps + 1 }}&nbsp</option>
+                                                <option selected="selected" value="{{ eps }}">
+                                                    &nbsp{{ eps + 1 }}&nbsp
+                                                </option>
                                             {% else %}
                                                 <option value="{{ eps }}">&nbsp{{ eps + 1 }}&nbsp</option>
                                             {% endif %}
@@ -94,11 +111,14 @@
                                     <b>Episode:</b>
                                 </div>
                                 <div class="col-8">
+                                    <label for="episode-dropdown"></label>
                                     <select id="episode-dropdown" class="text-light text-center cat-drop"
-                                            onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
+                                    onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
                                         {% for i in range(data['eps_per_season'][data['current_season'] - 1]) %}
                                             {% if i + 1 == data['last_episode_watched'] %}
-                                                <option selected="selected" value="{{ i }}">&nbsp{{ i + 1 }}&nbsp</option>
+                                                <option selected="selected" value="{{ i }}">
+                                                    &nbsp{{ i + 1 }}&nbsp
+                                                </option>
                                             {% else %}
                                                 <option value="{{ i }}">&nbsp{{ i + 1 }}&nbsp</option>
                                             {% endif %}
@@ -110,6 +130,28 @@
                                 </div>
                             </div>
                         {% endif %}
+                        <div id="rewatch-row" class="row m-l-30 m-r-25" data-toggle="tooltip"
+                        title="How many time you rewatched this media. Do not count the inital completetion.">
+                            <div class="col-4" >
+                                <b>Re-watched:</b>
+                            </div>
+                            <div class="col-8">
+                                <label for="rewatched-dropdown"></label>
+                                <select id="rewatched-dropdown" class="text-light text-center cat-drop"
+                                onchange="updateRewatched('{{ data['id'] }}', this, '{{ media_list }}')">
+                                    {% for i in range(0, 11) %}
+                                        {% if i == data['rewatched'] %}
+                                            <option selected="selected" value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
+                                        {% else %}
+                                            <option value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <img id="rewatched-loading" class="loading-img" style="display: none;" alt=""
+                                src="/static/img/loading.webp"/>
+                                &nbsp;<i id="rewatched-check" class="fas fa-check" style="display: none;"></i>
+                            </div>
+                        </div>
                         <div class="text-center m-t-15">
                             <button class="btn btn-smaller btn-danger" onclick="removeFromUser('{{ data['id'] }}',
                                     '{{ media_list }}')">
@@ -118,7 +160,7 @@
                             <img id="loading-remove-list" class="d-none" height="20" width="20"
                              src="/static/img/loading.webp" alt=""/>
                         </div>
-                    </div>
+                        </div>
                     <div class="text-center">
                         <button id="add-to-list" class="btn btn-smaller btn-info"{% if data['in_user_list'] %}
                              style="display: none;" {% endif %} onclick="addToUser('{{ data['id'] }}',

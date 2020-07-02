@@ -480,6 +480,91 @@ def update_element_episode():
     return '', 204
 
 
+@bp.route('/update_rewatch', methods=['POST'])
+@login_required
+def update_rewatch():
+    try:
+        json_data = request.get_json()
+        rewatched = int(json_data['rewatch'])
+        element_id = int(json_data['element_id'])
+        element_type = json_data['element_type']
+    except:
+        return '', 400
+
+    # Check if the media_list exist and is valid
+    try:
+        list_type = ListType(element_type)
+    except ValueError:
+        return '', 400
+
+    # Check that the user took the value from the <select>
+    if 0 > rewatched > 10:
+        return '', 400
+
+    if list_type == ListType.SERIES:
+        # Check if the element is in the database (also used for watched_time)
+        series = Series.query.filter_by(id=element_id).first()
+        if series is None:
+            return '', 400
+
+        # Check if the element is in the current user's list
+        series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
+        if series_list is None:
+            return '', 400
+
+        # Set the new data
+        series_list.rewatched = rewatched
+        app.logger.info('[{}] Series ID {} rewatched {}x times'.format(current_user.id, element_id, rewatched))
+
+        # Commit the changes
+        db.session.commit()
+
+        # Compute the new time spent
+        compute_time_spent(cat_type="rewatched", media=series, list_type=list_type)
+    elif list_type == ListType.ANIME:
+        # Check if the element is in the database (also used for watched_time)
+        anime = Anime.query.filter_by(id=element_id).first()
+        if anime is None:
+            return '', 400
+
+        # Check if the element is in the current user's list
+        anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
+        if anime_list is None:
+            return '', 400
+
+        # Set the new data
+        anime_list.rewatched = rewatched
+        app.logger.info('[{}] Anime with ID {} rewatched {}x times'.format(current_user.id, element_id, rewatched))
+
+        # Commit the changes
+        db.session.commit()
+
+        # Compute the new time spent
+        compute_time_spent(cat_type="rewatched", media=anime, list_type=list_type)
+    elif list_type == ListType.MOVIES:
+        # Check if the element is in the database (also used for watched_time)
+        movie = Movies.query.filter_by(id=element_id).first()
+        if movie is None:
+            return '', 400
+
+        # Check if the element is in the current user's list
+        movies_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
+        if movies_list is None:
+            return '', 400
+
+        # Set the new data
+        movies_list.rewatched = rewatched
+        app.logger.info('[{}] Movie with ID {} rewatched {}x times'.format(current_user.id, element_id, rewatched))
+
+        # Commit the changes
+        db.session.commit()
+
+        # Compute the new time spent
+        compute_time_spent(cat_type="rewatched", media=movie, list_type=list_type)
+
+    return '', 204
+
+
 @bp.route('/add_favorite', methods=['POST'])
 @login_required
 def add_favorite():

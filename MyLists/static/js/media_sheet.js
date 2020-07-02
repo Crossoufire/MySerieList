@@ -239,6 +239,29 @@ function updateEpisode(element_id, episode, media_list) {
 }
 
 
+// --- Update rewatched data -------------------------------------------
+function updateRewatched(element_id, rewatch, media_list) {
+    $('#rewatched-loading').show();
+
+    $.ajax ({
+        type: "POST",
+        url: "/update_rewatch",
+        contentType: "application/json",
+        data: JSON.stringify({rewatch: rewatch.selectedIndex, element_id: element_id, element_type: media_list }),
+        dataType: "json",
+        success: function() {
+            $('#rewatched-check').show().delay(1500).fadeOut();
+        },
+        error: function() {
+            error_ajax_message('Error updating the rewatching number for the media. Please try again later.');
+        },
+        complete: function () {
+            $('#rewatched-loading').hide();
+        }
+    });
+}
+
+
 // --- Lock the media --------------------------------------------------
 function lock_media(element_id, element_type) {
     let lock_status;
