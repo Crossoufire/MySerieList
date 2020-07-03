@@ -712,7 +712,8 @@ def set_last_update(media, media_type, old_status=None, new_status=None, old_sea
 
 
 def compute_time_spent(media=None, old_season=None, new_season=None, old_episode=None, new_episode=None,
-                       list_type=None, movie_status=None, movie_delete=False, movie_add=False):
+                       list_type=None, movie_status=None, movie_delete=False, movie_add=False, new_rewatch=None,
+                       old_rewatch=None):
 
     def eps_watched(season, episode, all_seasons):
         nb_eps_watched = 0

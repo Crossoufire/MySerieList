@@ -420,7 +420,7 @@ def update_element_episode():
 def update_rewatch():
     try:
         json_data = request.get_json()
-        rewatched = int(json_data['rewatch'])
+        new_rewatch = int(json_data['rewatch'])
         element_id = int(json_data['element_id'])
         element_type = json_data['element_type']
     except:
@@ -432,70 +432,34 @@ def update_rewatch():
     except ValueError:
         return '', 400
 
-    # Check that the user took the value from the <select>
-    if 0 > rewatched > 10:
+    # Check that the user took the value from the <select> tag
+    if 0 > new_rewatch > 10:
         return '', 400
 
     if list_type == ListType.SERIES:
-        # Check if the element is in the database (also used for watched_time)
-        series = Series.query.filter_by(id=element_id).first()
-        if series is None:
-            return '', 400
-
-        # Check if the element is in the current user's list
-        series_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
-        if series_list is None:
-            return '', 400
-
-        # Set the new data
-        series_list.rewatched = rewatched
-        app.logger.info('[{}] Series ID {} rewatched {}x times'.format(current_user.id, element_id, rewatched))
-
-        # Commit the changes
-        db.session.commit()
-
-        # Compute the new time spent
-        compute_time_spent(media=series, list_type=list_type)
+        media = Series.query.filter_by(id=element_id).first()
+        media_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
     elif list_type == ListType.ANIME:
-        # Check if the element is in the database (also used for watched_time)
-        anime = Anime.query.filter_by(id=element_id).first()
-        if anime is None:
-            return '', 400
-
-        # Check if the element is in the current user's list
-        anime_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
-        if anime_list is None:
-            return '', 400
-
-        # Set the new data
-        anime_list.rewatched = rewatched
-        app.logger.info('[{}] Anime with ID {} rewatched {}x times'.format(current_user.id, element_id, rewatched))
-
-        # Commit the changes
-        db.session.commit()
-
-        # Compute the new time spent
-        compute_time_spent(media=anime, list_type=list_type)
+        media = Anime.query.filter_by(id=element_id).first()
+        media_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
     elif list_type == ListType.MOVIES:
-        # Check if the element is in the database (also used for watched_time)
-        movie = Movies.query.filter_by(id=element_id).first()
-        if movie is None:
-            return '', 400
+        media = Movies.query.filter_by(id=element_id).first()
+        media_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
 
-        # Check if the element is in the current user's list
-        movies_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
-        if movies_list is None:
-            return '', 400
+    if not media or not media_list or media_list.status != Status.COMPLETED \
+            or media_list.status != Status.COMPLETED_ANIMATION:
+        return '', 400
 
-        # Set the new data
-        movies_list.rewatched = rewatched
-        app.logger.info('[{}] Movie with ID {} rewatched {}x times'.format(current_user.id, element_id, rewatched))
+    # Set the new data
+    old_rewatch = media_list.rewatched
+    media_list.rewatched = new_rewatch
+    app.logger.info('[{}] Series ID {} re-watched {}x times'.format(current_user.id, element_id, new_rewatch))
 
-        # Commit the changes
-        db.session.commit()
+    # Commit the changes
+    db.session.commit()
 
-        # Compute the new time spent
-        compute_time_spent(media=movie, list_type=list_type)
+    # Compute the new time spent
+    compute_time_spent(media=media, list_type=list_type, old_rewatch=old_rewatch, new_rewatch=new_rewatch)
 
     return '', 204
 
