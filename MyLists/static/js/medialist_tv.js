@@ -13,20 +13,15 @@ function chargeButtons(card) {
 
     if ($('#'+card.id).parent().hasClass('category-WATCHING')) {
         display_watching = "none;";
-    }
-    else if ($('#'+card.id).parent().hasClass('category-COMPLETED')) {
+    } else if ($('#'+card.id).parent().hasClass('category-COMPLETED')) {
         display_completed = "none;";
-    }
-    else if ($('#'+card.id).parent().hasClass('category-ON.HOLD')) {
+    } else if ($('#'+card.id).parent().hasClass('category-ON.HOLD')) {
         display_on_hold = "none;";
-    }
-    else if ($('#'+card.id).parent().hasClass('category-RANDOM')) {
+    } else if ($('#'+card.id).parent().hasClass('category-RANDOM')) {
         display_random = "none;";
-    }
-    else if ($('#'+card.id).parent().hasClass('category-DROPPED')) {
+    } else if ($('#'+card.id).parent().hasClass('category-DROPPED')) {
         display_dropped = "none;";
-    }
-    else {
+    } else {
         display_plan_to_watch = "none;";
     }
 
@@ -73,7 +68,6 @@ function changeCategory(new_category, card_id) {
     let seas_data = $('#'+card_id).attr('values').split('-')[0];
     let media_list = $('#'+card_id).attr('values').split('-')[1];
     let element_id = $('#'+card_id).attr('values').split('-')[2];
-    let parent_cat = $('#'+card_id).parent();
     $('#'+card_id).find('.loading-medialist').show();
 
     $.ajax ({
@@ -89,15 +83,15 @@ function changeCategory(new_category, card_id) {
             else if (new_category === 'Completed') {
                 $("#"+card_id).prependTo(".category-COMPLETED");
 
-                var season_data = JSON.parse("[" + seas_data + "]");
-                var episode_drop = $('#E_'+element_id);
-                var seasons_length = $('#S_'+element_id).children('option').length;
-                var seasons_index = (seasons_length - 1);
+                let season_data = JSON.parse("[" + seas_data + "]");
+                let episode_drop = $('#E_'+element_id);
+                let seasons_length = $('#S_'+element_id).children('option').length;
+                let seasons_index = (seasons_length - 1);
                 $('#S_'+element_id).prop('selectedIndex', seasons_index);
 
                 episode_drop[0].length = 1;
 
-                for (i = 2; i <= season_data[0][seasons_index]; i++) {
+                for (let i = 2; i <= season_data[0][seasons_index]; i++) {
                     let opt = document.createElement("option");
                     opt.className = "card-opt-box";
                     if (i <= 9) {
@@ -136,10 +130,8 @@ function changeCategory(new_category, card_id) {
 
 // --- Update episode ------------------------------------------------------
 function updateEpisode(element_id, episode, media_list) {
-    var selected_episode = episode.selectedIndex
+    let selected_episode = episode.selectedIndex
 
-    $body = $("body");
-    $categories.isotope('layout');
     $.ajax ({
         type: "POST",
         url: "/update_element_episode",
@@ -158,9 +150,9 @@ function updateEpisode(element_id, episode, media_list) {
 
 // --- Update season -------------------------------------------------------
 function updateSeason(element_id, value) {
-    var selected_season = value.selectedIndex;
-    var seas_data = $('#card_'+element_id).attr('values').split('-')[0];
-    var media_list = $('#card_'+element_id).attr('values').split('-')[1];
+    let selected_season = value.selectedIndex;
+    let seas_data = $('#card_'+element_id).attr('values').split('-')[0];
+    let media_list = $('#card_'+element_id).attr('values').split('-')[1];
 
     $.ajax ({
         type: "POST",
@@ -169,11 +161,11 @@ function updateSeason(element_id, value) {
         data: JSON.stringify({season: selected_season, element_id: element_id, element_type: media_list }),
         dataType: "json",
         success: function() {
-            var episode_drop = $('#E_'+element_id);
-            var season_data = JSON.parse("[" + seas_data + "]");
+            let episode_drop = $('#E_'+element_id);
+            let season_data = JSON.parse("[" + seas_data + "]");
 
             episode_drop[0].length = 1;
-            for (i = 2; i <= season_data[0][selected_season]; i++) {
+            for (let i = 2; i <= season_data[0][selected_season]; i++) {
                 let opt = document.createElement("option");
                 opt.className = "card-opt-box";
                 if (i <= 9) {

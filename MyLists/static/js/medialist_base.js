@@ -3,10 +3,10 @@
 // --- Delete element --------------------------------------------------
 function deleteElement(card, media_list) {
     let element_id = $(card)[0].id.split('_')[1];
-    let name = $(card).find('.font-mask').html();
     $(card).find('.loading-medialist').show();
 
-    if (!confirm('Delete "' + name  + '" from your list?')) {
+    // noinspection SqlNoDataSourceInspection
+    if (!confirm('Delete the media from your list?')) {
         $(card).find('.loading-medialist').hide();
         return false;
     }
@@ -40,7 +40,8 @@ function removeCat() {
     $('.card-btn-top-right').attr('style', 'display: block;');
 
     $('.seas-eps-box').each(function () {
-        if ($(this).parent().parent().parent()[0].className === 'row category-PLAN TO WATCH') {
+        if ($(this).parent().parent().parent()[0].className === 'row category-PLAN TO WATCH' ||
+            $(this).parent().parent().parent()[0].className === 'row category-RANDOM') {
             $(this).attr('style', 'display: none;');
         }
         else {

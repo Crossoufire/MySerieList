@@ -320,16 +320,10 @@ def update_element_season():
         return '', 400
 
     if list_type == ListType.SERIES:
-        # Check if the element is in the database (also used for watched_time and last_update)
         media = Series.query.filter_by(id=element_id).first()
-
-        # Check if in the user's list:
         media_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
     elif list_type == ListType.ANIME:
-        # Check if the element is in the database (also used for watched_time and last_update)
         media = Anime.query.filter_by(id=element_id).first()
-
-        # Check if the element is in the current account's list
         media_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
     else:
         return '', 400
@@ -383,16 +377,10 @@ def update_element_episode():
         return '', 400
 
     if list_type == ListType.SERIES:
-        # Check if the element is in the database (also used for watched_time and last_update)
         media = Series.query.filter_by(id=element_id).first()
-
-        # Check if the element is in the current user's list
         media_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
     elif list_type == ListType.ANIME:
-        # Check if the element is in the database (also used for watched_time and last_update)
         media = Anime.query.filter_by(id=element_id).first()
-
-        # Check if the element is in the current user's list
         media_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
     else:
         return '', 400
@@ -569,22 +557,13 @@ def delete_element():
         return '', 400
 
     if list_type == ListType.SERIES:
-        # Check if series exists in the database (also used for watched_time and last_update)
         media = Series.query.filter_by(id=element_id).first()
-
-        # Check if series exists in the user's list
         media_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
     elif list_type == ListType.ANIME:
-        # Check if anime exists in the database (also used for watched_time and last_update)
         media = Anime.query.filter_by(id=element_id).first()
-
-        # Check if anime exists in the user's list
         media_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
     elif list_type == ListType.MOVIES:
-        # Check if movie exists in the database (also used for watched_time and last_update)
         media = Movies.query.filter_by(id=element_id).first()
-
-        # Check if movie exists in the user's list
         media_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
 
     if not media or not media_list:
@@ -726,12 +705,13 @@ def add_element():
 
     # Setup the season, episode and category of the media
     if list_type != ListType.MOVIES:
+        new_season = 1
+        new_episode = 1
         if new_status == Status.COMPLETED:
             new_season = len(media.eps_per_season)
             new_episode = media.eps_per_season[-1].episodes
-        else:
-            new_season = 1
-            new_episode = 1
+        elif new_status == Status.RANDOM or new_status == Status.PLAN_TO_WATCH:
+            new_episode = 0
     elif list_type == ListType.MOVIES:
         if new_status == Status.COMPLETED:
             # If contain the "ANIMATION" genre add to "COMPLETED_ANIMATION" category
@@ -759,7 +739,7 @@ def add_element():
     # Commit the changes
     db.session.add(user_list)
     db.session.commit()
-    app.logger.info('[User {}] Added a(n) {} [ID {}] in the category: {}'
+    app.logger.info('[User {}] {} Added [ID {}] in the category: {}'
                     .format(current_user.id, list_type.value.replace('list', ''), media.id, new_status.value))
 
     # Set the last update

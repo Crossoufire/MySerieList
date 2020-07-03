@@ -111,28 +111,28 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
             $('#your-medialist-data').removeClass('disabled');
 
             if (new_cat === 'Completed') {
-            season_data = JSON.parse("["+seas_data+"]");
-            episode_drop = document.getElementById('episode-dropdown');
-            seasons_length = $('#season-dropdown').children('option').length;
-            seasons_index = (seasons_length - 1);
-            $('#season-dropdown').prop('selectedIndex', seasons_index);
+                season_data = JSON.parse("["+seas_data+"]");
+                episode_drop = document.getElementById('episode-dropdown');
+                seasons_length = $('#season-dropdown').children('option').length;
+                seasons_index = (seasons_length - 1);
+                $('#season-dropdown').prop('selectedIndex', seasons_index);
 
-            episode_drop.length = 1;
+                episode_drop.length = 1;
 
-            for (i = 2; i <= season_data[0][seasons_index]; i++) {
-                opt = document.createElement("option");
-                opt.className = "";
-                opt.innerHTML = '&nbsp;'+i+'&nbsp;';
-                episode_drop.appendChild(opt);
+                for (i = 2; i <= season_data[0][seasons_index]; i++) {
+                    opt = document.createElement("option");
+                    opt.className = "";
+                    opt.innerHTML = '&nbsp;'+i+'&nbsp;';
+                    episode_drop.appendChild(opt);
+                }
+                $('#episode-dropdown').prop('selectedIndex', season_data[0][seasons_index]-1);
             }
-            $('#episode-dropdown').prop('selectedIndex', season_data[0][seasons_index]-1);
-        }
             else if (new_cat === 'Random' || new_cat === 'Plan to Watch') {
-            $('#season-dropdown').val("0");
-            $('#episode-dropdown').val("0");
-            $('#season-row').hide();
-            $('#episode-row').hide();
-        }
+                $('#season-dropdown').val("0");
+                $('#episode-dropdown').val("0");
+                $('#season-row').hide();
+                $('#episode-row').hide();
+            }
         },
         error: function() {
             error_ajax_message('Error changing your media status. Please try again later.');

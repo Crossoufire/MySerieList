@@ -114,15 +114,31 @@
                                     <label for="episode-dropdown"></label>
                                     <select id="episode-dropdown" class="text-light text-center cat-drop"
                                     onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
-                                        {% for i in range(data['eps_per_season'][data['current_season'] - 1]) %}
-                                            {% if i + 1 == data['last_episode_watched'] %}
-                                                <option selected="selected" value="{{ i }}">
-                                                    &nbsp{{ i + 1 }}&nbsp
-                                                </option>
-                                            {% else %}
-                                                <option value="{{ i }}">&nbsp{{ i + 1 }}&nbsp</option>
-                                            {% endif %}
-                                        {% endfor %}
+                                        {% if data['status'] == 'Plan to Watch' or data['status'] == 'Random' %}
+                                            {% for i in range(0, data['eps_per_season'][data['current_season'] - 1]) %}
+                                                {% if i + 1 == 1 %}
+                                                    <option selected="selected" value="{{ i }}">
+                                                        &nbsp;{{ "E{:02}".format(i + 1) }}&nbsp;
+                                                    </option>
+                                                {% else %}
+                                                    <option value="{{ i }}">
+                                                        &nbsp;{{ "E{:02}".format(i + 1) }}&nbsp;
+                                                    </option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            {% for i in range(data['eps_per_season'][data['current_season'] - 1]) %}
+                                                {% if i + 1 == data['last_episode_watched'] %}
+                                                    <option selected="selected" value="{{ i }}">
+                                                        &nbsp;{{ i + 1 }}&nbsp;
+                                                    </option>
+                                                {% else %}
+                                                    <option value="{{ i }}">
+                                                        &nbsp;{{ i + 1 }}&nbsp;
+                                                    </option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
                                     </select>
                                     <img id="eps-loading" class="loading-img" style="display: none;"
                                          src="/static/img/loading.webp" alt=""/>
@@ -132,10 +148,10 @@
                         {% endif %}
                         <div id="rewatch-row" class="row m-l-30 m-r-25" data-toggle="tooltip"
                         title="How many time you rewatched this media. Do not count the inital completetion.">
-                            <div class="col-4" >
+                            <div class="col-5" >
                                 <b>Re-watched:</b>
                             </div>
-                            <div class="col-8">
+                            <div class="col-7">
                                 <label for="rewatched-dropdown"></label>
                                 <select id="rewatched-dropdown" class="text-light text-center cat-drop"
                                 onchange="updateRewatched('{{ data['id'] }}', this, '{{ media_list }}')">
@@ -154,13 +170,13 @@
                         </div>
                         <div class="text-center m-t-15">
                             <button class="btn btn-smaller btn-danger" onclick="removeFromUser('{{ data['id'] }}',
-                                    '{{ media_list }}')">
+                            '{{ media_list }}')">
                                 <i class="fas fa-ban"></i>&nbsp; Remove from list
                             </button>
                             <img id="loading-remove-list" class="d-none" height="20" width="20"
                              src="/static/img/loading.webp" alt=""/>
                         </div>
-                        </div>
+                    </div>
                     <div class="text-center">
                         <button id="add-to-list" class="btn btn-smaller btn-info"{% if data['in_user_list'] %}
                              style="display: none;" {% endif %} onclick="addToUser('{{ data['id'] }}',

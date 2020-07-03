@@ -698,17 +698,9 @@ def set_last_update(media, media_type, old_status=None, new_status=None, old_sea
     if check:
         diff = (datetime.utcnow() - check.date).total_seconds()
 
-    update = UserLastUpdate(user_id=current_user.id,
-                            media_name=media.name,
-                            media_id=media.id,
-                            media_type=media_type,
-                            old_status=old_status,
-                            new_status=new_status,
-                            old_season=old_season,
-                            new_season=new_season,
-                            old_episode=old_episode,
-                            new_episode=new_episode,
-                            date=datetime.utcnow())
+    update = UserLastUpdate(user_id=current_user.id, media_name=media.name, media_id=media.id, media_type=media_type,
+                            old_status=old_status, new_status=new_status, old_season=old_season, new_season=new_season,
+                            old_episode=old_episode, new_episode=new_episode, date=datetime.utcnow())
 
     if diff > 600:
         db.session.add(update)
@@ -727,7 +719,6 @@ def compute_time_spent(media=None, old_season=None, new_season=None, old_episode
         for i in range(1, season):
             nb_eps_watched += all_seasons[i-1].episodes
         nb_eps_watched += episode
-
         return nb_eps_watched
 
     if list_type == ListType.SERIES:
