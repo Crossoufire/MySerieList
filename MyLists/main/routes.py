@@ -446,8 +446,9 @@ def update_rewatch():
         media = Movies.query.filter_by(id=element_id).first()
         media_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
 
-    if not media or not media_list or media_list.status != Status.COMPLETED \
-            or media_list.status != Status.COMPLETED_ANIMATION:
+    if media or media_list or media_list.status == Status.COMPLETED or media_list.status == Status.COMPLETED_ANIMATION:
+        pass
+    else:
         return '', 400
 
     # Set the new data
@@ -459,7 +460,11 @@ def update_rewatch():
     db.session.commit()
 
     # Compute the new time spent
-    compute_time_spent(media=media, list_type=list_type, old_rewatch=old_rewatch, new_rewatch=new_rewatch)
+    if list_type != ListType.MOVIES:
+        compute_time_spent(media=media, list_type=list_type, old_season=1, old_episode=0, new_season=1,
+                           new_episode=0, old_rewatch=old_rewatch, new_rewatch=new_rewatch)
+    elif list_type == ListType.MOVIES:
+        compute_time_spent(media=media, list_type=list_type, old_rewatch=old_rewatch, new_rewatch=new_rewatch)
 
     return '', 204
 
@@ -538,9 +543,9 @@ def delete_element():
         # Get the old data
         old_episode = media_list.last_episode_watched
         old_season = media_list.current_season
-
+        old_rewatch = media_list.rewatched
         compute_time_spent(media=media, old_season=old_season, old_episode=old_episode, new_season=1, new_episode=0,
-                           list_type=list_type)
+                           list_type=list_type, old_rewatch=old_rewatch, new_rewatch=0)
     elif list_type == ListType.MOVIES:
         compute_time_spent(media=media, list_type=list_type, movie_status=media_list.status, movie_delete=True)
 
@@ -589,16 +594,19 @@ def change_element_category():
     if not media or not media_list:
         return '', 400
 
-    # Get the old status
+    # Get the old status and old rewatch time multiplier
     old_status = media_list.status
+    old_rewatch = media_list.rewatched
 
-    # Set the new status
+    # Set the new status and reset the rewatched time multiplier
     media_list.status = new_status
+    media_list.rewatched = 0
 
     # Set and change accordingly <last_episode_watched> and <current_season>
     if list_type != ListType.MOVIES:
         old_season = media_list.current_season
         old_episode = media_list.last_episode_watched
+
         if new_status == Status.COMPLETED:
             media_list.current_season = len(media.eps_per_season)
             media_list.last_episode_watched = media.eps_per_season[-1].episodes
@@ -619,7 +627,7 @@ def change_element_category():
     # Compute the new time spent
     if list_type != ListType.MOVIES:
         compute_time_spent(media=media, old_season=old_season, new_season=new_season, old_episode=old_episode,
-                           new_episode=new_episode, list_type=list_type)
+                           new_episode=new_episode, list_type=list_type, old_rewatch=old_rewatch, new_rewatch=0)
     elif list_type == ListType.MOVIES:
         compute_time_spent(media=media, list_type=list_type, movie_status=media_list.status)
 

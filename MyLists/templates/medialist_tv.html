@@ -7,7 +7,7 @@
 
 
 {% block select_box %}
-    <div class="seas-eps-box" {% if data['category'].value == 'PLAN_TO_WATCH' or data['category'].value == 'RANDOM' %}
+    <div class="seas-eps-box" {% if data['category'].value == 'Plan to Watch' or data['category'].value == 'Random' %}
          style="display: none;"{% endif %}>
         <div style="display: inline-block;">
             <label for="S_{{ data['id'] }}"></label>
@@ -29,7 +29,7 @@
             <select id="E_{{ data['id'] }}" class="text-light text-center p-0 select-box
              {% if target_user_id != current_user.get_id() %} disabled{% endif %}"
              onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
-                {% if data['category'].value == 'PLAN_TO_WATCH' or data['category'].value == 'RANDOM' %}
+                {% if data['category'].value == 'Plan to Watch' or data['category'].value == 'Random' %}
                     {% for i in range(0, data['eps_per_season'][data['current_season'] - 1]) %}
                         {% if i + 1 == 1 %}
                             <option class="card-opt-box" selected="selected">&nbsp;{{ "E{:02}".format(i + 1) }}&nbsp;</option>

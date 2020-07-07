@@ -98,6 +98,14 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
 
+    if (new_cat === 'Completed') {
+        $('#rewatch-hr').show('slow');
+        $('#rewatch-row').show('slow');
+    } else {
+        $('#rewatch-hr').hide('slow');
+        $('#rewatch-row').hide('slow');
+    }
+
     $.ajax ({
         type: "POST",
         url: "/change_element_category",

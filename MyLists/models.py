@@ -230,8 +230,8 @@ class Series(db.Model):
             .filter(followers.c.follower_id == user_id, SeriesList.series_id == self.id).all()
         return in_follows_lists
 
-    def in_user_list(self):
-        in_user_list = self.list_info.first()
+    def in_user_list(self, user_id):
+        in_user_list = self.list_info.filter_by(user_id=user_id).first()
         return in_user_list
 
 

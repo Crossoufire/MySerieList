@@ -70,6 +70,27 @@ function changeCategory(new_category, card_id) {
     let element_id = $('#'+card_id).attr('values').split('-')[2];
     $('#'+card_id).find('.loading-medialist').show();
 
+    if ($('#'+card_id).parent()[0].className === 'row category-PLAN TO WATCH' ||
+        $('#'+card_id).parent()[0].className === 'row category-RANDOM') {
+        let season_data = JSON.parse("[" + seas_data + "]");
+        let episode_drop = $('#E_'+element_id);
+        $('#S_'+element_id).prop('selectedIndex', 0);
+
+        episode_drop[0].length = 1;
+
+        for (let i = 2; i <= season_data[0][0]; i++) {
+            let opt = document.createElement("option");
+            opt.className = "card-opt-box";
+            if (i <= 9) {
+                opt.innerHTML = "&nbsp;E0"+i+"&nbsp;";
+            } else {
+                opt.innerHTML = "&nbsp;E"+i+"&nbsp;";
+            }
+            episode_drop[0].appendChild(opt);
+        }
+        $('#E_'+element_id).prop('selectedIndex', 0);
+    }
+
     $.ajax ({
         type: "POST",
         url: "/change_element_category",
@@ -115,7 +136,7 @@ function changeCategory(new_category, card_id) {
             else {
                 $("#"+card_id).prependTo(".category-PLAN.TO.WATCH");
             }
-
+            removeCat();
             $categories.isotope('layout');
         },
         error: function () {
