@@ -104,6 +104,7 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
     } else {
         $('#rewatch-hr').hide('slow');
         $('#rewatch-row').hide('slow');
+        $('#rewatched-dropdown').val("0");
     }
 
     $.ajax ({

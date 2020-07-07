@@ -451,8 +451,10 @@ def update_rewatch():
     else:
         return '', 400
 
-    # Set the new data
+    # Get the old data
     old_rewatch = media_list.rewatched
+
+    # Set the new data
     media_list.rewatched = new_rewatch
     app.logger.info('[{}] Series ID {} re-watched {}x times'.format(current_user.id, element_id, new_rewatch))
 
@@ -461,8 +463,8 @@ def update_rewatch():
 
     # Compute the new time spent
     if list_type != ListType.MOVIES:
-        compute_time_spent(media=media, list_type=list_type, old_season=1, old_episode=0, new_season=1,
-                           new_episode=0, old_rewatch=old_rewatch, new_rewatch=new_rewatch)
+        compute_time_spent(media=media, list_type=list_type, old_season=1, old_episode=0, new_season=1, new_episode=0,
+                           old_rewatch=old_rewatch, new_rewatch=new_rewatch)
     elif list_type == ListType.MOVIES:
         compute_time_spent(media=media, list_type=list_type, old_rewatch=old_rewatch, new_rewatch=new_rewatch)
 
@@ -606,7 +608,6 @@ def change_element_category():
     if list_type != ListType.MOVIES:
         old_season = media_list.current_season
         old_episode = media_list.last_episode_watched
-
         if new_status == Status.COMPLETED:
             media_list.current_season = len(media.eps_per_season)
             media_list.last_episode_watched = media.eps_per_season[-1].episodes
@@ -629,7 +630,8 @@ def change_element_category():
         compute_time_spent(media=media, old_season=old_season, new_season=new_season, old_episode=old_episode,
                            new_episode=new_episode, list_type=list_type, old_rewatch=old_rewatch, new_rewatch=0)
     elif list_type == ListType.MOVIES:
-        compute_time_spent(media=media, list_type=list_type, movie_status=media_list.status)
+        compute_time_spent(media=media, list_type=list_type, movie_status=media_list.status,
+                           movie_runtime=media.runtime)
 
     db.session.commit()
     app.logger.info("[User {}] {}'s category [ID {}] changed from {} to {}."

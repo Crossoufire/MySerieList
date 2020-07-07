@@ -638,23 +638,27 @@ def load_media_sheet(media, user_id, list_type):
                          'current_season': in_user_list.current_season,
                          'score': in_user_list.score,
                          'favorite': in_user_list.favorite,
-                         'status': in_user_list.status.value}
+                         'status': in_user_list.status.value,
+                         'rewatched': in_user_list.rewatch}
         else:
             user_info = {'last_episode_watched': 1,
                          'current_season': 1,
                          'score': 0,
                          'favorite': False,
-                         'status': Status.WATCHING.value}
+                         'status': Status.WATCHING.value,
+                         'rewatched': 0}
     elif list_type == ListType.MOVIES:
         if in_user_list:
             user_info = {'in_user_list': True,
                          'score': in_user_list.score,
                          'favorite': in_user_list.favorite,
-                         'status': in_user_list.status.value}
+                         'status': in_user_list.status.value,
+                         'rewatched': in_user_list.rewatch}
         else:
             user_info = {'score': 0,
                          'favorite': False,
-                         'status': Status.WATCHING.value}
+                         'status': Status.WATCHING.value,
+                         'rewatched': 0}
 
     # Merge all data into one dict
     element_info['same_genres'] = same_genres
@@ -712,7 +716,8 @@ def set_last_update(media, media_type, old_status=None, new_status=None, old_sea
 
 
 def compute_time_spent(media=None, old_season=None, new_season=None, old_episode=None, new_episode=None, list_type=None,
-                       movie_status=None, movie_delete=False, movie_add=False, new_rewatch=0, old_rewatch=0):
+                       movie_status=None, movie_delete=False, movie_add=False, new_rewatch=0, old_rewatch=0,
+                       movie_runtime=0):
 
     def eps_watched(season, episode, all_seasons):
         nb_eps_watched = 0
@@ -731,20 +736,21 @@ def compute_time_spent(media=None, old_season=None, new_season=None, old_episode
         old_time = current_user.time_spent_anime
         old_total = eps_watched(old_season, old_episode, media.eps_per_season)
         new_total = eps_watched(new_season, new_episode, media.eps_per_season)
-        current_user.time_spent_series = old_time + ((new_total - old_total) * media.episode_duration) + \
-                                         (media.total_episodes * media.episode_duration * (new_rewatch - old_rewatch))
+        current_user.time_spent_series = old_time + ((new_total-old_total)*media.episode_duration) + \
+                                         (media.total_episodes*media.episode_duration*(new_rewatch-old_rewatch))
     elif list_type == ListType.MOVIES:
+        old_time = current_user.time_spent_movies
         if movie_delete:
             if movie_status == Status.COMPLETED or movie_status == Status.COMPLETED_ANIMATION:
-                current_user.time_spent_movies = current_user.time_spent_movies - media.runtime
+                current_user.time_spent_movies = old_time - media.runtime + media.runtime*(new_rewatch-old_rewatch)
         elif movie_add:
             if movie_status == Status.COMPLETED or movie_status == Status.COMPLETED_ANIMATION:
-                current_user.time_spent_movies = current_user.time_spent_movies + media.runtime
+                current_user.time_spent_movies = old_time + media.runtime
         else:
             if movie_status == Status.COMPLETED or movie_status == Status.COMPLETED_ANIMATION:
-                current_user.time_spent_movies = current_user.time_spent_movies + media.runtime
+                current_user.time_spent_movies = old_time + movie_runtime + media.runtime*(new_rewatch-old_rewatch)
             else:
-                current_user.time_spent_movies = current_user.time_spent_movies - media.runtime
+                current_user.time_spent_movies = old_time - media.runtime + media.runtime*(new_rewatch-old_rewatch)
 
     db.session.commit()
 

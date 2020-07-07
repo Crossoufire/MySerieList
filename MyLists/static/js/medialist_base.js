@@ -40,7 +40,8 @@ function removeCat() {
     $('.card-btn-top-right').attr('style', 'display: block;');
 
     $('.seas-eps-box').each(function () {
-        if ($(this).parent().parent().parent()[0].className === 'row category-PLAN TO WATCH' || $(this).parent().parent().parent()[0].className === 'row category-RANDOM') {
+        if ($(this).parent().parent().parent()[0].className === 'row category-PLAN TO WATCH' ||
+            $(this).parent().parent().parent()[0].className === 'row category-RANDOM') {
             $(this).attr('style', 'display: none;');
         }
         else {

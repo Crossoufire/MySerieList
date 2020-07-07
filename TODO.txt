@@ -2,9 +2,6 @@
 Movies Collection:
 	Add: Movies collection
 
-Homepage:
-    Fix: Update pictures
-
 Settings:
     Enhance: Better CSS
 
