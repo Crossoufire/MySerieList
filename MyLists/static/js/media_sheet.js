@@ -93,16 +93,13 @@ function addFavorite(element_id, media_type) {
 
 // --- Change the TV category ------------------------------------------
 function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
-    let new_cat, season_data, episode_drop, seasons_length, seasons_index, opt, i;
-    new_cat = cat_selector.options[cat_selector.selectedIndex].value;
+    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
 
     if (new_cat === 'Completed') {
-        $('#rewatch-hr').show('slow');
         $('#rewatch-row').show('slow');
     } else {
-        $('#rewatch-hr').hide('slow');
         $('#rewatch-row').hide('slow');
         $('#rewatched-dropdown').val("0");
     }
@@ -120,16 +117,16 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
             $('#your-medialist-data').removeClass('disabled');
 
             if (new_cat === 'Completed') {
-                season_data = JSON.parse("["+seas_data+"]");
-                episode_drop = document.getElementById('episode-dropdown');
-                seasons_length = $('#season-dropdown').children('option').length;
-                seasons_index = (seasons_length - 1);
+                let season_data = JSON.parse("["+seas_data+"]");
+                let episode_drop = document.getElementById('episode-dropdown');
+                let seasons_length = $('#season-dropdown').children('option').length;
+                let seasons_index = (seasons_length - 1);
                 $('#season-dropdown').prop('selectedIndex', seasons_index);
 
                 episode_drop.length = 1;
 
-                for (i = 2; i <= season_data[0][seasons_index]; i++) {
-                    opt = document.createElement("option");
+                for (let i = 2; i <= season_data[0][seasons_index]; i++) {
+                    let opt = document.createElement("option");
                     opt.className = "";
                     opt.innerHTML = '&nbsp;'+i+'&nbsp;';
                     episode_drop.appendChild(opt);
@@ -155,13 +152,19 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
 
 // --- Change the Movie category ---------------------------------------
 function changeCategoryMovies(element_id, cat_selector, genres) {
-    let new_cat;
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
 
-    new_cat = cat_selector.options[cat_selector.selectedIndex].value;
+    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
     if (new_cat === 'Completed' && genres.includes("Animation")) {
         new_cat = 'Completed Animation';
+    }
+
+    if (new_cat === 'Completed') {
+        $('#rewatch-row').show('slow');
+    } else {
+        $('#rewatch-row').hide('slow');
+        $('#rewatched-dropdown').val("0");
     }
 
     $.ajax ({
@@ -186,11 +189,10 @@ function changeCategoryMovies(element_id, cat_selector, genres) {
 
 // --- Update season ---------------------------------------------------
 function updateSeason(element_id, value, seas_data, media_list) {
-    let season_data, selected_season, i, opt;
     $('#season-loading').show();
     $('#your-medialist-data').addClass('disabled');
 
-    selected_season = value.selectedIndex;
+    let selected_season = value.selectedIndex;
 
     $.ajax ({
         type: "POST",
@@ -202,12 +204,14 @@ function updateSeason(element_id, value, seas_data, media_list) {
             $('#season-check').show().delay(1500).fadeOut();
             $('#your-medialist-data').removeClass('disabled');
 
-            season_data = JSON.parse("["+seas_data+"]");
-            selected_season = value.selectedIndex;
-            $('#episode-dropdown').length = 1;
+            let season_data = JSON.parse("[" + seas_data + "]");
+            let selected_season = value.selectedIndex;
+            let episode_drop = document.getElementById('episode-dropdown');
 
-            for (i = 2; i <= season_data[0][selected_season]; i++) {
-                opt = document.createElement("option");
+            episode_drop.length = 1;
+
+            for (let i = 2; i <= season_data[0][selected_season]; i++) {
+                let opt = document.createElement("option");
                 opt.className = "";
                 opt.innerHTML = '&nbsp;'+i+'&nbsp;';
                 document.getElementById('episode-dropdown').appendChild(opt);

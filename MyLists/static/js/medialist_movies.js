@@ -91,7 +91,7 @@ function ChargeButtonsOther(card) {
             '</li>' +
         "</ul>");
 
-    $('#'+card_id).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
-    $('#'+card_id).find('.card-btn-top-left').attr('style', 'display: none;');
-    $('#'+card_id).find('.mask').hide();
+    $('#'+card.id).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
+    $('#'+card.id).find('.card-btn-top-left').attr('style', 'display: none;');
+    $('#'+card.id).find('.mask').hide();
 }

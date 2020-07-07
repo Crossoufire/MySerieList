@@ -155,6 +155,24 @@ function ShowFavorites() {
 }
 
 
+// --- Show/Hide favorites media ---------------------------------------
+function ShowRewatched() {
+    if ($('#ShowRewatched').prop("checked") === true) {
+        $('.rewatched').each(function () {
+            if ($(this).attr('value') === "0") {
+                $(this).parent().parent().parent().parent().hide();
+            }
+        });
+        $(".categories.PLAN.TO.WATCH").hide();
+    } else {
+        $('.rewatched').parent().parent().parent().parent().show();
+        $(".categories.PLAN.TO.WATCH").show();
+    }
+
+    $categories.isotope('layout');
+}
+
+
 // --- Add the category to the user (from other list) ------------------
 function AddCatUser(category, card_id) {
     let media_list = $('#'+card_id).attr('values').split('-')[1];

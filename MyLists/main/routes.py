@@ -466,7 +466,8 @@ def update_rewatch():
         compute_time_spent(media=media, list_type=list_type, old_season=1, old_episode=0, new_season=1, new_episode=0,
                            old_rewatch=old_rewatch, new_rewatch=new_rewatch)
     elif list_type == ListType.MOVIES:
-        compute_time_spent(media=media, list_type=list_type, old_rewatch=old_rewatch, new_rewatch=new_rewatch)
+        compute_time_spent(media=media, list_type=list_type, movie_status=media_list.status, old_rewatch=old_rewatch,
+                           new_rewatch=new_rewatch)
 
     return '', 204
 
@@ -540,16 +541,19 @@ def delete_element():
     if not media or not media_list:
         return '', 400
 
+    # Get the old data
+    old_rewatch = media_list.rewatched
+
     # Compute the new time spent
     if list_type != ListType.MOVIES:
         # Get the old data
         old_episode = media_list.last_episode_watched
         old_season = media_list.current_season
-        old_rewatch = media_list.rewatched
         compute_time_spent(media=media, old_season=old_season, old_episode=old_episode, new_season=1, new_episode=0,
                            list_type=list_type, old_rewatch=old_rewatch, new_rewatch=0)
     elif list_type == ListType.MOVIES:
-        compute_time_spent(media=media, list_type=list_type, movie_status=media_list.status, movie_delete=True)
+        compute_time_spent(media=media, list_type=list_type, movie_status=media_list.status, movie_delete=True,
+                           old_rewatch=old_rewatch, new_rewatch=0)
 
     # Delete the media from the user's list
     db.session.delete(media_list)
@@ -630,8 +634,8 @@ def change_element_category():
         compute_time_spent(media=media, old_season=old_season, new_season=new_season, old_episode=old_episode,
                            new_episode=new_episode, list_type=list_type, old_rewatch=old_rewatch, new_rewatch=0)
     elif list_type == ListType.MOVIES:
-        compute_time_spent(media=media, list_type=list_type, movie_status=media_list.status,
-                           movie_runtime=media.runtime)
+        compute_time_spent(media=media, list_type=list_type, movie_status=media_list.status, new_rewatch=0,
+                           movie_runtime=media.runtime, old_rewatch=old_rewatch)
 
     db.session.commit()
     app.logger.info("[User {}] {}'s category [ID {}] changed from {} to {}."

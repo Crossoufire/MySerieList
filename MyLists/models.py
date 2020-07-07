@@ -242,7 +242,7 @@ class SeriesList(db.Model):
     current_season = db.Column(db.Integer, nullable=False)
     last_episode_watched = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
-    rewatch = db.Column(db.Integer, nullable=False, default=0)
+    rewatched = db.Column(db.Integer, nullable=False, default=0)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
 
@@ -358,7 +358,7 @@ class AnimeList(db.Model):
     current_season = db.Column(db.Integer, nullable=False)
     last_episode_watched = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
-    rewatch = db.Column(db.Integer, nullable=False, default=0)
+    rewatched = db.Column(db.Integer, nullable=False, default=0)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
 
@@ -492,7 +492,7 @@ class MoviesList(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     movies_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
-    rewatch = db.Column(db.Integer, nullable=False, default=0)
+    rewatched = db.Column(db.Integer, nullable=False, default=0)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
 

@@ -75,10 +75,16 @@
             <input id="SharedMedia" type="checkbox" class="custom-control-input" onchange="HideCommon()">
             <label class="custom-control-label" for="SharedMedia"><b>Hide shared media</b></label>
         </div>
-        <div class="custom-control custom-switch">
+        <div class="custom-control custom-switch m-b-10">
             <input id="ShowFavorites" type="checkbox" class="custom-control-input" onchange="ShowFavorites()">
-            <label class="custom-control-label" for="ShowFavorites"><b>Show only favorites</b></label>
+            <label class="custom-control-label" for="ShowFavorites"><b>Show favorites</b></label>
         </div>
+        {% if media_list == 'movieslist' %}
+            <div class="custom-control custom-switch">
+                <input id="ShowRewatched" type="checkbox" class="custom-control-input" onchange="ShowRewatched()">
+                <label class="custom-control-label" for="ShowRewatched"><b>Show rewatched</b></label>
+            </div>
+        {% endif %}
     </div>
     <div id="categories-iso" class="categories-iso p-t-30">
         {% for key in media_data %}
@@ -132,6 +138,13 @@
                                         <span class="by-genre" style="display: none;" >{{ data['genres'] }}</span>
                                         <span class="by-director" style="display: none;" >{{ data['director'] }}</span>
                                     </a>
+                                    {% if media_list == 'movieslist' and key != 'PLAN TO WATCH' %}
+                                        <div class="card-btn-bottom-right">
+                                            <span class="fas fa-redo rewatched" value="{{ data['rewatched'] }}">
+                                                <b>&nbsp;&nbsp;{{ data['rewatched'] }}</b>
+                                            </span>
+                                        </div>
+                                    {% endif %}
                                     {% if target_user_id == current_user.get_id() %}
                                         <a class="card-btn-top-left fas fa-bars text-light"
                                            onclick="chargeButtons(card_{{ data['id'] }})">
@@ -145,10 +158,10 @@
                                             onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')">
                                         </a>
                                     {% else %}
-                                        <a {% if data['favorite'] %} class="card-favorite fas fa-star"
+                                        <div {% if data['favorite'] %} class="card-favorite fas fa-star"
                                             style="color: darkgoldenrod;" {% else %} class="card-btn-bottom-left far
                                             fa-star" {% endif %}>
-                                        </a>
+                                        </div>
                                         {% if data['common'] %}
                                             <div class="card-ribbon"></div>
                                         {% else %}

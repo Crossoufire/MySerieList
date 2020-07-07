@@ -27,7 +27,7 @@ def compute_media_time_spent(list_type):
             for media in media_list:
                 if media[0].status == Status.COMPLETED:
                     try:
-                        total_time += media[1].episode_duration * media[1].total_episodes
+                        total_time += media[1].episode_duration*media[1].total_episodes*(1+media[0].rewatched)
                     except:
                         pass
                 elif media[0].status != Status.PLAN_TO_WATCH or media[0].status != Status.RANDOM:
@@ -44,7 +44,7 @@ def compute_media_time_spent(list_type):
             for media in media_list:
                 if media[0].status != Status.PLAN_TO_WATCH:
                     try:
-                        total_time += media[1].runtime
+                        total_time += media[1].runtime*(1+media[0].rewatched)
                     except:
                         pass
 

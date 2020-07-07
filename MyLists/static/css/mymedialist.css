@@ -233,6 +233,22 @@ option {
     z-index: 100;
 }
 
+.card-btn-bottom-right {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    opacity: 0;
+    z-index: 100;
+}
+
+.card-btn-bottom-right:hover {
+    opacity: 1;
+}
+
+.mask:hover~.card-btn-bottom-right {
+    opacity: 0.7;
+}
+
 @media (max-width: 1025px) {
     .card {
         margin-bottom: 0;
