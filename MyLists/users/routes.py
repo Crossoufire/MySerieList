@@ -55,12 +55,6 @@ def account(user_name):
     # Recover the Favorites
     favorites = get_favorites(user.id)
 
-    # from MyLists.main.functions import add_media_id_to_userlastupdates
-    # add_media_id_to_userlastupdates()
-
-    # from MyLists.main.functions import add_next_episode_to_air
-    # add_next_episode_to_air()
-
     return render_template('account.html',
                            title=user.username+"'s account",
                            user_data=user_data,

@@ -114,9 +114,7 @@ option {
 }
 
 .card-img-top {
-    border-style: solid;
-    border-width: 1px;
-    border-color: black;
+    border: 1px solid black;
     border-radius: 0 !important;
 }
 
@@ -295,4 +293,36 @@ option {
     top: 50%;
     transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
+}
+
+.side-card-info {
+    background-color: #21263b;
+    position: absolute;
+    opacity: 0;
+    height: 100%;
+    width: 50px;
+    top: 0;
+    right: 0;
+}
+
+.side-card-info:hover {
+    opacity: 0.9;
+}
+
+.mask:hover~.side-card-info {
+    opacity: 0.8;
+}
+
+.seas-eps-drop {
+    background-color: #2f4b67;
+    border: 1px solid black;
+    position: absolute;
+    display: inline-block;
+    width: 100%;
+    bottom: -25px;
+    left: 0;
+}
+
+.favorited {
+    color: darkgoldenrod !important;
 }

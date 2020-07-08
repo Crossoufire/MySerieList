@@ -1,0 +1,180 @@
+{% extends 'layout.html' %}
+
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mymedialist.css') }}">
+{% endblock css %}
+
+
+{% block content %}
+    <div class="back-image p-b-15">
+        <div class="d-flex flex-wrap center-mobile">
+            <div class="m-l-30 m-t-20 icons-mobile">
+                <a class="fas fa-lg fa-user m-r-8 return-icon" href="/account/{{ target_user_name }}"
+                   data-toggle="tooltip" title="{{ target_user_name }}" style="color: grey;"></a>
+                {% if media_list == 'serieslist' %}
+                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon text-anime" data-toggle="tooltip"
+                       href="/animelist/{{ target_user_name }}" title="Anime list"></a>
+                    <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
+                       href="/movieslist/{{ target_user_name }}" title="Movies list"></a>
+                {% elif media_list == 'animelist' %}
+                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
+                       href="/serieslist/{{ target_user_name }}" title="Series list"></a>
+                    <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
+                       href="/movieslist/{{ target_user_name }}" title="Movies list"></a>
+                {% else %}
+                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
+                       href="/serieslist/{{ target_user_name }}" title="Series list"></a>
+                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon text-anime" data-toggle="tooltip"
+                       href="/animelist/{{ target_user_name }}" title="Anime list"></a>
+                {% endif %}
+            </div>
+            {% if target_user_id != current_user.get_id() %}
+                <div class="ml-auto m-r-30 m-t-20">
+                    <div class="text-center common-media">
+                        You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)
+                    </div>
+                    <div class="common-media-meter">
+                        <span class="common-media-meter-bar" style="width: {{ common_elements[2] }}%;"></span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <hr class="header-bar m-l-20 m-r-20 m-t-15">
+        <div class="center-mobile d-flex flex-wrap m-t-20">
+            <div class="ml-auto mr-auto">
+                <i class="fas fa-search text-dark" style="text-shadow: 0 0 0 #000 !important;"></i>
+                <label for="searchInput"></label>
+                <input id="searchInput" class='modded-input text-light' placeholder="Search..."
+                       onkeyup="searchElement()">
+                <label>
+                    <select class="search-select m-l-10">
+                        <option selected="selected">All</option>
+                        {% if media_list == 'movieslist' %}
+                            <option>Director</option>
+                        {% endif %}
+                        <option>Titles</option>
+                        <option>Actors</option>
+                        <option>Genres</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+        <div class="center-mobile d-flex flex-wrap filters-button-group m-t-10">
+            <button class="btn btn-sm btn-selected" data-filter="*">Show all</button>
+            {% for key in media_data %}
+                <button class="btn btn-sm btn-header" data-filter=".categories.{% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key|replace(' ', '.') }}{% endif %}">
+                    {{ key }}
+                </button>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="m-t-10">
+        <div class="custom-control custom-switch m-b-10" {% if target_user_id == current_user.get_id() %}
+        style="display: none;" {% endif %}>
+            <input id="SharedMedia" type="checkbox" class="custom-control-input" onchange="HideCommon()">
+            <label class="custom-control-label" for="SharedMedia"><b>Hide shared media</b></label>
+        </div>
+        <div class="custom-control custom-switch m-b-10">
+            <input id="ShowFavorites" type="checkbox" class="custom-control-input" onchange="ShowFavorites()">
+            <label class="custom-control-label" for="ShowFavorites"><b>Show favorites</b></label>
+        </div>
+        {% if media_list == 'movieslist' %}
+            <div class="custom-control custom-switch">
+                <input id="ShowRewatched" type="checkbox" class="custom-control-input" onchange="ShowRewatched()">
+                <label class="custom-control-label" for="ShowRewatched"><b>Show rewatched</b></label>
+            </div>
+        {% endif %}
+    </div>
+    <div id="categories-iso" class="categories-iso p-t-30">
+        {% for key in media_data %}
+            <div class="categories {% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key }}{% endif %}">
+                <h2 class="text-center m-t-20 mb-0">{{ key }}<hr class="mt-2 pb-3 mb-0"></h2>
+                <div class="row category-{% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key }}{% endif %}">
+                    {% for data in media_data[key] %}
+                        <div id="card_{{ data['id'] }}" values="{% block data scoped %}{% endblock data %}"
+                             class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+                            <div class="card bg-transparent">
+                                <div class="view overlay">
+                                    <div class="loading-medialist" style="display: none;">
+                                        <img class="img-loading-medialist" src="/static/img/loading.webp" alt="">
+                                    </div>
+                                    <img class="card-img-top lazyload" data-src="{{ data['cover'] }}" height="300"
+                                         width="200" style="height: auto;" alt=""/>
+                                    <a class="mask flex-center rgba-black-strong" {% if media_list == 'serieslist' %}
+                                       href="/media_sheet/Series/{{ data['id'] }}" {% elif media_list == 'animelist' %}
+                                       href="/media_sheet/Anime/{{ data['id'] }}" {% else %}
+                                       href="/media_sheet/Movies/{{ data['id'] }}" {% endif %}>
+                                        {% if media_list == 'serieslist' %}
+                                            <span class="font-mask text-center text-light">
+                                                {{ data['original_name'] }}
+                                            </span>
+                                            <span class="by-original-title" style="display: none;" >
+                                                {{ data['name'] }}
+                                            </span>
+                                        {% elif media_list == 'animelist' %}
+                                            <span class="font-mask text-center text-light">{{ data['name'] }}</span>
+                                            <span class="by-original-title" style="display: none;">
+                                                {{ data['original_name'] }}
+                                            </span>
+                                        {% elif media_list == 'movieslist' %}
+                                            {% if data['original_language'] == 'ja' %}
+                                                <span class="font-mask text-center text-light">
+                                                    {{ data['name'] }}
+                                                </span>
+                                                <span class="by-original-title" style="display: none;">
+                                                    {{ data['original_name'] }}
+                                                </span>
+                                            {% else %}
+                                                <span class="font-mask text-center text-light">
+                                                    {{ data['original_name'] }}
+                                                </span>
+                                                <span class="by-original-title" style="display: none;">
+                                                    {{ data['name'] }}
+                                                </span>
+                                            {% endif %}
+                                        {% endif %}
+                                        <span class="by-actor" style="display: none;" >{{ data['actors'] }}</span>
+                                        <span class="by-genre" style="display: none;" >{{ data['genres'] }}</span>
+                                        <span class="by-director" style="display: none;" >{{ data['director'] }}</span>
+                                    </a>
+                                    <div class="side-card-info text-center">
+                                        <a class="fas fa-trash m-t-10 m-b-20" data-toggle='tooltip' title="Remove" data-placement="right"
+                                           onclick="deleteElement(card_{{ data['id'] }}, '{{ media_list }}')">
+                                        </a><br>
+                                        <a class="fas fa-bars m-b-20" data-toggle='tooltip' title="Categories"
+                                           data-placement="right" onclick="chargeButtons(card_{{ data['id'] }})">
+                                        </a><br>
+                                        <a class="fa-star m-b-20 {% if data['favorite'] %} fas favorited {% else %}
+                                        far {% endif %}" data-toggle='tooltip' title="Favorite" data-placement="right"
+                                           onclick="addFavorite(this,'{{ data['id'] }}','{{ media_list }}')">
+                                        </a><br>
+                                        <a data-toggle='tooltip' title="Score /10" data-placement="right">
+                                            <b>8.5</b>
+                                        </a><br>
+                                        <a class="fas fa-comment-alt m-t-20 m-b-20" data-toggle='tooltip' title="Comments"
+                                           data-placement="right">
+                                        </a><br>
+                                        <div class="fas fa-redo rewatched m-b-20" data-toggle='tooltip' data-placement="right"
+                                             title="Rewatched" value="{{ data['rewatched'] }}">
+                                        </div><b>&nbsp;&nbsp;{{ data['rewatched'] }}</b><br>
+                                    </div>
+                                </div>
+                                {% block select_box scoped %}
+                                {% endblock select_box %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}
+
+
+{% block script %}
+    <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
+    <script src="{{ url_for('static', filename='js/medialist_base.js') }}"></script>
+    {% block javascript scoped %}
+    {% endblock javascript %}
+{% endblock script %}

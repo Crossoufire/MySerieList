@@ -54,8 +54,9 @@ function chargeButtons(card) {
             '</li>' +
         "</ul>");
 
-    $(card).find('.card-btn-top-left').attr('style', 'display: none;');
-    $(card).find('.card-btn-top-right').attr('style', 'display: none;');
+    $(card).find('.card-btn-top-left').hide();
+    $(card).find('.card-btn-top-right').hide();
+    $(card).find('.side-card-info').hide();
     $(card).find('.seas-eps-box').attr('style', 'display: none;');
     $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
     $(card).find('.mask').hide();

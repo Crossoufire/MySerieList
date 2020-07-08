@@ -442,7 +442,8 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "actors": element[5],
                             "genres": element[2],
                             "common": False,
-                            "category": element[1].status}
+                            "category": element[1].status,
+                            "rewatched": element[1].rewatched}
 
             if element[0].id in current_list:
                 element_info['common'] = True
@@ -764,9 +765,9 @@ class ScheduledTask:
         self.remove_non_list_media()
         self.remove_old_covers()
         self.automatic_media_refresh()
-        self.new_releasing_movies()
         self.new_releasing_series()
         self.new_releasing_anime()
+        self.new_releasing_movies()
 
         compute_media_time_spent(ListType.SERIES)
         compute_media_time_spent(ListType.ANIME)
@@ -774,7 +775,7 @@ class ScheduledTask:
 
     @staticmethod
     def remove_non_list_media():
-        app.logger.info('[SYSTEM] - Starting media remover')
+        app.logger.info('[SYSTEM] - Starting non user media remover')
 
         # SERIES DELETIONS
         series = db.session.query(Series, SeriesList).outerjoin(SeriesList, SeriesList.series_id == Series.id).all()
@@ -1044,7 +1045,7 @@ class ScheduledTask:
         return True
 
     def automatic_media_refresh(self):
-        app.logger.info('[SYSTEM] - Starting automatic refresh')
+        app.logger.info('[SYSTEM] - Starting automatic media refresh')
 
         # Recover all the data
         all_series_tmdb_id = [m.themoviedb_id for m in Series.query.filter(Series.lock_status != True)]
@@ -1092,10 +1093,94 @@ class ScheduledTask:
                 except Exception as e:
                     app.logger.error('Error while refreshing: {}'.format(e))
 
-        app.logger.info('[SYSTEM] - Automatic refresh completed')
+        app.logger.info('[SYSTEM] - Automatic media refresh finished')
+
+    @staticmethod
+    def new_releasing_series():
+        app.logger.info('[SYSTEM] - Starting releasing series notifications')
+        all_series = Series.query.filter(Series.next_episode_to_air != None).all()
+
+        series_id = []
+        for series in all_series:
+            try:
+                diff = (datetime.utcnow() - datetime.strptime(series.next_episode_to_air, '%Y-%m-%d')).total_seconds()
+                # Check if the next episode of the series is releasing in one week or less (7 days)
+                if diff < 0 and abs(diff/(3600*24)) <= 7:
+                    series_id.append(series.id)
+            except:
+                pass
+
+        series_in_ptw = db.session.query(Series, SeriesList) \
+            .join(SeriesList, SeriesList.series_id == Series.id) \
+            .filter(SeriesList.series_id.in_(series_id), and_(SeriesList.status != Status.RANDOM,
+                                                              SeriesList.status != Status.DROPPED)).all()
+
+        for info in series_in_ptw:
+            if not bool(Notifications.query.filter_by(user_id=info[1].user_id,
+                                                      media_type='serieslist',
+                                                      media_id=info[0].id).first()):
+
+                release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
+                payload = {'name': info[0].name,
+                           'release_date': release_date,
+                           'season': '{:02d}'.format(info[0].season_to_air),
+                           'episode': '{:02d}'.format(info[0].episode_to_air)}
+
+                data = Notifications(user_id=info[1].user_id,
+                                     media_type='serieslist',
+                                     media_id=info[0].id,
+                                     payload_json=json.dumps(payload))
+                db.session.add(data)
+                app.logger.info('Series notification [ID {}] send to user {}'.format(info[0].id, info[1].user_id))
+
+        db.session.commit()
+        app.logger.info('[SYSTEM] - Atomatic releasing series notifications finished')
+
+    @staticmethod
+    def new_releasing_anime():
+        app.logger.info('[SYSTEM] - Starting releasing anime notifications')
+        all_anime = Anime.query.filter(Anime.next_episode_to_air != None).all()
+
+        anime_id = []
+        for anime in all_anime:
+            try:
+                diff = (datetime.utcnow() - datetime.strptime(anime.next_episode_to_air, '%Y-%m-%d')).total_seconds()
+                # Check if the next episode of the series is releasing in one week or less (7 days)
+                if diff < 0 and abs(diff/(3600*24)) <= 7:
+                    anime_id.append(anime.id)
+            except:
+                pass
+
+        anime_in_ptw = db.session.query(Anime, AnimeList) \
+            .join(AnimeList, AnimeList.anime_id == Anime.id) \
+            .filter(AnimeList.anime_id.in_(anime_id), and_(AnimeList.status != Status.RANDOM,
+                                                           AnimeList.status != Status.DROPPED)).all()
+
+        for info in anime_in_ptw:
+            if not bool(Notifications.query.filter_by(user_id=info[1].user_id,
+                                                      media_type='animelist',
+                                                      media_id=info[0].id).first()):
+
+                release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
+                payload = {'name': info[0].name,
+                           'release_date': release_date,
+                           'season': '{:02d}'.format(info[0].season_to_air),
+                           'episode': '{:02d}'.format(info[0].episode_to_air)}
+
+                data = Notifications(user_id=info[1].user_id,
+                                     media_type='animelist',
+                                     media_id=info[0].id,
+                                     payload_json=json.dumps(payload))
+                db.session.add(data)
+                app.logger.info('Anime notification [ID {}] send to user {}'.format(info[0].id, info[1].user_id))
+
+        db.session.commit()
+        app.logger.info('[SYSTEM] - Automatic releasing anime notifications finished')
 
     @staticmethod
     def new_releasing_movies():
+        app.logger.info('[SYSTEM] - Starting releasing movies notifications')
+
         all_movies = Movies.query.all()
 
         movies_id = []
@@ -1126,84 +1211,10 @@ class ScheduledTask:
                                      media_id=info[0].id,
                                      payload_json=json.dumps(payload))
                 db.session.add(data)
+                app.logger.info('Movie notification [ID {}] send to user {}'.format(info[0].id, info[1].user_id))
 
         db.session.commit()
-
-    @staticmethod
-    def new_releasing_series():
-        all_series = Series.query.filter(Series.next_episode_to_air != None).all()
-
-        series_id = []
-        for series in all_series:
-            try:
-                diff = (datetime.utcnow() - datetime.strptime(series.next_episode_to_air, '%Y-%m-%d')).total_seconds()
-                # Check if the next episode of the series is releasing in one week or less (7 days)
-                if diff < 0 and abs(diff/(3600*24)) <= 7:
-                    series_id.append(series.id)
-            except:
-                pass
-
-        series_in_ptw = db.session.query(Series, SeriesList) \
-            .join(SeriesList, SeriesList.series_id == Series.id) \
-            .filter(SeriesList.series_id.in_(series_id), and_(SeriesList.status != Status.RANDOM,
-                                                              SeriesList.status != Status.DROPPED)).all()
-
-        for info in series_in_ptw:
-            if not bool(Notifications.query.filter_by(user_id=info[1].user_id,
-                                                      media_type='serieslist',
-                                                      media_id=info[0].id).first()):
-
-                release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
-                payload = {'name': info[0].name,
-                           'release_date': release_date,
-                           'season': info[0].season_to_air,
-                           'episode': info[0].episode_to_air}
-
-                data = Notifications(user_id=info[1].user_id,
-                                     media_type='serieslist',
-                                     media_id=info[0].id,
-                                     payload_json=json.dumps(payload))
-                db.session.add(data)
-
-        db.session.commit()
-
-    @staticmethod
-    def new_releasing_anime():
-        all_anime = Series.query.filter(Anime.next_episode_to_air != None).all()
-
-        anime_id = []
-        for anime in all_anime:
-            try:
-                diff = (datetime.utcnow() - datetime.strptime(anime.next_episode_to_air, '%Y-%m-%d')).total_seconds()
-                # Check if the next episode of the series is releasing in one week or less (7 days)
-                if diff < 0 and abs(diff/(3600*24)) <= 7:
-                    anime_id.append(anime.id)
-            except:
-                pass
-
-        anime_in_ptw = db.session.query(Anime, AnimeList) \
-            .join(AnimeList, AnimeList.anime_id == Anime.id) \
-            .filter(AnimeList.anime_id.in_(anime_id), and_(AnimeList.status != Status.RANDOM,
-                                                           AnimeList.status != Status.DROPPED)).all()
-
-        for info in anime_in_ptw:
-            if not bool(Notifications.query.filter_by(user_id=info[1].user_id,
-                                                      media_type='animelist',
-                                                      media_id=info[0].id).first()):
-
-                release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
-                payload = {'name': info[0].name,
-                           'release_date': release_date,
-                           'season': info[0].season_to_air,
-                           'episode': info[0].episode_to_air}
-
-                data = Notifications(user_id=info[1].user_id,
-                                     media_type='animelist',
-                                     media_id=info[0].id,
-                                     payload_json=json.dumps(payload))
-                db.session.add(data)
-
-        db.session.commit()
+        app.logger.info('[SYSTEM] - Automatic releasing movies notifications finished')
 
 
-app.apscheduler.add_job(func=ScheduledTask, trigger='cron', id='scheduled_task', hour=3, minute=00)
+app.apscheduler.add_job(func=ScheduledTask, trigger='cron', id='scheduled_task', hour=11, minute=36)

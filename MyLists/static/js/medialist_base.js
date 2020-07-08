@@ -36,8 +36,9 @@ function deleteElement(card, media_list) {
 function removeCat() {
     $('.card-cat-buttons').remove();
     $('.card-btn-top-right-2').remove();
-    $('.card-btn-top-left').attr('style', 'display: block;');
-    $('.card-btn-top-right').attr('style', 'display: block;');
+    $('.card-btn-top-left').show();
+    $('.card-btn-top-right').show();
+    $('.side-card-info').show();
 
     $('.seas-eps-box').each(function () {
         if ($(this).parent().parent().parent()[0].className === 'row category-PLAN TO WATCH' ||
@@ -95,9 +96,8 @@ function searchElement() {
 
 
 // --- Add media to favorite -------------------------------------------
-function addFavorite(element_id, media_type) {
-    let favorite;
-    favorite = !!$('#fav-' + element_id).hasClass('far');
+function addFavorite(fav_div, element_id, media_type) {
+    let favorite = !!$(fav_div).hasClass('far');
 
     $.ajax ({
         type: "POST",
@@ -107,11 +107,9 @@ function addFavorite(element_id, media_type) {
         dataType: "json",
         success: function() {
             if (favorite === true) {
-                $('#fav-'+element_id).removeClass('far card-btn-bottom-left').addClass('fas card-favorite');
-                $('#fav-'+element_id).attr('style', 'color: darkgoldenrod;');
+                $(fav_div).removeClass('far').addClass('fas favorited');
             } else {
-                $('#fav-'+element_id).removeClass('fas card-favorite').addClass('far card-btn-bottom-left');
-                $('#fav-'+element_id).attr('style', 'color: white;');
+                $(fav_div).removeClass('fas favorited').addClass('far');
             }
         },
         error: function() {
