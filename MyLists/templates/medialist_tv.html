@@ -7,14 +7,14 @@
 
 
 {% block select_box %}
-    <div class="seas-eps-box" {% if data['category'].value == "PLAN_TO_WATCH" %}style="display: none;"{% endif %}>
+    <div class="seas-eps-box" {% if data['category'].value == "PLAN TO WATCH" %}style="display: none;"{% endif %}>
         <div style="display: inline-block;">
             <select id="S_{{ data['id'] }}" class="text-light text-center select-box
              {% if target_user_id != current_user.get_id() %} disabled{% endif %}" onchange="updateSeason(
              '{{ data['id'] }}', this)">
                 {% for i in range(data['eps_per_season']|length) %}
                     {% if i + 1 == data['current_season'] %}
-                        <option class="card-opt-box" selected="selected">&nbsp;{{ "S{:02}".format(i+1) }}&nbsp;</option>
+                        <option class="card-opt-box" selected="selected">&nbsp;{{ "S{:02}".format(i + 1) }}&nbsp;</option>
                     {% else %}
                         <option class="card-opt-box">&nbsp;{{ "S{:02}".format(i + 1) }}&nbsp;</option>
                     {% endif %}

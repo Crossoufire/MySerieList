@@ -1256,8 +1256,8 @@ def scheduled_task():
                 release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
                 payload = {'name': info[0].name,
                            'release_date': release_date,
-                           'season': info[0].season_to_air,
-                           'episode': info[0].episode_to_air}
+                           'season': '{:02d}'.format(info[0].season_to_air),
+                           'episode': '{:02d}'.format( info[0].episode_to_air)}
 
                 data = Notifications(user_id=info[1].user_id,
                                      media_type='serieslist',
@@ -1293,8 +1293,8 @@ def scheduled_task():
                 release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
                 payload = {'name': info[0].name,
                            'release_date': release_date,
-                           'season': info[0].season_to_air,
-                           'episode': info[0].episode_to_air}
+                           'season': '{:02d}'.format(info[0].season_to_air),
+                           'episode': '{:02d}'.format(info[0].episode_to_air)}
 
                 data = Notifications(user_id=info[1].user_id,
                                      media_type='animelist',

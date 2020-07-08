@@ -41,7 +41,7 @@ function removeCat() {
 
     $('.seas-eps-box').each(function () {
         if ($(this).parent().parent().parent()[0].className === 'row category-PLAN TO WATCH') {
-            $(this).attr('style', 'display: none;');
+            $(this).hide();
         }
         else {
             $(this).attr('style', 'display: inline-block;');
