@@ -7,7 +7,7 @@
 
 
 {% block select_box %}
-    <div class="seas-eps-box" {% if data['category'].value == "PLAN TO WATCH" %}style="display: none;"{% endif %}>
+    <div class="seas-eps-box" {% if data['category'].value == "Plan to Watch" %}style="display: none;"{% endif %}>
         <div style="display: inline-block;">
             <select id="S_{{ data['id'] }}" class="text-light text-center select-box
              {% if target_user_id != current_user.get_id() %} disabled{% endif %}" onchange="updateSeason(
