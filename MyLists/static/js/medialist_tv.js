@@ -13,20 +13,25 @@ function chargeButtons(card) {
 
     if ($('#'+card.id).parent().hasClass('category-WATCHING')) {
         display_watching = "none;";
-    } else if ($('#'+card.id).parent().hasClass('category-COMPLETED')) {
+    }
+    else if ($('#'+card.id).parent().hasClass('category-COMPLETED')) {
         display_completed = "none;";
-    } else if ($('#'+card.id).parent().hasClass('category-ON.HOLD')) {
+    }
+    else if ($('#'+card.id).parent().hasClass('category-ON.HOLD')) {
         display_on_hold = "none;";
-    } else if ($('#'+card.id).parent().hasClass('category-RANDOM')) {
+    }
+    else if ($('#'+card.id).parent().hasClass('category-RANDOM')) {
         display_random = "none;";
-    } else if ($('#'+card.id).parent().hasClass('category-DROPPED')) {
+    }
+    else if ($('#'+card.id).parent().hasClass('category-DROPPED')) {
         display_dropped = "none;";
-    } else {
+    }
+    else {
         display_plan_to_watch = "none;";
     }
 
     $(card).find('.view.overlay').prepend (
-        '<a class="card-btn-top-right-2 fas fa-times" onclick="removeCat()"></a>' +
+        '<a class="card-btn-top-right fas fa-times" onclick="removeCat()"></a>' +
         '<ul class="card-cat-buttons">' +
             '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+display_watching+'" ' +
             'onclick="changeCategory(\'Watching\', \''+card.id+'\')">' +
@@ -54,10 +59,7 @@ function chargeButtons(card) {
             '</li>' +
         "</ul>");
 
-    $(card).find('.card-btn-top-left').hide();
-    $(card).find('.card-btn-top-right').hide();
     $(card).find('.side-card-info').hide();
-    $(card).find('.seas-eps-box').attr('style', 'display: none;');
     $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
     $(card).find('.mask').hide();
 }
@@ -187,13 +189,14 @@ function updateSeason(element_id, value) {
             let season_data = JSON.parse("[" + seas_data + "]");
 
             episode_drop[0].length = 1;
+
             for (let i = 2; i <= season_data[0][selected_season]; i++) {
                 let opt = document.createElement("option");
-                opt.className = "card-opt-box";
+                opt.className = "seas-eps-drop-options";
                 if (i <= 9) {
-                        opt.innerHTML = "&nbsp;E0"+i+"&nbsp;";
+                        opt.innerHTML = "E0"+i;
                     } else {
-                        opt.innerHTML = "&nbsp;E"+i+"&nbsp;";
+                        opt.innerHTML = "E"+i;
                     }
                 episode_drop[0].appendChild(opt);
             }

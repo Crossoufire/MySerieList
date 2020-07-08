@@ -445,6 +445,11 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "category": element[1].status,
                             "rewatched": element[1].rewatched}
 
+            if list_type == ListType.SERIES:
+                element_info['media'] = 'Series'
+            else:
+                element_info['media'] = 'Anime'
+
             if element[0].id in current_list:
                 element_info['common'] = True
                 common_elements += 1

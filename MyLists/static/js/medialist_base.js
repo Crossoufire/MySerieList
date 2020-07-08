@@ -5,7 +5,6 @@ function deleteElement(card, media_list) {
     let element_id = $(card)[0].id.split('_')[1];
     $(card).find('.loading-medialist').show();
 
-    // noinspection SqlNoDataSourceInspection
     if (!confirm('Delete the media from your list?')) {
         $(card).find('.loading-medialist').hide();
         return false;
@@ -35,18 +34,16 @@ function deleteElement(card, media_list) {
 // --- Remove the category buttons -------------------------------------
 function removeCat() {
     $('.card-cat-buttons').remove();
-    $('.card-btn-top-right-2').remove();
-    $('.card-btn-top-left').show();
-    $('.card-btn-top-right').show();
+    $('.card-btn-top-right').remove();
     $('.side-card-info').show();
 
-    $('.seas-eps-box').each(function () {
+    $('.seas-eps-drop-container').each(function () {
         if ($(this).parent().parent().parent()[0].className === 'row category-PLAN TO WATCH' ||
             $(this).parent().parent().parent()[0].className === 'row category-RANDOM') {
-            $(this).attr('style', 'display: none;');
+            $(this).hide();
         }
         else {
-            $(this).attr('style', 'display: inline-block;');
+            $(this).show();
         }
     });
 
@@ -139,14 +136,14 @@ function HideCommon() {
 // --- Show/Hide favorites media ---------------------------------------
 function ShowFavorites() {
     if ($('#ShowFavorites').prop("checked") === true) {
-        $('.far.fa-star').parent().parent().parent().hide();
+        $('.far.fa-star').parent().parent().parent().parent().hide();
     }
     else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === true) {
-        $('.far.fa-star').parent().parent().parent().show();
-        $('.card-ribbon').parent().parent().parent().hide();
+        $('.far.fa-star').parent().parent().parent().parent().show();
+        $('.card-ribbon').parent().parent().parent().parent().hide();
     }
     else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === false) {
-        $('.far.fa-star').parent().parent().parent().show();
+        $('.far.fa-star').parent().parent().parent().parent().show();
     }
 
     $categories.isotope('layout');

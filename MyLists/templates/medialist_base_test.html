@@ -101,34 +101,28 @@
                                     </div>
                                     <img class="card-img-top lazyload" data-src="{{ data['cover'] }}" height="300"
                                          width="200" style="height: auto;" alt=""/>
-                                    <a class="mask flex-center rgba-black-strong" {% if media_list == 'serieslist' %}
-                                       href="/media_sheet/Series/{{ data['id'] }}" {% elif media_list == 'animelist' %}
-                                       href="/media_sheet/Anime/{{ data['id'] }}" {% else %}
-                                       href="/media_sheet/Movies/{{ data['id'] }}" {% endif %}>
+                                    <a class="mask flex-center rgba-black-strong"
+                                       href="/media_sheet/{{ data['media'] }}/{{ data['id'] }}">
                                         {% if media_list == 'serieslist' %}
-                                            <span class="font-mask text-center text-light">
+                                            <span class="font-mask text-center">
                                                 {{ data['original_name'] }}
                                             </span>
                                             <span class="by-original-title" style="display: none;" >
                                                 {{ data['name'] }}
                                             </span>
                                         {% elif media_list == 'animelist' %}
-                                            <span class="font-mask text-center text-light">{{ data['name'] }}</span>
+                                            <span class="font-mask text-center">{{ data['name'] }}</span>
                                             <span class="by-original-title" style="display: none;">
                                                 {{ data['original_name'] }}
                                             </span>
                                         {% elif media_list == 'movieslist' %}
                                             {% if data['original_language'] == 'ja' %}
-                                                <span class="font-mask text-center text-light">
-                                                    {{ data['name'] }}
-                                                </span>
+                                                <span class="font-mask text-center">{{ data['name'] }}</span>
                                                 <span class="by-original-title" style="display: none;">
                                                     {{ data['original_name'] }}
                                                 </span>
                                             {% else %}
-                                                <span class="font-mask text-center text-light">
-                                                    {{ data['original_name'] }}
-                                                </span>
+                                                <span class="font-mask text-center">{{ data['original_name'] }}</span>
                                                 <span class="by-original-title" style="display: none;">
                                                     {{ data['name'] }}
                                                 </span>
@@ -138,30 +132,57 @@
                                         <span class="by-genre" style="display: none;" >{{ data['genres'] }}</span>
                                         <span class="by-director" style="display: none;" >{{ data['director'] }}</span>
                                     </a>
-                                    <div class="side-card-info text-center">
-                                        <a class="fas fa-trash m-t-10 m-b-20" data-toggle='tooltip' title="Remove" data-placement="right"
-                                           onclick="deleteElement(card_{{ data['id'] }}, '{{ media_list }}')">
-                                        </a><br>
-                                        <a class="fas fa-bars m-b-20" data-toggle='tooltip' title="Categories"
-                                           data-placement="right" onclick="chargeButtons(card_{{ data['id'] }})">
-                                        </a><br>
-                                        <a class="fa-star m-b-20 {% if data['favorite'] %} fas favorited {% else %}
-                                        far {% endif %}" data-toggle='tooltip' title="Favorite" data-placement="right"
-                                           onclick="addFavorite(this,'{{ data['id'] }}','{{ media_list }}')">
-                                        </a><br>
-                                        <a data-toggle='tooltip' title="Score /10" data-placement="right">
-                                            <b>8.5</b>
-                                        </a><br>
-                                        <a class="fas fa-comment-alt m-t-20 m-b-20" data-toggle='tooltip' title="Comments"
-                                           data-placement="right">
-                                        </a><br>
-                                        <div class="fas fa-redo rewatched m-b-20" data-toggle='tooltip' data-placement="right"
-                                             title="Rewatched" value="{{ data['rewatched'] }}">
-                                        </div><b>&nbsp;&nbsp;{{ data['rewatched'] }}</b><br>
+                                    <a class="card-top-left fas fa-bars" onclick="chargeButtons(card_{{ data['id'] }})"></a>
+                                    <a class="card-toop-right fas fa-trash" onclick="deleteElement(card_{{ data['id'] }}, '{{ media_list }}')"></a>
+                                    {% if data['common'] %}
+                                        <div class="card-ribbon"></div>
+                                    {% endif %}
+                                </div>
+                                <div class="bottom-card-info{% if media_list =='movieslist' %}-movie {% endif %}">
+                                    <div class="row no-gutters tata">
+                                        <div class="col m-l-10">
+                                            <a class="fa-star {% if data['favorite'] %} fas favorited {% else %}
+                                             far {% endif %}" data-toggle='tooltip' title="Favorite"
+                                             onclick="addFavorite(this,'{{ data['id'] }}','{{ media_list }}')">
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <select class="score-drop" data-toggle='tooltip' title="Score /10">
+                                                <option class="seas-eps-drop-options">---</option>
+                                                <option class="seas-eps-drop-options">0.0</option>
+                                                <option class="seas-eps-drop-options">0.5</option>
+                                                <option class="seas-eps-drop-options">1.0</option>
+                                                <option class="seas-eps-drop-options">2.0</option>
+                                                <option class="seas-eps-drop-options">2.5</option>
+                                                <option class="seas-eps-drop-options">3.0</option>
+                                                <option class="seas-eps-drop-options">3.5</option>
+                                                <option class="seas-eps-drop-options">4.0</option>
+                                                <option class="seas-eps-drop-options">4.5</option>
+                                                <option class="seas-eps-drop-options">5.0</option>
+                                                <option class="seas-eps-drop-options">5.5</option>
+                                                <option class="seas-eps-drop-options">6.0</option>
+                                                <option class="seas-eps-drop-options">6.5</option>
+                                                <option class="seas-eps-drop-options">7.0</option>
+                                                <option class="seas-eps-drop-options">7.5</option>
+                                                <option class="seas-eps-drop-options">8.0</option>
+                                                <option class="seas-eps-drop-options">8.5</option>
+                                                <option class="seas-eps-drop-options">9.0</option>
+                                                <option class="seas-eps-drop-options">9.5</option>
+                                                <option class="seas-eps-drop-options">10</option>
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <a class="far fa-comment-alt" data-toggle='tooltip' title="Comments"></a>
+                                        </div>
+                                        <div class="col m-r-10">
+                                            <a data-toggle="tooltip" title="Rewatched">
+                                                <b>&nbsp;{{ data['rewatched'] }}</b>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                                {% block select_box scoped %}
-                                {% endblock select_box %}
+                                {% block seas_eps_drop scoped %}
+                                {% endblock seas_eps_drop %}
                             </div>
                         </div>
                     {% endfor %}
