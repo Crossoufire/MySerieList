@@ -5,11 +5,20 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/media_sheet.css') }}">
     <style>
         {% if media_list == 'serieslist' %}
-            hr {margin-top: 5px; border-top: 1px solid #216e7d;}
+            hr {
+                margin-top: 5px;
+                border-top: 1px solid #216e7d;
+            }
         {% elif media_list == 'animelist' %}
-            hr {margin-top: 5px; border-top: 1px solid #945141;}
+            hr {
+                margin-top: 5px;
+                border-top: 1px solid #945141;
+            }
         {% else %}
-            hr {margin-top: 5px; border-top: 1px solid #8c7821;}
+            hr {
+                margin-top: 5px;
+                border-top: 1px solid #8c7821;
+            }
         {% endif %}
     </style>
 {% endblock css %}
@@ -44,8 +53,8 @@
                                 {% if media_list != 'movieslist' %}
                                     <label for="category-dropdown"></label>
                                     <select id="category-dropdown" class="text-light text-center cat-drop"
-                                    onchange="changeCategoryTV('{{ data['id'] }}', this,'{{ data['eps_per_season'] }}',
-                                    '{{ media_list }}')">
+                                            onchange="changeCategoryTV('{{ data['id'] }}', this,'{{ data['eps_per_season'] }}',
+                                            '{{ media_list }}')">
                                         <option {% if data['status'] == 'Watching' %} selected="selected" {% endif %}>
                                             Watching
                                         </option>
@@ -68,11 +77,15 @@
                                     </select>
                                 {% else %}
                                     <select id="category-dropdown" class="text-light text-center cat-drop"
-                                        onchange="changeCategoryMovies('{{ data['id'] }}', this, '{{ data['genres'] }}')">
-                                    <option {% if data['status'] == 'Completed' or data['status'] == 'Completed Animation' %}
-                                        selected="selected" {% endif %}>Completed</option>
-                                    <option {% if data['status'] == 'Plan to Watch' %} selected="selected" {% endif %}>Plan to Watch</option>
-                                </select>
+                                            onchange="changeCategoryMovies('{{ data['id'] }}', this, '{{ data['genres'] }}')">
+                                        <option
+                                        {% if data['status'] == 'Completed' or data['status'] == 'Completed Animation' %}
+                                            selected="selected" {% endif %}>Completed
+                                        </option>
+                                        <option {% if data['status'] == 'Plan to Watch' %}
+                                            selected="selected" {% endif %}>Plan to Watch
+                                        </option>
+                                    </select>
                                 {% endif %}
                                 <img id="cat-loading" class="loading-img" style="display: none;"
                                      src="/static/img/loading.webp" alt=""/>
@@ -88,8 +101,8 @@
                                 <div class="col-8">
                                     <label for="season-dropdown"></label>
                                     <select id="season-dropdown" class="text-light text-center cat-drop"
-                                    onchange="updateSeason('{{ data['id'] }}', this, '{{ data['eps_per_season'] }}',
-                                    '{{ media_list }}')">
+                                            onchange="updateSeason('{{ data['id'] }}', this, '{{ data['eps_per_season'] }}',
+                                            '{{ media_list }}')">
                                         {% for eps in range(0, data['eps_per_season']|length) %}
                                             {% if eps + 1 == data['current_season'] %}
                                                 <option selected="selected" value="{{ eps }}">
@@ -101,7 +114,7 @@
                                         {% endfor %}
                                     </select>
                                     <img id="season-loading" class="loading-img" style="display: none;"
-                                     src="/static/img/loading.webp" alt=""/>
+                                         src="/static/img/loading.webp" alt=""/>
                                     &nbsp;<i id="season-check" class="fas fa-check" style="display: none;"></i>
                                 </div>
                             </div>
@@ -113,7 +126,7 @@
                                 <div class="col-8">
                                     <label for="episode-dropdown"></label>
                                     <select id="episode-dropdown" class="text-light text-center cat-drop"
-                                    onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
+                                            onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
                                         {% if data['status'] == 'Plan to Watch' or data['status'] == 'Random' %}
                                             {% for i in range(0, data['eps_per_season'][data['current_season'] - 1]) %}
                                                 {% if i + 1 == 1 %}
@@ -148,7 +161,7 @@
                         {% endif %}
                         <div id="rewatch-hr" class="m-l-35 m-r-55 m-t-8 m-b-8" style="border: 1px solid grey;"></div>
                         <div id="rewatch-row" class="row m-l-30 m-r-25" data-toggle="tooltip"
-                        title="How many time you rewatched this media. Do not count the inital completion."
+                             title="How many time you rewatched this media. Do not count the inital completion."
                         {% if data['status'] == 'Completed' or data['status'] == 'Completed Animation' %}
                         {% else %} style="display: none;" {% endif %}>
                             <div class="col-4">
@@ -157,7 +170,7 @@
                             <div class="col-8">
                                 <label for="rewatched-dropdown"></label>
                                 <select id="rewatched-dropdown" class="text-light text-center cat-drop"
-                                onchange="updateRewatched('{{ data['id'] }}', this, '{{ media_list }}')">
+                                        onchange="updateRewatched('{{ data['id'] }}', this, '{{ media_list }}')">
                                     {% for i in range(0, 11) %}
                                         {% if i == data['rewatched'] %}
                                             <option selected="selected" value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
@@ -167,7 +180,7 @@
                                     {% endfor %}
                                 </select>
                                 <img id="rewatched-loading" class="loading-img" style="display: none;" alt=""
-                                src="/static/img/loading.webp"/>
+                                     src="/static/img/loading.webp"/>
                                 &nbsp;<i id="rewatched-check" class="fas fa-check" style="display: none;"></i>
                             </div>
                         </div>
@@ -177,13 +190,13 @@
                                 <i class="fas fa-ban"></i>&nbsp; Remove from list
                             </button>
                             <img id="loading-remove-list" class="d-none" height="20" width="20"
-                             src="/static/img/loading.webp" alt=""/>
+                                 src="/static/img/loading.webp" alt=""/>
                         </div>
                     </div>
                     <div class="text-center">
                         <button id="add-to-list" class="btn btn-smaller btn-info"{% if data['in_user_list'] %}
-                             style="display: none;" {% endif %} onclick="addToUser('{{ data['id'] }}',
-                                '{{ media_list }}')">
+                                style="display: none;" {% endif %} onclick="addToUser('{{ data['id'] }}',
+                        '{{ media_list }}')">
                             <i class="fas fa-plus"></i>&nbsp; Add to your list
                         </button>
                         <img id="loading-add-list" class="d-none" height="20" width="20"
@@ -220,25 +233,25 @@
                     {% endfor %}
                 </div>
 
-{#                {% if media_list == 'movieslist' and data['collection_data'][0] %}#}
-{#                    <h4 class="m-l-21 m-r-15"><i class="fas fa-box-open m-t-8"></i>&nbsp;&nbsp;#}
-{#                        <b>{{ data['collection_data'][0].name }}</b>#}
-{#                    </h4>#}
-{#                    <hr class="m-l-20 m-r-24">#}
-{#                    <div class="m-b-30">#}
-{#                        {% set release = data['collection_data'][0].releases_dates.split(',') %}#}
-{#                        {% for name in data['collection_data'][0].movies_names.split(',') %}#}
-{#                            <div class="row m-l-5 m-r-5">#}
-{#                                <div class="col-9">#}
-{#                                    <b>{{ name }}</b>#}
-{#                                </div>#}
-{#                                <div class="col-3">#}
-{#                                    <b>{{ release[loop.index0].split('-')[0] }}</b>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        {% endfor %}#}
-{#                    </div>#}
-{#                {% endif %}#}
+                {#                {% if media_list == 'movieslist' and data['collection_data'][0] %}#}
+                {#                    <h4 class="m-l-21 m-r-15"><i class="fas fa-box-open m-t-8"></i>&nbsp;&nbsp;#}
+                {#                        <b>{{ data['collection_data'][0].name }}</b>#}
+                {#                    </h4>#}
+                {#                    <hr class="m-l-20 m-r-24">#}
+                {#                    <div class="m-b-30">#}
+                {#                        {% set release = data['collection_data'][0].releases_dates.split(',') %}#}
+                {#                        {% for name in data['collection_data'][0].movies_names.split(',') %}#}
+                {#                            <div class="row m-l-5 m-r-5">#}
+                {#                                <div class="col-9">#}
+                {#                                    <b>{{ name }}</b>#}
+                {#                                </div>#}
+                {#                                <div class="col-3">#}
+                {#                                    <b>{{ release[loop.index0].split('-')[0] }}</b>#}
+                {#                                </div>#}
+                {#                            </div>#}
+                {#                        {% endfor %}#}
+                {#                    </div>#}
+                {#                {% endif %}#}
 
             </div>
             <div class="col-lg-8 col-md-7 col-sm-12" style="margin-top: -10px;">
@@ -255,8 +268,8 @@
                             <li class="m-b-10">
                                 <div class="row">
                                     {% if media_list != 'movieslist' %}
-                                    <div class="col-5"><b>Created by:</b></div>
-                                    <div class="col-7">{{ data['created_by'] }}</div>
+                                        <div class="col-5"><b>Created by:</b></div>
+                                        <div class="col-7">{{ data['created_by'] }}</div>
                                     {% else %}
                                         <div class="col-5"><b>Directed by:</b></div>
                                         <div class="col-7">{{ data['director'] }}</div>
@@ -267,7 +280,8 @@
                                 <div class="row">
                                     {% if media_list != 'movieslist' %}
                                         <div class="col-5"><b>Airing dates:</b></div>
-                                        <div class="col-7">{{ data['first_air_date'] }} – {{ data['last_air_date'] }}</div>
+                                        <div class="col-7">{{ data['first_air_date'] }}
+                                            – {{ data['last_air_date'] }}</div>
                                     {% else %}
                                         <div class="col-5"><b>Release date:</b></div>
                                         <div class="col-7">{{ data['release_date'] }}</div>
@@ -297,7 +311,8 @@
                             <li class="m-b-10">
                                 <div class="row">
                                     <div class="col-5"><b>TMDb score:</b></div>
-                                    <div class="col-7">{{ data['vote_average'] }} ({{ data['vote_count']|int }} votes)</div>
+                                    <div class="col-7">{{ data['vote_average'] }} ({{ data['vote_count']|int }} votes)
+                                    </div>
                                 </div>
                             </li>
                             {% if media_list != 'movieslist' %}
@@ -329,15 +344,18 @@
                                 <li class="m-b-10">
                                     <div class="row">
                                         <div class="col-5"><b>Time to watch:</b></div>
-                                        <div class="col-7">{{ ((data['total_episodes'] * data['episode_duration'])/60)|round(1) }} hours</div>
+                                        <div
+                                        class="col-7">{{ ((data['total_episodes'] * data['episode_duration'])/60)|round(1) }}
+                                            hours
+                                        </div>
                                     </div>
                                 </li>
                                 <li class="m-b-10">
-                                <div class="row">
-                                    <div class="col-5"><b>Origin country:</b></div>
-                                    <div class="col-7">{{ data['origin_country'] }}</div>
-                                </div>
-                            </li>
+                                    <div class="row">
+                                        <div class="col-5"><b>Origin country:</b></div>
+                                        <div class="col-7">{{ data['origin_country'] }}</div>
+                                    </div>
+                                </li>
                             {% endif %}
                             {% if media_list == 'movieslist' %}
                                 <li class="m-b-10">
@@ -398,13 +416,15 @@
                                 <li class="m-b-10">
                                     <div class="row">
                                         <div class="col-4"><b>Budget:</b></div>
-                                        <div class="col-8">{{ "{:,.2f}".format(data['budget']).replace(',', ' ') }} $</div>
+                                        <div class="col-8">{{ "{:,.2f}".format(data['budget']).replace(',', ' ') }} $
+                                        </div>
                                     </div>
                                 </li>
                                 <li class="m-b-10">
                                     <div class="row">
                                         <div class="col-4"><b>Revenue:</b></div>
-                                        <div class="col-8">{{ "{:,.2f}".format(data['revenue']).replace(',', ' ') }} $</div>
+                                        <div class="col-8">{{ "{:,.2f}".format(data['revenue']).replace(',', ' ') }} $
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -414,8 +434,10 @@
                         <div>
                             {% for similar in data['same_genres'] %}
                                 <a class="m-r-10" href="/media_sheet/{{ data['media_type'] }}/{{ similar[0].id }}">
-                                    <img class="m-b-10" height="80" width="53" data-toggle="tooltip" title="{{ similar[0].name }}"
-                                         src="/static/covers/{{ data['cover_path'] }}/{{ similar[0].image_cover }}" alt=""/>
+                                    <img class="m-b-10" height="80" width="53" data-toggle="tooltip"
+                                         title="{{ similar[0].name }}"
+                                         src="/static/covers/{{ data['cover_path'] }}/{{ similar[0].image_cover }}"
+                                         alt=""/>
                                 </a>
                             {% endfor %}
                             {% if not data['same_genres'] %}
@@ -449,11 +471,11 @@
                         {% endif %}
                         {% if data['lock_status'] %}
                             <a id="edit-button" class="btn btn-sm btn-warning text-dark"
-                            href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}">Edit media</a>
+                               href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}">Edit media</a>
                         {% else %}
                             <a id="edit-button" class="btn btn-sm btn-warning text-dark"
-                                 href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}"
-                                 style="display: none;">Edit media</a>
+                               href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}"
+                               style="display: none;">Edit media</a>
                         {% endif %}
                     </div>
                 {% endif %}

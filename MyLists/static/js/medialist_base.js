@@ -35,7 +35,9 @@ function deleteElement(card, media_list) {
 function removeCat() {
     $('.card-cat-buttons').remove();
     $('.card-btn-top-right').remove();
-    $('.side-card-info').show();
+    $('.card-btn-toop-right').show();
+    $('.card-btn-top-left').show();
+    $('.bottom-card-info').show();
 
     $('.seas-eps-drop-container').each(function () {
         if ($(this).parent().parent().parent()[0].className === 'row category-PLAN TO WATCH' ||
@@ -90,6 +92,54 @@ function searchElement() {
 
     $categories.isotope('layout');
 }
+
+function delay(callback, ms) {
+    var timer = 0;
+    return function() {
+        var context = this, args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            callback.apply(context, args);
+        }, ms || 0);
+    };
+}
+$('#searchInput').keyup(delay(function (e) {
+    let input, cat, filter, cards, cardContainer, title, i, l;
+
+    input = document.getElementById("searchInput");
+    cat = document.getElementsByClassName("search-select")[0].value;
+    filter = input.value.toUpperCase();
+    cardContainer = document.getElementById("categories-iso");
+    cards = cardContainer.getElementsByClassName("card-container");
+    l = cards.length;
+    for (i = 0; i < l; i++) {
+        title = cards[i].querySelector(".font-mask");
+        let original_title = cards[i].querySelector(".by-original-title");
+        let actors = cards[i].querySelector(".by-actor");
+        let genres = cards[i].querySelector(".by-genre");
+        let director = cards[i].querySelector(".by-director");
+        if (title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
+            cards[i].style.display = "";
+        }
+        else if (original_title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
+            cards[i].style.display = "";
+        }
+        else if (actors.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Actors' || cat === 'All')) {
+            cards[i].style.display = "";
+        }
+        else if (genres.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Genres' || cat === 'All')) {
+            cards[i].style.display = "";
+        }
+        else if (director.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Director' || cat === 'All')) {
+            cards[i].style.display = "";
+        }
+        else {
+            cards[i].style.display = "none";
+        }
+    }
+
+    $categories.isotope('layout');
+}, 250));
 
 
 // --- Add media to favorite -------------------------------------------
@@ -150,24 +200,6 @@ function ShowFavorites() {
 }
 
 
-// --- Show/Hide favorites media ---------------------------------------
-function ShowRewatched() {
-    if ($('#ShowRewatched').prop("checked") === true) {
-        $('.rewatched').each(function () {
-            if ($(this).attr('value') === "0") {
-                $(this).parent().parent().parent().parent().hide();
-            }
-        });
-        $(".categories.PLAN.TO.WATCH").hide();
-    } else {
-        $('.rewatched').parent().parent().parent().parent().show();
-        $(".categories.PLAN.TO.WATCH").show();
-    }
-
-    $categories.isotope('layout');
-}
-
-
 // --- Add the category to the user (from other list) ------------------
 function AddCatUser(category, card_id) {
     let media_list = $('#'+card_id).attr('values').split('-')[1];
@@ -182,7 +214,7 @@ function AddCatUser(category, card_id) {
         dataType: "json",
         success: function() {
             $("#"+card_id).find('.view.overlay').append('<div class="card-ribbon"></div>');
-            $("#"+card_id).find('.card-btn-top-left.fas.fa-plus.text-light').remove();
+            $("#"+card_id).find('.card-btn-top-left').remove();
         },
         error: function () {
             error_ajax_message('Error trying to add the media to your list. Please try again later.')
@@ -195,7 +227,7 @@ function AddCatUser(category, card_id) {
 }
 
 
-// --- Isotopes --------------------------------------------------------
+// --- Isotopes categories ---------------------------------------------
 let $categories = $('.categories-iso').isotope({
     itemSelector: '.categories',
     layoutMode: 'vertical',

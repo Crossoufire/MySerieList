@@ -432,8 +432,6 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             element_info = {"id": element[0].id,
                             "tmdb_id": element[0].themoviedb_id,
                             "cover": "{}{}".format(covers_path, element[0].image_cover),
-                            "name": element[0].name,
-                            "original_name": element[0].original_name,
                             "last_episode_watched": element[1].last_episode_watched,
                             "eps_per_season": eps_per_season,
                             "current_season": element[1].current_season,
@@ -444,6 +442,20 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "common": False,
                             "category": element[1].status,
                             "rewatched": element[1].rewatched}
+
+            def latin_alphabet(original_name):
+                try:
+                    original_name.encode('iso-8859-1')
+                    return True
+                except UnicodeEncodeError:
+                    return False
+
+            if latin_alphabet(element[0].original_name):
+                element_info["display_name"] = element[0].original_name
+                element_info["other_name"] = element[0].name
+            else:
+                element_info["display_name"] = element[0].name
+                element_info["other_name"] = element[0].original_name
 
             if list_type == ListType.SERIES:
                 element_info['media'] = 'Series'
@@ -505,8 +517,6 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             element_info = {"id": element[0].id,
                             "tmdb_id": element[0].themoviedb_id,
                             "cover": "{}{}".format(covers_path, element[0].image_cover),
-                            "name": element[0].name,
-                            "original_name": element[0].original_name,
                             "original_language": element[0].original_language,
                             "director": element[0].director_name,
                             "score": element[1].score,
@@ -514,7 +524,22 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "actors": element[3],
                             "genres": element[2],
                             "common": False,
-                            "rewatched": element[1].rewatched}
+                            "rewatched": element[1].rewatched,
+                            "media": 'Movies'}
+
+            def latin_alphabet(original_name):
+                try:
+                    original_name.encode('iso-8859-1')
+                    return True
+                except UnicodeDecodeError:
+                    return False
+
+            if latin_alphabet(element[0].original_name):
+                element_info["display_name"] = element[0].original_name
+                element_info["other_name"] = element[0].name
+            else:
+                element_info["display_name"] = element[0].name
+                element_info["other_name"] = element[0].original_name
 
             if element[0].id in current_list:
                 element_info['common'] = True

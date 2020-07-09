@@ -14,7 +14,7 @@ function chargeButtons(card) {
     }
 
     $(card).find('.view.overlay').prepend(
-        '<a class="card-btn-top-right-2 fas fa-times" onclick="removeCat()"></a>' +
+        '<a class="card-btn-top-right fas fa-times" onclick="removeCat()"></a>' +
         '<ul class="card-cat-buttons">' +
             '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: ' + completed +'" ' +
             'onclick="changeCategory(\'Completed\', \''+card.id+'\')">' +
@@ -26,8 +26,8 @@ function chargeButtons(card) {
             '</li>' +
         "</ul>");
 
-    $(card).find('.card-btn-top-left').attr('style', 'display: none;');
-    $(card).find('.card-btn-top-right').attr('style', 'display: none;');
+    $(card).find('.card-btn-top-left').hide();
+    $(card).find('.card-btn-toop-right').hide();
     $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
     $(card).find('.mask').hide();
 }
@@ -79,7 +79,7 @@ function ChargeButtonsOther(card) {
     removeCat();
 
     $(card).find('.view.overlay').prepend(
-        '<a class="card-btn-top-right-2 fas fa-times" onclick="removeCat()"></a>' +
+        '<a class="card-btn-top-right fas fa-times" onclick="removeCat()"></a>' +
         '<ul class="card-cat-buttons">' +
             '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
             'onclick="AddCatUser(\'Completed\', \''+card.id+'\')">' +
@@ -91,7 +91,7 @@ function ChargeButtonsOther(card) {
             '</li>' +
         "</ul>");
 
+    $('#'+card.id).find('.card-btn-top-left').hide();
     $('#'+card.id).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
-    $('#'+card.id).find('.card-btn-top-left').attr('style', 'display: none;');
     $('#'+card.id).find('.mask').hide();
 }

@@ -6,18 +6,20 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-146580264-1"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
+
         function gtag() {
             dataLayer.push(arguments);
         }
+
         gtag('js', new Date());
         gtag('config', 'UA-146580264-1');
     </script>
 
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="Create your TV shows/anime/movies list, see how much time you spent and gain
-    levels and badges." />
+    levels and badges."/>
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
@@ -25,12 +27,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
 
     <link rel='icon' type='image/gif' href="{{ url_for('static', filename='img/favicon.ico') }}">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/mylists.css') }}">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mylists.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
     {% block css %}
     {% endblock %}
 
-	{% if title %}
+    {% if title %}
         <title>MyLists - {{ title }}</title>
     {% else %}
         <title>MyLists</title>
@@ -38,74 +40,74 @@
 </head>
 
 <body>
-    <header class="site-header">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top p-0">
-            <div class="container">
-                {% if current_user.is_authenticated %}
-                    <ul class="navbar-nav mr-auto m-l-10">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle fs-18" data-toggle="dropdown">MyLists</a>
-                            <div class="dropdown-menu medialist-dropdown">
-                                <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
+<header class="site-header">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top p-0">
+        <div class="container">
+            {% if current_user.is_authenticated %}
+                <ul class="navbar-nav mr-auto m-l-10">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle fs-18" data-toggle="dropdown">MyLists</a>
+                        <div class="dropdown-menu medialist-dropdown">
+                            <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
                                     media_list='serieslist', user_name=current_user.username) }}">
-                                    <div class="row">
-                                        <div class="col-3" style="margin-right: -5px;">
-                                            <i class="fas fa-tv text-series"></i>
-                                        </div>
-                                        <div class="col-9">SeriesList</div>
+                                <div class="row">
+                                    <div class="col-3" style="margin-right: -5px;">
+                                        <i class="fas fa-tv text-series"></i>
                                     </div>
-                                </a>
-                                <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
+                                    <div class="col-9">SeriesList</div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
                                 media_list='animelist', user_name=current_user.username) }}">
-                                    <div class="row">
-                                        <div class="col-3" style="margin-right: -5px;">
-                                            <i class="fas fa-torii-gate text-anime"></i>
-                                        </div>
-                                        <div class="col-9">AnimeList</div>
+                                <div class="row">
+                                    <div class="col-3" style="margin-right: -5px;">
+                                        <i class="fas fa-torii-gate text-anime"></i>
                                     </div>
-                                </a>
-                                <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
+                                    <div class="col-9">AnimeList</div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
                                 media_list='movieslist', user_name=current_user.username) }}">
-                                    <div class="row">
-                                        <div class="col-3" style="margin-right: -5px;">
-                                            <i class="fas fa-film text-movies"></i>
-                                        </div>
-                                        <div class="col-9">MoviesList</div>
+                                <div class="row">
+                                    <div class="col-3" style="margin-right: -5px;">
+                                        <i class="fas fa-film text-movies"></i>
                                     </div>
-                                </a>
-                            </div>
+                                    <div class="col-9">MoviesList</div>
+                                </div>
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="nav-collapse">
+                    <form class="form-inline my-2 my-lg-0 nav-form" action="{{ url_for('main.search_media') }}">
+                        <label for="autocomplete"></label>
+                        <input id="autocomplete" class="form-control tatayo" name="search"
+                               placeholder="Search Media">
+                    </form>
+                    <ul class="navbar-nav mr-auto nav-ul-1">
+                        <li class="nav-item nav-li-1">
+                            <a class="nav-link" href="{{ url_for('users.hall_of_fame') }}">
+                                <i class="fas fa-lg fa-trophy" style="color: goldenrod;"></i>
+                                <div class="info-nav fs-14 nav-text">Hall of Fame</div>
+                            </a>
+                        </li>
+                        <li class="nav-item nav-li-1">
+                            <a class="nav-link" href="{{ url_for('general.global_stats') }}">
+                                <i class="far fa-lg fa-chart-bar" style="color: darkorange;"></i>
+                                <div class="info-nav fs-14 nav-text">General Stats</div>
+                            </a>
+                        </li>
+                        <li class="nav-item nav-li-1">
+                            <a class="nav-link" href="{{ url_for('general.current_trends') }}">
+                                <i class="fas fa-lg fa-fire-alt" style="color: orangered;"></i>
+                                <div class="info-nav fs-14 nav-text">Trends</div>
+                            </a>
                         </li>
                     </ul>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-collapse">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="nav-collapse">
-                        <form class="form-inline my-2 my-lg-0 nav-form" action="{{ url_for('main.search_media') }}">
-                            <label for="autocomplete"></label>
-                            <input id="autocomplete" class="form-control tatayo" name="search"
-                                   placeholder="Search Media">
-                        </form>
-                        <ul class="navbar-nav mr-auto nav-ul-1">
-                            <li class="nav-item nav-li-1">
-                                <a class="nav-link" href="{{ url_for('users.hall_of_fame') }}">
-                                    <i class="fas fa-lg fa-trophy" style="color: goldenrod;"></i>
-                                    <div class="info-nav fs-14 nav-text">Hall of Fame</div>
-                                </a>
-                            </li>
-                            <li class="nav-item nav-li-1">
-                                <a class="nav-link" href="{{ url_for('general.global_stats') }}">
-                                    <i class="far fa-lg fa-chart-bar" style="color: darkorange;"></i>
-                                    <div class="info-nav fs-14 nav-text">General Stats</div>
-                                </a>
-                            </li>
-                            <li class="nav-item nav-li-1">
-                                <a class="nav-link" href="{{ url_for('general.current_trends') }}">
-                                    <i class="fas fa-lg fa-fire-alt" style="color: orangered;"></i>
-                                    <div class="info-nav fs-14 nav-text">Trends</div>
-                                </a>
-                            </li>
-                        </ul>
-                        <ul class="navbar-nav ml-auto">
+                    <ul class="navbar-nav ml-auto">
                         <li class="nav-item dropdown">
                             <a id="notif" class="nav-link my-drop-toggle notif-li m-r-10" data-toggle="dropdown"
                                onclick="notifications()">
@@ -122,7 +124,7 @@
                             </div>
                         </li>
                     </ul>
-                        <ul class="navbar-nav">
+                    <ul class="navbar-nav">
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown">
                                 <img class="navbar-pic" src="/static/profile_pics/{{ current_user.image_file }}"/>
@@ -146,63 +148,65 @@
                             </div>
                         </li>
                     </ul>
+                </div>
+
+            {% else %}
+                <a class="navbar-brand m-l-10" href="{{ url_for('auth.home') }}">MyLists</a>
+                {% if request.path == '/' %}
+                    <a class="nav-link ml-auto">
+                        <button class="btn btn-sm btn-primary my-2 my-sm-0" data-toggle="modal"
+                                data-target="#modalLoginForm">Login
+                        </button>
+                    </a>
+                    <a class="nav-link">
+                        <button class="btn btn-sm btn-danger my-2 my-sm-0" data-toggle="modal"
+                                data-target="#modalRegisterForm">Register
+                        </button>
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="content content-message">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible m-t-15" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message }}
                     </div>
-
-                {% else %}
-                    <a class="navbar-brand m-l-10" href="{{ url_for('auth.home') }}">MyLists</a>
-                    {% if request.path == '/' %}
-                        <a class="nav-link ml-auto">
-                            <button class="btn btn-sm btn-primary my-2 my-sm-0" data-toggle="modal"
-                             data-target="#modalLoginForm">Login</button>
-                        </a>
-                        <a class="nav-link">
-                            <button class="btn btn-sm btn-danger my-2 my-sm-0" data-toggle="modal"
-                             data-target="#modalRegisterForm">Register</button>
-                        </a>
-                    {% endif %}
-                {% endif %}
-            </div>
-        </nav>
-    </header>
-
-    <div class="container">
-        <div class="content content-message">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible m-t-15" role="alert">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                            {{message}}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-        </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
     </div>
+</div>
 
-    {% block home_header %}
-    {% endblock %}
+{% block home_header %}
+{% endblock %}
 
-    <main role="main" class="container">
-        <div class="content">
-            {% block content %}
-            {% endblock %}
-        </div>
-    </main>
+<main role="main" class="container">
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+</main>
 
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/js/mdb.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/js/mdb.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
 
-    {% block script %}
-    {% endblock %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/mylists.js') }}" ></script>
+{% block script %}
+{% endblock %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/mylists.js') }}"></script>
 
 <footer class="page-footer font-small">
     <div class="footer-copyright text-center py-3">
@@ -215,7 +219,7 @@
             </a>&nbsp;&nbsp;|&nbsp;
             © 2020 Copyright:&nbsp;
             <a href="https://MyLists.info" target="_blank">
-            Mylists.info
+                Mylists.info
             </a>&nbsp;&nbsp;|&nbsp;&nbsp;
             <a href="#!" target="_blank">
                 Contact

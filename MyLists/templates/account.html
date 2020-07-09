@@ -7,10 +7,13 @@
             <div class="follow-btn-mobile d-flex">
                 {% if user_data["isfollowing"] %}
                     <button class="btn btn-sm btn-dark follow-btn" value="1"
-                            onclick="follow_status('{{ user_data['id'] }}')">Unfollow</button>
+                            onclick="follow_status('{{ user_data['id'] }}')">
+                        Unfollow
+                    </button>
                 {% else %}
                     <button class="btn btn-sm btn-primary follow-btn" value="0"
-                            onclick="follow_status('{{ user_data['id'] }}')">Follow</button>
+                            onclick="follow_status('{{ user_data['id'] }}')">Follow
+                    </button>
                 {% endif %}
                 <img class="loading-follow m-t-11" style="display: none;" height="20" width="20"
                      src="/static/img/loading.webp" alt=""/>
@@ -156,18 +159,18 @@
                         </div>
 
                         <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
-                            <script type="text/javascript">
-                                var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-                                var localdate = new Date("{{update['date']}}").toLocaleString("en-GB", {timeZone: tz});
-                                var d = new Date("{{ update['date'] }}")
-                                var month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
-                                    "Nov", "Dec"];
-                                var date_month = month[d.getMonth()];
-                                var date_day = localdate.slice(0,2);
-                                var date_time = localdate.slice(11,17)
-                                document.write(date_day + " " + date_month + " at " + date_time)
-                            </script>
-                        </span>
+              <script type="text/javascript">
+                var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+                var localdate = new Date("{{update['date']}}").toLocaleString("en-GB", {timeZone: tz});
+                var d = new Date("{{ update['date'] }}")
+                var month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
+                    "Nov", "Dec"];
+                var date_month = month[d.getMonth()];
+                var date_day = localdate.slice(0, 2);
+                var date_time = localdate.slice(11, 17)
+                document.write(date_day + " " + date_month + " at " + date_time)
+              </script>
+          </span>
                         </div>
                         {% endfor %}
                     </li>
@@ -177,26 +180,26 @@
                         <ul class="text-left" style="list-style-type: disc; font-size: 13pt;">
                             <li class="m-b-10">
                                 <div class="row">
-                                    <div  class="col-9">Profile views:</div>
-                                    <div  class="col-2">{{ user_data['view_count']["profile"] }}</div>
+                                    <div class="col-9">Profile views:</div>
+                                    <div class="col-2">{{ user_data['view_count']["profile"] }}</div>
                                 </div>
                             </li>
                             <li class="m-b-10">
                                 <div class="row">
-                                    <div  class="col-9">SeriesList views:</div>
-                                    <div  class="col-2">{{ user_data['view_count']["series"] }}</div>
+                                    <div class="col-9">SeriesList views:</div>
+                                    <div class="col-2">{{ user_data['view_count']["series"] }}</div>
                                 </div>
                             </li>
                             <li class="m-b-10">
                                 <div class="row">
-                                    <div  class="col-9">AnimeList views:</div>
-                                    <div  class="col-2">{{ user_data['view_count']["anime"] }}</div>
+                                    <div class="col-9">AnimeList views:</div>
+                                    <div class="col-2">{{ user_data['view_count']["anime"] }}</div>
                                 </div>
                             </li>
                             <li class="m-b-10">
                                 <div class="row">
-                                    <div  class="col-9">MoviesList views:</div>
-                                    <div  class="col-2">{{ user_data['view_count']["movies"] }}</div>
+                                    <div class="col-9">MoviesList views:</div>
+                                    <div class="col-2">{{ user_data['view_count']["movies"] }}</div>
                                 </div>
                             </li>
                             {% if user_data['id'] == current_user.get_id() %}
@@ -556,7 +559,7 @@
                                         <span class="block-no-data" data-toggle="tooltip" title="No data">
                                             <span id="100%" class="value"></span>
                                         </span>
-                                        {% else %}
+                                    {% else %}
                                         <span class="block" data-toggle="tooltip" title="Completed">
                                             <span id="{{ media_data['movies']['media_count']['Completed']
                                             ['percent'] }}%" class="value"></span>
@@ -612,13 +615,13 @@
                             <div class="row m-b-16">
                                 <div class="col">
                                     {% for favorite in favorites[2] %}
-                                       {% if loop.index < 11 %}
-                                           <a href="/media_sheet/Movies/{{ favorite[0].id }}">
-                                               <img class="favorite-img" data-toggle="tooltip"
-                                                    title="{{ favorite[0].name }}"
-                                                    src="/static/covers/movies_covers/{{ favorite[0].image_cover }}"/>
-                                           </a>
-                                       {% endif %}
+                                        {% if loop.index < 11 %}
+                                            <a href="/media_sheet/Movies/{{ favorite[0].id }}">
+                                                <img class="favorite-img" data-toggle="tooltip"
+                                                     title="{{ favorite[0].name }}"
+                                                     src="/static/covers/movies_covers/{{ favorite[0].image_cover }}"/>
+                                            </a>
+                                        {% endif %}
                                     {% endfor %}
                                 </div>
                             </div>
@@ -640,13 +643,13 @@
                         <hr>
                         {% if user_data['id'] == current_user.get_id() %}
                             <form method="POST" action="" enctype="multipart/form-data">
-                            {{ follow_form.hidden_tag() }}
-                            <div class="d-flex m-l-10 m-b-10" style="margin-top: -10px;">
-                                {{ follow_form.follow_to_add(style="max-width: 120px;", class='form-control',
+                                {{ follow_form.hidden_tag() }}
+                                <div class="d-flex m-l-10 m-b-10" style="margin-top: -10px;">
+                                    {{ follow_form.follow_to_add(style="max-width: 120px;", class='form-control',
                                 placeholder='Username') }}
-                                {{ follow_form.submit_follow(class="btn btn-sm btn-dark m-t-4 m-l-15 p-2") }}
-                            </div>
-                        </form>
+                                    {{ follow_form.submit_follow(class="btn btn-sm btn-dark m-t-4 m-l-15 p-2") }}
+                                </div>
+                            </form>
                         {% endif %}
                         <div class='row no-gutters text-center' style="margin-bottom: -15px;">
                             {% if follows_list %}
@@ -654,9 +657,9 @@
                                     {% for follow in follows_list %}
                                         <div class="col-3 m-b-15">
                                             <a href="{{ follow.username }}">
-                                            <img class="follow-img" data-toggle="tooltip"
-                                                 title="{{ follow.username }}"
-                                                 src="/static/profile_pics/{{ follow.image_file }}">
+                                                <img class="follow-img" data-toggle="tooltip"
+                                                     title="{{ follow.username }}"
+                                                     src="/static/profile_pics/{{ follow.image_file }}">
                                             </a>
                                         </div>
                                     {% endfor %}
@@ -664,9 +667,9 @@
                                     {% for follow in follows_list %}
                                         <div class="col-3 m-b-15">
                                             <a href="{{ follow.username }}">
-                                            <img width='50' height='50' data-toggle="tooltip"
-                                                 title="{{ follow.username }}"
-                                                 src="/static/profile_pics/{{ follow.image_file }}">
+                                                <img width='50' height='50' data-toggle="tooltip"
+                                                     title="{{ follow.username }}"
+                                                     src="/static/profile_pics/{{ follow.image_file }}">
                                             </a>
                                         </div>
                                     {% endfor %}
@@ -674,9 +677,9 @@
                                     {% for follow in follows_list[:15] %}
                                         <div class="col-3 m-b-15">
                                             <a href="{{ follow.username }}">
-                                            <img width='50' height='50' data-toggle="tooltip"
-                                                 title="{{ follow.username }}"
-                                                 src="/static/profile_pics/{{ follow.image_file }}">
+                                                <img width='50' height='50' data-toggle="tooltip"
+                                                     title="{{ follow.username }}"
+                                                     src="/static/profile_pics/{{ follow.image_file }}">
                                             </a>
                                         </div>
                                     {% endfor %}
@@ -751,8 +754,8 @@
                                     month[10] = "Nov";
                                     month[11] = "Dec";
                                     var date_month = month[d.getMonth()];
-                                    var date_day = localdate.slice(0,2);
-                                    var date_time = localdate.slice(11,17)
+                                    var date_day = localdate.slice(0, 2);
+                                    var date_time = localdate.slice(11, 17)
                                     document.write(date_day + " " + date_month + " at " + date_time)
                                 </script>
                                 by
@@ -769,121 +772,121 @@
                 </ul>
             </div>
         </div>
-{#        <div class="m-t-25 m-b-60">#}
-{#            <h4><i class="fas fa-trophy"></i>&nbsp&nbspAchievements</h4>#}
-{#            <hr>#}
-{#            <div class="row">#}
-{#                <div class="col">#}
-{#                    <h5 class="text-center m-b-20">Series</h5>#}
-{#                    <div class="m-b-20" style="background-color: #216e7d;">#}
-{#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
-{#                            <div class="col-3">#}
-{#                                <img height='100' width='95' style="border-radius: 50%;"#}
-{#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3
+        {#        <div class="m-t-25 m-b-60">#}
+        {#            <h4><i class="fas fa-trophy"></i>&nbsp&nbspAchievements</h4>#}
+        {#            <hr>#}
+        {#            <div class="row">#}
+        {#                <div class="col">#}
+        {#                    <h5 class="text-center m-b-20">Series</h5>#}
+        {#                    <div class="m-b-20" style="background-color: #216e7d;">#}
+        {#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
+        {#                            <div class="col-3">#}
+        {#                                <img height='100' width='95' style="border-radius: 50%;"#}
+        {#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3
 AANd9GcQ1kPZoy5MDOZbuDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>#}
-{#                            </div>#}
-{#                            <div class="col-9 m-t-8">#}
-{#                                <div class="relative-medal">#}
-{#                                    <img height='30' width='30' src="https://image.flaticon.com/
+        {#                            </div>#}
+        {#                            <div class="col-9 m-t-8">#}
+        {#                                <div class="relative-medal">#}
+        {#                                    <img height='30' width='30' src="https://image.flaticon.com/
 icons/svg/179/179249.svg" alt=""/>#}
-{#                                </div>#}
-{#                                <h5><b>You're goddamn right</b></h5>#}
-{#                                You've watched 6 series with the actor Bryan Cranston#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="m-b-20" style="background-color: #333333;">#}
-{#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
-{#                            <div class="col-3">#}
-{#                                <img height='100' width='95' style="border-radius: 50%;"#}
-{#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon
+        {#                                </div>#}
+        {#                                <h5><b>You're goddamn right</b></h5>#}
+        {#                                You've watched 6 series with the actor Bryan Cranston#}
+        {#                            </div>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                    <div class="m-b-20" style="background-color: #333333;">#}
+        {#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
+        {#                            <div class="col-3">#}
+        {#                                <img height='100' width='95' style="border-radius: 50%;"#}
+        {#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon
 -linear-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>#}
-{#                            </div>#}
-{#                            <div class="col-9 m-t-8">#}
-{#                                <h5><b>Short is good too</b></h5>#}
-{#                                You've watched 4/8 series with less than 4 episodes.#}
-{#                            </div>#}
-{#                        </div>#}
-{#                        <div class="common-media-meter m-t-4">#}
-{#                            <span class="common-media-meter-bar" style="width: 50%;"></span>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="vertical_line"></div>#}
-{#                <div class="col">#}
-{#                    <h5 class="text-center m-b-20">Anime</h5>#}
-{#                    <div class="m-b-20" style="background-color: #216e7d;">#}
-{#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
-{#                            <div class="col-3">#}
-{#                                <img height='100' width='95' style="border-radius: 50%;"#}
-{#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ1kPZoy5MDO
+        {#                            </div>#}
+        {#                            <div class="col-9 m-t-8">#}
+        {#                                <h5><b>Short is good too</b></h5>#}
+        {#                                You've watched 4/8 series with less than 4 episodes.#}
+        {#                            </div>#}
+        {#                        </div>#}
+        {#                        <div class="common-media-meter m-t-4">#}
+        {#                            <span class="common-media-meter-bar" style="width: 50%;"></span>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#                <div class="vertical_line"></div>#}
+        {#                <div class="col">#}
+        {#                    <h5 class="text-center m-b-20">Anime</h5>#}
+        {#                    <div class="m-b-20" style="background-color: #216e7d;">#}
+        {#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
+        {#                            <div class="col-3">#}
+        {#                                <img height='100' width='95' style="border-radius: 50%;"#}
+        {#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ1kPZoy5MDO
 ZbuDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>#}
-{#                            </div>#}
-{#                            <div class="col-9 m-t-8">#}
-{#                                <div class="relative-medal">#}
-{#                                    <img height='30' width='30' src="https://image.flaticon.com/icons/svg
+        {#                            </div>#}
+        {#                            <div class="col-9 m-t-8">#}
+        {#                                <div class="relative-medal">#}
+        {#                                    <img height='30' width='30' src="https://image.flaticon.com/icons/svg
 /179/179249.svg" alt=""/>#}
-{#                                </div>#}
-{#                                <h5><b>You're goddamn right</b></h5>#}
-{#                                You've watched 6 series with the actor Bryan Cranston#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="m-b-20" style="background-color: #333333;">#}
-{#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
-{#                            <div class="col-3">#}
-{#                                <img height='100' width='95' style="border-radius: 50%;"#}
-{#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon-li
+        {#                                </div>#}
+        {#                                <h5><b>You're goddamn right</b></h5>#}
+        {#                                You've watched 6 series with the actor Bryan Cranston#}
+        {#                            </div>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                    <div class="m-b-20" style="background-color: #333333;">#}
+        {#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
+        {#                            <div class="col-3">#}
+        {#                                <img height='100' width='95' style="border-radius: 50%;"#}
+        {#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon-li
 near-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>#}
-{#                            </div>#}
-{#                            <div class="col-9 m-t-8">#}
-{#                                <h5><b>Short is good too</b></h5>#}
-{#                                You've watched 4/8 series with less than 4 episodes.#}
-{#                            </div>#}
-{#                        </div>#}
-{#                        <div class="common-media-meter m-t-4">#}
-{#                            <span class="common-media-meter-bar" style="width: 50%;"></span>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="vertical_line"></div>#}
-{#                <div class="col">#}
-{#                    <h5 class="text-center m-b-20">Movies</h5>#}
-{#                    <div class="m-b-20" style="background-color: #216e7d;">#}
-{#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
-{#                            <div class="col-3">#}
-{#                                <img height='100' width='95' style="border-radius: 50%;"#}
-{#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ1kPZoy5MDOZ
+        {#                            </div>#}
+        {#                            <div class="col-9 m-t-8">#}
+        {#                                <h5><b>Short is good too</b></h5>#}
+        {#                                You've watched 4/8 series with less than 4 episodes.#}
+        {#                            </div>#}
+        {#                        </div>#}
+        {#                        <div class="common-media-meter m-t-4">#}
+        {#                            <span class="common-media-meter-bar" style="width: 50%;"></span>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#                <div class="vertical_line"></div>#}
+        {#                <div class="col">#}
+        {#                    <h5 class="text-center m-b-20">Movies</h5>#}
+        {#                    <div class="m-b-20" style="background-color: #216e7d;">#}
+        {#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
+        {#                            <div class="col-3">#}
+        {#                                <img height='100' width='95' style="border-radius: 50%;"#}
+        {#                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ1kPZoy5MDOZ
 buDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>#}
-{#                            </div>#}
-{#                            <div class="col-9 m-t-8">#}
-{#                                <div class="relative-medal">#}
-{#                                    <img height='30' width='30' src="https://image.flaticon.com/icons/svg
+        {#                            </div>#}
+        {#                            <div class="col-9 m-t-8">#}
+        {#                                <div class="relative-medal">#}
+        {#                                    <img height='30' width='30' src="https://image.flaticon.com/icons/svg
 /179/179249.svg" alt=""/>#}
-{#                                </div>#}
-{#                                <h5><b>You're goddamn right</b></h5>#}
-{#                                You've watched 6 series with the actor Bryan Cranston#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="m-b-20" style="background-color: #333333;">#}
-{#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
-{#                            <div class="col-3">#}
-{#                                <img height='100' width='95' style="border-radius: 50%;"#}
-{#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon-lin
+        {#                                </div>#}
+        {#                                <h5><b>You're goddamn right</b></h5>#}
+        {#                                You've watched 6 series with the actor Bryan Cranston#}
+        {#                            </div>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                    <div class="m-b-20" style="background-color: #333333;">#}
+        {#                        <div class="row no-gutters" style="padding: 0 5px 0 0;">#}
+        {#                            <div class="col-3">#}
+        {#                                <img height='100' width='95' style="border-radius: 50%;"#}
+        {#                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon-lin
 ear-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>#}
-{#                            </div>#}
-{#                            <div class="col-9 m-t-8">#}
-{#                                <h5><b>Short is good too</b></h5>#}
-{#                                You've watched 4/8 series with less than 4 episodes.#}
-{#                            </div>#}
-{#                        </div>#}
-{#                        <div class="common-media-meter m-t-4">#}
-{#                            <span class="common-media-meter-bar" style="width: 50%;"></span>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
+        {#                            </div>#}
+        {#                            <div class="col-9 m-t-8">#}
+        {#                                <h5><b>Short is good too</b></h5>#}
+        {#                                You've watched 4/8 series with less than 4 episodes.#}
+        {#                            </div>#}
+        {#                        </div>#}
+        {#                        <div class="common-media-meter m-t-4">#}
+        {#                            <span class="common-media-meter-bar" style="width: 50%;"></span>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
     </div>
 {% endblock data %}

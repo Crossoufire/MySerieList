@@ -2,21 +2,21 @@
 
 
 {% block css %}
-<link href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet">
 {% endblock %}
 
 
 {% block home_header %}
-<div class="view">
-    <img class="img-fluid" src="{{ url_for('static', filename='img/home_header.jpg') }}" alt=""/>
-    <div class="mask d-flex justify-content-center align-items-center">
-        <div class="text-center white-text mx-5 wow fadeIn">
-            <h1 class="title">
-                <strong>Welcome to MyLists</strong>
-            </h1>
+    <div class="view">
+        <img class="img-fluid" src="{{ url_for('static', filename='img/home_header.jpg') }}" alt=""/>
+        <div class="mask d-flex justify-content-center align-items-center">
+            <div class="text-center white-text mx-5 wow fadeIn">
+                <h1 class="title">
+                    <strong>Welcome to MyLists</strong>
+                </h1>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 
@@ -33,32 +33,32 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form  method="POST" action="">
+                        <form method="POST" action="">
                             <fieldset>
                                 {{ login_form.hidden_tag() }}
                                 <div class="md-form">
                                     {% if login_form.login_username.errors %}
-                                    {{ login_form.login_username(class="form-control is-invalid") }}
-                                    <div class="invalid-feedback">
-                                        {% for error in login_form.login_username.errors %}
-                                        <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
+                                        {{ login_form.login_username(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in login_form.login_username.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
                                     {% else %}
-                                    {{ login_form.login_username(class="form-control text-light",
+                                        {{ login_form.login_username(class="form-control text-light",
                                     placeholder="Username") }}
                                     {% endif %}
                                 </div>
                                 <div class="md-form">
                                     {% if login_form.login_password.errors %}
-                                    {{ login_form.login_password(class="form-control is-invalid") }}
-                                    <div class="invalid-feedback">
-                                        {% for error in login_form.login_password.errors %}
-                                        <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
+                                        {{ login_form.login_password(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in login_form.login_password.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
                                     {% else %}
-                                    {{ login_form.login_password(class="form-control text-light",
+                                        {{ login_form.login_password(class="form-control text-light",
                                     placeholder="Password") }}
                                     {% endif %}
                                 </div>
@@ -72,7 +72,7 @@
                             </fieldset>
                         </form>
                         <div class="login-help text-center">
-                            <a type="text" href="{{url_for('auth.reset_password')}}" >Forgot Password?</a>
+                            <a type="text" href="{{ url_for('auth.reset_password') }}">Forgot Password?</a>
                         </div>
                     </div>
                 </div>
@@ -97,60 +97,60 @@
                             <fieldset>
                                 <div class="md-form m-l-10 m-r-10">
                                     {% if register_form.register_username.errors %}
-                                    {{ register_form.register_username(class="form-control is-invalid") }}
-                                    <div class="invalid-feedback">
-                                        {% for error in register_form.register_username.errors %}
-                                        <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
+                                        {{ register_form.register_username(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in register_form.register_username.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
                                     {% else %}
-                                    {{ register_form.register_username(class="form-control text-light",
+                                        {{ register_form.register_username(class="form-control text-light",
                                     placeholder="Username") }}
                                     {% endif %}
                                 </div>
 
                                 <div class="md-form m-l-10 m-r-10">
                                     {% if register_form.register_email.errors %}
-                                    {{ register_form.register_email(class="form-control is-invalid") }}
-                                    <div class="invalid-feedback">
-                                        {% for error in register_form.register_email.errors %}
-                                        <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
+                                        {{ register_form.register_email(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in register_form.register_email.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
                                     {% else %}
-                                    {{ register_form.register_email(class="form-control text-light",
+                                        {{ register_form.register_email(class="form-control text-light",
                                     placeholder="E-mail") }}
                                     {% endif %}
                                 </div>
 
                                 <div class="md-form m-l-10 m-r-10">
                                     {% if register_form.register_password.errors %}
-                                    {{ register_form.register_password(class="form-control is-invalid") }}
-                                    <div class="invalid-feedback">
-                                        {% for error in register_form.register_password.errors %}
-                                        <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
+                                        {{ register_form.register_password(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in register_form.register_password.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
                                     {% else %}
-                                    {{ register_form.register_password(class="form-control text-light",
+                                        {{ register_form.register_password(class="form-control text-light",
                                     placeholder="Password") }}
                                     {% endif %}
                                 </div>
 
                                 <div class="md-form m-l-10 m-r-10">
                                     {% if register_form.register_confirm_password.errors %}
-                                    {{ register_form.register_confirm_password(class="form-control is-invalid") }}
-                                    <div class="invalid-feedback">
-                                        {% for error in register_form.register_confirm_password.errors %}
-                                        {% if error == "Field must be equal to new_password." %}
-                                        <span>New password and confirm new password are different.</span>
-                                        {% else %}
-                                        <span>{{ error }}</span>
-                                        {% endif %}
-                                        {% endfor %}
-                                    </div>
+                                        {{ register_form.register_confirm_password(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in register_form.register_confirm_password.errors %}
+                                                {% if error == "Field must be equal to new_password." %}
+                                                    <span>New password and confirm new password are different.</span>
+                                                {% else %}
+                                                    <span>{{ error }}</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
                                     {% else %}
-                                    {{ register_form.register_confirm_password(class="form-control text-light",
+                                        {{ register_form.register_confirm_password(class="form-control text-light",
                                     placeholder="Confirm Password") }}
                                     {% endif %}
                                 </div>
@@ -169,7 +169,7 @@
         <h1 class="title_section my-5 h3 text-center">
             TRACK YOUR FAVORITE TV SHOWS / ANIME / MOVIES AND NEVER GET LOST
         </h1>
-        <h5 class="title_section my-5 text-center" >
+        <h5 class="title_section my-5 text-center">
             MyLists has a beautiful and clear interface which allows you to track all your TV shows / anime / movies
             without remembering what was your last watched episode. It integrates all kind of statistics so you can
             see how much time you spent. Moreover, you can see your friends' list and compare it to yours.
@@ -185,7 +185,8 @@
     <section>
         <h1 class="title_section my-5 h3 text-center">COMPARE YOUR LIST WITH OTHER USERS</h1>
         <h5 class="title_section my-5 text-center">
-            MyLists includes a Hall of Fame of all registered users. By default, everyone can see everyone's list, last updates, time spent, favorites and much more.
+            MyLists includes a Hall of Fame of all registered users. By default, everyone can see everyone's list, last
+            updates, time spent, favorites and much more.
             You can also set your profile to private, so only you and your friends can see it.
         </h5>
         <div class="row wow fadeIn">
@@ -196,110 +197,112 @@
     </section>
     <hr class="my-5 background_white">
 
- <section>
-	<h2 class="my-5 h3 text-center">AND EVEN MORE</h2>
-	<div class="row features-small mt-5 wow fadeIn justify-content-md-center">
-		<div class="col-xl-4">
-			<div class="row">
-				<div class="col-2">
-					<i class="fab fa-bootstrap fa-2x mb-1 indigo-text" aria-hidden="true"></i>
-				</div>
-				<div class="col-10 mb-2">
-					<h5 class="feature-title font-bold mb-1">Responsive</h5>
-					<p class="grey-text mt-2">Fully responsive created with <a href="https://mdbootstrap.com/">MDB</a>.
-                        Supports PC, tablets, mobile, TV.</p>
-				</div>
-			</div>
-		</div>
-		<div class="col-xl-4">
-			<div class="row">
-				<div class="col-2">
-					<i class="fab fa-github fa-2x mb-1 indigo-text" aria-hidden="true"></i>
-				</div>
-				<div class="col-10 mb-2">
-					<h5 class="feature-title font-bold mb-1">Open Source</h5>
-					<p class="grey-text mt-2">Totally open source, made with <a href="http://flask.pocoo.org/">
-                        Flask</a>. You can find the source code on
-                        <a href="https://www.github.com/Crossoufire/MyLists">Github.</a>
-                    </p>
-				</div>
-			</div>
-		</div>
-		<div class="col-xl-4">
-			<div class="row">
-				<div class="col-2">
-					<i class="fas fa-ad fa-2x mb-1 indigo-text" aria-hidden="true"></i>
-				</div>
-				<div class="col-10 mb-2">
-					<h5 class="feature-title font-bold mb-1">No ads & 100% free</h5>
-					<p class="grey-text mt-2">You will not find any ads here, we don't do that here. You only need to
-                        create an account to access all the content.
-                    </p>
-				</div>
-			</div>
-		</div>
+    <section>
+        <h2 class="my-5 h3 text-center">AND EVEN MORE</h2>
+        <div class="row features-small mt-5 wow fadeIn justify-content-md-center">
+            <div class="col-xl-4">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fab fa-bootstrap fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">Responsive</h5>
+                        <p class="grey-text mt-2">Fully responsive created with <a
+                        href="https://mdbootstrap.com/">MDB</a>.
+                            Supports PC, tablets, mobile, TV.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fab fa-github fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">Open Source</h5>
+                        <p class="grey-text mt-2">Totally open source, made with <a href="http://flask.pocoo.org/">
+                            Flask</a>. You can find the source code on
+                            <a href="https://www.github.com/Crossoufire/MyLists">Github.</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fas fa-ad fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">No ads & 100% free</h5>
+                        <p class="grey-text mt-2">You will not find any ads here, we don't do that here. You only need
+                            to
+                            create an account to access all the content.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-		<div class="col-xl-4">
-			<div class="row">
-				<div class="col-2">
-					<i class="fas fa-comments fa-2x mb-1 indigo-text" aria-hidden="true"></i>
-				</div>
-				<div class="col-10 mb-2">
-					<h5 class="feature-title font-bold mb-1">Found a bug?</h5>
-					<p class="grey-text mt-2">You can contact us by e-mail at:
-                        <script>
-                            let part1 = "contact";
-                            let part2 = Math.pow(2,6);
-                            let part3 = String.fromCharCode(part2);
-                            let part4 = "mylists.info";
-                            let part5 = part1 + String.fromCharCode(part2) + part4;
-						    document.write("<a href=" + "mai" + "lto" + ":" + part5 + ">" + part1 + part3 + part4
-                                + "</a>.");
-                        </script>
-                    </p>
-				</div>
-			</div>
-		</div>
+            <div class="col-xl-4">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fas fa-comments fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">Found a bug?</h5>
+                        <p class="grey-text mt-2">You can contact us by e-mail at:
+                            <script>
+                                let part1 = "contact";
+                                let part2 = Math.pow(2, 6);
+                                let part3 = String.fromCharCode(part2);
+                                let part4 = "mylists.info";
+                                let part5 = part1 + String.fromCharCode(part2) + part4;
+                                document.write("<a href=" + "mai" + "lto" + ":" + part5 + ">" + part1 + part3 + part4
+                                    + "</a>.");
+                            </script>
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-		<div class="col-xl-4">
-			<div class="row">
-				<div class="col-2">
-					<i class="far fa-smile fa-2x mb-1 indigo-text" aria-hidden="true"></i>
-				</div>
-				<div class="col-10 mb-2">
-					<h5 class="feature-title font-bold mb-1">Made by random people with ❤</h5>
-					<p class="grey-text mt-2">Built and kept alive by only 2 people, on their spare time.</p>
-				</div>
-			</div>
-		</div>
-		<div class="col-xl-4">
-			<div class="row">
-				<div class="col-2">
-					<i class="fas fa-code fa-2x mb-1 indigo-text" aria-hidden="true"></i>
-				</div>
-				<div class="col-10 mb-2">
-					<h5 class="feature-title font-bold mb-1">New features incoming</h5>
-					<p class="grey-text mt-2">We have a ton of ideas, just not enough time. Stay tuned!</p>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
+            <div class="col-xl-4">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="far fa-smile fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">Made by random people with ❤</h5>
+                        <p class="grey-text mt-2">Built and kept alive by only 2 people, on their spare time.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fas fa-code fa-2x mb-1 indigo-text" aria-hidden="true"></i>
+                    </div>
+                    <div class="col-10 mb-2">
+                        <h5 class="feature-title font-bold mb-1">New features incoming</h5>
+                        <p class="grey-text mt-2">We have a ton of ideas, just not enough time. Stay tuned!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock content %}
 
 
 {% block script %}
-<!------------------ Main JS ---------------------->
-<script>
-    // Animations initialization
-    new WOW().init();
+    <!------------------ Main JS ---------------------->
+    <script>
+        // Animations initialization
+        new WOW().init();
 
-    $('#modalLoginForm').on('shown.bs.modal', function() {
-        $('#login_username').focus();
-    })
+        $('#modalLoginForm').on('shown.bs.modal', function () {
+            $('#login_username').focus();
+        })
 
-    $('#modalRegisterForm').on('shown.bs.modal', function() {
-        $('#register_username').focus();
-    })
-</script>
+        $('#modalRegisterForm').on('shown.bs.modal', function () {
+            $('#register_username').focus();
+        })
+    </script>
 {% endblock script %}

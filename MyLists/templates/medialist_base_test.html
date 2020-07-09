@@ -63,7 +63,8 @@
         <div class="center-mobile d-flex flex-wrap filters-button-group m-t-10">
             <button class="btn btn-sm btn-selected" data-filter="*">Show all</button>
             {% for key in media_data %}
-                <button class="btn btn-sm btn-header" data-filter=".categories.{% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key|replace(' ', '.') }}{% endif %}">
+                <button class="btn btn-sm btn-header"
+                        data-filter=".categories.{% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key|replace(' ', '.') }}{% endif %}">
                     {{ key }}
                 </button>
             {% endfor %}
@@ -71,7 +72,7 @@
     </div>
     <div class="m-t-10">
         <div class="custom-control custom-switch m-b-10" {% if target_user_id == current_user.get_id() %}
-        style="display: none;" {% endif %}>
+             style="display: none;" {% endif %}>
             <input id="SharedMedia" type="checkbox" class="custom-control-input" onchange="HideCommon()">
             <label class="custom-control-label" for="SharedMedia"><b>Hide shared media</b></label>
         </div>
@@ -89,7 +90,9 @@
     <div id="categories-iso" class="categories-iso p-t-30">
         {% for key in media_data %}
             <div class="categories {% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key }}{% endif %}">
-                <h2 class="text-center m-t-20 mb-0">{{ key }}<hr class="mt-2 pb-3 mb-0"></h2>
+                <h2 class="text-center m-t-20 mb-0">{{ key }}
+                    <hr class="mt-2 pb-3 mb-0">
+                </h2>
                 <div class="row category-{% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key }}{% endif %}">
                     {% for data in media_data[key] %}
                         <div id="card_{{ data['id'] }}" values="{% block data scoped %}{% endblock data %}"
@@ -107,7 +110,7 @@
                                             <span class="font-mask text-center">
                                                 {{ data['original_name'] }}
                                             </span>
-                                            <span class="by-original-title" style="display: none;" >
+                                            <span class="by-original-title" style="display: none;">
                                                 {{ data['name'] }}
                                             </span>
                                         {% elif media_list == 'animelist' %}
@@ -128,12 +131,14 @@
                                                 </span>
                                             {% endif %}
                                         {% endif %}
-                                        <span class="by-actor" style="display: none;" >{{ data['actors'] }}</span>
-                                        <span class="by-genre" style="display: none;" >{{ data['genres'] }}</span>
-                                        <span class="by-director" style="display: none;" >{{ data['director'] }}</span>
+                                        <span class="by-actor" style="display: none;">{{ data['actors'] }}</span>
+                                        <span class="by-genre" style="display: none;">{{ data['genres'] }}</span>
+                                        <span class="by-director" style="display: none;">{{ data['director'] }}</span>
                                     </a>
-                                    <a class="card-top-left fas fa-bars" onclick="chargeButtons(card_{{ data['id'] }})"></a>
-                                    <a class="card-toop-right fas fa-trash" onclick="deleteElement(card_{{ data['id'] }}, '{{ media_list }}')"></a>
+                                    <a class="card-top-left fas fa-bars"
+                                       onclick="chargeButtons(card_{{ data['id'] }})"></a>
+                                    <a class="card-toop-right fas fa-trash"
+                                       onclick="deleteElement(card_{{ data['id'] }}, '{{ media_list }}')"></a>
                                     {% if data['common'] %}
                                         <div class="card-ribbon"></div>
                                     {% endif %}
@@ -143,7 +148,7 @@
                                         <div class="col m-l-10">
                                             <a class="fa-star {% if data['favorite'] %} fas favorited {% else %}
                                              far {% endif %}" data-toggle='tooltip' title="Favorite"
-                                             onclick="addFavorite(this,'{{ data['id'] }}','{{ media_list }}')">
+                                               onclick="addFavorite(this,'{{ data['id'] }}','{{ media_list }}')">
                                             </a>
                                         </div>
                                         <div class="col">

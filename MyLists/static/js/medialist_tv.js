@@ -59,7 +59,9 @@ function chargeButtons(card) {
             '</li>' +
         "</ul>");
 
-    $(card).find('.side-card-info').hide();
+    $(card).find('.card-btn-toop-right').hide();
+    $(card).find('.card-btn-top-left').hide();
+    $(card).find('.bottom-card-info').hide();
     $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
     $(card).find('.mask').hide();
 }
@@ -213,7 +215,7 @@ function ChargeButtonsOther(card) {
     removeCat();
 
     $(card).find('.view.overlay').prepend(
-        '<a class="card-btn-top-right-2 fas fa-times" onclick="removeCat()"></a>' +
+        '<a class="card-btn-top-right fas fa-times" onclick="removeCat()"></a>' +
         '<ul class="card-cat-buttons">' +
             '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
             'onclick="AddCatUser(\'Watching\', \''+card.id+'\')">' +
@@ -241,8 +243,8 @@ function ChargeButtonsOther(card) {
             '</li>' +
         "</ul>");
 
+    $('#'+card_id).find('.card-btn-top-left').hide();
+    $(card).find('.bottom-card-info').hide();
     $('#'+card_id).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
-    $('#'+card_id).find('.card-btn-top-left').attr('style', 'display: none;');
-    $('#'+card_id).find('.seas-eps-box').attr('style', 'display: none;');
     $('#'+card_id).find('.mask').hide();
 }

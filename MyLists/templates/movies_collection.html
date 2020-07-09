@@ -9,6 +9,7 @@
             border-right: solid black 1px;
             border-left: solid black 1px;
         }
+
         .number-seen {
             position: absolute;
             bottom: 1px;
@@ -77,7 +78,7 @@
                                      width="200" style="height: auto;">
                                 <div class="mask flex-center rgba-black-strong">
                                     <span class="font-mask text-center text-light">{{ movie['name'] }}</span>
-                                    <span class="by-original-title" style="display: none;" >{{ movie['name'] }}</span>
+                                    <span class="by-original-title" style="display: none;">{{ movie['name'] }}</span>
                                 </div>
                             </div>
                             <div class="number-seen">
@@ -100,7 +101,7 @@
                                      width="200" style="height: auto;">
                                 <div class="mask flex-center rgba-black-strong">
                                     <span class="font-mask text-center text-light">{{ movie['name'] }}</span>
-                                    <span class="by-original-title" style="display: none;" >{{ movie['name'] }}</span>
+                                    <span class="by-original-title" style="display: none;">{{ movie['name'] }}</span>
                                 </div>
                             </div>
                             <div class="number-seen">
@@ -119,7 +120,7 @@
     <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
     <script>
         // --- Tooltip ---------------------------------------------------------
-        $(document).ready(function() {
+        $(document).ready(function () {
             $body = $("body");
             $body.tooltip();
             $(function () {
@@ -131,22 +132,22 @@
         let $categories = $('.categories-iso').isotope({
             itemSelector: '.categories',
             layoutMode: 'vertical',
-            onLayout: function() {
+            onLayout: function () {
                 $window.trigger("scroll");
             }
         });
         $("img.lazyload").lazyload({
-            failure_limit : Math.max($("img.lazyload").length-1, 0)
+            failure_limit: Math.max($("img.lazyload").length - 1, 0)
         });
 
-        $('.filters-button-group').on('click', 'button', function() {
+        $('.filters-button-group').on('click', 'button', function () {
             var filterValue = $(this).attr('data-filter');
-            $categories.isotope({ filter: filterValue });
+            $categories.isotope({filter: filterValue});
         });
 
-        $('.filters-button-group').each(function(i, buttonGroup) {
+        $('.filters-button-group').each(function (i, buttonGroup) {
             var $buttonGroup = $(buttonGroup);
-            $buttonGroup.on('click', 'button', function() {
+            $buttonGroup.on('click', 'button', function () {
                 $buttonGroup.find('.btn-selected').addClass('btn-header');
                 $buttonGroup.find('.btn-selected').removeClass('btn-selected');
                 $(this).addClass('btn-selected');
@@ -156,7 +157,7 @@
         $categories.isotope('layout');
 
         // --- Row gutters -----------------------------------------------------
-        (function($) {
+        (function ($) {
             var $window = $(window),
                 $row = $('.row');
 
@@ -166,6 +167,7 @@
                 }
                 $row.removeClass('no-gutters');
             }
+
             $window.resize(resize).trigger('resize');
             $categories.isotope('layout');
         })(jQuery);
