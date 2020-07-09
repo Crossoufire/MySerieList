@@ -4,7 +4,7 @@ import pytz
 from MyLists import db, app
 from datetime import datetime
 from MyLists.API_data import ApiData
-from MyLists.main.forms import EditMediaData
+from MyLists.main.forms import EditMediaData, MediaComment
 from flask_login import login_required, current_user
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
@@ -60,6 +60,51 @@ def mymedialist(media_list, user_name):
                                media_list=media_list,
                                target_user_name=user_name,
                                target_user_id=str(user.id))
+
+
+@bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
+@login_required
+def write_comment(media_type, media_id):
+    if media_type == 'Series':
+        list_type = ListType.SERIES
+    elif media_type == 'Anime':
+        list_type = ListType.ANIME
+    elif media_type == 'Movies':
+        list_type = ListType.MOVIES
+    else:
+        abort(404)
+
+    if list_type == ListType.SERIES:
+        media = Series.query.filter_by(id=media_id).first()
+        media_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=media_id).first()
+    elif list_type == ListType.ANIME:
+        media = Anime.query.filter_by(id=media_id).first()
+        media_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=media_id).first()
+    elif list_type == ListType.MOVIES:
+        media = Movies.query.filter_by(id=media_id).first()
+        media_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=media_id).first()
+
+    if not media or not media_list:
+        abort(404)
+
+    form = MediaComment()
+
+    if request.method == 'GET':
+        form.comment.data = media_list.comment
+
+    if form.validate_on_submit():
+        comment = form.comment.data
+        media_list.comment = comment
+
+        db.session.commit()
+        app.logger.info('[{}] added a comment on {} with ID {}'.format(current_user.id, media_type, media_id))
+        if comment == "":
+            flash("Comment removed or empty.", 'warning')
+        else:
+            flash("Comment successfully added.", 'success')
+        return redirect(url_for('main.mymedialist', media_list=list_type.value, user_name=current_user.username))
+
+    return render_template('medialist_comment.html', title='Add comment', form=form, media=media)
 
 
 @bp.route("/movies_collection/<string:user_name>", methods=['GET', 'POST'])

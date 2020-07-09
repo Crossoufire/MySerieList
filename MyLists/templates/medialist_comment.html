@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+    <style>
+        .ui-input-container {
+            padding-top: 10px;
+            border-radius: 4px;
+            width: 50%;
+            margin: 0 auto;
+        }
+        .ui-form-input {
+            padding: 13px 15px;
+            border-radius: 8px;
+            border: 2px solid lightgray;
+            outline: 0;
+            width: 100%;
+        }
+        textarea {
+            min-height: 6em;
+            max-height: 50vh;
+            width: 100%;
+        }
+    @media (max-width: 769px) {
+        .ui-input-container {
+            width: 90%;
+        }
+    }
+    </style>
+{% endblock css %}
+
+
+{% block content %}
+    <h4 class="m-t-30 text-center">{{ media.name }}</h4>
+    <hr class="m-t-0 m-b-25" style="border-color: darkslateblue;">
+    <form method="POST" action="" enctype="multipart/form-data" class="form m-b-50">
+        {{ form.hidden_tag() }}
+        <div class="ui-input-container">
+            <label for="comment">Add a comment:</label>
+             {{ form.comment(class="ui-form-input") }}
+        </div>
+        <div class="text-center">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+{% endblock content %}

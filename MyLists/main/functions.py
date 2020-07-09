@@ -441,7 +441,11 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "genres": element[2],
                             "common": False,
                             "category": element[1].status,
-                            "rewatched": element[1].rewatched}
+                            "rewatched": element[1].rewatched,
+                            "comment": element[1].comment}
+
+            if element_info['score'] is None:
+                element_info['score'] = '---'
 
             def latin_alphabet(original_name):
                 try:
@@ -525,13 +529,17 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "genres": element[2],
                             "common": False,
                             "rewatched": element[1].rewatched,
-                            "media": 'Movies'}
+                            "media": 'Movies',
+                            "comment": element[1].comment}
+
+            if element_info['score'] is None:
+                element_info['score'] = '---'
 
             def latin_alphabet(original_name):
                 try:
                     original_name.encode('iso-8859-1')
                     return True
-                except UnicodeDecodeError:
+                except UnicodeEncodeError:
                     return False
 
             if latin_alphabet(element[0].original_name):

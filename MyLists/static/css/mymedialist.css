@@ -159,12 +159,10 @@ option {
     width: 46%;
 }
 
-.score-drop {
+.score-drop, .rewatch-drop {
 	cursor: pointer;
+    text-align-last: center;
     background: transparent;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    appearance: none;
     border: none;
     color: lightgrey;
 }
@@ -292,7 +290,7 @@ option {
     opacity: 0.8;
 }
 
-.card-top-left {
+.card-btn-top-left {
     position: absolute;
     top: 10px;
     left: 10px;
@@ -300,15 +298,15 @@ option {
     z-index: 100;
 }
 
-.card-top-left:hover {
+.card-btn-top-left:hover {
     opacity: 0.8;
 }
 
-.mask:hover~.card-top-left {
+.mask:hover~.card-btn-top-left {
     opacity: 0.8;
 }
 
-.card-toop-right {
+.card-btn-toop-right {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -316,22 +314,19 @@ option {
     z-index: 100;
 }
 
-.card-toop-right:hover {
+.card-btn-toop-right:hover {
     opacity: 0.8;
 }
 
-.mask:hover~.card-toop-right {
+.mask:hover~.card-btn-toop-right {
     opacity: 0.8;
 }
 
-.what {
-    background-color: rgba(20, 20, 20, 0.95);
-    padding: 10px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    width: 80%;
-    border-radius: 5px;
+.modal-content {
+    max-width:  300px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #131418;
+    border-radius: 5px !important;
+    border: grey 1px solid !important;
 }
-

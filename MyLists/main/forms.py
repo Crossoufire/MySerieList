@@ -25,3 +25,8 @@ class EditMediaData(FlaskForm):
     revenue = StringField('Revenue')
     synopsis = TextAreaField('Synopsis')
     submit = SubmitField('Submit')
+
+
+class MediaComment(FlaskForm):
+    comment = TextAreaField('Comment')
+    submit = SubmitField('Submit')

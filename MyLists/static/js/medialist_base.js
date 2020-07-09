@@ -93,54 +93,6 @@ function searchElement() {
     $categories.isotope('layout');
 }
 
-function delay(callback, ms) {
-    var timer = 0;
-    return function() {
-        var context = this, args = arguments;
-        clearTimeout(timer);
-        timer = setTimeout(function () {
-            callback.apply(context, args);
-        }, ms || 0);
-    };
-}
-$('#searchInput').keyup(delay(function (e) {
-    let input, cat, filter, cards, cardContainer, title, i, l;
-
-    input = document.getElementById("searchInput");
-    cat = document.getElementsByClassName("search-select")[0].value;
-    filter = input.value.toUpperCase();
-    cardContainer = document.getElementById("categories-iso");
-    cards = cardContainer.getElementsByClassName("card-container");
-    l = cards.length;
-    for (i = 0; i < l; i++) {
-        title = cards[i].querySelector(".font-mask");
-        let original_title = cards[i].querySelector(".by-original-title");
-        let actors = cards[i].querySelector(".by-actor");
-        let genres = cards[i].querySelector(".by-genre");
-        let director = cards[i].querySelector(".by-director");
-        if (title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
-            cards[i].style.display = "";
-        }
-        else if (original_title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
-            cards[i].style.display = "";
-        }
-        else if (actors.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Actors' || cat === 'All')) {
-            cards[i].style.display = "";
-        }
-        else if (genres.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Genres' || cat === 'All')) {
-            cards[i].style.display = "";
-        }
-        else if (director.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Director' || cat === 'All')) {
-            cards[i].style.display = "";
-        }
-        else {
-            cards[i].style.display = "none";
-        }
-    }
-
-    $categories.isotope('layout');
-}, 250));
-
 
 // --- Add media to favorite -------------------------------------------
 function addFavorite(fav_div, element_id, media_type) {
@@ -186,14 +138,14 @@ function HideCommon() {
 // --- Show/Hide favorites media ---------------------------------------
 function ShowFavorites() {
     if ($('#ShowFavorites').prop("checked") === true) {
-        $('.far.fa-star').parent().parent().parent().parent().hide();
+        $('.far.fa-star').parent().parent().parent().parent().parent().hide();
     }
     else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === true) {
-        $('.far.fa-star').parent().parent().parent().parent().show();
-        $('.card-ribbon').parent().parent().parent().parent().hide();
+        $('.far.fa-star').parent().parent().parent().parent().parent().show();
+        $('.card-ribbon').parent().parent().parent().parent().parent().hide();
     }
     else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === false) {
-        $('.far.fa-star').parent().parent().parent().parent().show();
+        $('.far.fa-star').parent().parent().parent().parent().parent().show();
     }
 
     $categories.isotope('layout');
@@ -225,6 +177,124 @@ function AddCatUser(category, card_id) {
         }
     });
 }
+
+
+// --- Show comments ---------------------------------------------------
+function showComment(card, comment, media_type, media_id) {
+    let media_name = $(card).find('.font-mask').text();
+
+    $('body').append(
+        '<div id="commentModal" class="modal" tabindex="-1" role="dialog">' +
+            '<div class="modal-dialog modal-dialog-centered" role="document">' +
+                '<div class="modal-content">' +
+                    '<div class="modal-header">' +
+                        '<h5 class="modal-title text-light"><b>'+media_name+'</b></h5>' +
+                        '<button type="button" class="close text-light" onclick="removeModal()"' +
+                            '<span aria-hidden="true">&times;</span>' +
+                        '</button>' +
+                    '</div>' +
+                    '<div class="modal-body text-light">' +
+                        '<p>'+comment+'</p>' +
+                    '</div>' +
+                    '<div class="modal-footer p-1">' +
+                        '<a href="/comment/'+media_type+'/'+media_id+'">' +
+                            '<button class="btn btn-sm btn-primary">'  +
+                                'Edit' +
+                            '</button>' +
+                        '</a>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>'
+    );
+
+    $('#commentModal').modal({backdrop: 'static', keyboard: false});
+}
+
+
+// --- Remove comments modal -------------------------------------------
+function removeModal() {
+    $('#commentModal').remove();
+    $('.modal-backdrop.show').remove();
+}
+
+
+// --- Create the score dropdown ---------------------------------------
+function scoreDrop(score, data_id) {
+    $(score).hide();
+    let score_value = $(score).text();
+    let drop = document.createElement("select");
+    drop.className = "score-drop";
+    drop.setAttribute('values', ''+data_id);
+    let option = document.createElement("option");
+    option.className = "seas-eps-drop-options";
+    option.value = "---";
+    option.text = "---";
+    drop.appendChild(option);
+    for (let i = 0; i < 21; i++) {
+        let option = document.createElement("option");
+        option.className = "seas-eps-drop-options";
+        option.value = ""+(i-(i/2));
+        if (i-(i/2) === parseFloat(score_value)) {
+            option.selected = true;
+        }
+        if (i < 20) {
+            option.text = ""+(i-(i/2)).toFixed(1);
+        } else {
+            option.text = ""+Math.floor(i-(i/2));
+        }
+        drop.appendChild(option);
+    }
+    $(score).parent().prepend(drop);
+    drop.focus();
+}
+
+
+// --- Change the score and delete dropdown ----------------------------
+$(document).on('change focusout','.score-drop',function() {
+    let value = parseFloat(this.value).toFixed(1);
+    if (isNaN(value)) {
+        value = "---";
+    } else if (value === "10.0") {
+        value = 10;
+    }
+    let score_id = $(this).attr('values');
+    this.remove();
+    $('#score_'+score_id).text(value).show();
+});
+
+
+// --- Create the rewatch dropdown -------------------------------------
+function rewatchDrop(rewatch, data_id) {
+    $(rewatch).hide();
+    let rewatch_value = $(rewatch).text();
+    let drop = document.createElement("select");
+    drop.className = "rewatch-drop";
+    drop.setAttribute('values', ''+data_id);
+    let option = document.createElement("option");
+    option.className = "seas-eps-drop-options";
+    for (let i = 0; i < 11; i++) {
+        let option = document.createElement("option");
+        option.className = "seas-eps-drop-options";
+        option.value = ""+i;
+        if (i === parseInt(rewatch_value)) {
+            option.selected = true;
+        }
+        option.text = ""+i;
+        drop.appendChild(option);
+    }
+    $(rewatch).parent().prepend(drop);
+    drop.focus();
+}
+
+
+// --- Change the rewatch and delete dropdown --------------------------
+$(document).on('change focusout','.rewatch-drop',function() {
+    let value = parseInt(this.value);
+    let rewatch_id = $(this).attr('values');
+    this.remove();
+    $('#rew_'+rewatch_id).text(value).show();
+});
 
 
 // --- Isotopes categories ---------------------------------------------

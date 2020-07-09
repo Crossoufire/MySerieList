@@ -245,6 +245,7 @@ class SeriesList(db.Model):
     rewatched = db.Column(db.Integer, nullable=False, default=0)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
+    comment = db.Column(db.Text)
 
     @staticmethod
     def get_series_info(user_id):
