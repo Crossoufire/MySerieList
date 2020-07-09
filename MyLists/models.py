@@ -419,7 +419,6 @@ class MoviesCollections(db.Model):
     collection_id = db.Column(db.Integer, db.ForeignKey('movies.collection_id'), nullable=False)
     parts = db.Column(db.Integer)
     name = db.Column(db.String(100))
-    releases_dates = db.Column(db.String(500))
     poster = db.Column(db.String(100))
     overview = db.Column(db.String(100))
 
