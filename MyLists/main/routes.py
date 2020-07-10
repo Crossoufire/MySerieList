@@ -460,6 +460,63 @@ def update_element_episode():
     return '', 204
 
 
+@bp.route('/update_score', methods=['POST'])
+@login_required
+def update_score():
+    try:
+        json_data = request.get_json()
+        new_rewatch = int(json_data['score'])
+        element_id = int(json_data['element_id'])
+        element_type = json_data['element_type']
+    except:
+        return '', 400
+
+    # Check if <media_list> exist and valid
+    try:
+        list_type = ListType(element_type)
+    except ValueError:
+        return '', 400
+
+    # Check that the value is '---' or between 0 and 10
+    if 0 > new_rewatch > 10:
+        return '', 400
+
+    if list_type == ListType.SERIES:
+        media = Series.query.filter_by(id=element_id).first()
+        media_list = SeriesList.query.filter_by(user_id=current_user.id, series_id=element_id).first()
+    elif list_type == ListType.ANIME:
+        media = Anime.query.filter_by(id=element_id).first()
+        media_list = AnimeList.query.filter_by(user_id=current_user.id, anime_id=element_id).first()
+    elif list_type == ListType.MOVIES:
+        media = Movies.query.filter_by(id=element_id).first()
+        media_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
+
+    if media or media_list or media_list.status == Status.COMPLETED or media_list.status == Status.COMPLETED_ANIMATION:
+        pass
+    else:
+        return '', 400
+
+    # Get the old data
+    old_rewatch = media_list.rewatched
+
+    # Set the new data
+    media_list.rewatched = new_rewatch
+    app.logger.info('[{}] Series ID {} re-watched {}x times'.format(current_user.id, element_id, new_rewatch))
+
+    # Commit the changes
+    db.session.commit()
+
+    # Compute the new time spent
+    if list_type != ListType.MOVIES:
+        compute_time_spent(media=media, list_type=list_type, old_season=1, old_episode=0, new_season=1, new_episode=0,
+                           old_rewatch=old_rewatch, new_rewatch=new_rewatch)
+    elif list_type == ListType.MOVIES:
+        compute_time_spent(media=media, list_type=list_type, movie_status=media_list.status, old_rewatch=old_rewatch,
+                           new_rewatch=new_rewatch)
+
+    return '', 204
+
+
 @bp.route('/update_rewatch', methods=['POST'])
 @login_required
 def update_rewatch():

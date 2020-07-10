@@ -220,28 +220,28 @@ function removeModal() {
 
 
 // --- Create the score dropdown ---------------------------------------
-function scoreDrop(score, data_id) {
+function scoreDrop(score, data_id, media_list) {
     $(score).hide();
     let score_value = $(score).text();
     let drop = document.createElement("select");
     drop.className = "score-drop";
-    drop.setAttribute('values', ''+data_id);
+    drop.setAttribute('values', ''+data_id+', '+media_list);
     let option = document.createElement("option");
     option.className = "seas-eps-drop-options";
     option.value = "---";
     option.text = "---";
     drop.appendChild(option);
-    for (let i = 0; i < 21; i++) {
+    for (let i = 0; i <= 10; i+=0.5) {
         let option = document.createElement("option");
         option.className = "seas-eps-drop-options";
-        option.value = ""+(i-(i/2));
-        if (i-(i/2) === parseFloat(score_value)) {
+        option.value = ""+i;
+        if (i === parseFloat(score_value)) {
             option.selected = true;
         }
-        if (i < 20) {
-            option.text = ""+(i-(i/2)).toFixed(1);
+        if (i < 10) {
+            option.text = ""+i.toFixed(1);
         } else {
-            option.text = ""+Math.floor(i-(i/2));
+            option.text = ""+i;
         }
         drop.appendChild(option);
     }
@@ -251,16 +251,35 @@ function scoreDrop(score, data_id) {
 
 
 // --- Change the score and delete dropdown ----------------------------
-$(document).on('change focusout','.score-drop',function() {
+$(document).on('change focusout','.score-drop',function(event) {
     let value = parseFloat(this.value).toFixed(1);
     if (isNaN(value)) {
         value = "---";
     } else if (value === "10.0") {
         value = 10;
     }
-    let score_id = $(this).attr('values');
+    let media_id = $(this).attr('values').split()[0];
+    let media_list = $(this).attr('values').split()[1];
+
+    if (event.type === 'change') {
+        $.ajax ({
+            type: "POST",
+            url: "/update_score",
+            contentType: "application/json",
+            data: JSON.stringify({score: value, element_id: media_id, element_type: media_list}),
+            dataType: "json",
+            success: function() {
+                $('#score_'+media_id).text(value).show();
+                $(this).remove();
+            },
+            error: function () {
+                error_ajax_message('Error trying to change the media score. Please try again later.')
+            }
+        });
+    }
+
+    $('#score_'+media_id).text(value).show();
     this.remove();
-    $('#score_'+score_id).text(value).show();
 });
 
 

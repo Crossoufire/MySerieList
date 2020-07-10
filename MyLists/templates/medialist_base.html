@@ -119,7 +119,7 @@
                                 <div class="bottom-card-info{% if media_list =='movieslist' %}-movie {% endif %}">
                                     <div class="row no-gutters" style="opacity: 0.7;">
                                         <div class="col m-l-5">
-                                            <a class="fa-star {% if data['favorite'] %} fas favorited {% else %}
+                                            <a class="fa-heart {% if data['favorite'] %} fas favorited {% else %}
                                              far {% endif %} {% if target_user_id != current_user.get_id() %}
                                              disabled {% endif %}" data-toggle='tooltip' title="Favorite"
                                                onclick="addFavorite(this,'{{ data['id'] }}','{{ media_list }}')">
@@ -127,7 +127,7 @@
                                         </div>
                                         <div class="col">
                                             <a id="score_{{ data['id'] }}" data-toggle="tooltip" title="Score /10"
-                                            onclick="scoreDrop(this, {{ data['id'] }})">
+                                            onclick="scoreDrop(this, {{ data['id'] }}, '{{ media_list }}')">
                                                 {{ data['score'] }}
                                             </a>
                                         </div>

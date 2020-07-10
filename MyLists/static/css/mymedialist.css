@@ -269,7 +269,7 @@ option {
 }
 
 .favorited {
-    color: darkgoldenrod !important;
+    color: #cd0303 !important;
 }
 
 .card-move-delete {
