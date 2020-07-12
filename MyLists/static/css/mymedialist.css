@@ -272,6 +272,10 @@ option {
     color: #cd0303 !important;
 }
 
+.commented {
+    color: darkgoldenrod !important;
+}
+
 .card-move-delete {
     position: absolute;
     top: 0;

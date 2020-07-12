@@ -465,7 +465,7 @@ def update_element_episode():
 def update_score():
     try:
         json_data = request.get_json()
-        new_rewatch = int(json_data['score'])
+        new_score = json_data['score']
         element_id = int(json_data['element_id'])
         element_type = json_data['element_type']
     except:
@@ -478,8 +478,11 @@ def update_score():
         return '', 400
 
     # Check that the value is '---' or between 0 and 10
-    if 0 > new_rewatch > 10:
-        return '', 400
+    try:
+        if 0 > float(new_score) > 10:
+            return '', 400
+    except:
+        new_score = -1
 
     if list_type == ListType.SERIES:
         media = Series.query.filter_by(id=element_id).first()
@@ -491,28 +494,19 @@ def update_score():
         media = Movies.query.filter_by(id=element_id).first()
         media_list = MoviesList.query.filter_by(user_id=current_user.id, movies_id=element_id).first()
 
-    if media or media_list or media_list.status == Status.COMPLETED or media_list.status == Status.COMPLETED_ANIMATION:
-        pass
-    else:
+    if not media or not media_list:
         return '', 400
 
     # Get the old data
-    old_rewatch = media_list.rewatched
+    old_score = media_list.score
 
     # Set the new data
-    media_list.rewatched = new_rewatch
-    app.logger.info('[{}] Series ID {} re-watched {}x times'.format(current_user.id, element_id, new_rewatch))
+    media_list.score = new_score
+    app.logger.info('[{}] Series ID {} score updated from {} to {}'
+                    .format(current_user.id, element_id, old_score, new_score))
 
     # Commit the changes
     db.session.commit()
-
-    # Compute the new time spent
-    if list_type != ListType.MOVIES:
-        compute_time_spent(media=media, list_type=list_type, old_season=1, old_episode=0, new_season=1, new_episode=0,
-                           old_rewatch=old_rewatch, new_rewatch=new_rewatch)
-    elif list_type == ListType.MOVIES:
-        compute_time_spent(media=media, list_type=list_type, movie_status=media_list.status, old_rewatch=old_rewatch,
-                           new_rewatch=new_rewatch)
 
     return '', 204
 

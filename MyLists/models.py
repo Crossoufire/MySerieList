@@ -362,6 +362,7 @@ class AnimeList(db.Model):
     rewatched = db.Column(db.Integer, nullable=False, default=0)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
+    comment = db.Column(db.Text)
 
     @staticmethod
     def get_anime_info(user_id):
@@ -496,6 +497,7 @@ class MoviesList(db.Model):
     rewatched = db.Column(db.Integer, nullable=False, default=0)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
+    comment = db.Column(db.Text)
 
     @staticmethod
     def get_movies_info(user_id):

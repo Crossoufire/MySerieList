@@ -4,7 +4,7 @@ import secrets
 from collections import OrderedDict
 
 from PIL import Image
-from flask import abort
+from flask import abort, jsonify
 from pathlib import Path
 from sqlalchemy import and_
 from MyLists import db, app
@@ -444,7 +444,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "rewatched": element[1].rewatched,
                             "comment": element[1].comment}
 
-            if element_info['score'] is None:
+            if element_info['score'] is None or element_info['score'] == -1:
                 element_info['score'] = '---'
 
             def latin_alphabet(original_name):
@@ -528,6 +528,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "actors": element[3],
                             "genres": element[2],
                             "common": False,
+                            "category": element[1].status,
                             "rewatched": element[1].rewatched,
                             "media": 'Movies',
                             "comment": element[1].comment}

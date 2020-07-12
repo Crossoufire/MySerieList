@@ -180,8 +180,19 @@ function AddCatUser(category, card_id) {
 
 
 // --- Show comments ---------------------------------------------------
-function showComment(card, comment, media_type, media_id) {
+function showComment(card, media_type, media_id, current_user) {
     let media_name = $(card).find('.font-mask').text();
+    let comment = $("#com_"+media_id).text();
+    console.log(comment);
+
+    if (current_user === true) {
+        var edit_button = ('<a href="/comment/'+media_type+'/'+media_id+'">' +
+            '<button class="btn btn-sm btn-primary">' +
+                'Edit' +
+            '</button>' +
+            '</a>'
+        )
+    }
 
     $('body').append(
         '<div id="commentModal" class="modal" tabindex="-1" role="dialog">' +
@@ -197,11 +208,7 @@ function showComment(card, comment, media_type, media_id) {
                         '<p>'+comment+'</p>' +
                     '</div>' +
                     '<div class="modal-footer p-1">' +
-                        '<a href="/comment/'+media_type+'/'+media_id+'">' +
-                            '<button class="btn btn-sm btn-primary">'  +
-                                'Edit' +
-                            '</button>' +
-                        '</a>' +
+                        edit_button +
                     '</div>' +
                 '</div>' +
             '</div>' +
@@ -225,7 +232,7 @@ function scoreDrop(score, data_id, media_list) {
     let score_value = $(score).text();
     let drop = document.createElement("select");
     drop.className = "score-drop";
-    drop.setAttribute('values', ''+data_id+', '+media_list);
+    drop.setAttribute('values', ''+data_id+','+media_list);
     let option = document.createElement("option");
     option.className = "seas-eps-drop-options";
     option.value = "---";
@@ -258,8 +265,8 @@ $(document).on('change focusout','.score-drop',function(event) {
     } else if (value === "10.0") {
         value = 10;
     }
-    let media_id = $(this).attr('values').split()[0];
-    let media_list = $(this).attr('values').split()[1];
+    let media_id = $(this).attr('values').split(',')[0];
+    let media_list = $(this).attr('values').split(',')[1];
 
     if (event.type === 'change') {
         $.ajax ({
@@ -284,12 +291,12 @@ $(document).on('change focusout','.score-drop',function(event) {
 
 
 // --- Create the rewatch dropdown -------------------------------------
-function rewatchDrop(rewatch, data_id) {
+function rewatchDrop(rewatch, data_id, media_list) {
     $(rewatch).hide();
     let rewatch_value = $(rewatch).text();
     let drop = document.createElement("select");
     drop.className = "rewatch-drop";
-    drop.setAttribute('values', ''+data_id);
+    drop.setAttribute('values', ''+data_id+','+media_list);
     let option = document.createElement("option");
     option.className = "seas-eps-drop-options";
     for (let i = 0; i < 11; i++) {
@@ -308,11 +315,30 @@ function rewatchDrop(rewatch, data_id) {
 
 
 // --- Change the rewatch and delete dropdown --------------------------
-$(document).on('change focusout','.rewatch-drop',function() {
+$(document).on('change focusout','.rewatch-drop',function(event) {
     let value = parseInt(this.value);
-    let rewatch_id = $(this).attr('values');
+    let media_id = $(this).attr('values').split()[0];
+    let media_list = $(this).attr('values').split()[1];
+
+    if (event.type === 'change') {
+        $.ajax ({
+            type: "POST",
+            url: "/update_rewatch",
+            contentType: "application/json",
+            data: JSON.stringify({rewatch: value, element_id: media_id, element_type: media_list}),
+            dataType: "json",
+            success: function() {
+                $('#rew_'+media_id).text(value).show();
+                $(this).remove();
+            },
+            error: function () {
+                error_ajax_message('Error trying to change the rewatched value for the media. Please try again later.')
+            }
+        });
+    }
+
+    $('#rew_'+media_id).text(value).show();
     this.remove();
-    $('#rew_'+rewatch_id).text(value).show();
 });
 
 

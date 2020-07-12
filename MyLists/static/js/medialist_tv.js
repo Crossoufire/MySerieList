@@ -243,8 +243,8 @@ function ChargeButtonsOther(card) {
             '</li>' +
         "</ul>");
 
-    $('#'+card_id).find('.card-btn-top-left').hide();
+    $(card).find('.card-btn-top-left').hide();
     $(card).find('.bottom-card-info').hide();
-    $('#'+card_id).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
-    $('#'+card_id).find('.mask').hide();
+    $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
+    $(card).find('.mask').hide();
 }

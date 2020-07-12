@@ -108,17 +108,18 @@
                                            onclick="deleteElement(card_{{ data['id'] }}, '{{ media_list }}')">
                                         </a>
                                     {% else %}
-                                        <a class="card-btn-top-left fas fa-plus text-light"
-                                           onclick="ChargeButtonsOther(card_{{ data['id'] }})">
-                                        </a>
                                         {% if data['common'] %}
                                             <div class="card-ribbon"></div>
+                                        {% else %}
+                                            <a class="card-btn-top-left fas fa-plus text-light"
+                                             onclick="ChargeButtonsOther(card_{{ data['id'] }})">
+                                            </a>
                                         {% endif %}
                                     {% endif %}
                                 </div>
                                 <div class="bottom-card-info{% if media_list =='movieslist' %}-movie {% endif %}">
                                     <div class="row no-gutters" style="opacity: 0.7;">
-                                        <div class="col m-l-5">
+                                        <div class="col">
                                             <a class="fa-heart {% if data['favorite'] %} fas favorited {% else %}
                                              far {% endif %} {% if target_user_id != current_user.get_id() %}
                                              disabled {% endif %}" data-toggle='tooltip' title="Favorite"
@@ -126,25 +127,41 @@
                                             </a>
                                         </div>
                                         <div class="col">
-                                            <a id="score_{{ data['id'] }}" data-toggle="tooltip" title="Score /10"
+                                            <a id="score_{{ data['id'] }}" class="{% if target_user_id != current_user.get_id() %}
+                                             disabled {% endif %}" data-toggle="tooltip" title="Score /10"
                                             onclick="scoreDrop(this, {{ data['id'] }}, '{{ media_list }}')">
                                                 {{ data['score'] }}
                                             </a>
                                         </div>
                                         <div class="col">
-                                            <a class="fa-comment-alt {% if data['comment'] %} fas {% else %} far
-                                               {% endif %} text-light" data-toggle='tooltip' title="Comments"
-                                               {% if data['comment'] %} onclick="showComment(card_{{ data['id'] }},
-                                               '{{ data['comment'] }}','{{ data['media'] }}', '{{ data['id'] }}')"
-                                               {% else %} href="/comment/{{ data['media'] }}/{{ data['id'] }}"{% endif %}>
-                                            </a>
+                                            <span id="com_{{ data['id'] }}" style="display: none;">
+                                                {{ data['comment'] }}
+                                            </span>
+                                            {% if target_user_id == current_user.get_id() %}
+                                                <a class="fa-comment-alt text-light {% if data['comment'] %} fas commented {% else %}
+                                                far {% endif %}" data-toggle='tooltip' title="Comments"
+                                                {% if data['comment'] %} onclick="showComment(card_{{ data['id'] }},
+                                                 '{{ data['media'] }}', '{{ data['id'] }}', true)"
+                                                {% else %} href="/comment/{{ data['media'] }}/{{ data['id'] }}"{% endif %}>
+                                                </a>
+                                            {% else %}
+                                                <a class="fa-comment-alt text-light {% if data['comment'] %} fas commented {% else %}
+                                                far {% endif %}" data-toggle='tooltip' title="Comments"
+                                                {% if data['comment'] %} onclick="showComment(card_{{ data['id'] }},
+                                                 '{{ data['media'] }}', '{{ data['id'] }}', false)"
+                                                {% endif %}>
+                                                </a>
+                                            {% endif %}
                                         </div>
-                                        <div class="col m-r-5">
-                                            <a id="rew_{{ data['id'] }}"  data-toggle="tooltip" title="Rewatched"
-                                            onclick="rewatchDrop(this, {{ data['id'] }})">
-                                                {{ data['rewatched'] }}
-                                            </a>
-                                        </div>
+                                        {% if data['category'].value == 'Completed' or data['category'].value == 'Completed Animation' %}
+                                            <div class="col">
+                                                <a id="rew_{{ data['id'] }}" class="{% if target_user_id != current_user.get_id() %}
+                                                 disabled {% endif %}" data-toggle="tooltip" title="Rewatched"
+                                                 onclick="rewatchDrop(this, {{ data['id'] }}, '{{ media_list }}')">
+                                                    {{ data['rewatched'] }}
+                                                </a>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 {% block seas_eps_drop scoped %}
