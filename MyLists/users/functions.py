@@ -409,7 +409,7 @@ def get_more_stats(user):
                     episodes_time['500+'] += 1
             else:
                 if time_watched < 60:
-                    movies_time['>1h'] += 1
+                    movies_time['<1h'] += 1
                 elif 60 <= time_watched < 90:
                     movies_time['1h-1h29'] += 1
                 elif 90 <= time_watched < 120:

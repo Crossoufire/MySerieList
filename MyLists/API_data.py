@@ -80,22 +80,20 @@ class ApiData:
         response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(anime_name))
 
         self.status_code(response.status_code)
-
-        time.sleep(1)
+        time.sleep(2)
 
         return json.loads(response.text)
 
     def get_anime_genres(self, mal_id):
-        """
-            "genres": [{"mal_id":1,"type":"anime","name":"Action","url":""},
+        """ "genres": [{"mal_id":1,"type":"anime","name":"Action","url":""},
             {"mal_id":37,"type":"anime","name":"Supernatural","url":""},
             {"mal_id":16,"type":"anime","name":"Magic","url":""},
-            {"mal_id":10,"type":"anime","name":"Fantasy","url":""}]
-        """
+            {"mal_id":10,"type":"anime","name":"Fantasy","url":""}] """
 
         response = requests.get("https://api.jikan.moe/v3/anime/{}".format(mal_id))
 
         self.status_code(response.status_code)
+        time.sleep(2)
 
         return json.loads(response.text)
 
