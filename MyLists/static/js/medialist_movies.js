@@ -48,6 +48,9 @@ function changeCategory(new_category, card_id) {
         data: JSON.stringify({status: new_category, element_id: element_id, element_type: media_list}),
         dataType: "json",
         success: function() {
+            $('#rew_'+element_id).text(0).show();
+            $('#rew_'+element_id).parent().hide();
+
             if (parent_cat.hasClass('category-COMPLETED')) {
                 $("#"+card_id).prependTo(".category-PLAN.TO.WATCH");
             }
@@ -55,6 +58,7 @@ function changeCategory(new_category, card_id) {
                 $("#"+card_id).prependTo(".category-PLAN.TO.WATCH");
             }
             else {
+                $('#rew_'+element_id).parent().show();
                 if (genres.includes("Animation")) {
                     $("#"+card_id).prependTo(".category-ANIMATION");
                 } else {

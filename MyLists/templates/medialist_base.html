@@ -146,22 +146,24 @@
                                                 </a>
                                             {% else %}
                                                 <a class="fa-comment-alt text-light {% if data['comment'] %} fas commented {% else %}
-                                                far {% endif %}" data-toggle='tooltip' title="Comments"
+                                                far disabled{% endif %}" data-toggle='tooltip' title="Comments"
                                                 {% if data['comment'] %} onclick="showComment(card_{{ data['id'] }},
                                                  '{{ data['media'] }}', '{{ data['id'] }}', false)"
                                                 {% endif %}>
                                                 </a>
                                             {% endif %}
                                         </div>
-                                        {% if data['category'].value == 'Completed' or data['category'].value == 'Completed Animation' %}
-                                            <div class="col">
+                                            <div class="col" {% if data['category'].value == 'Completed'
+                                            or data['category'].value == 'Completed Animation' %} style="display: block;"{% else %}
+                                                 style="display: none;"{% endif %}>
                                                 <a id="rew_{{ data['id'] }}" class="{% if target_user_id != current_user.get_id() %}
-                                                 disabled {% endif %}" data-toggle="tooltip" title="Rewatched"
+                                                 disabled {% endif %}" data-toggle="tooltip" title="How many time you
+                                                 rewatched this media. Do not count the inital completion."
                                                  onclick="rewatchDrop(this, {{ data['id'] }}, '{{ media_list }}')">
                                                     {{ data['rewatched'] }}
                                                 </a>
                                             </div>
-                                        {% endif %}
+
                                     </div>
                                 </div>
                                 {% block seas_eps_drop scoped %}

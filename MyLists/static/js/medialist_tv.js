@@ -103,11 +103,15 @@ function changeCategory(new_category, card_id) {
         data: JSON.stringify({status: new_category, element_id: element_id, element_type: media_list }),
         dataType: "json",
         success: function() {
+            $('#rew_'+element_id).text(0).show();
+            $('#rew_'+element_id).parent().hide();
+
             if (new_category === 'Watching') {
                 $("#"+card_id).prependTo(".category-WATCHING");
             }
             else if (new_category === 'Completed') {
                 $("#"+card_id).prependTo(".category-COMPLETED");
+                $('#rew_'+element_id).parent().show();
 
                 let season_data = JSON.parse("[" + seas_data + "]");
                 let episode_drop = $('#E_'+element_id);

@@ -92,6 +92,26 @@
                                 &nbsp;<i id="cat-check" class="fas fa-check" style="display: none;"></i>
                             </div>
                         </div>
+                        <div id="score-row" class="row m-l-30 m-r-25" data-toggle="tooltip" title="Score /10">
+                            <div class="col-4">
+                                <b>Score:</b>
+                            </div>
+                            <div class="col-8">
+                                <select id="score-dropdown" class="text-light text-center cat-drop"
+                                onchange="updateScore('{{ data['id'] }}', this, '{{ media_list }}')">
+                                    {% for i in range(0, 21) %}
+                                        {% if i == data['score'] %}
+                                            <option selected="selected" value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
+                                        {% else %}
+                                            <option value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <img id="score-loading" class="loading-img" style="display: none;" alt=""
+                                     src="/static/img/loading.webp"/>
+                                &nbsp;<i id="score-check" class="fas fa-check" style="display: none;"></i>
+                            </div>
+                        </div>
                         {% if media_list != 'movieslist' %}
                             <div id="season-row" class="row m-l-30 m-r-25" {% if data['status'] == 'Plan to Watch'
                             or data['status'] == 'Random' %} style="display: none;" {% endif %}>

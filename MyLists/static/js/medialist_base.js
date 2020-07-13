@@ -260,13 +260,14 @@ function scoreDrop(score, data_id, media_list) {
 // --- Change the score and delete dropdown ----------------------------
 $(document).on('change focusout','.score-drop',function(event) {
     let value = parseFloat(this.value).toFixed(1);
+    let media_id = $(this).attr('values').split(',')[0];
+    let media_list = $(this).attr('values').split(',')[1];
+
     if (isNaN(value)) {
         value = "---";
     } else if (value === "10.0") {
         value = 10;
     }
-    let media_id = $(this).attr('values').split(',')[0];
-    let media_list = $(this).attr('values').split(',')[1];
 
     if (event.type === 'change') {
         $.ajax ({
@@ -317,8 +318,8 @@ function rewatchDrop(rewatch, data_id, media_list) {
 // --- Change the rewatch and delete dropdown --------------------------
 $(document).on('change focusout','.rewatch-drop',function(event) {
     let value = parseInt(this.value);
-    let media_id = $(this).attr('values').split()[0];
-    let media_list = $(this).attr('values').split()[1];
+    let media_id = $(this).attr('values').split(',')[0];
+    let media_list = $(this).attr('values').split(',')[1];
 
     if (event.type === 'change') {
         $.ajax ({
