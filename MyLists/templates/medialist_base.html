@@ -60,7 +60,7 @@
             <button class="btn btn-sm btn-selected" data-filter="*">Show all</button>
             {% for key in media_data %}
                 <button class="btn btn-sm btn-header"
-                        data-filter=".categories.{% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key|replace(' ', '.') }}{% endif %}">
+                data-filter=".categories.{% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key|replace(' ', '.') }}{% endif %}">
                     {{ key }}
                 </button>
             {% endfor %}

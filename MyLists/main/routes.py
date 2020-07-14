@@ -98,10 +98,12 @@ def write_comment(media_type, media_id):
 
         db.session.commit()
         app.logger.info('[{}] added a comment on {} with ID {}'.format(current_user.id, media_type, media_id))
-        if comment == "":
-            flash("Comment removed or empty.", 'warning')
+        if not comment or comment == "":
+            flash("Comment has been removed (or is empty).", 'warning')
         else:
-            flash("Comment successfully added.", 'success')
+            flash("Comment successfully added/modified.", 'success')
+        if request.args.get('from') == 'media':
+            return redirect(url_for('main.media_sheet', media_type=media_type, media_id=media_id))
         return redirect(url_for('main.mymedialist', media_list=list_type.value, user_name=current_user.username))
 
     return render_template('medialist_comment.html', title='Add comment', form=form, media=media)

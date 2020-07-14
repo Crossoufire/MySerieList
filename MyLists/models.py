@@ -65,6 +65,7 @@ class User(db.Model, UserMixin):
     series_views = db.Column(db.Integer, nullable=False, default=0)
     anime_views = db.Column(db.Integer, nullable=False, default=0)
     movies_views = db.Column(db.Integer, nullable=False, default=0)
+    last_update = db.Column(db.String(50))
     biography = db.Column(db.Text)
     transition_email = db.Column(db.String(120))
     activated_on = db.Column(db.DateTime)
@@ -141,6 +142,15 @@ class User(db.Model, UserMixin):
             elif list_type == ListType.MOVIES:
                 user.movies_views += 1
             db.session.commit()
+
+    def get_last_update(self):
+        last_update = self.last_update or datetime(1900, 1, 1)
+        last_update = datetime.strptime(last_update, '%Y-%m-%d %H:%M:%S.%f')
+        if datetime(2020, 7, 13, 22, 39) > last_update:
+            self.last_update = datetime.utcnow()
+            db.session.commit()
+            return True
+        return False
 
     @staticmethod
     def verify_reset_token(token):

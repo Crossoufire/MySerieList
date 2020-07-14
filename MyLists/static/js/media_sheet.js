@@ -77,10 +77,10 @@ function addFavorite(element_id, media_type) {
             $('#fav-title').removeClass('disabled');
 
             if (favorite === true) {
-                $('#favorite').addClass('fas').removeClass('far');
+                $('#favorite').addClass('fas favorited').removeClass('far no-fav');
                 $('#add-fav').show('slow').delay(2000).fadeOut();
             } else {
-                $('#favorite').addClass('far').removeClass('fas');
+                $('#favorite').addClass('far no-fav').removeClass('fas favorited');
                 $('#remove-fav').show('slow').delay(2000).fadeOut();
             }
         },
@@ -270,6 +270,30 @@ function updateRewatched(element_id, rewatch, media_list) {
         },
         complete: function () {
             $('#rewatched-loading').hide();
+        }
+    });
+}
+
+
+// --- Update score data -----------------------------------------------
+function updateScore(element_id, score, media_list) {
+    $('#score-loading').show();
+    let value = score.options[score.selectedIndex].value;
+
+    $.ajax ({
+        type: "POST",
+        url: "/update_score",
+        contentType: "application/json",
+        data: JSON.stringify({score: value, element_id: element_id, element_type: media_list }),
+        dataType: "json",
+        success: function() {
+            $('#score-check').show().delay(1500).fadeOut();
+        },
+        error: function() {
+            error_ajax_message('Error updating the media score. Please try again later.');
+        },
+        complete: function () {
+            $('#score-loading').hide();
         }
     });
 }

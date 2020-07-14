@@ -41,8 +41,10 @@
                          style="display: none;" {% endif %}>
                         <h4 id="fav-title" class="m-l-15 m-r-15">
                             <i class="fas fa-list m-t-10"></i>&nbsp&nbsp <b>List Info</b>
-                            <i id="favorite" class="favorite-css {% if data['favorite'] %} fas{% else %} far {% endif %}
-                            fa-star m-t-10" onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></i>
+                            <i id="favorite" class="fa-heart m-t-10 {% if data['favorite'] %} fas favorited {% else %}
+                             far no-fav{% endif %}" onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></i>
+                            <a class="far fa-edit" href="/comment/{{ data['media_type'] }}/{{ data['id'] }}?from=media"
+                               data-toggle="tooltip" title="Add/Edit Comment"></a>
                         </h4>
                         <hr class="m-l-15 m-r-15 m-b-8">
                         <div class="row m-l-30 m-r-25">
@@ -90,26 +92,6 @@
                                 <img id="cat-loading" class="loading-img" style="display: none;"
                                      src="/static/img/loading.webp" alt=""/>
                                 &nbsp;<i id="cat-check" class="fas fa-check" style="display: none;"></i>
-                            </div>
-                        </div>
-                        <div id="score-row" class="row m-l-30 m-r-25" data-toggle="tooltip" title="Score /10">
-                            <div class="col-4">
-                                <b>Score:</b>
-                            </div>
-                            <div class="col-8">
-                                <select id="score-dropdown" class="text-light text-center cat-drop"
-                                onchange="updateScore('{{ data['id'] }}', this, '{{ media_list }}')">
-                                    {% for i in range(0, 21) %}
-                                        {% if i == data['score'] %}
-                                            <option selected="selected" value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
-                                        {% else %}
-                                            <option value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                                <img id="score-loading" class="loading-img" style="display: none;" alt=""
-                                     src="/static/img/loading.webp"/>
-                                &nbsp;<i id="score-check" class="fas fa-check" style="display: none;"></i>
                             </div>
                         </div>
                         {% if media_list != 'movieslist' %}
@@ -180,6 +162,29 @@
                             </div>
                         {% endif %}
                         <div id="rewatch-hr" class="m-l-35 m-r-55 m-t-8 m-b-8" style="border: 1px solid grey;"></div>
+                        <div id="score-row" class="row m-l-30 m-r-25" data-toggle="tooltip" title="Score /10">
+                            <div class="col-4">
+                                <b>Score:</b>
+                            </div>
+                            <div class="col-8">
+                                &nbsp;<select id="score-dropdown" class="text-light text-center cat-drop"
+                                onchange="updateScore('{{ data['id'] }}', this, '{{ media_list }}')">
+                                    <option {% if data['score'] == None or data['score'] == -1 %} selected="selected"
+                                    {% endif %}value="---">
+                                        &nbsp;---&nbsp;
+                                    </option>
+                                    {% for i in range(0, 21) %}
+                                        <option {% if (i-(i/2)) == data['score'] %} selected="selected" {% endif %}
+                                        value="{{ (i-(i/2)) }}">
+                                            &nbsp;{{ (i-(i/2)) }}&nbsp;
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <img id="score-loading" class="loading-img" style="display: none;" alt=""
+                                src="/static/img/loading.webp"/>
+                                &nbsp;<i id="score-check" class="fas fa-check" style="display: none;"></i>
+                            </div>
+                        </div>
                         <div id="rewatch-row" class="row m-l-30 m-r-25" data-toggle="tooltip"
                              title="How many time you rewatched this media. Do not count the inital completion."
                         {% if data['status'] == 'Completed' or data['status'] == 'Completed Animation' %}
@@ -204,6 +209,12 @@
                                 &nbsp;<i id="rewatched-check" class="fas fa-check" style="display: none;"></i>
                             </div>
                         </div>
+                        {% if data['comment'] %}
+                            <div id="comment-data" class="m-l-20 m-r-35 m-t-25 p-2" style="border: 2px dodgerblue solid;">
+                                <span class="comment-position"><b>Comment</b></span>
+                                <p class="comment-style">{{ data['comment'] }}</p>
+                            </div>
+                        {% endif %}
                         <div class="text-center m-t-15">
                             <button class="btn btn-smaller btn-danger" onclick="removeFromUser('{{ data['id'] }}',
                             '{{ media_list }}')">

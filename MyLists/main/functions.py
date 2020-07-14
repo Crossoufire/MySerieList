@@ -4,7 +4,7 @@ import secrets
 from collections import OrderedDict
 
 from PIL import Image
-from flask import abort, jsonify
+from flask import abort
 from pathlib import Path
 from sqlalchemy import and_
 from MyLists import db, app
@@ -680,26 +680,30 @@ def load_media_sheet(media, user_id, list_type):
                          'score': in_user_list.score,
                          'favorite': in_user_list.favorite,
                          'status': in_user_list.status.value,
-                         'rewatched': in_user_list.rewatched}
+                         'rewatched': in_user_list.rewatched,
+                         'comment': in_user_list.comment}
         else:
             user_info = {'last_episode_watched': 1,
                          'current_season': 1,
-                         'score': 0,
+                         'score': '---',
                          'favorite': False,
                          'status': Status.WATCHING.value,
-                         'rewatched': 0}
+                         'rewatched': 0,
+                         'comment': None}
     elif list_type == ListType.MOVIES:
         if in_user_list:
             user_info = {'in_user_list': True,
                          'score': in_user_list.score,
                          'favorite': in_user_list.favorite,
                          'status': in_user_list.status.value,
-                         'rewatched': in_user_list.rewatched}
+                         'rewatched': in_user_list.rewatched,
+                         'comment': in_user_list.comment}
         else:
-            user_info = {'score': 0,
+            user_info = {'score': '---',
                          'favorite': False,
                          'status': Status.WATCHING.value,
-                         'rewatched': 0}
+                         'rewatched': 0,
+                         'comment': None}
 
     # Merge all data into one dict
     element_info['same_genres'] = same_genres
