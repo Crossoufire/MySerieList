@@ -49,6 +49,7 @@ function removeFromUser(element_id, media_type) {
                 $('#category-dropdown').val("Watching");
                 $('#season-dropdown').val("0");
                 $('#episode-dropdown').val("0");
+                $('#rewatched-dropdown').val("0");
             }, 300);
         },
         error: function() {

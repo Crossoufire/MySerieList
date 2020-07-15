@@ -194,7 +194,7 @@ def media_sheet(media_type, media_id):
     element_sheet = load_media_sheet(media, current_user.id, list_type)
     title = element_sheet['original_name']
 
-    return render_template('media_sheet.html', title=title, data=element_sheet, media_list=list_type.value)
+    return render_template('media_sheet_test.html', title=title, data=element_sheet, media_list=list_type.value)
 
 
 @bp.route("/media_sheet_form/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])

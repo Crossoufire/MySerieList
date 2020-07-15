@@ -239,23 +239,6 @@
                     <div id="add-fav" class="alert alert-success p-2" style="display: none;">Media added to your favorite</div>
                     <div id="remove-fav" class="alert alert-warning p-2" style="display: none;">Media removed from your favorite</div>
                 </div>
-                <h4 class="m-l-21 m-r-15"><i class="fas fa-user-check m-t-8"></i>&nbsp&nbsp <b>In follow's list</b></h4>
-                <hr class="m-l-20 m-r-24">
-                <div class="mobile-follow m-l-15 m-r-15 p-2" style="margin-top: -10px;">
-                    {% for follow in data['in_follows_lists'] %}
-                        <a class="m-r-10" href="/account/{{ follow[0].username }}">
-                            <div class="text-center m-b-10" style="display: inline-block;">
-                                <img height="55" width="55" data-toggle="tooltip" title="{{ follow[0].username }}"
-                                     src="/static/profile_pics/{{ follow[0].image_file }}" alt=""/><br>
-                                {% if follow[1].favorite %}
-                                    <i class="fas fa-sm fa-star" style="color: darkgoldenrod;"></i>
-                                {% else %}
-                                    <i class="far fa-sm fa-star" style="color: rgba(255, 255, 255, 0.25);"></i>
-                                {% endif %}
-                            </div>
-                        </a>
-                    {% endfor %}
-                </div>
 
                 {#                {% if media_list == 'movieslist' and data['collection_data'][0] %}#}
                 {#                    <h4 class="m-l-21 m-r-15"><i class="fas fa-box-open m-t-8"></i>&nbsp;&nbsp;#}
@@ -504,6 +487,25 @@
                     </div>
                 {% endif %}
             </div>
+            <h4 class="m-l-21 m-r-15">
+                <i class="fas fa-user-check m-t-8"></i>&nbsp;&nbsp; <b>In follow's list</b>
+            </h4><br>
+            <hr class="m-l-20 m-r-24">
+            <div class="mobile-follow m-l-15 m-r-15 p-2" style="margin-top: -10px;">
+                    {% for follow in data['in_follows_lists'] %}
+                        <a class="m-r-10" href="/account/{{ follow[0].username }}">
+                            <div class="text-center m-b-10" style="display: inline-block;">
+                                <img height="55" width="55" data-toggle="tooltip" title="{{ follow[0].username }}"
+                                     src="/static/profile_pics/{{ follow[0].image_file }}" alt=""/><br>
+                                {% if follow[1].favorite %}
+                                    <i class="fas fa-sm fa-star" style="color: darkgoldenrod;"></i>
+                                {% else %}
+                                    <i class="far fa-sm fa-star" style="color: rgba(255, 255, 255, 0.25);"></i>
+                                {% endif %}
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
         </div>
     </div>
 {% endblock content %}

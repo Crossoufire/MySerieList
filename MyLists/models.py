@@ -145,7 +145,8 @@ class User(db.Model, UserMixin):
 
     def get_last_update(self):
         last_update = self.last_update or datetime(1900, 1, 1)
-        last_update = datetime.strptime(last_update, '%Y-%m-%d %H:%M:%S.%f')
+        if type(last_update) is str:
+            last_update = datetime.strptime(last_update, '%Y-%m-%d %H:%M:%S.%f')
         if datetime(2020, 7, 13, 22, 39) > last_update:
             self.last_update = datetime.utcnow()
             db.session.commit()
