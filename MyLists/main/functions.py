@@ -595,13 +595,21 @@ def load_media_sheet(media, user_id, list_type):
                     "actors": ', '.join([r.name for r in media.actors]),
                     "genres": ', '.join([r.genre for r in media.genres])}
 
-    # Check <original_name> and change name accordingly for all media
-    if media.original_name != media.name:
-        element_info['name'] = media.name
-        element_info['original_name'] = media.original_name
+    # Check if <original_name> is latin and change accordingly
+    def latin_alphabet(original_name):
+        try:
+            original_name.encode('iso-8859-1')
+            return True
+        except UnicodeEncodeError:
+            return False
+    if latin_alphabet(media.original_name):
+        element_info["display_name"] = media.original_name
+        element_info["other_name"] = media.name
     else:
-        element_info['name'] = None
-        element_info['original_name'] = media.original_name
+        element_info["display_name"] = media.name
+        element_info["other_name"] = media.original_name
+    if media.original_name == media.name:
+        element_info["other_name"] = None
 
     # Depending on the media add/modify supplementary information
     if list_type != ListType.MOVIES:

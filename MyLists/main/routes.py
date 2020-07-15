@@ -192,7 +192,7 @@ def media_sheet(media_type, media_id):
         return redirect(url_for('main.media_sheet', media_type=media_type, media_id=media.id))
 
     element_sheet = load_media_sheet(media, current_user.id, list_type)
-    title = element_sheet['original_name']
+    title = element_sheet['display_name']
 
     return render_template('media_sheet_test.html', title=title, data=element_sheet, media_list=list_type.value)
 

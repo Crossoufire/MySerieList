@@ -76,6 +76,30 @@ ul {
     color: lightgray;
 }
 
+.follow-margin-mobile {
+    margin-left: 21px;
+}
+
+.follow-img {
+    border-radius: 50%;
+    height: 55px;
+    width: 55px;
+}
+
+.f-favorited {
+    color: #cd0303;
+}
+
+.f-no-fav {
+    color: #929292;
+}
+
+.follow-div {
+    background: #0e2031;
+    border-radius: 8px;
+    padding: 5px 20px 15px 20px;
+}
+
 @media (max-width: 1100px) {
     .wrapper {
         width: auto;
@@ -102,5 +126,8 @@ ul {
     .media-cover {
         width: 200px;
         height: 300px;
+    }
+    .follow-margin-mobile {
+        margin-left: 2px;
     }
 }
