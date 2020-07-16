@@ -194,7 +194,7 @@
         {% block content %}
         {% endblock %}
     </div>
-    {% if request.path != '/' and current_user.get_last_update() %}
+    {% if current_user.is_authenticated and current_user.get_last_update() %}
         <div id="newFeatures" class="modal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document" style="border: 2px lightsalmon solid;">
                 <div class="modal-content" style="background-color: #0a262d;">
@@ -249,7 +249,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/js/mdb.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
-{% if request.path != '/' and current_user.get_last_update() %}
+{% if current_user.is_authenticated and current_user.get_last_update() %}
     <script type="text/javascript">
         $(window).on('load',function() {
             $('#newFeatures').modal('show');

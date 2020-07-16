@@ -204,3 +204,9 @@ def knowledge_frame_data():
     ranks = Frames.query.all()
 
     return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
+
+
+@bp.route("/new_features", methods=['GET'])
+@login_required
+def new_features():
+    return render_template('new_features.html', title='New Features')

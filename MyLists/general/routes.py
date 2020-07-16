@@ -292,3 +292,5 @@ def current_trends():
                            series_trends=series_results,
                            anime_trends=anime_results,
                            movies_trends=movies_results)
+
+

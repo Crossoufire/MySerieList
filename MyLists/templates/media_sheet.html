@@ -26,7 +26,7 @@
 
 {% block content %}
     <div class="wrapper">
-        <div class="row m-t-30">
+        <div class="row m-t-30 m-b-10">
             <div class="col-lg-4 col-md-5 col-sm-12">
                 <div class="media-title-mobile" style="display: none;">
                     <h3>{{ data['original_name'] }}</h3>
@@ -215,6 +215,8 @@
                         <hr class="m-l-15 m-r-15 m-b-8">
                         {% if data['comment'] %}
                             <p class="comment-style m-l-20 m-r-20">{{ data['comment'] }}</p>
+                        {% else %}
+                            <p class="comment-style m-l-20 m-r-20"><i>No comment added.</i></p>
                         {% endif %}
                         <div class="text-center m-t-15">
                             <button class="btn btn-smaller btn-danger" onclick="removeFromUser('{{ data['id'] }}',
@@ -238,23 +240,6 @@
                     <div id="remove-media" class="alert alert-warning p-2" style="display: none;">Media removed from your list</div>
                     <div id="add-fav" class="alert alert-success p-2" style="display: none;">Media added to your favorite</div>
                     <div id="remove-fav" class="alert alert-warning p-2" style="display: none;">Media removed from your favorite</div>
-                </div>
-                <h4 class="m-l-21 m-r-15"><i class="fas fa-user-check m-t-8"></i>&nbsp&nbsp <b>In follow's list</b></h4>
-                <hr class="m-l-20 m-r-24">
-                <div class="mobile-follow m-l-15 m-r-15 p-2" style="margin-top: -10px;">
-                    {% for follow in data['in_follows_lists'] %}
-                        <a class="m-r-10" href="/account/{{ follow[0].username }}">
-                            <div class="text-center m-b-10" style="display: inline-block;">
-                                <img height="55" width="55" data-toggle="tooltip" title="{{ follow[0].username }}"
-                                     src="/static/profile_pics/{{ follow[0].image_file }}" alt=""/><br>
-                                {% if follow[1].favorite %}
-                                    <i class="fas fa-sm fa-star" style="color: darkgoldenrod;"></i>
-                                {% else %}
-                                    <i class="far fa-sm fa-star" style="color: rgba(255, 255, 255, 0.25);"></i>
-                                {% endif %}
-                            </div>
-                        </a>
-                    {% endfor %}
                 </div>
 
                 {#                {% if media_list == 'movieslist' and data['collection_data'][0] %}#}
@@ -280,8 +265,8 @@
             </div>
             <div class="col-lg-8 col-md-7 col-sm-12" style="margin-top: -10px;">
                 <div class="media-title-pc">
-                    <h3>{{ data['original_name'] }}</h3>
-                    {% if data['name'] %} <h5 class="text-grey"><i>{{ data['name'] }}</i></h5> {% endif %}
+                    <h3>{{ data['display_name'] }}</h3>
+                    {% if data['other_name'] %} <h5 class="text-grey"><i>{{ data['other_name'] }}</i></h5> {% endif %}
                     <hr>
                 </div>
                 <div class="row p-t-15">
@@ -472,39 +457,78 @@
                 </div>
                 <h4><i class="fas fa-book-open m-t-15"></i>&nbsp&nbsp <b>Synopsis</b></h4>
                 <hr>
-                <p class="m-0 p-b-30 fs-18 text-justify">{{ data['synopsis'] }}</p>
-                {% if current_user.role.value == "admin" or current_user.role.value == "manager" %}
-                    <hr>
-                    <div class="m-b-20 text-right">
-                        {% if data['lock_status'] %}
-                            <div class="custom-control custom-switch">
-                                <input id="lock-button" class="custom-control-input" type="checkbox" checked
-                                       onchange="lock_media('{{ data['id'] }}', '{{ media_list }}')">
-                                <label id="lock-button-label" class="custom-control-label" for="lock-button">
-                                    Media is Locked
-                                </label>
-                            </div>
-                        {% else %}
-                            <div class="custom-control custom-switch">
-                                <input id="lock-button" class="custom-control-input" type="checkbox"
-                                       onchange="lock_media('{{ data['id'] }}', '{{ media_list }}')">
-                                <label id="lock-button-label" class="custom-control-label" for="lock-button">
-                                    Media is Unlocked
-                                </label>
-                            </div>
-                        {% endif %}
-                        {% if data['lock_status'] %}
-                            <a id="edit-button" class="btn btn-sm btn-warning text-dark"
-                               href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}">Edit media</a>
-                        {% else %}
-                            <a id="edit-button" class="btn btn-sm btn-warning text-dark"
-                               href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}"
-                               style="display: none;">Edit media</a>
-                        {% endif %}
-                    </div>
-                {% endif %}
+                <p class="m-0 p-b-10 fs-18 text-justify">{{ data['synopsis'] }}</p>
+                <hr>
             </div>
         </div>
+
+        <div class="follow-margin-mobile">
+            <h4><i class="fas fa-user-check"></i>&nbsp;&nbsp; <b>In follow's list</b></h4><hr>
+            <div class="row" style="margin-top: -5px;">
+                {% for follow in data['in_follows_lists'] %}
+                    <div class="col col-lg-4 col-md-4 col-sm-6 col-12 m-b-35">
+                        <a href="/account/{{ follow[0].username }}">
+                            <div class="follow-div text-light">
+                                <div class="text-light">
+                                    <img class="follow-img" src="/static/profile_pics/{{ follow[0].image_file }}" alt=""/>
+                                    <h5 style="display: inline-block;"><b>&nbsp;&nbsp;{{ follow[0].username }}</b></h5>
+                                    <i class="fa-sm fa-heart m-l-10{% if follow[1].favorite %} fas f-favorited{% else %}
+                                    far f-no-fav{% endif %}"></i>
+                                </div>
+                                <hr class="m-b-8" style="border-color: gray;">
+                                <div><b>Score:&nbsp; {{ follow[1].score }}</b></div>
+                                <div><b>Status:&nbsp; {{ follow[1].status.value }}</b></div>
+                                {% if media_list != 'movieslist' %}
+                                    {% if follow[1].status.value == 'Completed' or follow[1].status.value == 'Random'
+                                    or follow[1].status.value == 'Plan to Watch' %}
+                                    {% else %}
+                                        <b>Season {{ follow[1].current_season }} - Episode
+                                            {{ follow[1].last_episode_watched }}</b>
+                                    {% endif %}
+                                {% endif %}
+                                {% if follow[1].status.value == 'Completed' %}
+                                    <div><b>Re-watched:&nbsp; {{ follow[1].rewatched }}</b></div>
+                                {% endif %}
+                                {% if follow[1].comment %}
+                                    <div class="m-t-10"><b>Comment:</b></div>
+                                    <p class="text-justify" style="margin-bottom: 0;">{{ follow[1].comment }}</p>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if current_user.role.value == "admin" or current_user.role.value == "manager" %}
+            <div class="m-b-30 text-right">
+            {% if data['lock_status'] %}
+                <div class="custom-control custom-switch">
+                    <input id="lock-button" class="custom-control-input" type="checkbox" checked
+                           onchange="lock_media('{{ data['id'] }}', '{{ media_list }}')">
+                    <label id="lock-button-label" class="custom-control-label" for="lock-button">
+                        Media is Locked
+                    </label>
+                </div>
+            {% else %}
+                <div class="custom-control custom-switch">
+                    <input id="lock-button" class="custom-control-input" type="checkbox"
+                           onchange="lock_media('{{ data['id'] }}', '{{ media_list }}')">
+                    <label id="lock-button-label" class="custom-control-label" for="lock-button">
+                        Media is Unlocked
+                    </label>
+                </div>
+            {% endif %}
+            {% if data['lock_status'] %}
+                <a id="edit-button" class="btn btn-sm btn-warning text-dark"
+                   href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}">Edit media</a>
+            {% else %}
+                <a id="edit-button" class="btn btn-sm btn-warning text-dark"
+                   href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}"
+                   style="display: none;">Edit media</a>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 {% endblock content %}
 
