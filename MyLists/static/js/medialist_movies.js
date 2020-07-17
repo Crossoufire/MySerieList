@@ -39,7 +39,8 @@ function changeCategory(new_category, card_id) {
     let media_list = $('#'+card_id).attr('values').split('-')[1];
     let element_id = $('#'+card_id).attr('values').split('-')[2];
     let parent_cat = $('#'+card_id).parent();
-    $('#'+card_id).find('.loading-medialist').show();
+    let load_img = $('#'+card_id).find('.view.overlay');
+    load_img.prepend(Loading());
 
         $.ajax ({
         type: "POST",
@@ -72,7 +73,7 @@ function changeCategory(new_category, card_id) {
         },
         complete: function () {
             removeCat();
-            $('#'+card_id).find('.loading-medialist').hide();
+            load_img.find('.load-medialist').remove();
         }
     });
 }

@@ -3,10 +3,11 @@
 // --- Delete element --------------------------------------------------
 function deleteElement(card, media_list) {
     let element_id = $(card)[0].id.split('_')[1];
-    $(card).find('.loading-medialist').show();
+    let load_img = $(card).find('.view.overlay');
+    load_img.prepend(Loading());
 
     if (!confirm('Delete the media from your list?')) {
-        $(card).find('.loading-medialist').hide();
+        load_img.find('.load-medialist').remove();
         return false;
     }
 
@@ -23,7 +24,7 @@ function deleteElement(card, media_list) {
             error_ajax_message('Error trying to remove the media. Please try again later.')
         },
         complete: function () {
-            $(card).find('.loading-medialist').show();
+            load_img.find('.load-medialist').remove();
         }
     });
 
@@ -156,7 +157,8 @@ function ShowFavorites() {
 function AddCatUser(category, card_id) {
     let media_list = $('#'+card_id).attr('values').split('-')[1];
     let element_id = $('#'+card_id).attr('values').split('-')[2];
-    $('#'+card_id).find('.loading-medialist').show();
+    let load_img = $('#'+card_id).find('.view.overlay');
+    load_img.prepend(Loading());
 
     $.ajax ({
         type: "POST",
@@ -173,7 +175,7 @@ function AddCatUser(category, card_id) {
         },
         complete: function () {
             removeCat();
-            $('#'+card_id).find('.loading-medialist').hide();
+            load_img.find('.load-medialist').remove();
         }
     });
 }
@@ -183,7 +185,6 @@ function AddCatUser(category, card_id) {
 function showComment(card, media_type, media_id, current_user) {
     let media_name = $(card).find('.font-mask').text();
     let comment = $("#com_"+media_id).text();
-    console.log(comment);
 
     if (current_user === true) {
         var edit_button = ('<a href="/comment/'+media_type+'/'+media_id+'">' +
@@ -383,3 +384,11 @@ $(document).ready(function() {
     $(window).resize(a).trigger('resize');
     $categories.isotope('layout');
 });
+
+
+// --- Create the loading screen on media ------------------------------
+function Loading() {
+    return ('<div class="load-medialist">' +
+                '<img class="img-load-medialist" src="/static/img/loading.webp" alt="">' +
+            '</div>')
+}

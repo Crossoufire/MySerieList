@@ -73,7 +73,8 @@ function changeCategory(new_category, card_id) {
     let seas_data = $('#'+card_id).attr('values').split('-')[0];
     let media_list = $('#'+card_id).attr('values').split('-')[1];
     let element_id = $('#'+card_id).attr('values').split('-')[2];
-    $('#'+card_id).find('.loading-medialist').show();
+    let load_img = $('#'+card_id).find('.view.overlay');
+    load_img.prepend(Loading());
 
     if ($('#'+card_id).parent()[0].className === 'row category-PLAN TO WATCH' ||
         $('#'+card_id).parent()[0].className === 'row category-RANDOM') {
@@ -152,7 +153,7 @@ function changeCategory(new_category, card_id) {
             error_ajax_message('Error changing the category of the media. PLease try again later.')
         },
         complete: function () {
-            $('#'+card_id).find('.loading-medialist').hide();
+            load_img.find('.load-medialist').remove();
         }
     });
 }

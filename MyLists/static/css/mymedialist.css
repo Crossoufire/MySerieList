@@ -225,7 +225,7 @@ option {
 
 /* ------------------------------------------ */
 
-.loading-medialist {
+.load-medialist {
     position: absolute;
     z-index: 200;
     width: 100%;
@@ -234,7 +234,7 @@ option {
     opacity: 0.85;
 }
 
-.img-loading-medialist {
+.img-load-medialist {
     height: 40px;
     width: 40px;
     left: 50% ;
