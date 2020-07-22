@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import secrets
 from collections import OrderedDict
 
@@ -14,7 +15,7 @@ from MyLists.API_data import ApiData
 from MyLists.general.functions import compute_media_time_spent
 from MyLists.models import ListType, Status, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
     SeriesList, Series, MoviesList, Movies, SeriesGenre, AnimeGenre, MoviesGenre, UserLastUpdate, SeriesActors, \
-    SeriesNetwork, AnimeNetwork, MoviesActors, MoviesCollections, AnimeActors, Notifications, User
+    SeriesNetwork, AnimeNetwork, MoviesActors, MoviesCollections, AnimeActors, Notifications
 
 
 def get_collection_movie(collection_id):
@@ -405,8 +406,6 @@ def add_element_in_db(api_id, list_type):
 
 
 def get_medialist_data(element_data, list_type, covers_path, user_id):
-    # Get the common media when looking at other lists
-
     current_list = []
     if user_id != current_user.id:
         if list_type == ListType.ANIME:
@@ -418,34 +417,21 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
         current_list = [r[0] for r in current_media]
 
     common_elements = 0
+    all_media = []
     if list_type != ListType.MOVIES:
-        category = OrderedDict({'WATCHING': '',
-                                'COMPLETED': '',
-                                'ON HOLD': '',
-                                'RANDOM': '',
-                                'DROPPED': '',
-                                'PLAN TO WATCH': ''})
-
         for element in element_data:
-            # Get episodes per season
-            nb_season = len(element[4].split(","))
-            eps_per_season = element[6].split(",")[:nb_season]
-            eps_per_season = [int(i) for i in eps_per_season]
-
             element_info = {"id": element[0].id,
                             "tmdb_id": element[0].themoviedb_id,
                             "cover": "{}{}".format(covers_path, element[0].image_cover),
                             "last_episode_watched": element[1].last_episode_watched,
-                            "eps_per_season": eps_per_season,
+                            "eps_per_season": [eps.episodes for eps in element[0].eps_per_season],
                             "current_season": element[1].current_season,
                             "score": element[1].score,
                             "favorite": element[1].favorite,
-                            "actors": element[5],
-                            "genres": element[2],
-                            "common": False,
-                            "category": element[1].status,
                             "rewatched": element[1].rewatched,
-                            "comment": element[1].comment}
+                            "comment": element[1].comment,
+                            "category": element[1].status.value,
+                            "common": False}
 
             if element_info['score'] is None or element_info['score'] == -1:
                 element_info['score'] = '---'
@@ -466,10 +452,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                 element_info['common'] = True
                 common_elements += 1
 
-            if category[element[1].status.value.upper()] == '':
-                category[element[1].status.value.upper()] = [element_info]
-            else:
-                category[element[1].status.value.upper()].append(element_info)
+            all_media.append(element_info)
     elif list_type == ListType.MOVIES:
         category = OrderedDict({'COMPLETED': '',
                                 'COMPLETED ANIMATION': '',
@@ -515,7 +498,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
     except ZeroDivisionError:
         percentage = 0
 
-    data = {"grouping": category,
+    data = {"all_media": all_media,
             "common_elements": [common_elements, len(element_data), percentage]}
 
     return data

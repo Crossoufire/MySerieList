@@ -30,9 +30,19 @@ def mymedialist(media_list, user_name):
     # Add views_count to the profile
     current_user.add_view_count(user, list_type)
 
+    category = request.args.get('cat', 'Completed', str)
+    page = request.args.get('page', 1, int)
+
+    # Check if <category> is valid
+    try:
+        category = Status(category)
+    except ValueError:
+        abort(404)
+
     # Retrieve the <media_data>
     if list_type == ListType.SERIES:
-        series_data = SeriesList.get_series_info(user.id)
+        series_data = SeriesList.get_series_info(user.id, category, page)
+        print(series_data)
         covers_path = url_for('static', filename='covers/series_covers/')
         media_data = get_medialist_data(series_data, list_type, covers_path, user.id)
     elif list_type == ListType.ANIME:
@@ -47,7 +57,7 @@ def mymedialist(media_list, user_name):
     if list_type != ListType.MOVIES:
         return render_template('medialist_tv.html',
                                title="{}'s {}".format(user_name, media_list),
-                               media_data=media_data["grouping"],
+                               media_data=media_data["all_media"],
                                common_elements=media_data["common_elements"],
                                media_list=media_list,
                                target_user_name=user_name,

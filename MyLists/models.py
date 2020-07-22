@@ -222,7 +222,7 @@ class Series(db.Model):
 
     genres = db.relationship('SeriesGenre', backref='series', lazy=True)
     actors = db.relationship('SeriesActors', backref='series', lazy=True)
-    eps_per_season = db.relationship('SeriesEpisodesPerSeason', backref='series', lazy=True)
+    eps_per_season = db.relationship('SeriesEpisodesPerSeason', backref='series', lazy=False)
     networks = db.relationship('SeriesNetwork', backref='series', lazy=True)
     list_info = db.relationship('SeriesList', backref='series', lazy="dynamic")
 
@@ -259,25 +259,17 @@ class SeriesList(db.Model):
     comment = db.Column(db.Text)
 
     @staticmethod
-    def get_series_info(user_id):
-        element_data = db.session.query(Series, SeriesList, func.group_concat(SeriesGenre.genre.distinct()),
-                                        func.group_concat(SeriesNetwork.network.distinct()),
-                                        func.group_concat(SeriesEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(SeriesActors.name.distinct()),
-                                        func.group_concat(SeriesEpisodesPerSeason.episodes)) \
+    def get_series_info(user_id, category, page):
+        element_data = db.session.query(Series, SeriesList) \
             .join(SeriesList, SeriesList.series_id == Series.id) \
-            .join(SeriesGenre, SeriesGenre.series_id == Series.id) \
-            .join(SeriesNetwork, SeriesNetwork.series_id == Series.id) \
-            .join(SeriesActors, SeriesActors.series_id == Series.id) \
-            .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == Series.id) \
-            .filter(SeriesList.user_id == user_id).group_by(Series.id).order_by(Series.name.asc()).all()
+            .filter(SeriesList.user_id == user_id, SeriesList.status == category).group_by(Series.id) \
+            .order_by(Series.name.asc()).paginate(page, 100, False).items
         return element_data
 
     @staticmethod
     def get_total_time(user_id):
-        element_data = db.session.query(SeriesList, Series, func.group_concat(SeriesEpisodesPerSeason.episodes)) \
+        element_data = db.session.query(SeriesList, Series) \
             .join(Series, Series.id == SeriesList.series_id) \
-            .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id) \
             .filter(SeriesList.user_id == user_id).group_by(SeriesList.series_id)
         return element_data
 

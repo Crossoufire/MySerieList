@@ -31,14 +31,10 @@ def compute_media_time_spent(list_type):
                     except:
                         pass
                 elif media[0].status != Status.PLAN_TO_WATCH or media[0].status != Status.RANDOM:
-                    try:
-                        episodes = media[2].split(",")
-                        episodes = [int(x) for x in episodes]
-                        for i in range(1, media[0].current_season):
-                            total_time += media[1].episode_duration * episodes[i - 1]
-                        total_time += media[0].last_episode_watched * media[1].episode_duration
-                    except:
-                        pass
+                    episodes = [eps.episodes for eps in media[1].eps_per_season]
+                    for i in range(1, media[0].current_season):
+                        total_time += media[1].episode_duration*episodes[i - 1]
+                    total_time += media[0].last_episode_watched*media[1].episode_duration
         elif list_type == ListType.MOVIES:
             total_time = 0
             for media in media_list:

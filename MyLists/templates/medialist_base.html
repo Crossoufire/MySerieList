@@ -57,13 +57,8 @@
             </div>
         </div>
         <div class="center-mobile d-flex flex-wrap filters-button-group m-t-10">
-            <button class="btn btn-sm btn-selected" data-filter="*">Show all</button>
-            {% for key in media_data %}
-                <button class="btn btn-sm btn-header"
-                data-filter=".categories.{% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key|replace(' ', '.') }}{% endif %}">
-                    {{ key }}
-                </button>
-            {% endfor %}
+            <a class="btn btn-sm btn-selected" href="/serieslist/Cross?cat=Completed&page=1">COMPLETED</a>
+            <a class="btn btn-sm btn-header" href="/serieslist/Cross?cat=Plan to Watch&page=1">ON HOLD</a>
         </div>
     </div>
     <div class="m-t-10">
@@ -78,98 +73,96 @@
         </div>
     </div>
     <div id="categories-iso" class="categories-iso p-t-30">
-        {% for key in media_data %}
-            <div class="categories {% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key }}{% endif %}">
-                <h2 class="text-center m-t-20 mb-0">{{ key }}</h2>
-                <hr class="mt-2 pb-3 mb-0">
-                <div class="row category-{% if key == 'COMPLETED ANIMATION' %}ANIMATION{% else %}{{ key }}{% endif %}">
-                    {% for data in media_data[key] %}
-                        <div id="card_{{ data['id'] }}" values="{% block data scoped %}{% endblock data %}"
-                             class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
-                            <div class="card bg-transparent">
-                                <div class="view overlay">
-                                    <img class="card-img-top lazyload" data-src="{{ data['cover'] }}" height="300"
-                                         width="200" style="height: auto;" alt=""/>
-                                    <a class="mask flex-center rgba-black-strong" href="/media_sheet/{{ data['media'] }}/{{ data['id'] }}">
-                                        <span class="font-mask text-center text-light">{{ data['display_name'] }}</span>
-                                        <span class="by-original-title" style="display: none;">{{ data['other_name'] }}</span>
-                                        <span class="by-actor" style="display: none;">{{ data['actors'] }}</span>
-                                        <span class="by-genre" style="display: none;">{{ data['genres'] }}</span>
-                                        <span class="by-director" style="display: none;">{{ data['director'] }}</span>
+        <div class="categories COMPLETED">
+            <h2 class="text-center m-t-20 mb-0">COMPLETED</h2>
+            <hr class="mt-2 pb-3 mb-0">
+            <div class="row category-COMPLETED">
+                {% for data in media_data %}
+                    <div id="card_{{ data['id'] }}" values="{% block data scoped %}{% endblock data %}"
+                         class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+                        <div class="card bg-transparent">
+                            <div class="view overlay">
+                                <img class="card-img-top lazyload" data-src="{{ data['cover'] }}" height="300"
+                                     width="200" style="height: auto;" alt=""/>
+                                <a class="mask flex-center rgba-black-strong" href="/media_sheet/{{ data['media'] }}/{{ data['id'] }}">
+                                    <span class="font-mask text-center text-light">{{ data['display_name'] }}</span>
+                                    <span class="by-original-title" style="display: none;">{{ data['other_name'] }}</span>
+                                    <span class="by-actor" style="display: none;">{{ data['actors'] }}</span>
+                                    <span class="by-genre" style="display: none;">{{ data['genres'] }}</span>
+                                    <span class="by-director" style="display: none;">{{ data['director'] }}</span>
+                                </a>
+                                {% if target_user_id == current_user.get_id() %}
+                                    <a class="card-btn-top-left fas fa-bars text-light"
+                                       onclick="chargeButtons(card_{{ data['id'] }})">
                                     </a>
-                                    {% if target_user_id == current_user.get_id() %}
-                                        <a class="card-btn-top-left fas fa-bars text-light"
-                                           onclick="chargeButtons(card_{{ data['id'] }})">
-                                        </a>
-                                        <a class="card-btn-toop-right fas fa-trash text-light"
-                                           onclick="deleteElement(card_{{ data['id'] }}, '{{ media_list }}')">
-                                        </a>
+                                    <a class="card-btn-toop-right fas fa-trash text-light"
+                                       onclick="deleteElement(card_{{ data['id'] }}, '{{ media_list }}')">
+                                    </a>
+                                {% else %}
+                                    {% if data['common'] %}
+                                        <div class="card-ribbon"></div>
                                     {% else %}
-                                        {% if data['common'] %}
-                                            <div class="card-ribbon"></div>
+                                        <a class="card-btn-top-left fas fa-plus text-light"
+                                         onclick="ChargeButtonsOther(card_{{ data['id'] }})">
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="bottom-card-info{% if media_list =='movieslist' %}-movie {% endif %}">
+                                <div class="row no-gutters" style="opacity: 0.7;">
+                                    <div class="col">
+                                        <a class="fa-heart {% if data['favorite'] %} fas favorited {% else %}
+                                         far {% endif %} {% if target_user_id != current_user.get_id() %}
+                                         disabled {% endif %}" data-toggle='tooltip' title="Favorite"
+                                           onclick="addFavorite(this,'{{ data['id'] }}','{{ media_list }}')">
+                                        </a>
+                                    </div>
+                                    <div class="col">
+                                        <a id="score_{{ data['id'] }}" class="{% if target_user_id != current_user.get_id() %}
+                                         disabled {% endif %}" data-toggle="tooltip" title="Score /10"
+                                        onclick="scoreDrop(this, {{ data['id'] }}, '{{ media_list }}')">
+                                            {{ data['score'] }}
+                                        </a>
+                                    </div>
+                                    <div class="col">
+                                        <span id="com_{{ data['id'] }}" style="display: none;">
+                                            {{ data['comment'] }}
+                                        </span>
+                                        {% if target_user_id == current_user.get_id() %}
+                                            <a class="fa-comment-alt text-light {% if data['comment'] %} fas commented {% else %}
+                                            far {% endif %}" data-toggle='tooltip' title="Comments"
+                                            {% if data['comment'] %} onclick="showComment(card_{{ data['id'] }},
+                                             '{{ data['media'] }}', '{{ data['id'] }}', true)"
+                                            {% else %} href="/comment/{{ data['media'] }}/{{ data['id'] }}"{% endif %}>
+                                            </a>
                                         {% else %}
-                                            <a class="card-btn-top-left fas fa-plus text-light"
-                                             onclick="ChargeButtonsOther(card_{{ data['id'] }})">
+                                            <a class="fa-comment-alt text-light {% if data['comment'] %} fas commented {% else %}
+                                            far disabled{% endif %}" data-toggle='tooltip' title="Comments"
+                                            {% if data['comment'] %} onclick="showComment(card_{{ data['id'] }},
+                                             '{{ data['media'] }}', '{{ data['id'] }}', false)"
+                                            {% endif %}>
                                             </a>
                                         {% endif %}
-                                    {% endif %}
-                                </div>
-                                <div class="bottom-card-info{% if media_list =='movieslist' %}-movie {% endif %}">
-                                    <div class="row no-gutters" style="opacity: 0.7;">
-                                        <div class="col">
-                                            <a class="fa-heart {% if data['favorite'] %} fas favorited {% else %}
-                                             far {% endif %} {% if target_user_id != current_user.get_id() %}
-                                             disabled {% endif %}" data-toggle='tooltip' title="Favorite"
-                                               onclick="addFavorite(this,'{{ data['id'] }}','{{ media_list }}')">
-                                            </a>
-                                        </div>
-                                        <div class="col">
-                                            <a id="score_{{ data['id'] }}" class="{% if target_user_id != current_user.get_id() %}
-                                             disabled {% endif %}" data-toggle="tooltip" title="Score /10"
-                                            onclick="scoreDrop(this, {{ data['id'] }}, '{{ media_list }}')">
-                                                {{ data['score'] }}
-                                            </a>
-                                        </div>
-                                        <div class="col">
-                                            <span id="com_{{ data['id'] }}" style="display: none;">
-                                                {{ data['comment'] }}
-                                            </span>
-                                            {% if target_user_id == current_user.get_id() %}
-                                                <a class="fa-comment-alt text-light {% if data['comment'] %} fas commented {% else %}
-                                                far {% endif %}" data-toggle='tooltip' title="Comments"
-                                                {% if data['comment'] %} onclick="showComment(card_{{ data['id'] }},
-                                                 '{{ data['media'] }}', '{{ data['id'] }}', true)"
-                                                {% else %} href="/comment/{{ data['media'] }}/{{ data['id'] }}"{% endif %}>
-                                                </a>
-                                            {% else %}
-                                                <a class="fa-comment-alt text-light {% if data['comment'] %} fas commented {% else %}
-                                                far disabled{% endif %}" data-toggle='tooltip' title="Comments"
-                                                {% if data['comment'] %} onclick="showComment(card_{{ data['id'] }},
-                                                 '{{ data['media'] }}', '{{ data['id'] }}', false)"
-                                                {% endif %}>
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                        <div class="col" {% if data['category'].value == 'Completed'
-                                        or data['category'].value == 'Completed Animation' %} style="display: block;"{% else %}
-                                             style="display: none;"{% endif %}>
-                                            <a id="rew_{{ data['id'] }}" class="{% if target_user_id != current_user.get_id() %}
-                                             disabled {% endif %}" data-toggle="tooltip" title="How many time you
-                                             rewatched this media. Do not count the inital completion."
-                                             onclick="rewatchDrop(this, {{ data['id'] }}, '{{ media_list }}')">
-                                                {{ data['rewatched'] }}
-                                            </a>
-                                        </div>
+                                    </div>
+                                    <div class="col" {% if data['category'].value == 'Completed'
+                                    or data['category'].value == 'Completed Animation' %} style="display: block;"{% else %}
+                                         style="display: none;"{% endif %}>
+                                        <a id="rew_{{ data['id'] }}" class="{% if target_user_id != current_user.get_id() %}
+                                         disabled {% endif %}" data-toggle="tooltip" title="How many time you
+                                         rewatched this media. Do not count the inital completion."
+                                         onclick="rewatchDrop(this, {{ data['id'] }}, '{{ media_list }}')">
+                                            {{ data['rewatched'] }}
+                                        </a>
                                     </div>
                                 </div>
-                                {% block seas_eps_drop scoped %}
-                                {% endblock seas_eps_drop %}
                             </div>
+                            {% block seas_eps_drop scoped %}
+                            {% endblock seas_eps_drop %}
                         </div>
-                    {% endfor %}
-                </div>
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        </div>
     </div>
 {% endblock content %}
 
