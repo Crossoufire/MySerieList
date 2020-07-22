@@ -150,17 +150,16 @@
                                                 </a>
                                             {% endif %}
                                         </div>
-                                            <div class="col" {% if data['category'].value == 'Completed'
-                                            or data['category'].value == 'Completed Animation' %} style="display: block;"{% else %}
-                                                 style="display: none;"{% endif %}>
-                                                <a id="rew_{{ data['id'] }}" class="{% if target_user_id != current_user.get_id() %}
-                                                 disabled {% endif %}" data-toggle="tooltip" title="How many time you
-                                                 rewatched this media. Do not count the inital completion."
-                                                 onclick="rewatchDrop(this, {{ data['id'] }}, '{{ media_list }}')">
-                                                    {{ data['rewatched'] }}
-                                                </a>
-                                            </div>
-
+                                        <div class="col" {% if data['category'].value == 'Completed'
+                                        or data['category'].value == 'Completed Animation' %} style="display: block;"{% else %}
+                                             style="display: none;"{% endif %}>
+                                            <a id="rew_{{ data['id'] }}" class="{% if target_user_id != current_user.get_id() %}
+                                             disabled {% endif %}" data-toggle="tooltip" title="How many time you
+                                             rewatched this media. Do not count the inital completion."
+                                             onclick="rewatchDrop(this, {{ data['id'] }}, '{{ media_list }}')">
+                                                {{ data['rewatched'] }}
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                                 {% block seas_eps_drop scoped %}

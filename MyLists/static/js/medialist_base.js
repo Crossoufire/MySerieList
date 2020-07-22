@@ -187,12 +187,15 @@ function showComment(card, media_type, media_id, current_user) {
     let comment = $("#com_"+media_id).text();
 
     if (current_user === true) {
-        var edit_button = ('<a href="/comment/'+media_type+'/'+media_id+'">' +
-            '<button class="btn btn-sm btn-primary">' +
-                'Edit' +
-            '</button>' +
-            '</a>'
-        )
+        var edit_button = ('<div class="modal-footer p-1">' +
+                                '<a href="/comment/'+media_type+'/'+media_id+'">' +
+                                    '<button class="btn btn-sm btn-primary">' +
+                                        'Edit' +
+                                    '</button>' +
+                                '</a>' +
+                            '</div>')
+    } else {
+        edit_button = ""
     }
 
     $('body').append(
@@ -208,9 +211,7 @@ function showComment(card, media_type, media_id, current_user) {
                     '<div class="modal-body text-light">' +
                         '<p>'+comment+'</p>' +
                     '</div>' +
-                    '<div class="modal-footer p-1">' +
                         edit_button +
-                    '</div>' +
                 '</div>' +
             '</div>' +
         '</div>'

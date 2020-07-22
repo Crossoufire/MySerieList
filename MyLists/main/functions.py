@@ -14,7 +14,7 @@ from MyLists.API_data import ApiData
 from MyLists.general.functions import compute_media_time_spent
 from MyLists.models import ListType, Status, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
     SeriesList, Series, MoviesList, Movies, SeriesGenre, AnimeGenre, MoviesGenre, UserLastUpdate, SeriesActors, \
-    SeriesNetwork, AnimeNetwork, MoviesActors, MoviesCollections, AnimeActors, Notifications
+    SeriesNetwork, AnimeNetwork, MoviesActors, MoviesCollections, AnimeActors, Notifications, User
 
 
 def get_collection_movie(collection_id):
@@ -273,6 +273,14 @@ def get_details(api_id, list_type):
     return data
 
 
+def latin_alphabet(original_name):
+    try:
+        original_name.encode('iso-8859-1')
+        return True
+    except UnicodeEncodeError:
+        return False
+
+
 # ---------------------------------------------------------------------------------------------------
 
 
@@ -398,6 +406,7 @@ def add_element_in_db(api_id, list_type):
 
 def get_medialist_data(element_data, list_type, covers_path, user_id):
     # Get the common media when looking at other lists
+
     current_list = []
     if user_id != current_user.id:
         if list_type == ListType.ANIME:
@@ -408,13 +417,6 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             current_media = db.session.query(MoviesList.movies_id).filter_by(user_id=current_user.id).all()
         current_list = [r[0] for r in current_media]
 
-    group = 'categories'
-
-    alphabet_group = {}
-    genres_group = {}
-    releases_group = {}
-    tmdb_score_group = {}
-    tmdb_scores_intervals = [[0, 2], [2, 4], [4, 6], [6, 8], [8, 11]]
     common_elements = 0
     if list_type != ListType.MOVIES:
         category = OrderedDict({'WATCHING': '',
@@ -423,6 +425,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                                 'RANDOM': '',
                                 'DROPPED': '',
                                 'PLAN TO WATCH': ''})
+
         for element in element_data:
             # Get episodes per season
             nb_season = len(element[4].split(","))
@@ -447,13 +450,6 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             if element_info['score'] is None or element_info['score'] == -1:
                 element_info['score'] = '---'
 
-            def latin_alphabet(original_name):
-                try:
-                    original_name.encode('iso-8859-1')
-                    return True
-                except UnicodeEncodeError:
-                    return False
-
             if latin_alphabet(element[0].original_name):
                 element_info["display_name"] = element[0].original_name
                 element_info["other_name"] = element[0].name
@@ -470,53 +466,15 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                 element_info['common'] = True
                 common_elements += 1
 
-            if group == 'categories':
-                if category[element[1].status.value.upper()] == '':
-                    category[element[1].status.value.upper()] = [element_info]
-                else:
-                    category[element[1].status.value.upper()].append(element_info)
-            elif group == 'alphabet':
-                try:
-                    if 0 <= int(element[0].name[0]) <= 9:
-                        if '0-9' in alphabet_group:
-                            alphabet_group['0-9'].append(element_info)
-                        else:
-                            alphabet_group['0-9'] = [element_info]
-                except:
-                    if element[0].name[0].upper() in alphabet_group:
-                        alphabet_group[element[0].name[0].upper()].append(element_info)
-                    else:
-                        alphabet_group[element[0].name[0].upper()] = [element_info]
-            elif group == 'genres':
-                for genre in element[2].split(','):
-                    if genre in genres_group:
-                        genres_group[genre].append(element_info)
-                    else:
-                        genres_group[genre] = [element_info]
-            elif group == 'releases':
-                try:
-                    if element[0].first_air_date.split('-')[0] in releases_group:
-                        releases_group[element[0].first_air_date.split('-')[0]].append(element_info)
-                    else:
-                        releases_group[element[0].first_air_date.split('-')[0]] = [element_info]
-                except:
-                    if "No Airing Date" in releases_group:
-                        releases_group["No Airing Date"].append(element_info)
-                    else:
-                        releases_group["No Airing Date"] = [element_info]
-            elif group == 'TDMB_score':
-                for interval in tmdb_scores_intervals:
-                    if interval[0] <= element[0].vote_average < interval[1]:
-                        if f'{interval[0]}-{interval[1]}' in tmdb_score_group:
-                            tmdb_score_group[f'{interval[0]}-{interval[1]}'].append(element_info)
-                            break
-                        else:
-                            tmdb_score_group[f'{interval[0]}-{interval[1]}'] = [element_info]
-                            break
+            if category[element[1].status.value.upper()] == '':
+                category[element[1].status.value.upper()] = [element_info]
+            else:
+                category[element[1].status.value.upper()].append(element_info)
     elif list_type == ListType.MOVIES:
         category = OrderedDict({'COMPLETED': '',
                                 'COMPLETED ANIMATION': '',
                                 'PLAN TO WATCH': ''})
+
         for element in element_data:
             element_info = {"id": element[0].id,
                             "tmdb_id": element[0].themoviedb_id,
@@ -536,13 +494,6 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
             if element_info['score'] is None:
                 element_info['score'] = '---'
 
-            def latin_alphabet(original_name):
-                try:
-                    original_name.encode('iso-8859-1')
-                    return True
-                except UnicodeEncodeError:
-                    return False
-
             if latin_alphabet(element[0].original_name):
                 element_info["display_name"] = element[0].original_name
                 element_info["other_name"] = element[0].name
@@ -554,23 +505,10 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                 element_info['common'] = True
                 common_elements += 1
 
-            if group == 'categories':
-                if category[element[1].status.value.upper()] == '':
-                    category[element[1].status.value.upper()] = [element_info]
-                else:
-                    category[element[1].status.value.upper()].append(element_info)
-            elif group == 'alphabet':
-                try:
-                    if 0 <= int(element[0].name[0]) <= 9:
-                        if '0-9' in alphabet_group:
-                            alphabet_group['0-9'].append(element_info)
-                        else:
-                            alphabet_group['0-9'] = [element_info]
-                except:
-                    if element[0].name[0].upper() in alphabet_group:
-                        alphabet_group[element[0].name[0].upper()].append(element_info)
-                    else:
-                        alphabet_group[element[0].name[0].upper()] = [element_info]
+            if category[element[1].status.value.upper()] == '':
+                category[element[1].status.value.upper()] = [element_info]
+            else:
+                category[element[1].status.value.upper()].append(element_info)
 
     try:
         percentage = int((common_elements/len(element_data))*100)
@@ -595,19 +533,13 @@ def load_media_sheet(media, user_id, list_type):
                     "actors": ', '.join([r.name for r in media.actors]),
                     "genres": ', '.join([r.genre for r in media.genres])}
 
-    # Check if <original_name> is latin and change accordingly
-    def latin_alphabet(original_name):
-        try:
-            original_name.encode('iso-8859-1')
-            return True
-        except UnicodeEncodeError:
-            return False
     if latin_alphabet(media.original_name):
         element_info["display_name"] = media.original_name
         element_info["other_name"] = media.name
     else:
         element_info["display_name"] = media.name
         element_info["other_name"] = media.original_name
+
     if media.original_name == media.name:
         element_info["other_name"] = None
 

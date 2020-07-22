@@ -150,14 +150,12 @@ hr {
     float: left;
     background-color: #334D5C;
 }
-
 .block-no-data {
     height: 30px;
     color: white;
     float: left;
     background-color: black;
 }
-
 .block:nth-of-type(2) {
 	background-color: #45B29D;
 }
@@ -174,7 +172,20 @@ hr {
 	background-color: #962D3E;
 }
 
-.block:hover {
+.block-movie {
+    height: 30px;
+    color: white;
+    float: left;
+    background-color: #45B29D;
+}
+.block-movie:nth-of-type(2) {
+	background-color: #22748d;
+}
+.block-movie:nth-of-type(3) {
+	background-color: #962D3E;
+}
+
+.block:hover, .block-movie:hover{
 	opacity: 0.75;
 }
 
@@ -358,12 +369,6 @@ hr {
     -webkit-filter: blur(5px);
 }
 /* --------------------------------- */
-
-.relative-medal {
-    position: absolute;
-    top: -8px;
-    right: 5px;
-}
 
 .favorite-img {
     height: 90px;

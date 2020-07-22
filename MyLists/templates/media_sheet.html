@@ -476,7 +476,11 @@
                                     far f-no-fav{% endif %}"></i>
                                 </div>
                                 <hr class="m-b-8" style="border-color: gray;">
-                                <div><b>Score:&nbsp; {{ follow[1].score }}</b></div>
+                                {% if follow[1].score == -1 or follow[1].score == None %}
+                                    <div><b>Score:&nbsp; ---</b></div>
+                                {% else %}
+                                    <div><b>Score:&nbsp; {{ follow[1].score }}</b></div>
+                                {% endif %}
                                 <div><b>Status:&nbsp; {{ follow[1].status.value }}</b></div>
                                 {% if media_list != 'movieslist' %}
                                     {% if follow[1].status.value == 'Completed' or follow[1].status.value == 'Random'

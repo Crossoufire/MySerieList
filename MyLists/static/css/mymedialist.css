@@ -327,10 +327,10 @@ option {
 }
 
 .modal-content {
-    max-width:  300px;
+    max-width:  320px;
     margin-left: auto;
     margin-right: auto;
     background-color: #131418;
-    border-radius: 5px !important;
-    border: grey 1px solid !important;
+    border-radius: 2px !important;
+    border: grey 2px solid !important;
 }
