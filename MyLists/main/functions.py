@@ -417,7 +417,7 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
         current_list = [r[0] for r in current_media]
 
     common_elements = 0
-    all_media = []
+    all_media_data = []
     if list_type != ListType.MOVIES:
         for element in element_data:
             element_info = {"id": element[0].id,
@@ -452,27 +452,19 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                 element_info['common'] = True
                 common_elements += 1
 
-            all_media.append(element_info)
+            all_media_data.append(element_info)
     elif list_type == ListType.MOVIES:
-        category = OrderedDict({'COMPLETED': '',
-                                'COMPLETED ANIMATION': '',
-                                'PLAN TO WATCH': ''})
-
         for element in element_data:
             element_info = {"id": element[0].id,
                             "tmdb_id": element[0].themoviedb_id,
                             "cover": "{}{}".format(covers_path, element[0].image_cover),
-                            "original_language": element[0].original_language,
-                            "director": element[0].director_name,
                             "score": element[1].score,
                             "favorite": element[1].favorite,
-                            "actors": element[3],
-                            "genres": element[2],
-                            "common": False,
                             "category": element[1].status,
                             "rewatched": element[1].rewatched,
+                            "comment": element[1].comment,
                             "media": 'Movies',
-                            "comment": element[1].comment}
+                            "common": False}
 
             if element_info['score'] is None:
                 element_info['score'] = '---'
@@ -488,17 +480,14 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                 element_info['common'] = True
                 common_elements += 1
 
-            if category[element[1].status.value.upper()] == '':
-                category[element[1].status.value.upper()] = [element_info]
-            else:
-                category[element[1].status.value.upper()].append(element_info)
+            all_media_data.append(element_info)
 
     try:
         percentage = int((common_elements/len(element_data))*100)
     except ZeroDivisionError:
         percentage = 0
 
-    data = {"all_media": all_media,
+    data = {"media_data": all_media_data,
             "common_elements": [common_elements, len(element_data), percentage]}
 
     return data
