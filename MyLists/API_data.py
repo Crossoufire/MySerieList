@@ -7,6 +7,7 @@ from PIL import Image
 from flask import abort
 from MyLists import app
 from pathlib import Path
+from datetime import datetime
 from MyLists.models import ListType
 
 
@@ -76,11 +77,11 @@ class ApiData:
 
     def anime_search(self, anime_name):
         """ Get the name of the anime from TMDB to MyAnimeList to obtain better genres with <anime_genres> function"""
+        time.sleep(3)
 
         response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(anime_name))
 
         self.status_code(response.status_code)
-        time.sleep(2)
 
         return json.loads(response.text)
 
@@ -89,11 +90,11 @@ class ApiData:
             {"mal_id":37,"type":"anime","name":"Supernatural","url":""},
             {"mal_id":16,"type":"anime","name":"Magic","url":""},
             {"mal_id":10,"type":"anime","name":"Fantasy","url":""}] """
+        time.sleep(3)
 
         response = requests.get("https://api.jikan.moe/v3/anime/{}".format(mal_id))
 
         self.status_code(response.status_code)
-        time.sleep(2)
 
         return json.loads(response.text)
 
