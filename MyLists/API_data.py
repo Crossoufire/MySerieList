@@ -1,5 +1,4 @@
 import json
-import time
 import requests
 import urllib.request
 
@@ -7,7 +6,7 @@ from PIL import Image
 from flask import abort
 from MyLists import app
 from pathlib import Path
-from datetime import datetime
+from ratelimit import limits, sleep_and_retry
 from MyLists.models import ListType
 
 
@@ -75,29 +74,6 @@ class ApiData:
 
         return json.loads(response.text)
 
-    def anime_search(self, anime_name):
-        """ Get the name of the anime from TMDB to MyAnimeList to obtain better genres with <anime_genres> function"""
-        time.sleep(3)
-
-        response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(anime_name))
-
-        self.status_code(response.status_code)
-
-        return json.loads(response.text)
-
-    def get_anime_genres(self, mal_id):
-        """ "genres": [{"mal_id":1,"type":"anime","name":"Action","url":""},
-            {"mal_id":37,"type":"anime","name":"Supernatural","url":""},
-            {"mal_id":16,"type":"anime","name":"Magic","url":""},
-            {"mal_id":10,"type":"anime","name":"Fantasy","url":""}] """
-        time.sleep(3)
-
-        response = requests.get("https://api.jikan.moe/v3/anime/{}".format(mal_id))
-
-        self.status_code(response.status_code)
-
-        return json.loads(response.text)
-
     def save_api_cover(self, media_cover_path, media_cover_name, list_type, collection=False):
         if list_type == ListType.SERIES:
             local_covers_path = Path(app.root_path, "static/covers/series_covers/")
@@ -115,6 +91,31 @@ class ApiData:
         img = Image.open(f"{local_covers_path}/{media_cover_name}")
         img = img.resize((300, 450), Image.ANTIALIAS)
         img.save(f"{local_covers_path}/{media_cover_name}", quality=90)
+
+    @sleep_and_retry
+    @limits(calls=1, period=2)
+    def anime_search(self, anime_name):
+        """ Get the name of the anime from TMDB to MyAnimeList to obtain better genres with <anime_genres> function"""
+
+        response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(anime_name))
+
+        self.status_code(response.status_code)
+
+        return json.loads(response.text)
+
+    @sleep_and_retry
+    @limits(calls=1, period=2)
+    def get_anime_genres(self, mal_id):
+        """ "genres": [{"mal_id":1,"type":"anime","name":"Action","url":""},
+            {"mal_id":37,"type":"anime","name":"Supernatural","url":""},
+            {"mal_id":16,"type":"anime","name":"Magic","url":""},
+            {"mal_id":10,"type":"anime","name":"Fantasy","url":""}] """
+
+        response = requests.get("https://api.jikan.moe/v3/anime/{}".format(mal_id))
+
+        self.status_code(response.status_code)
+
+        return json.loads(response.text)
 
     @staticmethod
     def status_code(status_code):
