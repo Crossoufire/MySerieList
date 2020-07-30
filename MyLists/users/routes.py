@@ -1,10 +1,11 @@
 import json
 
 from MyLists import app, db
+from datetime import datetime
 from MyLists.users.forms import AddFollowForm
 from flask_login import login_required, current_user
+from flask import Blueprint, url_for, flash, redirect, request, render_template, abort
 from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications, RoleType
-from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
     get_knowledge_frame, get_updates, get_favorites, get_all_follows_data
 
@@ -210,3 +211,16 @@ def knowledge_frame_data():
     ranks = Frames.query.all()
 
     return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
+
+
+@bp.route("/apscheduler_info", methods=['GET', 'POST'])
+@login_required
+def apscheduler_info():
+    if current_user.role == RoleType.MANAGER or current_user.role == RoleType.ADMIN:
+        refresh = app.apscheduler.get_job('refresh_all_data')
+        refresh.modify(next_run_time=datetime.now())
+        flash('All the data have been refreshed!', 'success')
+
+        return redirect(request.referrer)
+    else:
+        abort(403)

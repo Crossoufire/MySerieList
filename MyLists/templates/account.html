@@ -207,9 +207,16 @@
                                     </a>
                                 </li>
                                 <li class="m-b-10">
-                                    <a class="text-light" href="{{ url_for('users.knowledge_frame_data') }}"
-                                       target="_blank">
+                                    <a class="text-light" href="{{ url_for('users.knowledge_frame_data') }}" target="_blank">
                                         <u>Knowledge frame data</u>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if current_user.role.value == 'manager' or current_user.role.value == 'admin' %}
+                                <li class="m-b-10">
+                                    Refresh APScheduler:
+                                    <a class="btn btn-sm btn-primary" href="{{ url_for('users.apscheduler_info') }}">
+                                        Refresh
                                     </a>
                                 </li>
                             {% endif %}
