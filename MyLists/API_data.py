@@ -93,7 +93,7 @@ class ApiData:
         img.save(f"{local_covers_path}/{media_cover_name}", quality=90)
 
     @sleep_and_retry
-    @limits(calls=1, period=2)
+    @limits(calls=1, period=4)
     def anime_search(self, anime_name):
         """ Get the name of the anime from TMDB to MyAnimeList to obtain better genres with <anime_genres> function"""
 
@@ -104,7 +104,7 @@ class ApiData:
         return json.loads(response.text)
 
     @sleep_and_retry
-    @limits(calls=1, period=2)
+    @limits(calls=1, period=4)
     def get_anime_genres(self, mal_id):
         """ "genres": [{"mal_id":1,"type":"anime","name":"Action","url":""},
             {"mal_id":37,"type":"anime","name":"Supernatural","url":""},
