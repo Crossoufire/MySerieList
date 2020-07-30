@@ -1,14 +1,14 @@
 import os
 import json
 import secrets
-from collections import OrderedDict
 
 from PIL import Image
 from flask import abort
 from pathlib import Path
-from sqlalchemy import and_
 from MyLists import db, app
 from datetime import datetime
+from sqlalchemy import and_, desc
+from collections import OrderedDict
 from flask_login import current_user
 from MyLists.API_data import ApiData
 from MyLists.general.functions import compute_media_time_spent
@@ -121,12 +121,10 @@ def get_details(api_id, list_type):
         # Seasons: List
         seasons = details_data.get('seasons') or None
         seasons_list = []
-        special = 0
         if seasons:
-            # Check if a special season exist, if so: Ignore it
-            if seasons[0]["season_number"] == 0:
-                special = 1
-            for i in range(special, len(seasons)):
+            for i in range(0, len(seasons)):
+                if seasons[i]['season_number'] <= 0:
+                    continue
                 season_dict = {'season': seasons[i]['season_number'],
                                'episodes': seasons[i]['episode_count']}
                 seasons_list.append(season_dict)
@@ -1249,21 +1247,32 @@ def scheduled_task():
                                                               SeriesList.status != Status.DROPPED)).all()
 
         for info in series_in_ptw:
-            if not bool(Notifications.query.filter_by(user_id=info[1].user_id,
-                                                      media_type='serieslist',
-                                                      media_id=info[0].id).first()):
+            series = Notifications.query.filter_by(user_id=info[1].user_id, media_type='serieslist', media_id=info[0].id) \
+                .order_by(desc(Notifications.timestamp)).first()
 
-                release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
-                payload = {'name': info[0].name,
-                           'release_date': release_date,
-                           'season': '{:02d}'.format(info[0].season_to_air),
-                           'episode': '{:02d}'.format( info[0].episode_to_air)}
+            if series:
+                payload_series = json.loads(series.payload_json)
+                if int(payload_series['season']) < int(info[0].season_to_air):
+                    pass
+                elif int(payload_series['season']) == int(info[0].season_to_air):
+                    if int(payload_series['episode']) < int(info[0].episode_to_air):
+                        pass
+                    else:
+                        continue
+                else:
+                    continue
 
-                data = Notifications(user_id=info[1].user_id,
-                                     media_type='serieslist',
-                                     media_id=info[0].id,
-                                     payload_json=json.dumps(payload))
-                db.session.add(data)
+            release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
+            payload = {'name': info[0].name,
+                       'release_date': release_date,
+                       'season': '{:02d}'.format(info[0].season_to_air),
+                       'episode': '{:02d}'.format( info[0].episode_to_air)}
+
+            data = Notifications(user_id=info[1].user_id,
+                                 media_type='serieslist',
+                                 media_id=info[0].id,
+                                 payload_json=json.dumps(payload))
+            db.session.add(data)
 
         db.session.commit()
 
@@ -1280,27 +1289,37 @@ def scheduled_task():
             except:
                 pass
 
-        anime_in_ptw = db.session.query(Anime, AnimeList) \
-            .join(AnimeList, AnimeList.anime_id == Anime.id) \
+        anime_in_ptw = db.session.query(Anime, AnimeList).join(AnimeList, AnimeList.anime_id == Anime.id) \
             .filter(AnimeList.anime_id.in_(anime_id), and_(AnimeList.status != Status.RANDOM,
                                                            AnimeList.status != Status.DROPPED)).all()
 
         for info in anime_in_ptw:
-            if not bool(Notifications.query.filter_by(user_id=info[1].user_id,
-                                                      media_type='animelist',
-                                                      media_id=info[0].id).first()):
+            anime = Notifications.query.filter_by(user_id=info[1].user_id, media_type='animelist', media_id=info[0].id)\
+                .order_by(desc(Notifications.timestamp)).first()
 
-                release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d")
-                payload = {'name': info[0].name,
-                           'release_date': release_date,
-                           'season': '{:02d}'.format(info[0].season_to_air),
-                           'episode': '{:02d}'.format(info[0].episode_to_air)}
+            if anime:
+                payload_anime = json.loads(anime.payload_json)
+                if int(payload_anime['season']) < int(info[0].season_to_air):
+                    pass
+                elif int(payload_anime['season']) == int(info[0].season_to_air):
+                    if int(payload_anime['episode']) < int(info[0].episode_to_air):
+                        pass
+                    else:
+                        continue
+                else:
+                    continue
 
-                data = Notifications(user_id=info[1].user_id,
-                                     media_type='animelist',
-                                     media_id=info[0].id,
-                                     payload_json=json.dumps(payload))
-                db.session.add(data)
+            release_date = datetime.strptime(info[0].next_episode_to_air, '%Y-%m-%d').strftime("%b %d %Y")
+            payload = {'name': info[0].name,
+                       'release_date': release_date,
+                       'season': '{:02d}'.format(info[0].season_to_air),
+                       'episode': '{:02d}'.format(info[0].episode_to_air)}
+
+            data = Notifications(user_id=info[1].user_id,
+                                 media_type='animelist',
+                                 media_id=info[0].id,
+                                 payload_json=json.dumps(payload))
+            db.session.add(data)
 
         db.session.commit()
 
@@ -1316,4 +1335,4 @@ def scheduled_task():
     compute_media_time_spent(ListType.MOVIES)
 
 
-app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='scheduled_task', hour=3, minute=00)
+app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='refresh_all_data', hour=3, minute=00)
