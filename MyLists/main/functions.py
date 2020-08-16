@@ -1,8 +1,6 @@
 import os
 import json
-import time
 import secrets
-from collections import OrderedDict
 
 from PIL import Image
 from flask import abort
@@ -405,7 +403,7 @@ def add_element_in_db(api_id, list_type):
     return element
 
 
-def get_medialist_data(element_data, list_type, covers_path, user_id):
+def get_medialist_data(list_type, element_data, cover_path, user_id):
     current_list = []
     if user_id != current_user.id:
         if list_type == ListType.ANIME:
@@ -417,12 +415,12 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
         current_list = [r[0] for r in current_media]
 
     common_elements = 0
-    all_media_data = []
+    media_data = []
     if list_type != ListType.MOVIES:
         for element in element_data:
             element_info = {"id": element[0].id,
                             "tmdb_id": element[0].themoviedb_id,
-                            "cover": "{}{}".format(covers_path, element[0].image_cover),
+                            "cover": "{}{}".format(cover_path, element[0].image_cover),
                             "last_episode_watched": element[1].last_episode_watched,
                             "eps_per_season": [eps.episodes for eps in element[0].eps_per_season],
                             "current_season": element[1].current_season,
@@ -430,10 +428,9 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                             "favorite": element[1].favorite,
                             "rewatched": element[1].rewatched,
                             "comment": element[1].comment,
-                            "category": element[1].status.value,
                             "common": False}
 
-            if element_info['score'] is None or element_info['score'] == -1:
+            if not element_info['score'] or element_info['score'] == -1:
                 element_info['score'] = '---'
 
             if latin_alphabet(element[0].original_name):
@@ -452,12 +449,12 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                 element_info['common'] = True
                 common_elements += 1
 
-            all_media_data.append(element_info)
+            media_data.append(element_info)
     elif list_type == ListType.MOVIES:
         for element in element_data:
             element_info = {"id": element[0].id,
                             "tmdb_id": element[0].themoviedb_id,
-                            "cover": "{}{}".format(covers_path, element[0].image_cover),
+                            "cover": "{}{}".format(cover_path, element[0].image_cover),
                             "score": element[1].score,
                             "favorite": element[1].favorite,
                             "category": element[1].status,
@@ -480,14 +477,14 @@ def get_medialist_data(element_data, list_type, covers_path, user_id):
                 element_info['common'] = True
                 common_elements += 1
 
-            all_media_data.append(element_info)
+            media_data.append(element_info)
 
     try:
         percentage = int((common_elements/len(element_data))*100)
     except ZeroDivisionError:
         percentage = 0
 
-    data = {"media_data": all_media_data,
+    data = {"media_data": media_data,
             "common_elements": [common_elements, len(element_data), percentage]}
 
     return data

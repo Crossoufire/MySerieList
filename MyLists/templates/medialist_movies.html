@@ -1,6 +1,16 @@
 {% extends 'medialist_base.html' %}
 
 
+{% block button %}
+    <a class="btn btn-sm {% if category.value == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"
+       href="/{{ media_list }}/{{ username }}?cat=Completed">COMPLETED</a>
+    <a class="btn btn-sm {% if category.value == 'Completed Animation' %} btn-selected {% else %} btn-header {% endif %}"
+       href="/{{ media_list }}/{{ username }}?cat=Completed Animation">COMPLETED ANIMATION</a>
+    <a class="btn btn-sm {% if category.value == 'Plan to Watch' %} btn-selected {% else %} btn-header {% endif %}"
+       href="/{{ media_list }}/{{ username }}?cat=Plan to Watch">PLAN TO WATCH</a>
+{% endblock button %}
+
+
 {% block data %}
     {{ data['genres'] }}-{{ media_list }}-{{ data['id'] }}
 {% endblock data %}

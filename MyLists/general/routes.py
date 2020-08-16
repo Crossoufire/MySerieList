@@ -4,9 +4,10 @@ from MyLists import db, bcrypt, app
 from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from flask import render_template, url_for, flash, request, abort
+from MyLists.models import Status, ListType, User, GlobalStats, RoleType
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
     refresh_db_frames, refresh_db_badges, refresh_db_ranks
-from MyLists.models import Status, ListType, User, GlobalStats, RoleType
+
 
 bp = Blueprint('general', __name__)
 
@@ -19,7 +20,6 @@ def create_user():
         admin1 = User(username='admin',
                       email='admin@admin.com',
                       password=bcrypt.generate_password_hash("password").decode('utf-8'),
-                      image_file='default.jpg',
                       active=True,
                       private=True,
                       registered_on=datetime.utcnow(),
@@ -28,21 +28,16 @@ def create_user():
         manager1 = User(username='manager',
                         email='manager@manager.com',
                         password=bcrypt.generate_password_hash("password").decode('utf-8'),
-                        image_file='default.jpg',
                         active=True,
-                        private=False,
                         registered_on=datetime.utcnow(),
                         activated_on=datetime.utcnow(),
                         role=RoleType.MANAGER)
         user1 = User(username='user',
                      email='user@user.com',
                      password=bcrypt.generate_password_hash("password").decode('utf-8'),
-                     image_file='default.jpg',
                      active=True,
-                     private=False,
                      registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow(),
-                     role=RoleType.USER)
+                     activated_on=datetime.utcnow())
         db.session.add(admin1)
         db.session.add(manager1)
         db.session.add(user1)
@@ -73,10 +68,10 @@ def global_stats():
 
     times_spent = stats.get_total_time_spent()
     if times_spent[0][0]:
-        total_time = {"total": int((times_spent[0][1] / 60) + (times_spent[0][2] / 60) + (times_spent[0][3] / 60)),
-                      "series": int(times_spent[0][1] / 60),
-                      "anime": int(times_spent[0][2] / 60),
-                      "movies": int(times_spent[0][3] / 60)}
+        total_time = {"total": int((times_spent[0][1]/60)+(times_spent[0][2]/60)+(times_spent[0][3]/60)),
+                      "series": int(times_spent[0][1]/60),
+                      "anime": int(times_spent[0][2]/60),
+                      "movies": int(times_spent[0][3]/60)}
     else:
         total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0}
 
@@ -213,11 +208,9 @@ def current_trends():
         if len(series_results) >= 12:
             if result["media_type"] == 'tv':
                 continue
-
         if len(movies_results) >= 12:
             if result["media_type"] == 'movie':
                 continue
-
         if result.get('known_for_department'):
             continue
 
@@ -294,3 +287,6 @@ def current_trends():
                            movies_trends=movies_results)
 
 
+@bp.route('/service-worker.js')
+def service_worker():
+    return app.send_static_file('service-worker.js')

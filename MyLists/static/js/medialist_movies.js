@@ -3,11 +3,12 @@
 // --- Create the cat buttons list -----------------------------------------
 function chargeButtons(card) {
     removeCat();
+
     let completed = "block;";
     let plan_to_watch = "block;";
-    let parent_category = $('#'+card.id).parent();
+    let $card = $('#'+card.id).parent().attr('value');
 
-    if (parent_category.hasClass('category-COMPLETED') || parent_category.hasClass('category-ANIMATION')) {
+    if ($card === 'Completed' || $card === 'Completed Animation') {
         completed = "none;";
     } else {
         plan_to_watch = "none;";
@@ -35,41 +36,23 @@ function chargeButtons(card) {
 
 // --- Change the category -------------------------------------------------
 function changeCategory(new_category, card_id) {
-    let genres = $('#'+card_id).attr('values').split('-')[0];
-    let media_list = $('#'+card_id).attr('values').split('-')[1];
-    let element_id = $('#'+card_id).attr('values').split('-')[2];
-    let parent_cat = $('#'+card_id).parent();
-    let load_img = $('#'+card_id).find('.view.overlay');
+    let $card = $('#'+card_id);
+    let media_list = $card.attr('values').split('-')[1];
+    let element_id = $card.attr('values').split('-')[2];
+    let load_img = $card.find('.view.overlay');
     load_img.prepend(Loading());
 
-        $.ajax ({
+    $.ajax ({
         type: "POST",
         url: "/change_element_category",
         contentType: "application/json",
         data: JSON.stringify({status: new_category, element_id: element_id, element_type: media_list}),
         dataType: "json",
         success: function() {
-            $('#rew_'+element_id).text(0).show();
-            $('#rew_'+element_id).parent().hide();
-
-            if (parent_cat.hasClass('category-COMPLETED')) {
-                $("#"+card_id).prependTo(".category-PLAN.TO.WATCH");
-            }
-            else if (parent_cat.hasClass('category-ANIMATION')) {
-                $("#"+card_id).prependTo(".category-PLAN.TO.WATCH");
-            }
-            else {
-                $('#rew_'+element_id).parent().show();
-                if (genres.includes("Animation")) {
-                    $("#"+card_id).prependTo(".category-ANIMATION");
-                } else {
-                    $("#"+card_id).prependTo(".category-COMPLETED");
-                }
-            }
-            $categories.isotope('layout');
+            $card.remove();
         },
         error: function () {
-            error_ajax_message('Error changing the media category. Please try again later.');
+            error_ajax_message('Error trying to change the media category. Please try again later.');
         },
         complete: function () {
             removeCat();
@@ -82,6 +65,7 @@ function changeCategory(new_category, card_id) {
 // --- Charge the categories buttons from other lists ----------------------
 function ChargeButtonsOther(card) {
     removeCat();
+    let $card = $('#'+card.id)
 
     $(card).find('.view.overlay').prepend(
         '<a class="card-btn-top-right fas fa-times" onclick="removeCat()"></a>' +
@@ -96,7 +80,7 @@ function ChargeButtonsOther(card) {
             '</li>' +
         "</ul>");
 
-    $('#'+card.id).find('.card-btn-top-left').hide();
-    $('#'+card.id).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
-    $('#'+card.id).find('.mask').hide();
+    $card.find('.card-btn-top-left').hide();
+    $card.find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
+    $card.find('.mask').hide();
 }

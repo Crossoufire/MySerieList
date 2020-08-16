@@ -51,10 +51,11 @@ followers = db.Table('followers',
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)
+    oauth_id = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
     password = db.Column(db.String(60), nullable=False)
-    homepage = db.Column(db.Enum(HomePage), nullable=False, default=HomePage.MYSERIESLIST)
+    homepage = db.Column(db.Enum(HomePage), nullable=False, default=HomePage.ACCOUNT)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     time_spent_series = db.Column(db.Integer, nullable=False, default=0)
     time_spent_movies = db.Column(db.Integer, nullable=False, default=0)
@@ -263,7 +264,7 @@ class SeriesList(db.Model):
         element_data = db.session.query(Series, SeriesList) \
             .join(SeriesList, SeriesList.series_id == Series.id) \
             .filter(SeriesList.user_id == user_id, SeriesList.status == category).group_by(Series.id) \
-            .order_by(Series.name.asc()).paginate(page, 100, False).items
+            .order_by(Series.name.asc()).paginate(page, 70, False).items
         return element_data
 
     @staticmethod
@@ -368,19 +369,11 @@ class AnimeList(db.Model):
     comment = db.Column(db.Text)
 
     @staticmethod
-    def get_anime_info(user_id):
-        element_data = db.session.query(Anime, AnimeList, func.group_concat(AnimeGenre.genre.distinct()),
-                                        func.group_concat(AnimeNetwork.network.distinct()),
-                                        func.group_concat(AnimeEpisodesPerSeason.season.distinct()),
-                                        func.group_concat(AnimeActors.name.distinct()),
-                                        func.group_concat(AnimeEpisodesPerSeason.episodes)) \
+    def get_anime_info(user_id, category, page):
+        element_data = db.session.query(Anime, AnimeList) \
             .join(AnimeList, AnimeList.anime_id == Anime.id) \
-            .join(AnimeGenre, AnimeGenre.anime_id == Anime.id) \
-            .join(AnimeNetwork, AnimeNetwork.anime_id == Anime.id) \
-            .join(AnimeActors, AnimeActors.anime_id == Anime.id) \
-            .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == Anime.id) \
-            .filter(AnimeList.user_id == user_id).group_by(Anime.id).order_by(Anime.name.asc()).all()
-
+            .filter(AnimeList.user_id == user_id, AnimeList.status == category).group_by(Anime.id) \
+            .order_by(Anime.name.asc()).paginate(page, 70, False).items
         return element_data
 
     @staticmethod
@@ -503,13 +496,11 @@ class MoviesList(db.Model):
     comment = db.Column(db.Text)
 
     @staticmethod
-    def get_movies_info(user_id):
-        element_data = db.session.query(Movies, MoviesList, func.group_concat(MoviesGenre.genre.distinct()),
-                                        func.group_concat(MoviesActors.name.distinct())) \
+    def get_movies_info(user_id, category, page):
+        element_data = db.session.query(Movies, MoviesList) \
             .join(MoviesList, MoviesList.movies_id == Movies.id) \
-            .join(MoviesGenre, MoviesGenre.movies_id == Movies.id) \
-            .join(MoviesActors, MoviesActors.movies_id == Movies.id) \
-            .filter(MoviesList.user_id == user_id).group_by(Movies.id).order_by(Movies.name.asc()).all()
+            .filter(MoviesList.user_id == user_id, MoviesList.status == category).group_by(Movies.id) \
+            .order_by(Movies.name.asc()).paginate(page, 70, False).items
         return element_data
 
     @staticmethod

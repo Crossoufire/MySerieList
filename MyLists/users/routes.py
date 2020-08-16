@@ -3,8 +3,8 @@ import json
 from MyLists import app, db
 from MyLists.users.forms import AddFollowForm
 from flask_login import login_required, current_user
+from flask import Blueprint, url_for, flash, redirect, request, render_template
 from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications, RoleType
-from flask import Blueprint, abort, url_for, flash, redirect, request, render_template
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
     get_knowledge_frame, get_updates, get_favorites, get_all_follows_data
 
@@ -24,7 +24,7 @@ def account(user_name):
         follow_username = follow_form.follow_to_add.data
         follow = User.query.filter_by(username=follow_username).first()
 
-        if follow is None or follow.role == RoleType.ADMIN:
+        if not follow or follow.role == RoleType.ADMIN:
             app.logger.info('[{}] Attempt to follow account {}'.format(current_user.id, follow_username))
             flash('Sorry, this account does not exist', 'warning')
             return redirect(url_for('users.account', user_name=current_user.username))

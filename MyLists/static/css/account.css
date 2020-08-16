@@ -274,7 +274,7 @@ hr {
     display: inline-block;
 }
 
-#series_level {
+#series-level {
     margin-left: 20px;
 }
 
@@ -293,7 +293,7 @@ hr {
 
 .xp-bar {
     height: 10px;
-    width: 70%;
+    width: 65%;
     background: grey;
     margin: 0 0 0 5px;
     display: inline-block;

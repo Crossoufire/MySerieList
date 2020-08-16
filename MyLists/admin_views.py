@@ -185,6 +185,7 @@ class MoviesActorsAdminView(ModelView):
 
 # -------------------------------------------------------------------------------------------------------------------- #
 
+
 # Override of the index flask-admin view:
 class MyHomeAdminView(AdminIndexView):
     @expose()

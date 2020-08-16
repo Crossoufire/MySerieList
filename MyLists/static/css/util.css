@@ -2074,6 +2074,11 @@
 .text-right {text-align: right;}
 .text-middle {vertical-align: middle;}
 
+/* --- [ BACKGROUND ] ----------------------------- */
+.bg-series {background: #216e7d;}
+.bg-anime {background: #945141;}
+.bg-movies {background: #8c7821;}
+
 .lh-1-0 {line-height: 1.0;}
 .lh-1-1 {line-height: 1.1;}
 .lh-1-2 {line-height: 1.2;}

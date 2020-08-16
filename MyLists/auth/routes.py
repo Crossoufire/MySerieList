@@ -1,6 +1,8 @@
 from datetime import datetime
 from MyLists import app, bcrypt, db
 from MyLists.models import User, HomePage
+from MyLists.auth.oauth import OAuthSignIn
+from MyLists.auth.functions import return_user_homepage
 from MyLists.auth.emails import send_register_email, send_reset_email
 from flask_login import login_user, current_user, logout_user, login_required
 from flask import Blueprint, flash, request, redirect, url_for, abort, render_template
@@ -19,26 +21,20 @@ def home():
         user = User.query.filter_by(username=login_form.login_username.data).first()
         if user and not user.active:
             app.logger.info('[{}] Connexion attempt while account not activated'.format(user.id))
-            flash('Your Account is not activated. Please check your e-mail address to activate your account.', 'danger')
+            flash('Your Account is not activated. Please check your email address to activate your account.', 'danger')
         elif user and bcrypt.check_password_hash(user.password, login_form.login_password.data):
             login_user(user, remember=login_form.login_remember.data)
             app.logger.info('[{}] Logged in.'.format(user.id))
             flash("You're now logged in. Welcome {0}".format(user.username), "success")
+
             next_page = request.args.get('next')
             if next_page:
                 return redirect(next_page)
             else:
-                if user.homepage != HomePage.ACCOUNT or user.homepage != HomePage.HALL_OF_FAME:
-                    return redirect(url_for('main.mymedialist', media_list=user.homepage.value,
-                                            user_name=current_user.username))
-                elif user.homepage == HomePage.ACCOUNT:
-                    return redirect(url_for('users.account', user_name=current_user.username))
-                elif user.homepage == HomePage.HALL_OF_FAME:
-                    return redirect(url_for('users.hall_of_fame'))
-                else:
-                    abort(404)
+                return_user_homepage(user.homepage, user.username)
         else:
             flash('Login Failed. Please check username and password.', 'warning')
+
     if register_form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(register_form.register_password.data).decode('utf-8')
         # noinspection PyArgumentList
@@ -54,20 +50,12 @@ def home():
             send_register_email(user)
             flash('Your account has been created. Check your e-mail address to activate your account.', 'info')
         except Exception as e:
-            app.logger.error('[SYSTEM] Error "{}" sending register email to account with ID {}.'.format(e, user.id))
+            app.logger.error('[SYSTEM ERROR] - "{}". Sending register email to account ID {}.'.format(e, user.id))
             flash("An error occured while sending your register e-mail. Admins were advised. Please try again later.")
         return redirect(url_for('auth.home'))
+
     if current_user.is_authenticated:
-        user = User.query.filter_by(id=current_user.id).first()
-        if user.homepage != HomePage.ACCOUNT or user.homepage != HomePage.HALL_OF_FAME:
-            return redirect(url_for('main.mymedialist', media_list=user.homepage.value,
-                                    user_name=current_user.username))
-        elif user.homepage == HomePage.ACCOUNT:
-            return redirect(url_for('users.account', user_name=current_user.username))
-        elif user.homepage == HomePage.HALL_OF_FAME:
-            return redirect(url_for('users.hall_of_fame'))
-        else:
-            abort(404)
+        return return_user_homepage(current_user.homepage, current_user.username)
 
     return render_template('home.html', login_form=login_form, register_form=register_form)
 
@@ -95,7 +83,7 @@ def reset_password():
             app.logger.info('[{}] Reset password email sent'.format(user.id))
             flash('An email has been sent with instructions to reset your password.', 'info')
         except Exception as e:
-            app.logger.error('[SYSTEM] - Error "{}" while sending reset password email to {}'.format(e, user.email))
+            app.logger.error('[SYSTEM ERROR] - "{}". Sending reset password email to {}'.format(e, user.email))
             flash("An error occured while sending the reset password email. Please try again later.")
 
         return redirect(url_for('auth.home'))
@@ -109,7 +97,7 @@ def reset_passord_token(token):
         return redirect(url_for('auth.home'))
 
     user = User.verify_reset_token(token)
-    if user is None:
+    if not user:
         flash('That is an invalid or an expired token', 'warning')
         return redirect(url_for('auth.reset_password'))
 
@@ -131,7 +119,7 @@ def register_account_token(token):
         return redirect(url_for('auth.home'))
 
     user = User.verify_reset_token(token)
-    if user is None or user.active:
+    if not user or user.active:
         flash('That is an invalid or an expired token.', 'warning')
         return redirect(url_for('auth.reset_password'))
 
@@ -142,3 +130,47 @@ def register_account_token(token):
     flash('Your account has been activated.', 'success')
 
     return redirect(url_for('auth.home'))
+
+
+@bp.route('/oauth_authorize/<provider>', methods=['GET', 'POST'])
+def oauth_authorize(provider):
+    if current_user.is_authenticated:
+        return return_user_homepage(current_user.homepage, current_user.username)
+
+    oauth = OAuthSignIn.get_provider(provider)
+
+    return oauth.authorize()
+
+
+@bp.route('/oauth_callback/<provider>', methods=['GET', 'POST'])
+def oauth_callback(provider):
+    if current_user.is_authenticated:
+        return return_user_homepage(current_user.homepage, current_user.username)
+
+    oauth = OAuthSignIn.get_provider(provider)
+    social_id, username, email = oauth.callback()
+
+    if not email:
+        email = '{}@oauth.com'.format(social_id)
+
+    if not social_id:
+        flash('Sorry, the authentication failed.')
+        return redirect(url_for('auth.home'))
+
+    user = User.query.filter_by(oauth_id=social_id).first()
+    if not user:
+        user = User(username=username,
+                    oauth_id=social_id,
+                    email=email,
+                    password="{}-oauth".format(social_id),
+                    registered_on=datetime.utcnow(),
+                    activated_on=datetime.utcnow(),
+                    active=True)
+        db.session.add(user)
+        db.session.commit()
+
+        login_user(user, True)
+        return redirect(url_for('users.account', user_name=username))
+
+    login_user(user, True)
+    return return_user_homepage(user.homepage, user.username)

@@ -2,18 +2,17 @@
 
 
 {% block css %}
-    <link href="{{ url_for('static', filename='css/datatables.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global_stats.css') }}">
 {% endblock css %}
 
 
 {% block content %}
-    <h2 class="font-weight-light text-center mt-1 mb-0 p-t-50 p-l-10 p-r-10">GLOBAL STATISTICS
-        <hr class="mt-2 pb-3 mb-0">
-    </h2>
+    <h2 class="font-weight-light text-center mt-1 mb-0 p-t-50 p-l-10 p-r-10">GLOBAL STATISTICS</h2>
+    <hr class="mt-2 mb-0">
 
     <h4 class="text-center m-t-10 p-l-10 p-r-10">
-        Total watched time: <b>{{ total_time["total"] }} hours</b> -
+        <b>Total watched time: {{ total_time["total"] }} hours</b> -
         <b>{{ (total_time["total"]/24)|int }} days</b> -
         <b>{{ (total_time["total"]/24/365)|round(2) }} years</b>
     </h4>
@@ -25,10 +24,10 @@
                 <span id="time-spent-pie"
                       values="{{ total_time['series'] }}, {{ total_time['anime'] }}, {{ total_time['movies'] }}"></span>
             </div>
-            <div style="font-size: 14pt;" class="text-center m-b-5 m-t-37"><b>Most popular genres</b></div>
+            <div class="text-center m-b-5 m-t-37 fs-20"><b>Most popular genres</b></div>
             <div class="row d-flex flex-wrap">
                 <div class="col">
-                    <table style="background: #216e7d;" class="table table-sm text-light">
+                    <table class="table table-sm bg-series text-light">
                         <thead>
                         <tr>
                             <th class="text-center">N°</th>
@@ -39,17 +38,16 @@
                         {% for series in most_genres_media["series"] %}
                             <tr>
                                 <td class="text-center">{{ series['quantity'] }}</td>
-                                <td
-                                style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                class="text-center" data-toggle="tooltip"
-                                title="{{ series['genre'] }}">{{ series['genre'] }}</td>
+                                <td class="text-center genres" data-toggle="tooltip" title="{{ series['genre'] }}">
+                                    {{ series['genre'] }}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 <div class="col">
-                    <table style="background: #945141;" class="table table-sm text-light">
+                    <table class="table bg-anime table-sm text-light">
                         <thead>
                         <tr>
                             <th class="text-center">N°</th>
@@ -60,17 +58,16 @@
                         {% for anime in most_genres_media["anime"] %}
                             <tr>
                                 <td class="text-center">{{ anime['quantity'] }}</td>
-                                <td
-                                style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                class="text-center" data-toggle="tooltip"
-                                title="{{ anime['genre'] }}">{{ anime['genre'] }}</td>
+                                <td class="text-center genres" data-toggle="tooltip" title="{{ anime['genre'] }}">
+                                    {{ anime['genre'] }}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 <div class="col">
-                    <table style="background: #8c7821;" class="table table-sm text-light">
+                    <table class="table bg-movies table-sm text-light">
                         <thead>
                         <tr>
                             <th class="text-center">#</th>
@@ -81,10 +78,9 @@
                         {% for movies in most_genres_media["movies"] %}
                             <tr>
                                 <td class="text-center">{{ movies['quantity'] }}</td>
-                                <td
-                                style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                class="text-center" data-toggle="tooltip"
-                                title="{{ movies['genre'] }}">{{ movies['genre'] }}</td>
+                                <td class="text-center genres" data-toggle="tooltip" title="{{ movies['genre'] }}">
+                                    {{ movies['genre'] }}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -93,10 +89,10 @@
             </div>
         </div>
         <div class="col col-lg-7 col-md-8">
-            <div style="font-size: 14pt;" class="text-center m-b-5"><b>Most popular media</b></div>
+            <div class="text-center fs-20 m-b-5"><b>Most popular media</b></div>
             <div class="row d-flex flex-wrap">
                 <div class="col">
-                    <table style="background: #216e7d;" class="table table-sm text-light">
+                    <table class="table table-sm bg-series text-light">
                         <thead>
                         <tr>
                             <th class="text-center">N°</th>
@@ -107,17 +103,16 @@
                         {% for series in most_present_media["series"] %}
                             <tr>
                                 <td class="text-center">{{ series['quantity'] }}</td>
-                                <td
-                                style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                class="text-center" data-toggle="tooltip"
-                                title="{{ series['name'] }}">{{ series['name'] }}</td>
+                                <td class="text-center genres" data-toggle="tooltip" title="{{ series['name'] }}">
+                                    {{ series['name'] }}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 <div class="col">
-                    <table style="background: #945141;" class="table table-sm text-light">
+                    <table class="table bg-anime table-sm text-light">
                         <thead>
                         <tr>
                             <th class="text-center">N°</th>
@@ -128,17 +123,16 @@
                         {% for anime in most_present_media["anime"] %}
                             <tr>
                                 <td class="text-center">{{ anime['quantity'] }}</td>
-                                <td
-                                style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                class="text-center" data-toggle="tooltip"
-                                title="{{ anime['name'] }}">{{ anime['name'] }}</td>
+                                <td class="text-center genres" data-toggle="tooltip" title="{{ anime['name'] }}">
+                                    {{ anime['name'] }}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 <div class="col">
-                    <table style="background: #8c7821;" class="table table-sm text-light">
+                    <table class="table table-sm bg-movies text-light">
                         <thead>
                         <tr>
                             <th class="text-center">#</th>
@@ -149,20 +143,19 @@
                         {% for movies in most_present_media["movies"] %}
                             <tr>
                                 <td class="text-center">{{ movies['quantity'] }}</td>
-                                <td
-                                style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                class="text-center" data-toggle="tooltip"
-                                title="{{ movies['name'] }}">{{ movies['name'] }}</td>
+                                <td class="text-center genres" data-toggle="tooltip" title="{{ movies['name'] }}">
+                                    {{ movies['name'] }}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-            <div style="font-size: 14pt;" class="text-center m-b-5"><b>Most popular actors</b></div>
+            <div class="text-center m-b-5 fs-20"><b>Most popular actors</b></div>
             <div class="row">
                 <div class="col">
-                    <table style="background: #216e7d;" class="table table-sm text-light">
+                    <table class="table table-sm bg-series text-light">
                         <thead>
                         <tr>
                             <th class="text-center">N°</th>
@@ -173,17 +166,16 @@
                         {% for series in most_actors_media["series"] %}
                             <tr>
                                 <td class="text-center">{{ series['quantity'] }}</td>
-                                <td
-                                style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                class="text-center" data-toggle="tooltip"
-                                title="{{ series['name'] }}">{{ series['name'] }}</td>
+                                <td class="text-center genres" data-toggle="tooltip" title="{{ series['name'] }}">
+                                    {{ series['name'] }}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 <div class="col">
-                    <table style="background: #945141;" class="table table-sm text-light">
+                    <table class="table table-sm bg-anime text-light">
                         <thead>
                         <tr>
                             <th class="text-center">N°</th>
@@ -194,17 +186,16 @@
                         {% for anime in most_actors_media["anime"] %}
                             <tr>
                                 <td class="text-center">{{ anime['quantity'] }}</td>
-                                <td
-                                style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                class="text-center" data-toggle="tooltip"
-                                title="{{ anime['name'] }}">{{ anime['name'] }}</td>
+                                <td class="text-center genres" data-toggle="tooltip" title="{{ anime['name'] }}">
+                                    {{ anime['name'] }}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 <div class="col">
-                    <table style="background: #8c7821;" class="table table-sm text-light">
+                    <table class="table table-sm bg-movies text-light">
                         <thead>
                         <tr>
                             <th class="text-center">#</th>
@@ -215,20 +206,19 @@
                         {% for movies in most_actors_media["movies"] %}
                             <tr>
                                 <td class="text-center">{{ movies['quantity'] }}</td>
-                                <td
-                                style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                class="text-center" data-toggle="tooltip"
-                                title="{{ movies['name'] }}">{{ movies['name'] }}</td>
+                                <td class="text-center genres" data-toggle="tooltip" title="{{ movies['name'] }}">
+                                    {{ movies['name'] }}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-            <div style="font-size: 14pt;" class="text-center m-b-5"><b>Most dropped Anime and Series</b></div>
+            <div class="text-center fs-20 m-b-5"><b>Most dropped Anime and Series</b></div>
             <div class="row">
                 <div class="col">
-                    <table style="background: #216e7d;" class="table table-sm text-light">
+                    <table class="table table-sm bg-series text-light">
                         <thead>
                         <tr>
                             <th class="text-center">N°</th>
@@ -239,17 +229,16 @@
                         {% for series in top_dropped_media["series"] %}
                             <tr>
                                 <td class="text-center">{{ series['quantity'] }}</td>
-                                <td
-                                style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                class="text-center" data-toggle="tooltip"
-                                title="{{ series['name'] }}">{{ series['name'] }}</td>
+                                <td class="text-center genres" data-toggle="tooltip" title="{{ series['name'] }}">
+                                    {{ series['name'] }}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 <div class="col">
-                    <table style="background: #945141;" class="table table-sm text-light">
+                    <table class="table table-sm bg-anime text-light">
                         <thead>
                         <tr>
                             <th class="text-center">N°</th>
@@ -260,10 +249,9 @@
                         {% for anime in top_dropped_media["anime"] %}
                             <tr>
                                 <td class="text-center">{{ anime['quantity'] }}</td>
-                                <td
-                                style="max-width: 167px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                class="text-center" data-toggle="tooltip"
-                                title="{{ anime['name'] }}">{{ anime['name'] }}</td>
+                                <td class="text-center genres" data-toggle="tooltip" title="{{ anime['name'] }}">
+                                    {{ anime['name'] }}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>

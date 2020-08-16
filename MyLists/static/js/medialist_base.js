@@ -6,7 +6,7 @@ function deleteElement(card, media_list) {
     let load_img = $(card).find('.view.overlay');
     load_img.prepend(Loading());
 
-    if (!confirm('Delete the media from your list?')) {
+    if (!confirm("Do you want to delete the media from your list?")) {
         load_img.find('.load-medialist').remove();
         return false;
     }
@@ -27,8 +27,6 @@ function deleteElement(card, media_list) {
             load_img.find('.load-medialist').remove();
         }
     });
-
-    $categories.isotope('layout');
 }
 
 
@@ -39,59 +37,8 @@ function removeCat() {
     $('.card-btn-toop-right').show();
     $('.card-btn-top-left').show();
     $('.bottom-card-info').show();
-
-    $('.seas-eps-drop-container').each(function () {
-        if ($(this).parent().parent().parent()[0].className === 'row category-PLAN TO WATCH' ||
-            $(this).parent().parent().parent()[0].className === 'row category-RANDOM') {
-            $(this).hide();
-        }
-        else {
-            $(this).show();
-        }
-    });
-
     $('.card-img-top').attr('style', 'filter: brightness(100%); height: auto;');
     $('.mask').show();
-}
-
-
-// --- Search in medialist ---------------------------------------------
-function searchElement() {
-    let input, cat, filter, cards, cardContainer, title, i, l;
-
-    input = document.getElementById("searchInput");
-    cat = document.getElementsByClassName("search-select")[0].value;
-    filter = input.value.toUpperCase();
-    cardContainer = document.getElementById("categories-iso");
-    cards = cardContainer.getElementsByClassName("card-container");
-    l = cards.length;
-    for (i = 0; i < l; i++) {
-        title = cards[i].querySelector(".font-mask");
-        let original_title = cards[i].querySelector(".by-original-title");
-        let actors = cards[i].querySelector(".by-actor");
-        let genres = cards[i].querySelector(".by-genre");
-        let director = cards[i].querySelector(".by-director");
-        if (title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
-            cards[i].style.display = "";
-        }
-        else if (original_title.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Titles' || cat === 'All')) {
-            cards[i].style.display = "";
-        }
-        else if (actors.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Actors' || cat === 'All')) {
-            cards[i].style.display = "";
-        }
-        else if (genres.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Genres' || cat === 'All')) {
-            cards[i].style.display = "";
-        }
-        else if (director.innerText.toUpperCase().indexOf(filter) > -1 && (cat === 'Director' || cat === 'All')) {
-            cards[i].style.display = "";
-        }
-        else {
-            cards[i].style.display = "none";
-        }
-    }
-
-    $categories.isotope('layout');
 }
 
 
@@ -113,51 +60,48 @@ function addFavorite(fav_div, element_id, media_type) {
             }
         },
         error: function() {
-            error_ajax_message('Error trying to favorite the media. Please try again later.')
+            error_ajax_message('Error trying to add the media to your favorite. Please try again later.')
         }
     });
 }
 
 
-// --- Show/Hide common media ------------------------------------------
-function HideCommon() {
-    if ($('#SharedMedia').prop("checked") === true) {
-        $('.card-ribbon').parent().parent().parent().hide();
-    }
-    else if ($('#SharedMedia').prop("checked") === false && $('#ShowFavorites').prop("checked") === true) {
-        $('.card-ribbon').parent().parent().parent().show();
-        $('.far.fa-star').parent().parent().parent().hide();
-    }
-    else if ($('#SharedMedia').prop("checked") === false && $('#ShowFavorites').prop("checked") === false) {
-        $('.card-ribbon').parent().parent().parent().show();
-    }
-
-    $categories.isotope('layout');
-}
-
-
-// --- Show/Hide favorites media ---------------------------------------
-function ShowFavorites() {
-    if ($('#ShowFavorites').prop("checked") === true) {
-        $('.far.fa-star').parent().parent().parent().parent().parent().hide();
-    }
-    else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === true) {
-        $('.far.fa-star').parent().parent().parent().parent().parent().show();
-        $('.card-ribbon').parent().parent().parent().parent().parent().hide();
-    }
-    else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === false) {
-        $('.far.fa-star').parent().parent().parent().parent().parent().show();
-    }
-
-    $categories.isotope('layout');
-}
+// // --- Show/Hide common media ------------------------------------------
+// function HideCommon() {
+//     if ($('#SharedMedia').prop("checked") === true) {
+//         $('.card-ribbon').parent().parent().parent().hide();
+//     }
+//     else if ($('#SharedMedia').prop("checked") === false && $('#ShowFavorites').prop("checked") === true) {
+//         $('.card-ribbon').parent().parent().parent().show();
+//         $('.far.fa-star').parent().parent().parent().hide();
+//     }
+//     else if ($('#SharedMedia').prop("checked") === false && $('#ShowFavorites').prop("checked") === false) {
+//         $('.card-ribbon').parent().parent().parent().show();
+//     }
+// }
+//
+//
+// // --- Show/Hide favorites media ---------------------------------------
+// function ShowFavorites() {
+//     if ($('#ShowFavorites').prop("checked") === true) {
+//         $('.far.fa-star').parent().parent().parent().parent().parent().hide();
+//     }
+//     else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === true) {
+//         $('.far.fa-star').parent().parent().parent().parent().parent().show();
+//         $('.card-ribbon').parent().parent().parent().parent().parent().hide();
+//     }
+//     else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === false) {
+//         $('.far.fa-star').parent().parent().parent().parent().parent().show();
+//     }
+// }
 
 
 // --- Add the category to the user (from other list) ------------------
 function AddCatUser(category, card_id) {
-    let media_list = $('#'+card_id).attr('values').split('-')[1];
-    let element_id = $('#'+card_id).attr('values').split('-')[2];
-    let load_img = $('#'+card_id).find('.view.overlay');
+    let $card = $('#'+card_id);
+    let media_list = $card.attr('values').split('-')[1];
+    let element_id = $card.attr('values').split('-')[2];
+    let load_img = $card.find('.view.overlay');
     load_img.prepend(Loading());
 
     $.ajax ({
@@ -167,8 +111,8 @@ function AddCatUser(category, card_id) {
         data: JSON.stringify({element_cat: category, element_id: element_id, element_type: media_list}),
         dataType: "json",
         success: function() {
-            $("#"+card_id).find('.view.overlay').append('<div class="card-ribbon"></div>');
-            $("#"+card_id).find('.card-btn-top-left').remove();
+            $card.find('.view.overlay').append('<div class="card-ribbon"></div>');
+            $card.find('.card-btn-top-left').remove();
         },
         error: function () {
             error_ajax_message('Error trying to add the media to your list. Please try again later.')
@@ -195,7 +139,7 @@ function showComment(card, media_type, media_id, current_user) {
                                 '</a>' +
                             '</div>')
     } else {
-        edit_button = ""
+        edit_button = "";
     }
 
     $('body').append(
@@ -259,7 +203,7 @@ function scoreDrop(score, data_id, media_list) {
 }
 
 
-// --- Change the score and delete dropdown ----------------------------
+// --- Change/delete the score dropdown --------------------------------
 $(document).on('change focusout','.score-drop',function(event) {
     let value = parseFloat(this.value).toFixed(1);
     let media_id = $(this).attr('values').split(',')[0];
@@ -317,7 +261,7 @@ function rewatchDrop(rewatch, data_id, media_list) {
 }
 
 
-// --- Change the rewatch and delete dropdown --------------------------
+// --- Change/delete the rewatch dropdown ------------------------------
 $(document).on('change focusout','.rewatch-drop',function(event) {
     let value = parseInt(this.value);
     let media_id = $(this).attr('values').split(',')[0];
@@ -335,7 +279,7 @@ $(document).on('change focusout','.rewatch-drop',function(event) {
                 $(this).remove();
             },
             error: function () {
-                error_ajax_message('Error trying to change the rewatched value for the media. Please try again later.')
+                error_ajax_message('Error trying to change the media rewatched value. Please try again later.')
             }
         });
     }
@@ -345,49 +289,29 @@ $(document).on('change focusout','.rewatch-drop',function(event) {
 });
 
 
-// --- Isotopes categories ---------------------------------------------
-let $categories = $('.categories-iso').isotope({
-    itemSelector: '.categories',
-    layoutMode: 'vertical',
-    onLayout: function() {
-        $window.trigger("scroll");
-    }
-});
-$("img.lazyload").lazyload({
-    failure_limit : Math.max($("img.lazyload").length-1, 0)
-});
-$('.filters-button-group').on('click', 'button', function() {
-    let filterValue = $(this).attr('data-filter');
-    $categories.isotope({
-        filter: filterValue
-    });
-});
-$('.filters-button-group').each(function(i, buttonGroup) {
-    let $buttonGroup = $(buttonGroup);
-    $buttonGroup.on('click', 'button', function() {
-        $buttonGroup.find('.btn-selected').addClass('btn-header');
-        $buttonGroup.find('.btn-selected').removeClass('btn-selected');
-        $(this).addClass('btn-selected');
-        $(this).removeClass('btn-header');
-    });
-});
-
-
-// --- Row gutters -----------------------------------------------------
+// --- Create Row gutters ----------------------------------------------
 $(document).ready(function() {
+    let $row = $('.row');
     function a() {
         if ($(window).width() < 1025) {
-            return $('.row').addClass('no-gutters');
+            return $row.addClass('no-gutters');
         }
-        $('.row').removeClass('no-gutters');
+        $row.removeClass('no-gutters');
     }
-
     $(window).resize(a).trigger('resize');
-    $categories.isotope('layout');
 });
 
 
-// --- Create the loading screen on media ------------------------------
+// --- Init Infinite Scroll --------------------------------------------
+$('.infinite-scroll-container').infiniteScroll({
+    path: '.pagination__next',
+    append: '.card-container',
+    status: '.scroller-status',
+    hideNav: '.pagination',
+});
+
+
+// --- Create the loading image on media -------------------------------
 function Loading() {
     return ('<div class="load-medialist">' +
                 '<img class="img-load-medialist" src="/static/img/loading.webp" alt="">' +
