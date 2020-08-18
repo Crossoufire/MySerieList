@@ -1,4 +1,4 @@
-flask
+flask~=1.1.1
 Flask-APScheduler
 flask-sqlalchemy
 flask-compress
@@ -10,13 +10,14 @@ flask-mail
 flask-wtf
 email_validator
 python-dotenv
-itsdangerous
+itsdangerous~=1.1.0
 apscheduler
-sqlalchemy
-requests
+sqlalchemy~=1.3.1
+requests~=2.23.0
 jikanpy
-wtforms
-pathlib
-Pillow
+wtforms~=2.2.1
+pathlib~=1.0.1
+Pillow~=6.1.0
 regex
-pytz
+pytz~=2018.9
+rauth~=0.7.3

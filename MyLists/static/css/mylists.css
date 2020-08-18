@@ -1,5 +1,9 @@
 
 /* --- General ------------------------------------------------ */
+* {
+    font-weight: 400;
+}
+
 body {
     padding: 0;
     display: flex;
@@ -128,12 +132,6 @@ hr {
     background-color: black;
 }
 
-/*#autocomplete.ui-autocomplete-loading {*/
-/*    background-image: url('/static/img/loading.webp');*/
-/*    background-position: right 7% bottom 50%;*/
-/*    background-repeat: no-repeat;*/
-/*}*/
-
 .ui-menu-item .ui-menu-item-wrapper.ui-state-active {
     background: #131418 !important;
     border: solid white 1px;
@@ -153,8 +151,6 @@ hr {
     height: 30px;
     width: 30px;
 }
-
-
 
 .nav-form {
     margin-left: 15px;

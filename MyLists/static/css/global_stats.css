@@ -51,7 +51,7 @@ table.table a {
     height: 449px;
 }
 
-@media (max-width: 767.97px) {
+@media (max-width: 768px) {
     .chart-container {
         height: 25vh;
         width: 98vw;
@@ -60,4 +60,11 @@ table.table a {
         position: relative;
         height: 300px;
     }
+}
+
+.genres {
+    max-width: 167px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

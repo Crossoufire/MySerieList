@@ -8,6 +8,7 @@
 
 .header-bar {
     border-color: darkgrey;
+    margin: 15px 20px 0 20px;
 }
 
 .modded-input {
@@ -22,10 +23,6 @@
     opacity: 1;
 }
 
-.filters-button-group {
-    justify-content: center;
-}
-
 .btn-header {
     background-color: rgba(0, 0, 0, 0.7);
 }
@@ -35,7 +32,7 @@
 }
 
 .btn-selected {
-    background-color: grey;
+    background-color: darkslategrey;
 }
 
 .btn-selected:hover {
@@ -66,6 +63,7 @@
 .search-select {
     background: rgba(0, 0, 0, 0.7);
     color: darkgray;
+    margin-left: 10px;
 }
 
 .return-icon {
@@ -135,7 +133,7 @@ option {
     color: lightgrey;
 }
 
-.fas.fa-star .fas.fa-trash .fas.fa-bars .far.fa-star {
+.fas.fa-star, .fas.fa-trash, .fas.fa-bars, .far.fa-star {
     text-shadow: 0 0 4px #000;
 }
 
@@ -217,13 +215,6 @@ option {
 }
 /* ------------------------------------------ */
 
-
-/* --- CATEGORIES --------------------------- */
-.categories {
-    width: 100%;
-}
-
-/* ------------------------------------------ */
 
 .load-medialist {
     position: absolute;

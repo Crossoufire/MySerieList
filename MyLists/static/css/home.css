@@ -36,16 +36,7 @@
     border-style: solid !important;
 }
 
-.modal-content a {
-    color:  #f0efee;
-    font-weight: 400;
-    text-align: center;
-    display: inline-block;
-    opacity: 0.6;
-    transition: opacity ease 0.5s;
-}
-
-.title_section {
+.title-section {
     margin-bottom: 2rem !important;
     margin-top: 2rem !important;
 }

@@ -21,14 +21,30 @@ class UpdateAccountForm(FlaskForm):
     def validate_username(self, username):
         if username.data != current_user.username:
             user = User.query.filter_by(username=username.data).first()
-            if user is not None:
+            if user:
                 raise ValidationError("This username is already taken. Please choose another one.")
 
     def validate_email(self, email):
         if email.data != current_user.email:
             user = User.query.filter_by(email=email.data).first()
-            if user is not None:
+            if user:
                 raise ValidationError("This email already exist.")
+
+
+class UpdateAccountOauthForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
+    picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
+    isprivate = BooleanField('Private mode')
+    homepage = SelectField('Default homepage', choices=[('serieslist', 'MySeriesList'), ('animelist', 'MyAnimeList'),
+                                                        ('movieslist', 'MyMoviesList'), ('account', 'Account'),
+                                                        ('hall_of_fame', 'Hall of Fame')])
+    submit_account = SubmitField('Update account')
+
+    def validate_username(self, username):
+        if username.data != current_user.username:
+            user = User.query.filter_by(username=username.data).first()
+            if user:
+                raise ValidationError("This username is already taken. Please choose another one.")
 
 
 class ChangePasswordForm(FlaskForm):

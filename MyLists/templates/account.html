@@ -30,27 +30,27 @@
                                 <div class='account-bar'>
                                     <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
                                          title="{{ media_data['series']['media_levels']['grade_title'] }}"
-                                         src="{{ media_data['series']['media_levels']['grade_id'] }}.png"/>
+                                         src="{{ media_data['series']['media_levels']['grade_id'] }}.png" alt=""/>
                                     <span class='account-bar-name'>Series</span>
-                                    <div id="series_level" class='account-bar-level'>
-                                        Level {{ '%02d' | format(media_data['series']['media_levels']['level']) }}
+                                    <div id="series-level" class='account-bar-level'>
+                                        Level {{ '%02d'|format(media_data['series']['media_levels']['level']) }}
                                     </div>
-                                    <div class='xp-bar' data-toggle="tooltip"
+                                    <div class="xp-bar" data-toggle="tooltip"
                                          title="{{ media_data['series']['media_levels']['level_percent'] }}%">
-                                        <div id='xp-bar-fill-series'
+                                        <div id="xp-bar-fill-series"
                                              data-percentage="{{ media_data['series']['media_levels']
                                              ['level_percent'] }}">
-                                            <div class='xp-increase-fx'>
-                                                <div class='xp-increase-fx-flicker'>
-                                                    <div class='xp-increase-glow1'></div>
-                                                    <div class='xp-increase-glow2'></div>
-                                                    <div class='xp-increase-glow3'></div>
+                                            <div class="xp-increase-fx">
+                                                <div class="xp-increase-fx-flicker">
+                                                    <div class="xp-increase-glow1"></div>
+                                                    <div class="xp-increase-glow2"></div>
+                                                    <div class="xp-increase-glow3"></div>
                                                 </div>
-                                                <div class='xp-increase-glow2'></div>
+                                                <div class="xp-increase-glow2"></div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' | format(media_data['series']
+                                    <div class='account-bar-next-level'>&nbsp;{{ '%02d'|format(media_data['series']
                                     ['media_levels']['level'] | int + 1) }}</div>
                                 </div>
                             </div>
@@ -248,14 +248,14 @@
                             <div class="col-5 text-center m-t-10">
                                 <div>
                                     <div class="m-b-10">
-                                        <b class="mobile-time">Total media time</b>
+                                        <b class="mobile-time">Total time</b>
                                         <div>&nbsp;&nbsp;{{ media_data['series']['time_spent_hour']+
                                         media_data['anime']['time_spent_hour']+
                                         media_data['movies']['time_spent_hour'] }} h
                                         </div>
                                     </div>
                                     <div class="m-b-10">
-                                        <b class="mobile-time">Total media time</b>
+                                        <b class="mobile-time">Total time</b>
                                         <div>&nbsp;&nbsp;{{ ((media_data['series']['time_spent_hour'] +
                                         media_data['anime']['time_spent_hour'] +
                                         media_data['movies']['time_spent_hour'])/24)|round(2) }} days
@@ -286,6 +286,16 @@
                                     </span>
                                     <span class="stat-text float-right"><b>Hours:</b>
                                         {{ media_data['series']['time_spent_hour'] }}
+                                    </span>
+                                </div>
+                                <div class="m-b-5">
+                                    <span class="stat-text" data-toggle="tooltip" title="Media scored"><b>Scored:</b>
+                                        {{ media_data['series']['media_score']['scored_media'] }}/{{ media_data
+                                        ['series']['media_score']['total_media'] }}
+                                        ({{ media_data['series']['media_score']['percentage'] }}%)
+                                    </span>
+                                    <span class="stat-text float-right"><b>Mean Score:</b>
+                                        {{ media_data['series']['media_score']['mean_score'] }}/10
                                     </span>
                                 </div>
                                 <figure class="d-flex">
@@ -353,7 +363,7 @@
                                             ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat-text">Plan to Watch:</span>
+                                            <span class="stat-text">P. to Watch:</span>
                                         </div>
                                         <div class="col p-l-0 position">
                                             <span class="stat-text">{{ media_data['series']['media_count']
@@ -369,12 +379,12 @@
                                             ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat-text" data-toggle="tooltip" title="- plan to watch">
+                                            <span class="stat-text">
                                                 Total Series:
                                             </span>
                                         </div>
                                         <div class="col p-l-0 position">
-                                            <span class="stat-text" data-toggle="tooltip" title="- plan to watch">
+                                            <span class="stat-text">
                                                 {{ media_data['series']['media_count']['total'] }}</span>
                                         </div>
                                     </div>
@@ -427,6 +437,16 @@
                                     </span>
                                     <span class="stat-text float-right"><b>Hours:</b> {{ media_data['anime']
                                     ['time_spent_hour'] }}</span>
+                                </div>
+                                <div class="m-b-5">
+                                    <span class="stat-text" data-toggle="tooltip" title="Media scored"><b>Scored:</b>
+                                        {{ media_data['anime']['media_score']['scored_media'] }}/{{ media_data
+                                        ['anime']['media_score']['total_media'] }}
+                                        ({{ media_data['anime']['media_score']['percentage'] }}%)
+                                    </span>
+                                    <span class="stat-text float-right"><b>Mean Score:</b>
+                                        {{ media_data['anime']['media_score']['mean_score'] }}/10
+                                    </span>
                                 </div>
                                 <figure class="d-flex">
                                     {% if media_data['anime']['media_count']['nodata'] %}
@@ -486,7 +506,7 @@
                                             ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat-text">Plan to Watch:</span>
+                                            <span class="stat-text">P. to Watch:</span>
                                         </div>
                                         <div class="col p-l-0 position">
                                             <span class="stat-text">{{ media_data['anime']['media_count']
@@ -552,12 +572,22 @@
                                 </a>
                             </h5>
                             <div id="MOVIES" class="m-b-8">
-                                <div class="m-b-8">
+                                <div class="m-b-5">
                                     <span class="stat-text"><b>Days:</b>
                                         {{ media_data['movies']['time_spent_day'] }}
                                     </span>
                                     <span class="stat-text float-right"><b>Hours:</b> {{ media_data['movies']
                                     ['time_spent_hour'] }}</span>
+                                </div>
+                                <div class="m-b-5">
+                                    <span class="stat-text" data-toggle="tooltip" title="Media scored"><b>Scored:</b>
+                                        {{ media_data['movies']['media_score']['scored_media'] }}/{{ media_data
+                                        ['movies']['media_score']['total_media'] }}
+                                        ({{ media_data['movies']['media_score']['percentage'] }}%)
+                                    </span>
+                                    <span class="stat-text float-right"><b>Mean Score:</b>
+                                        {{ media_data['movies']['media_score']['mean_score'] }}/10
+                                    </span>
                                 </div>
                                 <figure class="d-flex">
                                     {% if media_data['movies']['media_count']['nodata'] %}
@@ -589,7 +619,7 @@
                                             ['count'] }}</span>
                                         </div>
                                         <div class="col mini p-r-0">
-                                            <span class="stat-text">Plan to Watch:</span>
+                                            <span class="stat-text">P. to Watch:</span>
                                         </div>
                                         <div class="col p-l-0 position">
                                             <span class="stat-text">{{ media_data['movies']['media_count']
