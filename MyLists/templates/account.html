@@ -23,7 +23,7 @@
             <div class="col-xl-3 col-lg col-md-12">
                 <ul class="p-l-0">
                     <li class="m-b-20">
-                        <h4><i class="fas fa-angle-double-up"></i>&nbsp&nbsp Lists Levels</h4>
+                        <h4><i class="fas fa-angle-double-up"></i>&nbsp;&nbsp; Lists Levels</h4>
                         <hr>
                         <div class="d-flex">
                             <div class='account-bar-wrapper'>
@@ -37,21 +37,12 @@
                                     </div>
                                     <div class="xp-bar" data-toggle="tooltip"
                                          title="{{ media_data['series']['media_levels']['level_percent'] }}%">
-                                        <div id="xp-bar-fill-series"
-                                             data-percentage="{{ media_data['series']['media_levels']
-                                             ['level_percent'] }}">
-                                            <div class="xp-increase-fx">
-                                                <div class="xp-increase-fx-flicker">
-                                                    <div class="xp-increase-glow1"></div>
-                                                    <div class="xp-increase-glow2"></div>
-                                                    <div class="xp-increase-glow3"></div>
-                                                </div>
-                                                <div class="xp-increase-glow2"></div>
-                                            </div>
+                                        <div class="xp-bar-fill bg-series" style="width: {{ media_data['series']
+                                        ['media_levels']['level_percent'] }}%;">
                                         </div>
                                     </div>
                                     <div class='account-bar-next-level'>&nbsp;{{ '%02d'|format(media_data['series']
-                                    ['media_levels']['level'] | int + 1) }}</div>
+                                    ['media_levels']['level']|int + 1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -62,25 +53,16 @@
                                          title="{{ media_data['anime']['media_levels']['grade_title'] }}"
                                          src="{{ media_data['anime']['media_levels']['grade_id'] }}.png"/>
                                     <div class='account-bar-name'>Anime</div>
-                                    <div id="anime_level" class='account-bar-level'>
+                                    <div id="anime-level" class='account-bar-level'>
                                         Level {{ '%02d' | format(media_data['anime']['media_levels']['level']) }}</div>
                                     <div class='xp-bar' data-toggle="tooltip"
                                          title="{{ media_data['anime']['media_levels']['level_percent'] }}%">
-                                        <div id='xp-bar-fill-anime'
-                                             data-percentage="{{ media_data['anime']['media_levels']
-                                             ['level_percent'] }}">
-                                            <div class='xp-increase-fx'>
-                                                <div class='xp-increase-fx-flicker'>
-                                                    <div class='xp-increase-glow1'></div>
-                                                    <div class='xp-increase-glow2'></div>
-                                                    <div class='xp-increase-glow3'></div>
-                                                </div>
-                                                <div class='xp-increase-glow2'></div>
-                                            </div>
+                                        <div class="xp-bar-fill bg-anime" style="width: {{ media_data['anime']
+                                        ['media_levels']['level_percent'] }}%;">
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' |
-                                    format(media_data['anime']['media_levels']['level'] | int + 1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp;{{ '%02d' |
+                                    format(media_data['anime']['media_levels']['level']|int + 1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -91,25 +73,17 @@
                                          title="{{ media_data['movies']['media_levels']['grade_title'] }}"
                                          src="{{ media_data['movies']['media_levels']['grade_id'] }}.png"/>
                                     <span class='account-bar-name'>Movies</span>
-                                    <div id="movies_level" class='account-bar-level'>Level {{ '%02d' |
-                                    format(media_data['movies']['media_levels']['level']) }}</div>
-                                    <div class='xp-bar' data-toggle="tooltip"
-                                         title="{{ media_data['movies']['media_levels']['level_percent'] }}%">
-                                        <div id='xp-bar-fill-movies'
-                                             data-percentage="{{ media_data['movies']['media_levels']
-                                             ['level_percent'] }}">
-                                            <div class='xp-increase-fx'>
-                                                <div class='xp-increase-fx-flicker'>
-                                                    <div class='xp-increase-glow1'></div>
-                                                    <div class='xp-increase-glow2'></div>
-                                                    <div class='xp-increase-glow3'></div>
-                                                </div>
-                                                <div class='xp-increase-glow2'></div>
-                                            </div>
+                                    <div id="movies-level" class='account-bar-level'>
+                                        Level {{ '%02d' |format(media_data['movies']['media_levels']['level']) }}
+                                    </div>
+                                    <div class='xp-bar' data-toggle="tooltip" title="{{ media_data['movies']
+                                    ['media_levels']['level_percent'] }}%">
+                                        <div class="xp-bar-fill bg-movies" style="width: {{ media_data['movies']
+                                        ['media_levels']['level_percent'] }}%;">
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp{{ '%02d' |
-                                    format(media_data['movies']['media_levels']['level'] | int + 1) }}</div>
+                                    <div class='account-bar-next-level'>&nbsp;{{ '%02d' |
+                                    format(media_data['movies']['media_levels']['level']|int + 1) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -175,7 +149,7 @@
                         {% endfor %}
                     </li>
                     <li class="m-b-20">
-                        <h4><i class="fas fa-sm fa-info-circle"></i>&nbsp&nbspInformation</h4>
+                        <h4><i class="fas fa-sm fa-info-circle"></i>&nbsp;&nbsp;Information</h4>
                         <hr>
                         <ul class="text-left" style="list-style-type: disc; font-size: 13pt;">
                             <li class="m-b-10">
@@ -652,8 +626,7 @@
                                     {% for favorite in favorites[2] %}
                                         {% if loop.index < 11 %}
                                             <a href="/media_sheet/Movies/{{ favorite[0].id }}">
-                                                <img class="favorite-img" data-toggle="tooltip"
-                                                     title="{{ favorite[0].name }}"
+                                                <img class="favorite-img" data-toggle="tooltip" title="{{ favorite[0].name }}"
                                                      src="/static/covers/movies_covers/{{ favorite[0].image_cover }}"/>
                                             </a>
                                         {% endif %}

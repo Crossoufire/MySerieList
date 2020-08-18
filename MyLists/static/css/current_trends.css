@@ -1,6 +1,6 @@
 
-/* ---------------- CARD CSS -------------------- */
 
+/* --- Card CSS ----------------------------------------- */
 .card-hashtag {
     position: absolute;
     bottom: -8px;
@@ -12,7 +12,7 @@
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 5; /* number of lines to show */
+   -webkit-line-clamp: 5;   /* number of lines to show */
 }
 
 .giveMeEllipsis2 {
@@ -20,9 +20,8 @@
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 2; /* number of lines to show */
+   -webkit-line-clamp: 2;   /* number of lines to show */
 }
-/* ------------------------------------------ */
 
 .frame {
     width: 100%;
@@ -57,7 +56,6 @@
         width: calc(100vw-15px);
     }
 }
-
 @media (max-width: 500px) {
     .media {
         width: 100vw;

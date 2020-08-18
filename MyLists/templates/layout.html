@@ -2,15 +2,13 @@
 <html lang="en">
 
 <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-146580264-1"></script>
-    <script>
+    <!--- Global site tag (gtag.js)/Google Analytics ------------------------>
+    <script async type="text/javascript" src="https://www.googletagmanager.com/gtag/js?id=UA-146580264-1"></script>
+    <script type="text/javascript">
         window.dataLayer = window.dataLayer || [];
-
         function gtag() {
             dataLayer.push(arguments);
         }
-
         gtag('js', new Date());
         gtag('config', 'UA-146580264-1');
     </script>
@@ -21,25 +19,25 @@
     <meta name="description" content="Create your TV shows/anime/movies list, see how much time you spent and gain
     levels and badges."/>
 
-    <!--- App Manifest ------------------------>
+    <!--- App Manifest ------------------------------------------------------>
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 
-    <!--- iOS --------------------------------->
+    <!--- iOS --------------------------------------------------------------->
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/icon-96.png') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="format-detection" content="telephone=no">
 
-    <!--- CDN CSS --------------------------------->
+    <!--- CDN CSS ---------------------------------------------------------->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/css/mdb.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
 
-    <!--- Website Icon --------------------------------->
+    <!--- Website Icon ----------------------------------------------------->
     <link rel='icon' type='image/gif' href="{{ url_for('static', filename='img/favicon.ico') }}">
 
-    <!--- Custom CSS --------------------------------->
+    <!--- Custom CSS ------------------------------------------------------->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mylists.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
     {% block css %}
@@ -91,7 +89,7 @@
                         </div>
                     </li>
                 </ul>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-collapse">
+                <button class="navbar-toggler third-button" type="button" data-toggle="collapse" data-target="#nav-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="nav-collapse">

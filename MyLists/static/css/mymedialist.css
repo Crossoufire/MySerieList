@@ -1,5 +1,9 @@
 
-/* -------------- HEADER CSS --------------- */
+/* --- Header CSS --------------------------------------- */
+option {
+    background: rgba(0, 0, 0, 0.8);
+}
+
 .back-image {
     background-image: url('/static/img/profile_background.jpg');
     background-size: cover;
@@ -76,10 +80,6 @@
     padding: 13px 10px 13px 10px;
 }
 
-option {
-    background: rgba(0, 0, 0, 0.8);
-}
-
 @media (max-width: 592px) {
     .center-mobile {
         justify-content: center;
@@ -101,10 +101,9 @@ option {
         height: 320px;
     }
 }
-/* ---------------------------------------------- */
 
 
-/* ---------------- CARD CSS -------------------- */
+/* --- Card CSS ----------------------------------------- */
 .card {
     border-radius: 0 !important;
     margin-bottom: 50px;
@@ -192,30 +191,6 @@ option {
     z-index: 100;
 }
 
-@media (max-width: 1025px) {
-    .card {
-        margin-bottom: 24px;
-    }
-    .font-mask {
-        font-size: 13pt;
-    }
-}
-@media (max-width: 991px) {
-    .card-btn-mobile {
-        font-size: 9px;
-        padding: 2px !important;
-    }
-}
-@media (max-width: 410px) {
-    .seas-eps-drop {
-        -moz-appearance: none;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-}
-/* ------------------------------------------ */
-
-
 .load-medialist {
     position: absolute;
     z-index: 200;
@@ -285,6 +260,34 @@ option {
     opacity: 0.8;
 }
 
+.bottom-card-cat {
+    background-color: #655757;
+    border-right: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px black;
+    text-align: center;
+    position: absolute;
+    opacity: 0.9;
+    height: 24px;
+    width: 100%;
+    bottom: 25px;
+    right: 0;
+}
+
+.bottom-card-cat-movie {
+    background-color: #655757;
+    border-right: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px black;
+    text-align: center;
+    position: absolute;
+    opacity: 0.9;
+    height: 24px;
+    width: 100%;
+    bottom: -1px;
+    right: 0;
+}
+
 .card-btn-top-left {
     position: absolute;
     top: 10px;
@@ -324,4 +327,26 @@ option {
     background-color: #131418;
     border-radius: 2px !important;
     border: grey 2px solid !important;
+}
+
+@media (max-width: 1025px) {
+    .card {
+        margin-bottom: 24px;
+    }
+    .font-mask {
+        font-size: 13pt;
+    }
+}
+@media (max-width: 991px) {
+    .card-btn-mobile {
+        font-size: 9px;
+        padding: 2px !important;
+    }
+}
+@media (max-width: 410px) {
+    .seas-eps-drop {
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        appearance: none;
+    }
 }

@@ -6,9 +6,9 @@ function chargeButtons(card) {
 
     let completed = "block;";
     let plan_to_watch = "block;";
-    let $card = $('#'+card.id).parent().attr('value');
+    let category = $('#'+card.id).attr('cat');
 
-    if ($card === 'Completed' || $card === 'Completed Animation') {
+    if (category === 'Completed' || category === 'Completed Animation') {
         completed = "none;";
     } else {
         plan_to_watch = "none;";
@@ -29,6 +29,7 @@ function chargeButtons(card) {
 
     $(card).find('.card-btn-top-left').hide();
     $(card).find('.card-btn-toop-right').hide();
+    $(card).find('.bottom-card-cat-movie').hide();
     $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
     $(card).find('.mask').hide();
 }
@@ -81,6 +82,7 @@ function ChargeButtonsOther(card) {
         "</ul>");
 
     $card.find('.card-btn-top-left').hide();
+    $card.find('.bottom-card-cat-movie').hide();
     $card.find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
     $card.find('.mask').hide();
 }

@@ -35,6 +35,8 @@ function removeCat() {
     $('.card-cat-buttons').remove();
     $('.card-btn-top-right').remove();
     $('.card-btn-toop-right').show();
+    $('.bottom-card-cat').show();
+    $('.bottom-card-cat-movie').show();
     $('.card-btn-top-left').show();
     $('.bottom-card-info').show();
     $('.card-img-top').attr('style', 'filter: brightness(100%); height: auto;');

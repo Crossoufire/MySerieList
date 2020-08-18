@@ -3,10 +3,11 @@
 // --- Follow status ----------------------------------------------
 function follow_status(follow_id) {
     let status;
+    let $follow_button = $('.follow-btn');
 
-    status = $('.follow-btn').prop('value') !== '1';
+    status = $follow_button.prop('value') !== '1';
+    $follow_button.addClass('disabled');
     $('.loading-follow').show();
-    $('.follow-btn').addClass('disabled');
 
     $.ajax ({
         type: "POST",
@@ -16,15 +17,15 @@ function follow_status(follow_id) {
         dataType: "json",
         success: function() {
             if (status === false) {
-                $('.follow-btn').text('Follow');
-                $('.follow-btn').prop('value', '0');
-                $('.follow-btn').addClass('btn-primary').removeClass('btn-dark');
-                $('.follow-btn').removeClass('disabled');
+                $follow_button.text('Follow');
+                $follow_button.prop('value', '0');
+                $follow_button.addClass('btn-primary').removeClass('btn-dark');
+                $follow_button.removeClass('disabled');
             } else {
-                $('.follow-btn').text('Unfollow');
-                $('.follow-btn').prop('value', '1');
-                $('.follow-btn').removeClass('btn-primary').addClass('btn-dark');
-                $('.follow-btn').removeClass('disabled');
+                $follow_button.text('Unfollow');
+                $follow_button.prop('value', '1');
+                $follow_button.removeClass('btn-primary').addClass('btn-dark');
+                $follow_button.removeClass('disabled');
             }
         },
         error: function() {
@@ -39,10 +40,10 @@ function follow_status(follow_id) {
 
 // --- On document load --------------------------------------------
 $(document).ready(function() {
-    // --- Canvas Data -----------------------------------------
+    // --- Time spent data -------------------------------------
     let time_data = $('#time-spent-pie').attr('values').split(', ');
 
-    // --- Time sent pie graph ---------------------------------
+    // --- Time spent pie graph --------------------------------
     let config_pie = {
         type: 'pie',
         data: {
@@ -112,42 +113,4 @@ $(document).ready(function() {
         let text = $(this).attr('id');
         $(this).parent().css('width', text);
     });
-
-    // --- Levels animations for overview tab ------------------
-    $(".xp-increase-fx-flicker").css("opacity", "1");
-    $(".xp-increase-fx-flicker").animate({"opacity":Math.random()}, 100);
-    $(".xp-increase-fx").css("display", "inline-block");
-
-    $("#xp-bar-fill-series").css("box-shadow", "-5px 0px 10px #fff inset");
-    setTimeout(function() {
-        $("#xp-bar-fill-series").css("-webkit-transition", "all 2s ease");
-        let series_percent = $("#xp-bar-fill-series").attr('data-percentage');
-        $("#xp-bar-fill-series").css("width", series_percent+"%");
-    }, 100);
-    setTimeout(function(){
-        $(".xp-increase-fx").fadeOut(500);
-        $("#xp-bar-fill-series").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-    }, 2000);
-
-    $("#xp-bar-fill-anime").css("box-shadow", "-5px 0px 10px #fff inset");
-    setTimeout(function() {
-        $("#xp-bar-fill-anime").css("-webkit-transition", "all 2s ease");
-        let anime_percent = $("#xp-bar-fill-anime").attr('data-percentage');
-        $("#xp-bar-fill-anime").css("width", anime_percent+"%");
-    }, 100);
-    setTimeout(function() {
-        $(".xp-increase-fx").fadeOut(500);$("#xp-bar-fill-anime")
-            .css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-    }, 2000);
-
-    $("#xp-bar-fill-movies").css("box-shadow", "-5px 0px 10px #fff inset");
-    setTimeout(function() {
-        $("#xp-bar-fill-movies").css("-webkit-transition", "all 2s ease");
-        let movies_percent = $("#xp-bar-fill-movies").attr('data-percentage');
-        $("#xp-bar-fill-movies").css("width", movies_percent+"%");
-    }, 100);
-    setTimeout(function(){
-        $(".xp-increase-fx").fadeOut(500);
-        $("#xp-bar-fill-movies").css({"-webkit-transition":"all 0.5s ease","box-shadow":""});
-    }, 2000);
 });

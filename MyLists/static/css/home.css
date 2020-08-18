@@ -1,4 +1,5 @@
 
+
 .title {
     font-size: 50pt;
     text-shadow: 0 0 2px #000;
@@ -6,7 +7,10 @@
     -webkit-text-shadow: 0 0 2px #000;
 }
 
-/* On screens that are 768px or less */
+.background_white {
+    border-color: #e2e2e2;
+}
+
 @media (max-width: 768px) {
     .title {
         font-size: 2rem !important;
@@ -17,12 +21,8 @@
     }
 }
 
-.background_white {
-    border-color: #e2e2e2;
-}
 
-
-/* --------- login & Register Modal ---------- */
+/* --- login & Register Modal --------------------------- */
 .modal-content {
     padding-top: 10px;
     padding-bottom: 10px;

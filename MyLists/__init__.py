@@ -24,7 +24,6 @@ try:
     port = int(config['Mail']['port'])
     themoviedb_key = config['TheMovieDB']['api_key']
     twitter_oauth = [config['OAuth']['twitter_id'], config['OAuth']['twitter_secret']]
-    google_oauth = [config['OAuth']['google_id'], config['OAuth']['google_secret']]
 except Exception as e:
     print("Config file error: {}. Please read the README to configure the config.ini file properly.\nExit.".format(e))
     sys.exit()
@@ -51,10 +50,6 @@ app.config['MAIL_PASSWORD'] = password
 
 app.config['THEMOVIEDB_API_KEY'] = themoviedb_key
 app.config['OAUTH_CREDENTIALS'] = {
-    'google': {
-        'id': google_oauth[0],
-        'secret': google_oauth[1],
-    },
     'twitter': {
         'id': twitter_oauth[0],
         'secret': twitter_oauth[1]

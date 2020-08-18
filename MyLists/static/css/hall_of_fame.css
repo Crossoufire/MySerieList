@@ -1,29 +1,4 @@
-table.dataTable thead .sorting:after,
-table.dataTable thead .sorting:before,
-table.dataTable thead .sorting_asc:after,
-table.dataTable thead .sorting_asc:before,
-table.dataTable thead .sorting_asc_disabled:after,
-table.dataTable thead .sorting_asc_disabled:before,
-table.dataTable thead .sorting_desc:after,
-table.dataTable thead .sorting_desc:before,
-table.dataTable thead .sorting_desc_disabled:after,
-table.dataTable thead .sorting_desc_disabled:before {
-    bottom: .5em;
-}
 
-.btn-badges {
-    background-color: #4d0000;
-    color: white !important;
-}
-
-@media (min-width: 901px) {
-    .hof {
-        width: 900px;
-    }
-    .more_stats {
-        width: 500px;
-    }
-}
 
 option {
     background-color: #131418;
@@ -47,6 +22,11 @@ table.table a {
     text-align: center;
     vertical-align: middle;
     padding: 40px 0 40px 0 !important;
+}
+
+.btn-badges {
+    background-color: #4d0000;
+    color: white !important;
 }
 
 .current_user {
@@ -100,3 +80,13 @@ table.table a {
     padding-left: 7px !important;
     padding-right: 7px !important;
 }
+
+@media (min-width: 901px) {
+    .hof {
+        width: 900px;
+    }
+    .more_stats {
+        width: 500px;
+    }
+}
+

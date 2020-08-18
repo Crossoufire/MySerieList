@@ -1,5 +1,6 @@
 
-/* --- General ------------------------------------------------ */
+
+/* --- General ------------------------------------------ */
 * {
     font-weight: 400;
 }
@@ -80,7 +81,7 @@ hr {
 }
 
 
-/* --- Website Scrollbar ----------------------------------------- */
+/* --- Website Scrollbar -------------------------------- */
 ::-webkit-scrollbar {
     width: 10px;
 }
@@ -98,7 +99,7 @@ hr {
 }
 
 
-/* --- Navbar modifications ---------------------------------------- */
+/* --- Navbar modifications ----------------------------- */
 .medialist-dropdown {
     padding: 0;
     border-radius: 0;

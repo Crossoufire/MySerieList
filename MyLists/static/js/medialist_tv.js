@@ -11,23 +11,24 @@ function chargeButtons(card) {
     let dis_dropped = "block;";
     let dis_plan_to_watch = "block;";
     let $card = $('#'+card.id);
+    let category = $card.attr('cat');
 
-    if ($card.parent().attr('value') === 'Watching') {
+    if (category === 'Watching') {
         dis_watching = "none;";
     }
-    else if ($card.parent().attr('value') === 'Completed') {
+    else if (category === 'Completed') {
         dis_completed = "none;";
     }
-    else if ($card.parent().attr('value') === 'On Hold') {
+    else if (category === 'On Hold') {
         dis_on_hold = "none;";
     }
-    else if ($card.parent().attr('value') === 'Random') {
+    else if (category === 'Random') {
         dis_random = "none;";
     }
-    else if ($card.parent().attr('value') === 'Dropped') {
+    else if (category === 'Dropped') {
         dis_dropped = "none;";
     }
-    else {
+    else if (category === 'Plan to Watch') {
         dis_plan_to_watch = "none;";
     }
 
@@ -62,6 +63,7 @@ function chargeButtons(card) {
 
     $card.find('.card-btn-toop-right').hide();
     $card.find('.card-btn-top-left').hide();
+    $card.find('.bottom-card-cat').hide();
     $card.find('.bottom-card-info').hide();
     $card.find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
     $card.find('.mask').hide();
@@ -189,6 +191,7 @@ function ChargeButtonsOther(card) {
 
     $(card).find('.card-btn-top-left').hide();
     $(card).find('.bottom-card-info').hide();
+    $(card).find('.bottom-card-cat').hide();
     $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
     $(card).find('.mask').hide();
 }

@@ -2,17 +2,17 @@
 
 
 {% block button %}
-    <a class="btn btn-sm {% if category.value == 'Watching' %} btn-selected {% else %} btn-header {% endif %}"
+    <a class="btn btn-sm {% if button_cat == 'Watching' %} btn-selected {% else %} btn-header {% endif %}"
        href="/{{ media_list }}/{{ username }}?cat=Watching">WATCHING</a>
-    <a class="btn btn-sm {% if category.value == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"
+    <a class="btn btn-sm {% if button_cat == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"
        href="/{{ media_list }}/{{ username }}?cat=Completed">COMPLETED</a>
-    <a class="btn btn-sm {% if category.value == 'On Hold' %} btn-selected {% else %} btn-header {% endif %}"
+    <a class="btn btn-sm {% if button_cat == 'On Hold' %} btn-selected {% else %} btn-header {% endif %}"
        href="/{{ media_list }}/{{ username }}?cat=On Hold">ON HOLD</a>
-    <a class="btn btn-sm {% if category.value == 'Random' %} btn-selected {% else %} btn-header {% endif %}"
+    <a class="btn btn-sm {% if button_cat == 'Random' %} btn-selected {% else %} btn-header {% endif %}"
        href="/{{ media_list }}/{{ username }}?cat=Random">RANDOM</a>
-    <a class="btn btn-sm {% if category.value == 'Dropped' %} btn-selected {% else %} btn-header {% endif %}"
+    <a class="btn btn-sm {% if button_cat == 'Dropped' %} btn-selected {% else %} btn-header {% endif %}"
        href="/{{ media_list }}/{{ username }}?cat=Dropped">DROPPED</a>
-    <a class="btn btn-sm {% if category.value == 'Plan to Watch' %} btn-selected {% else %} btn-header {% endif %}"
+    <a class="btn btn-sm {% if button_cat == 'Plan to Watch' %} btn-selected {% else %} btn-header {% endif %}"
        href="/{{ media_list }}/{{ username }}?cat=Plan to Watch">PLAN TO WATCH</a>
 {% endblock button %}
 
@@ -23,10 +23,10 @@
 
 
 {% block seas_eps_drop %}
-    <div class="seas-eps-drop-container" {% if category.value == 'Plan to Watch'
-    or category.value == 'Random' %} style="display: none;"{% endif %}>
+    <div class="seas-eps-drop-container" {% if category == 'Plan to Watch'
+    or category == 'Random' %} style="display: none;"{% endif %}>
         <select id="S_{{ data['id'] }}" class="seas-eps-drop
-         {% if target_user_id != current_user.get_id() %} disabled{% endif %}"
+         {% if user_id != current_user.get_id() %} disabled{% endif %}"
                 onchange="updateSeason('{{ data['id'] }}', this)">
             {% for i in range(data['eps_per_season']|length) %}
                 <option class="seas-eps-drop-options" {% if i + 1 == data['current_season'] %}
@@ -39,9 +39,9 @@
         <span style="border-right: 2px solid gray;"></span>
 
         <select id="E_{{ data['id'] }}" class="text-light text-center p-0 seas-eps-drop
-         {% if target_user_id != current_user.get_id() %} disabled{% endif %}"
+         {% if user_id != current_user.get_id() %} disabled{% endif %}"
                 onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
-            {% if category.value == 'Plan to Watch' or category.value == 'Random' %}
+            {% if category == 'Plan to Watch' or category == 'Random' %}
                 {% for i in range(0, data['eps_per_season'][data['current_season'] - 1]) %}
                     <option class="seas-eps-drop-options" {% if i + 1 == 1 %} selected="selected" {% endif %}>
                         {{ "E{:02}".format(i + 1) }}

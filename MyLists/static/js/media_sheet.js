@@ -3,7 +3,9 @@
 // --- Add the media to the user ---------------------------------------
 function addToUser(element_id, media_type) {
     let category = media_type === 'movieslist' ? 'Completed' : 'Watching';
-    $('#your-medialist-data').addClass('disabled');
+    let $medialist = $('#your-medialist-data');
+
+    $medialist.addClass('disabled');
     $('#loading-add-list').hide();
 
     $.ajax ({
@@ -16,7 +18,7 @@ function addToUser(element_id, media_type) {
             $('#your-medialist-data').slideDown(300);
             $('#add-to-list').hide();
             $('#add-media').show('slow').delay(2000).fadeOut();
-            $('#your-medialist-data').removeClass('disabled');
+            $medialist.removeClass('disabled');
         },
         error: function() {
             error_ajax_message('Error: The media could not be added. Please try again later.');

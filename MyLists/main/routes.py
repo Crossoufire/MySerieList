@@ -34,12 +34,11 @@ def mymedialist(media_list, user_name):
     # Check the <category>, the page of the <medialist> and setup the html page.
     if list_type != ListType.MOVIES:
         category = request.args.get('cat', 'Watching', str)
-        page = request.args.get('page', 1, int)
-        html_media = 'medialist_tv.html'
-    else:
+        html_template = 'medialist_tv.html'
+    elif list_type == ListType.MOVIES:
         category = request.args.get('cat', 'Completed', str)
-        page = request.args.get('page', 1, int)
-        html_media = 'medialist_movies.html'
+        html_template = 'medialist_movies.html'
+    page = request.args.get('page', 1, int)
 
     # Check if <category> is valid
     try:
@@ -47,50 +46,84 @@ def mymedialist(media_list, user_name):
     except ValueError:
         abort(404)
 
-    # Retrieve the <media_data>
-    if list_type == ListType.SERIES:
-        element_data = SeriesList.get_series_info(user.id, category, page)
-        cover_path = '/static/covers/series_covers/'
-        media_data = get_medialist_data(list_type, element_data, cover_path, user.id)
-    elif list_type == ListType.ANIME:
-        element_data = AnimeList.get_anime_info(user.id, category, page)
-        cover_path = '/static/covers/anime_covers/'
-        media_data = get_medialist_data(list_type, element_data, cover_path, user.id)
-    elif list_type == ListType.MOVIES:
-        element_data = MoviesList.get_movies_info(user.id, category, page)
-        cover_path = '/static/covers/movies_covers/'
-        media_data = get_medialist_data(list_type, element_data, cover_path, user.id)
+    # Check if <search> is enabled then retrieve the <element_data>
+    search = request.args.get('search')
+    total_pages = None
+    total_response = None
+    element_data = None
+    if search:
+        if list_type == ListType.SERIES:
+            query = db.session.query(Series, SeriesList)\
+                .join(Series, Series.id == SeriesList.series_id)\
+                .filter(Series.name.like('%' + search + '%'), SeriesList.user_id == user.id)\
+                .order_by(SeriesList.status).paginate(page, 25, error_out=True)
+            cover_path = url_for('static', filename='covers/series_covers/')
+        elif list_type == ListType.ANIME:
+            query = db.session.query(Anime, AnimeList)\
+                .join(Anime, Anime.id == AnimeList.anime_id)\
+                .filter(Anime.name.like('%' + search + '%'), AnimeList.user_id == user.id)\
+                .order_by(AnimeList.status).paginate(page, 25, error_out=True)
+            cover_path = url_for('static', filename='covers/anime_covers/')
+        elif list_type == ListType.MOVIES:
+            query = db.session.query(Movies, MoviesList) \
+                .join(Movies, Movies.id == MoviesList.movies_id) \
+                .filter(Movies.name.like('%' + search + '%'), MoviesList.user_id == user.id)\
+                .order_by(MoviesList.status).paginate(page, 25, error_out=True)
+            cover_path = url_for('static', filename='covers/movies_covers/')
+        total_pages = query.pages
+        total_response = query.total
+        element_data = query.items
+        searching = True
+        category = "Search results for '{}'".format(search)
+    else:
+        if list_type == ListType.SERIES:
+            element_data = SeriesList.get_series_info(user.id, category, page)
+            cover_path = url_for('static', filename='covers/series_covers/')
+        elif list_type == ListType.ANIME:
+            element_data = AnimeList.get_anime_info(user.id, category, page)
+            cover_path = url_for('static', filename='covers/anime_covers/')
+        elif list_type == ListType.MOVIES:
+            element_data = MoviesList.get_movies_info(user.id, category, page)
+            cover_path = url_for('static', filename='covers/movies_covers/')
+        searching = False
+        category = category.value
 
-    return render_template(html_media,
+    # Shape the <media_data>
+    media_data = get_medialist_data(list_type, element_data, cover_path, user.id)
+
+    return render_template(html_template,
                            title="{}'s {}".format(user_name, media_list),
                            media_data=media_data["media_data"],
                            common_elements=media_data["common_elements"],
                            media_list=media_list,
+                           button_cat=category,
                            category=category,
+                           searching=searching,
                            username=user_name,
-                           user_id=str(user.id))
+                           user_id=str(user.id),
+                           search=search,
+                           total_pages=total_pages,
+                           total_response=total_response)
 
 
-@bp.route("/medialist_search", methods=['GET'])
+@bp.route("/next_airing", methods=['GET', 'POST'])
 @login_required
-def medialist_search():
-    q = request.args.get('search')
-
-    query = db.session.query(Movies, MoviesList)\
+def next_airing():
+    airing_series = db.session.query(Series, SeriesList)\
+        .join(Series, Series.id == SeriesList.series_id)\
+        .filter(Series.next_episode_to_air > datetime.utcnow(), SeriesList.user_id == current_user.id).all()
+    airing_anime = db.session.query(Anime, AnimeList)\
+        .join(Anime, Anime.id == AnimeList.anime_id)\
+        .filter(Anime.next_episode_to_air > datetime.utcnow(), AnimeList.user_id == current_user.id).all()
+    airing_movies = db.session.query(Movies, MoviesList)\
         .join(Movies, Movies.id == MoviesList.movies_id)\
-        .filter(Movies.name.like('%' + q + '%'), MoviesList.user_id == current_user.id).all()
-    cover_path = '/static/covers/movies_covers/'
+        .filter(Movies.release_date > datetime.utcnow(), MoviesList.user_id == current_user.id).all()
 
-    media_data = get_medialist_data(ListType.MOVIES, query, cover_path, current_user.id)
-
-    return render_template('medialist_movies.html',
-                           title="{}'s {}".format(current_user.username, ListType.MOVIES.value),
-                           media_data=media_data["media_data"],
-                           common_elements=media_data["common_elements"],
-                           media_list=ListType.MOVIES.value,
-                           category=Status.COMPLETED,
-                           username=current_user.username,
-                           user_id=str(current_user.id))
+    return render_template('next_airing.html',
+                           title='Next Airing',
+                           airing_series=airing_series,
+                           airing_anime=airing_anime,
+                           airing_movies=airing_movies)
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])

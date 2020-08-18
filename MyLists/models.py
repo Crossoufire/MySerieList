@@ -2,9 +2,10 @@ import enum
 
 from flask import abort
 from datetime import datetime
-from flask_login import UserMixin
-from sqlalchemy import func, desc, text
+from sqlalchemy.orm import aliased
 from MyLists import app, db, login_manager
+from sqlalchemy import func, desc, text, and_
+from flask_login import UserMixin, current_user
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 
@@ -264,8 +265,19 @@ class SeriesList(db.Model):
         element_data = db.session.query(Series, SeriesList) \
             .join(SeriesList, SeriesList.series_id == Series.id) \
             .filter(SeriesList.user_id == user_id, SeriesList.status == category).group_by(Series.id) \
-            .order_by(Series.name.asc()).paginate(page, 70, False).items
+            .order_by(Series.name.asc()).paginate(page, 70, error_out=True).items
         return element_data
+
+    @staticmethod
+    def get_series_count(user_id):
+        v1 = aliased(SeriesList)
+        v2 = aliased(SeriesList)
+        count_total = v1.query.filter_by(user_id=user_id).count()
+        count_versus = db.session.query(v1, v2).join(v2, and_(v2.user_id == user_id, v2.series_id == v1.series_id)) \
+            .filter(v1.user_id == current_user.id).all()
+        common_ids = [r[0].series_id for r in count_versus]
+
+        return [common_ids, int(count_total)]
 
     @staticmethod
     def get_total_time(user_id):
@@ -332,7 +344,7 @@ class Anime(db.Model):
 
     genres = db.relationship('AnimeGenre', backref='anime', lazy=True)
     actors = db.relationship('AnimeActors', backref='anime', lazy=True)
-    eps_per_season = db.relationship('AnimeEpisodesPerSeason', backref='anime', lazy=True)
+    eps_per_season = db.relationship('AnimeEpisodesPerSeason', backref='anime', lazy=False)
     list_info = db.relationship('AnimeList', backref='anime', lazy='dynamic')
     networks = db.relationship('AnimeNetwork', backref='anime', lazy=True)
 
@@ -373,15 +385,25 @@ class AnimeList(db.Model):
         element_data = db.session.query(Anime, AnimeList) \
             .join(AnimeList, AnimeList.anime_id == Anime.id) \
             .filter(AnimeList.user_id == user_id, AnimeList.status == category).group_by(Anime.id) \
-            .order_by(Anime.name.asc()).paginate(page, 70, False).items
+            .order_by(Anime.name.asc()).paginate(page, 70, error_out=True).items
         return element_data
 
     @staticmethod
+    def get_anime_count(user_id):
+        v1 = aliased(AnimeList)
+        v2 = aliased(AnimeList)
+        count_total = v1.query.filter_by(user_id=user_id).count()
+        count_versus = db.session.query(v1, v2).join(v2, and_(v2.user_id == user_id, v2.anime_id == v1.anime_id)) \
+            .filter(v1.user_id == current_user.id).all()
+        common_ids = [r[0].anime_id for r in count_versus]
+
+        return [common_ids, int(count_total)]
+
+    @staticmethod
     def get_total_time(user_id):
-        element_data = db.session.query(AnimeList, Anime, func.group_concat(AnimeEpisodesPerSeason.episodes)) \
+        element_data = db.session.query(AnimeList, Anime) \
             .join(Anime, Anime.id == AnimeList.anime_id) \
-            .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id) \
-            .filter(AnimeList.user_id == user_id).group_by(AnimeList.anime_id).all()
+            .filter(AnimeList.user_id == user_id).group_by(AnimeList.anime_id)
         return element_data
 
 
@@ -500,8 +522,19 @@ class MoviesList(db.Model):
         element_data = db.session.query(Movies, MoviesList) \
             .join(MoviesList, MoviesList.movies_id == Movies.id) \
             .filter(MoviesList.user_id == user_id, MoviesList.status == category).group_by(Movies.id) \
-            .order_by(Movies.name.asc()).paginate(page, 70, False).items
+            .order_by(Movies.name.asc()).paginate(page, 70, error_out=True).items
         return element_data
+
+    @staticmethod
+    def get_movies_count(user_id):
+        v1 = aliased(MoviesList)
+        v2 = aliased(MoviesList)
+        count_total = v1.query.filter_by(user_id=user_id).count()
+        count_versus = db.session.query(v1, v2).join(v2, and_(v2.user_id == user_id, v2.movies_id == v1.movies_id)) \
+            .filter(v1.user_id == current_user.id).all()
+        common_ids = [r[0].movies_id for r in count_versus]
+
+        return [common_ids, int(count_total)]
 
     @staticmethod
     def get_total_time(user_id):

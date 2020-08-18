@@ -404,17 +404,13 @@ def add_element_in_db(api_id, list_type):
 
 
 def get_medialist_data(list_type, element_data, cover_path, user_id):
-    current_list = []
-    if user_id != current_user.id:
-        if list_type == ListType.ANIME:
-            current_media = db.session.query(AnimeList.anime_id).filter_by(user_id=current_user.id).all()
-        elif list_type == ListType.SERIES:
-            current_media = db.session.query(SeriesList.series_id).filter_by(user_id=current_user.id).all()
-        elif list_type == ListType.MOVIES:
-            current_media = db.session.query(MoviesList.movies_id).filter_by(user_id=current_user.id).all()
-        current_list = [r[0] for r in current_media]
+    if list_type == ListType.SERIES:
+        common_media, total_media = SeriesList.get_series_count(user_id)
+    elif list_type == ListType.ANIME:
+        common_media, total_media = AnimeList.get_anime_count(user_id)
+    elif list_type == ListType.MOVIES:
+        common_media, total_media = MoviesList.get_movies_count(user_id)
 
-    common_elements = 0
     media_data = []
     if list_type != ListType.MOVIES:
         for element in element_data:
@@ -428,6 +424,7 @@ def get_medialist_data(list_type, element_data, cover_path, user_id):
                             "favorite": element[1].favorite,
                             "rewatched": element[1].rewatched,
                             "comment": element[1].comment,
+                            "category": element[1].status.value,
                             "common": False}
 
             if not element_info['score'] or element_info['score'] == -1:
@@ -440,14 +437,12 @@ def get_medialist_data(list_type, element_data, cover_path, user_id):
                 element_info["display_name"] = element[0].name
                 element_info["other_name"] = element[0].original_name
 
-            if list_type == ListType.SERIES:
-                element_info['media'] = 'Series'
-            else:
+            element_info['media'] = 'Series'
+            if list_type == ListType.ANIME:
                 element_info['media'] = 'Anime'
 
-            if element[0].id in current_list:
+            if element[0].id in common_media:
                 element_info['common'] = True
-                common_elements += 1
 
             media_data.append(element_info)
     elif list_type == ListType.MOVIES:
@@ -457,7 +452,7 @@ def get_medialist_data(list_type, element_data, cover_path, user_id):
                             "cover": "{}{}".format(cover_path, element[0].image_cover),
                             "score": element[1].score,
                             "favorite": element[1].favorite,
-                            "category": element[1].status,
+                            "category": element[1].status.value,
                             "rewatched": element[1].rewatched,
                             "comment": element[1].comment,
                             "media": 'Movies',
@@ -473,19 +468,18 @@ def get_medialist_data(list_type, element_data, cover_path, user_id):
                 element_info["display_name"] = element[0].name
                 element_info["other_name"] = element[0].original_name
 
-            if element[0].id in current_list:
+            if element[0].id in common_media:
                 element_info['common'] = True
-                common_elements += 1
 
             media_data.append(element_info)
 
     try:
-        percentage = int((common_elements/len(element_data))*100)
+        percentage = int((len(common_media)/total_media)*100)
     except ZeroDivisionError:
         percentage = 0
 
     data = {"media_data": media_data,
-            "common_elements": [common_elements, len(element_data), percentage]}
+            "common_elements": [len(common_media), total_media, percentage]}
 
     return data
 

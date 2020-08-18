@@ -1,11 +1,11 @@
 from datetime import datetime
+from MyLists.models import User
 from MyLists import app, bcrypt, db
-from MyLists.models import User, HomePage
 from MyLists.auth.oauth import OAuthSignIn
 from MyLists.auth.functions import return_user_homepage
 from MyLists.auth.emails import send_register_email, send_reset_email
 from flask_login import login_user, current_user, logout_user, login_required
-from flask import Blueprint, flash, request, redirect, url_for, abort, render_template
+from flask import Blueprint, flash, request, redirect, url_for, render_template
 from MyLists.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
 
 
@@ -159,6 +159,7 @@ def oauth_callback(provider):
 
     user = User.query.filter_by(oauth_id=social_id).first()
     if not user:
+        # noinspection PyArgumentList
         user = User(username=username,
                     oauth_id=social_id,
                     email=email,

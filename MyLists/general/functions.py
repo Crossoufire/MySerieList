@@ -59,6 +59,7 @@ def compute_media_time_spent(list_type):
 
 # ---------------------------------------- DB add/refresh from CSV data ---------------------------------------------- #
 
+
 def add_ranks_to_db():
     list_all_ranks = []
     path = Path(app.root_path, 'static/csv_data/ranks.csv')

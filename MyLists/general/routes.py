@@ -287,6 +287,6 @@ def current_trends():
                            movies_trends=movies_results)
 
 
-@bp.route('/service-worker.js')
-def service_worker():
-    return app.send_static_file('service-worker.js')
+# @bp.route('/service-worker.js')
+# def service_worker():
+#     return app.send_static_file('service-worker.js')
