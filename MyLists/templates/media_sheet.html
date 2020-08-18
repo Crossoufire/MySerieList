@@ -42,7 +42,8 @@
                         <h4 id="fav-title" class="m-l-15 m-r-15">
                             <i class="fas fa-list m-t-10"></i>&nbsp;&nbsp; <b>List Info</b>
                             <i id="favorite" class="fa-heart m-t-10 {% if data['favorite'] %} fas favorited {% else %}
-                             far no-fav{% endif %}" onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></i>
+                             far no-fav{% endif %}" data-toggle="tooltip" title="Favorite"
+                               onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></i>
                         </h4>
                         <hr class="m-l-15 m-r-15 m-b-8">
                         <div class="row m-l-30 m-r-25">
@@ -476,22 +477,25 @@
                                     far f-no-fav{% endif %}"></i>
                                 </div>
                                 <hr class="m-b-8" style="border-color: gray;">
-                                {% if follow[1].score == -1 or follow[1].score == None %}
-                                    <div><b>Score:&nbsp; ---</b></div>
-                                {% else %}
-                                    <div><b>Score:&nbsp; {{ follow[1].score }}</b></div>
-                                {% endif %}
-                                <div><b>Status:&nbsp; {{ follow[1].status.value }}</b></div>
+                                <i class="fas fa-sm fa-star"></i>
+                                <b>{% if follow[1].score == -1 or follow[1].score == None %}&nbsp;Score:&nbsp; ---
+                                {% else %}&nbsp;Score:&nbsp; {{ follow[1].score }}{% endif %}</b>
+                                <div class="follow-status" value="{{ follow[1].status.value }}">
+                                    <i class="fas fa-certificate"></i>
+                                    <b>&nbsp;Status:&nbsp;{{ follow[1].status.value }}</b>
+                                </div>
                                 {% if media_list != 'movieslist' %}
                                     {% if follow[1].status.value == 'Completed' or follow[1].status.value == 'Random'
                                     or follow[1].status.value == 'Plan to Watch' %}
                                     {% else %}
-                                        <b>Season {{ follow[1].current_season }} - Episode
+                                        <i class="fas fa-sm fa-play"></i>
+                                        <b>&nbsp;Season {{ follow[1].current_season }} - Episode
                                             {{ follow[1].last_episode_watched }}</b>
                                     {% endif %}
                                 {% endif %}
                                 {% if follow[1].status.value == 'Completed' %}
-                                    <div><b>Re-watched:&nbsp; {{ follow[1].rewatched }}</b></div>
+                                    <i class="fas fas-sm fa-redo"></i>
+                                    <b>&nbsp;Re-watched:&nbsp; {{ follow[1].rewatched }}</b>
                                 {% endif %}
                                 {% if follow[1].comment %}
                                     <div class="m-t-10"><b>Comment:</b></div>

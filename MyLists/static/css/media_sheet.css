@@ -73,7 +73,7 @@ ul {
 
 .far.fa-edit {
     float: right;
-    color: lightgray;
+    color: #929292;
 }
 
 .follow-margin-mobile {
@@ -95,8 +95,8 @@ ul {
 }
 
 .follow-div {
-    background: #0e2031;
-    border-radius: 8px;
+    background: #242428;
+    border-radius: 3px;
     padding: 5px 20px 15px 20px;
 }
 

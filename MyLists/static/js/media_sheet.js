@@ -328,6 +328,28 @@ function lock_media(element_id, element_type) {
 }
 
 
+// --- Get the color of the status -------------------------------------
+$(document).ready(function () {
+    $('.follow-div').each(function () {
+        if ($(this).find('.follow-status').attr('value') === 'Watching') {
+            $(this).find('.fa-certificate').attr('style', 'color: #334D5C;');
+        } else if ($(this).find('.follow-status').attr('value') === 'Completed') {
+            $(this).find('.fa-certificate').attr('style', 'color: #45B29D;');
+        } else if ($(this).find('.follow-status').attr('value') === 'On Hold') {
+            $(this).find('.fa-certificate').attr('style', 'color: #EFC94C;');
+        } else if ($(this).find('.follow-status').attr('value') === 'Random') {
+            $(this).find('.fa-certificate').attr('style', 'color: #E27A3F;');
+        } else if ($(this).find('.follow-status').attr('value') === 'Dropped') {
+            $(this).find('.fa-certificate').attr('style', 'color: #DF5A49;');
+        } else if ($(this).find('.follow-status').attr('value') === 'Plan to Watch') {
+            $(this).find('.fa-certificate').attr('style', 'color: #962D3E;');
+        } else if ($(this).find('.follow-status').attr('value') === 'Completed Animation') {
+            $(this).find('.fa-certificate').attr('style', 'color: #22748d;');
+        }
+    });
+});
+
+
 // --- Random box color ------------------------------------------------
 $(document).ready(function () {
     let colors, boxes, i;
