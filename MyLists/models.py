@@ -262,22 +262,30 @@ class SeriesList(db.Model):
 
     @staticmethod
     def get_series_info(user_id, category, page):
-        element_data = db.session.query(Series, SeriesList) \
+        query = db.session.query(Series, SeriesList) \
             .join(SeriesList, SeriesList.series_id == Series.id) \
             .filter(SeriesList.user_id == user_id, SeriesList.status == category).group_by(Series.id) \
-            .order_by(Series.name.asc()).paginate(page, 70, error_out=True).items
-        return element_data
+            .order_by(Series.name.asc()).paginate(page, 70, error_out=True)
+        return query
 
     @staticmethod
     def get_series_count(user_id):
-        v1 = aliased(SeriesList)
-        v2 = aliased(SeriesList)
+        v1, v2 = aliased(SeriesList), aliased(SeriesList)
         count_total = v1.query.filter_by(user_id=user_id).count()
         count_versus = db.session.query(v1, v2).join(v2, and_(v2.user_id == user_id, v2.series_id == v1.series_id)) \
             .filter(v1.user_id == current_user.id).all()
         common_ids = [r[0].series_id for r in count_versus]
 
         return [common_ids, int(count_total)]
+
+    @staticmethod
+    def get_series_search(user_id, search, page):
+        query = db.session.query(Series, SeriesList)\
+            .join(Series, Series.id == SeriesList.series_id) \
+            .filter(Series.name.like('%' + search + '%'), SeriesList.user_id == user_id) \
+            .order_by(SeriesList.status).paginate(page, 25, error_out=True)
+
+        return query
 
     @staticmethod
     def get_total_time(user_id):
@@ -382,11 +390,11 @@ class AnimeList(db.Model):
 
     @staticmethod
     def get_anime_info(user_id, category, page):
-        element_data = db.session.query(Anime, AnimeList) \
+        query = db.session.query(Anime, AnimeList) \
             .join(AnimeList, AnimeList.anime_id == Anime.id) \
             .filter(AnimeList.user_id == user_id, AnimeList.status == category).group_by(Anime.id) \
-            .order_by(Anime.name.asc()).paginate(page, 70, error_out=True).items
-        return element_data
+            .order_by(Anime.name.asc()).paginate(page, 70, error_out=True)
+        return query
 
     @staticmethod
     def get_anime_count(user_id):
@@ -398,6 +406,15 @@ class AnimeList(db.Model):
         common_ids = [r[0].anime_id for r in count_versus]
 
         return [common_ids, int(count_total)]
+
+    @staticmethod
+    def get_anime_search(user_id, search, page):
+        query = db.session.query(Anime, AnimeList) \
+            .join(Anime, Anime.id == AnimeList.anime_id) \
+            .filter(Anime.name.like('%' + search + '%'), AnimeList.user_id == user_id) \
+            .order_by(AnimeList.status).paginate(page, 25, error_out=True)
+
+        return query
 
     @staticmethod
     def get_total_time(user_id):
@@ -519,11 +536,11 @@ class MoviesList(db.Model):
 
     @staticmethod
     def get_movies_info(user_id, category, page):
-        element_data = db.session.query(Movies, MoviesList) \
+        query = db.session.query(Movies, MoviesList) \
             .join(MoviesList, MoviesList.movies_id == Movies.id) \
             .filter(MoviesList.user_id == user_id, MoviesList.status == category).group_by(Movies.id) \
-            .order_by(Movies.name.asc()).paginate(page, 70, error_out=True).items
-        return element_data
+            .order_by(Movies.name.asc()).paginate(page, 70, error_out=True)
+        return query
 
     @staticmethod
     def get_movies_count(user_id):
@@ -535,6 +552,15 @@ class MoviesList(db.Model):
         common_ids = [r[0].movies_id for r in count_versus]
 
         return [common_ids, int(count_total)]
+
+    @staticmethod
+    def get_movies_search(user_id, search, page):
+        query = db.session.query(Movies, MoviesList) \
+            .join(Movies, Movies.id == MoviesList.movies_id) \
+            .filter(Movies.name.like('%' + search + '%'), MoviesList.user_id == user_id) \
+            .order_by(MoviesList.status).paginate(page, 25, error_out=True)
+
+        return query
 
     @staticmethod
     def get_total_time(user_id):

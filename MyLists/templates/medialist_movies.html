@@ -2,11 +2,11 @@
 
 
 {% block button %}
-    <a class="btn btn-sm {% if button_cat == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"
+    <a class="btn btn-sm {% if category == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"
        href="/{{ media_list }}/{{ username }}?cat=Completed">COMPLETED</a>
-    <a class="btn btn-sm {% if button_cat == 'Completed Animation' %} btn-selected {% else %} btn-header {% endif %}"
+    <a class="btn btn-sm {% if category == 'Completed Animation' %} btn-selected {% else %} btn-header {% endif %}"
        href="/{{ media_list }}/{{ username }}?cat=Completed Animation">COMPLETED ANIMATION</a>
-    <a class="btn btn-sm {% if button_cat == 'Plan to Watch' %} btn-selected {% else %} btn-header {% endif %}"
+    <a class="btn btn-sm {% if category == 'Plan to Watch' %} btn-selected {% else %} btn-header {% endif %}"
        href="/{{ media_list }}/{{ username }}?cat=Plan to Watch">PLAN TO WATCH</a>
 {% endblock button %}
 

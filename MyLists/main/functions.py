@@ -11,6 +11,7 @@ from datetime import datetime
 from flask_login import current_user
 from MyLists.API_data import ApiData
 from MyLists.general.functions import compute_media_time_spent
+from MyLists.main.media_object import MediaObject, SeriesAnimeDict, MoviesDict
 from MyLists.models import ListType, Status, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
     SeriesList, Series, MoviesList, Movies, SeriesGenre, AnimeGenre, MoviesGenre, UserLastUpdate, SeriesActors, \
     SeriesNetwork, AnimeNetwork, MoviesActors, MoviesCollections, AnimeActors, Notifications
@@ -485,81 +486,9 @@ def get_medialist_data(list_type, element_data, cover_path, user_id):
 
 
 def load_media_sheet(media, user_id, list_type):
-    # Basic element information
-    element_info = {"id": media.id,
-                    "homepage": media.homepage,
-                    "vote_average": media.vote_average,
-                    "vote_count": media.vote_count,
-                    "synopsis": media.synopsis,
-                    "popularity": media.popularity,
-                    "lock_status": media.lock_status,
-                    "actors": ', '.join([r.name for r in media.actors]),
-                    "genres": ', '.join([r.genre for r in media.genres])}
+    media_dict = MediaObject(media, list_type)
 
-    if latin_alphabet(media.original_name):
-        element_info["display_name"] = media.original_name
-        element_info["other_name"] = media.name
-    else:
-        element_info["display_name"] = media.name
-        element_info["other_name"] = media.original_name
-
-    if media.original_name == media.name:
-        element_info["other_name"] = None
-
-    # Depending on the media add/modify supplementary information
-    if list_type != ListType.MOVIES:
-        supp_info = {"created_by": media.created_by,
-                     "total_seasons": media.total_seasons,
-                     "total_episodes": media.total_episodes,
-                     "prod_status": media.status,
-                     "episode_duration": media.episode_duration,
-                     "in_production": media.in_production,
-                     "origin_country": media.origin_country,
-                     "eps_per_season": [r.episodes for r in media.eps_per_season],
-                     "networks": ', '.join([r.network for r in media.networks])}
-
-        # Change <first_air_time> format
-        if media.first_air_date != 'Unknown':
-            supp_info['first_air_date'] = datetime.strptime(media.first_air_date, '%Y-%m-%d').strftime("%d %b %Y")
-        else:
-            supp_info['first_air_date'] = 'Unknown'
-
-        # Change <last_air_time> format
-        if media.last_air_date != 'Unknown':
-            supp_info['last_air_date'] = datetime.strptime(media.last_air_date, '%Y-%m-%d').strftime("%d %b %Y")
-        else:
-            supp_info['last_air_date'] = 'Unknown'
-
-        if list_type == ListType.SERIES:
-            supp_info["media_type"] = 'Series'
-            supp_info["cover"] = 'series_covers/{}'.format(media.image_cover)
-            supp_info["cover_path"] = 'series_covers'
-        elif list_type == ListType.ANIME:
-            element_info['name'] = media.original_name
-            element_info['original_name'] = media.name
-            supp_info["media_type"] = 'Anime'
-            supp_info["cover"] = 'anime_covers/{}'.format(media.image_cover)
-            supp_info["cover_path"] = 'anime_covers'
-    elif list_type == ListType.MOVIES:
-        supp_info = {"media_type": 'Movies',
-                     "cover_path": 'movies_covers',
-                     "cover": 'movies_covers/{}'.format(media.image_cover),
-                     "original_language": media.original_language,
-                     "director": media.director_name,
-                     "runtime": media.runtime,
-                     "budget": media.budget,
-                     "revenue": media.revenue,
-                     "tagline": media.tagline,
-                     "collection_data": media.collection_movies}
-
-        # Change release date format
-        if 'Unknown' not in media.release_date:
-            supp_info['release_date'] = datetime.strptime(media.release_date, '%Y-%m-%d').strftime("%d %b %Y")
-        else:
-            supp_info['release_date'] = 'Unknown'
-
-    # Merge all the media info into one dict
-    element_info.update(supp_info)
+    print(media_dict)
 
     # Recover the same media genres
     if len([r.genre for r in media.genres]) > 2:

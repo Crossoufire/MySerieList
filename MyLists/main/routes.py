@@ -46,64 +46,49 @@ def mymedialist(media_list, user_name):
     except ValueError:
         abort(404)
 
-    # Check if <search> is enabled then retrieve the <element_data>
+    # Check if <search> is enabled then retrieve the <media_data> from the SQL query
     search = request.args.get('search')
-    total_pages = None
-    total_response = None
-    element_data = None
     if search:
         if list_type == ListType.SERIES:
-            query = db.session.query(Series, SeriesList)\
-                .join(Series, Series.id == SeriesList.series_id)\
-                .filter(Series.name.like('%' + search + '%'), SeriesList.user_id == user.id)\
-                .order_by(SeriesList.status).paginate(page, 25, error_out=True)
+            query = SeriesList.get_series_search(user.id, search, page)
             cover_path = url_for('static', filename='covers/series_covers/')
         elif list_type == ListType.ANIME:
-            query = db.session.query(Anime, AnimeList)\
-                .join(Anime, Anime.id == AnimeList.anime_id)\
-                .filter(Anime.name.like('%' + search + '%'), AnimeList.user_id == user.id)\
-                .order_by(AnimeList.status).paginate(page, 25, error_out=True)
+            query = AnimeList.get_anime_search(user.id, search, page)
             cover_path = url_for('static', filename='covers/anime_covers/')
         elif list_type == ListType.MOVIES:
-            query = db.session.query(Movies, MoviesList) \
-                .join(Movies, Movies.id == MoviesList.movies_id) \
-                .filter(Movies.name.like('%' + search + '%'), MoviesList.user_id == user.id)\
-                .order_by(MoviesList.status).paginate(page, 25, error_out=True)
+            query = MoviesList.get_movies_search(user.id, search, page)
             cover_path = url_for('static', filename='covers/movies_covers/')
-        total_pages = query.pages
-        total_response = query.total
-        element_data = query.items
-        searching = True
         category = "Search results for '{}'".format(search)
     else:
         if list_type == ListType.SERIES:
-            element_data = SeriesList.get_series_info(user.id, category, page)
+            query = SeriesList.get_series_info(user.id, category, page)
             cover_path = url_for('static', filename='covers/series_covers/')
         elif list_type == ListType.ANIME:
-            element_data = AnimeList.get_anime_info(user.id, category, page)
+            query = AnimeList.get_anime_info(user.id, category, page)
             cover_path = url_for('static', filename='covers/anime_covers/')
         elif list_type == ListType.MOVIES:
-            element_data = MoviesList.get_movies_info(user.id, category, page)
+            query = MoviesList.get_movies_info(user.id, category, page)
             cover_path = url_for('static', filename='covers/movies_covers/')
-        searching = False
         category = category.value
 
+    # Get the actual page, total number of pages and the total number of media from the query
+    info_pages = {'actual_page': query.page,
+                  'total_pages': query.pages,
+                  'total_media': query.total}
+
     # Shape the <media_data>
-    media_data = get_medialist_data(list_type, element_data, cover_path, user.id)
+    media_data = get_medialist_data(list_type, query.items, cover_path, user.id)
 
     return render_template(html_template,
                            title="{}'s {}".format(user_name, media_list),
                            media_data=media_data["media_data"],
                            common_elements=media_data["common_elements"],
                            media_list=media_list,
-                           button_cat=category,
                            category=category,
-                           searching=searching,
                            username=user_name,
                            user_id=str(user.id),
-                           search=search,
-                           total_pages=total_pages,
-                           total_response=total_response)
+                           info_pages=info_pages,
+                           search=search)
 
 
 @bp.route("/next_airing", methods=['GET', 'POST'])

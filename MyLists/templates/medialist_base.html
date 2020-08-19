@@ -77,7 +77,9 @@
         </div>
     </div>
 
-    <h2 class="text-center m-t-40 mb-0">{{ category|upper }} ({{ total_response }})</h2>
+    <h2 class="text-center m-t-40 mb-0">{{ category|upper }} ({{ info_pages['total_media'] }})
+        <div class="float-r">Total pages: {{ info_pages['total_pages'] }}</div>
+    </h2>
     <hr class="mt-2 pb-3 mb-0">
     <div class="row infinite-scroll-container">
         {% for data in media_data  %}
@@ -90,7 +92,7 @@
                 <a class="mask flex-center rgba-black-strong" href="/media_sheet/{{ data['media'] }}/{{ data['id'] }}">
                     <span class="font-mask text-center text-light">{{ data['display_name'] }}</span>
                 </a>
-                {% if searching %}
+                {% if search %}
                     <div class="bottom-card-cat{% if media_list =='movieslist' %}-movie {% endif %}">{{ data['category'] }}</div>
                 {% endif %}
                 {% if user_id == current_user.get_id() %}
@@ -169,10 +171,10 @@
         <p class="infinite-scroll-error text-center">End of content</p>
     </div>
     <p class="pagination">
-        {% if searching %}
+        {% if search %}
             <a class="pagination__next" href="/{{ media_list }}/{{ username }}?search={{ search }}&page=2"></a>
         {% else %}
-            <a class="pagination__next" href="/{{ media_list }}/{{ username }}?cat={{ button_cat }}&page=2"></a>
+            <a class="pagination__next" href="/{{ media_list }}/{{ username }}?cat={{ category }}&page=2"></a>
         {% endif %}
     </p>
 {% endblock content %}
