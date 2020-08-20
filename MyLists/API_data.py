@@ -8,6 +8,7 @@ from flask import abort
 from MyLists import app
 from pathlib import Path
 from MyLists.models import ListType
+from ratelimit import sleep_and_retry, limits
 
 
 class ApiData:
@@ -74,6 +75,8 @@ class ApiData:
 
         return json.loads(response.text)
 
+    @sleep_and_retry
+    @limits(calls=1, period=4)
     def anime_search(self, anime_name):
         """ Get the name of the anime from TMDB to MyAnimeList to obtain better genres with <anime_genres> function"""
 
@@ -85,6 +88,8 @@ class ApiData:
 
         return json.loads(response.text)
 
+    @sleep_and_retry
+    @limits(calls=1, period=4)
     def get_anime_genres(self, mal_id):
         """
             "genres": [{"mal_id":1,"type":"anime","name":"Action","url":""},

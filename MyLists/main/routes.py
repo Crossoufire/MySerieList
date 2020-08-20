@@ -49,6 +49,9 @@ def mymedialist(media_list, user_name):
 
     # Check if <search> is enabled then retrieve the <media_data> from the SQL query
     search = request.args.get('search')
+    favorite_only = request.args.get('fav')
+    without_common = request.args.get('common')
+    search_option = 'Titles'
     if search:
         search_option = request.args.get('search_option')
         if list_type == ListType.SERIES:
@@ -61,6 +64,28 @@ def mymedialist(media_list, user_name):
             query = MoviesList.get_movies_search(user.id, search, search_option, page)
             cover_path = url_for('static', filename='covers/movies_covers/')
         category = "Search results for '{}'".format(search)
+    elif favorite_only:
+        if list_type == ListType.SERIES:
+            query = SeriesList.get_series_search(user.id, 'favorite', page)
+            cover_path = url_for('static', filename='covers/series_covers/')
+        elif list_type == ListType.ANIME:
+            query = AnimeList.get_anime_search(user.id, 'favorite', page, search=None)
+            cover_path = url_for('static', filename='covers/anime_covers/')
+        elif list_type == ListType.MOVIES:
+            query = MoviesList.get_movies_search(user.id, 'favorite', page, search=None)
+            cover_path = url_for('static', filename='covers/movies_covers/')
+        category = "Only favorites"
+    elif without_common:
+        if list_type == ListType.SERIES:
+            query = SeriesList.get_series_search(user.id, 'no_common', page, category=category)
+            cover_path = url_for('static', filename='covers/series_covers/')
+        elif list_type == ListType.ANIME:
+            query = AnimeList.get_anime_search(user.id, 'no_common', page, search=None)
+            cover_path = url_for('static', filename='covers/anime_covers/')
+        elif list_type == ListType.MOVIES:
+            query = MoviesList.get_movies_search(user.id, 'no_common', page, search=None)
+            cover_path = url_for('static', filename='covers/movies_covers/')
+        category = category.value
     else:
         if list_type == ListType.SERIES:
             query = SeriesList.get_series_info(user.id, category, page)
@@ -91,7 +116,8 @@ def mymedialist(media_list, user_name):
                            username=user_name,
                            user_id=str(user.id),
                            info_pages=info_pages,
-                           search=search)
+                           search=search,
+                           search_option=search_option)
 
 
 @bp.route("/your_next_airing", methods=['GET', 'POST'])
@@ -276,7 +302,7 @@ def media_sheet(media_type, media_id):
 
     # If <media> exist and a TMDB ID was provived redirect to get a nice URL.
     if media and tmdb_id:
-        return redirect(url_for('main.media_sheet', media_type=media_type, media_id=media.id))
+        return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media.id))
 
     element_sheet = MediaDict(media, list_type).create_media_dict()
     title = element_sheet['display_name']

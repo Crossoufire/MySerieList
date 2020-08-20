@@ -75,14 +75,14 @@ function HideCommon() {
     let $card_ribbon = $('.card-ribbon');
 
     if ($shared_media.prop("checked") === true) {
-        $card_ribbon.parents().eq(2).hide();
+        $card_ribbon.parent().parent().parent().hide();
     }
     else if ($shared_media.prop("checked") === false && $fav_media.prop("checked") === true) {
-        $card_ribbon.parents().eq(2).show();
-        $('.far.fa-heart').parents().eq(2).hide();
+        $card_ribbon.parent().parent().parent().show();
+        $('.far.fa-heart').parent().parent().parent().parent().parent().hide();
     }
     else if ($shared_media.prop("checked") === false && $fav_media.prop("checked") === false) {
-        $card_ribbon.parents().eq(2).show();
+        $card_ribbon.parent().parent().parent().show();
     }
 }
 
@@ -94,14 +94,14 @@ function ShowFavorites() {
     let $far_heart = $('.far.fa-heart');
 
     if ($fav_media.prop("checked") === true) {
-        $far_heart.parents().eq(4).hide();
+        $far_heart.parent().parent().parent().parent().parent().hide();
     }
     else if ($fav_media.prop("checked") === false && $shared_media.prop("checked") === true) {
-        $far_heart.parent().parents().eq(4).show();
-        $('.card-ribbon').parents().eq(2).hide();
+        $far_heart.parent().parent().parent().parent().parent().show();
+        $('.card-ribbon').parent().parent().parent().hide();
     }
     else if ($fav_media.prop("checked") === false && $shared_media.prop("checked") === false) {
-        $far_heart.parents().eq(4).show();
+        $far_heart.parent().parent().parent().parent().parent().show();
     }
 }
 
@@ -338,9 +338,10 @@ $infini_scroll.infiniteScroll({
 });
 
 
-// --- Infinite Scroll on load event -----------------------------------
-$infini_scroll.on( 'load.infiniteScroll', function() {
+// --- Infinite Scroll on load event ---------- test with append -------------------
+$infini_scroll.on( 'append.infiniteScroll', function() {
     HideCommon()
+    ShowFavorites()
 });
 
 

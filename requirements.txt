@@ -21,3 +21,5 @@ Pillow
 regex
 pytz
 rauth
+configparser
+ratelimit

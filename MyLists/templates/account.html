@@ -195,11 +195,19 @@
                                     </a>
                                 </li>
                             {% endif %}
+                            {% if user_data['id'] == current_user.get_id() and current_user.role.value != 'user' %}
+                                <li class="m-b-10">
+                                    Refresh APScheduler:
+                                    <a class="btn btn-sm btn-primary" href="{{ url_for('users.apscheduler_info') }}">
+                                        Refresh
+                                    </a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </li>
                 </ul>
             </div>
-            <div class="vertical_line"></div>
+            <div class="vertical-line"></div>
             <div class="col-xl col-lg-5 col-md-12">
                 <ul class="p-l-0">
                     <h4>
@@ -637,7 +645,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="vertical_line"></div>
+            <div class="vertical-line"></div>
             <div class="col-xl-3 col-lg col-md-12">
                 <ul class="p-l-0 p-r-0">
                     <li class="m-b-20">

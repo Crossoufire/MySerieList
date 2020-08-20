@@ -277,14 +277,15 @@ class SeriesList(db.Model):
     def get_series_count(user_id):
         v1, v2 = aliased(SeriesList), aliased(SeriesList)
         count_total = v1.query.filter_by(user_id=user_id).count()
-        count_versus = db.session.query(v1, v2).join(v2, and_(v2.user_id == user_id, v2.series_id == v1.series_id)) \
+        count_versus = db.session.query(v1, v2)\
+            .join(v2, and_(v2.user_id == user_id, v2.series_id == v1.series_id)) \
             .filter(v1.user_id == current_user.id).all()
         common_ids = [r[0].series_id for r in count_versus]
 
         return [common_ids, int(count_total)]
 
     @staticmethod
-    def get_series_search(user_id, search, option, page):
+    def get_series_search(user_id, option, page, search=None, category=None):
         if option == 'Titles':
             query = db.session.query(Series, SeriesList) \
                 .join(Series, Series.id == SeriesList.series_id) \
@@ -303,6 +304,21 @@ class SeriesList(db.Model):
                 .join(SeriesGenre, SeriesGenre.series_id == SeriesList.series_id) \
                 .filter(SeriesGenre.genre.like('%' + search + '%'), SeriesList.user_id == user_id) \
                 .order_by(SeriesList.status).paginate(page, 25, error_out=True)
+        elif option == 'favorite':
+            query = db.session.query(Series, SeriesList) \
+                .join(Series, Series.id == SeriesList.series_id) \
+                .filter(SeriesList.favorite, SeriesList.user_id == user_id) \
+                .order_by(SeriesList.status).paginate(page, 25, error_out=True)
+        elif option == 'no_common':
+            v1, v2 = aliased(SeriesList), aliased(SeriesList)
+            get_common = db.session.query(v1, v2) \
+                .join(v2, and_(v2.user_id == user_id, v2.series_id == v1.series_id)) \
+                .filter(v1.user_id == current_user.id).all()
+            common_ids = [r[0].series_id for r in get_common]
+            query = db.session.query(Series, SeriesList) \
+                .join(Series, Series.id == SeriesList.series_id) \
+                .filter(SeriesList.user_id == user_id, SeriesList.series_id.notin_(common_ids),
+                        SeriesList.status == category).paginate(page, 25, error_out=True)
         return query
 
     @staticmethod
@@ -316,7 +332,8 @@ class SeriesList(db.Model):
     def get_next_series_airing():
         airing_series = db.session.query(Series, SeriesList) \
             .join(Series, Series.id == SeriesList.series_id) \
-            .filter(Series.next_episode_to_air > datetime.utcnow(), SeriesList.user_id == current_user.id).all()
+            .filter(Series.next_episode_to_air > datetime.utcnow(), SeriesList.user_id == current_user.id,
+                    and_(SeriesList.status != Status.RANDOM, SeriesList.status != Status.DROPPED)).all()
         return airing_series
 
 
@@ -465,7 +482,8 @@ class AnimeList(db.Model):
     def get_next_anime_airing():
         airing_anime = db.session.query(Anime, AnimeList) \
             .join(Anime, Anime.id == AnimeList.anime_id) \
-            .filter(Anime.next_episode_to_air > datetime.utcnow(), AnimeList.user_id == current_user.id).all()
+            .filter(Anime.next_episode_to_air > datetime.utcnow(), AnimeList.user_id == current_user.id,
+                    and_(AnimeList.status != Status.RANDOM, AnimeList.status != Status.DROPPED)).all()
         return airing_anime
 
 

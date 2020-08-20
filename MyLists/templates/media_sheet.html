@@ -243,25 +243,25 @@
                     <div id="remove-fav" class="alert alert-warning p-2" style="display: none;">Media removed from your favorite</div>
                 </div>
 
-                {#                {% if media_list == 'movieslist' and data['collection_data'][0] %}#}
-                {#                    <h4 class="m-l-21 m-r-15"><i class="fas fa-box-open m-t-8"></i>&nbsp;&nbsp;#}
-                {#                        <b>{{ data['collection_data'][0].name }}</b>#}
-                {#                    </h4>#}
-                {#                    <hr class="m-l-20 m-r-24">#}
-                {#                    <div class="m-b-30">#}
-                {#                        {% set release = data['collection_data'][0].releases_dates.split(',') %}#}
-                {#                        {% for name in data['collection_data'][0].movies_names.split(',') %}#}
-                {#                            <div class="row m-l-5 m-r-5">#}
-                {#                                <div class="col-9">#}
-                {#                                    <b>{{ name }}</b>#}
-                {#                                </div>#}
-                {#                                <div class="col-3">#}
-                {#                                    <b>{{ release[loop.index0].split('-')[0] }}</b>#}
-                {#                                </div>#}
-                {#                            </div>#}
-                {#                        {% endfor %}#}
-                {#                    </div>#}
-                {#                {% endif %}#}
+{#                {% if media_list == 'movieslist' and data['collection_data'][0] %}#}
+{#                    <h4 class="m-l-21 m-r-15"><i class="fas fa-box-open m-t-8"></i>&nbsp;&nbsp;#}
+{#                        <b>{{ data['collection_data'][0].name }}</b>#}
+{#                    </h4>#}
+{#                    <hr class="m-l-20 m-r-24">#}
+{#                    <div class="m-b-30">#}
+{#                        {% set release = data['collection_data'][0].releases_dates.split(',') %}#}
+{#                        {% for name in data['collection_data'][0].movies_names.split(',') %}#}
+{#                            <div class="row m-l-5 m-r-5">#}
+{#                                <div class="col-9">#}
+{#                                    <b>{{ name }}</b>#}
+{#                                </div>#}
+{#                                <div class="col-3">#}
+{#                                    <b>{{ release[loop.index0].split('-')[0] }}</b>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        {% endfor %}#}
+{#                    </div>#}
+{#                {% endif %}#}
 
             </div>
             <div class="col-lg-8 col-md-7 col-sm-12" style="margin-top: -10px;">
@@ -481,7 +481,7 @@
                                 <b>{% if follow[1].score == -1 or follow[1].score == None %}&nbsp;Score:&nbsp; ---
                                 {% else %}&nbsp;Score:&nbsp; {{ follow[1].score }}{% endif %}</b>
                                 <div class="follow-status" value="{{ follow[1].status.value }}">
-                                    <i class="fas fa-certificate"></i>
+                                    <i class="fas fa-list"></i>
                                     <b>&nbsp;Status:&nbsp;{{ follow[1].status.value }}</b>
                                 </div>
                                 {% if media_list != 'movieslist' %}
@@ -499,7 +499,7 @@
                                 {% endif %}
                                 {% if follow[1].comment %}
                                     <div class="m-t-10"><b>Comment:</b></div>
-                                    <p class="text-justify" style="margin-bottom: 0;">{{ follow[1].comment }}</p>
+                                    <p class="text-justify commentary"><i>{{ follow[1].comment }}</i></p>
                                 {% endif %}
                             </div>
                         </a>
@@ -508,7 +508,7 @@
             </div>
         </div>
 
-        {% if current_user.role.value == "admin" or current_user.role.value == "manager" %}
+        {% if current_user.role.value != "user" %}
             <div class="m-b-30 text-right">
             {% if data['lock_status'] %}
                 <div class="custom-control custom-switch">

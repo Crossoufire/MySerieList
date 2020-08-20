@@ -7,7 +7,7 @@ option {
 .back-image {
     background-image: url('/static/img/profile_background.jpg');
     background-size: cover;
-    height: 250px;
+    height: 210px;
 }
 
 .header-bar {
@@ -17,9 +17,14 @@ option {
 
 .modded-input {
     background: rgba(0, 0, 0, 0.8);
+    color: lightgray;
     border: none;
     padding: 5px;
-    width: 350px;
+    width: 20vw;
+}
+
+.modded-input:focus {
+    outline: none;
 }
 
 .modded-input::placeholder {
@@ -80,6 +85,11 @@ option {
     padding: 13px 10px 13px 10px;
 }
 
+@media (max-width: 769px) {
+    .modded-input {
+        width: 40vw;
+    }
+}
 @media (max-width: 592px) {
     .center-mobile {
         justify-content: center;
@@ -90,15 +100,15 @@ option {
 }
 @media (max-width: 469px) {
     .back-image {
-        height: 280px;
+        height: 260px;
     }
 }
-@media (max-width: 403px) {
+@media (max-width: 412px) {
     .modded-input {
-        width: 180px;
+        width: 60vw;
     }
     .back-image {
-        height: 320px;
+        height: 250px;
     }
 }
 
@@ -354,6 +364,7 @@ option {
 
 /* --- Your next airing CSS ----------------------------- */
 .absolute-data {
+    background-color: #21263b;
     border-top: solid 1px black;
     border-right: solid 1px black;
     border-left: solid 1px black;
@@ -370,7 +381,7 @@ option {
     border-right: solid 1px black;
     border-left: solid 1px black;
     position: absolute;
-    opacity: 0.9;
+    opacity: 1;
     height: 24px;
     width: 100%;
     bottom: -24px;

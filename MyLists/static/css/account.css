@@ -132,7 +132,7 @@ hr {
 
 
 /* --- Overview ----------------------------------------- */
-.vertical_line {
+.vertical-line {
     width: 5px;
     border-left: 2px solid rgba(44, 57, 70, 1);
     height: 100wh;

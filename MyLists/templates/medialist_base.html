@@ -43,19 +43,27 @@
         <hr class="header-bar">
         <div class="center-mobile d-flex flex-wrap m-t-20">
             <div class="ml-auto mr-auto">
-                <i class="fas fa-search text-dark"></i>
                 <form style="display: inline-block;" action="{{ url_for('main.mymedialist', media_list=media_list,
                 user_name=username) }}">
                     <label for="searchInput"></label>
-                    <input id="searchInput" class='modded-input text-light' name="search" placeholder="Search...">
+                    <input id="searchInput" class="modded-input" name="search" placeholder="&#128269; Search..."
+                    onfocus="this.placeholder = ''" onblur="this.placeholder = '&#128269; Search...'">
                     <label for="selectOption"></label>
                     <select id="selectOption" class="search-select" name="search_option">
-                        <option selected="selected" value="Titles">Titles</option>
+                        <option {% if search_option == 'Titles' %}selected="selected"{% endif %} value="Titles">
+                            Titles
+                        </option>
                         {% if media_list == 'movieslist' %}
-                            <option value="Director">Director</option>
+                        <option {% if search_option == 'Director' %}selected="selected"{% endif %} value="Director">
+                            Director
+                        </option>
                         {% endif %}
-                        <option value="Actors">Actors</option>
-                        <option value="Genres">Genres</option>
+                        <option {% if search_option == 'Actors' %}selected="selected"{% endif %} value="Actors">
+                            Actors
+                        </option>
+                        <option {% if search_option == 'Genres' %}selected="selected"{% endif %} value="Genres">
+                            Genres
+                        </option>
                     </select>
                 </form>
             </div>
@@ -65,18 +73,15 @@
             {% endblock button %}
         </div>
     </div>
-    <div class="m-t-10">
-        <div class="float-r"><b>Total pages: {{ info_pages['total_pages'] }}</b></div>
-        {% if user_id != current_user.get_id() %}
-            <div class="custom-control custom-switch m-b-10">
-                <input id="SharedMedia" type="checkbox" class="custom-control-input" onchange="HideCommon()">
-                <label class="custom-control-label" for="SharedMedia"><b>Hide shared media</b></label>
-            </div>
+    <div class="bg-dark p-1">
+        {% if not request.args.get('fav') %}
+            <div class="float-r m-r-10"><b>Total pages: {{ info_pages['total_pages'] }}</b></div>
+            <a class="fas fa-lg fa-eye m-l-10" data-toggle="tooltip" title="Hide common media"
+               href="/{{ media_list }}/{{ username }}?common=False&cat={{ category }}"></a>
+            <span>&nbsp;&nbsp;<b>|</b>&nbsp;&nbsp;</span>
+            <a class="fas fa-lg fa-heart m-l-10" data-toggle="tooltip" title="Show only favorites"
+               href="/{{ media_list }}/{{ username }}?fav=True"></a>
         {% endif %}
-        <div class="custom-control custom-switch m-b-10">
-            <input id="ShowFavorites" type="checkbox" class="custom-control-input" onchange="ShowFavorites()">
-            <label class="custom-control-label" for="ShowFavorites"><b>Show favorites</b></label>
-        </div>
     </div>
 
     <h2 class="text-center m-t-40 mb-0">{{ category|upper }} ({{ info_pages['total_media'] }})</h2>

@@ -83,6 +83,7 @@ ul {
 
 .follow-img {
     border-radius: 50%;
+    background-color: grey;
     height: 55px;
     width: 55px;
 }
@@ -97,8 +98,11 @@ ul {
 
 .follow-div {
     background: #242428;
-    border-radius: 3px;
     padding: 5px 20px 15px 20px;
+}
+
+.commentary {
+    margin-bottom: 0;
 }
 
 @media (max-width: 1100px) {
