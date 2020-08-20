@@ -2,7 +2,7 @@ import enum
 
 from flask import abort
 from datetime import datetime
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, relationship
 from MyLists import app, db, login_manager
 from sqlalchemy import func, desc, text, and_
 from flask_login import UserMixin, current_user
@@ -28,6 +28,12 @@ class ListType(enum.Enum):
     SERIES = "serieslist"
     ANIME = "animelist"
     MOVIES = 'movieslist'
+
+
+class MediaType(enum.Enum):
+    SERIES = "Series"
+    ANIME = "Anime"
+    MOVIES = 'Movies'
 
 
 class HomePage(enum.Enum):
@@ -135,7 +141,6 @@ class User(db.Model, UserMixin):
         return user
 
     def add_view_count(self, user, list_type):
-        # View count of the media lists
         if self.role != RoleType.ADMIN and user.id != self.id:
             if list_type == ListType.SERIES:
                 user.series_views += 1
@@ -294,6 +299,13 @@ class SeriesList(db.Model):
             .filter(SeriesList.user_id == user_id).group_by(SeriesList.series_id)
         return element_data
 
+    @staticmethod
+    def get_next_series_airing():
+        airing_series = db.session.query(Series, SeriesList) \
+            .join(Series, Series.id == SeriesList.series_id) \
+            .filter(Series.next_episode_to_air > datetime.utcnow(), SeriesList.user_id == current_user.id).all()
+        return airing_series
+
 
 class SeriesGenre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -422,6 +434,13 @@ class AnimeList(db.Model):
             .join(Anime, Anime.id == AnimeList.anime_id) \
             .filter(AnimeList.user_id == user_id).group_by(AnimeList.anime_id)
         return element_data
+
+    @staticmethod
+    def get_next_anime_airing():
+        airing_anime = db.session.query(Anime, AnimeList) \
+            .join(Anime, Anime.id == AnimeList.anime_id) \
+            .filter(Anime.next_episode_to_air > datetime.utcnow(), AnimeList.user_id == current_user.id).all()
+        return airing_anime
 
 
 class AnimeEpisodesPerSeason(db.Model):
@@ -567,6 +586,13 @@ class MoviesList(db.Model):
         element_data = db.session.query(MoviesList, Movies).join(Movies, Movies.id == MoviesList.movies_id) \
             .filter(MoviesList.user_id == user_id).group_by(MoviesList.movies_id)
         return element_data
+
+    @staticmethod
+    def get_next_movies_airing():
+        airing_movies = db.session.query(Movies, MoviesList) \
+            .join(Movies, Movies.id == MoviesList.movies_id) \
+            .filter(Movies.release_date > datetime.utcnow(), MoviesList.user_id == current_user.id).all()
+        return airing_movies
 
 
 class MoviesGenre(db.Model):

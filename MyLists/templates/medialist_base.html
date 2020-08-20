@@ -66,20 +66,20 @@
         </div>
     </div>
     <div class="m-t-10">
-        <div class="custom-control custom-switch m-b-10" {% if user_id == current_user.get_id() %}
-             style="display: none;" {% endif %}>
-            <input id="SharedMedia" type="checkbox" class="custom-control-input" onchange="HideCommon()">
-            <label class="custom-control-label" for="SharedMedia"><b>Hide shared media</b></label>
-        </div>
+        <div class="float-r"><b>Total pages: {{ info_pages['total_pages'] }}</b></div>
+        {% if user_id != current_user.get_id() %}
+            <div class="custom-control custom-switch m-b-10">
+                <input id="SharedMedia" type="checkbox" class="custom-control-input" onchange="HideCommon()">
+                <label class="custom-control-label" for="SharedMedia"><b>Hide shared media</b></label>
+            </div>
+        {% endif %}
         <div class="custom-control custom-switch m-b-10">
             <input id="ShowFavorites" type="checkbox" class="custom-control-input" onchange="ShowFavorites()">
             <label class="custom-control-label" for="ShowFavorites"><b>Show favorites</b></label>
         </div>
     </div>
 
-    <h2 class="text-center m-t-40 mb-0">{{ category|upper }} ({{ info_pages['total_media'] }})
-        <div class="float-r">Total pages: {{ info_pages['total_pages'] }}</div>
-    </h2>
+    <h2 class="text-center m-t-40 mb-0">{{ category|upper }} ({{ info_pages['total_media'] }})</h2>
     <hr class="mt-2 pb-3 mb-0">
     <div class="row infinite-scroll-container">
         {% for data in media_data  %}

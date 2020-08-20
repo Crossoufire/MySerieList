@@ -3,18 +3,18 @@ import json
 import secrets
 
 from PIL import Image
-from flask import abort
 from pathlib import Path
 from sqlalchemy import and_
 from MyLists import db, app
 from datetime import datetime
+from flask import abort, url_for
 from flask_login import current_user
 from MyLists.API_data import ApiData
+from MyLists.main.media_object import MediaListDict
 from MyLists.general.functions import compute_media_time_spent
-from MyLists.main.media_object import MediaObject, SeriesAnimeDict, MoviesDict
 from MyLists.models import ListType, Status, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
     SeriesList, Series, MoviesList, Movies, SeriesGenre, AnimeGenre, MoviesGenre, UserLastUpdate, SeriesActors, \
-    SeriesNetwork, AnimeNetwork, MoviesActors, MoviesCollections, AnimeActors, Notifications
+    SeriesNetwork, AnimeNetwork, MoviesActors, MoviesCollections, AnimeActors, Notifications, MediaType
 
 
 def get_collection_movie(collection_id):
@@ -273,14 +273,6 @@ def get_details(api_id, list_type):
     return data
 
 
-def latin_alphabet(original_name):
-    try:
-        original_name.encode('iso-8859-1')
-        return True
-    except UnicodeEncodeError:
-        return False
-
-
 # ---------------------------------------------------------------------------------------------------
 
 
@@ -404,7 +396,7 @@ def add_element_in_db(api_id, list_type):
     return element
 
 
-def get_medialist_data(list_type, element_data, cover_path, user_id):
+def get_medialist_data(list_type, all_media_data, cover_path, user_id):
     if list_type == ListType.SERIES:
         common_media, total_media = SeriesList.get_series_count(user_id)
     elif list_type == ListType.ANIME:
@@ -412,146 +404,29 @@ def get_medialist_data(list_type, element_data, cover_path, user_id):
     elif list_type == ListType.MOVIES:
         common_media, total_media = MoviesList.get_movies_count(user_id)
 
-    media_data = []
-    if list_type != ListType.MOVIES:
-        for element in element_data:
-            element_info = {"id": element[0].id,
-                            "tmdb_id": element[0].themoviedb_id,
-                            "cover": "{}{}".format(cover_path, element[0].image_cover),
-                            "last_episode_watched": element[1].last_episode_watched,
-                            "eps_per_season": [eps.episodes for eps in element[0].eps_per_season],
-                            "current_season": element[1].current_season,
-                            "score": element[1].score,
-                            "favorite": element[1].favorite,
-                            "rewatched": element[1].rewatched,
-                            "comment": element[1].comment,
-                            "category": element[1].status.value,
-                            "common": False}
-
-            if not element_info['score'] or element_info['score'] == -1:
-                element_info['score'] = '---'
-
-            if latin_alphabet(element[0].original_name):
-                element_info["display_name"] = element[0].original_name
-                element_info["other_name"] = element[0].name
-            else:
-                element_info["display_name"] = element[0].name
-                element_info["other_name"] = element[0].original_name
-
-            element_info['media'] = 'Series'
-            if list_type == ListType.ANIME:
-                element_info['media'] = 'Anime'
-
-            if element[0].id in common_media:
-                element_info['common'] = True
-
-            media_data.append(element_info)
-    elif list_type == ListType.MOVIES:
-        for element in element_data:
-            element_info = {"id": element[0].id,
-                            "tmdb_id": element[0].themoviedb_id,
-                            "cover": "{}{}".format(cover_path, element[0].image_cover),
-                            "score": element[1].score,
-                            "favorite": element[1].favorite,
-                            "category": element[1].status.value,
-                            "rewatched": element[1].rewatched,
-                            "comment": element[1].comment,
-                            "media": 'Movies',
-                            "common": False}
-
-            if element_info['score'] is None:
-                element_info['score'] = '---'
-
-            if latin_alphabet(element[0].original_name):
-                element_info["display_name"] = element[0].original_name
-                element_info["other_name"] = element[0].name
-            else:
-                element_info["display_name"] = element[0].name
-                element_info["other_name"] = element[0].original_name
-
-            if element[0].id in common_media:
-                element_info['common'] = True
-
-            media_data.append(element_info)
+    media_data_list = []
+    for media_data in all_media_data:
+        data = MediaListDict(media_data, cover_path, common_media, list_type).create_medialist_dict()
+        media_data_list.append(data)
 
     try:
         percentage = int((len(common_media)/total_media)*100)
     except ZeroDivisionError:
         percentage = 0
 
-    data = {"media_data": media_data,
+    data = {"media_data": media_data_list,
             "common_elements": [len(common_media), total_media, percentage]}
 
     return data
 
 
-def load_media_sheet(media, user_id, list_type):
-    media_dict = MediaObject(media, list_type)
-
-    print(media_dict)
-
-    # Recover the same media genres
-    if len([r.genre for r in media.genres]) > 2:
-        genres_list = [r.genre for r in media.genres][:2]
-        genre_str = ','.join([g for g in genres_list])
-    else:
-        genres_list = [r.genre for r in media.genres]
-        genre_str = ','.join([g for g in genres_list])
-    same_genres = media.get_same_genres(genres_list, genre_str)
-
-    # Recover the followers that have this media
-    in_follows_list = media.in_follows_lists(user_id)
-
-    # Recover the user information for this media
-    in_user_list = media.in_user_list(user_id)
-    if list_type != ListType.MOVIES:
-        if in_user_list:
-            user_info = {'in_user_list': True,
-                         'last_episode_watched': in_user_list.last_episode_watched,
-                         'current_season': in_user_list.current_season,
-                         'score': in_user_list.score,
-                         'favorite': in_user_list.favorite,
-                         'status': in_user_list.status.value,
-                         'rewatched': in_user_list.rewatched,
-                         'comment': in_user_list.comment}
-        else:
-            user_info = {'last_episode_watched': 1,
-                         'current_season': 1,
-                         'score': '---',
-                         'favorite': False,
-                         'status': Status.WATCHING.value,
-                         'rewatched': 0,
-                         'comment': None}
-    elif list_type == ListType.MOVIES:
-        if in_user_list:
-            user_info = {'in_user_list': True,
-                         'score': in_user_list.score,
-                         'favorite': in_user_list.favorite,
-                         'status': in_user_list.status.value,
-                         'rewatched': in_user_list.rewatched,
-                         'comment': in_user_list.comment}
-        else:
-            user_info = {'score': '---',
-                         'favorite': False,
-                         'status': Status.WATCHING.value,
-                         'rewatched': 0,
-                         'comment': None}
-
-    # Merge all data into one dict
-    element_info['same_genres'] = same_genres
-    element_info['in_follows_lists'] = in_follows_list
-    element_info.update(user_info)
-
-    return element_info
-
-
 def save_new_cover(cover_file, media_type):
-    if media_type == 'Series':
-        cover_path = 'static/covers/series_covers/'
-    elif media_type == 'Anime':
-        cover_path = 'static/covers/anime_covers/'
-    elif media_type == 'Movies':
-        cover_path = 'static/covers/movies_covers/'
+    if media_type == MediaType.SERIES:
+        cover_path = url_for('static', filename='covers/series_covers/')
+    elif media_type == MediaType.ANIME:
+        cover_path = url_for('static', filename='covers/anime_covers/')
+    elif media_type == MediaType.MOVIES:
+        cover_path = url_for('static', filename='covers/movies_covers/')
 
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(cover_file.filename)

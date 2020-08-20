@@ -1,0 +1,126 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mymedialist.css') }}">
+    <style>
+        .absolute-data {
+            border-top: solid 1px black;
+            border-right: solid 1px black;
+            border-left: solid 1px black;
+            border-bottom: solid 1px black;
+            position: absolute;
+            opacity: 0.9;
+            height: 24px;
+            width: 100%;
+            bottom: -1px;
+            right: 0;
+        }
+
+        .absolute-data-2 {
+            border-right: solid 1px black;
+            border-left: solid 1px black;
+            position: absolute;
+            opacity: 0.9;
+            height: 24px;
+            width: 100%;
+            bottom: -24px;
+            right: 0;
+        }
+    </style>
+{% endblock css %}
+
+
+{% block content %}
+    <div class="m-t-30 ml-auto mr-auto">
+        <h3 class="font-weight-light text-center mt-1 mb-0 p-t-30">YOUR NEXT SERIES TO AIR</h3>
+        <hr class="mt-2 mb-4" style="border-top: 1px solid #216e7d;">
+        <div class="row">
+            {% for series in airing_series %}
+                <div class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+                    <div class="card bg-transparent">
+                        <div class="view overlay">
+                            <img class="card-img-top" src="/static/covers/series_covers/{{ series[0].image_cover }}"
+                                 style="height: auto;" alt=""/>
+                            <a class="mask flex-center rgba-black-strong" href="/media_sheet/Series/{{ series[0].id }}">
+                                <span class="font-mask text-center text-light">{{ series[0].name }}</span>
+                            </a>
+                        </div>
+                        <div class="absolute-data text-center bg-series">
+                            S{{ '{:02d}'.format(series[0].season_to_air) }}
+                            &nbsp; - &nbsp;
+                            E{{ '{:02d}'.format(series[0].episode_to_air) }}
+                        </div>
+                        <div class="absolute-data-2 text-center bg-series">
+                           {{ series_dates[loop.index0] }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <h3 class="font-weight-light text-center mt-1 mb-0 p-t-20">YOUR NEXT ANIME TO AIR</h3>
+        <hr class="mt-2 mb-4" style="border-top: 1px solid #945141;">
+        <div class="row">
+            {% for series in airing_anime %}
+                <div class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+                    <div class="card bg-transparent">
+                        <div class="view overlay">
+                            <img class="card-img-top" src="/static/covers/anime_covers/{{ series[0].image_cover }}"
+                                 height="300" width="200" style="height: auto;" alt=""/>
+                            <a class="mask flex-center rgba-black-strong" href="/media_sheet/Anime/{{ series[0].id }}">
+                                <span class="font-mask text-center text-light">{{ series[0].name }}</span>
+                            </a>
+                        </div>
+                        <div class="absolute-data text-center bg-anime">
+                            S{{ '{:02d}'.format(series[0].season_to_air) }}
+                            &nbsp; - &nbsp;
+                            E{{ '{:02d}'.format(series[0].episode_to_air) }}
+                        </div>
+                        <div class="absolute-data-2 text-center bg-anime">
+                            {{ anime_dates[loop.index0] }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <h3 class="font-weight-light text-center mt-1 mb-0 p-t-20">YOUR NEXT MOVIES TO AIR</h3>
+        <hr class="mt-2 mb-4" style="border-top: 1px solid #8c7821;">
+        <div class="row">
+            {% for series in airing_movies %}
+                <div class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+                    <div class="card bg-transparent">
+                        <div class="view overlay">
+                            <img class="card-img-top" src="/static/covers/movies_covers/{{ series[0].image_cover }}"
+                                 height="300" width="200" style="height: auto;" alt=""/>
+                            <a class="mask flex-center rgba-black-strong" href="/media_sheet/Movies/{{ series[0].id }}">
+                                <span class="font-mask text-center text-light">{{ series[0].name }}</span>
+                            </a>
+                        </div>
+                        <div class="absolute-data-2 text-center bg-movies">
+                            {{ movies_dates[loop.index0] }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}
+
+
+{% block script %}
+    <script>
+        // --- Create Row gutters ----------------------------------------------
+        $(document).ready(function() {
+            let $row = $('.row');
+            function a() {
+                if ($(window).width() < 1025) {
+                    return $row.addClass('no-gutters');
+                }
+                $row.removeClass('no-gutters');
+            }
+            $(window).resize(a).trigger('resize');
+        });
+    </script>
+{% endblock script %}

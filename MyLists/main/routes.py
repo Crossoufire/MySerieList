@@ -4,13 +4,14 @@ import pytz
 from MyLists import db, app
 from datetime import datetime
 from MyLists.API_data import ApiData
+from MyLists.main.media_object import MediaDict
 from flask_login import login_required, current_user
 from MyLists.main.forms import EditMediaData, MediaComment
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
-    add_element_in_db, load_media_sheet, save_new_cover
+    add_element_in_db, save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
-    AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, RoleType, MoviesGenre
+    AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, RoleType, MoviesGenre, MediaType
 
 
 bp = Blueprint('main', __name__)
@@ -31,7 +32,7 @@ def mymedialist(media_list, user_name):
     # Add views_count to the profile
     current_user.add_view_count(user, list_type)
 
-    # Check the <category>, the page of the <medialist> and setup the html page.
+    # Check the <category>, the <page> of the <medialist> and setup the html template.
     if list_type != ListType.MOVIES:
         category = request.args.get('cat', 'Watching', str)
         html_template = 'medialist_tv.html'
@@ -91,34 +92,61 @@ def mymedialist(media_list, user_name):
                            search=search)
 
 
-@bp.route("/next_airing", methods=['GET', 'POST'])
+@bp.route("/your_next_airing", methods=['GET', 'POST'])
 @login_required
-def next_airing():
-    airing_series = db.session.query(Series, SeriesList)\
-        .join(Series, Series.id == SeriesList.series_id)\
-        .filter(Series.next_episode_to_air > datetime.utcnow(), SeriesList.user_id == current_user.id).all()
-    airing_anime = db.session.query(Anime, AnimeList)\
-        .join(Anime, Anime.id == AnimeList.anime_id)\
-        .filter(Anime.next_episode_to_air > datetime.utcnow(), AnimeList.user_id == current_user.id).all()
-    airing_movies = db.session.query(Movies, MoviesList)\
-        .join(Movies, Movies.id == MoviesList.movies_id)\
-        .filter(Movies.release_date > datetime.utcnow(), MoviesList.user_id == current_user.id).all()
+def your_next_airing():
+    next_series_airing = SeriesList.get_next_series_airing()
+    next_anime_airing = AnimeList.get_next_anime_airing()
+    next_movies_airing = MoviesList.get_next_movies_airing()
 
-    return render_template('next_airing.html',
-                           title='Next Airing',
-                           airing_series=airing_series,
-                           airing_anime=airing_anime,
-                           airing_movies=airing_movies)
+    def change_air_format(date):
+        return datetime.strptime(date, '%Y-%m-%d').strftime("%d %b %Y")
+
+    series_dates = []
+    for series in next_series_airing:
+        try:
+            series_dates.append(change_air_format(series[0].next_episode_to_air))
+        except:
+            series_dates.append('Unknown')
+
+    anime_dates = []
+    for anime in next_anime_airing:
+        try:
+            anime_dates.append(change_air_format(anime[0].next_episode_to_air))
+        except:
+            anime_dates.append('Unknown')
+
+    movies_dates = []
+    for movies in next_movies_airing:
+        try:
+            movies_dates.append(change_air_format(movies[0].release_date))
+        except:
+            movies_dates.append('Unknown')
+
+    return render_template('your_next_airing.html',
+                           title='Your Next Airing',
+                           airing_series=next_series_airing,
+                           airing_anime=next_anime_airing,
+                           airing_movies=next_movies_airing,
+                           series_dates=series_dates,
+                           anime_dates=anime_dates,
+                           movies_dates=movies_dates)
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
 @login_required
 def write_comment(media_type, media_id):
-    if media_type == 'Series':
+    # Check if <media_type> is valid
+    try:
+        media_type = MediaType(media_type)
+    except ValueError:
+        abort(404)
+
+    if media_type == MediaType.SERIES:
         list_type = ListType.SERIES
-    elif media_type == 'Anime':
+    elif media_type == MediaType.ANIME:
         list_type = ListType.ANIME
-    elif media_type == 'Movies':
+    elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
     else:
         abort(404)
@@ -147,10 +175,12 @@ def write_comment(media_type, media_id):
 
         db.session.commit()
         app.logger.info('[{}] added a comment on {} with ID {}'.format(current_user.id, media_type, media_id))
+
         if not comment or comment == "":
             flash("Comment has been removed (or is empty).", 'warning')
         else:
             flash("Comment successfully added/modified.", 'success')
+
         if request.args.get('from') == 'media':
             return redirect(url_for('main.media_sheet', media_type=media_type, media_id=media_id))
         return redirect(url_for('main.mymedialist', media_list=list_type.value, user_name=current_user.username))
@@ -200,11 +230,17 @@ def movies_collection(user_name):
 @bp.route('/media_sheet/<string:media_type>/<int:media_id>', methods=['GET', 'POST'])
 @login_required
 def media_sheet(media_type, media_id):
-    if media_type == 'Series':
+    # Check if <media_type> is valid
+    try:
+        media_type = MediaType(media_type)
+    except ValueError:
+        abort(404)
+
+    if media_type == MediaType.SERIES:
         list_type = ListType.SERIES
-    elif media_type == 'Anime':
+    elif media_type == MediaType.ANIME:
         list_type = ListType.ANIME
-    elif media_type == 'Movies':
+    elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
     else:
         abort(404)
@@ -212,16 +248,16 @@ def media_sheet(media_type, media_id):
     # Check if <media_id> came from TMDB and if in local DB
     tmdb_id = request.args.get('search')
     if tmdb_id:
-        searching = {'themoviedb_id': media_id}
+        search = {'themoviedb_id': media_id}
     else:
-        searching = {'id': media_id}
+        search = {'id': media_id}
 
     if list_type == ListType.SERIES:
-        media = Series.query.filter_by(**searching).first()
+        media = Series.query.filter_by(**search).first()
     elif list_type == ListType.ANIME:
-        media = Anime.query.filter_by(**searching).first()
+        media = Anime.query.filter_by(**search).first()
     elif list_type == ListType.MOVIES:
-        media = Movies.query.filter_by(**searching).first()
+        media = Movies.query.filter_by(**search).first()
 
     # If <media> is None and a TMDB ID was provived add the media to the local DB else abort.
     if not media:
@@ -240,7 +276,7 @@ def media_sheet(media_type, media_id):
     if media and tmdb_id:
         return redirect(url_for('main.media_sheet', media_type=media_type, media_id=media.id))
 
-    element_sheet = load_media_sheet(media, current_user.id, list_type)
+    element_sheet = MediaDict(media, list_type).create_media_dict()
     title = element_sheet['display_name']
 
     return render_template('media_sheet.html', title=title, data=element_sheet, media_list=list_type.value)
@@ -254,11 +290,17 @@ def media_sheet_form(media_type, media_id):
 
     form = EditMediaData()
 
-    if media_type == 'Series':
+    # Check if <media_type> is valid
+    try:
+        media_type = MediaType(media_type)
+    except ValueError:
+        abort(404)
+
+    if media_type == MediaType.SERIES:
         list_type = ListType.SERIES
-    elif media_type == 'Anime':
+    elif media_type == MediaType.ANIME:
         list_type = ListType.ANIME
-    elif media_type == 'Movies':
+    elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
     else:
         abort(404)
@@ -424,7 +466,8 @@ def update_element_season():
     else:
         return '', 400
 
-    if not media or not media_list or media_list.status == Status.RANDOM or media_list.status == Status.PLAN_TO_WATCH:
+    if not media or not media_list or media_list.status == Status.RANDOM \
+            or media_list.status == Status.PLAN_TO_WATCH:
         return '', 400
 
     # Check if the season number is between 1 and <last_season>
