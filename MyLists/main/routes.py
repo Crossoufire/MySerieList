@@ -50,14 +50,15 @@ def mymedialist(media_list, user_name):
     # Check if <search> is enabled then retrieve the <media_data> from the SQL query
     search = request.args.get('search')
     if search:
+        search_option = request.args.get('search_option')
         if list_type == ListType.SERIES:
-            query = SeriesList.get_series_search(user.id, search, page)
+            query = SeriesList.get_series_search(user.id, search, search_option, page)
             cover_path = url_for('static', filename='covers/series_covers/')
         elif list_type == ListType.ANIME:
-            query = AnimeList.get_anime_search(user.id, search, page)
+            query = AnimeList.get_anime_search(user.id, search, search_option, page)
             cover_path = url_for('static', filename='covers/anime_covers/')
         elif list_type == ListType.MOVIES:
-            query = MoviesList.get_movies_search(user.id, search, page)
+            query = MoviesList.get_movies_search(user.id, search, search_option, page)
             cover_path = url_for('static', filename='covers/movies_covers/')
         category = "Search results for '{}'".format(search)
     else:
@@ -73,12 +74,13 @@ def mymedialist(media_list, user_name):
         category = category.value
 
     # Get the actual page, total number of pages and the total number of media from the query
+    items = query.items
     info_pages = {'actual_page': query.page,
                   'total_pages': query.pages,
                   'total_media': query.total}
 
-    # Shape the <media_data>
-    media_data = get_medialist_data(list_type, query.items, cover_path, user.id)
+    # Shape into dict the <media_data>
+    media_data = get_medialist_data(list_type, items, cover_path, user.id)
 
     return render_template(html_template,
                            title="{}'s {}".format(user_name, media_list),

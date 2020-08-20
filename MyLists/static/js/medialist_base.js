@@ -3,11 +3,11 @@
 // --- Delete element --------------------------------------------------
 function deleteElement(card, media_list) {
     let element_id = $(card)[0].id.split('_')[1];
-    let load_img = $(card).find('.view.overlay');
-    load_img.prepend(Loading());
+    let $load_img = $(card).find('.view.overlay');
 
+    $load_img.prepend(Loading());
     if (!confirm("Do you want to delete the media from your list?")) {
-        load_img.find('.load-medialist').remove();
+        $load_img.find('.load-medialist').remove();
         return false;
     }
 
@@ -20,11 +20,11 @@ function deleteElement(card, media_list) {
         success: function() {
             $(card).remove();
         },
-        error: function () {
+        error: function() {
             error_ajax_message('Error trying to remove the media. Please try again later.')
         },
-        complete: function () {
-            load_img.find('.load-medialist').remove();
+        complete: function() {
+            $load_img.find('.load-medialist').remove();
         }
     });
 }
@@ -39,8 +39,8 @@ function removeCat() {
     $('.bottom-card-cat-movie').show();
     $('.card-btn-top-left').show();
     $('.bottom-card-info').show();
-    $('.card-img-top').attr('style', 'filter: brightness(100%); height: auto;');
     $('.mask').show();
+    $('.card-img-top').attr('style', 'filter: brightness(100%); height: auto;');
 }
 
 
@@ -68,34 +68,42 @@ function addFavorite(fav_div, element_id, media_type) {
 }
 
 
-// // --- Show/Hide common media ------------------------------------------
-// function HideCommon() {
-//     if ($('#SharedMedia').prop("checked") === true) {
-//         $('.card-ribbon').parent().parent().parent().hide();
-//     }
-//     else if ($('#SharedMedia').prop("checked") === false && $('#ShowFavorites').prop("checked") === true) {
-//         $('.card-ribbon').parent().parent().parent().show();
-//         $('.far.fa-star').parent().parent().parent().hide();
-//     }
-//     else if ($('#SharedMedia').prop("checked") === false && $('#ShowFavorites').prop("checked") === false) {
-//         $('.card-ribbon').parent().parent().parent().show();
-//     }
-// }
-//
-//
-// // --- Show/Hide favorites media ---------------------------------------
-// function ShowFavorites() {
-//     if ($('#ShowFavorites').prop("checked") === true) {
-//         $('.far.fa-star').parent().parent().parent().parent().parent().hide();
-//     }
-//     else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === true) {
-//         $('.far.fa-star').parent().parent().parent().parent().parent().show();
-//         $('.card-ribbon').parent().parent().parent().parent().parent().hide();
-//     }
-//     else if ($('#ShowFavorites').prop("checked") === false && $('#SharedMedia').prop("checked") === false) {
-//         $('.far.fa-star').parent().parent().parent().parent().parent().show();
-//     }
-// }
+// --- Show/Hide common media ------------------------------------------
+function HideCommon() {
+    let $shared_media = $('#SharedMedia');
+    let $fav_media = $('#ShowFavorites');
+    let $card_ribbon = $('.card-ribbon');
+
+    if ($shared_media.prop("checked") === true) {
+        $card_ribbon.parents().eq(2).hide();
+    }
+    else if ($shared_media.prop("checked") === false && $fav_media.prop("checked") === true) {
+        $card_ribbon.parents().eq(2).show();
+        $('.far.fa-heart').parents().eq(2).hide();
+    }
+    else if ($shared_media.prop("checked") === false && $fav_media.prop("checked") === false) {
+        $card_ribbon.parents().eq(2).show();
+    }
+}
+
+
+// --- Show/Hide favorites media ---------------------------------------
+function ShowFavorites() {
+    let $shared_media = $('#SharedMedia');
+    let $fav_media = $('#ShowFavorites');
+    let $far_heart = $('.far.fa-heart');
+
+    if ($fav_media.prop("checked") === true) {
+        $far_heart.parents().eq(4).hide();
+    }
+    else if ($fav_media.prop("checked") === false && $shared_media.prop("checked") === true) {
+        $far_heart.parent().parents().eq(4).show();
+        $('.card-ribbon').parents().eq(2).hide();
+    }
+    else if ($fav_media.prop("checked") === false && $shared_media.prop("checked") === false) {
+        $far_heart.parents().eq(4).show();
+    }
+}
 
 
 // --- Add the category to the user (from other list) ------------------
@@ -103,9 +111,9 @@ function AddCatUser(category, card_id) {
     let $card = $('#'+card_id);
     let media_list = $card.attr('values').split('-')[1];
     let element_id = $card.attr('values').split('-')[2];
-    let load_img = $card.find('.view.overlay');
-    load_img.prepend(Loading());
+    let $load_img = $card.find('.view.overlay');
 
+    $load_img.prepend(Loading());
     $.ajax ({
         type: "POST",
         url: "/add_element",
@@ -116,12 +124,12 @@ function AddCatUser(category, card_id) {
             $card.find('.view.overlay').append('<div class="card-ribbon"></div>');
             $card.find('.card-btn-top-left').remove();
         },
-        error: function () {
+        error: function() {
             error_ajax_message('Error trying to add the media to your list. Please try again later.')
         },
-        complete: function () {
+        complete: function() {
             removeCat();
-            load_img.find('.load-medialist').remove();
+            $load_img.find('.load-medialist').remove();
         }
     });
 }
@@ -131,17 +139,18 @@ function AddCatUser(category, card_id) {
 function showComment(card, media_type, media_id, current_user) {
     let media_name = $(card).find('.font-mask').text();
     let comment = $("#com_"+media_id).text();
+    let edit_button = "";
 
     if (current_user === true) {
-        var edit_button = ('<div class="modal-footer p-1">' +
-                                '<a href="/comment/'+media_type+'/'+media_id+'">' +
-                                    '<button class="btn btn-sm btn-primary">' +
-                                        'Edit' +
-                                    '</button>' +
-                                '</a>' +
-                            '</div>')
-    } else {
-        edit_button = "";
+        edit_button = (
+            '<div class="modal-footer p-1">' +
+                '<a href="/comment/'+media_type+'/'+media_id+'">' +
+                    '<button class="btn btn-sm btn-primary">' +
+                        'Edit' +
+                    '</button>' +
+                '</a>' +
+            '</div>'
+        )
     }
 
     $('body').append(
@@ -176,30 +185,35 @@ function removeModal() {
 
 // --- Create the score dropdown ---------------------------------------
 function scoreDrop(score, data_id, media_list) {
-    $(score).hide();
     let score_value = $(score).text();
     let drop = document.createElement("select");
+    let option = document.createElement("option");
+    let i;
+
+    $(score).hide();
+
     drop.className = "score-drop";
     drop.setAttribute('values', ''+data_id+','+media_list);
-    let option = document.createElement("option");
     option.className = "seas-eps-drop-options";
     option.value = "---";
     option.text = "---";
     drop.appendChild(option);
-    for (let i = 0; i <= 10; i+=0.5) {
+
+    for (i = 0; i <= 10; i += 0.50) {
         let option = document.createElement("option");
         option.className = "seas-eps-drop-options";
-        option.value = ""+i;
+        option.value = "" + i;
         if (i === parseFloat(score_value)) {
             option.selected = true;
         }
         if (i < 10) {
-            option.text = ""+i.toFixed(1);
+            option.text = "" + i.toFixed(1);
         } else {
-            option.text = ""+i;
+            option.text = "" + i;
         }
         drop.appendChild(option);
     }
+
     $(score).parent().prepend(drop);
     drop.focus();
 }
@@ -210,6 +224,7 @@ $(document).on('change focusout','.score-drop',function(event) {
     let value = parseFloat(this.value).toFixed(1);
     let media_id = $(this).attr('values').split(',')[0];
     let media_list = $(this).attr('values').split(',')[1];
+    let $score_id = $('#score_'+media_id);
 
     if (isNaN(value)) {
         value = "---";
@@ -225,7 +240,7 @@ $(document).on('change focusout','.score-drop',function(event) {
             data: JSON.stringify({score: value, element_id: media_id, element_type: media_list}),
             dataType: "json",
             success: function() {
-                $('#score_'+media_id).text(value).show();
+                $score_id.text(value).show();
                 $(this).remove();
             },
             error: function () {
@@ -234,30 +249,35 @@ $(document).on('change focusout','.score-drop',function(event) {
         });
     }
 
-    $('#score_'+media_id).text(value).show();
+    $score_id.text(value).show();
     this.remove();
 });
 
 
 // --- Create the rewatch dropdown -------------------------------------
 function rewatchDrop(rewatch, data_id, media_list) {
-    $(rewatch).hide();
     let rewatch_value = $(rewatch).text();
     let drop = document.createElement("select");
+    let option = document.createElement("option");
+    let i;
+
+    $(rewatch).hide();
+
     drop.className = "rewatch-drop";
     drop.setAttribute('values', ''+data_id+','+media_list);
-    let option = document.createElement("option");
     option.className = "seas-eps-drop-options";
-    for (let i = 0; i < 11; i++) {
+
+    for (i = 0; i < 11; i++) {
         let option = document.createElement("option");
         option.className = "seas-eps-drop-options";
-        option.value = ""+i;
+        option.value = "" + i;
         if (i === parseInt(rewatch_value)) {
             option.selected = true;
         }
-        option.text = ""+i;
+        option.text = "" + i;
         drop.appendChild(option);
     }
+
     $(rewatch).parent().prepend(drop);
     drop.focus();
 }
@@ -268,6 +288,7 @@ $(document).on('change focusout','.rewatch-drop',function(event) {
     let value = parseInt(this.value);
     let media_id = $(this).attr('values').split(',')[0];
     let media_list = $(this).attr('values').split(',')[1];
+    let $rew_div = $('#rew_'+media_id);
 
     if (event.type === 'change') {
         $.ajax ({
@@ -277,7 +298,7 @@ $(document).on('change focusout','.rewatch-drop',function(event) {
             data: JSON.stringify({rewatch: value, element_id: media_id, element_type: media_list}),
             dataType: "json",
             success: function() {
-                $('#rew_'+media_id).text(value).show();
+                $rew_div.text(value).show();
                 $(this).remove();
             },
             error: function () {
@@ -286,7 +307,7 @@ $(document).on('change focusout','.rewatch-drop',function(event) {
         });
     }
 
-    $('#rew_'+media_id).text(value).show();
+    $rew_div.text(value).show();
     this.remove();
 });
 
@@ -294,18 +315,22 @@ $(document).on('change focusout','.rewatch-drop',function(event) {
 // --- Create Row gutters ----------------------------------------------
 $(document).ready(function() {
     let $row = $('.row');
-    function a() {
+
+    function gutter() {
         if ($(window).width() < 1025) {
             return $row.addClass('no-gutters');
         }
+
         $row.removeClass('no-gutters');
     }
-    $(window).resize(a).trigger('resize');
+
+    $(window).resize(gutter).trigger('resize');
 });
 
 
 // --- Init Infinite Scroll --------------------------------------------
-$('.infinite-scroll-container').infiniteScroll({
+$infini_scroll = $('.infinite-scroll-container');
+$infini_scroll.infiniteScroll({
     path: '.pagination__next',
     append: '.card-container',
     status: '.scroller-status',
@@ -313,9 +338,18 @@ $('.infinite-scroll-container').infiniteScroll({
 });
 
 
+// --- Infinite Scroll on load event -----------------------------------
+$infini_scroll.on( 'load.infiniteScroll', function() {
+    HideCommon()
+});
+
+
 // --- Create the loading image on media -------------------------------
+/** @return {string} */
 function Loading() {
-    return ('<div class="load-medialist">' +
-                '<img class="img-load-medialist" src="/static/img/loading.webp" alt="">' +
-            '</div>')
+    return (
+        '<div class="load-medialist">' +
+            '<img class="img-load-medialist" src="/static/img/loading.webp" alt="">' +
+        '</div>'
+    )
 }

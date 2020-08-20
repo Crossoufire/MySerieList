@@ -121,18 +121,18 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
 
             if (new_cat === 'Completed') {
                 let season_data = JSON.parse("["+seas_data+"]");
-                let episode_drop = document.getElementById('episode-dropdown');
+                let episode_drop = $('#episode-dropdown');
                 let seasons_length = $('#season-dropdown').children('option').length;
                 let seasons_index = (seasons_length - 1);
                 $('#season-dropdown').prop('selectedIndex', seasons_index);
 
-                episode_drop.length = 1;
+                episode_drop[0].length = 1;
 
                 for (let i = 2; i <= season_data[0][seasons_index]; i++) {
                     let opt = document.createElement("option");
                     opt.className = "";
-                    opt.innerHTML = '&nbsp;'+i+'&nbsp;';
-                    episode_drop.appendChild(opt);
+                    (i <= 9) ? opt.innerHTML = "E0"+i : opt.innerHTML = "E"+i;
+                    episode_drop[0].appendChild(opt);
                 }
                 $('#episode-dropdown').prop('selectedIndex', season_data[0][seasons_index]-1);
             }

@@ -151,10 +151,10 @@
                                 user_name=current_user.username) }}">
                                     <i class="fas fa-user"></i>&nbsp;&nbsp;&nbsp;&nbsp;Profile
                                 </a>
-                                <a class="dropdown-item text-light" href="{{ url_for('users.achievements',
-                                user_name=current_user.username) }}">
-                                    <i class="fas fa-trophy"></i>&nbsp;&nbsp;&nbsp;&nbsp;Achievements
-                                </a>
+{#                                <a class="dropdown-item text-light" href="{{ url_for('users.achievements',#}
+{#                                user_name=current_user.username) }}">#}
+{#                                    <i class="fas fa-trophy"></i>&nbsp;&nbsp;&nbsp;&nbsp;Achievements#}
+{#                                </a>#}
                                 {% if current_user.role.value == 'admin' %}
                                     <a class="dropdown-item text-light" href="{{ url_for('admin.index') }}">
                                         <i class="fas fa-database"></i>&nbsp;&nbsp;&nbsp;&nbsp;Dashboard

@@ -350,3 +350,29 @@ option {
         appearance: none;
     }
 }
+
+
+/* --- Your next airing CSS ----------------------------- */
+.absolute-data {
+    border-top: solid 1px black;
+    border-right: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px black;
+    position: absolute;
+    opacity: 0.9;
+    height: 24px;
+    width: 100%;
+    bottom: -1px;
+    right: 0;
+}
+
+.absolute-data-2 {
+    border-right: solid 1px black;
+    border-left: solid 1px black;
+    position: absolute;
+    opacity: 0.9;
+    height: 24px;
+    width: 100%;
+    bottom: -24px;
+    right: 0;
+}

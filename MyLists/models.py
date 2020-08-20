@@ -4,7 +4,7 @@ from flask import abort
 from datetime import datetime
 from sqlalchemy.orm import aliased, relationship
 from MyLists import app, db, login_manager
-from sqlalchemy import func, desc, text, and_
+from sqlalchemy import func, desc, text, and_, or_
 from flask_login import UserMixin, current_user
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
@@ -284,12 +284,25 @@ class SeriesList(db.Model):
         return [common_ids, int(count_total)]
 
     @staticmethod
-    def get_series_search(user_id, search, page):
-        query = db.session.query(Series, SeriesList)\
-            .join(Series, Series.id == SeriesList.series_id) \
-            .filter(Series.name.like('%' + search + '%'), SeriesList.user_id == user_id) \
-            .order_by(SeriesList.status).paginate(page, 25, error_out=True)
-
+    def get_series_search(user_id, search, option, page):
+        if option == 'Titles':
+            query = db.session.query(Series, SeriesList) \
+                .join(Series, Series.id == SeriesList.series_id) \
+                .filter(or_(Series.name.like('%' + search + '%'), Series.original_name.like('%' + search + '%')),
+                        SeriesList.user_id == user_id) \
+                .order_by(SeriesList.status).paginate(page, 25, error_out=True)
+        elif option == 'Actors':
+            query = db.session.query(Series, SeriesList, SeriesActors) \
+                .join(Series, Series.id == SeriesList.series_id)\
+                .join(SeriesActors, SeriesActors.series_id == SeriesList.series_id) \
+                .filter(SeriesActors.name.like('%' + search + '%'), SeriesList.user_id == user_id) \
+                .order_by(SeriesList.status).paginate(page, 25, error_out=True)
+        elif option == 'Genres':
+            query = db.session.query(Series, SeriesList, SeriesGenre) \
+                .join(Series, Series.id == SeriesList.series_id) \
+                .join(SeriesGenre, SeriesGenre.series_id == SeriesList.series_id) \
+                .filter(SeriesGenre.genre.like('%' + search + '%'), SeriesList.user_id == user_id) \
+                .order_by(SeriesList.status).paginate(page, 25, error_out=True)
         return query
 
     @staticmethod
@@ -420,12 +433,25 @@ class AnimeList(db.Model):
         return [common_ids, int(count_total)]
 
     @staticmethod
-    def get_anime_search(user_id, search, page):
-        query = db.session.query(Anime, AnimeList) \
-            .join(Anime, Anime.id == AnimeList.anime_id) \
-            .filter(Anime.name.like('%' + search + '%'), AnimeList.user_id == user_id) \
-            .order_by(AnimeList.status).paginate(page, 25, error_out=True)
-
+    def get_anime_search(user_id, search, option, page):
+        if option == 'Titles':
+            query = db.session.query(Anime, AnimeList) \
+                .join(Anime, Anime.id == AnimeList.anime_id) \
+                .filter(or_(Anime.name.like('%' + search + '%'), Anime.original_name.like('%' + search + '%')),
+                        AnimeList.user_id == user_id) \
+                .order_by(AnimeList.status).paginate(page, 25, error_out=True)
+        elif option == 'Actors':
+            query = db.session.query(Anime, AnimeList, AnimeActors) \
+                .join(Anime, Anime.id == AnimeList.anime_id)\
+                .join(AnimeActors, AnimeActors.anime_id == AnimeList.anime_id) \
+                .filter(AnimeActors.name.like('%' + search + '%'), AnimeList.user_id == user_id) \
+                .order_by(AnimeList.status).paginate(page, 25, error_out=True)
+        elif option == 'Genres':
+            query = db.session.query(Anime, AnimeList, AnimeGenre) \
+                .join(Anime, Anime.id == AnimeList.anime_id) \
+                .join(AnimeGenre, AnimeGenre.anime_id == AnimeList.anime_id) \
+                .filter(AnimeGenre.genre.like('%' + search + '%'), AnimeList.user_id == user_id) \
+                .order_by(AnimeList.status).paginate(page, 25, error_out=True)
         return query
 
     @staticmethod
@@ -573,13 +599,32 @@ class MoviesList(db.Model):
         return [common_ids, int(count_total)]
 
     @staticmethod
-    def get_movies_search(user_id, search, page):
-        query = db.session.query(Movies, MoviesList) \
-            .join(Movies, Movies.id == MoviesList.movies_id) \
-            .filter(Movies.name.like('%' + search + '%'), MoviesList.user_id == user_id) \
-            .order_by(MoviesList.status).paginate(page, 25, error_out=True)
-
+    def get_movies_search(user_id, search, option, page):
+        if option == 'Titles':
+            query = db.session.query(Movies, MoviesList) \
+                .join(Movies, Movies.id == MoviesList.movies_id) \
+                .filter(or_(Movies.name.like('%' + search + '%'), Movies.original_name.like('%' + search + '%')),
+                        MoviesList.user_id == user_id) \
+                .order_by(MoviesList.status).paginate(page, 25, error_out=True)
+        elif option == 'Director':
+            query = db.session.query(Movies, MoviesList) \
+                .join(Movies, Movies.id == MoviesList.movies_id) \
+                .filter(Movies.director_name.like('%' + search + '%'), MoviesList.user_id == user_id) \
+                .order_by(MoviesList.status).paginate(page, 25, error_out=True)
+        elif option == 'Actors':
+            query = db.session.query(Movies, MoviesList, MoviesActors) \
+                .join(Movies, Movies.id == MoviesList.movies_id) \
+                .join(MoviesActors, MoviesActors.movies_id == MoviesList.movies_id) \
+                .filter(MoviesActors.name.like('%' + search + '%'), MoviesList.user_id == user_id) \
+                .order_by(MoviesList.status).paginate(page, 25, error_out=True)
+        elif option == 'Genres':
+            query = db.session.query(Movies, MoviesList, MoviesGenre) \
+                .join(Movies, Movies.id == MoviesList.movies_id) \
+                .join(MoviesGenre, MoviesGenre.movies_id == MoviesList.movies_id) \
+                .filter(MoviesGenre.genre.like('%' + search + '%'), MoviesList.user_id == user_id) \
+                .order_by(MoviesList.status).paginate(page, 25, error_out=True)
         return query
+
 
     @staticmethod
     def get_total_time(user_id):
