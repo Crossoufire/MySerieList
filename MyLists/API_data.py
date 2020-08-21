@@ -16,9 +16,9 @@ class ApiData:
         self.tmdb_api_key = app.config['THEMOVIEDB_API_KEY']
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
 
-    def TMDb_search(self, element_name):
+    def TMDb_search(self, media_name):
         response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
-                                .format(self.tmdb_api_key, element_name))
+                                .format(self.tmdb_api_key, media_name))
 
         self.status_code(response.status_code)
 

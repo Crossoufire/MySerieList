@@ -9,13 +9,6 @@
             width: 50%;
             margin: 0 auto;
         }
-        .ui-form-input {
-            padding: 13px 15px;
-            border-radius: 8px;
-            border: 2px solid lightgray;
-            outline: 0;
-            width: 100%;
-        }
         textarea {
             min-height: 6em;
             max-height: 50vh;
@@ -31,7 +24,7 @@
 
 
 {% block content %}
-    <h4 class="m-t-30 text-center">{{ media.name }}</h4>
+    <h4 class="m-t-30 text-center">{{ media_name }}</h4>
     <hr class="m-t-0 m-b-25" style="border-color: darkslateblue;">
     <form method="POST" action="" enctype="multipart/form-data" class="form m-b-50">
         {{ form.hidden_tag() }}

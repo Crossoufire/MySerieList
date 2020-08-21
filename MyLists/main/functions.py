@@ -4,27 +4,27 @@ import secrets
 
 from PIL import Image
 from pathlib import Path
-from sqlalchemy import and_, desc
 from MyLists import db, app
 from datetime import datetime
 from flask import abort, url_for
+from sqlalchemy import and_, desc
 from flask_login import current_user
 from MyLists.API_data import ApiData
 from MyLists.main.media_object import MediaListDict
 from MyLists.general.functions import compute_media_time_spent
 from MyLists.models import ListType, Status, AnimeList, Anime, AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, \
     SeriesList, Series, MoviesList, Movies, SeriesGenre, AnimeGenre, MoviesGenre, UserLastUpdate, SeriesActors, \
-    SeriesNetwork, AnimeNetwork, MoviesActors, MoviesCollections, AnimeActors, Notifications, MediaType
+    SeriesNetwork, AnimeNetwork, MoviesActors, MoviesCollections, AnimeActors, Notifications, MediaType, get_media_count
 
 
 def get_collection_movie(collection_id):
     try:
         collection_data = ApiData().get_collection_data(collection_id)
     except Exception as e:
-        app.logger.error('[SYSTEM] Error requesting the TMDB API for movies collection data: {}'.format(e))
+        app.logger.error('[ERROR] - Requesting the TMDB API for movies collection data: {}'.format(e))
 
     # Check the API response
-    if collection_data is None:
+    if not collection_data:
         return None
 
     # Get the collection media cover
@@ -35,7 +35,7 @@ def get_collection_movie(collection_id):
         try:
             ApiData().save_api_cover(collection_cover_path, collection_cover_name, ListType.MOVIES, collection=True)
         except Exception as e:
-            app.logger.error('[SYSTEM] Error trying to recover the poster: {}'.format(e))
+            app.logger.error('[ERROR] - Trying to recover the poster: {}'.format(e))
             collection_cover_name = "default.jpg"
     else:
         collection_cover_name = "default.jpg"
@@ -54,16 +54,14 @@ def get_details(api_id, list_type):
 
     # Get the media cover
     media_cover_path = details_data.get("poster_path") or None
-
+    media_cover_name = "default.jpg"
     if media_cover_path:
         media_cover_name = "{}.jpg".format(secrets.token_hex(8))
         try:
             ApiData().save_api_cover(media_cover_path, media_cover_name, list_type)
         except Exception as e:
-            app.logger.error('[SYSTEM] Error trying to recover the poster: {}'.format(e))
+            app.logger.error('[ERROR] - Trying to recover the poster: {}'.format(e))
             media_cover_name = "default.jpg"
-    else:
-        media_cover_name = "default.jpg"
 
     if list_type != ListType.MOVIES:
         tv_data = {'name': details_data.get("name", "Unknown") or "Unknown",
@@ -85,14 +83,13 @@ def get_details(api_id, list_type):
 
         # Next episode to air (air_date, season, episode):
         next_episode_to_air = details_data.get("next_episode_to_air") or None
+        tv_data['next_episode_to_air'] = None
+        tv_data['season_to_air'] = None
+        tv_data['episode_to_air'] = None
         if next_episode_to_air:
             tv_data['next_episode_to_air'] = next_episode_to_air['air_date']
             tv_data['season_to_air'] = next_episode_to_air['season_number']
             tv_data['episode_to_air'] = next_episode_to_air['episode_number']
-        else:
-            tv_data['next_episode_to_air'] = None
-            tv_data['season_to_air'] = None
-            tv_data['episode_to_air'] = None
 
         # Episode duration: List
         episode_duration = details_data.get("episode_run_time") or None
@@ -317,43 +314,43 @@ def add_element_in_db(api_id, list_type):
         # Add genres to DB
         if list_type == ListType.SERIES:
             for genre in data['genres_data']:
-                genre.update({'series_id': element.id})
+                genre.update({'media_id': element.id})
                 db.session.add(SeriesGenre(**genre))
         elif list_type == ListType.ANIME:
             if data['anime_genres_data']:
                 for genre in data['anime_genres_data']:
-                    genre.update({'anime_id': element.id})
+                    genre.update({'media_id': element.id})
                     db.session.add(AnimeGenre(**genre))
             else:
                 for genre in data['genres_data']:
-                    genre.update({'anime_id': element.id})
+                    genre.update({'media_id': element.id})
                     db.session.add(AnimeGenre(**genre))
 
         # Add actors to DB
         for actor in data['actors_data']:
             if list_type == ListType.SERIES:
-                actor.update({'series_id': element.id})
+                actor.update({'media_id': element.id})
                 db.session.add(SeriesActors(**actor))
             elif list_type == ListType.ANIME:
-                actor.update({'anime_id': element.id})
+                actor.update({'media_id': element.id})
                 db.session.add(AnimeActors(**actor))
 
         # Add networks to DB
         for network in data['networks_data']:
             if list_type == ListType.SERIES:
-                network.update({'series_id': element.id})
+                network.update({'media_id': element.id})
                 db.session.add(SeriesNetwork(**network))
             elif list_type == ListType.ANIME:
-                network.update({'anime_id': element.id})
+                network.update({'media_id': element.id})
                 db.session.add(AnimeNetwork(**network))
 
         # Add seasons to DB
         for season in data['seasons_data']:
             if list_type == ListType.SERIES:
-                season.update({'series_id': element.id})
+                season.update({'media_id': element.id})
                 db.session.add(SeriesEpisodesPerSeason(**season))
             elif list_type == ListType.ANIME:
-                season.update({'anime_id': element.id})
+                season.update({'media_id': element.id})
                 db.session.add(AnimeEpisodesPerSeason(**season))
     elif list_type == ListType.MOVIES:
         # Add movie details to DB
@@ -369,12 +366,12 @@ def add_element_in_db(api_id, list_type):
 
         # Add genres to DB
         for genre in data['genres_data']:
-            genre.update({'movies_id': element.id})
+            genre.update({'media_id': element.id})
             db.session.add(MoviesGenre(**genre))
 
         # Add actors to DB
         for actor in data['actors_data']:
-            actor.update({'movies_id': element.id})
+            actor.update({'media_id': element.id})
             db.session.add(MoviesActors(**actor))
 
         # Add collection movie to DB
@@ -394,28 +391,21 @@ def add_element_in_db(api_id, list_type):
     return element
 
 
-def get_medialist_data(list_type, all_media_data, cover_path, user_id):
-    if list_type == ListType.SERIES:
-        common_media, total_media = SeriesList.get_series_count(user_id)
-    elif list_type == ListType.ANIME:
-        common_media, total_media = AnimeList.get_anime_count(user_id)
-    elif list_type == ListType.MOVIES:
-        common_media, total_media = MoviesList.get_movies_count(user_id)
+def get_medialist_data(list_type, all_media_data, user_id):
+    common_media, total_media = get_media_count(user_id, list_type)
 
     media_data_list = []
     for media_data in all_media_data:
-        data = MediaListDict(media_data, cover_path, common_media, list_type).create_medialist_dict()
-        media_data_list.append(data)
+        add_data = MediaListDict(media_data, common_media, list_type).create_medialist_dict()
+        media_data_list.append(add_data)
 
     try:
         percentage = int((len(common_media)/total_media)*100)
     except ZeroDivisionError:
         percentage = 0
 
-    data = {"media_data": media_data_list,
+    return {"media_data": media_data_list,
             "common_elements": [len(common_media), total_media, percentage]}
-
-    return data
 
 
 def save_new_cover(cover_file, media_type):
@@ -514,7 +504,7 @@ def scheduled_task():
         app.logger.info('[SYSTEM] - Starting media remover')
 
         # SERIES DELETIONS
-        series = db.session.query(Series, SeriesList).outerjoin(SeriesList, SeriesList.series_id == Series.id).all()
+        series = db.session.query(Series, SeriesList).outerjoin(SeriesList, SeriesList.media_id == Series.id).all()
         count = 0
         to_delete = []
         for tv_series in series:
@@ -522,10 +512,10 @@ def scheduled_task():
                 to_delete.append(tv_series[0].id)
         for deletion in to_delete:
             Series.query.filter_by(id=deletion).delete()
-            SeriesActors.query.filter_by(series_id=deletion).delete()
-            SeriesGenre.query.filter_by(series_id=deletion).delete()
-            SeriesNetwork.query.filter_by(series_id=deletion).delete()
-            SeriesEpisodesPerSeason.query.filter_by(series_id=deletion).delete()
+            SeriesActors.query.filter_by(media_id=deletion).delete()
+            SeriesGenre.query.filter_by(media_id=deletion).delete()
+            SeriesNetwork.query.filter_by(media_id=deletion).delete()
+            SeriesEpisodesPerSeason.query.filter_by(media_id=deletion).delete()
             UserLastUpdate.query.filter_by(media_type=ListType.SERIES, media_id=deletion).delete()
             Notifications.query.filter_by(media_type='serieslist', media_id=deletion).delete()
             count += 1
@@ -534,7 +524,7 @@ def scheduled_task():
         app.logger.info('Total series removed: {}'.format(count))
 
         # ANIME DELETIONS
-        anime = db.session.query(Anime, AnimeList).outerjoin(AnimeList, AnimeList.anime_id == Anime.id).all()
+        anime = db.session.query(Anime, AnimeList).outerjoin(AnimeList, AnimeList.media_id == Anime.id).all()
         count = 0
         to_delete = []
         for tv_anime in anime:
@@ -542,10 +532,10 @@ def scheduled_task():
                 to_delete.append(tv_anime[0].id)
         for deletion in to_delete:
             Anime.query.filter_by(id=deletion).delete()
-            AnimeActors.query.filter_by(anime_id=deletion).delete()
-            AnimeGenre.query.filter_by(anime_id=deletion).delete()
-            AnimeNetwork.query.filter_by(anime_id=deletion).delete()
-            AnimeEpisodesPerSeason.query.filter_by(anime_id=deletion).delete()
+            AnimeActors.query.filter_by(media_id=deletion).delete()
+            AnimeGenre.query.filter_by(media_id=deletion).delete()
+            AnimeNetwork.query.filter_by(media_id=deletion).delete()
+            AnimeEpisodesPerSeason.query.filter_by(media_id=deletion).delete()
             UserLastUpdate.query.filter_by(media_type=ListType.ANIME, media_id=deletion).delete()
             Notifications.query.filter_by(media_type='animelist', media_id=deletion).delete()
             count += 1
@@ -554,7 +544,7 @@ def scheduled_task():
         app.logger.info('Total anime removed: {}'.format(count))
 
         # MOVIES DELETIONS
-        movies = db.session.query(Movies, MoviesList).outerjoin(MoviesList, MoviesList.movies_id == Movies.id).all()
+        movies = db.session.query(Movies, MoviesList).outerjoin(MoviesList, MoviesList.media_id == Movies.id).all()
         count = 0
         to_delete = []
         for movie in movies:
@@ -562,8 +552,8 @@ def scheduled_task():
                 to_delete.append(movie[0].id)
         for deletion in to_delete:
             Movies.query.filter_by(id=deletion).delete()
-            MoviesActors.query.filter_by(movies_id=deletion).delete()
-            MoviesGenre.query.filter_by(movies_id=deletion).delete()
+            MoviesActors.query.filter_by(media_id=deletion).delete()
+            MoviesGenre.query.filter_by(media_id=deletion).delete()
             UserLastUpdate.query.filter_by(media_type=ListType.MOVIES, media_id=deletion).delete()
             Notifications.query.filter_by(media_type='movieslist', media_id=deletion).delete()
             count += 1
@@ -697,17 +687,17 @@ def scheduled_task():
                 if list_type == ListType.SERIES:
                     element = Series.query.filter_by(themoviedb_id=api_id).first()
                     old_seas_eps = \
-                        [n.episodes for n in SeriesEpisodesPerSeason.query.filter_by(series_id=element.id).all()]
+                        [n.episodes for n in SeriesEpisodesPerSeason.query.filter_by(media_id=element.id).all()]
                 elif list_type == ListType.ANIME:
                     element = Anime.query.filter_by(themoviedb_id=api_id).first()
                     old_seas_eps = \
-                        [n.episodes for n in AnimeEpisodesPerSeason.query.filter_by(anime_id=element.id).all()]
+                        [n.episodes for n in AnimeEpisodesPerSeason.query.filter_by(media_id=element.id).all()]
 
                 new_seas_eps = [d['episodes'] for d in data['seasons_data']]
 
                 if new_seas_eps != old_seas_eps:
                     if list_type == ListType.SERIES:
-                        users_list = SeriesList.query.filter_by(series_id=element.id).all()
+                        users_list = SeriesList.query.filter_by(media_id=element.id).all()
 
                         for user in users_list:
                             episodes_watched = get_total_eps(user, old_seas_eps)
@@ -733,17 +723,17 @@ def scheduled_task():
                                         break
                             db.session.commit()
 
-                        SeriesEpisodesPerSeason.query.filter_by(series_id=element.id).delete()
+                        SeriesEpisodesPerSeason.query.filter_by(media_id=element.id).delete()
                         db.session.commit()
 
                         for seas in data['seasons_data']:
-                            season = SeriesEpisodesPerSeason(series_id=element.id,
+                            season = SeriesEpisodesPerSeason(media_id=element.id,
                                                              season=seas['season'],
                                                              episodes=seas['episodes'])
                             db.session.add(season)
                         db.session.commit()
                     elif list_type == ListType.ANIME:
-                        users_list = AnimeList.query.filter_by(anime_id=element.id).all()
+                        users_list = AnimeList.query.filter_by(media_id=element.id).all()
 
                         for user in users_list:
                             episodes_watched = get_total_eps(user, old_seas_eps)
@@ -769,11 +759,11 @@ def scheduled_task():
                                         break
                             db.session.commit()
 
-                        AnimeEpisodesPerSeason.query.filter_by(anime_id=element.id).delete()
+                        AnimeEpisodesPerSeason.query.filter_by(media_id=element.id).delete()
                         db.session.commit()
 
                         for seas in data['seasons_data']:
-                            season = AnimeEpisodesPerSeason(anime_id=element.id,
+                            season = AnimeEpisodesPerSeason(media_id=element.id,
                                                             season=seas['season'],
                                                             episodes=seas['episodes'])
                             db.session.add(season)
@@ -834,20 +824,20 @@ def scheduled_task():
 
         all_series = Series.query.filter(Series.next_episode_to_air != None).all()
 
-        series_id = []
+        media_id = []
         for series in all_series:
             try:
                 diff = (datetime.utcnow() - datetime.strptime(series.next_episode_to_air, '%Y-%m-%d')).total_seconds()
                 # Check if the next episode of the series is releasing in one week or less (7 days)
                 if diff < 0 and abs(diff/(3600*24)) <= 7:
-                    series_id.append(series.id)
+                    media_id.append(series.id)
             except:
                 pass
 
         series_in_ptw = db.session.query(Series, SeriesList) \
-            .join(SeriesList, SeriesList.series_id == Series.id) \
-            .filter(SeriesList.series_id.in_(series_id), and_(SeriesList.status != Status.RANDOM,
-                                                              SeriesList.status != Status.DROPPED)).all()
+            .join(SeriesList, SeriesList.media_id == Series.id) \
+            .filter(SeriesList.media_id.in_(media_id), and_(SeriesList.status != Status.RANDOM,
+                                                            SeriesList.status != Status.DROPPED)).all()
 
         for info in series_in_ptw:
             series = Notifications.query.filter_by(user_id=info[1].user_id, media_type='serieslist',
@@ -886,18 +876,18 @@ def scheduled_task():
 
         all_anime = Anime.query.filter(Anime.next_episode_to_air != None).all()
 
-        anime_id = []
+        media_id = []
         for anime in all_anime:
             try:
                 diff = (datetime.utcnow() - datetime.strptime(anime.next_episode_to_air, '%Y-%m-%d')).total_seconds()
                 # Check if the next episode of the series is releasing in one week or less (7 days)
                 if diff < 0 and abs(diff/(3600*24)) <= 7:
-                    anime_id.append(anime.id)
+                    media_id.append(anime.id)
             except:
                 pass
 
-        anime_in_ptw = db.session.query(Anime, AnimeList).join(AnimeList, AnimeList.anime_id == Anime.id) \
-            .filter(AnimeList.anime_id.in_(anime_id), and_(AnimeList.status != Status.RANDOM,
+        anime_in_ptw = db.session.query(Anime, AnimeList).join(AnimeList, AnimeList.media_id == Anime.id) \
+            .filter(AnimeList.media_id.in_(media_id), and_(AnimeList.status != Status.RANDOM,
                                                            AnimeList.status != Status.DROPPED)).all()
 
         for info in anime_in_ptw:
@@ -936,19 +926,19 @@ def scheduled_task():
 
         all_movies = Movies.query.all()
 
-        movies_id = []
+        media_id = []
         for movie in all_movies:
             try:
                 diff = (datetime.utcnow() - datetime.strptime(movie.release_date, '%Y-%m-%d')).total_seconds()
                 # Check if he movie released in one week or less (7 days)
                 if diff < 0 and abs(diff/(3600*24)) <= 7:
-                    movies_id.append(movie.id)
+                    media_id.append(movie.id)
             except:
                 pass
 
         movies_in_ptw = db.session.query(Movies, MoviesList) \
-            .join(MoviesList, MoviesList.movies_id == Movies.id) \
-            .filter(MoviesList.movies_id.in_(movies_id), MoviesList.status == Status.PLAN_TO_WATCH).all()
+            .join(MoviesList, MoviesList.media_id == Movies.id) \
+            .filter(MoviesList.media_id.in_(media_id), MoviesList.status == Status.PLAN_TO_WATCH).all()
 
         for info in movies_in_ptw:
             if not bool(Notifications.query.filter_by(user_id=info[1].user_id,

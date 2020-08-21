@@ -7,20 +7,14 @@ from PIL import Image
 from pathlib import Path
 from MyLists import db, app
 from datetime import datetime
-from MyLists.models import ListType, Status, User, AnimeList, SeriesList, MoviesList, Movies, Badges, Ranks, Frames, \
-    MoviesCollections
+from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, MoviesCollections, get_total_time
 
 
 def compute_media_time_spent(list_type):
     users = User.query.all()
 
     for user in users:
-        if list_type == ListType.SERIES:
-            media_list = SeriesList.get_total_time(user.id)
-        elif list_type == ListType.ANIME:
-            media_list = AnimeList.get_total_time(user.id)
-        elif list_type == ListType.MOVIES:
-            media_list = MoviesList.get_total_time(user.id)
+        media_list = get_total_time(user.id, list_type)
 
         if list_type != ListType.MOVIES:
             total_time = 0
@@ -160,7 +154,7 @@ def refresh_db_frames():
 
 
 def add_collections_movies():
-    print('Started.')
+    print('Started to add movies collection.')
     local_covers_path = Path(app.root_path, "static/covers/movies_collection_covers/")
 
     all_movies = Movies.query.filter_by().all()
@@ -217,6 +211,8 @@ def add_collections_movies():
             add_collection = MoviesCollections(collection_id=collection_id,
                                                parts=collection_parts,
                                                name=collection_name,
+                                               movies_names=None,
+                                               releases_dates=None,
                                                poster=collection_poster_id,
                                                overview=collection_overview)
 
@@ -224,11 +220,11 @@ def add_collections_movies():
             db.session.commit()
         except:
             continue
-    print('Finished.')
+    print('Finished adding movies collection.')
 
 
 def refresh_collections_movies():
-    print('Started.')
+    print('Started to refresh movies collection.')
 
     all_collection_movies = MoviesCollections.query.filter_by().all()
     for index, collection in enumerate(all_collection_movies):
@@ -258,4 +254,4 @@ def refresh_collections_movies():
             db.session.commit()
         except:
             continue
-    print('Finished.')
+    print('Finished refreshing movies collection.')

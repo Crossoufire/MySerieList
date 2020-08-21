@@ -43,45 +43,45 @@ class SeriesListAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('user_id', 'series_id', 'current_season', 'last_episode_watched', 'status', 'score')
-    column_searchable_list = ('user_id', 'series_id', 'status')
-    column_sortable_list = ('id', 'user_id', 'series_id', 'status')
+    column_list = ('user_id', 'media_id', 'current_season', 'last_episode_watched', 'status', 'score')
+    column_searchable_list = ('user_id', 'media_id', 'status')
+    column_sortable_list = ('id', 'user_id', 'media_id', 'status')
 
 
 class SeriesEpisodesPerSeasonAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('series_id', 'season', 'episodes')
-    column_searchable_list = ['series_id']
-    column_sortable_list = ('id', 'series_id')
+    column_list = ('media_id', 'season', 'episodes')
+    column_searchable_list = ['media_id']
+    column_sortable_list = ('id', 'media_id')
 
 
 class SeriesGenreAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('series_id', 'genre')
-    column_searchable_list = ['series_id']
-    column_sortable_list = ('series_id', 'genre')
+    column_list = ('media_id', 'genre')
+    column_searchable_list = ['media_id']
+    column_sortable_list = ('media_id', 'genre')
 
 
 class SeriesNetworkAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('series_id', 'network')
-    column_searchable_list = ('series_id', 'network')
-    column_sortable_list = ('series_id', 'network')
+    column_list = ('media_id', 'network')
+    column_searchable_list = ('media_id', 'network')
+    column_sortable_list = ('media_id', 'network')
 
 
 class SeriesActorsAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('series_id', 'name')
-    column_searchable_list = ('series_id', 'name')
-    column_sortable_list = ('series_id', 'name')
+    column_list = ('media_id', 'name')
+    column_searchable_list = ('media_id', 'name')
+    column_sortable_list = ('media_id', 'name')
 
 
 # ------------------------------------------------------ ANIME ------------------------------------------------------- #
@@ -102,45 +102,45 @@ class AnimeListAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('user_id', 'anime_id', 'current_season', 'last_episode_watched', 'status', 'score')
-    column_searchable_list = ('user_id', 'anime_id', 'status')
-    column_sortable_list = ('id', 'user_id', 'anime_id', 'status')
+    column_list = ('user_id', 'media_id', 'current_season', 'last_episode_watched', 'status', 'score')
+    column_searchable_list = ('user_id', 'media_id', 'status')
+    column_sortable_list = ('id', 'user_id', 'media_id', 'status')
 
 
 class AnimeEpisodesPerSeasonAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('anime_id', 'season', 'episodes')
-    column_searchable_list = ['anime_id']
-    column_sortable_list = ('id', 'anime_id')
+    column_list = ('media_id', 'season', 'episodes')
+    column_searchable_list = ['media_id']
+    column_sortable_list = ('id', 'media_id')
 
 
 class AnimeGenreAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('anime_id', 'genre')
-    column_searchable_list = ('anime_id', 'genre')
-    column_sortable_list = ('anime_id', 'genre')
+    column_list = ('media_id', 'genre')
+    column_searchable_list = ('media_id', 'genre')
+    column_sortable_list = ('media_id', 'genre')
 
 
 class AnimeNetworkAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('anime_id', 'network')
-    column_searchable_list = ('anime_id', 'network')
-    column_sortable_list = ('anime_id', 'network')
+    column_list = ('media_id', 'network')
+    column_searchable_list = ('media_id', 'network')
+    column_sortable_list = ('media_id', 'network')
 
 
 class AnimeActorsAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('anime_id', 'name')
-    column_searchable_list = ('anime_id', 'name')
-    column_sortable_list = ('anime_id', 'name')
+    column_list = ('media_id', 'name')
+    column_searchable_list = ('media_id', 'name')
+    column_sortable_list = ('media_id', 'name')
 
 
 # ------------------------------------------------------ MOVIES ------------------------------------------------------ #
@@ -160,27 +160,27 @@ class MoviesGenreAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('movies_id', 'genre')
-    column_searchable_list = ['movies_id']
-    column_sortable_list = ('movies_id', 'genre')
+    column_list = ('media_id', 'genre')
+    column_searchable_list = ['media_id']
+    column_sortable_list = ('media_id', 'genre')
 
 
 class MoviesListAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('user_id', 'movies_id', 'status', 'score')
-    column_searchable_list = ('user_id', 'movies_id', 'status')
-    column_sortable_list = ('id', 'user_id', 'movies_id', 'status')
+    column_list = ('user_id', 'media_id', 'status', 'score')
+    column_searchable_list = ('user_id', 'media_id', 'status')
+    column_sortable_list = ('id', 'user_id', 'media_id', 'status')
 
 
 class MoviesActorsAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
-    column_list = ('movies_id', 'name')
-    column_searchable_list = ('movies_id', 'name')
-    column_sortable_list = ('id', 'movies_id', 'name')
+    column_list = ('media_id', 'name')
+    column_searchable_list = ('media_id', 'name')
+    column_sortable_list = ('id', 'media_id', 'name')
 
 
 # -------------------------------------------------------------------------------------------------------------------- #

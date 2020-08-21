@@ -75,100 +75,96 @@ def global_stats():
     else:
         total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0}
 
-    top_series, top_anime, top_movies = stats.get_top_media()
+    top_media = stats.get_top_media()
     top_all_series, top_all_anime, top_all_movies = [], [], []
     for i in range(0, 5):
         try:
-            top_all_series.append({"name": top_series[i][0].name, "quantity": top_series[i][2]})
+            top_all_series.append({"name": top_media[0][i][0].name, "quantity": top_media[0][i][2]})
         except:
             top_all_series.append({"name": "-", "quantity": "-"})
         try:
-            top_all_anime.append({"name": top_anime[i][0].name, "quantity": top_anime[i][2]})
+            top_all_anime.append({"name": top_media[1][i][0].name, "quantity": top_media[1][i][2]})
         except:
             top_all_anime.append({"name": "-", "quantity": "-"})
         try:
-            top_all_movies.append({"name": top_movies[i][0].name, "quantity": top_movies[i][2]})
+            top_all_movies.append({"name": top_media[2][i][0].name, "quantity": top_media[2][i][2]})
         except:
             top_all_movies.append({"name": "-", "quantity": "-"})
-
     most_present_media = {"series": top_all_series, "anime": top_all_anime, "movies": top_all_movies}
 
-    series_genres, anime_genres, movies_genres = stats.get_top_genres()
+    media_genres = stats.get_top_genres()
     all_series_genres, all_anime_genres, all_movies_genres = [], [], []
     for i in range(5):
         try:
-            all_series_genres.append({"genre": series_genres[i][1].genre, "quantity": series_genres[i][2]})
+            all_series_genres.append({"genre": media_genres[0][i][1].genre, "quantity": media_genres[0][i][2]})
         except:
             all_series_genres.append({"genre": "-", "quantity": "-"})
         try:
-            all_anime_genres.append({"genre": anime_genres[i][1].genre, "quantity": anime_genres[i][2]})
+            all_anime_genres.append({"genre": media_genres[1][i][1].genre, "quantity": media_genres[1][i][2]})
         except:
             all_anime_genres.append({"genre": "-", "quantity": "-"})
         try:
-            all_movies_genres.append({"genre": movies_genres[i][1].genre, "quantity": movies_genres[i][2]})
+            all_movies_genres.append({"genre": media_genres[2][i][1].genre, "quantity": media_genres[2][i][2]})
         except:
             all_movies_genres.append({"genre": "-", "quantity": "-"})
-
     most_genres_media = {"series": all_series_genres, "anime": all_anime_genres, "movies": all_movies_genres}
 
-    series_actors, anime_actors, movies_actors = stats.get_top_actors()
+    media_actors = stats.get_top_actors()
     all_series_actors, all_anime_actors, all_movies_actors = [], [], []
     for i in range(5):
         try:
-            all_series_actors.append({"name": series_actors[i][1].name, "quantity": series_actors[i][2]})
+            all_series_actors.append({"name": media_actors[0][i][1].name, "quantity": media_actors[0][i][2]})
         except:
             all_series_actors.append({"name": "-", "quantity": "-"})
         try:
-            all_anime_actors.append({"name": anime_actors[i][1].name, "quantity": anime_actors[i][2]})
+            all_anime_actors.append({"name": media_actors[1][i][1].name, "quantity": media_actors[1][i][2]})
         except:
             all_anime_actors.append({"name": "-", "quantity": "-"})
         try:
-            all_movies_actors.append({"name": movies_actors[i][1].name, "quantity": movies_actors[i][2]})
+            all_movies_actors.append({"name": media_actors[2][i][1].name, "quantity": media_actors[2][i][2]})
         except:
             all_movies_actors.append({"name": "-", "quantity": "-"})
-
     most_actors_media = {"series": all_series_actors, "anime": all_anime_actors, "movies": all_movies_actors}
 
-    series_dropped, anime_dropped = stats.get_top_dropped()
+    media_dropped = stats.get_top_dropped()
     top_series_dropped, top_anime_dropped = [], []
     for i in range(5):
         try:
-            top_series_dropped.append({"name": series_dropped[i][0].name, "quantity": series_dropped[i][2]})
+            top_series_dropped.append({"name": media_dropped[0][i][0].name, "quantity": media_dropped[0][i][2]})
         except:
             top_series_dropped.append({"name": "-", "quantity": "-"})
         try:
-            top_anime_dropped.append({"name": anime_dropped[i][0].name, "quantity": anime_dropped[i][2]})
+            top_anime_dropped.append({"name": media_dropped[1][i][0].name, "quantity": media_dropped[1][i][2]})
         except:
             top_anime_dropped.append({"name": "-", "quantity": "-"})
-
     top_dropped_media = {"series": top_series_dropped, "anime": top_anime_dropped}
 
-    total_series_eps_seasons, total_anime_eps_seasons = stats.get_total_eps_seasons()
+    total_media_eps_seas = stats.get_total_eps_seasons()
     total_series_seas_watched, total_series_eps_watched = 0, 0
-    for element in total_series_eps_seasons:
-        if element[0].status != Status.PLAN_TO_WATCH:
-            episodes = element[2].split(",")
+    for media in total_media_eps_seas[0]:
+        if media[0].status != Status.PLAN_TO_WATCH:
+            episodes = media[2].split(",")
             episodes = [int(x) for x in episodes]
-            if episodes[int(element[0].current_season) - 1] == int(element[0].last_episode_watched):
-                total_series_seas_watched += int(element[0].current_season)
+            if episodes[int(media[0].current_season) - 1] == int(media[0].last_episode_watched):
+                total_series_seas_watched += int(media[0].current_season)
             else:
-                total_series_seas_watched += int(element[0].current_season) - 1
-            for i in range(1, element[0].current_season):
+                total_series_seas_watched += int(media[0].current_season) - 1
+            for i in range(1, media[0].current_season):
                 total_series_eps_watched += episodes[i - 1]
-            total_series_eps_watched += element[0].last_episode_watched
+            total_series_eps_watched += media[0].last_episode_watched
 
     total_anime_seas_watched, total_anime_eps_watched = 0, 0
-    for element in total_anime_eps_seasons:
-        if element[0].status != Status.PLAN_TO_WATCH:
-            episodes = element[2].split(",")
+    for media in total_media_eps_seas[1]:
+        if media[0].status != Status.PLAN_TO_WATCH:
+            episodes = media[2].split(",")
             episodes = [int(x) for x in episodes]
-            if episodes[int(element[0].current_season) - 1] == int(element[0].last_episode_watched):
-                total_anime_seas_watched += int(element[0].current_season)
+            if episodes[int(media[0].current_season) - 1] == int(media[0].last_episode_watched):
+                total_anime_seas_watched += int(media[0].current_season)
             else:
-                total_anime_seas_watched += int(element[0].current_season) - 1
-            for i in range(1, element[0].current_season):
+                total_anime_seas_watched += int(media[0].current_season) - 1
+            for i in range(1, media[0].current_season):
                 total_anime_eps_watched += episodes[i - 1]
-            total_anime_eps_watched += element[0].last_episode_watched
+            total_anime_eps_watched += media[0].last_episode_watched
 
     total_seasons_media = {"series": total_series_seas_watched, "anime": total_anime_seas_watched}
     total_episodes_media = {"series": total_series_eps_watched, "anime": total_anime_eps_watched}

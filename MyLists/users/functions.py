@@ -48,13 +48,13 @@ def get_media_total_eps(user_id, list_type):
     if list_type == ListType.SERIES:
         media_data = db.session.query(SeriesList, SeriesEpisodesPerSeason,
                                       func.group_concat(SeriesEpisodesPerSeason.episodes)) \
-            .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.series_id == SeriesList.series_id) \
-            .filter(SeriesList.user_id == user_id).group_by(SeriesList.series_id).all()
+            .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.media_id == SeriesList.media_id) \
+            .filter(SeriesList.user_id == user_id).group_by(SeriesList.media_id).all()
     elif list_type == ListType.ANIME:
         media_data = db.session.query(AnimeList, AnimeEpisodesPerSeason,
                                       func.group_concat(AnimeEpisodesPerSeason.episodes)) \
-            .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.anime_id == AnimeList.anime_id) \
-            .filter(AnimeList.user_id == user_id).group_by(AnimeList.anime_id)
+            .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.media_id == AnimeList.media_id) \
+            .filter(AnimeList.user_id == user_id).group_by(AnimeList.media_id)
 
     nb_eps_watched = 0
     for element in media_data:
@@ -70,15 +70,15 @@ def get_media_total_eps(user_id, list_type):
 
 def get_media_score(user_id, list_type):
     if list_type == ListType.SERIES:
-        media_score = db.session.query(func.count(SeriesList.score), func.count(SeriesList.series_id),
+        media_score = db.session.query(func.count(SeriesList.score), func.count(SeriesList.media_id),
                                        func.sum(SeriesList.score)) \
             .filter(SeriesList.user_id == user_id, SeriesList.status != Status.PLAN_TO_WATCH).all()
     if list_type == ListType.ANIME:
-        media_score = db.session.query(func.count(AnimeList.score), func.count(AnimeList.anime_id),
+        media_score = db.session.query(func.count(AnimeList.score), func.count(AnimeList.media_id),
                                        func.sum(AnimeList.score)) \
             .filter(AnimeList.user_id == user_id, AnimeList.status != Status.PLAN_TO_WATCH).all()
     if list_type == ListType.MOVIES:
-        media_score = db.session.query(func.count(MoviesList.score), func.count(MoviesList.movies_id),
+        media_score = db.session.query(func.count(MoviesList.score), func.count(MoviesList.media_id),
                                        func.sum(MoviesList.score)) \
             .filter(MoviesList.user_id == user_id, MoviesList.status != Status.PLAN_TO_WATCH).all()
 
@@ -102,18 +102,18 @@ def get_media_score(user_id, list_type):
 
 def get_favorites(user_id):
     series_favorites = db.session.query(Series, SeriesList) \
-        .join(Series, Series.id == SeriesList.series_id) \
-        .filter(SeriesList.user_id == user_id, SeriesList.favorite == True).group_by(SeriesList.series_id).all()
+        .join(Series, Series.id == SeriesList.media_id) \
+        .filter(SeriesList.user_id == user_id, SeriesList.favorite == True).group_by(SeriesList.media_id).all()
     random.shuffle(series_favorites)
 
     anime_favorites = db.session.query(Anime, AnimeList) \
-        .join(Anime, Anime.id == AnimeList.anime_id) \
-        .filter(AnimeList.user_id == user_id, AnimeList.favorite == True).group_by(AnimeList.anime_id).all()
+        .join(Anime, Anime.id == AnimeList.media_id) \
+        .filter(AnimeList.user_id == user_id, AnimeList.favorite == True).group_by(AnimeList.media_id).all()
     random.shuffle(anime_favorites)
 
     movies_favorites = db.session.query(Movies, MoviesList) \
-        .join(Movies, Movies.id == MoviesList.movies_id) \
-        .filter(MoviesList.user_id == user_id, MoviesList.favorite == True).group_by(MoviesList.movies_id).all()
+        .join(Movies, Movies.id == MoviesList.media_id) \
+        .filter(MoviesList.user_id == user_id, MoviesList.favorite == True).group_by(MoviesList.media_id).all()
     random.shuffle(movies_favorites)
 
     favorites = [series_favorites, anime_favorites, movies_favorites]
@@ -362,17 +362,17 @@ def get_more_stats(user):
             return [0, 0]
 
     series_data = db.session.query(Series, SeriesList) \
-        .join(SeriesList, SeriesList.series_id == Series.id) \
+        .join(SeriesList, SeriesList.media_id == Series.id) \
         .filter(SeriesList.user_id == user.id) \
         .group_by(Series.id).all()
 
     anime_data = db.session.query(Anime, AnimeList) \
-        .join(AnimeList, AnimeList.anime_id == Anime.id) \
+        .join(AnimeList, AnimeList.media_id == Anime.id) \
         .filter(AnimeList.user_id == user.id) \
         .group_by(Anime.id).all()
 
     movies_data = db.session.query(Movies, MoviesList) \
-        .join(MoviesList, MoviesList.movies_id == Movies.id) \
+        .join(MoviesList, MoviesList.media_id == Movies.id) \
         .filter(MoviesList.user_id == user.id) \
         .group_by(Movies.id).all()
 
