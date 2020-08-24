@@ -671,7 +671,7 @@ def get_media_count(user_id, list_type):
         media_list = MoviesList
 
     v1, v2 = aliased(media_list), aliased(media_list)
-    count_total = v1.query.filter_by(user_id=user_id).count()
+    count_total = media_list.query.filter_by(user_id=user_id).count()
     count_versus = db.session.query(v1, v2) \
         .join(v2, and_(v2.user_id == user_id, v2.media_id == v1.media_id)) \
         .filter(v1.user_id == current_user.id).all()
