@@ -30,22 +30,22 @@
         <div class="d-flex flex-wrap center-mobile">
             <div class="m-l-30 m-t-20 icons-mobile">
                 <a class="fas fa-lg fa-user m-r-8 return-icon"
-                   href="{{ url_for('users.account', user_name=target_user_name) }}" data-toggle="tooltip"
-                   title="{{ target_user_name }}" style="color: grey;"></a>
+                   href="{{ url_for('users.account', user_name=username) }}" data-toggle="tooltip"
+                   title="{{ username }}" style="color: grey;"></a>
                 {% if media_list == 'serieslist' %}
-                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon" href="/animelist/{{ target_user_name }}"
+                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon" href="/animelist/{{ username }}"
                        data-toggle="tooltip" title="Anime list" style="color: #945141;"></a>
-                    <a class="fas fa-lg fa-film m-r-8 return-icon" href="/movieslist/{{ target_user_name }}"
+                    <a class="fas fa-lg fa-film m-r-8 return-icon" href="/movieslist/{{ username }}"
                        data-toggle="tooltip" title="Movies list" style="color: #8c7821;"></a>
                 {% elif media_list == 'animelist' %}
-                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv" href="/serieslist/{{ target_user_name }}"
+                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv" href="/serieslist/{{ username }}"
                        data-toggle="tooltip" title="Series list" style="color: #216e7d;"></a>
-                    <a class="fas fa-lg fa-film m-r-8 return-icon" href="/movieslist/{{ target_user_name }}"
+                    <a class="fas fa-lg fa-film m-r-8 return-icon" href="/movieslist/{{ username }}"
                        data-toggle="tooltip" title="Movies list" style="color: #8c7821;"></a>
                 {% else %}
-                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv" href="/serieslist/{{ target_user_name }}"
+                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv" href="/serieslist/{{ username }}"
                        data-toggle="tooltip" title="Series list" style="color: #216e7d;"></a>
-                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon" href="/animelist/{{ target_user_name }}"
+                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon" href="/animelist/{{ username }}"
                        data-toggle="tooltip" title="Anime list" style="color: #945141;"></a>
                 {% endif %}
             </div>

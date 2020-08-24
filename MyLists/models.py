@@ -4,8 +4,8 @@ from flask import abort
 from datetime import datetime
 from sqlalchemy.orm import aliased
 from MyLists import app, db, login_manager
-from sqlalchemy import func, desc, text, and_, or_
 from flask_login import UserMixin, current_user
+from sqlalchemy import func, desc, text, and_, or_
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 
@@ -537,15 +537,15 @@ class GlobalStats:
             self.media_actors = MoviesActors
             self.media_list = MoviesList
 
-    # Total time spent for each media type
+    # Total time spent
     @staticmethod
     def get_total_time_spent():
-        times_spent = db.session.query(User, func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
+        times_spent = db.session.query(func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
                                        func.sum(User.time_spent_movies)) \
             .filter(User.role != RoleType.ADMIN, User.active == True).all()
         return times_spent
 
-    # Top media in users' lists
+    # Top media
     def get_top_media(self):
         queries = []
         for list_type in self.all_list_type:
@@ -553,35 +553,33 @@ class GlobalStats:
             queries.append(db.session.query(self.media, self.media_list,
                                             func.count(self.media_list.media_id == self.media.id).label("count"))
                            .join(self.media_list, self.media_list.media_id == self.media.id)
-                           .group_by(self.media_list.media_id)
-                           .filter(self.media_list.user_id >= '2').order_by(text("count desc")).limit(5).all())
+                           .group_by(self.media_list.media_id).order_by(text("count desc")).limit(5).all())
         return queries
 
-    # Top genre in users' lists
+    # Top genres
     def get_top_genres(self):
         queries = []
         for list_type in self.all_list_type:
             self.get_type(list_type)
-            queries.append(db.session.query(self.media_list, self.media_genre,
+            queries.append(db.session.query(self.media_genre, self.media_list,
                                             func.count(self.media_genre.genre).label('count'))
                            .join(self.media_genre, self.media_genre.media_id == self.media_list.media_id)
-                           .group_by(self.media_genre.genre).filter(self.media_list.user_id >= '2')
-                           .order_by(text('count desc')).limit(5).all())
+                           .group_by(self.media_genre.genre).order_by(text('count desc')).limit(5).all())
         return queries
 
-    # Top actors in the users' lists
+    # Top actors
     def get_top_actors(self):
         queries = []
         for list_type in self.all_list_type:
             self.get_type(list_type)
-            queries.append(db.session.query(self.media_list, self.media_actors,
+            queries.append(db.session.query(self.media_actors, self.media_list,
                                             func.count(self.media_actors.name).label('count'))
                            .join(self.media_actors, self.media_actors.media_id == self.media_list.media_id)
-                           .filter(self.media_actors.name != "Unknown").group_by(self.media_actors.name)
-                           .filter(self.media_list.user_id >= '2').order_by(text('count desc')).limit(5).all())
+                           .group_by(self.media_actors.name).filter(self.media_actors.name != 'Unknown')
+                           .order_by(text('count desc')).limit(5).all())
         return queries
 
-    # Top dropped media in the users' lists
+    # Top dropped media
     def get_top_dropped(self):
         queries = []
         for list_type in self.truncated_list_type:
@@ -590,10 +588,10 @@ class GlobalStats:
                                             func.count(self.media_list.media_id == self.media.id).label('count'))
                            .join(self.media_list, self.media_list.media_id == self.media.id)
                            .filter(self.media_list.status == Status.DROPPED).group_by(self.media_list.media_id)
-                           .filter(self.media_list.user_id >= '2').order_by(text('count desc')).limit(5).all())
+                           .order_by(text('count desc')).limit(5).all())
         return queries
 
-    # Total number of seasons/episodes watched for the series and anime
+    # Total number of seasons/episodes watched
     def get_total_eps_seasons(self):
         queries = []
         for list_type in self.truncated_list_type:
@@ -601,7 +599,7 @@ class GlobalStats:
             queries.append(db.session.query(self.media_list, self.media_eps,
                                             func.group_concat(self.media_eps.episodes))
                            .join(self.media_eps, self.media_eps.media_id == self.media_list.media_id)
-                           .group_by(self.media_list.id).filter(self.media_list.user_id >= '2').all())
+                           .group_by(self.media_list.id).all())
         return queries
 
 
@@ -626,31 +624,32 @@ def get_media_query(user_id, page, list_type, category, option=None, search=None
         query = db.session.query(media, media_list) \
             .join(media_list, media_list.media_id == media.id) \
             .filter(media_list.user_id == user_id, media_list.status == category).group_by(media.id) \
-            .order_by(media.name.asc()).paginate(page, 70, error_out=True)
+            .order_by(media.name.asc()).paginate(page, 50, error_out=True)
+        category = category.value
     elif search:
         if option == 'Titles':
             query = db.session.query(media, media_list) \
                 .join(media, media.id == media_list.media_id) \
                 .filter(or_(media.name.like('%' + search + '%'), media.original_name.like('%' + search + '%')),
                         media_list.user_id == user_id) \
-                .order_by(media_list.status).paginate(page, 25, error_out=True)
+                .order_by(media_list.status).paginate(page, 30, error_out=True)
         elif option == 'Actors':
             query = db.session.query(media, media_list, actors_list) \
                 .join(media, media.id == media_list.media_id)\
                 .join(actors_list, actors_list.media_id == media_list.media_id) \
                 .filter(actors_list.name.like('%' + search + '%'), media_list.user_id == user_id) \
-                .order_by(media_list.status).paginate(page, 25, error_out=True)
+                .order_by(media_list.status).paginate(page, 30, error_out=True)
         elif option == 'Genres':
             query = db.session.query(media, media_list, genre_list) \
                 .join(media, media.id == media_list.media_id)\
                 .join(genre_list, genre_list.media_id == media_list.media_id) \
                 .filter(genre_list.genre.like('%' + search + '%'), media_list.user_id == user_id) \
-                .order_by(media_list.status).paginate(page, 25, error_out=True)
+                .order_by(media_list.status).paginate(page, 50, error_out=True)
         elif option == 'Director':
             query = db.session.query(media, media_list) \
                 .join(media, media.id == media_list.media_id) \
                 .filter(media.director_name.like('%' + search + '%'), media_list.user_id == user_id) \
-                .order_by(media_list.status).paginate(page, 25, error_out=True)
+                .order_by(media_list.status).paginate(page, 30, error_out=True)
         else:
             abort(404)
         category = "{} Search results for '{}'".format(option, search)
@@ -658,7 +657,7 @@ def get_media_query(user_id, page, list_type, category, option=None, search=None
         query = db.session.query(media, media_list) \
             .join(media, media.id == media_list.media_id) \
             .filter(media_list.favorite, media_list.user_id == user_id) \
-            .order_by(media_list.status).paginate(page, 25, error_out=True)
+            .order_by(media_list.status).paginate(page, 30, error_out=True)
         category = "All Favorites"
     elif common:
         v1, v2 = aliased(media_list), aliased(media_list)
@@ -669,7 +668,8 @@ def get_media_query(user_id, page, list_type, category, option=None, search=None
         query = db.session.query(media, media_list) \
             .join(media, media.id == media_list.media_id) \
             .filter(media_list.user_id == user_id, media_list.media_id.notin_(common_ids),
-                    media_list.status == category).paginate(page, 25, error_out=True)
+                    media_list.status == category).paginate(page, 50, error_out=True)
+        category = category.value
     else:
         abort(404)
 
@@ -708,12 +708,12 @@ def get_next_airing(list_type):
         media_data = Movies.release_date
         media_list = MoviesList
 
-    airing_data = db.session.query(media, media_list) \
+    query = db.session.query(media, media_list) \
         .join(media, media.id == media_list.media_id) \
         .filter(media_data > datetime.utcnow(), media_list.user_id == current_user.id,
                 and_(media_list.status != Status.RANDOM, media_list.status != Status.DROPPED)).all()
 
-    return airing_data
+    return query
 
 
 def get_total_time(user_id, list_type):
@@ -734,7 +734,7 @@ def get_total_time(user_id, list_type):
     return query
 
 
-def check_media(media_id, list_type):
+def check_media(media_id, list_type, add=False):
     if list_type == ListType.SERIES:
         media = Series
         media_list = SeriesList
@@ -748,5 +748,8 @@ def check_media(media_id, list_type):
     query = db.session.query(media, media_list) \
         .join(media, media.id == media_list.media_id) \
         .filter(media.id == media_id, media_list.user_id == current_user.id).first()
+
+    if add:
+        query = db.session.query(media).filter(media.id == media_id).first()
 
     return query

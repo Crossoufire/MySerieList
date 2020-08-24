@@ -46,10 +46,10 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
             $li.append(
                 '<div class="row">' +
                     '<div class="col" style="min-width: 60px; max-width: 60px;">' +
-                        '<img src="'+item.poster_path+'" alt="'+item.name+'" style="width: 50px; height: 75px;">' +
+                        '<img src="'+item.poster_path+'" alt="" style="width: 50px; height: 75px;">' +
                     '</div>' +
                     '<div class="col">' +
-                        '<a class="text-light">' + item.name +
+                        '<a class="text-light">' + item.display_name +
                             '<br>' +
                             '<span style="font-size: 10pt;">' + media + ' | ' + item.first_air_date + '</span>' +
                         '</a>' +

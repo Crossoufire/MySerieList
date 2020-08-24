@@ -154,6 +154,41 @@ def achievements(user_name):
     return render_template('achievements.html', title="{}'s achievements".format(user_name))
 
 
+@bp.route("/level_grade_data", methods=['GET'])
+@login_required
+def level_grade_data():
+    ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
+    return render_template('level_grade_data.html', title='Level grade data', data=ranks)
+
+
+@bp.route("/knowledge_frame_data", methods=['GET'])
+@login_required
+def knowledge_frame_data():
+    ranks = Frames.query.all()
+    return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
+
+
+@bp.route("/new_features", methods=['GET'])
+@login_required
+def new_features():
+    return render_template('new_features.html', title='New Features')
+
+
+@bp.route("/apscheduler_info", methods=['GET', 'POST'])
+@login_required
+def apscheduler_info():
+    if current_user.role != RoleType.USER:
+        refresh = app.apscheduler.get_job('refresh_all_data')
+        refresh.modify(next_run_time=datetime.now())
+        flash('All the data have been refreshed!', 'success')
+
+        return redirect(request.referrer)
+    abort(403)
+
+
+# --- AJAX Methods ---------------------------------------------------------------------------------------------
+
+
 @bp.route("/follow_status", methods=['POST'])
 @login_required
 def follow_status():
@@ -198,38 +233,3 @@ def follow_status():
         app.logger.info('[{}] Unfollowed the account with ID {} '.format(current_user.id, follow_id))
 
     return '', 204
-
-
-@bp.route("/level_grade_data", methods=['GET'])
-@login_required
-def level_grade_data():
-    ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
-
-    return render_template('level_grade_data.html', title='Level grade data', data=ranks)
-
-
-@bp.route("/knowledge_frame_data", methods=['GET'])
-@login_required
-def knowledge_frame_data():
-    ranks = Frames.query.all()
-
-    return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
-
-
-@bp.route("/new_features", methods=['GET'])
-@login_required
-def new_features():
-    return render_template('new_features.html', title='New Features')
-
-
-@bp.route("/apscheduler_info", methods=['GET', 'POST'])
-@login_required
-def apscheduler_info():
-    if current_user.role != RoleType.USER:
-        refresh = app.apscheduler.get_job('refresh_all_data')
-        refresh.modify(next_run_time=datetime.now())
-        flash('All the data have been refreshed!', 'success')
-
-        return redirect(request.referrer)
-    else:
-        abort(403)

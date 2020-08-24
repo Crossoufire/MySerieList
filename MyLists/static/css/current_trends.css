@@ -7,7 +7,15 @@
     right: 16px;
 }
 
-.giveMeEllipsis {
+.ellipsis-title {
+   overflow: hidden;
+   text-overflow: ellipsis;
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-line-clamp: 2;   /* number of lines to show */
+}
+
+.ellipsis-text {
    overflow: hidden;
    text-overflow: ellipsis;
    display: -webkit-box;
@@ -15,12 +23,12 @@
    -webkit-line-clamp: 5;   /* number of lines to show */
 }
 
-.giveMeEllipsis2 {
+.ellipsis-mob {
    overflow: hidden;
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 2;   /* number of lines to show */
+   -webkit-line-clamp: 4;   /* number of lines to show */
 }
 
 .frame {
@@ -46,9 +54,6 @@
 
 .card-img {
     border-radius: 0;
-}
-
-.img-anime {
 }
 
 @media (max-width: 601px) {

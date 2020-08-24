@@ -106,9 +106,9 @@
                             </a>
                         </li>
                         <li class="nav-item nav-li-1">
-                            <a class="nav-link" href="{{ url_for('general.global_stats') }}">
+                            <a class="nav-link" href="{{ url_for('general.mylists_stats') }}">
                                 <i class="far fa-lg fa-chart-bar" style="color: darkorange;"></i>
-                                <div class="info-nav fs-14 nav-text">General Stats</div>
+                                <div class="info-nav fs-14 nav-text">MyLists Stats</div>
                             </a>
                         </li>
                         <li class="nav-item nav-li-1">
@@ -273,7 +273,7 @@
 {% if current_user.is_authenticated and current_user.get_last_update() %}
     <script type="text/javascript">
         $(window).on('load',function() {
-            $('#newFeatures').modal('show');
+            $("#newFeatures").modal('show');
         });
     </script>
 {% endif %}

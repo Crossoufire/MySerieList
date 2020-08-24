@@ -315,7 +315,11 @@
                             <li class="m-b-10">
                                 <div class="row">
                                     <div class="col-5"><b>Actors:</b></div>
-                                    <div class="col-7">{{ data['actors'] }}</div>
+                                    {% if data['actors'] == 'Unknown' %}
+                                        <div class="col-7"><i>No actors found</i></div>
+                                    {% else %}
+                                        <div class="col-7">{{ data['actors'] }}</div>
+                                    {% endif %}
                                 </div>
                             </li>
                             <li class="m-b-10">
@@ -379,7 +383,11 @@
                                 <li class="m-b-10">
                                     <div class="row">
                                         <div class="col-5"><b>Networks:</b></div>
-                                        <div class="col-7">{{ data['networks'] }}</div>
+                                        {% if data['networks'] == 'Unknown' %}
+                                            <div class="col-7"><i>No networks found</i></div>
+                                        {% else %}
+                                            <div class="col-7">{{ data['networks'] }}</div>
+                                        {% endif %}
                                     </div>
                                 </li>
                             {% endif %}

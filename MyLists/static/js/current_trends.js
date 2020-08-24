@@ -27,3 +27,15 @@ function showless(show, media) {
     $show.text("Show more...");
     $show.attr("onclick", "showmore(\"" + show + "\", \"" + media + "\")");
 }
+
+
+// --- Change anime img size ----------------------------------------------
+$(document).ready(function() {
+    function resizeAnimeImg() {
+        let $anime_img = $('.img-anime');
+        let width = $anime_img.width();
+        let height = width*1.5+'px';
+        $anime_img.attr('style', 'height: '+ height);
+    }
+    $(window).resize(resizeAnimeImg).trigger('resize');
+});

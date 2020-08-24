@@ -1,4 +1,5 @@
 import secrets
+import pykakasi
 
 from MyLists import app
 from flask import url_for
@@ -13,11 +14,25 @@ def latin_alphabet(original_name):
         original_name.encode('iso-8859-1')
         return True
     except UnicodeEncodeError:
-        return False
+        try:
+            kks = pykakasi.kakasi()
+            kks.setMode("H", "a")
+            kks.setMode("K", "a")
+            kks.setMode("J", "a")
+            kks.setMode("s", True)
+            conv = kks.getConverter().do(original_name).split()
+            cap_parts = [p.capitalize() for p in conv]
+            cap_message = " ".join(cap_parts)
+            return cap_message
+        except:
+            return False
 
 
 def change_air_format(date):
-    return datetime.strptime(date, '%Y-%m-%d').strftime("%d %b %Y")
+    try:
+        return datetime.strptime(date, '%Y-%m-%d').strftime("%d %b %Y")
+    except:
+        return 'Unknown'
 
 
 class MediaDict:
@@ -36,17 +51,22 @@ class MediaDict:
                            "lock_status": self.data.lock_status,
                            "actors": ', '.join([r.name for r in self.data.actors]),
                            "genres": ', '.join([r.genre for r in self.data.genres]),
-                           "display_name": self.data.name,
-                           "other_name": self.data.original_name,
                            "in_user_list": False,
                            "score": "---",
                            "favorite": False,
                            "rewatched": 0,
                            "comment": None}
 
-        if latin_alphabet(self.data.original_name):
+        return_latin = latin_alphabet(self.data.original_name)
+        if return_latin is True:
             self.media_info["display_name"] = self.data.original_name
             self.media_info["other_name"] = self.data.name
+        elif return_latin is False:
+            self.media_info["display_name"] = self.data.name
+            self.media_info["other_name"] = self.data.original_name
+        else:
+            self.media_info["display_name"] = self.data.name
+            self.media_info["other_name"] = return_latin
 
         if self.data.original_name == self.data.name:
             self.media_info["other_name"] = None
@@ -70,7 +90,7 @@ class MediaDict:
         self.media_info["in_production"] = self.data.in_production
         self.media_info["origin_country"] = self.data.origin_country
         self.media_info["eps_per_season"] = [r.episodes for r in self.data.eps_per_season]
-        self.media_info["networks"] = ", ".join([r.network for r in self.data.networks])
+        self.media_info["networks"] = ', '.join([r.network for r in self.data.networks])
         self.media_info["first_air_date"] = self.data.first_air_date
         self.media_info["last_air_date"] = self.data.last_air_date
         self.media_info["status"] = Status.WATCHING.value
@@ -78,16 +98,14 @@ class MediaDict:
         self.media_info["current_season"] = 1
 
         # Change <first_air_time> format
-        if self.data.first_air_date != 'Unknown':
-            self.media_info['first_air_date'] = change_air_format(self.data.first_air_date)
+        self.media_info['first_air_date'] = change_air_format(self.data.first_air_date)
 
         # Change <last_air_time> format
-        if self.data.last_air_date != 'Unknown':
-            self.media_info['last_air_date'] = change_air_format(self.data.last_air_date)
+        self.media_info['last_air_date'] = change_air_format(self.data.last_air_date)
 
         if self.list_type == ListType.SERIES:
             self.media_info["media_type"] = 'Series'
-            self.media_info["cover"] = 'series_covers/{}'.format(self.data.image_cover),
+            self.media_info["cover"] = 'series_covers/{}'.format(self.data.image_cover)
             self.media_info["cover_path"] = 'series_covers'
         elif self.list_type == ListType.ANIME:
             self.media_info['name'] = self.data.original_name
@@ -122,8 +140,7 @@ class MediaDict:
         self.media_info["status"] = Status.COMPLETED.value
 
         # Change <release_date> format
-        if self.data.release_date != 'Unknown':
-            self.media_info['release_date'] = change_air_format(self.data.release_date)
+        self.media_info['release_date'] = change_air_format(self.data.release_date)
 
         in_user_list = self.add_user_list()
         if in_user_list:
@@ -173,17 +190,22 @@ class MediaListDict:
                            "rewatched": self.data[1].rewatched,
                            "comment": self.data[1].comment,
                            "category": self.data[1].status.value,
-                           "display_name": self.data[0].name,
-                           "other_name": self.data[0].original_name,
                            "common": False,
                            "media": "Movies"}
 
         if not self.media_info['score'] or self.media_info['score'] == -1:
             self.media_info['score'] = '---'
 
-        if latin_alphabet(self.data[0].original_name):
+        return_latin = latin_alphabet(self.data[0].original_name)
+        if return_latin is True:
             self.media_info["display_name"] = self.data[0].original_name
             self.media_info["other_name"] = self.data[0].name
+        elif return_latin is False:
+            self.media_info["display_name"] = self.data[0].name
+            self.media_info["other_name"] = self.data[0].original_name
+        else:
+            self.media_info["display_name"] = self.data[0].name
+            self.media_info["other_name"] = return_latin
 
         if self.data[0].id in self.common_media:
             self.media_info['common'] = True
@@ -203,11 +225,11 @@ class MediaListDict:
         self.media_info["current_season"] = self.data[1].current_season
 
 
-class MediaDetail:
+class MediaDetails:
     def __init__(self, media_data, list_type):
         self.media_data = media_data
         self.list_type = list_type
-        self.media_detail = {}
+        self.media_details = {}
 
         if list_type != ListType.MOVIES:
             self.get_tv_details()
@@ -215,72 +237,51 @@ class MediaDetail:
             self.get_movies_details()
 
     def get_media_cover(self):
-        media_cover_path = self.media_data.get("poster_path") or None
-        media_cover_name = "default.jpg"
+        media_cover_path = self.media_data.get('poster_path') or None
+        media_cover_name = 'default.jpg'
         if media_cover_path:
-            media_cover_name = "{}.jpg".format(secrets.token_hex(8))
+            media_cover_name = '{}.jpg'.format(secrets.token_hex(8))
             try:
                 ApiData().save_api_cover(media_cover_path, media_cover_name, self.list_type)
             except Exception as e:
                 app.logger.error('[ERROR] - Trying to recover the poster: {}'.format(e))
-                media_cover_name = "default.jpg"
+                media_cover_name = 'default.jpg'
 
         return media_cover_name
 
-    def get_tv_details(self):
-        self.media_detail = {'name': self.media_data.get("name", "Unknown") or "Unknown",
-                             'original_name': self.media_data.get("original_name", "Unknown") or "Unknown",
-                             'first_air_date': self.media_data.get("first_air_date", "Unknown") or "Unknown",
-                             'last_air_date': self.media_data.get("last_air_date", "Unknown") or "Unknown",
-                             'homepage': self.media_data.get("homepage", "Unknown") or "Unknown",
-                             'in_production': self.media_data.get("in_production", False) or False,
-                             'total_seasons': self.media_data.get("number_of_seasons", 1) or 1,
-                             'total_episodes': self.media_data.get("number_of_episodes", 1) or 1,
-                             'status': self.media_data.get("status", "Unknown") or "Unknown",
-                             'vote_average': self.media_data.get("vote_average", 0) or 0,
-                             'vote_count': self.media_data.get("vote_count", 0) or 0,
-                             'synopsis': self.media_data.get("overview", "No overview avalaible.") or
-                                         "No overview available.",
-                             'popularity': self.media_data.get("popularity", 0) or 0,
-                             'themoviedb_id': self.media_data.get("id"),
-                             'image_cover': self.get_media_cover(),
-                             'last_update': datetime.utcnow()}
-
-        # Next episode to air (air_date, season, episode):
+    def get_next_eps_seas(self):
         next_episode_to_air = self.media_data.get("next_episode_to_air") or None
-        tv_data['next_episode_to_air'] = None
-        tv_data['season_to_air'] = None
-        tv_data['episode_to_air'] = None
+        self.media_details['next_episode_to_air'] = None
+        self.media_details['season_to_air'] = None
+        self.media_details['episode_to_air'] = None
         if next_episode_to_air:
-            tv_data['next_episode_to_air'] = next_episode_to_air['air_date']
-            tv_data['season_to_air'] = next_episode_to_air['season_number']
-            tv_data['episode_to_air'] = next_episode_to_air['episode_number']
+            self.media_details['next_episode_to_air'] = next_episode_to_air['air_date']
+            self.media_details['season_to_air'] = next_episode_to_air['season_number']
+            self.media_details['episode_to_air'] = next_episode_to_air['episode_number']
 
-        # Episode duration: List
+    def get_episode_duration(self):
         episode_duration = self.media_data.get("episode_run_time") or None
         if episode_duration:
-            tv_data['episode_duration'] = episode_duration[0]
+            self.media_details['episode_duration'] = episode_duration[0]
         else:
-            if list_type == ListType.ANIME:
-                tv_data['episode_duration'] = 24
-            elif list_type == ListType.SERIES:
-                tv_data['episode_duration'] = 45
+            if self.list_type == ListType.ANIME:
+                self.media_details['episode_duration'] = 24
+            elif self.list_type == ListType.SERIES:
+                self.media_details['episode_duration'] = 45
 
-        # Origin country: List
+    def get_origin_country(self):
         origin_country = self.media_data.get("origin_country") or None
+        self.media_details['origin_country'] = 'Unknown'
         if origin_country:
-            tv_data['origin_country'] = origin_country[0]
-        else:
-            tv_data['origin_country'] = 'Unknown'
+            self.media_details['origin_country'] = origin_country[0]
 
-        # Created by: List
+    def get_created_by(self):
         created_by = self.media_data.get("created_by") or None
+        self.media_details['created_by'] = 'Unknown'
         if created_by:
-            tv_data['created_by'] = ", ".join(creator['name'] for creator in created_by)
-        else:
-            tv_data['created_by'] = 'Unknown'
+            self.media_details['created_by'] = ", ".join(creator['name'] for creator in created_by)
 
-        # Seasons: List
+    def get_seasons(self):
         seasons = self.media_data.get('seasons') or None
         seasons_list = []
         if seasons:
@@ -295,141 +296,223 @@ class MediaDetail:
                            'episodes': 1}
             seasons_list.append(season_dict)
 
-        # Genres: List
+        return seasons_list
+
+    def get_genres(self):
         genres = self.media_data.get('genres') or None
         genres_list = []
         if genres:
             for i in range(0, len(genres)):
-                genres_dict = {'genre': genres[i]["name"],
-                               'genre_id': int(genres[i]["id"])}
+                genres_dict = {'genre': genres[i]['name'],
+                               'genre_id': int(genres[i]['id'])}
                 genres_list.append(genres_dict)
         else:
             genres_dict = {'genre': 'No genres found',
                            'genre_id': 0}
             genres_list.append(genres_dict)
 
-        # Anime Genre from Jikan My AnimeList API
+        return genres_list
+
+    def get_anime_genres(self):
         a_genres_list = []
-        if list_type == ListType.ANIME:
-            try:
-                anime_search = ApiData().anime_search(self.media_data.get("name"))
-                mal_id = anime_search["results"][0]["mal_id"]
-            except Exception as e:
-                app.logger.error('[SYSTEM] Error requesting the Jikan search API: {}'.format(e))
-                mal_id = None
+        try:
+            anime_search = ApiData().anime_search(self.media_data.get("name"))
+            mal_id = anime_search["results"][0]["mal_id"]
+        except Exception as e:
+            app.logger.error('[ERROR] - Requesting the Jikan search API: {}'.format(e))
+            mal_id = None
 
-            try:
-                anime_genres = ApiData().get_anime_genres(mal_id)
-                anime_genres = anime_genres["genres"]
-            except Exception as e:
-                app.logger.error('[SYSTEM] Error requesting the Jikan genre API: {}'.format(e))
-                anime_genres = None
+        try:
+            anime_genres = ApiData().get_anime_genres(mal_id)['genres']
+        except Exception as e:
+            app.logger.error('[ERROR] - Requesting the Jikan genre API: {}'.format(e))
+            anime_genres = None
 
-            if anime_genres:
-                for i in range(0, len(anime_genres)):
-                    genres_dict = {'genre': anime_genres[i]['name'],
-                                   'genre_id': int(anime_genres[i]['mal_id'])}
-                    a_genres_list.append(genres_dict)
+        if anime_genres:
+            for i in range(0, len(anime_genres)):
+                genres_dict = {'genre': anime_genres[i]['name'],
+                               'genre_id': int(anime_genres[i]['mal_id'])}
+                a_genres_list.append(genres_dict)
 
-        # Actors: List
-        actors = self.media_data.get("credits").get("cast") or None
+        return a_genres_list
+
+    def get_actors(self):
+        actors = self.media_data.get('credits', {'cast': None}).get('cast') or None
         actors_list = []
         if actors:
-            for i in range(0, len(actors)):
-                actors_dict = {'name': actors[i]["name"]}
+            for actor in actors[:5]:
+                actors_dict = {'name': actor["name"]}
                 actors_list.append(actors_dict)
-                if int(i) == 4:
-                    break
         else:
-            actors_dict = {'name': 'No actors found'}
+            actors_dict = {'name': 'Unknown'}
             actors_list.append(actors_dict)
 
-        # Network: List
+        return actors_list
+
+    def get_networks(self):
         networks = self.media_data.get('networks') or None
         networks_list = []
         if networks:
-            for i in range(0, len(networks)):
-                networks_dict = {'network': networks[i]["name"]}
+            for network in networks[:4]:
+                networks_dict = {'network': network["name"]}
                 networks_list.append(networks_dict)
-                if i == 4:
-                    break
         else:
-            networks_dict = {'network': 'No networks found'}
+            networks_dict = {'network': 'Unknown'}
             networks_list.append(networks_dict)
 
-        data = {'tv_data': tv_data,
-                'seasons_data': seasons_list,
-                'genres_data': genres_list,
-                'anime_genres_data': a_genres_list,
-                'actors_data': actors_list,
-                'networks_data': networks_list}
+        return networks_list
 
-    def get_movies_details(self):
-        movie_data = {'name': self.media_data.get("title", "Unknown") or 'Unknown',
-                      'original_name': self.media_data.get("original_title", "Unknown") or 'Unknown',
-                      'release_date': self.media_data.get("release_date", "Unknown") or 'Unknown',
-                      'homepage': self.media_data.get("homepage", "Unknown") or 'Unknown',
-                      'released': self.media_data.get("status", "Unknown") or "Unknown",
-                      'vote_average': self.media_data.get("vote_average", 0) or 0,
-                      'vote_count': self.media_data.get("vote_count", 0) or 0,
-                      'synopsis': self.media_data.get("overview",
-                                                   "No overview avalaible.") or 'No overview avalaible.',
-                      'popularity': self.media_data.get("popularity", 0) or 0,
-                      'budget': self.media_data.get("budget", 0) or 0,
-                      'revenue': self.media_data.get("revenue", 0) or 0,
-                      'tagline': self.media_data.get("tagline", "-") or '-',
-                      'runtime': self.media_data.get("runtime", 0) or 0,
-                      'original_language': self.media_data.get("original_language", "Unknown") or 'Unknown',
-                      'themoviedb_id': self.media_data.get("id"),
-                      'image_cover': media_cover_name,
-                      'director_name': "Unknown"}
-
-        # Director Name: str
-        the_crew = self.media_data.get("credits").get("crew") or None
+    def get_director_name(self):
+        the_crew = self.media_data.get('credits', {'crew': None}).get('crew') or None
+        self.media_details['director_name'] = 'Unknown'
         if the_crew:
             for element in the_crew:
-                if element['job'] == "Director":
-                    movie_data['director_name'] = element['name']
+                if element['job'] == 'Director':
+                    self.media_details['director_name'] = element['name']
                     break
 
-        # Collection ID: Int
-        collection_id = self.media_data.get("belongs_to_collection")
+    def get_collection_info(self):
+        collection_id = self.media_data.get("belongs_to_collection") or None
+
+        def get_collection_data(collection_id):
+            collection_data = ApiData().get_collection_data(collection_id)
+
+            collection_cover_path = collection_data.get('poster_path') or None
+            collection_cover_name = 'default.jpg'
+            if collection_cover_path:
+                collection_cover_name = '{}.jpg'.format(secrets.token_hex(8))
+                try:
+                    ApiData().save_api_cover(collection_cover_path, collection_cover_name, ListType.MOVIES,
+                                             collection=True)
+                except Exception as e:
+                    app.logger.error('[ERROR] - Trying to recover the poster for collection: {}'.format(e))
+                    collection_cover_name = 'default.jpg'
+
+            collection_info = {'collection_id': collection_id,
+                               'parts': len(collection_data.get('parts')),
+                               'name': collection_data.get('name', 'Unknown') or 'Unknown',
+                               'poster': collection_cover_name,
+                               'overview': collection_data.get('overview')}
+
+            return collection_info
+
+        self.media_details['collection_id'] = None
+        collection_info = None
         if collection_id:
-            movie_data['collection_id'] = collection_id['id']
-            collection_id = collection_id['id']
+            self.media_details['collection_id'] = collection_id['id']
+            collection_info = get_collection_data(collection_id['id'])
+
+        return collection_info
+
+    def get_tv_details(self):
+        self.media_details = {'name': self.media_data.get('name', 'Unknown') or 'Unknown',
+                              'original_name': self.media_data.get('original_name', 'Unknown') or 'Unknown',
+                              'first_air_date': self.media_data.get('first_air_date', 'Unknown') or 'Unknown',
+                              'last_air_date': self.media_data.get('last_air_date', 'Unknown') or 'Unknown',
+                              'homepage': self.media_data.get('homepage', 'Unknown') or 'Unknown',
+                              'in_production': self.media_data.get('in_production', False) or False,
+                              'total_seasons': self.media_data.get('number_of_seasons', 1) or 1,
+                              'total_episodes': self.media_data.get('number_of_episodes', 1) or 1,
+                              'status': self.media_data.get('status', 'Unknown') or 'Unknown',
+                              'vote_average': self.media_data.get('vote_average', 0) or 0,
+                              'vote_count': self.media_data.get('vote_count', 0) or 0,
+                              'synopsis': self.media_data.get('overview', 'Not defined.') or 'Not defined.',
+                              'popularity': self.media_data.get('popularity', 0) or 0,
+                              'themoviedb_id': self.media_data.get('id'),
+                              'image_cover': self.get_media_cover(),
+                              'last_update': datetime.utcnow()}
+
+        self.get_next_eps_seas()
+        self.get_episode_duration()
+        self.get_origin_country()
+        self.get_created_by()
+        seasons_list = self.get_seasons()
+        genres_list = self.get_genres()
+
+        a_genres_list = None
+        if self.list_type == ListType.ANIME:
+            a_genres_list = self.get_anime_genres()
+
+        actors_list = self.get_actors()
+        networks_list = self.get_networks()
+
+        all_data = {'tv_data': self.media_details,
+                    'seasons_data': seasons_list,
+                    'genres_data': genres_list,
+                    'anime_genres_data': a_genres_list,
+                    'actors_data': actors_list,
+                    'networks_data': networks_list}
+
+        return all_data
+
+    def get_movies_details(self):
+        self.media_details = {'name': self.media_data.get('title', 'Unknown') or 'Unknown',
+                              'original_name': self.media_data.get('original_title', 'Unknown') or 'Unknown',
+                              'release_date': self.media_data.get('release_date', 'Unknown') or 'Unknown',
+                              'homepage': self.media_data.get('homepage', 'Unknown') or 'Unknown',
+                              'released': self.media_data.get('status', 'Unknown') or '"Unknown',
+                              'vote_average': self.media_data.get('vote_average', 0) or 0,
+                              'vote_count': self.media_data.get('vote_count', 0) or 0,
+                              'synopsis': self.media_data.get('overview', 'Not defined.') or 'Not defined.',
+                              'popularity': self.media_data.get('popularity', 0) or 0,
+                              'budget': self.media_data.get('budget', 0) or 0,
+                              'revenue': self.media_data.get('revenue', 0) or 0,
+                              'tagline': self.media_data.get('tagline', '-') or '-',
+                              'runtime': self.media_data.get('runtime', 0) or 0,
+                              'original_language': self.media_data.get('original_language', 'Unknown') or 'Unknown',
+                              'themoviedb_id': self.media_data.get('id'),
+                              'image_cover': self.get_media_cover()}
+
+        self.get_director_name()
+        collection_info = self.get_collection_info()
+        genres_list = self.get_genres()
+        actors_list = self.get_actors()
+
+        all_data = {'movies_data': self.media_details,
+                    'collection_info': collection_info,
+                    'genres_data': genres_list,
+                    'actors_data': actors_list}
+
+        return all_data
+
+
+class Autocomplete:
+    def __init__(self, result):
+        self.tmdb_cover_link = "http://image.tmdb.org/t/p/w300"
+        self.result = result
+        self.media_info = {}
+
+    def get_autocomplete_dict(self):
+        self.media_info['tmdb_id'] = self.result.get('id')
+
+        self.media_info["poster_path"] = url_for('static', filename="covers/series_covers/default.jpg")
+        if self.result["poster_path"]:
+            self.media_info["poster_path"] = "{}{}".format(self.tmdb_cover_link, self.result["poster_path"])
+
+        if self.result['media_type'] == 'tv':
+            self.get_tv_dict()
         else:
-            movie_data['collection_id'] = None
-            collection_id = None
+            self.get_movies_dict()
 
-        # Genres: List
-        genres = self.media_data.get('genres') or None
-        genres_list = []
-        if genres:
-            for i in range(0, len(genres)):
-                genres_dict = {'genre': genres[i]["name"],
-                               'genre_id': int(genres[i]["id"])}
-                genres_list.append(genres_dict)
-        else:
-            genres_dict = {'genre': 'No genres found',
-                           'genre_id': 0}
-            genres_list.append(genres_dict)
+        return self.media_info
 
-        # Actors: List
-        actors = self.media_data.get("credits").get("cast") or None
-        actors_list = []
-        if actors:
-            for i in range(0, len(actors)):
-                actors_dict = {'name': actors[i]["name"]}
-                actors_list.append(actors_dict)
-                if i == 4:
-                    break
-        else:
-            actors_dict = {'name': 'No actors found'}
-            actors_list.append(actors_dict)
+    def get_tv_dict(self):
+        return_latin = latin_alphabet(self.result.get('original_name'))
+        self.media_info["display_name"] = self.result.get('name')
+        if return_latin is True:
+            self.media_info["display_name"] = self.result.get('original_name')
 
-        data = {'movies_data': movie_data,
-                'collections_data': collection_id,
-                'genres_data': genres_list,
-                'actors_data': actors_list}
+        self.media_info["first_air_date"] = change_air_format(self.result.get('first_air_date'))
+        self.media_info['media_type'] = ListType.SERIES.value
+        if self.result['origin_country'] == 'JP' or self.result['original_language'] == 'ja' \
+                and 16 in self.result['genre_ids']:
+            self.media_info['media_type'] = ListType.ANIME.value
 
-        return data
+    def get_movies_dict(self):
+        return_latin = latin_alphabet(self.result.get('original_title'))
+        self.media_info["display_name"] = self.result.get('title')
+        if return_latin is True:
+            self.media_info["display_name"] = self.result.get('original_title')
+
+        self.media_info["first_air_date"] = change_air_format(self.result.get('release_date'))
+        self.media_info['media_type'] = ListType.MOVIES.value

@@ -8,6 +8,7 @@ flask-login
 flask-user
 flask-mail
 flask-wtf
+pykakasi
 email_validator
 python-dotenv
 itsdangerous

@@ -146,7 +146,9 @@ $(document).ready(function () {
                     },
                     scaleLabel: {
                         display: true,
-                        labelString: 'Seasons completed'
+                        labelString: 'Seasons completed',
+                        fontColor: '#e2e2e2',
+                        fontSize: 14
                     }
                 },
                     {
@@ -164,7 +166,9 @@ $(document).ready(function () {
                         },
                         scaleLabel: {
                             display: true,
-                            labelString: 'Episodes watched'
+                            labelString: 'Episodes watched',
+                            fontColor: '#e2e2e2',
+                            fontSize: 14
                         }
                     }],
                 xAxes: [{

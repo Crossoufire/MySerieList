@@ -16,6 +16,11 @@ class ApiData:
         self.tmdb_api_key = app.config['THEMOVIEDB_API_KEY']
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
 
+    @staticmethod
+    def status_code(status_code):
+        if status_code != 200:
+            abort(status_code)
+
     def TMDb_search(self, media_name):
         response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
                                 .format(self.tmdb_api_key, media_name))
@@ -48,22 +53,26 @@ class ApiData:
 
         return json.loads(response.text)
 
-    def get_trending_media(self, api_name):
-        if api_name == 'TMDB':
-            response = requests.get("https://api.themoviedb.org/3/trending/all/week?api_key={}"
-                                    .format(self.tmdb_api_key))
-            response_2 = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
-                                      .format(self.tmdb_api_key))
-        elif api_name == 'Jikan':
-            response = requests.get("https://api.jikan.moe/v3/top/anime/1/airing")
+    def get_trending_movies(self):
+        response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
+                                       .format(self.tmdb_api_key))
 
         self.status_code(response.status_code)
 
-        if api_name == 'TMDB':
-            self.status_code(response_2.status_code)
-            a = json.loads(response.text)
-            b = json.loads(response_2.text)
-            return a, b
+        return json.loads(response.text)
+
+    def get_trending_tv(self):
+        response = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
+                                   .format(self.tmdb_api_key))
+
+        self.status_code(response.status_code)
+
+        return json.loads(response.text)
+
+    def get_trending_anime(self):
+        response = requests.get("https://api.jikan.moe/v3/top/anime/1/airing")
+
+        self.status_code(response.status_code)
 
         return json.loads(response.text)
 
@@ -121,8 +130,3 @@ class ApiData:
         img = Image.open(f"{local_covers_path}/{media_cover_name}")
         img = img.resize((300, 450), Image.ANTIALIAS)
         img.save(f"{local_covers_path}/{media_cover_name}", quality=90)
-
-    @staticmethod
-    def status_code(status_code):
-        if status_code != 200:
-            abort(status_code)

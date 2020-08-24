@@ -43,8 +43,7 @@
         <hr class="header-bar">
         <div class="center-mobile d-flex flex-wrap m-t-20">
             <div class="ml-auto mr-auto">
-                <form style="display: inline-block;" action="{{ url_for('main.mymedialist', media_list=media_list,
-                user_name=username) }}">
+                <form style="display: inline-block;" action="{{ url_for('main.mymedialist', media_list=media_list, user_name=username) }}">
                     <label for="searchInput"></label>
                     <input id="searchInput" class="modded-input" name="search" placeholder="&#128269; Search..."
                     onfocus="this.placeholder = ''" onblur="this.placeholder = '&#128269; Search...'">
@@ -73,18 +72,23 @@
             {% endblock button %}
         </div>
     </div>
-    <div class="bg-dark p-1">
+    <div class="{% if media_list == 'serieslist' %}bg-series-opa {% elif media_list == 'animelist' %}bg-anime-opa
+        {% else %}bg-movies-opa {% endif %} p-t-4 p-b-4">
         {% if not request.args.get('fav') %}
-            <div class="float-r m-r-10"><b>Total pages: {{ info_pages['total_pages'] }}</b></div>
-            <a class="fas fa-lg fa-eye m-l-10" data-toggle="tooltip" title="Hide common media"
-               href="/{{ media_list }}/{{ username }}?common=False&cat={{ category }}"></a>
-            <span>&nbsp;&nbsp;<b>|</b>&nbsp;&nbsp;</span>
-            <a class="fas fa-lg fa-heart m-l-10" data-toggle="tooltip" title="Show only favorites"
+            <a class="fas fa-lg fa-heart m-l-10 text-light" data-toggle="tooltip" title="Show only favorites"
                href="/{{ media_list }}/{{ username }}?fav=True"></a>
+            <div class="float-r m-r-10"><b>Total pages: {{ info_pages['total_pages'] }}</b></div>
+        {% else %}
+            <div class="m-l-10"><b>Total pages: {{ info_pages['total_pages'] }}</b></div>
+        {% endif %}
+        {% if user_id != current_user.get_id() and not request.args.get('fav') and not request.args.get('common') %}
+            <span>&nbsp;&nbsp;<b>|</b>&nbsp;&nbsp;</span>
+            <a class="fas fa-lg fa-eye-slash text-light" data-toggle="tooltip" title="Hide common media"
+               href="/{{ media_list }}/{{ username }}?common=False&cat={{ category }}"></a>
         {% endif %}
     </div>
 
-    <h2 class="text-center m-t-40 mb-0">{{ category|upper }} ({{ info_pages['total_media'] }})</h2>
+    <h2 class="text-center m-t-50 mb-0">{{ category|upper }} ({{ info_pages['total_media'] }})</h2>
     <hr class="mt-2 pb-3 mb-0">
     <div class="row infinite-scroll-container">
         {% for data in media_data  %}
@@ -177,6 +181,10 @@
     <p class="pagination">
         {% if search %}
             <a class="pagination__next" href="/{{ media_list }}/{{ username }}?search={{ search }}&page=2"></a>
+        {% elif common %}
+            <a class="pagination__next" href="/{{ media_list }}/{{ username }}?cat={{ category }}&common=False&page=2"></a>
+        {% elif favorite %}
+            <a class="pagination__next" href="/{{ media_list }}/{{ username }}?fav=True&page=2"></a>
         {% else %}
             <a class="pagination__next" href="/{{ media_list }}/{{ username }}?cat={{ category }}&page=2"></a>
         {% endif %}

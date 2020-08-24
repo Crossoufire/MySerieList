@@ -31,7 +31,7 @@
                                     <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
                                          title="{{ media_data['series']['media_levels']['grade_title'] }}"
                                          src="{{ media_data['series']['media_levels']['grade_id'] }}.png" alt=""/>
-                                    <span class='account-bar-name'>Series</span>
+                                    <a class="account-bar-name text-light" href="/serieslist/{{ user_data['username'] }}">Series</a>
                                     <div id="series-level" class='account-bar-level'>
                                         Level {{ '%02d'|format(media_data['series']['media_levels']['level']) }}
                                     </div>
@@ -52,7 +52,7 @@
                                     <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
                                          title="{{ media_data['anime']['media_levels']['grade_title'] }}"
                                          src="{{ media_data['anime']['media_levels']['grade_id'] }}.png"/>
-                                    <div class='account-bar-name'>Anime</div>
+                                    <a class="account-bar-name text-light" href="/animelist/{{ user_data['username'] }}">Anime</a>
                                     <div id="anime-level" class='account-bar-level'>
                                         Level {{ '%02d' | format(media_data['anime']['media_levels']['level']) }}</div>
                                     <div class='xp-bar' data-toggle="tooltip"
@@ -67,22 +67,22 @@
                             </div>
                         </div>
                         <div class="d-flex">
-                            <div class='account-bar-wrapper'>
-                                <div class='account-bar'>
+                            <div class="account-bar-wrapper">
+                                <div class="account-bar">
                                     <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
                                          title="{{ media_data['movies']['media_levels']['grade_title'] }}"
                                          src="{{ media_data['movies']['media_levels']['grade_id'] }}.png"/>
-                                    <span class='account-bar-name'>Movies</span>
+                                    <a class="account-bar-name text-light" href="/movieslist/{{ user_data['username'] }}">Movies</a>
                                     <div id="movies-level" class='account-bar-level'>
                                         Level {{ '%02d' |format(media_data['movies']['media_levels']['level']) }}
                                     </div>
-                                    <div class='xp-bar' data-toggle="tooltip" title="{{ media_data['movies']
+                                    <div class="xp-bar" data-toggle="tooltip" title="{{ media_data['movies']
                                     ['media_levels']['level_percent'] }}%">
                                         <div class="xp-bar-fill bg-movies" style="width: {{ media_data['movies']
                                         ['media_levels']['level_percent'] }}%;">
                                         </div>
                                     </div>
-                                    <div class='account-bar-next-level'>&nbsp;{{ '%02d' |
+                                    <div class="account-bar-next-level">&nbsp;{{ '%02d' |
                                     format(media_data['movies']['media_levels']['level']|int + 1) }}</div>
                                 </div>
                             </div>
@@ -133,18 +133,18 @@
                         </div>
 
                         <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
-              <script type="text/javascript">
-                var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-                var localdate = new Date("{{update['date']}}").toLocaleString("en-GB", {timeZone: tz});
-                var d = new Date("{{ update['date'] }}")
-                var month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
-                    "Nov", "Dec"];
-                var date_month = month[d.getMonth()];
-                var date_day = localdate.slice(0, 2);
-                var date_time = localdate.slice(11, 17)
-                document.write(date_day + " " + date_month + " at " + date_time)
-              </script>
-          </span>
+                            <script type="text/javascript">
+                                var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+                                var localdate = new Date("{{update['date']}}").toLocaleString("en-GB", {timeZone: tz});
+                                var d = new Date("{{ update['date'] }}")
+                                var month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
+                                    "Nov", "Dec"];
+                                var date_month = month[d.getMonth()];
+                                var date_day = localdate.slice(0, 2);
+                                var date_time = localdate.slice(11, 17)
+                                document.write(date_day + " " + date_month + " at " + date_time)
+                            </script>
+                        </span>
                         </div>
                         {% endfor %}
                     </li>
