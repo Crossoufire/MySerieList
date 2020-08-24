@@ -19,7 +19,7 @@
 
 {% block content %}
     {% if not current_user.oauth_id %}
-        <div class="row text-center m-t-60">
+        <div class="row text-center m-t-60 m-b-60">
         <div class="col">
             <h4><i class="fas fa-sliders-h"></i>&nbsp&nbsp General settings</h4>
             <hr>
@@ -97,7 +97,7 @@
         </div>
     </div>
     {% else %}
-        <div class="text-center m-t-60">
+        <div class="text-center m-t-60 m-b-60">
             <h4><i class="fas fa-sliders-h"></i>&nbsp&nbsp General settings</h4>
             <hr>
             <form method="POST" action="" enctype="multipart/form-data">

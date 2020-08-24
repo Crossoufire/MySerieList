@@ -300,6 +300,8 @@ option {
 
 .card-btn-top-left {
     position: absolute;
+    width: 50px;
+    height: 50px;
     top: 10px;
     left: 10px;
     opacity: 0;
@@ -348,6 +350,12 @@ option {
     }
 }
 @media (max-width: 991px) {
+    .card-btn-top-left {
+        opacity: 0.8;
+    }
+    .card-btn-toop-right {
+        opacity: 0.8;
+    }
     .card-btn-mobile {
         font-size: 9px;
         padding: 2px !important;

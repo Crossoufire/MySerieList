@@ -186,6 +186,18 @@ def current_trends():
                            movies_trends=movies_results)
 
 
+@bp.route("/privacy_policy", methods=['GET'])
+@login_required
+def privacy_policy():
+    return render_template('privacy_policy.html', title='Privacy Policy of MyLists')
+
+
+@bp.route("/about", methods=['GET'])
+@login_required
+def about():
+    return render_template('about.html', title='About MyLists')
+
+
 # @bp.route('/service-worker.js')
 # def service_worker():
 #     return app.send_static_file('service-worker.js')

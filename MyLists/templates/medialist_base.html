@@ -90,7 +90,7 @@
 
     <h2 class="text-center m-t-50 mb-0">{{ category|upper }} ({{ info_pages['total_media'] }})</h2>
     <hr class="mt-2 pb-3 mb-0">
-    <div class="row infinite-scroll-container">
+    <div class="row infinite-scroll-container m-b-60">
         {% for data in media_data  %}
             <div id="card_{{ data['id'] }}" values="{% block data scoped %}{% endblock data %}"
                  cat="{{ data['category'] }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
@@ -176,7 +176,7 @@
     </div>
 
     <div class="scroller-status">
-        <p class="infinite-scroll-error text-center">End of content</p>
+        <p class="infinite-scroll-error text-center"></p>
     </div>
     <p class="pagination">
         {% if search %}

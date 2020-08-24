@@ -2,7 +2,7 @@
 
 
 {% block data %}
-    <div class="account-wrapper">
+    <div class="account-wrapper m-b-60">
         {% if user_data['id'] != current_user.get_id() %}
             <div class="follow-btn-mobile d-flex">
                 {% if user_data["isfollowing"] %}
@@ -187,11 +187,6 @@
                                     <a class="text-light" href="{{ url_for('users.knowledge_frame_data') }}"
                                        target="_blank">
                                         <u>Knowledge frame data</u>
-                                    </a>
-                                </li>
-                                <li class="m-b-10">
-                                    <a class="text-light" href="{{ url_for('users.new_features') }}" target="_blank">
-                                        <u>New Features</u>
                                     </a>
                                 </li>
                             {% endif %}
@@ -546,7 +541,7 @@
                             </div>
                         </div>
                         <hr>
-                        <div class="stats-size m-b-50">
+                        <div class="stats-size">
                             <h5 class="text-center mb-2">
                                 <a class="text-light" href="{{ url_for('main.mymedialist', media_list='movieslist',
                                 user_name=user_data['username']) }}">
