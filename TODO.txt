@@ -17,8 +17,8 @@ Media sheet:
 	
 Account:
   Enhance: Possibility to change background image
-	Add: New achievements system
-	Enhance: Notification system (follow's level up)
+  Add: New achievements system
+  Enhance: Notification system (follow's level up)
 	
 General:
   Add: Contact form
@@ -26,4 +26,3 @@ General:
   Enhance: Change the hamburger display to a vertical panel in mobile
   Add: If API down, user can still add media but check in our database instead of API
   Enhance: Create one admin with admin view (HoF, Stats, admin and settings) and one standard user
-	Add: Check if alphabet latin or not to show original name or not

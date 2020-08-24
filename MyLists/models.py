@@ -157,7 +157,7 @@ class User(db.Model, UserMixin):
         except:
             return None
         user = User.query.get(user_id)
-        if user is None:
+        if not user:
             return None
         else:
             return user
@@ -196,9 +196,9 @@ class Series(db.Model):
     original_name = db.Column(db.String(50), nullable=False)
     first_air_date = db.Column(db.String(30))
     last_air_date = db.Column(db.String(30))
-    next_episode_to_air = db.Column(db.String(30), default=None)
-    season_to_air = db.Column(db.Integer, default=None)
-    episode_to_air = db.Column(db.Integer, default=None)
+    next_episode_to_air = db.Column(db.String(30))
+    season_to_air = db.Column(db.Integer)
+    episode_to_air = db.Column(db.Integer)
     homepage = db.Column(db.String(200))
     in_production = db.Column(db.Boolean)
     created_by = db.Column(db.String(100))
@@ -290,9 +290,9 @@ class Anime(db.Model):
     original_name = db.Column(db.String(50), nullable=False)
     first_air_date = db.Column(db.String(30))
     last_air_date = db.Column(db.String(30))
-    next_episode_to_air = db.Column(db.String(30), default=None)
-    season_to_air = db.Column(db.Integer, default=None)
-    episode_to_air = db.Column(db.Integer, default=None)
+    next_episode_to_air = db.Column(db.String(30))
+    season_to_air = db.Column(db.Integer)
+    episode_to_air = db.Column(db.Integer)
     homepage = db.Column(db.String(200))
     in_production = db.Column(db.Boolean)
     created_by = db.Column(db.String(100))
@@ -504,6 +504,11 @@ class GlobalStats:
     def __init__(self):
         self.all_list_type = [ListType.SERIES, ListType.ANIME, ListType.MOVIES]
         self.truncated_list_type = [ListType.SERIES, ListType.ANIME]
+        self.media = None
+        self.media_genre = None
+        self.media_actors = None
+        self.media_eps = None
+        self.media_list = None
 
     def get_type(self, list_type):
         if list_type == ListType.SERIES:
@@ -524,7 +529,6 @@ class GlobalStats:
             self.media_actors = MoviesActors
             self.media_list = MoviesList
 
-    # Total time spent
     @staticmethod
     def get_total_time_spent():
         times_spent = db.session.query(func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
@@ -532,7 +536,6 @@ class GlobalStats:
             .filter(User.role != RoleType.ADMIN, User.active == True).all()
         return times_spent
 
-    # Top media
     def get_top_media(self):
         queries = []
         for list_type in self.all_list_type:
@@ -543,7 +546,6 @@ class GlobalStats:
                            .group_by(self.media_list.media_id).order_by(text("count desc")).limit(5).all())
         return queries
 
-    # Top genres
     def get_top_genres(self):
         queries = []
         for list_type in self.all_list_type:
@@ -554,7 +556,6 @@ class GlobalStats:
                            .group_by(self.media_genre.genre).order_by(text('count desc')).limit(5).all())
         return queries
 
-    # Top actors
     def get_top_actors(self):
         queries = []
         for list_type in self.all_list_type:
@@ -566,7 +567,6 @@ class GlobalStats:
                            .order_by(text('count desc')).limit(5).all())
         return queries
 
-    # Top dropped media
     def get_top_dropped(self):
         queries = []
         for list_type in self.truncated_list_type:
@@ -578,7 +578,6 @@ class GlobalStats:
                            .order_by(text('count desc')).limit(5).all())
         return queries
 
-    # Total number of seasons/episodes watched
     def get_total_eps_seasons(self):
         queries = []
         for list_type in self.truncated_list_type:
