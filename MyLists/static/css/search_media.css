@@ -1,19 +1,12 @@
 
-/* ---------------- CARD CSS -------------------- */
+
+/* --- Card CSS ----------------------------------------- */
 .giveMeEllipsis {
    overflow: hidden;
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 3; /* number of lines to show */
-}
-
-.giveMeEllipsis-3 {
-   overflow: hidden;
-   text-overflow: ellipsis;
-   display: -webkit-box;
-   -webkit-box-orient: vertical;
-   -webkit-line-clamp: 4; /* number of lines to show */
+   -webkit-line-clamp: 3;     /* number of lines to show */
 }
 
 .giveMeEllipsis2 {
@@ -21,6 +14,13 @@
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 2; /* number of lines to show */
+   -webkit-line-clamp: 2;     /* number of lines to show */
 }
-/* ------------------------------------------ */
+
+.giveMeEllipsis-3 {
+   overflow: hidden;
+   text-overflow: ellipsis;
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-line-clamp: 4;     /* number of lines to show */
+}

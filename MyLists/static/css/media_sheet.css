@@ -1,4 +1,5 @@
 
+
 ul {
     list-style-type: none;
 }
@@ -15,9 +16,15 @@ ul {
     height: 100wh;
 }
 
-.favorite-css {
+.favorited {
     cursor: pointer;
-    color: darkgoldenrod;
+    color: #cd0303;
+    float: right;
+}
+
+.no-fav {
+    cursor: pointer;
+    color: #929292;
     float: right;
 }
 
@@ -52,6 +59,52 @@ ul {
     color: green;
 }
 
+.comment-position {
+    position: relative;
+    padding: 0 7px 0 7px;
+    background: #131418;
+    top: -20px;
+    left: 2px;
+}
+
+.comment-style {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+.far.fa-edit {
+    float: right;
+    color: #929292;
+}
+
+.follow-margin-mobile {
+    margin-left: 21px;
+}
+
+.follow-img {
+    border-radius: 50%;
+    background-color: grey;
+    height: 55px;
+    width: 55px;
+}
+
+.f-favorited {
+    color: #cd0303;
+}
+
+.f-no-fav {
+    color: #929292;
+}
+
+.follow-div {
+    background: #242428;
+    padding: 5px 20px 15px 20px;
+}
+
+.commentary {
+    margin-bottom: 0;
+}
+
 @media (max-width: 1100px) {
     .wrapper {
         width: auto;
@@ -78,5 +131,8 @@ ul {
     .media-cover {
         width: 200px;
         height: 300px;
+    }
+    .follow-margin-mobile {
+        margin-left: 2px;
     }
 }

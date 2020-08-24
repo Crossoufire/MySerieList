@@ -7,44 +7,37 @@ from PIL import Image
 from pathlib import Path
 from MyLists import db, app
 from datetime import datetime
-from MyLists.models import ListType, Status, User, AnimeList, SeriesList, MoviesList, Movies, Badges, Ranks, Frames, \
-    MoviesCollections
+from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, MoviesCollections, get_total_time
 
 
 def compute_media_time_spent(list_type):
     users = User.query.all()
 
     for user in users:
-        if list_type == ListType.SERIES:
-            element_data = SeriesList.get_total_time(user.id)
-        elif list_type == ListType.ANIME:
-            element_data = AnimeList.get_total_time(user.id)
-        elif list_type == ListType.MOVIES:
-            element_data = MoviesList.get_total_time(user.id)
+        media_list = get_total_time(user.id, list_type)
 
         if list_type != ListType.MOVIES:
             total_time = 0
-            for element in element_data:
-                if element[0].status == Status.COMPLETED:
+            for media in media_list:
+                if media[1].status == Status.COMPLETED:
                     try:
-                        total_time += element[1].episode_duration * element[1].total_episodes
+                        total_time += media[0].episode_duration*media[0].total_episodes*(1+media[1].rewatched)
                     except:
                         pass
-                elif element[0].status != Status.PLAN_TO_WATCH or element[0].status != Status.RANDOM:
+                elif media[1].status != Status.PLAN_TO_WATCH or media[1].status != Status.RANDOM:
                     try:
-                        episodes = element[2].split(",")
-                        episodes = [int(x) for x in episodes]
-                        for i in range(1, element[0].current_season):
-                            total_time += element[1].episode_duration * episodes[i - 1]
-                        total_time += element[0].last_episode_watched * element[1].episode_duration
+                        episodes = [eps.episodes for eps in media[0].eps_per_season]
+                        for i in range(1, media[1].current_season):
+                            total_time += media[0].episode_duration*episodes[i - 1]
+                        total_time += media[1].last_episode_watched*media[0].episode_duration
                     except:
                         pass
         elif list_type == ListType.MOVIES:
             total_time = 0
-            for element in element_data:
-                if element[0].status != Status.PLAN_TO_WATCH:
+            for media in media_list:
+                if media[1].status != Status.PLAN_TO_WATCH:
                     try:
-                        total_time += element[1].runtime
+                        total_time += media[0].runtime*(1+media[1].rewatched)
                     except:
                         pass
 
@@ -59,6 +52,7 @@ def compute_media_time_spent(list_type):
 
 
 # ---------------------------------------- DB add/refresh from CSV data ---------------------------------------------- #
+
 
 def add_ranks_to_db():
     list_all_ranks = []
@@ -160,7 +154,7 @@ def refresh_db_frames():
 
 
 def add_collections_movies():
-    print('Started.')
+    print('Started to add movies collection.')
     local_covers_path = Path(app.root_path, "static/covers/movies_collection_covers/")
 
     all_movies = Movies.query.filter_by().all()
@@ -217,6 +211,8 @@ def add_collections_movies():
             add_collection = MoviesCollections(collection_id=collection_id,
                                                parts=collection_parts,
                                                name=collection_name,
+                                               movies_names=None,
+                                               releases_dates=None,
                                                poster=collection_poster_id,
                                                overview=collection_overview)
 
@@ -224,11 +220,11 @@ def add_collections_movies():
             db.session.commit()
         except:
             continue
-    print('Finished.')
+    print('Finished adding movies collection.')
 
 
 def refresh_collections_movies():
-    print('Started.')
+    print('Started to refresh movies collection.')
 
     all_collection_movies = MoviesCollections.query.filter_by().all()
     for index, collection in enumerate(all_collection_movies):
@@ -258,4 +254,4 @@ def refresh_collections_movies():
             db.session.commit()
         except:
             continue
-    print('Finished.')
+    print('Finished refreshing movies collection.')

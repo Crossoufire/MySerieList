@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+    <style>
+    .relative-medal {
+        position: absolute;
+        top: -8px;
+        right: 5px;
+    }
+</style>
+{% endblock css %}
+
+
+{% block content %}
+    <h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">
+        <i class="fas fa-trophy"></i>&nbsp;&nbsp;ACHIEVEMENTS
+    </h2><hr>
+    <div class="m-t-40 m-b-60">
+        <div class="row">
+            <div class="col-4">
+                <div class="m-b-20" style="background-color: #216e7d;">
+                    <div class="row no-gutters" style="padding: 0 5px 0 0;">
+                        <div class="col-3">
+                            <img height='100' width='95' style="border-radius: 50%;"
+                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3
+AANd9GcQ1kPZoy5MDOZbuDV_Zy1RjJ-1lXCMfUs9NPNXyN6b64lfsCGcM&usqp=CAU" alt=""/>
+                        </div>
+                        <div class="col-9 m-t-8">
+                            <div class="relative-medal">
+                                <img height='30' width='30' src="https://image.flaticon.com/
+icons/svg/179/179249.svg" alt=""/>
+                            </div>
+                            <h5><b>You're goddamn right</b></h5>
+                            You've watched 6 series with the actor Bryan Cranston
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="m-b-20" style="background-color: #333333;">
+                    <div class="row no-gutters" style="padding: 0 5px 0 0;">
+                        <div class="col-3">
+                            <img height='100' width='95' style="border-radius: 50%;"
+                                 src="https://thumbs.dreamstime.com/b/little-bit-hand-gesture-line-icon
+-linear-style-sign-mobile-concept-web-design-small-size-showing-hand-outline-vector-152997051.jpg" alt=""/>
+                        </div>
+                        <div class="col-9 m-t-8">
+                            <h5><b>Short is good too</b></h5>
+                            You've watched 4/8 series with less than 4 episodes.
+                        </div>
+                    </div>
+                    <div class="common-media-meter m-t-4">
+                        <span class="common-media-meter-bar" style="width: 50%;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

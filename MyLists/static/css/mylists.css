@@ -1,5 +1,7 @@
 
-/* --- General ------------------------------------------------ */
+
+/* --- General ------------------------------------------ */
+
 body {
     padding: 0;
     display: flex;
@@ -17,10 +19,6 @@ main {
 
 hr {
     border-top: 1px solid rgba(255, 255, 255, 0.9);
-}
-
-.bg-dark {
-    background-color: #2c3946 !important;
 }
 
 .container {
@@ -76,7 +74,7 @@ hr {
 }
 
 
-/* --- Website Scrollbar ----------------------------------------- */
+/* --- Website Scrollbar -------------------------------- */
 ::-webkit-scrollbar {
     width: 10px;
 }
@@ -94,7 +92,7 @@ hr {
 }
 
 
-/* --- Navbar modifications ---------------------------------------- */
+/* --- Navbar modifications ----------------------------- */
 .medialist-dropdown {
     padding: 0;
     border-radius: 0;
@@ -128,12 +126,6 @@ hr {
     background-color: black;
 }
 
-/*#autocomplete.ui-autocomplete-loading {*/
-/*    background-image: url('/static/img/loading.webp');*/
-/*    background-position: right 7% bottom 50%;*/
-/*    background-repeat: no-repeat;*/
-/*}*/
-
 .ui-menu-item .ui-menu-item-wrapper.ui-state-active {
     background: #131418 !important;
     border: solid white 1px;
@@ -153,8 +145,6 @@ hr {
     height: 30px;
     width: 30px;
 }
-
-
 
 .nav-form {
     margin-left: 15px;

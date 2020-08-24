@@ -1,10 +1,10 @@
 /*!
- * sly 1.6.1 - 8th Aug 2015
- * https://github.com/darsain/sly
- *
- * Licensed under the MIT license.
- * http://opensource.org/licenses/MIT
- */
+	* sly 1.6.1 - 8th Aug 2015
+	* https://github.com/darsain/sly
+	*
+	* Licensed under the MIT license.
+	* http://opensource.org/licenses/MIT
+*/
 
 ;(function ($, w, undefined) {
 	'use strict';

@@ -22,13 +22,10 @@ $(function() {
         }
     });
 });
-
 $.widget("custom.catcomplete", $.ui.autocomplete, {
     "_renderItem": function(ul, item) {
         ul.addClass('autocomplete-ul');
-
         let media, $li;
-
         if (item.media_type === "serieslist") {
             media = 'TV Show';
             item.media_type = 'Series';
@@ -40,7 +37,6 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
             media = 'Movie';
             item.media_type = 'Movies';
         }
-
         if (item.nb_results === 0) {
             let a = "No results found.";
             $li = $('<li class="disabled bg-dark text-light p-l-5">'+ a + '</li>');
@@ -50,16 +46,17 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
             $li.append(
                 '<div class="row">' +
                     '<div class="col" style="min-width: 60px; max-width: 60px;">' +
-                        '<img src="'+item.poster_path+'" alt="'+item.name+'" style="width: 50px; height: 75px;">' +
+                        '<img src="'+item.poster_path+'" alt="" style="width: 50px; height: 75px;">' +
                     '</div>' +
                     '<div class="col">' +
-                        '<a class="text-light">' + item.name +
+                        '<a class="text-light">' + item.display_name +
                             '<br>' +
                             '<span style="font-size: 10pt;">' + media + ' | ' + item.first_air_date + '</span>' +
                         '</a>' +
                     '</div>' +
                 '</div>');
         }
+
         return $li.appendTo(ul);
     }
 });
@@ -170,18 +167,6 @@ function display_notifications(data) {
 }
 
 
-// --- Ajax error handling --------------------------------------------------
-function error_ajax_message(message) {
-    $('.content-message').prepend(
-        '<div class="alert alert-danger alert-dismissible m-t-15">' +
-            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-                '<span aria-hidden="true">&times;</span>' +
-            '</button>' +
-            message +
-        '</div>');
-}
-
-
 // --- AJAX Notification ----------------------------------------------------
 function notifications() {
     $('.notif-items').remove();
@@ -206,6 +191,18 @@ function notifications() {
 }
 
 
+// --- Ajax error handling --------------------------------------------------
+function error_ajax_message(message) {
+    $('.content-message').prepend(
+        '<div class="alert alert-danger alert-dismissible m-t-15">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span>' +
+            '</button>' +
+            message +
+        '</div>');
+}
+
+
 // --- Tooltip initialization -----------------------------------------------
 $(function () {
     $('[data-toggle="tooltip"]').tooltip()
@@ -225,3 +222,20 @@ $(document).ready(function() {
 
     $(window).resize(a).trigger('resize');
 });
+
+
+// --- Service Worker for PWA -----------------------------------------------
+// if ('serviceWorker' in navigator) {
+//     navigator.serviceWorker
+//         .register('service-worker.js', {
+//             scope: '.'
+//         })
+//         .then(function(registration) {
+//             console.log('ServiceWorker registration successful with scope: ', registration.scope);
+//         }, function(err) {
+//             console.log('ServiceWorker registration failed: ', err);
+//         })
+//         .catch(function(err) {
+//             console.error('Unable to register service worker.', err);
+//         });
+// }

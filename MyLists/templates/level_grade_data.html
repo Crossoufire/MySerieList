@@ -2,27 +2,27 @@
 
 
 {% block css %}
-<link href="{{ url_for('static', filename='css/grades_data.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/grades_data.css') }}" rel="stylesheet">
 {% endblock css %}
 
 
 {% block content %}
-<h2 class="text-center p-t-50">
-    GRADES AND LEVELS
-    <hr class="mt-2 m-b-25">
-</h2>
+    <h2 class="text-center p-t-50">
+        GRADES AND LEVELS
+        <hr class="mt-2 m-b-25">
+    </h2>
 
-<ul class="details p-t-10 p-b-10 p-r-10">
-    <li>All grades are from the video game Halo Reach.</li>
-    <li>50 grades and 150 levels. You gain a grade each 3 levels.</li>
-    <li>Levels are based on time spent in series, anime, and movies.</li>
-    <li>XP calculation is: XP = 20*lvl*(1+lvl) &#8596; Level = (&#8730;(400+80*XP)-20)/40</li>
-    <li>1 min = 1 XP from the media duration.</li>
-</ul>
+    <ul class="details p-t-10 p-b-10 p-r-10">
+        <li>All grades are from the video game Halo Reach.</li>
+        <li>50 grades and 150 levels. You gain a grade each 3 levels.</li>
+        <li>Levels are based on time spent in series, anime, and movies.</li>
+        <li>XP calculation is: XP = 20*lvl*(1+lvl) &#8596; Level = (&#8730;(400+80*XP)-20)/40</li>
+        <li>1 min = 1 XP from the media duration.</li>
+    </ul>
 
-<div class="table-responsive-sm m-t-30 table-style">
-    <table class="table text-light">
-        <thead>
+    <div class="table-responsive-sm m-t-30 table-style">
+        <table class="table text-light">
+            <thead>
             <tr>
                 <th class="text-center">Grade</th>
                 <th class="text-center">Title</th>
@@ -30,34 +30,37 @@
                 <th class="text-center">XP</th>
                 <th class="text-center">hours (days)</th>
             </tr>
-        </thead>
-        <tbody>
-        {% for rank in data %}
-            <tr>
-                {% if loop.index0 % 3 == 0 %}
-                <td class="text-center">
-                    <img height='40' width="40" src="{{ url_for('static', filename='img/levels_ranks/') }}{{ rank.image_id }}.png" alt="">
-                </td>
-                <td class="text-center" style="vertical-align: middle;">
-                    <strong>{{ rank.name }}</strong>
-                </td>
-                <td class="text-center" style="vertical-align: middle;">
-                    <strong>{{ rank.level }}</strong>
-                </td>
-                <td class="text-center" style="vertical-align: middle;">
-                    <strong>{{ 20*rank.level*(1+rank.level) }}</strong>
-                </td>
-                <td class="text-center" style="vertical-align: middle;">
-                    {% if ((20*rank.level*(1+rank.level))/60) > 24 %}
-                    <strong>{{ ((20*rank.level*(1+rank.level))/60)|round(2) }}&nbsp; - &nbsp;({{ ((20*rank.level*(1+rank.level))/1440)|round(2) }})</strong>
-                    {% else %}
-                    <strong>{{ ((20*rank.level*(1+rank.level))/60)|round(2) }}</strong>
+            </thead>
+            <tbody>
+            {% for rank in data %}
+                <tr>
+                    {% if loop.index0 % 3 == 0 %}
+                        <td class="text-center">
+                            <img height='40' width="40"
+                                 src="{{ url_for('static', filename='img/levels_ranks/') }}{{ rank.image_id }}.png"
+                                 alt="">
+                        </td>
+                        <td class="text-center" style="vertical-align: middle;">
+                            <strong>{{ rank.name }}</strong>
+                        </td>
+                        <td class="text-center" style="vertical-align: middle;">
+                            <strong>{{ rank.level }}</strong>
+                        </td>
+                        <td class="text-center" style="vertical-align: middle;">
+                            <strong>{{ 20*rank.level*(1+rank.level) }}</strong>
+                        </td>
+                        <td class="text-center" style="vertical-align: middle;">
+                            {% if ((20*rank.level*(1+rank.level))/60) > 24 %}
+                                <strong>{{ ((20*rank.level*(1+rank.level))/60)|round(2) }}&nbsp; -
+                                    &nbsp;({{ ((20*rank.level*(1+rank.level))/1440)|round(2) }})</strong>
+                            {% else %}
+                                <strong>{{ ((20*rank.level*(1+rank.level))/60)|round(2) }}</strong>
+                            {% endif %}
+                        </td>
                     {% endif %}
-                </td>
-                {% endif %}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock content %}

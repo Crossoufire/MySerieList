@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+    <style>
+        .small-container {
+            padding: 10px;
+            width: 50wv;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+{% endblock css %}
+
+
+{% block content %}
+    <div class="small-container m-t-40 m-b-40">
+        <h5><b>About Mylists.info</b></h5>
+        <p class="text-justify">
+            We are only 2 french persons to maintain this website. We are amateurs and do not pretends to be good
+            programmers (nor to speak good english). It is just a small project on our free time to know where we were
+            in our series/anime or movies for us and our friends. If you have any constructive remarks, find any bugs
+            or want to be parts of the evolution of Mylists.info do not hesitate and
+            <a href="mailto:contact@mylists.info">contact us</a>&nbsp;<i class="fas fa-heart"></i>.
+        </p>
+
+        <h5 class="m-t-40"><b>About TMDb API</b></h5>
+        <p class="text-justify">
+            MyLists.info uses the TMDb API but is not endorsed or certified by TMDb. Here is the link to the
+            <a href="https://developers.themoviedb.org/4/getting-started/authorization">TMDb API</a>.
+        </p>
+
+        <h5 class="m-t-40"><b>About Flask</b></h5>
+        <p class="text-justify">
+            MyLists.info is powered server side by Flask, and uses Jinja2, itsDangerous, Werkzeug from:
+            <a href="https://palletsprojects.com/">the palletsprojects.com/</a>. The license of Flask:
+            <a href="https://flask.palletsprojects.com/en/1.1.x/license/">Flask license</a>.
+        </p>
+
+        <h5 class="m-t-40"><b>About MDB</b></h5>
+        <p class="text-justify">
+            MyLists.info uses Material Design for Bootstrap. The license of MDB:
+            <a href="https://mdbootstrap.com/general/license/">MDB license</a>.
+        </p>
+    </div>
+{% endblock content %}

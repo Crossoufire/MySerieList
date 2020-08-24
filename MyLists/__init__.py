@@ -23,13 +23,15 @@ try:
     server = config['Mail']['server']
     port = int(config['Mail']['port'])
     themoviedb_key = config['TheMovieDB']['api_key']
+    twitter_oauth = [config['OAuth']['twitter_id'], config['OAuth']['twitter_secret']]
 except Exception as e:
     print("Config file error: {}. Please read the README to configure the config.ini file properly.\nExit.".format(e))
     sys.exit()
 
+
 app = Flask(__name__)
-# minify(app=app, html=True, js=True, cssless=True)
 Compress(app)
+
 
 app.config['SECRET_KEY'] = flask_secret
 app.config['SESSION_COOKIE_SECURE'] = True
@@ -47,6 +49,12 @@ app.config['MAIL_USERNAME'] = email
 app.config['MAIL_PASSWORD'] = password
 
 app.config['THEMOVIEDB_API_KEY'] = themoviedb_key
+app.config['OAUTH_CREDENTIALS'] = {
+    'twitter': {
+        'id': twitter_oauth[0],
+        'secret': twitter_oauth[1]
+    }
+}
 
 
 mail = Mail(app)

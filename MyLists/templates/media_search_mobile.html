@@ -26,27 +26,28 @@
         <div class="tab-pane fade show active" id="series">
             <div class="d-flex flex-wrap justify-content-center m-t-30">
                 {% for media in series_results %}
-                <a class="card mb-4" style="background: #216c7d; width: 800px; border-radius: 0;"
-                   href="/media_sheet/Series/{{ media['tmdb_id'] }}?search=True">
-                    <div class="row no-gutters">
-                        <div class="col-3 p-2">
-                            <img width="70" src="{{ media['poster_path'] }}">
-                        </div>
-                        <div class="col-9">
-                            <div class="card-body p-2">
-                                <h5 class="card-title">
-                                    <div class="text-light fs-15 giveMeEllipsis2">{{ media['name'] }}</div>
-                                    <div class="fs-12 text-grey"><i>{{ media['first_air_date'] }}</i></div>
-                                </h5>
-                                {% if media['overview'] %}
-                                <p class="fs-12 text-light giveMeEllipsis m-b-0">{{ media['overview'] }}</p>
-                                {% else %}
-                                <p class="fs-12 text-light m-b-0"><i>No overview avalaible for this content.</i></p>
-                                {% endif %}
+                    <a class="card mb-4" style="background: #216c7d; width: 800px; border-radius: 0;"
+                       href="/media_sheet/Series/{{ media['tmdb_id'] }}?search=True">
+                        <div class="row no-gutters">
+                            <div class="col-3 p-2">
+                                <img width="70" src="{{ media['poster_path'] }}">
+                            </div>
+                            <div class="col-9">
+                                <div class="card-body p-2">
+                                    <h5 class="card-title">
+                                        <div class="text-light fs-15 giveMeEllipsis2">{{ media['name'] }}</div>
+                                        <div class="fs-12 text-grey"><i>{{ media['first_air_date'] }}</i></div>
+                                    </h5>
+                                    {% if media['overview'] %}
+                                        <p class="fs-12 text-light giveMeEllipsis m-b-0">{{ media['overview'] }}</p>
+                                    {% else %}
+                                        <p class="fs-12 text-light m-b-0"><i>No overview avalaible for this content.</i>
+                                        </p>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </a>
+                    </a>
                 {% endfor %}
             </div>
         </div>
@@ -66,9 +67,10 @@
                                         <div class="fs-12 text-grey"><i>{{ media['first_air_date'] }}</i></div>
                                     </h5>
                                     {% if media['overview'] %}
-                                    <p class="fs-12 text-light giveMeEllipsis m-b-0">{{ media['overview'] }}</p>
+                                        <p class="fs-12 text-light giveMeEllipsis m-b-0">{{ media['overview'] }}</p>
                                     {% else %}
-                                    <p class="fs-12 text-light m-b-0"><i>No overview avalaible for this content.</i></p>
+                                        <p class="fs-12 text-light m-b-0"><i>No overview avalaible for this content.</i>
+                                        </p>
                                     {% endif %}
                                 </div>
                             </div>
@@ -93,9 +95,10 @@
                                         <div class="fs-12 text-grey"><i>{{ media['first_air_date'] }}</i></div>
                                     </h5>
                                     {% if media['overview'] %}
-                                    <p class="fs-12 text-light giveMeEllipsis m-b-0">{{ media['overview'] }}</p>
+                                        <p class="fs-12 text-light giveMeEllipsis m-b-0">{{ media['overview'] }}</p>
                                     {% else %}
-                                    <p class="fs-12 text-light m-b-0"><i>No overview avalaible for this content.</i></p>
+                                        <p class="fs-12 text-light m-b-0"><i>No overview avalaible for this content.</i>
+                                        </p>
                                     {% endif %}
                                 </div>
                             </div>
@@ -109,5 +112,5 @@
 
 
 {% block script %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/media_search.js') }}" ></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/media_search.js') }}"></script>
 {% endblock script %}

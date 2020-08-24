@@ -36,7 +36,6 @@ def save_profile_picture(form_picture, old_picture):
         picture_fn = "default.jpg"
         app.logger.error('[SYSTEM] Invalid picture format: {}'.format(imghdr.what(form_picture)))
 
-    # Remove old cover
     try:
         if old_picture != 'default.jpg':
             os.remove(os.path.join(app.root_path, 'static/profile_pics', old_picture))

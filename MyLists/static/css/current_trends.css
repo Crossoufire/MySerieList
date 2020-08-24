@@ -1,28 +1,35 @@
 
-/* ---------------- CARD CSS -------------------- */
 
+/* --- Card CSS ----------------------------------------- */
 .card-hashtag {
     position: absolute;
     bottom: -8px;
     right: 16px;
 }
 
-.giveMeEllipsis {
+.ellipsis-title {
    overflow: hidden;
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 5; /* number of lines to show */
+   -webkit-line-clamp: 2;   /* number of lines to show */
 }
 
-.giveMeEllipsis2 {
+.ellipsis-text {
    overflow: hidden;
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 2; /* number of lines to show */
+   -webkit-line-clamp: 5;   /* number of lines to show */
 }
-/* ------------------------------------------ */
+
+.ellipsis-mob {
+   overflow: hidden;
+   text-overflow: ellipsis;
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-line-clamp: 4;   /* number of lines to show */
+}
 
 .frame {
     width: 100%;
@@ -49,15 +56,11 @@
     border-radius: 0;
 }
 
-.img-anime {
-}
-
 @media (max-width: 601px) {
     .media {
         width: calc(100vw-15px);
     }
 }
-
 @media (max-width: 500px) {
     .media {
         width: 100vw;

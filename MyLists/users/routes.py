@@ -25,7 +25,7 @@ def account(user_name):
         follow_username = follow_form.follow_to_add.data
         follow = User.query.filter_by(username=follow_username).first()
 
-        if follow is None or follow.role == RoleType.ADMIN:
+        if not follow or follow.role == RoleType.ADMIN:
             app.logger.info('[{}] Attempt to follow account {}'.format(current_user.id, follow_username))
             flash('Sorry, this account does not exist', 'warning')
             return redirect(url_for('users.account', user_name=current_user.username))
@@ -55,12 +55,6 @@ def account(user_name):
     follows_list, follows_update_list = get_follows_data(user)
     # Recover the Favorites
     favorites = get_favorites(user.id)
-
-    # from MyLists.main.functions import add_media_id_to_userlastupdates
-    # add_media_id_to_userlastupdates()
-
-    # from MyLists.main.functions import add_next_episode_to_air
-    # add_next_episode_to_air()
 
     return render_template('account.html',
                            title=user.username+"'s account",
@@ -151,6 +145,44 @@ def hall_of_fame():
     return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
 
 
+@bp.route("/achievements/<user_name>", methods=['GET', 'POST'])
+@login_required
+def achievements(user_name):
+    # Check if the user can see the <media_list>
+    user = current_user.check_autorization(user_name)
+
+    return render_template('achievements.html', title="{}'s achievements".format(user_name))
+
+
+@bp.route("/level_grade_data", methods=['GET'])
+@login_required
+def level_grade_data():
+    ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
+    return render_template('level_grade_data.html', title='Level grade data', data=ranks)
+
+
+@bp.route("/knowledge_frame_data", methods=['GET'])
+@login_required
+def knowledge_frame_data():
+    ranks = Frames.query.all()
+    return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
+
+
+@bp.route("/apscheduler_info", methods=['GET', 'POST'])
+@login_required
+def apscheduler_info():
+    if current_user.role != RoleType.USER:
+        refresh = app.apscheduler.get_job('refresh_all_data')
+        refresh.modify(next_run_time=datetime.now())
+        flash('All the data have been refreshed!', 'success')
+
+        return redirect(request.referrer)
+    abort(403)
+
+
+# --- AJAX Methods ---------------------------------------------------------------------------------------------
+
+
 @bp.route("/follow_status", methods=['POST'])
 @login_required
 def follow_status():
@@ -195,32 +227,3 @@ def follow_status():
         app.logger.info('[{}] Unfollowed the account with ID {} '.format(current_user.id, follow_id))
 
     return '', 204
-
-
-@bp.route("/level_grade_data", methods=['GET'])
-@login_required
-def level_grade_data():
-    ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
-
-    return render_template('level_grade_data.html', title='Level grade data', data=ranks)
-
-
-@bp.route("/knowledge_frame_data", methods=['GET'])
-@login_required
-def knowledge_frame_data():
-    ranks = Frames.query.all()
-
-    return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
-
-
-@bp.route("/apscheduler_info", methods=['GET', 'POST'])
-@login_required
-def apscheduler_info():
-    if current_user.role == RoleType.MANAGER or current_user.role == RoleType.ADMIN:
-        refresh = app.apscheduler.get_job('refresh_all_data')
-        refresh.modify(next_run_time=datetime.now())
-        flash('All the data have been refreshed!', 'success')
-
-        return redirect(request.referrer)
-    else:
-        abort(403)

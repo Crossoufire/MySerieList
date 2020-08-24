@@ -1,5 +1,5 @@
 
-/* ------------ Main CSS ----------- */
+/* --- Main CSS ----------------------------------------- */
 ul {
     list-style: none;
 }
@@ -8,10 +8,9 @@ hr {
     border-top: 1px solid rgba(44, 57, 70, 1);
     margin-top: 1px;
 }
-/* --------------------------------- */
 
 
-/* ------------ Header ------------- */
+/* --- Header ------------------------------------------- */
 .header-container {
     position: relative;
     height: 240px;
@@ -130,11 +129,10 @@ hr {
         display: flex !important;
     }
 }
-/* --------------------------------- */
 
 
-/* ----------- Overview ------------ */
-.vertical_line {
+/* --- Overview ----------------------------------------- */
+.vertical-line {
     width: 5px;
     border-left: 2px solid rgba(44, 57, 70, 1);
     height: 100wh;
@@ -150,14 +148,12 @@ hr {
     float: left;
     background-color: #334D5C;
 }
-
 .block-no-data {
     height: 30px;
     color: white;
     float: left;
     background-color: black;
 }
-
 .block:nth-of-type(2) {
 	background-color: #45B29D;
 }
@@ -174,7 +170,20 @@ hr {
 	background-color: #962D3E;
 }
 
-.block:hover {
+.block-movie {
+    height: 30px;
+    color: white;
+    float: left;
+    background-color: #45B29D;
+}
+.block-movie:nth-of-type(2) {
+	background-color: #22748d;
+}
+.block-movie:nth-of-type(3) {
+	background-color: #962D3E;
+}
+
+.block:hover, .block-movie:hover{
 	opacity: 0.75;
 }
 
@@ -204,12 +213,18 @@ hr {
    -webkit-line-clamp: 1; /* number of lines to show */
 }
 
-@media (max-width: 990px) {
-    #overview-tab {
-        padding-left: 100px;
-        padding-right: 100px;
-    }
+.favorite-img {
+    height: 89px;
+    width: auto;
 }
+
+.follow-img {
+    border-radius: 50%;
+    height: 60px;
+    width: 60px;
+    background-color: grey;
+}
+
 @media (max-width: 768px) {
     .media-container {
         position: relative;
@@ -237,10 +252,9 @@ hr {
         font-size: 15px;
     }
 }
-/* --------------------------------- */
 
 
-/* ------------ Levels ------------ */
+/* --- Levels ------------------------------------------- */
 .account-bar-wrapper {
     width: 100%;
 }
@@ -263,15 +277,15 @@ hr {
     display: inline-block;
 }
 
-#series_level {
+#series-level {
     margin-left: 20px;
 }
 
-#movies_level {
+#movies-level {
     margin-left: 13px;
 }
 
-#anime_level {
+#anime-level {
     margin-left: 18px;
 }
 
@@ -282,95 +296,17 @@ hr {
 
 .xp-bar {
     height: 10px;
-    width: 70%;
+    width: 65%;
     background: grey;
     margin: 0 0 0 5px;
     display: inline-block;
     vertical-align: middle;
 }
 
-#xp-bar-fill-series {
+.xp-bar-fill {
     height: 100%;
     width: 0.1%;
-    background: #216e7d;
     font-size: 12px;
     line-height: 10px;
     text-align: right;
-}
-
-#xp-bar-fill-movies {
-    height: 100%;
-    width: 0.1%;
-    background: #8c7821;
-    font-size: 12px;
-    line-height: 10px;
-    text-align: right;
-}
-
-#xp-bar-fill-anime {
-    height: 100%;
-    width: 0.1%;
-    background: #945141;
-    font-size: 12px;
-    line-height: 10px;
-    text-align: right;
-}
-
-.xp-increase-fx {
-    position: relative;
-    display: none;
-    height: 100%;
-}
-
-.xp-increase-glow1 {
-    position: absolute;
-    margin: 0 0 0 -2px;
-    left: 0;
-    top: 0;
-    background: #fff;
-    width: 5px;
-    height: 100%;
-    border-radius: 0;
-    -webkit-filter: blur(2px);
-}
-
-.xp-increase-glow2 {
-    position: absolute;
-    margin: -5px 0 0 -2px;
-    left: 0;
-    top: 0;
-    background: #aaf;
-    width: 5px;
-    height: 200%;
-    border-radius: 0;
-    -webkit-filter: blur(10px);
-}
-
-.xp-increase-glow3 {
-    position: absolute;
-    margin: 0 0 0 -5px;
-    left: 0;
-    top: 0;
-    background: #fff;
-    width: 10px;
-    height: 100%;
-    border-radius: 5px;
-    -webkit-filter: blur(5px);
-}
-/* --------------------------------- */
-
-.relative-medal {
-    position: absolute;
-    top: -8px;
-    right: 5px;
-}
-
-.favorite-img {
-    height: 90px;
-    width: 60px;
-}
-
-.follow-img {
-    height: 60px;
-    width: 60px;
 }

@@ -16,60 +16,60 @@
     <div class="all_history ml-auto mr-auto" style="margin-top: -13px;">
         <table id="all_history" class="table text-light m-t-20 text-center ml-auto mr-auto">
             <thead>
-                <tr>
-                    <th>Media type</th>
-                    <th>Media name</th>
-                    <th>Update</th>
-                    <th>date</th>
-                </tr>
+            <tr>
+                <th>Media type</th>
+                <th>Media name</th>
+                <th>Update</th>
+                <th>date</th>
+            </tr>
             </thead>
             <tbody>
-                {% for update in media_updates %}
-                    <tr>
-                        <td>
-                            {% if update['category'] == 'movie' %}
-                                <i class="fas fa-2x fa-film" style="color: #8c7821;"></i>
-                            {% elif update['category'] == 'anime' %}
-                                <i class="fas fa-2x fa-torii-gate" style="color: #945141;"></i>
-                            {% else %}
-                                <i class="fas fa-2x fa-tv" style="color: #216e7d;"></i>
-                            {% endif %}
-                        </td>
-                        <td>{{ update['media_name'] }}</td>
-                        <td>
-                            {% if update['update']|length == 2 %}
-                                {{ update['update'][0] }}
-                                &nbsp;&nbsp;<i class="fas fa-long-arrow-alt-right"></i>&nbsp;&nbsp;
-                                {{ update['update'][1] }}</td>
-                            {% else %}
-                                {{ update['update'][0] }}
-                            {% endif %}
-                        <td>
-                           <script>
-                                var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-                                var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB", {timeZone: tz});
-                                var d = new Date("{{ update['date'] }}")
-                                var month = new Array();
-                                month[0] = "Jan";
-                                month[1] = "Feb";
-                                month[2] = "Mar";
-                                month[3] = "Apr";
-                                month[4] = "May";
-                                month[5] = "Jun";
-                                month[6] = "Jul";
-                                month[7] = "Aug";
-                                month[8] = "Sep";
-                                month[9] = "Oct";
-                                month[10] = "Nov";
-                                month[11] = "Dec";
-                                var date_month = month[d.getMonth()];
-                                var date_day = localdate.slice(0,2);
-                                var date_time = localdate.slice(11,17)
-                                document.write(date_day + " " + date_month + " at " + date_time)
-                            </script>
-                        </td>
-                    </tr>
-                {% endfor %}
+            {% for update in media_updates %}
+                <tr>
+                    <td>
+                        {% if update['category'] == 'movie' %}
+                            <i class="fas fa-2x fa-film" style="color: #8c7821;"></i>
+                        {% elif update['category'] == 'anime' %}
+                            <i class="fas fa-2x fa-torii-gate" style="color: #945141;"></i>
+                        {% else %}
+                            <i class="fas fa-2x fa-tv" style="color: #216e7d;"></i>
+                        {% endif %}
+                    </td>
+                    <td>{{ update['media_name'] }}</td>
+                    <td>
+                        {% if update['update']|length == 2 %}
+                            {{ update['update'][0] }}
+                            &nbsp;&nbsp;<i class="fas fa-long-arrow-alt-right"></i>&nbsp;&nbsp;
+                            {{ update['update'][1] }}</td>
+                        {% else %}
+                            {{ update['update'][0] }}
+                        {% endif %}
+                    <td>
+                        <script>
+                            var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+                            var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB", {timeZone: tz});
+                            var d = new Date("{{ update['date'] }}")
+                            var month = new Array();
+                            month[0] = "Jan";
+                            month[1] = "Feb";
+                            month[2] = "Mar";
+                            month[3] = "Apr";
+                            month[4] = "May";
+                            month[5] = "Jun";
+                            month[6] = "Jul";
+                            month[7] = "Aug";
+                            month[8] = "Sep";
+                            month[9] = "Oct";
+                            month[10] = "Nov";
+                            month[11] = "Dec";
+                            var date_month = month[d.getMonth()];
+                            var date_day = localdate.slice(0, 2);
+                            var date_time = localdate.slice(11, 17)
+                            document.write(date_day + " " + date_month + " at " + date_time)
+                        </script>
+                    </td>
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>

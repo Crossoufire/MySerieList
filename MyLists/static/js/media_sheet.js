@@ -3,7 +3,9 @@
 // --- Add the media to the user ---------------------------------------
 function addToUser(element_id, media_type) {
     let category = media_type === 'movieslist' ? 'Completed' : 'Watching';
-    $('#your-medialist-data').addClass('disabled');
+    let $medialist = $('#your-medialist-data');
+
+    $medialist.addClass('disabled');
     $('#loading-add-list').hide();
 
     $.ajax ({
@@ -16,7 +18,7 @@ function addToUser(element_id, media_type) {
             $('#your-medialist-data').slideDown(300);
             $('#add-to-list').hide();
             $('#add-media').show('slow').delay(2000).fadeOut();
-            $('#your-medialist-data').removeClass('disabled');
+            $medialist.removeClass('disabled');
         },
         error: function() {
             error_ajax_message('Error: The media could not be added. Please try again later.');
@@ -49,6 +51,7 @@ function removeFromUser(element_id, media_type) {
                 $('#category-dropdown').val("Watching");
                 $('#season-dropdown').val("0");
                 $('#episode-dropdown').val("0");
+                $('#rewatched-dropdown').val("0");
             }, 300);
         },
         error: function() {
@@ -77,10 +80,10 @@ function addFavorite(element_id, media_type) {
             $('#fav-title').removeClass('disabled');
 
             if (favorite === true) {
-                $('#favorite').addClass('fas').removeClass('far');
+                $('#favorite').addClass('fas favorited').removeClass('far no-fav');
                 $('#add-fav').show('slow').delay(2000).fadeOut();
             } else {
-                $('#favorite').addClass('far').removeClass('fas');
+                $('#favorite').addClass('far no-fav').removeClass('fas favorited');
                 $('#remove-fav').show('slow').delay(2000).fadeOut();
             }
         },
@@ -93,10 +96,16 @@ function addFavorite(element_id, media_type) {
 
 // --- Change the TV category ------------------------------------------
 function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
-    let new_cat, season_data, episode_drop, seasons_length, seasons_index, opt, i;
-    new_cat = cat_selector.options[cat_selector.selectedIndex].value;
+    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
+
+    if (new_cat === 'Completed') {
+        $('#rewatch-row').show('slow');
+    } else {
+        $('#rewatch-row').hide('slow');
+        $('#rewatched-dropdown').val("0");
+    }
 
     $.ajax ({
         type: "POST",
@@ -111,28 +120,28 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
             $('#your-medialist-data').removeClass('disabled');
 
             if (new_cat === 'Completed') {
-            season_data = JSON.parse("["+seas_data+"]");
-            episode_drop = document.getElementById('episode-dropdown');
-            seasons_length = $('#season-dropdown').children('option').length;
-            seasons_index = (seasons_length - 1);
-            $('#season-dropdown').prop('selectedIndex', seasons_index);
+                let season_data = JSON.parse("["+seas_data+"]");
+                let episode_drop = $('#episode-dropdown');
+                let seasons_length = $('#season-dropdown').children('option').length;
+                let seasons_index = (seasons_length - 1);
+                $('#season-dropdown').prop('selectedIndex', seasons_index);
 
-            episode_drop.length = 1;
+                episode_drop[0].length = 1;
 
-            for (i = 2; i <= season_data[0][seasons_index]; i++) {
-                opt = document.createElement("option");
-                opt.className = "";
-                opt.innerHTML = '&nbsp;'+i+'&nbsp;';
-                episode_drop.appendChild(opt);
+                for (let i = 2; i <= season_data[0][seasons_index]; i++) {
+                    let opt = document.createElement("option");
+                    opt.className = "";
+                    (i <= 9) ? opt.innerHTML = "E0"+i : opt.innerHTML = "E"+i;
+                    episode_drop[0].appendChild(opt);
+                }
+                $('#episode-dropdown').prop('selectedIndex', season_data[0][seasons_index]-1);
             }
-            $('#episode-dropdown').prop('selectedIndex', season_data[0][seasons_index]-1);
-        }
             else if (new_cat === 'Random' || new_cat === 'Plan to Watch') {
-            $('#season-dropdown').val("0");
-            $('#episode-dropdown').val("0");
-            $('#season-row').hide();
-            $('#episode-row').hide();
-        }
+                $('#season-dropdown').val("0");
+                $('#episode-dropdown').val("0");
+                $('#season-row').hide();
+                $('#episode-row').hide();
+            }
         },
         error: function() {
             error_ajax_message('Error changing your media status. Please try again later.');
@@ -146,13 +155,19 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
 
 // --- Change the Movie category ---------------------------------------
 function changeCategoryMovies(element_id, cat_selector, genres) {
-    let new_cat;
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
 
-    new_cat = cat_selector.options[cat_selector.selectedIndex].value;
+    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
     if (new_cat === 'Completed' && genres.includes("Animation")) {
         new_cat = 'Completed Animation';
+    }
+
+    if (new_cat === 'Completed') {
+        $('#rewatch-row').show('slow');
+    } else {
+        $('#rewatch-row').hide('slow');
+        $('#rewatched-dropdown').val("0");
     }
 
     $.ajax ({
@@ -177,11 +192,10 @@ function changeCategoryMovies(element_id, cat_selector, genres) {
 
 // --- Update season ---------------------------------------------------
 function updateSeason(element_id, value, seas_data, media_list) {
-    let season_data, selected_season, i, opt;
     $('#season-loading').show();
     $('#your-medialist-data').addClass('disabled');
 
-    selected_season = value.selectedIndex;
+    let selected_season = value.selectedIndex;
 
     $.ajax ({
         type: "POST",
@@ -193,12 +207,14 @@ function updateSeason(element_id, value, seas_data, media_list) {
             $('#season-check').show().delay(1500).fadeOut();
             $('#your-medialist-data').removeClass('disabled');
 
-            season_data = JSON.parse("["+seas_data+"]");
-            selected_season = value.selectedIndex;
-            $('#episode-dropdown').length = 1;
+            let season_data = JSON.parse("[" + seas_data + "]");
+            let selected_season = value.selectedIndex;
+            let episode_drop = document.getElementById('episode-dropdown');
 
-            for (i = 2; i <= season_data[0][selected_season]; i++) {
-                opt = document.createElement("option");
+            episode_drop.length = 1;
+
+            for (let i = 2; i <= season_data[0][selected_season]; i++) {
+                let opt = document.createElement("option");
                 opt.className = "";
                 opt.innerHTML = '&nbsp;'+i+'&nbsp;';
                 document.getElementById('episode-dropdown').appendChild(opt);
@@ -239,6 +255,53 @@ function updateEpisode(element_id, episode, media_list) {
 }
 
 
+// --- Update rewatched data -------------------------------------------
+function updateRewatched(element_id, rewatch, media_list) {
+    $('#rewatched-loading').show();
+
+    $.ajax ({
+        type: "POST",
+        url: "/update_rewatch",
+        contentType: "application/json",
+        data: JSON.stringify({rewatch: rewatch.selectedIndex, element_id: element_id, element_type: media_list }),
+        dataType: "json",
+        success: function() {
+            $('#rewatched-check').show().delay(1500).fadeOut();
+        },
+        error: function() {
+            error_ajax_message('Error updating the rewatching number for the media. Please try again later.');
+        },
+        complete: function () {
+            $('#rewatched-loading').hide();
+        }
+    });
+}
+
+
+// --- Update score data -----------------------------------------------
+function updateScore(element_id, score, media_list) {
+    $('#score-loading').show();
+    let value = score.options[score.selectedIndex].value;
+
+    $.ajax ({
+        type: "POST",
+        url: "/update_score",
+        contentType: "application/json",
+        data: JSON.stringify({score: value, element_id: element_id, element_type: media_list }),
+        dataType: "json",
+        success: function() {
+            $('#score-check').show().delay(1500).fadeOut();
+        },
+        error: function() {
+            error_ajax_message('Error updating the media score. Please try again later.');
+        },
+        complete: function () {
+            $('#score-loading').hide();
+        }
+    });
+}
+
+
 // --- Lock the media --------------------------------------------------
 function lock_media(element_id, element_type) {
     let lock_status;
@@ -265,6 +328,28 @@ function lock_media(element_id, element_type) {
         }
     });
 }
+
+
+// --- Get the color of the status -------------------------------------
+$(document).ready(function () {
+    $('.follow-div').each(function () {
+        if ($(this).find('.follow-status').attr('value') === 'Watching') {
+            $(this).find('.fa-list').attr('style', 'color: #334D5C;');
+        } else if ($(this).find('.follow-status').attr('value') === 'Completed') {
+            $(this).find('.fa-list').attr('style', 'color: #45B29D;');
+        } else if ($(this).find('.follow-status').attr('value') === 'On Hold') {
+            $(this).find('.fa-list').attr('style', 'color: #EFC94C;');
+        } else if ($(this).find('.follow-status').attr('value') === 'Random') {
+            $(this).find('.fa-list').attr('style', 'color: #E27A3F;');
+        } else if ($(this).find('.follow-status').attr('value') === 'Dropped') {
+            $(this).find('.fa-list').attr('style', 'color: #DF5A49;');
+        } else if ($(this).find('.follow-status').attr('value') === 'Plan to Watch') {
+            $(this).find('.fa-list').attr('style', 'color: #962D3E;');
+        } else if ($(this).find('.follow-status').attr('value') === 'Completed Animation') {
+            $(this).find('.fa-list').attr('style', 'color: #22748d;');
+        }
+    });
+});
 
 
 // --- Random box color ------------------------------------------------

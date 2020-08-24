@@ -2,30 +2,32 @@
 
 
 {% block css %}
-<link href="{{ url_for('static', filename='css/grades_data.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/grades_data.css') }}" rel="stylesheet">
 {% endblock css %}
 
 
 {% block content %}
-<h2 class="text-center p-t-50">KNOWLEDGE FRAME DATA<hr class="mt-2 m-b-25"></h2>
+    <h2 class="text-center p-t-50">KNOWLEDGE FRAME DATA
+        <hr class="mt-2 m-b-25">
+    </h2>
 
-<ul class="details p-t-10 p-b-10 p-r-10">
-    <li>Frames created using freepik images.</li>
-    <li>40 frames. You gain a frame each 8 levels.</li>
-    <li>Equation is: Frame = (lvl(Series)+lvl(Anime)+lvl(Movies))/8.</li>
-    <li>Knowledge frame are based on the sum of the different levels.</li>
-    <li>You earn a new frame until level 320.</li>
-</ul>
+    <ul class="details p-t-10 p-b-10 p-r-10">
+        <li>Frames created using freepik images.</li>
+        <li>40 frames. You gain a frame each 8 levels.</li>
+        <li>Equation is: Frame = (lvl(Series)+lvl(Anime)+lvl(Movies))/8.</li>
+        <li>Knowledge frame are based on the sum of the different levels.</li>
+        <li>You earn a new frame until level 320.</li>
+    </ul>
 
-<div class="table-responsive-sm m-t-30 table-style-2">
-    <table class="table text-light">
-        <thead>
+    <div class="table-responsive-sm m-t-30 table-style-2">
+        <table class="table text-light">
+            <thead>
             <tr>
                 <th class="text-center fs-20">Frame</th>
                 <th class="text-center fs-20">Levels</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% for rank in data %}
                 <tr>
                     <td class="text-center">
@@ -36,7 +38,7 @@
                     </td>
                 </tr>
             {% endfor %}
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
 {% endblock content %}

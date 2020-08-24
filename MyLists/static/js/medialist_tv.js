@@ -4,77 +4,81 @@
 function chargeButtons(card) {
     removeCat();
 
-    let display_watching = "block;";
-    let display_completed = "block;";
-    let display_on_hold = "block;";
-    let display_random = "block;";
-    let display_dropped = "block;";
-    let display_plan_to_watch = "block;";
+    let dis_watching = "block;";
+    let dis_completed = "block;";
+    let dis_on_hold = "block;";
+    let dis_random = "block;";
+    let dis_dropped = "block;";
+    let dis_plan_to_watch = "block;";
+    let $card = $('#'+card.id);
+    let category = $card.attr('cat');
 
-    if ($('#'+card.id).parent().hasClass('category-WATCHING')) {
-        display_watching = "none;";
+    if (category === 'Watching') {
+        dis_watching = "none;";
     }
-    else if ($('#'+card.id).parent().hasClass('category-COMPLETED')) {
-        display_completed = "none;";
+    else if (category === 'Completed') {
+        dis_completed = "none;";
     }
-    else if ($('#'+card.id).parent().hasClass('category-ON.HOLD')) {
-        display_on_hold = "none;";
+    else if (category === 'On Hold') {
+        dis_on_hold = "none;";
     }
-    else if ($('#'+card.id).parent().hasClass('category-RANDOM')) {
-        display_random = "none;";
+    else if (category === 'Random') {
+        dis_random = "none;";
     }
-    else if ($('#'+card.id).parent().hasClass('category-DROPPED')) {
-        display_dropped = "none;";
+    else if (category === 'Dropped') {
+        dis_dropped = "none;";
     }
-    else {
-        display_plan_to_watch = "none;";
+    else if (category === 'Plan to Watch') {
+        dis_plan_to_watch = "none;";
     }
 
-    $(card).find('.view.overlay').prepend (
-        '<a class="card-btn-top-right-2 fas fa-times" onclick="removeCat()"></a>' +
+    $card.find('.view.overlay').prepend(
+        '<a class="card-btn-top-right fas fa-times" onclick="removeCat()"></a>' +
         '<ul class="card-cat-buttons">' +
-            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+display_watching+'" ' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_watching+'" ' +
             'onclick="changeCategory(\'Watching\', \''+card.id+'\')">' +
                 'Watching' +
             '</li>' +
-            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+display_completed+'" ' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_completed+'" ' +
             'onclick="changeCategory(\'Completed\', \''+card.id+'\')">' +
                 'Completed' +
             '</li>' +
-            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+display_on_hold+'" ' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_on_hold+'" ' +
             'onclick="changeCategory(\'On Hold\', \''+card.id+'\')">' +
                 'On Hold' +
             '</li>' +
-            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+display_random+'" ' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_random+'" ' +
             'onclick="changeCategory(\'Random\', \''+card.id+'\')">' +
                 'Random' +
             '</li>' +
-            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+display_dropped+'" ' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_dropped+'" ' +
             'onclick="changeCategory(\'Dropped\', \''+card.id+'\')">' +
                 'Dropped' +
             '</li>' +
-            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+display_plan_to_watch+'" ' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_plan_to_watch+'" ' +
             'onclick="changeCategory(\'Plan to Watch\', \''+card.id+'\')">' +
                 'Plan to Watch' +
             '</li>' +
         "</ul>");
 
-    $(card).find('.card-btn-top-left').attr('style', 'display: none;');
-    $(card).find('.card-btn-top-right').attr('style', 'display: none;');
-    $(card).find('.seas-eps-box').attr('style', 'display: none;');
-    $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
-    $(card).find('.mask').hide();
+    $card.find('.card-btn-toop-right').hide();
+    $card.find('.card-btn-top-left').hide();
+    $card.find('.bottom-card-cat').hide();
+    $card.find('.bottom-card-info').hide();
+    $card.find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
+    $card.find('.mask').hide();
 }
 
 
 // --- Change the category -------------------------------------------------
 function changeCategory(new_category, card_id) {
     removeCat();
-    let seas_data = $('#'+card_id).attr('values').split('-')[0];
-    let media_list = $('#'+card_id).attr('values').split('-')[1];
-    let element_id = $('#'+card_id).attr('values').split('-')[2];
-    let parent_cat = $('#'+card_id).parent();
-    $('#'+card_id).find('.loading-medialist').show();
+
+    let $card = $('#'+card_id)
+    let media_list = $card.attr('values').split('-')[1];
+    let element_id = $card.attr('values').split('-')[2];
+    let load_img = $card.find('.view.overlay');
+    load_img.prepend(Loading());
 
     $.ajax ({
         type: "POST",
@@ -83,52 +87,14 @@ function changeCategory(new_category, card_id) {
         data: JSON.stringify({status: new_category, element_id: element_id, element_type: media_list }),
         dataType: "json",
         success: function() {
-            if (new_category === 'Watching') {
-                $("#"+card_id).prependTo(".category-WATCHING");
-            }
-            else if (new_category === 'Completed') {
-                $("#"+card_id).prependTo(".category-COMPLETED");
-
-                var season_data = JSON.parse("[" + seas_data + "]");
-                var episode_drop = $('#E_'+element_id);
-                var seasons_length = $('#S_'+element_id).children('option').length;
-                var seasons_index = (seasons_length - 1);
-                $('#S_'+element_id).prop('selectedIndex', seasons_index);
-
-                episode_drop[0].length = 1;
-
-                for (i = 2; i <= season_data[0][seasons_index]; i++) {
-                    let opt = document.createElement("option");
-                    opt.className = "card-opt-box";
-                    if (i <= 9) {
-                        opt.innerHTML = "&nbsp;E0"+i+"&nbsp;";
-                    } else {
-                        opt.innerHTML = "&nbsp;E"+i+"&nbsp;";
-                    }
-                    episode_drop[0].appendChild(opt);
-                }
-                $('#E_'+element_id).prop('selectedIndex', season_data[0][seasons_index]-1);
-            }
-            else if (new_category === 'On Hold') {
-                $("#"+card_id).prependTo(".category-ON.HOLD");
-            }
-            else if (new_category === 'Random') {
-                $("#"+card_id).prependTo(".category-RANDOM");
-            }
-            else if (new_category === 'Dropped') {
-                $("#"+card_id).prependTo(".category-DROPPED");
-            }
-            else {
-                $("#"+card_id).prependTo(".category-PLAN.TO.WATCH");
-            }
-
-            $categories.isotope('layout');
+            $card.remove();
         },
         error: function () {
-            error_ajax_message('Error changing the category of the media. PLease try again later.')
+            error_ajax_message('Error trying to change the media category. Please try again later.')
         },
         complete: function () {
-            $('#'+card_id).find('.loading-medialist').hide();
+            removeCat();
+            load_img.find('.load-medialist').remove();
         }
     });
 }
@@ -136,10 +102,8 @@ function changeCategory(new_category, card_id) {
 
 // --- Update episode ------------------------------------------------------
 function updateEpisode(element_id, episode, media_list) {
-    var selected_episode = episode.selectedIndex
+    let selected_episode = episode.selectedIndex
 
-    $body = $("body");
-    $categories.isotope('layout');
     $.ajax ({
         type: "POST",
         url: "/update_element_episode",
@@ -147,7 +111,6 @@ function updateEpisode(element_id, episode, media_list) {
         data: JSON.stringify({episode: selected_episode, element_id: element_id, element_type: media_list }),
         dataType: "json",
         success: function() {
-
         },
         error: function () {
             error_ajax_message("Error updating the media's episode. Please try again later.")
@@ -158,9 +121,10 @@ function updateEpisode(element_id, episode, media_list) {
 
 // --- Update season -------------------------------------------------------
 function updateSeason(element_id, value) {
-    var selected_season = value.selectedIndex;
-    var seas_data = $('#card_'+element_id).attr('values').split('-')[0];
-    var media_list = $('#card_'+element_id).attr('values').split('-')[1];
+    let $card = $('#card_'+element_id)
+    let selected_season = value.selectedIndex;
+    let seas_data = $card.attr('values').split('-')[0];
+    let media_list = $card.attr('values').split('-')[1];
 
     $.ajax ({
         type: "POST",
@@ -169,23 +133,24 @@ function updateSeason(element_id, value) {
         data: JSON.stringify({season: selected_season, element_id: element_id, element_type: media_list }),
         dataType: "json",
         success: function() {
-            var episode_drop = $('#E_'+element_id);
-            var season_data = JSON.parse("[" + seas_data + "]");
+            let episode_drop = $('#E_'+element_id);
+            let season_data = JSON.parse("[" + seas_data + "]");
 
             episode_drop[0].length = 1;
-            for (i = 2; i <= season_data[0][selected_season]; i++) {
+
+            for (let i = 2; i <= season_data[0][selected_season]; i++) {
                 let opt = document.createElement("option");
-                opt.className = "card-opt-box";
+                opt.className = "seas-eps-drop-options";
                 if (i <= 9) {
-                        opt.innerHTML = "&nbsp;E0"+i+"&nbsp;";
+                        opt.innerHTML = "E0"+i;
                     } else {
-                        opt.innerHTML = "&nbsp;E"+i+"&nbsp;";
+                        opt.innerHTML = "E"+i;
                     }
                 episode_drop[0].appendChild(opt);
             }
         },
         error: function () {
-            error_ajax_message('Error updating the season of the media. Please try again later.')
+            error_ajax_message('Error updating the media season. Please try again later.')
         }
     });
 }
@@ -196,7 +161,7 @@ function ChargeButtonsOther(card) {
     removeCat();
 
     $(card).find('.view.overlay').prepend(
-        '<a class="card-btn-top-right-2 fas fa-times" onclick="removeCat()"></a>' +
+        '<a class="card-btn-top-right fas fa-times" onclick="removeCat()"></a>' +
         '<ul class="card-cat-buttons">' +
             '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
             'onclick="AddCatUser(\'Watching\', \''+card.id+'\')">' +
@@ -224,8 +189,9 @@ function ChargeButtonsOther(card) {
             '</li>' +
         "</ul>");
 
-    $('#'+card_id).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
-    $('#'+card_id).find('.card-btn-top-left').attr('style', 'display: none;');
-    $('#'+card_id).find('.seas-eps-box').attr('style', 'display: none;');
-    $('#'+card_id).find('.mask').hide();
+    $(card).find('.card-btn-top-left').hide();
+    $(card).find('.bottom-card-info').hide();
+    $(card).find('.bottom-card-cat').hide();
+    $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
+    $(card).find('.mask').hide();
 }
