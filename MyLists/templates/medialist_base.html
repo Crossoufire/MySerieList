@@ -102,7 +102,9 @@
                             <span class="font-mask text-center text-light">{{ data['display_name'] }}</span>
                         </a>
                         {% if search %}
-                            <div class="bottom-card-cat{% if media_list =='movieslist' %}-movie {% endif %}">{{ data['category'] }}</div>
+                            <div class="bottom-card-cat{% if media_list =='movieslist' %}-movie {% endif %}">
+                                {{ data['category'] }}
+                            </div>
                         {% endif %}
                         {% if user_id == current_user.get_id() %}
                             <a class="card-btn-top-left fas fa-bars text-light"
@@ -157,7 +159,7 @@
                                     </a>
                                 {% endif %}
                             </div>
-                            <div class="col" {% if category == 'Completed'or category == 'Completed Animation' %}
+                            <div class="col" {% if category == 'Completed' or category == 'Completed Animation' %}
                             style="display: block;"{% else %}style="display: none;"{% endif %}>
                                 <a id="rew_{{ data['id'] }}" class="{% if user_id != current_user.get_id() %}
                                 disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this media.

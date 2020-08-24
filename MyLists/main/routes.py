@@ -737,7 +737,7 @@ def update_rewatch():
         compute_time_spent(media=media[0], list_type=list_type, old_season=1, old_episode=0, new_season=1,
                            new_episode=0, old_rewatch=old_rewatch, new_rewatch=new_rewatch)
     elif list_type == ListType.MOVIES:
-        compute_time_spent(media=media[0], list_type=list_type, movie_status=media_list.status, old_rewatch=old_rewatch,
+        compute_time_spent(media=media[0], list_type=list_type, movie_status=media[1].status, old_rewatch=old_rewatch,
                            new_rewatch=new_rewatch)
 
     return '', 204
