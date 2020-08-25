@@ -26,20 +26,23 @@ def create_user():
                       private=True,
                       registered_on=datetime.utcnow(),
                       activated_on=datetime.utcnow(),
-                      role=RoleType.ADMIN)
+                      role=RoleType.ADMIN,
+                      oauth_id="a")
         manager1 = User(username='manager',
                         email='manager@manager.com',
                         password=bcrypt.generate_password_hash("password").decode('utf-8'),
                         active=True,
                         registered_on=datetime.utcnow(),
                         activated_on=datetime.utcnow(),
-                        role=RoleType.MANAGER)
+                        role=RoleType.MANAGER,
+                        oauth_id="b")
         user1 = User(username='user',
                      email='user@user.com',
                      password=bcrypt.generate_password_hash("password").decode('utf-8'),
                      active=True,
                      registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
+                     activated_on=datetime.utcnow(),
+                     oauth_id="c")
         db.session.add(admin1)
         db.session.add(manager1)
         db.session.add(user1)

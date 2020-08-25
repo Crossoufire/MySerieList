@@ -230,11 +230,11 @@
 
 <footer class="text-center text-lg-left" style="background-color: #100e0e;">
     {% if current_user.is_authenticated %}
-        <div class="container p-3">
-        <div class="row">
+        <div class="container p-3" style="padding-bottom: 0px !important;">
+        <div class="row p-t-30">
             <div class="col-lg-6 col-sm-12 col-xs-12 mb-4">
                 <img class="m-b-5" src="{{ url_for('static', filename='img/favicon.ico') }}">&nbsp;
-                <h5 class="dis-inline text-uppercase"><b>MyLists</b></h5>
+                <h5 class="dis-inline text-uppercase" style="color: #3fd3da"><b>MyLists.info</b></h5>
                 <p class="text-justify m-b-5">
                     Create your series/anime and movies list, see how much time you spent, follow your friends.
                     Add your favorites, comments, rewatch and gain levels to get to the top of the Hall of Fame.
@@ -244,7 +244,7 @@
                 </a>
             </div>
             <div class="col-lg-3 col-sm-6 col-xs-12 mb-4">
-                <h5 class="text-uppercase"><b>Powered by</b></h5>
+                <h5 class="text-uppercase" style="color: #3fd3da"><b>Powered by</b></h5>
                 <ul class="list-unstyled mb-0">
                     <li><a href="https://www.themoviedb.org/" class="text-light" target="_blank">TMDb</a></li>
                     <li><a href="https://mdbootstrap.com/" class="text-light" target="_blank">MDB</a></li>
@@ -252,7 +252,7 @@
                 </ul>
             </div>
             <div class="col-lg-3 col-sm-6 col-xs-12 mb-2">
-                <h5 class="text-uppercase"><b>MyLists Info</b></h5>
+                <h5 class="text-uppercase" style="color: #3fd3da"><b>MyLists Info</b></h5>
                 <ul class="list-unstyled mb-0">
                     <li><a href="https://github.com/Crossoufire/MyLists" class="text-light" target="_blank">Github</a></li>
                     <li><a href="/about" class="text-light" target="_blank">About</a></li>
@@ -262,7 +262,8 @@
         </div>
     </div>
     {% endif %}
-    <div class="text-center p-2" style="background-color: rgba(0, 0, 0, 0.5);">
+    <hr style="margin: 0px;">
+    <div class="text-center p-2" style="background-color: rgb(16, 14, 14);">
         © 2020 Copyright:
         <a class="text-light" href="https://MyLists.info">Mylists.info</a>
     </div>
