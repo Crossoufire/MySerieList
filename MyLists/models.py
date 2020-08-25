@@ -715,7 +715,7 @@ def get_total_time(user_id, list_type):
 
     query = db.session.query(media, media_list) \
         .join(media, media.id == media_list.media_id) \
-        .filter(media_list.user_id == user_id).group_by(media_list.media_id)
+        .filter(media_list.user_id == user_id)
 
     return query
 
