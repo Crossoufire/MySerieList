@@ -363,18 +363,15 @@ def get_more_stats(user):
 
     series_data = db.session.query(Series, SeriesList) \
         .join(SeriesList, SeriesList.media_id == Series.id) \
-        .filter(SeriesList.user_id == user.id) \
-        .group_by(Series.id).all()
+        .filter(SeriesList.user_id == user.id)
 
     anime_data = db.session.query(Anime, AnimeList) \
         .join(AnimeList, AnimeList.media_id == Anime.id) \
-        .filter(AnimeList.user_id == user.id) \
-        .group_by(Anime.id).all()
+        .filter(AnimeList.user_id == user.id)
 
     movies_data = db.session.query(Movies, MoviesList) \
         .join(MoviesList, MoviesList.media_id == Movies.id) \
-        .filter(MoviesList.user_id == user.id) \
-        .group_by(Movies.id).all()
+        .filter(MoviesList.user_id == user.id)
 
     media_data = [series_data, anime_data, movies_data]
 
