@@ -23,16 +23,15 @@ def compute_media_time_spent(list_type):
                     try:
                         total_time += media[0].episode_duration * media[0].total_episodes * (1 + media[1].rewatched)
                     except Exception as e:
-                        print('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
+                        app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
                 elif media[1].status != Status.PLAN_TO_WATCH or media[1].status != Status.RANDOM:
                     try:
                         episodes = [eps.episodes for eps in media[0].eps_per_season]
-                        print(episodes)
                         for i in range(1, media[1].current_season):
                             total_time += media[0].episode_duration * episodes[i - 1]
                         total_time += media[1].last_episode_watched * media[0].episode_duration
                     except Exception as e:
-                        print('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
+                        app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
         elif list_type == ListType.MOVIES:
             total_time = 0
             for media in media_list:
@@ -40,7 +39,7 @@ def compute_media_time_spent(list_type):
                     try:
                         total_time += media[0].runtime*(1+media[1].rewatched)
                     except Exception as e:
-                        print('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
+                        app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
 
         if list_type == ListType.ANIME:
             user.time_spent_anime = total_time
