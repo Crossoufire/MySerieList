@@ -31,7 +31,8 @@ def compute_media_time_spent(list_type):
                             total_time += media[0].episode_duration * episodes[i - 1]
                         total_time += media[1].last_episode_watched * media[0].episode_duration
                     except Exception as e:
-                        app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
+                        app.logger.info('[ERROR] - {}. [MEDIA] - {}. [LIST EPISODES] - {}. [CURRENT SEASON] - {}.'
+                                        .format(e, media[0].name, episodes, media[1].current_season))
         elif list_type == ListType.MOVIES:
             total_time = 0
             for media in media_list:
