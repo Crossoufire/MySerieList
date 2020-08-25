@@ -20,18 +20,18 @@ def compute_media_time_spent(list_type):
             total_time = 0
             for media in media_list:
                 if media[1].status == Status.COMPLETED:
-                    try:
-                        total_time += media[0].episode_duration*media[0].total_episodes*(1+media[1].rewatched)
-                    except:
-                        pass
+                    # try:
+                    total_time += media[0].episode_duration * media[0].total_episodes * (1 + media[1].rewatched)
+                    # except:
+                    #     pass
                 elif media[1].status != Status.PLAN_TO_WATCH or media[1].status != Status.RANDOM:
-                    try:
-                        episodes = [eps.episodes for eps in media[0].eps_per_season]
-                        for i in range(1, media[1].current_season):
-                            total_time += media[0].episode_duration*episodes[i - 1]
-                        total_time += media[1].last_episode_watched*media[0].episode_duration
-                    except:
-                        pass
+                    # try:
+                    episodes = [eps.episodes for eps in media[0].eps_per_season]
+                    for i in range(1, media[1].current_season):
+                        total_time += media[0].episode_duration * episodes[i - 1]
+                    total_time += media[1].last_episode_watched * media[0].episode_duration
+                    # except:
+                    #     pass
         elif list_type == ListType.MOVIES:
             total_time = 0
             for media in media_list:
