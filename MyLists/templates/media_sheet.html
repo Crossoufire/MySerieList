@@ -20,6 +20,10 @@
                 border-top: 1px solid #8c7821;
             }
         {% endif %}
+        .fast-spin {
+            -webkit-animation: fa-spin 1s infinite linear;
+            animation: fa-spin 1s infinite linear;
+        }
     </style>
 {% endblock css %}
 
@@ -29,8 +33,10 @@
         <div class="row m-t-30 m-b-10">
             <div class="col-lg-4 col-md-5 col-sm-12">
                 <div class="media-title-mobile" style="display: none;">
-                    <h3>{{ data['original_name'] }}</h3>
-                    {% if data['name'] %} <h5 class="text-grey"><i>{{ data['name'] }}</i></h5> {% endif %}
+                    <h3>{{ data['display_name'] }}</h3>
+                    {% if data['other_name'] %}
+                        <h5 class="text-grey"><i>{{ data['other_name'] }}</i></h5>
+                    {% endif %}
                     <hr>
                 </div>
                 <div class="text-center">
@@ -154,8 +160,7 @@
                                             {% endfor %}
                                         {% endif %}
                                     </select>
-                                    <img id="eps-loading" class="loading-img" style="display: none;"
-                                         src="/static/img/loading.webp" alt=""/>
+                                    <i id="eps-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
                                     &nbsp;<i id="eps-check" class="fas fa-check" style="display: none;"></i>
                                 </div>
                             </div>
@@ -242,7 +247,6 @@
                     <div id="add-fav" class="alert alert-success p-2" style="display: none;">Media added to your favorite</div>
                     <div id="remove-fav" class="alert alert-warning p-2" style="display: none;">Media removed from your favorite</div>
                 </div>
-
 {#                {% if media_list == 'movieslist' and data['collection_data'][0] %}#}
 {#                    <h4 class="m-l-21 m-r-15"><i class="fas fa-box-open m-t-8"></i>&nbsp;&nbsp;#}
 {#                        <b>{{ data['collection_data'][0].name }}</b>#}
@@ -262,156 +266,235 @@
 {#                        {% endfor %}#}
 {#                    </div>#}
 {#                {% endif %}#}
-
             </div>
             <div class="col-lg-8 col-md-7 col-sm-12" style="margin-top: -10px;">
                 <div class="media-title-pc">
                     <h3>{{ data['display_name'] }}</h3>
-                    {% if data['other_name'] %} <h5 class="text-grey"><i>{{ data['other_name'] }}</i></h5> {% endif %}
+                    {% if data['other_name'] %}
+                        <h5 class="text-grey"><i>{{ data['other_name'] }}</i></h5>
+                    {% endif %}
                     <hr>
                 </div>
                 <div class="row p-t-15">
                     <div class="col-lg-7 col-md-12 col-sm-12">
                         <h4><i class="fas fa-info-circle"></i>&nbsp&nbsp <b>Information</b></h4>
                         <hr>
-                        <ul class="text-left p-0">
-                            <li class="m-b-10">
-                                <div class="row">
-                                    {% if media_list != 'movieslist' %}
-                                        <div class="col-5"><b>Created by:</b></div>
-                                        <div class="col-7">{{ data['created_by'] }}</div>
-                                    {% else %}
-                                        <div class="col-5"><b>Directed by:</b></div>
-                                        <div class="col-7">{{ data['director'] }}</div>
-                                    {% endif %}
-                                </div>
-                            </li>
-                            <li class="m-b-10">
-                                <div class="row">
-                                    {% if media_list != 'movieslist' %}
-                                        <div class="col-5"><b>Airing dates:</b></div>
-                                        <div class="col-7">{{ data['first_air_date'] }}
-                                            – {{ data['last_air_date'] }}</div>
-                                    {% else %}
-                                        <div class="col-5"><b>Release date:</b></div>
-                                        <div class="col-7">{{ data['release_date'] }}</div>
-                                    {% endif %}
-                                </div>
-                            </li>
-                            {% if media_list != 'movieslist' %}
-                                <li class="m-b-10">
-                                    <div class="row">
-                                        <div class="col-5"><b>Production status:</b></div>
-                                        <div class="col-7">{{ data['prod_status'] }}</div>
-                                    </div>
-                                </li>
-                            {% endif %}
-                            <li class="m-b-10">
-                                <div class="row">
-                                    <div class="col-5"><b>Genres:</b></div>
-                                    <div class="col-7">{{ data['genres'] }}</div>
-                                </div>
-                            </li>
-                            <li class="m-b-10">
-                                <div class="row">
-                                    <div class="col-5"><b>Actors:</b></div>
-                                    {% if data['actors'] == 'Unknown' %}
-                                        <div class="col-7"><i>No actors found</i></div>
-                                    {% else %}
-                                        <div class="col-7">{{ data['actors'] }}</div>
-                                    {% endif %}
-                                </div>
-                            </li>
-                            <li class="m-b-10">
-                                <div class="row">
-                                    <div class="col-5"><b>TMDb score:</b></div>
-                                    <div class="col-7">{{ data['vote_average'] }} ({{ data['vote_count']|int }} votes)
-                                    </div>
-                                </div>
-                            </li>
-                            {% if media_list != 'movieslist' %}
-                                <li class="m-b-10">
-                                    <div class="row">
-                                        <div class="col-5"><b>N° of seasons:</b></div>
-                                        <div class="col-7">{{ data['total_seasons'] }}</div>
-                                    </div>
-                                </li>
-                                <li class="m-b-10">
-                                    <div class="row">
-                                        <div class="col-5"><b>N° of episodes:</b></div>
-                                        <div class="col-7">{{ data['total_episodes'] }}</div>
-                                    </div>
-                                </li>
-                            {% endif %}
-                            <li class="m-b-10">
-                                <div class="row">
-                                    {% if media_list != 'movieslist' %}
-                                        <div class="col-5"><b>Episode duration:</b></div>
-                                        <div class="col-7">{{ data['episode_duration'] }} min</div>
-                                    {% else %}
-                                        <div class="col-5"><b>Movie Runtime</b></div>
-                                        <div class="col-7">{{ data['runtime'] }} min</div>
-                                    {% endif %}
-                                </div>
-                            </li>
-                            {% if media_list != 'movieslist' %}
-                                <li class="m-b-10">
-                                    <div class="row">
-                                        <div class="col-5"><b>Time to watch:</b></div>
-                                        <div
-                                        class="col-7">{{ ((data['total_episodes'] * data['episode_duration'])/60)|round(1) }}
-                                            hours
+                        <div class="row">
+                            <div class="col-6">
+                                <ul class="list-unstyled">
+                                    <li class="m-b-20">
+                                        <h5 class="mb-1"><i class="fas fa-film"></i><b>&nbsp; TMDb Score</b></h5>
+                                        <div>
+                                            <i class="fas fa-ticket-alt fa-3x" style="background:-webkit-linear-gradient(180deg, grey
+                                                    {{ 100 - data['vote_average']*10 }}%, darkgoldenrod 0%);
+                                                   -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                            </i>
+                                            <div style="color: black; font-weight: 1000; position: absolute; top: 53px;
+                                            left: 43px; transform: translate(-50%, -50%); -ms-transform: translate(-50%, -50%);">
+                                                {{ data['vote_average'] }}
+                                            </div>
+                                            <div style="position: absolute; top: 40px; left: 80px;">
+                                                ({{ data['vote_count']|int }} votes)
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
-                                <li class="m-b-10">
-                                    <div class="row">
-                                        <div class="col-5"><b>Origin country:</b></div>
-                                        <div class="col-7">{{ data['origin_country'] }}</div>
-                                    </div>
-                                </li>
-                            {% endif %}
-                            {% if media_list == 'movieslist' %}
-                                <li class="m-b-10">
-                                    <div class="row">
-                                        <div class="col-5"><b>Original language:</b></div>
-                                        <div class="col-7">{{ data['original_language'] }}</div>
-                                    </div>
-                                </li>
-                            {% endif %}
-                            {% if media_list != 'movieslist' %}
-                                <li class="m-b-10">
-                                    <div class="row">
-                                        <div class="col-5"><b>Networks:</b></div>
-                                        {% if data['networks'] == 'Unknown' %}
-                                            <div class="col-7"><i>No networks found</i></div>
+                                    </li>
+                                    <li class="m-b-20">
+                                        <h5 class="mb-1"><i class="fas fa-video"></i><b>&nbsp; Directed by</b></h5>
+                                        <div>{{ data['director'] }}</div>
+                                    </li>
+                                    <li class="m-b-20">
+                                        <h5 class="mb-1"><i class="fas fa-calendar-check"></i><b>&nbsp; Release date</b></h5>
+                                        <div class="">{{ data['release_date'] }}</div>
+                                    </li>
+                                    <li class="m-b-20">
+                                        <h5 class="mb-1"><i class="fas fa-clock"></i><b>&nbsp; Runtime</b></h5>
+                                        <div>
+                                            {{ data['runtime']//60 }} h
+                                            {{ '%02d'|format(data['runtime']%60) }} min
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <h5 class="mb-1"><i class="fas fa-flag"></i>&nbsp; Original language</h5>
+                                        {% if data['original_language'] == 'en' %}
+                                            <span class="flag-icon flag-icon-us"></span>&nbsp;
                                         {% else %}
-                                            <div class="col-7">{{ data['networks'] }}</div>
+                                            <span class="flag-icon flag-icon-{{ data['original_language'] }}"></span>
                                         {% endif %}
-                                    </div>
-                                </li>
-                            {% endif %}
-                            {% if media_list == 'movieslist' %}
-                                <li class="m-b-10">
-                                    <div class="row">
-                                        <div class="col-5"><b>Tagline:</b></div>
-                                        <div class="col-7">{{ data['tagline'] }}</div>
-                                    </div>
-                                </li>
-                            {% endif %}
-                            <li class="m-b-10">
-                                <div class="row">
-                                    <div class="col-5"><b>Homepage:</b></div>
-                                    <div class="col-7" style="overflow-wrap: break-word;">
-                                        {% if data['homepage'] == 'Unknown' %}
-                                            <div><i>No homepage available</i></div>
-                                        {% elif data['homepage'] != 'Unknown' or data['homepage'] != None %}
-                                            <a href="{{ data['homepage'] }}">{{ data['homepage'] }}</a>
+                                            &nbsp;<span>{{ data['original_language'] }}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-6">
+                                <ul class="list-unstyled">
+                                    <li class="m-b-20">
+                                        <h5 class="mb-1"><i class="fas fa-theater-masks"></i><b>&nbsp; Genres</b></h5>
+                                        <div class="">{{ data['genres'] }}</div>
+                                    </li>
+                                    <li class="m-b-20">
+                                        <h5 class="mb-1"><i class="fas fa-user"></i><b>&nbsp; Actors</b></h5>
+                                        {% if data['actors'] == 'Unknown' %}
+                                            <div class=""><i>No actors found</i></div>
+                                        {% else %}
+                                            <div>{{ data['actors'] }}</div>
                                         {% endif %}
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
+                                    </li>
+                                    <li class="m-b-20">
+                                        <h5 class="mb-1"><i class="fas fa-tag"></i><b>&nbsp; Tagline</b></h5>
+                                        <div class="">{{ data['tagline'] }}</div>
+                                    </li>
+                                    <li>
+                                        <h5 class="mb-1"><i class="fas fa-home"></i><b>&nbsp; Homepage</b></h5>
+                                        {% if data['homepage'] != 'Unknown' %}
+                                            <a style="word-break: break-all;" href="{{ data['homepage'] }}">
+                                                {{ data['homepage'] }}
+                                            </a>
+                                        {% else %}
+                                            <i>No homepage available</i>
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+{#                        <ul class="text-left p-0">#}
+{#                            <li class="m-b-10">#}
+{#                                <div class="row">#}
+{#                                    {% if media_list != 'movieslist' %}#}
+{#                                        <div class="col-5"><b>Created by:</b></div>#}
+{#                                        <div class="col-7">{{ data['created_by'] }}</div>#}
+{#                                    {% else %}#}
+{#                                        <div class="col-5"><b>Directed by:</b></div>#}
+{#                                        <div class="col-7">{{ data['director'] }}</div>#}
+{#                                    {% endif %}#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            <li class="m-b-10">#}
+{#                                <div class="row">#}
+{#                                    {% if media_list != 'movieslist' %}#}
+{#                                        <div class="col-5"><b>Airing dates:</b></div>#}
+{#                                        <div class="col-7">{{ data['first_air_date'] }}#}
+{#                                            – {{ data['last_air_date'] }}</div>#}
+{#                                    {% else %}#}
+{#                                        <div class="col-5"><b>Release date:</b></div>#}
+{#                                        <div class="col-7">{{ data['release_date'] }}</div>#}
+{#                                    {% endif %}#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            {% if media_list != 'movieslist' %}#}
+{#                                <li class="m-b-10">#}
+{#                                    <div class="row">#}
+{#                                        <div class="col-5"><b>Production status:</b></div>#}
+{#                                        <div class="col-7">{{ data['prod_status'] }}</div>#}
+{#                                    </div>#}
+{#                                </li>#}
+{#                            {% endif %}#}
+{#                            <li class="m-b-10">#}
+{#                                <div class="row">#}
+{#                                    <div class="col-5"><b>Genres:</b></div>#}
+{#                                    <div class="col-7">{{ data['genres'] }}</div>#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            <li class="m-b-10">#}
+{#                                <div class="row">#}
+{#                                    <div class="col-5"><b>Actors:</b></div>#}
+{#                                    {% if data['actors'] == 'Unknown' %}#}
+{#                                        <div class="col-7"><i>No actors found</i></div>#}
+{#                                    {% else %}#}
+{#                                        <div class="col-7">{{ data['actors'] }}</div>#}
+{#                                    {% endif %}#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            <li class="m-b-10">#}
+{#                                <div class="row">#}
+{#                                    <div class="col-5"><b>TMDb score:</b></div>#}
+{#                                    <div class="col-7">#}
+{#                                        {{ data['vote_average'] }} ({{ data['vote_count']|int }} votes)#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            {% if media_list != 'movieslist' %}#}
+{#                                <li class="m-b-10">#}
+{#                                    <div class="row">#}
+{#                                        <div class="col-5"><b>N° of seasons:</b></div>#}
+{#                                        <div class="col-7">{{ data['total_seasons'] }}</div>#}
+{#                                    </div>#}
+{#                                </li>#}
+{#                                <li class="m-b-10">#}
+{#                                    <div class="row">#}
+{#                                        <div class="col-5"><b>N° of episodes:</b></div>#}
+{#                                        <div class="col-7">{{ data['total_episodes'] }}</div>#}
+{#                                    </div>#}
+{#                                </li>#}
+{#                            {% endif %}#}
+{#                            <li class="m-b-10">#}
+{#                                <div class="row">#}
+{#                                    {% if media_list != 'movieslist' %}#}
+{#                                        <div class="col-5"><b>Episode duration:</b></div>#}
+{#                                        <div class="col-7">{{ data['episode_duration'] }} min</div>#}
+{#                                    {% else %}#}
+{#                                        <div class="col-5"><b>Movie Runtime</b></div>#}
+{#                                        <div class="col-7">{{ data['runtime'] }} min</div>#}
+{#                                    {% endif %}#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            {% if media_list != 'movieslist' %}#}
+{#                                <li class="m-b-10">#}
+{#                                    <div class="row">#}
+{#                                        <div class="col-5"><b>Time to watch:</b></div>#}
+{#                                        <div#}
+{#                                        class="col-7">{{ ((data['total_episodes'] * data['episode_duration'])/60)|round(1) }}#}
+{#                                            hours#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </li>#}
+{#                                <li class="m-b-10">#}
+{#                                    <div class="row">#}
+{#                                        <div class="col-5"><b>Origin country:</b></div>#}
+{#                                        <div class="col-7">{{ data['origin_country'] }}</div>#}
+{#                                    </div>#}
+{#                                </li>#}
+{#                            {% endif %}#}
+{#                            {% if media_list == 'movieslist' %}#}
+{#                                <li class="m-b-10">#}
+{#                                    <div class="row">#}
+{#                                        <div class="col-5"><b>Original language:</b></div>#}
+{#                                        <div class="col-7">{{ data['original_language'] }}</div>#}
+{#                                    </div>#}
+{#                                </li>#}
+{#                            {% endif %}#}
+{#                            {% if media_list != 'movieslist' %}#}
+{#                                <li class="m-b-10">#}
+{#                                    <div class="row">#}
+{#                                        <div class="col-5"><b>Networks:</b></div>#}
+{#                                        {% if data['networks'] == 'Unknown' %}#}
+{#                                            <div class="col-7"><i>No networks found</i></div>#}
+{#                                        {% else %}#}
+{#                                            <div class="col-7">{{ data['networks'] }}</div>#}
+{#                                        {% endif %}#}
+{#                                    </div>#}
+{#                                </li>#}
+{#                            {% endif %}#}
+{#                            {% if media_list == 'movieslist' %}#}
+{#                                <li class="m-b-10">#}
+{#                                    <div class="row">#}
+{#                                        <div class="col-5"><b>Tagline:</b></div>#}
+{#                                        <div class="col-7">{{ data['tagline'] }}</div>#}
+{#                                    </div>#}
+{#                                </li>#}
+{#                            {% endif %}#}
+{#                            <li class="m-b-10">#}
+{#                                <div class="row">#}
+{#                                    <div class="col-5"><b>Homepage:</b></div>#}
+{#                                    <div class="col-7" style="overflow-wrap: break-word;">#}
+{#                                        {% if data['homepage'] == 'Unknown' %}#}
+{#                                            <div><i>No homepage available</i></div>#}
+{#                                        {% elif data['homepage'] != 'Unknown' or data['homepage'] != None %}#}
+{#                                            <a href="{{ data['homepage'] }}">{{ data['homepage'] }}</a>#}
+{#                                        {% endif %}#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </li>#}
+{#                        </ul>#}
                     </div>
                     <div class="col-lg-5 col-md-12 col-sm-12">
                         {% if media_list != 'movieslist' %}
@@ -433,15 +516,29 @@
                             <ul class="text-left p-0">
                                 <li class="m-b-10">
                                     <div class="row">
-                                        <div class="col-4"><b>Budget:</b></div>
-                                        <div class="col-8">{{ "{:,.2f}".format(data['budget']).replace(',', ' ') }} $
+                                        <div class="col-5">
+                                            <i class="fas fa-coins"></i><b>&nbsp; Budget:</b>
+                                        </div>
+                                        <div class="col-7">
+                                            {% if data['budget'] != 0 %}
+                                                {{ "{:,.0f}".format(data['budget']).replace(',', ' ') }} $
+                                            {% else %}
+                                                <i>No data available</i>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </li>
                                 <li class="m-b-10">
                                     <div class="row">
-                                        <div class="col-4"><b>Revenue:</b></div>
-                                        <div class="col-8">{{ "{:,.2f}".format(data['revenue']).replace(',', ' ') }} $
+                                        <div class="col-5">
+                                           <i class="fas fa-coins"></i><b>&nbsp; Revenue:</b>
+                                        </div>
+                                        <div class="col-7">
+                                           {% if data['revenue'] != 0 %}
+                                                {{ "{:,.0f}".format(data['revenue']).replace(',', ' ') }} $
+                                            {% else %}
+                                                <i>No data available</i>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </li>
@@ -472,7 +569,7 @@
         </div>
 
         <div class="follow-margin-mobile">
-            <h4><i class="fas fa-user-check"></i>&nbsp;&nbsp; <b>In follow's list</b></h4><hr>
+            <h4><i class="fas fa-user-check"></i>&nbsp;&nbsp;<b>In follow's list</b></h4><hr>
             <div class="row" style="margin-top: -5px;">
                 {% for follow in data['in_follows_lists'] %}
                     <div class="col col-lg-4 col-md-4 col-sm-6 col-12 m-b-35">
@@ -516,7 +613,7 @@
             </div>
         </div>
 
-        {% if current_user.role.value != "user" %}
+        {% if current_user.role.value != 'user' %}
             <div class="m-b-30 text-right">
             {% if data['lock_status'] %}
                 <div class="custom-control custom-switch">

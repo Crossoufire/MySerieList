@@ -383,8 +383,6 @@ def get_more_stats(user):
         .filter(SeriesList.user_id == current_user.id)\
         .group_by(SeriesGenre.genre).order_by(text('count desc')).all()
 
-    print(test)
-
     anime_data = db.session.query(Anime, AnimeList) \
         .join(AnimeList, AnimeList.media_id == Anime.id) \
         .filter(AnimeList.user_id == user.id)
