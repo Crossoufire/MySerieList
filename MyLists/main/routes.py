@@ -187,12 +187,14 @@ def media_sheet(media_type, media_id):
     else:
         search = {'id': media_id}
 
+    html_template = 'media_sheet_tv.html'
     if list_type == ListType.SERIES:
         media = Series.query.filter_by(**search).first()
     elif list_type == ListType.ANIME:
         media = Anime.query.filter_by(**search).first()
     elif list_type == ListType.MOVIES:
         media = Movies.query.filter_by(**search).first()
+        html_template = 'media_sheet_movies.html'
 
     # If not <media> and a <tmdb_id> is provived: add media to DB, else abort.
     if not media:
@@ -214,7 +216,7 @@ def media_sheet(media_type, media_id):
     media_info = MediaDict(media, list_type).create_media_dict()
     title = media_info['display_name']
 
-    return render_template('media_sheet.html', title=title, data=media_info, media_list=list_type.value)
+    return render_template(html_template, title=title, data=media_info, media_list=list_type.value)
 
 
 @bp.route("/media_sheet_form/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])

@@ -1,0 +1,134 @@
+{% extends 'media_sheet_base.html' %}
+
+
+{% block medialist_cat_drop %}
+    <select id="category-dropdown" class="text-light text-center cat-drop"
+    onchange="changeCategoryMovies('{{ data['id'] }}', this, '{{ data['genres'] }}')">
+        <option {% if data['status'] == 'Completed' or data['status'] == 'Completed Animation' %} selected="selected"
+        {% endif %}>Completed</option>
+        <option {% if data['status'] == 'Plan to Watch' %}selected="selected" {% endif %}>Plan to Watch</option>
+    </select>
+{% endblock medialist_cat_drop %}
+
+
+{% block medialist_eps_seas_drop %}
+{% endblock medialist_eps_seas_drop %}
+
+
+{% block information %}
+    <div class="col-6">
+        <ul class="list-unstyled">
+            <li class="m-b-20">
+                <h5 class="mb-1"><i class="fas fa-star"></i><b>&nbsp; TMDb Score</b></h5>
+                <i class="fas fa-ticket-alt fa-3x media-ticket" value="{{ data['vote_average'] }}"></i>
+                <div class="movie-vote-average">{{ data['vote_average'] }}</div>
+                <div class="movie-vote-count">({{ data['vote_count']|int }} votes)</div>
+            </li>
+            <li class="m-b-20">
+                <h5 class="mb-1"><i class="fas fa-video"></i><b>&nbsp; Directed by</b></h5>
+                <div>{{ data['director'] }}</div>
+            </li>
+            <li class="m-b-20">
+                <h5 class="mb-1"><i class="fas fa-calendar-check"></i><b>&nbsp; Release date</b></h5>
+                <div>{{ data['release_date'] }}</div>
+            </li>
+            <li class="m-b-20">
+                <h5 class="mb-1"><i class="fas fa-clock"></i><b>&nbsp; Runtime</b></h5>
+                <div>{{ data['runtime']//60 }} h {{ '%02d'|format(data['runtime']%60) }} min</div>
+            </li>
+            <li>
+                <h5 class="mb-1"><i class="fas fa-flag"></i>&nbsp; Original language</h5>
+                {% if data['original_language'] == 'en' %}
+                    <span class="flag-icon flag-icon-us"></span>&nbsp;
+                {% else %}
+                    <span class="flag-icon flag-icon-{{ data['original_language'] }}"></span>
+                {% endif %}
+                &nbsp;<span>{{ data['original_language']|capitalize }}</span>
+            </li>
+        </ul>
+    </div>
+    <div class="col-6">
+        <ul class="list-unstyled">
+            <li class="m-b-20">
+                <h5 class="mb-1"><i class="fas fa-theater-masks"></i><b>&nbsp; Genres</b></h5>
+                <div class="">{{ data['genres'] }}</div>
+            </li>
+            <li class="m-b-20">
+                <h5 class="mb-1"><i class="fas fa-user"></i><b>&nbsp; Actors</b></h5>
+                {% if data['actors'] == 'Unknown' %}
+                    <div class=""><i>No actors found</i></div>
+                {% else %}
+                    <div>{{ data['actors'] }}</div>
+                {% endif %}
+            </li>
+            <li class="m-b-20">
+                <h5 class="mb-1"><i class="fas fa-tag"></i><b>&nbsp; Tagline</b></h5>
+                <div class="">{{ data['tagline'] }}</div>
+            </li>
+            <li>
+                <h5 class="mb-1"><i class="fas fa-home"></i><b>&nbsp; Homepage</b></h5>
+                {% if data['homepage'] != 'Unknown' %}
+                    <a style="word-break: break-all;" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a>
+                {% else %}
+                    <i>No homepage available</i>
+                {% endif %}
+            </li>
+        </ul>
+    </div>
+{% endblock information %}
+
+
+{% block more_info %}
+    <h4><i class="fas fa-dollar-sign"></i>&nbsp;&nbsp; <b>Box-Office</b></h4><hr>
+    <ul class="text-left p-0">
+        <li class="m-b-10">
+            <div class="row">
+                <div class="col-5">
+                    <i class="fas fa-coins"></i><b>&nbsp; Budget:</b>
+                </div>
+                <div class="col-7">
+                    {% if data['budget'] != 0 %}
+                        {{ "{:,.0f}".format(data['budget']).replace(',', ' ') }} $
+                    {% else %}
+                        <i>No data available</i>
+                    {% endif %}
+                </div>
+            </div>
+        </li>
+        <li class="m-b-10">
+            <div class="row">
+                <div class="col-5">
+                   <i class="fas fa-coins"></i><b>&nbsp; Revenue:</b>
+                </div>
+                <div class="col-7">
+                   {% if data['revenue'] != 0 %}
+                        {{ "{:,.0f}".format(data['revenue']).replace(',', ' ') }} $
+                    {% else %}
+                        <i>No data available</i>
+                    {% endif %}
+                </div>
+            </div>
+        </li>
+    </ul>
+{% endblock more_info %}
+
+
+{#                {% if media_list == 'movieslist' and data['collection_data'][0] %}#}
+{#                    <h4 class="m-l-21 m-r-15"><i class="fas fa-box-open m-t-8"></i>&nbsp;&nbsp;#}
+{#                        <b>{{ data['collection_data'][0].name }}</b>#}
+{#                    </h4>#}
+{#                    <hr class="m-l-20 m-r-24">#}
+{#                    <div class="m-b-30">#}
+{#                        {% set release = data['collection_data'][0].releases_dates.split(',') %}#}
+{#                        {% for name in data['collection_data'][0].movies_names.split(',') %}#}
+{#                            <div class="row m-l-5 m-r-5">#}
+{#                                <div class="col-9">#}
+{#                                    <b>{{ name }}</b>#}
+{#                                </div>#}
+{#                                <div class="col-3">#}
+{#                                    <b>{{ release[loop.index0].split('-')[0] }}</b>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        {% endfor %}#}
+{#                    </div>#}
+{#                {% endif %}#}

@@ -105,6 +105,38 @@ ul {
     margin-bottom: 0;
 }
 
+.movie-vote-average {
+    color: black;
+    font-weight: 1000;
+    position: absolute;
+    top: 53px;
+    left: 43px;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+}
+
+.movie-vote-count {
+    position: absolute;
+    top: 40px;
+    left: 80px;
+}
+
+.tv-vote-average {
+    color: lightgray;
+    font-weight: 1000;
+    position: absolute;
+    top: 49px;
+    left: 46px;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+}
+
+.tv-vote-count {
+    position: absolute;
+    top: 37px;
+    left: 80px;
+}
+
 @media (max-width: 1100px) {
     .wrapper {
         width: auto;
