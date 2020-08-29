@@ -189,6 +189,10 @@ hr {
         margin-left: 0;
         margin-right: 0;
     }
+    .nav-li-2 {
+        margin-left: 5px;
+        margin-right: 5px;
+    }
     .nav-text {
         display: inline-block;
     }

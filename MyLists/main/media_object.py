@@ -20,7 +20,10 @@ def latin_alphabet(original_name):
             kks.setMode("K", "a")
             kks.setMode("J", "a")
             kks.setMode("s", True)
-            conv = kks.getConverter().do(original_name).split()
+            try:
+                conv = kks.getConverter().do(original_name).split('.')
+            except:
+                conv = kks.getConverter().do(original_name).split()
             cap_parts = [p.capitalize() for p in conv]
             cap_message = " ".join(cap_parts)
             return cap_message

@@ -19,25 +19,25 @@
     <div class="col-6">
         <ul class="list-unstyled">
             <li class="m-b-20">
-                <h5 class="mb-1"><i class="fas fa-star"></i><b>&nbsp; TMDb Score</b></h5>
+                <h5 class="mb-1 text-media"><i class="fas fa-star"></i><b>&nbsp; TMDb Score</b></h5>
                 <i class="fas fa-ticket-alt fa-3x media-ticket" value="{{ data['vote_average'] }}"></i>
                 <div class="movie-vote-average">{{ data['vote_average'] }}</div>
                 <div class="movie-vote-count">({{ data['vote_count']|int }} votes)</div>
             </li>
             <li class="m-b-20">
-                <h5 class="mb-1"><i class="fas fa-video"></i><b>&nbsp; Directed by</b></h5>
+                <h5 class="mb-1 text-media"><i class="fas fa-video"></i><b>&nbsp; Directed by</b></h5>
                 <div>{{ data['director'] }}</div>
             </li>
             <li class="m-b-20">
-                <h5 class="mb-1"><i class="fas fa-calendar-check"></i><b>&nbsp; Release date</b></h5>
+                <h5 class="mb-1 text-media"><i class="fas fa-calendar-check"></i><b>&nbsp; Release date</b></h5>
                 <div>{{ data['release_date'] }}</div>
             </li>
             <li class="m-b-20">
-                <h5 class="mb-1"><i class="fas fa-clock"></i><b>&nbsp; Runtime</b></h5>
+                <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Runtime</b></h5>
                 <div>{{ data['runtime']//60 }} h {{ '%02d'|format(data['runtime']%60) }} min</div>
             </li>
             <li>
-                <h5 class="mb-1"><i class="fas fa-flag"></i>&nbsp; Original language</h5>
+                <h5 class="mb-1 text-media"><i class="fas fa-flag"></i><b>&nbsp; Original language</b></h5>
                 {% if data['original_language'] == 'en' %}
                     <span class="flag-icon flag-icon-us"></span>&nbsp;
                 {% else %}
@@ -50,23 +50,23 @@
     <div class="col-6">
         <ul class="list-unstyled">
             <li class="m-b-20">
-                <h5 class="mb-1"><i class="fas fa-theater-masks"></i><b>&nbsp; Genres</b></h5>
-                <div class="">{{ data['genres'] }}</div>
+                <h5 class="mb-1 text-media"><i class="fas fa-theater-masks"></i><b>&nbsp; Genres</b></h5>
+                <div>{{ data['genres'] }}</div>
             </li>
             <li class="m-b-20">
-                <h5 class="mb-1"><i class="fas fa-user"></i><b>&nbsp; Actors</b></h5>
+                <h5 class="mb-1 text-media"><i class="fas fa-user"></i><b>&nbsp; Actors</b></h5>
                 {% if data['actors'] == 'Unknown' %}
-                    <div class=""><i>No actors found</i></div>
+                    <div><i>No actors found</i></div>
                 {% else %}
                     <div>{{ data['actors'] }}</div>
                 {% endif %}
             </li>
             <li class="m-b-20">
-                <h5 class="mb-1"><i class="fas fa-tag"></i><b>&nbsp; Tagline</b></h5>
-                <div class="">{{ data['tagline'] }}</div>
+                <h5 class="mb-1 text-media"><i class="fas fa-tag"></i><b>&nbsp; Tagline</b></h5>
+                <div>{{ data['tagline'] }}</div>
             </li>
             <li>
-                <h5 class="mb-1"><i class="fas fa-home"></i><b>&nbsp; Homepage</b></h5>
+                <h5 class="mb-1 text-media"><i class="fas fa-home"></i><b>&nbsp; Homepage</b></h5>
                 {% if data['homepage'] != 'Unknown' %}
                     <a style="word-break: break-all;" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a>
                 {% else %}
@@ -84,7 +84,7 @@
         <li class="m-b-10">
             <div class="row">
                 <div class="col-5">
-                    <i class="fas fa-coins"></i><b>&nbsp; Budget:</b>
+                    <i class="fas fa-coins"></i>&nbsp; Budget
                 </div>
                 <div class="col-7">
                     {% if data['budget'] != 0 %}
@@ -98,7 +98,7 @@
         <li class="m-b-10">
             <div class="row">
                 <div class="col-5">
-                   <i class="fas fa-coins"></i><b>&nbsp; Revenue:</b>
+                   <i class="fas fa-coins"></i>&nbsp; Revenue
                 </div>
                 <div class="col-7">
                    {% if data['revenue'] != 0 %}

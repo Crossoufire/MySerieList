@@ -6,6 +6,7 @@ import configparser
 
 from flask import Flask
 from flask_mail import Mail
+from flask_caching import Cache
 from flask_bcrypt import Bcrypt
 from flask_compress import Compress
 from flask_login import LoginManager
@@ -31,7 +32,7 @@ except Exception as e:
 
 app = Flask(__name__)
 Compress(app)
-
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 app.config['SECRET_KEY'] = flask_secret
 app.config['SESSION_COOKIE_SECURE'] = False

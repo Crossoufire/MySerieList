@@ -333,7 +333,7 @@ function lock_media(element_id, element_type) {
 $(document).ready(function () {
     // --- Random box color -----------------------------------------------------
     let colors, boxes, i;
-    colors = ['#6e7f80', '#536872', '#708090', '#536878', '#36454f'];
+    colors = ['#5d6566', '#536872', '#708090', '#5d7282', '#36454f'];
     boxes = document.querySelectorAll(".box");
 
     for (i = 0; i < boxes.length; i++) {
@@ -378,6 +378,3 @@ $(document).ready(function () {
             '-webkit-text-fill-color: transparent;')
     }
 });
-
-
-//#3fd3da

@@ -3,7 +3,7 @@
 
 {% block css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/media_sheet.css') }}">
-    <style>
+    <style rel="stylesheet">
         {% if media_list == 'serieslist' %}
             hr {
                 margin-top: 5px;
@@ -29,7 +29,7 @@
         <div class="row m-t-30 m-b-10">
             <div class="col-lg-4 col-md-5 col-sm-12">
                 <div class="media-title-mobile" style="display: none;">
-                    <h3>{{ data['display_name'] }}</h3>
+                    <h3><b>{{ data['display_name'] }}</b></h3>
                     {% if data['other_name'] %}
                         <h5 class="text-grey"><i>{{ data['other_name'] }}</i></h5>
                     {% endif %}
@@ -145,7 +145,7 @@
             </div>
             <div class="col-lg-8 col-md-7 col-sm-12" style="margin-top: -10px;">
                 <div class="media-title-pc">
-                    <h3>{{ data['display_name'] }}</h3>
+                    <h3><b>{{ data['display_name'] }}</b></h3>
                     {% if data['other_name'] %}
                         <h5 class="text-grey"><i>{{ data['other_name'] }}</i></h5>
                     {% endif %}

@@ -344,11 +344,8 @@ $infini_scroll.infiniteScroll({
 
 
 // --- Create the loading image on media -------------------------------
-/** @return {string} */
 function Loading() {
-    return (
-        '<div class="load-medialist">' +
-            '<img class="img-load-medialist" src="/static/img/loading.webp" alt="">' +
-        '</div>'
-    )
+    return ('<div class="load-medialist">' +
+                '<div class="central-loading fas fa-3x fa-spinner fast-spin"></div>' +
+            '</div>')
 }

@@ -1,4 +1,6 @@
-
+body > li {
+    font-weight: 400;
+}
 
 ul {
     list-style-type: none;
@@ -12,7 +14,6 @@ ul {
 .vertical_line {
     width: 5px;
     border-left: 2px solid darkgray;
-    /*noinspection CssInvalidPropertyValue*/
     height: 100wh;
 }
 
@@ -125,8 +126,8 @@ ul {
     color: lightgray;
     font-weight: 1000;
     position: absolute;
-    top: 49px;
-    left: 46px;
+    top: 46px;
+    left: 43px;
     transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
 }
@@ -134,7 +135,7 @@ ul {
 .tv-vote-count {
     position: absolute;
     top: 37px;
-    left: 80px;
+    left: 74px;
 }
 
 @media (max-width: 1100px) {

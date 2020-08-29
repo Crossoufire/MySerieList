@@ -142,7 +142,7 @@ option {
     color: lightgrey;
 }
 
-.fas.fa-star, .fas.fa-trash, .fas.fa-bars, .far.fa-star {
+.fas.fa-trash, .fas.fa-bars, .far.fa-star {
     text-shadow: 0 0 4px #000;
 }
 
@@ -210,13 +210,10 @@ option {
     opacity: 0.85;
 }
 
-.img-load-medialist {
-    height: 40px;
-    width: 40px;
-    left: 50% ;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
+.central-loading {
+    position: relative;
+    top: 40%;
+    left: 40%;
 }
 
 .bottom-card-info {
