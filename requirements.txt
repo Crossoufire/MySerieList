@@ -1,8 +1,9 @@
 ratelimit
 flask
-Flask-APScheduler
+flask-APScheduler
 flask-sqlalchemy
 flask-compress
+flask_caching
 flask-bcrypt
 flask-admin
 flask-login
