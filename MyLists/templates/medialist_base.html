@@ -43,28 +43,16 @@
         <hr class="header-bar">
         <div class="center-mobile d-flex flex-wrap m-t-20">
             <div class="ml-auto mr-auto">
-                <form style="display: inline-block;" action="{{ url_for('main.mymedialist', media_list=media_list, user_name=username) }}">
-                    <label for="searchInput"></label>
-                    <input id="searchInput" class="modded-input" name="search" placeholder="&#128269; Search..."
-                    onfocus="this.placeholder = ''" onblur="this.placeholder = '&#128269; Search...'">
-                    <label for="selectOption"></label>
-                    <select id="selectOption" class="search-select" name="option">
-                        <option {% if search_option == 'Titles' %}selected="selected"{% endif %} value="Titles">
-                            Titles
-                        </option>
-                        {% if media_list == 'movieslist' %}
-                        <option {% if search_option == 'Director' %}selected="selected"{% endif %} value="Director">
-                            Director
-                        </option>
-                        {% endif %}
-                        <option {% if search_option == 'Actors' %}selected="selected"{% endif %} value="Actors">
-                            Actors
-                        </option>
-                        <option {% if search_option == 'Genres' %}selected="selected"{% endif %} value="Genres">
-                            Genres
-                        </option>
-                    </select>
-                </form>
+                <input id="search-input" class="modded-input" placeholder="&#128269; Search..."
+                onfocus="this.placeholder = '';" onblur="this.placeholder = '&#128269; Search...';">
+                <select id="select-option" class="search-select">
+                    <option {% if option == 'title' %}selected="selected"{% endif %} value="title">Title</option>
+                    {% if media_list == 'movieslist' %}
+                        <option {% if option == 'director' %}selected="selected"{% endif %} value="director">Director</option>
+                    {% endif %}
+                    <option {% if option == 'actor' %}selected="selected"{% endif %} value="actor">Actor</option>
+                    <option {% if option == 'genre' %}selected="selected"{% endif %} value="genre">Genre</option>
+                </select>
             </div>
         </div>
         <div class="d-flex flex-wrap" style="justify-content: center;">
@@ -73,27 +61,28 @@
         </div>
     </div>
     <div class="{% if media_list == 'serieslist' %}bg-series-opa {% elif media_list == 'animelist' %}bg-anime-opa
-        {% else %}bg-movies-opa {% endif %} p-t-4 p-b-4">
-        {% if not request.args.get('fav') %}
-            <a class="fas fa-lg fa-heart m-l-10 text-light" data-toggle="tooltip" title="Show only favorites"
-               href="/{{ media_list }}/{{ username }}?fav=True"></a>
-            <div class="float-r m-r-10"><b>Total pages: {{ info_pages['total_pages'] }}</b></div>
-        {% else %}
-            <div class="m-l-10"><b>Total pages: {{ info_pages['total_pages'] }}</b></div>
-        {% endif %}
-        {% if user_id != current_user.get_id() and not request.args.get('fav') and not request.args.get('common') %}
-            <span>&nbsp;&nbsp;<b>|</b>&nbsp;&nbsp;</span>
-            <a class="fas fa-lg fa-eye-slash text-light" data-toggle="tooltip" title="Hide common media"
-               href="/{{ media_list }}/{{ username }}?common=False&cat={{ category }}"></a>
-        {% endif %}
+    {% else %}bg-movies-opa {% endif %} p-t-4 p-b-4">
+        <div class="mobile-sorting">
+            <label class="m-l-10 mb-0"><b>Sort by:</b></label>
+            <select class="m-l-8" onchange="sort_medialist(this)">
+                <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Title</option>
+                <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>
+                <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>
+            </select>
+            {% if user_id != current_user.get_id() %}
+                <input id="shared-check" class="m-l-15" type="checkbox" value="{{ filter_val }}" onclick="filter_medialist()"
+                {% if filter_val == 'check' %}checked {% endif %}>
+                <b> Show Shared</b>
+            {% endif %}
+            <div class="t-pages float-r m-r-10"><b>Total pages: {{ info_pages['total_pages'] }}</b></div>
+        </div>
     </div>
-
     <h2 class="text-center m-t-50 mb-0">{{ category|upper }} ({{ info_pages['total_media'] }})</h2>
     <hr class="mt-2 pb-3 mb-0">
     <div class="row infinite-scroll-container m-b-60">
         {% for data in media_data  %}
             <div id="card_{{ data['id'] }}" values="{% block data scoped %}{% endblock data %}"
-                 cat="{{ data['category'] }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+            cat="{{ data['category'] }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
                 <div class="card bg-transparent">
                     <div class="view overlay">
                         <img class="card-img-top" src="{{ data['cover'] }}" height="300" width="200"
@@ -159,8 +148,8 @@
                                     </a>
                                 {% endif %}
                             </div>
-                            <div class="col" {% if category == 'Completed' or category == 'Completed Animation' %}
-                            style="display: block;"{% else %}style="display: none;"{% endif %}>
+                            <div class="col" {% if data['category'] == 'Completed' or data['category'] == 'Completed Animation' %}
+                            style="display: block;" {% else %}style="display: none;"{% endif %}>
                                 <a id="rew_{{ data['id'] }}" class="{% if user_id != current_user.get_id() %}
                                 disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this media.
                                 Do not count the inital completion." onclick="rewatchDrop(this, {{ data['id'] }},
@@ -182,13 +171,11 @@
     </div>
     <p class="pagination">
         {% if search %}
-            <a class="pagination__next" href="/{{ media_list }}/{{ username }}?search={{ search }}&page=2"></a>
-        {% elif common %}
-            <a class="pagination__next" href="/{{ media_list }}/{{ username }}?cat={{ category }}&common=False&page=2"></a>
-        {% elif favorite %}
-            <a class="pagination__next" href="/{{ media_list }}/{{ username }}?fav=True&page=2"></a>
+            <a class="pagination__next"
+               href="/{{ media_list }}/{{ username }}?category=Search&query={{ search }}&option={{ option }}&sort={{ sort_val }}&filter={{ filter_val }}&page=2"></a>
         {% else %}
-            <a class="pagination__next" href="/{{ media_list }}/{{ username }}?cat={{ category }}&page=2"></a>
+            <a class="pagination__next"
+               href="/{{ media_list }}/{{ username }}?category={{ category }}&sort={{ sort_val }}&filter={{ filter_val }}&page=2"></a>
         {% endif %}
     </p>
 {% endblock content %}
@@ -197,6 +184,49 @@
 {% block script %}
     <script src="https://unpkg.com/infinite-scroll@3/dist/infinite-scroll.pkgd.min.js"></script>
     <script src="{{ url_for('static', filename='js/medialist_base.js') }}"></script>
+    <script>
+        var input = document.getElementById("search-input");
+        input.addEventListener("keyup", function(event) {
+            console.log(event);
+            if (event.code === 'Enter') {
+                event.preventDefault();
+                let option_val = document.getElementById("select-option").value;
+                let query = input.value;
+                if (query === '') {
+                } else {
+                    window.location.replace('/{{ media_list }}/{{ username }}?category=Search&query='+query +
+                    '&option=' + option_val + '&sort={{ sort_val }}&filter={{ filter_val }}')
+                }
+            }
+        });
+
+        function sort_medialist(sort_option) {
+            let sort_val = sort_option.value;
+            let option_val = document.getElementById("select-option").value;
+            {% if search %}
+                window.location.replace('/{{ media_list }}/{{ username }}?category=Search&query={{ search }}' +
+                '&option='+option_val+'&sort='+sort_val+'&filter={{ filter_val }}')
+            {% else %}
+                window.location.replace('/{{ media_list }}/{{ username }}?category={{ category }}' +
+                '&sort='+sort_val+'&filter={{ filter_val }}')
+            {% endif %}
+        }
+
+        function filter_medialist() {
+            let now = 'check';
+            let option_val = document.getElementById("select-option").value;
+            if ($('#shared-check').attr('value') === 'check') {
+                now = 'not_check';
+            }
+            {% if search %}
+                window.location.replace('/{{ media_list }}/{{ username }}?category=Search&query={{ search }}' +
+                '&option='+option_val+'&sort={{ sort_val }}&filter='+now)
+            {% else %}
+                window.location.replace('/{{ media_list }}/{{ username }}?category={{ category }}' +
+                '&sort={{ sort_val }}&filter='+now)
+            {% endif %}
+        }
+    </script>
     {% block javascript scoped %}
     {% endblock javascript %}
 {% endblock script %}

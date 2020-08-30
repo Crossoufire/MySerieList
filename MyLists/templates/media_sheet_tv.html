@@ -83,7 +83,7 @@
 {% block information %}
     <div class="col-6">
         <ul class="list-unstyled">
-            <li class="m-b-20">
+            <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-star"></i><b>&nbsp; TMDb Score</b></h5>
                 <div style="font-size: 0.9rem;">
                     <i class="fas fa-tv fa-3x media-ticket" value="{{ data['vote_average'] }}"></i>
@@ -91,27 +91,27 @@
                 <div class="tv-vote-average">{{ data['vote_average'] }}</div>
                 <div class="tv-vote-count">({{ data['vote_count']|int }} votes)</div>
             </li>
-            <li class="m-b-20">
+            <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-video"></i><b>&nbsp; Created by</b></h5>
                 <div>{{ data['created_by'] }}</div>
             </li>
-            <li class="m-b-20">
+            <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-cog"></i><b>&nbsp; Prod. Status</b></h5>
                 <div>{{ data['prod_status'] }}</div>
             </li>
-            <li class="m-b-20">
+            <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-calendar-check"></i><b>&nbsp; Air dates</b></h5>
                 <div>{{ data['first_air_date'] }} - {{ data['last_air_date'] }}</div>
             </li>
-            <li class="m-b-20">
+            <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-play-circle"></i><b>&nbsp; Seasons</b></h5>
                 <div>{{ data['total_seasons'] }} Seasons</div>
             </li>
-            <li class="m-b-20">
+            <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-forward"></i><b>&nbsp; Episodes</b></h5>
                 <div>{{ data['total_episodes'] }} Episodes</div>
             </li>
-            <li class="m-b-20">
+            <li>
                 <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Episode duration</b></h5>
                 <div>{{ data['episode_duration'] }} min</div>
             </li>
@@ -119,11 +119,11 @@
     </div>
     <div class="col-6">
         <ul class="list-unstyled">
-            <li class="m-b-20">
+            <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-theater-masks"></i><b>&nbsp; Genres</b></h5>
                 <div>{{ data['genres'] }}</div>
             </li>
-            <li class="m-b-20">
+            <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-user"></i><b>&nbsp; Actors</b></h5>
                 {% if data['actors'] == 'Unknown' %}
                     <div><i>No actors found</i></div>
@@ -131,15 +131,15 @@
                     <div>{{ data['actors'] }}</div>
                 {% endif %}
             </li>
-            <li class="m-b-20">
+            <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-building"></i><b>&nbsp; Networks</b></h5>
                 <div>{{ data['networks'] }}</div>
             </li>
-            <li class="m-b-20">
+            <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Completion Time</b></h5>
                 <div>{{ data['time_to_complete']//60 }} h {{ '%02d'|format(data['time_to_complete']%60) }} min</div>
             </li>
-            <li class="m-b-20">
+            <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-flag"></i><b>&nbsp; Origin country</b></h5>
                 {% if data['origin_country'] == 'en' %}
                     <span class="flag-icon flag-icon-us"></span>&nbsp;

@@ -57,7 +57,6 @@ app.config['OAUTH_CREDENTIALS'] = {
     }
 }
 
-
 mail = Mail(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)

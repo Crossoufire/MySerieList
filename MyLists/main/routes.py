@@ -13,8 +13,7 @@ from MyLists.main.functions import get_medialist_data, set_last_update, compute_
     save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, RoleType, MoviesGenre, MediaType, \
-    get_media_query, get_next_airing, check_media
-
+    get_media_query, get_next_airing, check_media, User
 
 bp = Blueprint('main', __name__)
 
@@ -35,26 +34,20 @@ def mymedialist(media_list, user_name):
     current_user.add_view_count(user, list_type)
 
     # Check the <category>, the <page>, the <medialist> and the <html_template>.
+    page = request.args.get('page', 1, int)
+    sort_val = request.args.get('sort', 'title')
+    search = request.args.get('query')
+    filter_val = request.args.get('filter', 'check')
+    option = request.args.get('option', None)
     if list_type != ListType.MOVIES:
-        category = request.args.get('cat', 'Watching', str)
+        category = request.args.get('category', 'Watching')
         html_template = 'medialist_tv.html'
     elif list_type == ListType.MOVIES:
-        category = request.args.get('cat', 'Completed', str)
+        category = request.args.get('category', 'Completed')
         html_template = 'medialist_movies.html'
-    page = request.args.get('page', 1, int)
-
-    # Check if <category> is valid
-    try:
-        category = Status(category)
-    except ValueError:
-        abort(404)
 
     # Check the <args> then retrieve the corresponding <media_data>
-    search = request.args.get('search')
-    favorite = request.args.get('fav')
-    common = request.args.get('common')
-    option = request.args.get('option')
-    query, category = get_media_query(user.id, page, list_type, category, option, search, favorite, common)
+    query, category = get_media_query(user.id, page, list_type, category, search, option, sort_val, filter_val)
 
     # Get the actual page, total number of pages and the total number of media from the query
     items = query.items
@@ -65,19 +58,10 @@ def mymedialist(media_list, user_name):
     # Shape into dict the <media_data>
     media_data = get_medialist_data(list_type, items, user.id)
 
-    return render_template(html_template,
-                           title="{}'s {}".format(user_name, media_list),
-                           media_data=media_data["media_data"],
-                           common_elements=media_data["common_elements"],
-                           media_list=media_list,
-                           category=category,
-                           username=user_name,
-                           user_id=str(user.id),
-                           info_pages=info_pages,
-                           search=search,
-                           option=option,
-                           common=common,
-                           favorite=favorite)
+    return render_template(html_template, title="{}'s {}".format(user_name, media_list),
+                           media_data=media_data["media_data"], common_elements=media_data["common_elements"],
+                           media_list=media_list, username=user_name, user_id=str(user.id), info_pages=info_pages,
+                           category=category, option=option, sort_val=sort_val, filter_val=filter_val, search=search)
 
 
 @bp.route("/movies_collection/<string:user_name>", methods=['GET', 'POST'])
@@ -960,14 +944,15 @@ def autocomplete():
     if data.get("total_results", 0) == 0:
         return jsonify(search_results=[{'nb_results': 0}]), 200
 
+    people = User.query.filter(User.username.like('%'+search+'%')).all()
+    print(people)
+
     results = []
     for i, result in enumerate(data["results"]):
         if i >= data["total_results"] or i > 19 or len(results) >= 7:
             break
-
         if result.get('known_for_department'):
             continue
-
         results.append(Autocomplete(result).get_autocomplete_dict())
 
     return jsonify(search_results=results), 200
