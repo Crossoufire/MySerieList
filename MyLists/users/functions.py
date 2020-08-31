@@ -1,14 +1,14 @@
 import pytz
 import random
 import operator
-from _collections import OrderedDict
 
 from MyLists import db
 from flask import url_for
-from sqlalchemy import func
+from sqlalchemy import func, text
 from flask_login import current_user
+from _collections import OrderedDict
 from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
-    AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, Movies, Ranks, followers, Frames
+    AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, Movies, Ranks, followers, Frames, SeriesGenre
 
 
 def get_media_count(user_id, list_type):
@@ -350,7 +350,7 @@ def get_more_stats(user):
                 return [element[0].total_episodes, int(element[0].episode_duration)*element[0].total_episodes]
         elif element[1].status != Status.PLAN_TO_WATCH and element[1].status != Status.RANDOM:
             nb_episodes = [m.episodes for m in element[0].eps_per_season]
-
+            
             ep_duration = int(element[0].episode_duration)
             ep_counter = 0
             for i in range(0, element[1].current_season - 1):
@@ -364,6 +364,24 @@ def get_more_stats(user):
     series_data = db.session.query(Series, SeriesList) \
         .join(SeriesList, SeriesList.media_id == Series.id) \
         .filter(SeriesList.user_id == user.id)
+
+    # test = db.session.query(func.strftime('%Y', Series.first_air_date).label('year'),
+    #                         func.count(Series.first_air_date))\
+    #     .join(SeriesList, Series.id == SeriesList.media_id)\
+    #     .filter(SeriesList.user_id == current_user.id)\
+    #     .group_by(func.strftime('%Y', Series.first_air_date)).order_by(text('year desc')).all()
+
+    # test = db.session.query(func.strftime('%Y', Movies.release_date).label('year'),
+    #                         func.count(Movies.release_date))\
+    #     .join(MoviesList, Movies.id == MoviesList.media_id)\
+    #     .filter(MoviesList.user_id == current_user.id)\
+    #     .group_by(func.strftime('%Y', Movies.release_date)).order_by(text('year desc')).all()
+
+    test = db.session.query(SeriesGenre.genre, func.count(SeriesGenre.genre).label('count')) \
+        .join(SeriesList, SeriesGenre.media_id == SeriesList.media_id) \
+        .join(Series, Series.id == SeriesList.media_id) \
+        .filter(SeriesList.user_id == current_user.id)\
+        .group_by(SeriesGenre.genre).order_by(text('count desc')).all()
 
     anime_data = db.session.query(Anime, AnimeList) \
         .join(AnimeList, AnimeList.media_id == Anime.id) \

@@ -2,18 +2,20 @@
 
 
 {% block button %}
-    <a class="btn btn-sm {% if category == 'Watching' %} btn-selected {% else %} btn-header {% endif %}"
-       href="/{{ media_list }}/{{ username }}?cat=Watching">WATCHING</a>
-    <a class="btn btn-sm {% if category == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"
-       href="/{{ media_list }}/{{ username }}?cat=Completed">COMPLETED</a>
-    <a class="btn btn-sm {% if category == 'On Hold' %} btn-selected {% else %} btn-header {% endif %}"
-       href="/{{ media_list }}/{{ username }}?cat=On Hold">ON HOLD</a>
-    <a class="btn btn-sm {% if category == 'Random' %} btn-selected {% else %} btn-header {% endif %}"
-       href="/{{ media_list }}/{{ username }}?cat=Random">RANDOM</a>
-    <a class="btn btn-sm {% if category == 'Dropped' %} btn-selected {% else %} btn-header {% endif %}"
-       href="/{{ media_list }}/{{ username }}?cat=Dropped">DROPPED</a>
-    <a class="btn btn-sm {% if category == 'Plan to Watch' %} btn-selected {% else %} btn-header {% endif %}"
-       href="/{{ media_list }}/{{ username }}?cat=Plan to Watch">PLAN TO WATCH</a>
+    <a class="btn btn-sm {% if category == 'Watching' %}btn-selected{% else %} btn-header{% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Watching&sort={{ sort_val }}&filter={{ filter_val }}">WATCHING</a>
+    <a class="btn btn-sm {% if category == 'Completed' %}btn-selected {% else %} btn-header{% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Completed&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED</a>
+    <a class="btn btn-sm {% if category == 'On Hold' %}btn-selected {% else %} btn-header{% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=On Hold&sort={{ sort_val }}&filter={{ filter_val }}">ON HOLD</a>
+    <a class="btn btn-sm {% if category == 'Random' %}btn-selected {% else %} btn-header{% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Random&sort={{ sort_val }}&filter={{ filter_val }}">RANDOM</a>
+    <a class="btn btn-sm {% if category == 'Dropped' %}btn-selected {% else %} btn-header{% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Dropped&sort={{ sort_val }}&filter={{ filter_val }}">DROPPED</a>
+    <a class="btn btn-sm {% if category == 'Plan to Watch' %}btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Plan to Watch&sort={{ sort_val }}&filter={{ filter_val }}">PLAN TO WATCH</a>
+    <a class="btn btn-sm {% if category == 'Favorite' %}btn-selected-fav {% else %} btn-header-fav{% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Favorite&sort={{ sort_val }}&filter={{ filter_val }}">FAVORITES</a>
 {% endblock button %}
 
 

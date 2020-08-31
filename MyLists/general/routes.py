@@ -1,11 +1,10 @@
 from flask import Blueprint
 from datetime import datetime
-from MyLists import db, bcrypt, app
 from MyLists.API_data import ApiData
+from MyLists import db, bcrypt, app, cache
 from flask_login import login_required, current_user
-from flask import render_template, flash, request, abort
-
 from MyLists.general.trending_data import TrendingData
+from flask import render_template, flash, request, abort
 from MyLists.models import Status, ListType, User, GlobalStats, RoleType
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
     refresh_db_frames, refresh_db_badges, refresh_db_ranks
@@ -26,20 +25,23 @@ def create_user():
                       private=True,
                       registered_on=datetime.utcnow(),
                       activated_on=datetime.utcnow(),
-                      role=RoleType.ADMIN)
+                      role=RoleType.ADMIN,
+                      oauth_id="a")
         manager1 = User(username='manager',
                         email='manager@manager.com',
                         password=bcrypt.generate_password_hash("password").decode('utf-8'),
                         active=True,
                         registered_on=datetime.utcnow(),
                         activated_on=datetime.utcnow(),
-                        role=RoleType.MANAGER)
+                        role=RoleType.MANAGER,
+                        oauth_id="b")
         user1 = User(username='user',
                      email='user@user.com',
                      password=bcrypt.generate_password_hash("password").decode('utf-8'),
                      active=True,
                      registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow())
+                     activated_on=datetime.utcnow(),
+                     oauth_id="c")
         db.session.add(admin1)
         db.session.add(manager1)
         db.session.add(user1)
@@ -65,6 +67,7 @@ def admin():
 
 @bp.route("/mylists_stats", methods=['GET'])
 @login_required
+@cache.cached(timeout=300)
 def mylists_stats():
     stats = GlobalStats()
 
@@ -151,6 +154,7 @@ def mylists_stats():
 
 @bp.route("/current_trends", methods=['GET'])
 @login_required
+@cache.cached(timeout=300)
 def current_trends():
     try:
         tv_info = ApiData().get_trending_tv()

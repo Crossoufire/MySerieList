@@ -6,6 +6,7 @@ import configparser
 
 from flask import Flask
 from flask_mail import Mail
+from flask_caching import Cache
 from flask_bcrypt import Bcrypt
 from flask_compress import Compress
 from flask_login import LoginManager
@@ -31,13 +32,13 @@ except Exception as e:
 
 app = Flask(__name__)
 Compress(app)
-
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 app.config['SECRET_KEY'] = flask_secret
-app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SECURE'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['TESTING'] = False
+app.config['TESTING'] = True
 app.config['MAX_CONTENT_LENGTH'] = 8*1024*1024
 app.config['FLASK_ADMIN_SWATCH'] = 'cyborg'
 
@@ -55,7 +56,6 @@ app.config['OAUTH_CREDENTIALS'] = {
         'secret': twitter_oauth[1]
     }
 }
-
 
 mail = Mail(app)
 db = SQLAlchemy(app)

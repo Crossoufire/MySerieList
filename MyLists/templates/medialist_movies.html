@@ -3,11 +3,13 @@
 
 {% block button %}
     <a class="btn btn-sm {% if category == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"
-       href="/{{ media_list }}/{{ username }}?cat=Completed">COMPLETED</a>
+    href="/{{ media_list }}/{{ username }}?category=Completed&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED</a>
     <a class="btn btn-sm {% if category == 'Completed Animation' %} btn-selected {% else %} btn-header {% endif %}"
-       href="/{{ media_list }}/{{ username }}?cat=Completed Animation">COMPLETED ANIMATION</a>
+    href="/{{ media_list }}/{{ username }}?category=Completed Animation&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED ANIMATION</a>
     <a class="btn btn-sm {% if category == 'Plan to Watch' %} btn-selected {% else %} btn-header {% endif %}"
-       href="/{{ media_list }}/{{ username }}?cat=Plan to Watch">PLAN TO WATCH</a>
+    href="/{{ media_list }}/{{ username }}?category=Plan to Watch&sort={{ sort_val }}&filter={{ filter_val }}">PLAN TO WATCH</a>
+    <a class="btn btn-sm {% if category == 'Favorite' %}btn-selected-fav {% else %} btn-header-fav{% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Favorite&sort={{ sort_val }}&filter={{ filter_val }}">FAVORITES</a>
 {% endblock button %}
 
 

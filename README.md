@@ -42,6 +42,10 @@ port = <port to connect to>
 
 [TheMovieDB]
 api_key = <API key of TheMovieDB. You need to register on their website to get one>
+
+[OAuth]
+twitter_id = <twitter_id>
+twitter_secret = <twitter_secret>
 ```
 
 For example if you want to use Gmail, set `server = smtp.gmail.com` and `port = 465` . If you need more settings, feel 
@@ -54,11 +58,14 @@ Then run the command `python3 Run.py` and open the link [http://localhost:5000](
 
 ## Administration
 
-When you run the program for the first time, it will create a user `admin` with the password `password` with the ID `1`.
- Do NOT forget to change the password. This can be done at the beginning of the file `Mylists/routes.py` or using the 
- UI. All the administration tasks are filtered on the user ID (ID == 1), so feel free to also change the username if you
-  want (again in the file `Mylists/routes.py` or using the UI). The admin has access to the pages `/admin`.
- 
+When you run the program for the first time, it will create 3 users : one `user`, one `manager` and one `admin` with all the same the password `password`:
+
+* `user`: standard user
+* `manager`: standard user with the right to manage media:
+    * Can lock any media so it won't be updated anymore by the APScheduler (to be used for old media with no more update needed)
+    * When a media is locked, can edit its metadata
+* `admin`: Used for administration tasks (access to all `/admin` pages). Should not be used as a standard user account. Does not appear in Hall of fame and its statistics are not taken into account.
+
 ## Misc
 
 We started this project to fulfill our needs. The live version [https://mylists.info](https://mylists.info) runs on a 

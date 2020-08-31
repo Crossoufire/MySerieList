@@ -20,7 +20,10 @@ def latin_alphabet(original_name):
             kks.setMode("K", "a")
             kks.setMode("J", "a")
             kks.setMode("s", True)
-            conv = kks.getConverter().do(original_name).split()
+            try:
+                conv = kks.getConverter().do(original_name).split('.')
+            except:
+                conv = kks.getConverter().do(original_name).split()
             cap_parts = [p.capitalize() for p in conv]
             cap_message = " ".join(cap_parts)
             return cap_message
@@ -30,7 +33,7 @@ def latin_alphabet(original_name):
 
 def change_air_format(date):
     try:
-        return datetime.strptime(date, '%Y-%m-%d').strftime("%d %b %Y")
+        return datetime.strptime(date, '%Y-%m-%d').strftime("%b %Y")
     except:
         return 'Unknown'
 
@@ -102,6 +105,9 @@ class MediaDict:
 
         # Change <last_air_time> format
         self.media_info['last_air_date'] = change_air_format(self.data.last_air_date)
+
+        # Time to complete
+        self.media_info['time_to_complete'] = (self.data.total_episodes * self.data.episode_duration)
 
         if self.list_type == ListType.SERIES:
             self.media_info["media_type"] = 'Series'

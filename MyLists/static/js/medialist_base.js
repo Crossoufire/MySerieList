@@ -68,44 +68,6 @@ function addFavorite(fav_div, element_id, media_type) {
 }
 
 
-// // --- Show/Hide common media ------------------------------------------
-// function HideCommon() {
-//     let $shared_media = $('#SharedMedia');
-//     let $fav_media = $('#ShowFavorites');
-//     let $card_ribbon = $('.card-ribbon');
-//
-//     if ($shared_media.prop("checked") === true) {
-//         $card_ribbon.parent().parent().parent().hide();
-//     }
-//     else if ($shared_media.prop("checked") === false && $fav_media.prop("checked") === true) {
-//         $card_ribbon.parent().parent().parent().show();
-//         $('.far.fa-heart').parent().parent().parent().parent().parent().hide();
-//     }
-//     else if ($shared_media.prop("checked") === false && $fav_media.prop("checked") === false) {
-//         $card_ribbon.parent().parent().parent().show();
-//     }
-// }
-//
-//
-// // --- Show/Hide favorites media ---------------------------------------
-// function ShowFavorites() {
-//     let $shared_media = $('#SharedMedia');
-//     let $fav_media = $('#ShowFavorites');
-//     let $far_heart = $('.far.fa-heart');
-//
-//     if ($fav_media.prop("checked") === true) {
-//         $far_heart.parent().parent().parent().parent().parent().hide();
-//     }
-//     else if ($fav_media.prop("checked") === false && $shared_media.prop("checked") === true) {
-//         $far_heart.parent().parent().parent().parent().parent().show();
-//         $('.card-ribbon').parent().parent().parent().hide();
-//     }
-//     else if ($fav_media.prop("checked") === false && $shared_media.prop("checked") === false) {
-//         $far_heart.parent().parent().parent().parent().parent().show();
-//     }
-// }
-
-
 // --- Add the category to the user (from other list) ------------------
 function AddCatUser(category, card_id) {
     let $card = $('#'+card_id);
@@ -336,19 +298,9 @@ $infini_scroll.infiniteScroll({
 });
 
 
-// // --- Infinite Scroll on load event -----------------------------------
-// $infini_scroll.on( 'append.infiniteScroll', function() {
-//     HideCommon()
-//     ShowFavorites()
-// });
-
-
 // --- Create the loading image on media -------------------------------
-/** @return {string} */
 function Loading() {
-    return (
-        '<div class="load-medialist">' +
-            '<img class="img-load-medialist" src="/static/img/loading.webp" alt="">' +
-        '</div>'
-    )
+    return ('<div class="load-medialist">' +
+                '<div class="central-loading fas fa-3x fa-spinner fast-spin"></div>' +
+            '</div>')
 }

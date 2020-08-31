@@ -6,16 +6,17 @@
     <script async type="text/javascript" src="https://www.googletagmanager.com/gtag/js?id=UA-146580264-1"></script>
     <script type="text/javascript">
         window.dataLayer = window.dataLayer || [];
-        function gtag() {
-            dataLayer.push(arguments);
-        }
+        function gtag() { dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', 'UA-146580264-1');
     </script>
 
-    <meta charset="utf-8">
+    <!--- <meta> tag to defines metadata about our HTML document ------------>
+    <meta charset="UTF-8">
+    <meta name="author" content="Crossoufire">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="keywords" content="Mylists, lists, series, tv shows, anime, movies, levels, hall of fame">
     <meta name="description" content="Create your TV shows/anime/movies list, see how much time you spent and gain
     levels and badges."/>
 
@@ -33,6 +34,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/css/mdb.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
 
     <!--- Website Icon ----------------------------------------------------->
     <link rel='icon' type='image/gif' href="{{ url_for('static', filename='img/favicon.ico') }}">
@@ -95,8 +97,7 @@
                 <div class="collapse navbar-collapse" id="nav-collapse">
                     <form class="form-inline my-2 my-lg-0 nav-form" action="{{ url_for('main.search_media') }}">
                         <label for="autocomplete"></label>
-                        <input id="autocomplete" class="form-control tatayo" name="search"
-                               placeholder="Search Media">
+                        <input id="autocomplete" class="form-control tatayo" name="search" placeholder="Search Media">
                     </form>
                     <ul class="navbar-nav mr-auto nav-ul-1">
                         <li class="nav-item nav-li-1">
@@ -117,17 +118,17 @@
                                 <div class="info-nav fs-14 nav-text">Trends</div>
                             </a>
                         </li>
-                        <li class="nav-item nav-li-1">
+                    </ul>
+                    <ul class="navbar-nav ml-auto nav-ul-1">
+                        <li class="nav-item nav-li-1 nav-li-2">
                             <a class="nav-link" href="{{ url_for('main.your_next_airing') }}">
                                 <i class="far fa-lg fa-calendar-check" style="color: olivedrab;"></i>
                                 <div class="info-nav fs-14 nav-text">Next Airing</div>
                             </a>
                         </li>
-                    </ul>
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item dropdown">
+                        <li class="nav-item nav-li-1 dropdown nav-li-2">
                             <a id="notif" class="nav-link my-drop-toggle notif-li m-r-10" data-toggle="dropdown"
-                               onclick="notifications()">
+                            onclick="notifications()">
                                 <i class="fas fa-lg fa-bell"></i>
                                 {% set count = current_user.count_notifications() %}
                                 <span id="notif-badge" class="badge {% if count == 0 %} badge-light {% else %}
@@ -154,6 +155,9 @@
 {#                                <a class="dropdown-item text-light" href="{{ url_for('users.achievements',#}
 {#                                user_name=current_user.username) }}">#}
 {#                                    <i class="fas fa-trophy"></i>&nbsp;&nbsp;&nbsp;&nbsp;Achievements#}
+{#                                </a>#}
+{#                                <a class="dropdown-item text-light" href="{{ url_for('users.media_stats') }}">#}
+{#                                    <i class="fas fa-chart-pie"></i>&nbsp;&nbsp;&nbsp;&nbsp;Media Stats#}
 {#                                </a>#}
                                 {% if current_user.role.value == 'admin' %}
                                     <a class="dropdown-item text-light" href="{{ url_for('admin.index') }}">
@@ -217,24 +221,26 @@
     </div>
 </main>
 
+<!--- Javascript CDN ---------------------------------------------------->
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/js/mdb.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
+
+<!--- Custom Javascript ------------------------------------------------->
 {% block script %}
 {% endblock %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/mylists.js') }}"></script>
 
 <footer class="text-center text-lg-left" style="background-color: #100e0e;">
     {% if current_user.is_authenticated %}
-        <div class="container p-3">
+        <div class="container p-3" style="padding-bottom: 0px !important;">
         <div class="row">
             <div class="col-lg-6 col-sm-12 col-xs-12 mb-4">
                 <img class="m-b-5" src="{{ url_for('static', filename='img/favicon.ico') }}">&nbsp;
-                <h5 class="dis-inline text-uppercase"><b>MyLists</b></h5>
+                <h5 class="dis-inline text-uppercase" style="color: #3fd3da;"><b>MyLists.info</b></h5>
                 <p class="text-justify m-b-5">
                     Create your series/anime and movies list, see how much time you spent, follow your friends.
                     Add your favorites, comments, rewatch and gain levels to get to the top of the Hall of Fame.
@@ -244,7 +250,7 @@
                 </a>
             </div>
             <div class="col-lg-3 col-sm-6 col-xs-12 mb-4">
-                <h5 class="text-uppercase"><b>Powered by</b></h5>
+                <h5 class="text-uppercase" style="color: #3fd3da;"><b>Powered by</b></h5>
                 <ul class="list-unstyled mb-0">
                     <li><a href="https://www.themoviedb.org/" class="text-light" target="_blank">TMDb</a></li>
                     <li><a href="https://mdbootstrap.com/" class="text-light" target="_blank">MDB</a></li>
@@ -252,7 +258,7 @@
                 </ul>
             </div>
             <div class="col-lg-3 col-sm-6 col-xs-12 mb-2">
-                <h5 class="text-uppercase"><b>MyLists Info</b></h5>
+                <h5 class="text-uppercase" style="color: #3fd3da;"><b>MyLists Info</b></h5>
                 <ul class="list-unstyled mb-0">
                     <li><a href="https://github.com/Crossoufire/MyLists" class="text-light" target="_blank">Github</a></li>
                     <li><a href="/about" class="text-light" target="_blank">About</a></li>
@@ -262,9 +268,9 @@
         </div>
     </div>
     {% endif %}
-    <div class="text-center p-2" style="background-color: rgba(0, 0, 0, 0.5);">
-        © 2020 Copyright:
-        <a class="text-light" href="https://MyLists.info">Mylists.info</a>
+    <hr style="margin: 0px;">
+    <div class="text-center p-2" style="background-color: rgb(16, 14, 14);">
+        © 2020 Copyright: <a class="text-light" href="https://MyLists.info">Mylists.info</a>
     </div>
 </footer>
 </body>
