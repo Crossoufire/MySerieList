@@ -356,7 +356,7 @@ def media_sheet_form(media_type, media_id):
                     db.session.add(add_network)
                 db.session.commit()
 
-        return redirect(url_for('main.media_sheet', media_type=media_type, media_id=media_id))
+        return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media_id))
 
     return render_template('media_sheet_form.html', title='Media Form', form=form, media_type=media_type.value)
 
@@ -944,8 +944,8 @@ def autocomplete():
     if data.get("total_results", 0) == 0:
         return jsonify(search_results=[{'nb_results': 0}]), 200
 
-    people = User.query.filter(User.username.like('%'+search+'%')).all()
-    print(people)
+    # people = User.query.filter(User.username.like('%'+search+'%')).all()
+    # print(people)
 
     results = []
     for i, result in enumerate(data["results"]):

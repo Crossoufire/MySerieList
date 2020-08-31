@@ -2,7 +2,6 @@ import os
 import secrets
 
 from PIL import Image
-from flask import url_for
 from MyLists import db, app
 from datetime import datetime
 from flask_login import current_user
@@ -57,25 +56,23 @@ def get_medialist_data(list_type, all_media_data, user_id):
 
 def save_new_cover(cover_file, media_type):
     if media_type == MediaType.SERIES:
-        cover_path = url_for('static', filename='covers/series_covers/')
+        cover_path = 'static/covers/series_covers/'
     elif media_type == MediaType.ANIME:
-        cover_path = url_for('static', filename='covers/anime_covers/')
+        cover_path = 'static/covers/anime_covers/'
     elif media_type == MediaType.MOVIES:
-        cover_path = url_for('static', filename='covers/movies_covers/')
+        cover_path = 'static/covers/movies_covers/'
 
-    random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(cover_file.filename)
-    picture_fn = random_hex + f_ext
+    picture_fn = secrets.token_hex(8) + f_ext
     picture_path = os.path.join(app.root_path, cover_path, picture_fn)
 
     try:
         i = Image.open(cover_file)
+        i = i.resize((300, 450), Image.ANTIALIAS)
+        i.save(picture_path, quality=90)
     except Exception as e:
         app.logger.error('[SYSTEM] Error occured updating media cover: {}'.format(e))
         return "default.jpg"
-
-    i = i.resize((300, 450), Image.ANTIALIAS)
-    i.save(picture_path, quality=90)
 
     return picture_fn
 
