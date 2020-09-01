@@ -54,7 +54,7 @@ class ApiData:
 
     def get_trending_movies(self):
         response = requests.get("https://api.themoviedb.org/3/trending/movie/week?api_key={}"
-                                       .format(self.tmdb_api_key))
+                                .format(self.tmdb_api_key), timeout=10)
 
         self.status_code(response.status_code)
 
@@ -62,14 +62,14 @@ class ApiData:
 
     def get_trending_tv(self):
         response = requests.get("https://api.themoviedb.org/3/trending/tv/week?api_key={}"
-                                   .format(self.tmdb_api_key))
+                                .format(self.tmdb_api_key), timeout=10)
 
         self.status_code(response.status_code)
 
         return json.loads(response.text)
 
     def get_trending_anime(self):
-        response = requests.get("https://api.jikan.moe/v3/top/anime/1/airing")
+        response = requests.get("https://api.jikan.moe/v3/top/anime/1/airing", timeout=10)
 
         self.status_code(response.status_code)
 

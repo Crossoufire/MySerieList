@@ -157,18 +157,21 @@ def current_trends():
     try:
         tv_info = ApiData().get_trending_tv()
     except Exception as e:
+        tv_info = {'results': []}
         app.logger.error('[ERROR] - Getting the tv shows trending info: {}.'.format(e))
         flash('The current TV trends from TMDB are not available right now.', 'warning')
 
     try:
         anime_info = ApiData().get_trending_anime()
     except Exception as e:
+        anime_info = {'top': []}
         app.logger.error('[ERROR] - Getting the anime trending info: {}.'.format(e))
         flash('The current anime trends from Jikan are not available right now.', 'warning')
 
     try:
         movies_info = ApiData().get_trending_movies()
     except Exception as e:
+        movies_info = {'results': []}
         app.logger.error('[ERROR] - Getting the movies trending info: {}.'.format(e))
         flash('The current movies trends from TMDB are not available right now.', 'warning')
 
