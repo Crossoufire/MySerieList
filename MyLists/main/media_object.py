@@ -31,11 +31,17 @@ def latin_alphabet(original_name):
             return False
 
 
-def change_air_format(date):
-    try:
-        return datetime.strptime(date, '%Y-%m-%d').strftime("%b %Y")
-    except:
-        return 'Unknown'
+def change_air_format(date, media_sheet=False):
+    if media_sheet:
+        try:
+            return datetime.strptime(date, '%Y-%m-%d').strftime("%b %Y")
+        except:
+            return 'Unknown'
+    else:
+        try:
+            return datetime.strptime(date, '%Y-%m-%d').strftime("%d %b %Y")
+        except:
+            return 'Unknown'
 
 
 class MediaDict:
@@ -101,10 +107,10 @@ class MediaDict:
         self.media_info["current_season"] = 1
 
         # Change <first_air_time> format
-        self.media_info['first_air_date'] = change_air_format(self.data.first_air_date)
+        self.media_info['first_air_date'] = change_air_format(self.data.first_air_date, media_sheet=True)
 
         # Change <last_air_time> format
-        self.media_info['last_air_date'] = change_air_format(self.data.last_air_date)
+        self.media_info['last_air_date'] = change_air_format(self.data.last_air_date, media_sheet=True)
 
         # Time to complete
         self.media_info['time_to_complete'] = (self.data.total_episodes * self.data.episode_duration)

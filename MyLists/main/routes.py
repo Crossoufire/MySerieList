@@ -13,7 +13,7 @@ from MyLists.main.functions import get_medialist_data, set_last_update, compute_
     save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, RoleType, MoviesGenre, MediaType, \
-    get_media_query, get_next_airing, check_media, User
+    get_media_query, get_next_airing, check_media
 
 bp = Blueprint('main', __name__)
 

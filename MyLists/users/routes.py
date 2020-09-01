@@ -1,7 +1,7 @@
 import json
 
+from MyLists import app, db
 from datetime import datetime
-from MyLists import app, db, cache
 from MyLists.users.forms import AddFollowForm
 from flask_login import login_required, current_user
 from flask import Blueprint, url_for, flash, redirect, request, render_template, abort
@@ -15,7 +15,6 @@ bp = Blueprint('users', __name__)
 
 @bp.route('/account/<user_name>', methods=['GET', 'POST'])
 @login_required
-@cache.cached(timeout=30)
 def account(user_name):
     # Check if the user can see the <media_list>
     user = current_user.check_autorization(user_name)
@@ -94,7 +93,6 @@ def all_follows(user_name):
 
 @bp.route("/account/more_stats/<user_name>", methods=['GET', 'POST'])
 @login_required
-@cache.cached(timeout=300)
 def more_stats(user_name):
     # Check if the user can see the <media_list>
     user = current_user.check_autorization(user_name)
