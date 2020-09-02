@@ -1,3 +1,4 @@
+import random
 from datetime import datetime
 from MyLists.models import User
 from MyLists import app, bcrypt, db
@@ -39,6 +40,7 @@ def home():
         hashed_password = bcrypt.generate_password_hash(register_form.register_password.data).decode('utf-8')
         # noinspection PyArgumentList
         user = User(username=register_form.register_username.data,
+                    oauth_id='{}'.format(random.randint(0, 16846876000056)),
                     email=register_form.register_email.data,
                     password=hashed_password,
                     registered_on=datetime.utcnow())

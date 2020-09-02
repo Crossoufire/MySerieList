@@ -320,5 +320,20 @@
         $('#modalRegisterForm').on('shown.bs.modal', function () {
             $('#register_username').focus();
         })
+
+        var registerformErrors = {% if register_form.register_username.errors or register_form.register_email.errors or
+         register_form.register_password.errors or register_form.register_confirm_password.errors %}
+            true{% else %}false{% endif %};
+        var loginformErrors = {% if login_form.login_username.errors or login_form.login_password.errors %}
+            true{% else %}false{% endif %};
+
+        $(document).ready(function() {
+            if (registerformErrors && loginformErrors === true) {
+                $('#modalRegisterForm').modal();
+            }
+            if (loginformErrors && registerformErrors === false) {
+                $('#modalLoginForm').modal();
+            }
+        });
     </script>
 {% endblock script %}
