@@ -3,9 +3,9 @@ import json
 
 from pathlib import Path
 from MyLists import app, db
-from datetime import datetime
 from sqlalchemy import and_, desc
 from MyLists.API_data import ApiData
+from datetime import datetime, timedelta
 from MyLists.main.media_object import MediaDetails
 from MyLists.general.functions import compute_media_time_spent
 from MyLists.models import Series, SeriesList, SeriesActors, SeriesGenre, SeriesNetwork, SeriesEpisodesPerSeason, \
@@ -183,12 +183,12 @@ def get_total_eps(user, eps_per_season):
 def refresh_element_data(api_id, list_type):
     if list_type != ListType.MOVIES:
         media_data = ApiData().get_details_and_credits_data(api_id, list_type)
-        data = MediaDetails(media_data, list_type).get_tv_details()
+        data = MediaDetails(media_data, list_type, updating=True).get_tv_details()
         if not data['tv_data']:
             return None
     elif list_type == ListType.MOVIES:
         media_data = ApiData().get_details_and_credits_data(api_id, list_type)
-        data = MediaDetails(media_data, list_type).get_movies_details()
+        data = MediaDetails(media_data, list_type, updating=True).get_movies_details()
         if not data['movies_data']:
             return None
 
@@ -203,6 +203,7 @@ def refresh_element_data(api_id, list_type):
     # Commit the new changes
     db.session.commit()
 
+    # Check the episodes/seasons
     if list_type != ListType.MOVIES:
         if list_type == ListType.SERIES:
             element = Series.query.filter_by(themoviedb_id=api_id).first()
@@ -319,7 +320,9 @@ def automatic_media_refresh():
     for element in all_id_tv_changes['results']:
         if element['id'] in all_series_tmdb_id:
             try:
-                refresh_element_data(element['id'], ListType.SERIES)
+                a = refresh_element_data(element['id'], ListType.SERIES)
+                if not a:
+                    raise
                 app.logger.info('[INFO] - Refreshed Series with TMDB ID: [{}]'.format(element['id']))
             except Exception as e:
                 app.logger.error('[ERROR] - While refreshing: {}'.format(e))
@@ -493,17 +496,46 @@ def new_releasing_movies():
     app.logger.info('###################################################################')
 
 
+def automatic_movies_locking():
+    app.logger.info('###################################################################')
+    app.logger.info('[SYSTEM] - Starting automatic movies locking')
+    all_movies = Movies.query.filter(Movies.lock_status != True).all()
+
+    count_locked = 0
+    count_not_locked = 0
+    now_date = (datetime.utcnow()-timedelta(minutes=45000))
+    for movie in all_movies:
+        try:
+            release_date = datetime.strptime(movie.release_date, '%Y-%m-%d')
+            if release_date < now_date and movie.image_cover != 'default.jpg':
+                movie.lock_status = True
+                count_locked += 1
+            else:
+                movie.lock_status = False
+                count_not_locked += 1
+        except:
+            movie.lock_status = False
+            count_not_locked += 1
+
+    db.session.commit()
+    app.logger.info('Number of movies locked: {}'.format(count_locked))
+    app.logger.info('Number of movies not locked: {}'.format(count_not_locked))
+    app.logger.info('[SYSTEM] - Finished automatic movies locking')
+    app.logger.info('###################################################################')
+
+
 # -----------------------------------------------------------------------------------------------------------------
 
 
 def scheduled_task():
-    remove_non_list_media()
-    remove_old_covers()
-    automatic_media_refresh()
-    new_releasing_movies()
-    new_releasing_series()
-    new_releasing_anime()
+    # remove_non_list_media()
+    # remove_old_covers()
+    # automatic_media_refresh()
+    # new_releasing_movies()
+    # new_releasing_series()
+    # new_releasing_anime()
+    automatic_movies_locking()
 
-    compute_media_time_spent(ListType.SERIES)
-    compute_media_time_spent(ListType.ANIME)
-    compute_media_time_spent(ListType.MOVIES)
+    # compute_media_time_spent(ListType.SERIES)
+    # compute_media_time_spent(ListType.ANIME)
+    # compute_media_time_spent(ListType.MOVIES)

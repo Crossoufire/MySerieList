@@ -23,7 +23,7 @@ class AddtoDB:
                 genre.update({'media_id': self.media.id})
                 db.session.add(SeriesGenre(**genre))
         elif self.list_type == ListType.ANIME:
-            if self.media_details['anime_genres_data']:
+            if len(self.media_details['anime_genres_data'] > 0):
                 for genre in self.media_details['anime_genres_data']:
                     genre.update({'media_id': self.media.id})
                     db.session.add(AnimeGenre(**genre))

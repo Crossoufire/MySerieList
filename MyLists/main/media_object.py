@@ -238,10 +238,11 @@ class MediaListDict:
 
 
 class MediaDetails:
-    def __init__(self, media_data, list_type):
+    def __init__(self, media_data, list_type, updating=False):
         self.media_data = media_data
         self.list_type = list_type
         self.media_details = {}
+        self.updating = updating
 
         if list_type != ListType.MOVIES:
             self.get_tv_details()
@@ -329,15 +330,9 @@ class MediaDetails:
         a_genres_list = []
         try:
             anime_search = ApiData().anime_search(self.media_data.get("name"))
-            mal_id = anime_search["results"][0]["mal_id"]
+            anime_genres = ApiData().get_anime_genres(anime_search["results"][0]["mal_id"])['genres']
         except Exception as e:
-            app.logger.error('[ERROR] - Requesting the Jikan search API: {}'.format(e))
-            mal_id = None
-
-        try:
-            anime_genres = ApiData().get_anime_genres(mal_id)['genres']
-        except Exception as e:
-            app.logger.error('[ERROR] - Requesting the Jikan genre API: {}'.format(e))
+            app.logger.error('[ERROR] - Requesting the Jikan API: {}'.format(e), {'API': 'Jikan'})
             anime_genres = None
 
         if anime_genres:
@@ -439,14 +434,17 @@ class MediaDetails:
         self.get_origin_country()
         self.get_created_by()
         seasons_list = self.get_seasons()
-        genres_list = self.get_genres()
 
-        a_genres_list = None
-        if self.list_type == ListType.ANIME:
-            a_genres_list = self.get_anime_genres()
-
-        actors_list = self.get_actors()
-        networks_list = self.get_networks()
+        a_genres_list = []
+        genres_list = []
+        actors_list = []
+        networks_list = []
+        if not self.updating:
+            genres_list = self.get_genres()
+            actors_list = self.get_actors()
+            networks_list = self.get_networks()
+            if self.list_type == ListType.ANIME:
+                a_genres_list = self.get_anime_genres()
 
         all_data = {'tv_data': self.media_details,
                     'seasons_data': seasons_list,
@@ -477,8 +475,12 @@ class MediaDetails:
 
         self.get_director_name()
         collection_info = self.get_collection_info()
-        genres_list = self.get_genres()
-        actors_list = self.get_actors()
+
+        genres_list = []
+        actors_list = []
+        if not self.updating:
+            genres_list = self.get_genres()
+            actors_list = self.get_actors()
 
         all_data = {'movies_data': self.media_details,
                     'collection_info': collection_info,

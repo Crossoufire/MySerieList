@@ -69,11 +69,11 @@ class ApiData:
         return json.loads(response.text)
 
     def get_trending_anime(self):
-        response = requests.get("https://api.jikan.moe/v3/top/anime/1/airing", timeout=10)
+        # response = requests.get("https://api.jikan.moe/v3/top/anime/1/airing", timeout=10)
 
-        self.status_code(response.status_code)
+        self.status_code(503)
 
-        return json.loads(response.text)
+        # return json.loads(response.text)
 
     def get_collection_data(self, collection_id):
         response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
