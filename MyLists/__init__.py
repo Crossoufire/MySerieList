@@ -12,7 +12,7 @@ from flask_login import LoginManager
 from email.message import EmailMessage
 from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
-from logging.handlers import SMTPHandler, RotatingFileHandler, MemoryHandler
+from logging.handlers import SMTPHandler, RotatingFileHandler
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -86,85 +86,85 @@ app.register_blueprint(users_bp)
 from MyLists.settings.routes import bp as settings_bp
 app.register_blueprint(settings_bp)
 
+if not app.debug and not app.testing:
+    class SSLSMTPHandler(SMTPHandler):
+        # def getSubject(self, record):
+        #     if record.args.get('API') == 'Jikan':
+        #         try:
+        #             qte = record.__dict__['qte']
+        #         except:
+        #             qte = ''
+        #         self.subject = 'MyLists - Exceptions Occurred - {} Jikan errors'.format(qte)
+        #
+        #     return self.subject
 
-class SSLSMTPHandler(SMTPHandler):
-    def getSubject(self, record):
-        if record.args.get('API') == 'Jikan':
+        def emit(self, record):
+            """ Emit a record. """
+            # print(self.getSubject(record), "oui")
             try:
-                qte = record.__dict__['qte']
+                port = self.mailport
+                if not port:
+                    port = smtplib.SMTP_PORT
+                smtp = smtplib.SMTP_SSL(self.mailhost, port, timeout=self.timeout)
+                msg = EmailMessage()
+                msg['From'] = self.fromaddr
+                msg['To'] = ','.join(self.toaddrs)
+                msg['Subject'] = self.getSubject(record)
+                msg['Date'] = em.localtime()
+                msg.set_content(self.format(record))
+                if self.username:
+                    smtp.login(self.username, self.password)
+                smtp.send_message(msg, self.fromaddr, self.toaddrs)
+                smtp.quit()
+            except (KeyboardInterrupt, SystemExit):
+                raise
             except:
-                qte = ''
-            self.subject = 'MyLists - Exceptions Occurred - {} Jikan errors'.format(qte)
-
-        return self.subject
-
-    def emit(self, record):
-        """ Emit a record. """
-        print(self.getSubject(record), "oui")
-        # try:
-        #     port = self.mailport
-        #     if not port:
-        #         port = smtplib.SMTP_PORT
-        #     smtp = smtplib.SMTP_SSL(self.mailhost, port, timeout=self.timeout)
-        #     msg = EmailMessage()
-        #     msg['From'] = self.fromaddr
-        #     msg['To'] = ','.join(self.toaddrs)
-        #     msg['Subject'] = self.getSubject(record)
-        #     msg['Date'] = em.localtime()
-        #     msg.set_content(self.format(record))
-        #     if self.username:
-        #         smtp.login(self.username, self.password)
-        #     smtp.send_message(msg, self.fromaddr, self.toaddrs)
-        #     smtp.quit()
-        # except (KeyboardInterrupt, SystemExit):
-        #     raise
-        # except:
-        #     self.handleError(record)
+                self.handleError(record)
 
 
-class MyMemoryhandler(MemoryHandler):
-    def shouldFlush(self, record):
-        if record.args.get('API') != 'Jikan' or len(self.buffer) >= self.capacity:
-            return True
-        return False
+    mail_handler = SSLSMTPHandler(mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
+                                  fromaddr=app.config['MAIL_USERNAME'],
+                                  toaddrs=app.config['MAIL_USERNAME'],
+                                  subject='MyLists - Exceptions Occurred',
+                                  credentials=(app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD']))
 
-    def flush(self):
-        self.acquire()
-        try:
-            if self.capacity > len(self.buffer) > 1:
-                self.buffer[0].__dict__.update({'qte': len(self.buffer)-1})
-                self.target.handle(self.buffer[0])
-                self.target.handle(self.buffer[-1])
-            elif len(self.buffer) >= self.capacity:
-                self.buffer[0].__dict__.update({'qte': len(self.buffer)})
-                self.target.handle(self.buffer[0])
-            else:
-                for rec in self.buffer:
-                    self.target.handle(rec)
-            self.buffer = []
-        finally:
-            self.release()
+    mail_handler.setLevel(logging.ERROR)
+    app.logger.addHandler(mail_handler)
 
+    # class MyMemoryhandler(MemoryHandler):
+    #     def shouldFlush(self, record):
+    #         if record.args.get('API') != 'Jikan' or len(self.buffer) >= self.capacity:
+    #             return True
+    #         return False
+    #
+    #     def flush(self):
+    #         self.acquire()
+    #         try:
+    #             if self.capacity > len(self.buffer) > 1:
+    #                 self.buffer[0].__dict__.update({'qte': len(self.buffer)-1})
+    #                 self.target.handle(self.buffer[0])
+    #                 self.target.handle(self.buffer[-1])
+    #             elif len(self.buffer) >= self.capacity:
+    #                 self.buffer[0].__dict__.update({'qte': len(self.buffer)})
+    #                 self.target.handle(self.buffer[0])
+    #             else:
+    #                 for rec in self.buffer:
+    #                     self.target.handle(rec)
+    #             self.buffer = []
+    #         finally:
+    #             self.release()
 
-mail_handler = SSLSMTPHandler(mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
-                              fromaddr=app.config['MAIL_USERNAME'],
-                              toaddrs=app.config['MAIL_USERNAME'],
-                              subject='MyLists - Exceptions Occurred',
-                              credentials=(app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD']))
+    # buffered_handler = MyMemoryhandler(20)
+    # buffered_handler.setLevel(logging.ERROR)
+    # buffered_handler.setTarget(mail_handler)
+    # app.logger.addHandler(buffered_handler)
 
-mail_handler.setLevel(logging.ERROR)
-
-buffered_handler = MyMemoryhandler(20)
-buffered_handler.setLevel(logging.ERROR)
-buffered_handler.setTarget(mail_handler)
-app.logger.addHandler(buffered_handler)
-
-handler = RotatingFileHandler("MyLists/static/log/mylists.log", maxBytes=3000000, backupCount=5)
-handler.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s"))
-handler.setLevel(logging.INFO)
-app.logger.setLevel(logging.INFO)
-app.logger.addHandler(handler)
-app.logger.info('MyLists startup')
+    handler = RotatingFileHandler("MyLists/static/log/mylists.log", maxBytes=3000000, backupCount=5)
+    handler.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s"))
+    handler.setLevel(logging.INFO)
+    app.logger.setLevel(logging.INFO)
+    app.logger.addHandler(handler)
+    app.logger.info('MyLists startup')
 
 
 from MyLists import admin_views

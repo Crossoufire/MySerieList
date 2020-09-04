@@ -69,11 +69,11 @@ class ApiData:
         return json.loads(response.text)
 
     def get_trending_anime(self):
-        # response = requests.get("https://api.jikan.moe/v3/top/anime/1/airing", timeout=10)
+        response = requests.get("https://api.jikan.moe/v3/top/anime/1/airing", timeout=10)
 
-        self.status_code(503)
+        self.status_code(response.status_code)
 
-        # return json.loads(response.text)
+        return json.loads(response.text)
 
     def get_collection_data(self, collection_id):
         response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
@@ -104,7 +104,7 @@ class ApiData:
     @sleep_and_retry
     @limits(calls=1, period=4)
     def anime_search(self, anime_name):
-        """ Get the name of the anime from TMDB to MyAnimeList to obtain better genres with <anime_genres> function"""
+        """ Get the name of the anime from TMDB to MyAnimeList to obtain better genres with <anime_genres> function """
 
         response = requests.get("https://api.jikan.moe/v3/search/anime?q={0}".format(anime_name))
 

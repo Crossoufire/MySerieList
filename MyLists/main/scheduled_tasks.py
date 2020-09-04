@@ -169,15 +169,15 @@ def remove_old_covers():
 
 
 def get_total_eps(user, eps_per_season):
-        if user.status == Status.PLAN_TO_WATCH or user.status == Status.RANDOM:
-            nb_eps_watched = 1
-        else:
-            nb_eps_watched = 0
-            for i in range(1, user.current_season):
-                nb_eps_watched += eps_per_season[i - 1]
-            nb_eps_watched += user.last_episode_watched
+    if user.status == Status.PLAN_TO_WATCH or user.status == Status.RANDOM:
+        nb_eps_watched = 1
+    else:
+        nb_eps_watched = 0
+        for i in range(1, user.current_season):
+            nb_eps_watched += eps_per_season[i - 1]
+        nb_eps_watched += user.last_episode_watched
 
-        return nb_eps_watched
+    return nb_eps_watched
 
 
 def refresh_element_data(api_id, list_type):
@@ -503,7 +503,7 @@ def automatic_movies_locking():
 
     count_locked = 0
     count_not_locked = 0
-    now_date = (datetime.utcnow()-timedelta(minutes=45000))
+    now_date = (datetime.utcnow()-timedelta(minutes=225000))  # About 5 months
     for movie in all_movies:
         try:
             release_date = datetime.strptime(movie.release_date, '%Y-%m-%d')
@@ -524,18 +524,18 @@ def automatic_movies_locking():
     app.logger.info('###################################################################')
 
 
-# -----------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------
 
 
 def scheduled_task():
-    # remove_non_list_media()
-    # remove_old_covers()
-    # automatic_media_refresh()
-    # new_releasing_movies()
-    # new_releasing_series()
-    # new_releasing_anime()
+    remove_non_list_media()
+    remove_old_covers()
+    automatic_media_refresh()
+    new_releasing_movies()
+    new_releasing_series()
+    new_releasing_anime()
     automatic_movies_locking()
 
-    # compute_media_time_spent(ListType.SERIES)
-    # compute_media_time_spent(ListType.ANIME)
-    # compute_media_time_spent(ListType.MOVIES)
+    compute_media_time_spent(ListType.SERIES)
+    compute_media_time_spent(ListType.ANIME)
+    compute_media_time_spent(ListType.MOVIES)
