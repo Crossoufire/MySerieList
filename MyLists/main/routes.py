@@ -184,10 +184,15 @@ def media_sheet(media_type, media_id):
     if not media:
         if tmdb_id:
             try:
-                media = AddtoDB(media_id, list_type).__dict__['media']
+                if list_type == ListType.SERIES:
+                    media = AddtoDB(media_id, list_type).add_tv_to_db()
+                elif list_type == ListType.ANIME:
+                    media = AddtoDB(media_id, list_type).add_tv_to_db()
+                elif list_type == ListType.MOVIES:
+                    media = AddtoDB(media_id, list_type).add_movies_to_db()
             except Exception as e:
                 app.logger.error('[ERROR] - Occured trying to add media ({}) ID [{}] to DB: {}'
-                                 .format(list_type, media_id, e))
+                                 .format(list_type.value, media_id, e))
                 flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
                 return redirect(request.referrer)
         else:

@@ -12,11 +12,6 @@ class AddtoDB:
         self.list_type = list_type
         self.media_data = ApiData().get_details_and_credits_data(api_id, self.list_type)
 
-        if self.list_type != ListType.MOVIES:
-            self.add_tv_to_db()
-        elif self.list_type == ListType.MOVIES:
-            self.add_movies_to_db()
-
     def add_genres_to_db(self):
         if self.list_type == ListType.SERIES:
             for genre in self.media_details['genres_data']:
