@@ -34,10 +34,10 @@ Compress(app)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 app.config['SECRET_KEY'] = flask_secret
-app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['TESTING'] = True
+app.config['TESTING'] = False
 app.config['MAX_CONTENT_LENGTH'] = 8*1024*1024
 app.config['FLASK_ADMIN_SWATCH'] = 'cyborg'
 
@@ -85,6 +85,7 @@ app.register_blueprint(users_bp)
 
 from MyLists.settings.routes import bp as settings_bp
 app.register_blueprint(settings_bp)
+
 
 if not app.debug and not app.testing:
     class SSLSMTPHandler(SMTPHandler):
