@@ -18,7 +18,7 @@ class AddtoDB:
                 genre.update({'media_id': self.media.id})
                 db.session.add(SeriesGenre(**genre))
         elif self.list_type == ListType.ANIME:
-            if len(self.media_details['anime_genres_data'] > 0):
+            if len(self.media_details['anime_genres_data']) > 0:
                 for genre in self.media_details['anime_genres_data']:
                     genre.update({'media_id': self.media.id})
                     db.session.add(AnimeGenre(**genre))
@@ -64,8 +64,8 @@ class AddtoDB:
     def add_collection_to_db(self):
         collection = self.media_details['collection_info']
         if collection:
-            update = MoviesCollections.query.filter_by(collection_id=collection['collection_id']).first()
-            if update:
+            collection_update = MoviesCollections.query.filter_by(collection_id=collection['collection_id']).first()
+            if collection_update:
                 MoviesCollections.query.filter_by(collection_id=collection['collection_id']).update(**collection)
             else:
                 db.session.add(MoviesCollections(**collection))

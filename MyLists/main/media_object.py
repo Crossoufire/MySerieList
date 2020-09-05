@@ -499,13 +499,13 @@ class Autocomplete:
     def get_autocomplete_dict(self):
         self.media_info['tmdb_id'] = self.result.get('id')
 
-        self.media_info["poster_path"] = url_for('static', filename="covers/series_covers/default.jpg")
-        if self.result["poster_path"]:
-            self.media_info["poster_path"] = "{}{}".format(self.tmdb_cover_link, self.result["poster_path"])
+        self.media_info['poster_path'] = url_for('static', filename="covers/series_covers/default.jpg")
+        if self.result.get('poster_path'):
+            self.media_info['poster_path'] = "{}{}".format(self.tmdb_cover_link, self.result.get('poster_path'))
 
-        if self.result['media_type'] == 'tv':
+        if self.result.get('media_type') == 'tv':
             self.get_tv_dict()
-        else:
+        elif self.result.get('media_type') == 'movie':
             self.get_movies_dict()
 
         return self.media_info
@@ -518,8 +518,8 @@ class Autocomplete:
 
         self.media_info["first_air_date"] = change_air_format(self.result.get('first_air_date'))
         self.media_info['media_type'] = ListType.SERIES.value
-        if self.result['origin_country'] == 'JP' or self.result['original_language'] == 'ja' \
-                and 16 in self.result['genre_ids']:
+        if self.result.get('origin_country') == 'JP' or self.result.get('original_language') == 'ja' \
+                and 16 in self.result.get('genre_ids'):
             self.media_info['media_type'] = ListType.ANIME.value
 
     def get_movies_dict(self):

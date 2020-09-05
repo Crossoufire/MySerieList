@@ -184,9 +184,7 @@ def media_sheet(media_type, media_id):
     if not media:
         if tmdb_id:
             try:
-                if list_type == ListType.SERIES:
-                    media = AddtoDB(media_id, list_type).add_tv_to_db()
-                elif list_type == ListType.ANIME:
+                if list_type != ListType.MOVIES:
                     media = AddtoDB(media_id, list_type).add_tv_to_db()
                 elif list_type == ListType.MOVIES:
                     media = AddtoDB(media_id, list_type).add_movies_to_db()
