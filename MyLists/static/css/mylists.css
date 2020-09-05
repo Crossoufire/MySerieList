@@ -133,7 +133,15 @@ hr {
 
 .ui-menu-item .ui-menu-item-wrapper.ui-state-active {
     background: #131418 !important;
-    border: solid white 1px;
+    border: solid grey 1px;
+}
+
+.ui-autocomplete-category {
+    background-color: #2b1818;
+    color: lightgray;
+    padding: 3px 0 3px 8px;
+    border-bottom: solid black 1px;
+    font-weight: 400;
 }
 
 .my-drop-toggle::after {

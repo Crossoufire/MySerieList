@@ -212,11 +212,11 @@ def get_updates(last_update):
         element_data["media_id"] = element.media_id
 
         if element.media_type == ListType.SERIES:
-            element_data["category"] = "series"
+            element_data["category"] = "Series"
         elif element.media_type == ListType.ANIME:
-            element_data["category"] = "anime"
+            element_data["category"] = "Anime"
         elif element.media_type == ListType.MOVIES:
-            element_data["category"] = "movie"
+            element_data["category"] = "Movies"
 
         update.append(element_data)
 

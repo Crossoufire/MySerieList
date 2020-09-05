@@ -10,9 +10,11 @@
 {% block data %}
     <h4><i class="fas fa-highlighter m-t-15"></i>&nbsp&nbspAll Updates</h4>
     <hr>
-    <a class="text-light" href="/account/{{ user_data['username'] }}">
-        <i class="fas fa-caret-left"></i>&nbsp&nbsp <b>Return to account</b>
-    </a>
+    <div class="m-b-30">
+         <a class="text-light" href="/account/{{ user_data['username'] }}">
+            <i class="fas fa-caret-left"></i>&nbsp&nbsp <b>Return to account</b>
+        </a>
+    </div>
     <div class="all_history ml-auto mr-auto" style="margin-top: -13px;">
         <table id="all_history" class="table text-light m-t-20 text-center ml-auto mr-auto">
             <thead>

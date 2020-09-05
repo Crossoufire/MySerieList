@@ -127,6 +127,7 @@ hr {
 
     .follow-btn-mobile {
         display: flex !important;
+        justify-content: center;
     }
 }
 
@@ -189,6 +190,7 @@ hr {
 
 .stat-text {
     font-size: 12pt;
+    color: lightgray;
 }
 
 .mini {
@@ -309,4 +311,13 @@ hr {
     font-size: 12px;
     line-height: 10px;
     text-align: right;
+}
+
+.truncate {
+    width: 100%;
+    margin-bottom: -8px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

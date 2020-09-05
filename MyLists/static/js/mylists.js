@@ -1,65 +1,80 @@
 
-
 // --- Autocomplete ---------------------------------------------------------
 $(function() {
-    $("#autocomplete").catcomplete({
-        delay: 200,
+    $('#autocomplete').catcomplete({
+        delay: 250,
         minLength: 2,
-        source: function(request, response) {
-            $.getJSON("/autocomplete", {
-                q: request.term,
-            },
-            function(data) {
-                response(data.search_results);
-            });
+        source: function (request, response){
+            $.getJSON("/autocomplete",
+                {
+                    q: request.term,
+                },
+                function (data) {
+                    response(data.search_results);
+                });
         },
-        select: function(event, ui) {
-            let form = document.createElement("form");
-            form.method = "POST";
-            form.action = "/media_sheet/"+ui.item.media_type+"/"+ui.item.tmdb_id+"?search=True";
+        select: function (event, ui){
+            let form = document.createElement('form');
+            form.method = 'POST';
+            if (ui.item.type === 'Movie') {
+                form.action = '/media_sheet/Movies/' + ui.item.tmdb_id + '?search=True';
+            } else if (ui.item.type === 'User') {
+                form.action = '/account/' + ui.item.display_name;
+            }
             document.body.appendChild(form);
             form.submit();
         }
     });
 });
-$.widget("custom.catcomplete", $.ui.autocomplete, {
-    "_renderItem": function(ul, item) {
-        ul.addClass('autocomplete-ul');
-        let media, $li;
-        if (item.media_type === "serieslist") {
-            media = 'TV Show';
-            item.media_type = 'Series';
+$.widget('custom.catcomplete', $.ui.autocomplete, {
+        _create: function (){
+            this._super();
+            this.widget().menu('option', 'items', '> :not(.ui-autocomplete-category)');
+        },
+        _renderMenu: function (ul, items) {
+            var that = this, categories = [];
+            $.each(items, function (index, item) {
+                if (categories.indexOf(item.category) < 0 && item.category !== null) {
+                    ul.append('<li class="ui-autocomplete-category">' + item.category + '</li>');
+                    categories.push(item.category);
+                }
+                that._renderItemData(ul, item);
+            });
+        },
+        _renderItemData(ul, item) {
+        return this._renderItem(ul, item).data("ui-autocomplete-item", item);
+        },
+        _renderItem: function (ul, item) {
+            ul.addClass('autocomplete-ul');
+            let $li, $img;
 
-        } else if (item.media_type === "animelist") {
-            media = 'Anime';
-            item.media_type = 'Anime';
-        } else {
-            media = 'Movie';
-            item.media_type = 'Movies';
-        }
-        if (item.nb_results === 0) {
-            let a = "No results found.";
-            $li = $('<li class="disabled bg-dark text-light p-l-5">'+ a + '</li>');
-        } else {
+            if (item.nb_results === 0) {
+                $li = $('<li class="disabled bg-dark text-light p-l-5">No results found.</li>')
+                return $li.appendTo(ul);
+            }
+
+            $img = '<img src="'+ item.image_cover +'" style="width: 50px; height: 75px;" alt="">'
+            if (item.category === 'Users') {
+                $img = '<img src="'+ item.image_cover +'" style="width: 50px; height: 50px;" alt="">'
+            }
+
             $li = $('<li class="bg-dark p-t-2 p-b-2" style="border-bottom: solid black 1px;">');
-
             $li.append(
                 '<div class="row">' +
                     '<div class="col" style="min-width: 60px; max-width: 60px;">' +
-                        '<img src="'+item.poster_path+'" alt="" style="width: 50px; height: 75px;">' +
+                        $img +
                     '</div>' +
-                    '<div class="col">' +
-                        '<a class="text-light">' + item.display_name +
-                            '<br>' +
-                            '<span style="font-size: 10pt;">' + media + ' | ' + item.first_air_date + '</span>' +
-                        '</a>' +
-                    '</div>' +
+                        '<div class="col">' +
+                            '<a class="text-light">' + item.display_name +
+                                '<br>' +
+                                '<span style="font-size: 10pt;">' + item.type + ' | ' + item.date + '</span>' +
+                            '</a>' +
+                        '</div>' +
                 '</div>');
-        }
 
-        return $li.appendTo(ul);
-    }
-});
+            return $li.appendTo(ul);
+        }
+    });
 
 
 // --- Notification ---------------------------------------------------------

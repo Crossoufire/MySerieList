@@ -2,9 +2,8 @@ import json
 
 from MyLists import app, db
 from datetime import datetime
-from MyLists.users.forms import AddFollowForm
 from flask_login import login_required, current_user
-from flask import Blueprint, url_for, flash, redirect, request, render_template, abort
+from flask import Blueprint, flash, redirect, request, render_template, abort
 from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications, RoleType
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
     get_knowledge_frame, get_updates, get_favorites, get_all_follows_data
@@ -19,33 +18,17 @@ def account(user_name):
     # Check if the user can see the <media_list>
     user = current_user.check_autorization(user_name)
 
-    # Add follows form
-    follow_form = AddFollowForm()
-    if follow_form.submit_follow.data and follow_form.validate():
-        follow_username = follow_form.follow_to_add.data
-        follow = User.query.filter_by(username=follow_username).first()
+    if request.form.get('all_follows'):
+        all_follows = get_all_follows_data(user)
+        user_data = get_user_data(user)
 
-        if not follow or follow.role == RoleType.ADMIN:
-            app.logger.info('[{}] Attempt to follow account {}'.format(current_user.id, follow_username))
-            flash('Sorry, this account does not exist', 'warning')
-            return redirect(url_for('users.account', user_name=current_user.username))
-        if current_user.id == follow.id:
-            flash("You cannot follow yourself", 'warning')
-            return redirect(url_for('users.account', user_name=current_user.username))
+        return render_template('all_follows.html', title='Follows', all_follows=all_follows, user_data=user_data)
+    elif request.form.get('all_history'):
+        updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
+        media_updates = get_updates(updates)
+        user_data = get_user_data(user)
 
-        current_user.add_follow(follow)
-
-        # Notify the followed user
-        payload = {'username': current_user.username,
-                   'message': '{} is following you.'.format(current_user.username)}
-        notif = Notifications(user_id=follow.id,
-                              payload_json=json.dumps(payload))
-        db.session.add(notif)
-
-        db.session.commit()
-        app.logger.info('[{}] is following the account with ID {}'.format(current_user.id, follow.id))
-        flash("You are now following: {}.".format(follow.username), 'success')
-        return redirect(url_for('users.account', user_name=current_user.username))
+        return render_template('all_history.html', title='History', media_updates=media_updates, user_data=user_data)
 
     # Recover user data
     user_data = get_user_data(user)
@@ -61,34 +44,8 @@ def account(user_name):
                            user_data=user_data,
                            favorites=favorites,
                            media_data=media_data,
-                           follow_form=follow_form,
                            follows_list=follows_list,
                            follows_update_list=follows_update_list)
-
-
-@bp.route("/account/all_history/<user_name>", methods=['GET', 'POST'])
-@login_required
-def all_history(user_name):
-    # Check if the user can see the <media_list>
-    user = current_user.check_autorization(user_name)
-
-    updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
-    media_updates = get_updates(updates)
-    user_data = get_user_data(user)
-
-    return render_template('all_history.html', title='Media History', media_updates=media_updates, user_data=user_data)
-
-
-@bp.route("/account/all_follows/<user_name>", methods=['GET', 'POST'])
-@login_required
-def all_follows(user_name):
-    # Check if the user can see the <media_list>
-    user = current_user.check_autorization(user_name)
-
-    all_follows = get_all_follows_data(user)
-    user_data = get_user_data(user)
-
-    return render_template('all_follows.html', title='Follows', all_follows=all_follows, user_data=user_data)
 
 
 @bp.route("/account/more_stats/<user_name>", methods=['GET', 'POST'])

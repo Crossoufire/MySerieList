@@ -181,14 +181,13 @@ def get_total_eps(user, eps_per_season):
 
 
 def refresh_element_data(api_id, list_type):
+    media_data = ApiData().get_details_and_credits_data(api_id, list_type)
     if list_type != ListType.MOVIES:
-        media_data = ApiData().get_details_and_credits_data(api_id, list_type)
-        data = MediaDetails(media_data, list_type, updating=True).get_tv_details()
+        data = MediaDetails(media_data, list_type, updating=True).get_media_details()
         if not data['tv_data']:
             return None
     elif list_type == ListType.MOVIES:
-        media_data = ApiData().get_details_and_credits_data(api_id, list_type)
-        data = MediaDetails(media_data, list_type, updating=True).get_movies_details()
+        data = MediaDetails(media_data, list_type, updating=True).get_media_details()
         if not data['movies_data']:
             return None
 

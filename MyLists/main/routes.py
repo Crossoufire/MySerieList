@@ -7,13 +7,13 @@ from MyLists.API_data import ApiData
 from MyLists.main.add_db import AddtoDB
 from flask_login import login_required, current_user
 from MyLists.main.forms import EditMediaData, MediaComment
-from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete
+from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
     save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, RoleType, MoviesGenre, MediaType, \
-    get_media_query, get_next_airing, check_media
+    get_media_query, get_next_airing, check_media, User
 
 bp = Blueprint('main', __name__)
 
@@ -166,6 +166,7 @@ def media_sheet(media_type, media_id):
 
     # Check if <media_id> came from TMDB and if in local DB
     tmdb_id = request.args.get('search')
+
     if tmdb_id:
         search = {'themoviedb_id': media_id}
     else:
@@ -184,10 +185,9 @@ def media_sheet(media_type, media_id):
     if not media:
         if tmdb_id:
             try:
-                if list_type != ListType.MOVIES:
-                    media = AddtoDB(media_id, list_type).add_tv_to_db()
-                elif list_type == ListType.MOVIES:
-                    media = AddtoDB(media_id, list_type).add_movies_to_db()
+                media_api_data = ApiData().get_details_and_credits_data(media_id, list_type)
+                media_details = MediaDetails(media_api_data, list_type).get_media_details()
+                media = AddtoDB(media_details, list_type).add_media_to_db()
             except Exception as e:
                 app.logger.error('[ERROR] - Occured trying to add media ({}) ID [{}] to DB: {}'
                                  .format(list_type.value, media_id, e))
@@ -938,27 +938,36 @@ def lock_media():
 def autocomplete():
     search = request.args.get('q')
 
+    # Get the users results
+    users = User.query.filter(User.username.like('%'+search+'%'), User.active == True).all()
+    users_results = []
+    for user in users:
+        users_results.append(Autocomplete(user).get_user_dict())
+
     try:
-        data = ApiData().TMDb_search(search)
+        media_data = ApiData().TMDb_search(search)
     except Exception as e:
+        media_data = {}
         app.logger.error('[ERROR] - Requesting the TMDB API: {}'.format(e))
-        return jsonify(search_results=[{'nb_results': 0}]), 200
 
-    if data.get("total_results", 0) == 0:
-        return jsonify(search_results=[{'nb_results': 0}]), 200
+    # Get the media results
+    media_results = []
+    if media_data.get('total_results', 0) or 0 > 0:
+        for i, result in enumerate(media_data["results"]):
+            if i >= media_data["total_results"] or i > 19 or len(media_results) >= 7:
+                break
+            if result.get('known_for_department'):
+                continue
+            media_results.append(Autocomplete(result).get_autocomplete_dict())
 
-    # people = User.query.filter(User.username.like('%'+search+'%')).all()
-    # print(people)
+    # Create the <total_results> list
+    total_results = media_results + users_results
+    if len(total_results) == 0:
+        return jsonify(search_results=[{'nb_results': 0, 'category': None}]), 200
 
-    results = []
-    for i, result in enumerate(data["results"]):
-        if i >= data["total_results"] or i > 19 or len(results) >= 7:
-            break
-        if result.get('known_for_department'):
-            continue
-        results.append(Autocomplete(result).get_autocomplete_dict())
+    total_results = sorted(total_results, key=lambda i: i['category'])
 
-    return jsonify(search_results=results), 200
+    return jsonify(search_results=total_results), 200
 
 
 @bp.route('/read_notifications', methods=['GET'])

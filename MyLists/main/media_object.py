@@ -241,13 +241,9 @@ class MediaDetails:
     def __init__(self, media_data, list_type, updating=False):
         self.media_data = media_data
         self.list_type = list_type
-        self.media_details = {}
         self.updating = updating
-
-        if list_type != ListType.MOVIES:
-            self.get_tv_details()
-        elif list_type == ListType.MOVIES:
-            self.get_movies_details()
+        self.media_details = {}
+        self.all_data = {}
 
     def get_media_cover(self):
         media_cover_path = self.media_data.get('poster_path') or None
@@ -379,10 +375,9 @@ class MediaDetails:
                     break
 
     def get_collection_info(self):
-        collection_id = self.media_data.get("belongs_to_collection") or None
 
-        def get_collection_data(collection_id):
-            collection_data = ApiData().get_collection_data(collection_id)
+        def get_collection_data(co_id):
+            collection_data = ApiData().get_collection_data(co_id)
 
             collection_cover_path = collection_data.get('poster_path') or None
             collection_cover_name = 'default.jpg'
@@ -395,13 +390,15 @@ class MediaDetails:
                     app.logger.error('[ERROR] - Trying to recover the poster for collection: {}'.format(e))
                     collection_cover_name = 'default.jpg'
 
-            collection_info = {'collection_id': collection_id,
+            collection_info = {'collection_id': co_id,
                                'parts': len(collection_data.get('parts')),
                                'name': collection_data.get('name', 'Unknown') or 'Unknown',
                                'poster': collection_cover_name,
                                'overview': collection_data.get('overview')}
 
             return collection_info
+
+        collection_id = self.media_data.get("belongs_to_collection") or None
 
         self.media_details['collection_id'] = None
         collection_info = None
@@ -446,14 +443,12 @@ class MediaDetails:
             if self.list_type == ListType.ANIME:
                 a_genres_list = self.get_anime_genres()
 
-        all_data = {'tv_data': self.media_details,
-                    'seasons_data': seasons_list,
-                    'genres_data': genres_list,
-                    'anime_genres_data': a_genres_list,
-                    'actors_data': actors_list,
-                    'networks_data': networks_list}
-
-        return all_data
+        self.all_data = {'tv_data': self.media_details,
+                         'seasons_data': seasons_list,
+                         'genres_data': genres_list,
+                         'anime_genres_data': a_genres_list,
+                         'actors_data': actors_list,
+                         'networks_data': networks_list}
 
     def get_movies_details(self):
         self.media_details = {'name': self.media_data.get('title', 'Unknown') or 'Unknown',
@@ -482,51 +477,70 @@ class MediaDetails:
             genres_list = self.get_genres()
             actors_list = self.get_actors()
 
-        all_data = {'movies_data': self.media_details,
-                    'collection_info': collection_info,
-                    'genres_data': genres_list,
-                    'actors_data': actors_list}
+        self.all_data = {'movies_data': self.media_details,
+                         'collection_info': collection_info,
+                         'genres_data': genres_list,
+                         'actors_data': actors_list}
 
-        return all_data
+    def get_media_details(self):
+        if self.list_type != ListType.MOVIES:
+            self.get_tv_details()
+        elif self.list_type == ListType.MOVIES:
+            self.get_movies_details()
+
+        return self.all_data
 
 
 class Autocomplete:
     def __init__(self, result):
         self.tmdb_cover_link = "http://image.tmdb.org/t/p/w300"
         self.result = result
-        self.media_info = {}
+        self.info = {}
 
     def get_autocomplete_dict(self):
-        self.media_info['tmdb_id'] = self.result.get('id')
+        self.info['tmdb_id'] = self.result.get('id')
 
-        self.media_info['poster_path'] = url_for('static', filename="covers/series_covers/default.jpg")
+        self.info['image_cover'] = url_for('static', filename="covers/series_covers/default.jpg")
         if self.result.get('poster_path'):
-            self.media_info['poster_path'] = "{}{}".format(self.tmdb_cover_link, self.result.get('poster_path'))
+            self.info['image_cover'] = "{}{}".format(self.tmdb_cover_link, self.result.get('poster_path'))
 
         if self.result.get('media_type') == 'tv':
             self.get_tv_dict()
         elif self.result.get('media_type') == 'movie':
             self.get_movies_dict()
 
-        return self.media_info
+        return self.info
+
+    def get_user_dict(self):
+        self.info = {'display_name': self.result.username,
+                     'image_cover': '/static/profile_pics/' + self.result.image_file,
+                     'date': datetime.strftime(self.result.activated_on, '%d %b %Y'),
+                     'category': 'Users',
+                     'type': 'User'}
+
+        return self.info
 
     def get_tv_dict(self):
-        return_latin = latin_alphabet(self.result.get('original_name'))
-        self.media_info["display_name"] = self.result.get('name')
-        if return_latin is True:
-            self.media_info["display_name"] = self.result.get('original_name')
+        self.info['category'] = 'Series/Anime'
 
-        self.media_info["first_air_date"] = change_air_format(self.result.get('first_air_date'))
-        self.media_info['media_type'] = ListType.SERIES.value
+        return_latin = latin_alphabet(self.result.get('original_name'))
+        self.info['display_name'] = self.result.get('name')
+        if return_latin is True:
+            self.info['display_name'] = self.result.get('original_name')
+
+        self.info['date'] = change_air_format(self.result.get('first_air_date'))
+        self.info['type'] = 'Series'
         if self.result.get('origin_country') == 'JP' or self.result.get('original_language') == 'ja' \
                 and 16 in self.result.get('genre_ids'):
-            self.media_info['media_type'] = ListType.ANIME.value
+            self.info['type'] = 'Anime'
 
     def get_movies_dict(self):
-        return_latin = latin_alphabet(self.result.get('original_title'))
-        self.media_info["display_name"] = self.result.get('title')
-        if return_latin is True:
-            self.media_info["display_name"] = self.result.get('original_title')
+        self.info['category'] = 'Movies'
 
-        self.media_info["first_air_date"] = change_air_format(self.result.get('release_date'))
-        self.media_info['media_type'] = ListType.MOVIES.value
+        return_latin = latin_alphabet(self.result.get('original_title'))
+        self.info['display_name'] = self.result.get('title')
+        if return_latin is True:
+            self.info['display_name'] = self.result.get('original_title')
+
+        self.info['date'] = change_air_format(self.result.get('release_date'))
+        self.info['type'] = 'Movie'

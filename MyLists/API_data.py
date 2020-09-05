@@ -30,10 +30,10 @@ class ApiData:
 
     def get_details_and_credits_data(self, api_id, list_type):
         if list_type != ListType.MOVIES:
-            response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}&append_to_response=credits"
+            response = requests.get("https://api.themoviedb.org/3/tv/{}?api_key={}&append_to_response=credits"
                                     .format(api_id, self.tmdb_api_key))
         elif list_type == ListType.MOVIES:
-            response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}&append_to_response=credits"
+            response = requests.get("https://api.themoviedb.org/3/movie/{}?api_key={}&append_to_response=credits"
                                     .format(api_id, self.tmdb_api_key))
 
         self.status_code(response.status_code)
