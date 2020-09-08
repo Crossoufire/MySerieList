@@ -1,14 +1,14 @@
 
 /* --- Main CSS ----------------------------------------- */
-ul {
-    list-style: none;
-}
 
 hr {
     border-top: 1px solid rgba(44, 57, 70, 1);
     margin-top: 1px;
 }
 
+a {
+    color: lightgray;
+}
 
 /* --- Header ------------------------------------------- */
 .header-container {
@@ -193,10 +193,6 @@ hr {
     color: lightgray;
 }
 
-.mini {
-    min-width: 105px;
-}
-
 .update-box {
     padding: 0 8px 8px 8px;
 }
@@ -243,9 +239,6 @@ hr {
     .stat-text {
         font-size: 10pt;
     }
-    .mini {
-        min-width: 100px;
-    }
     .account-wrapper {
         padding-left: 10px;
         padding-right: 10px;
@@ -255,16 +248,15 @@ hr {
     }
 }
 
-
 /*!* --- Levels ------------------------------------------- *!*/
-/*.account-bar-wrapper {*/
-/*    width: 100%;*/
-/*}*/
+.account-bar-wrapper {
+    width: 100%;
+}
 
-/*.account-bar {*/
-/*    height: 100%;*/
-/*    margin: 0 auto;*/
-/*}*/
+.account-bar {
+    height: 100%;
+    margin: 0 auto;
+}
 
 .account-bar-name {
     font-size: 12pt;
@@ -277,6 +269,7 @@ hr {
     font-size: 12pt;
     margin: 0 0 0;
     display: inline-block;
+    vertical-align: bottom;
 }
 
 #series-level {

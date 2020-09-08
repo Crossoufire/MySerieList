@@ -39,7 +39,7 @@ def account(user_name):
     # Recover the Favorites
     favorites = get_favorites(user.id)
 
-    return render_template('account-tst.html',
+    return render_template('account.html',
                            title=user.username+"'s account",
                            user_data=user_data,
                            favorites=favorites,

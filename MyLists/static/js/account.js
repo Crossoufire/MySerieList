@@ -1,6 +1,6 @@
 
 
-// --- Follow status ----------------------------------------------
+// --- Follow status -------------------------------------------------------------------------------------
 function follow_status(follow_id) {
     let status;
     let $follow_button = $('.follow-btn');
@@ -38,7 +38,7 @@ function follow_status(follow_id) {
 }
 
 
-// --- On document load --------------------------------------------
+// --- On document load -----------------------------------------------------------------------------------
 $(document).ready(function() {
     // --- Time spent data -------------------------------------
     let time_data = $('#time-spent-pie').attr('values').split(', ');
