@@ -256,15 +256,15 @@ hr {
 }
 
 
-/* --- Levels ------------------------------------------- */
-.account-bar-wrapper {
-    width: 100%;
-}
+/*!* --- Levels ------------------------------------------- *!*/
+/*.account-bar-wrapper {*/
+/*    width: 100%;*/
+/*}*/
 
-.account-bar {
-    height: 100%;
-    margin: 0 auto;
-}
+/*.account-bar {*/
+/*    height: 100%;*/
+/*    margin: 0 auto;*/
+/*}*/
 
 .account-bar-name {
     font-size: 12pt;
