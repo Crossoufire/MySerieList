@@ -39,10 +39,9 @@ def mymedialist(media_list, user_name):
     search = request.args.get('query')
     filter_val = request.args.get('filter', 'check')
     option = request.args.get('option', None)
-    if list_type != ListType.MOVIES:
-        category = request.args.get('category', 'Watching')
-        html_template = 'medialist_tv.html'
-    elif list_type == ListType.MOVIES:
+    html_template = 'medialist_tv.html'
+    category = request.args.get('category', 'Watching')
+    if list_type == ListType.MOVIES:
         category = request.args.get('category', 'Completed')
         html_template = 'medialist_movies.html'
 
@@ -500,11 +499,13 @@ def update_element_season():
     # Get the old data
     old_season = media[1].current_season
     old_episode = media[1].last_episode_watched
+    old_eps_watched = sum(media[0].eps_per_season[:old_season-1]) + old_episode
 
     # Set the new data
     media[1].current_season = new_season
     media[1].last_episode_watched = 1
-    app.logger.info('[User {}] {} [ID {}] season updated from {} to {}'
+    media[1].episodes_watched = sum(media[0].eps_per_season[:new_season-1]) + 1
+    app.logger.info('[User {}] - [Media {}] - [ID {}] season updated from {} to {}'
                     .format(current_user.id, list_type.value.replace('list', ''), media_id, old_season, new_season))
 
     # Commit the changes
@@ -555,6 +556,7 @@ def update_element_episode():
 
     # Set the new data
     media[1].last_episode_watched = new_episode
+    media[1].episodes_watched = sum(media[0].eps_per_season[:old_season-1]) + new_episode
     app.logger.info('[User {}] {} [ID {}] episode updated from {} to {}'
                     .format(current_user.id, list_type.value.replace('list', ''), media_id, old_episode, new_episode))
 

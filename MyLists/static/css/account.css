@@ -84,6 +84,7 @@ a {
 
 .follow-btn-mobile {
     display: none !important;
+    text-align: center;
 }
 
 @media (max-width: 490px) {

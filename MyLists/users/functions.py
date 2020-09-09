@@ -8,7 +8,7 @@ from sqlalchemy import func, text
 from flask_login import current_user
 from _collections import OrderedDict
 from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
-    AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, Movies, Ranks, followers, Frames, SeriesGenre
+    AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, Movies, Ranks, followers, Frames, SeriesGenre, RoleType
 
 
 def get_media_count(user_id, list_type):
@@ -213,10 +213,16 @@ def get_updates(last_update):
 
         if element.media_type == ListType.SERIES:
             element_data["category"] = "Series"
+            element_data["icon-color"] = "fas fa-tv text-series"
+            element_data["border"] = "#216e7d"
         elif element.media_type == ListType.ANIME:
             element_data["category"] = "Anime"
+            element_data["icon-color"] = "fas torii-gate text-anime"
+            element_data["border"] = "#945141"
         elif element.media_type == ListType.MOVIES:
             element_data["category"] = "Movies"
+            element_data["icon-color"] = "fas fa-film text-movies"
+            element_data["border"] = "#8c7821"
 
         update.append(element_data)
 
@@ -226,43 +232,47 @@ def get_updates(last_update):
 # ----------------------------------------------------------------------------------------------------------
 
 
-def get_user_data(user):
-    # Recover the view count of the account and the media lists
-    if current_user.id != 1 and user.id != current_user.id:
-        user.profile_views += 1
-        profile_view_count = user.profile_views
-        db.session.commit()
-    else:
-        profile_view_count = user.profile_views
-    view_count = {"profile": profile_view_count,
-                  "series": user.series_views,
-                  "anime": user.anime_views,
-                  "movies": user.movies_views}
-
+def get_header_data(user):
     # Check if the current user follows the user's account
+    isfollowing = False
     if user.id != current_user.id and current_user.is_following(user):
         isfollowing = True
-    else:
-        isfollowing = False
 
-    # Recover the number of person that follows you
+    # Recover the number of person that follows the user
     followers = user.followers.count()
 
     # Recover the knowledge frame and level of the user
     knowledge_info = get_knowledge_frame(user)
 
+    # Header info
+    header_data = {"id": str(user.id),
+                   "username": user.username,
+                   "profile_picture": url_for('static', filename='profile_pics/{0}'.format(user.image_file)),
+                   "register": user.registered_on.strftime("%d %b %Y"),
+                   "followers": followers,
+                   "isfollowing": isfollowing,
+                   "knowledge_info": knowledge_info}
+
+    return header_data
+
+
+def get_user_data(user):
+    # Recover the view count of the account and the media lists
+    profile_view_count = user.profile_views
+    if current_user.role != RoleType.ADMIN and user.id != current_user.id:
+        user.profile_views += 1
+        profile_view_count = user.profile_views
+        db.session.commit()
+    view_count = {"profile": profile_view_count,
+                  "series": user.series_views,
+                  "anime": user.anime_views,
+                  "movies": user.movies_views}
+
     # Recover the overview user's last update
     last_update = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).limit(7)
     media_update = get_updates(last_update)
 
-    user_data = {"id": str(user.id),
-                 "username": user.username,
-                 "profile_picture": url_for('static', filename='profile_pics/{0}'.format(user.image_file)),
-                 "register": user.registered_on.strftime("%d %b %Y"),
-                 "followers": followers,
-                 "isfollowing": isfollowing,
-                 "knowledge_info": knowledge_info,
-                 "media_update": media_update,
+    user_data = {"media_update": media_update,
                  "view_count": view_count}
 
     return user_data
@@ -280,10 +290,9 @@ def get_media_data(user):
         media_score = get_media_score(user.id, list_type[1])
         media_time = list_type[2]
 
+        media_total_eps = None
         if list_type[1] != ListType.MOVIES:
             media_total_eps = get_media_total_eps(user.id, list_type[1])
-        else:
-            media_total_eps = None
 
         # Each media_data dict contains all the data for one type of media
         media_data = {'time_spent_hour': round(media_time/60),

@@ -6,8 +6,7 @@ from flask_login import login_required, current_user
 from flask import Blueprint, flash, redirect, request, render_template, abort
 from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications, RoleType
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
-    get_knowledge_frame, get_updates, get_favorites, get_all_follows_data
-
+    get_knowledge_frame, get_updates, get_favorites, get_all_follows_data, get_header_data
 
 bp = Blueprint('users', __name__)
 
@@ -18,11 +17,12 @@ def account(user_name):
     # Check if the user can see the <media_list>
     user = current_user.check_autorization(user_name)
 
+    # Recover the account header data
+    header_data = get_header_data(user)
+
     if request.form.get('all_follows'):
         all_follows = get_all_follows_data(user)
-        user_data = get_user_data(user)
-
-        return render_template('all_follows.html', title='Follows', all_follows=all_follows, user_data=user_data)
+        return render_template('all_follows.html', title='Follows', all_follows=all_follows, header_data=header_data)
     elif request.form.get('all_history'):
         updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
         media_updates = get_updates(updates)
@@ -41,6 +41,7 @@ def account(user_name):
 
     return render_template('account.html',
                            title=user.username+"'s account",
+                           header_data=header_data,
                            user_data=user_data,
                            favorites=favorites,
                            media_data=media_data,

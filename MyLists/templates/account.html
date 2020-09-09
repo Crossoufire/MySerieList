@@ -3,20 +3,20 @@
 
 {% block data %}
     <div class="account-wrapper m-b-60">
-        {% if user_data['id'] != current_user.get_id() %}
-            <div class="follow-btn-mobile text-center">
+        {% if header_data['id'] != current_user.get_id() %}
+            <div class="follow-btn-mobile">
                 {% if user_data["isfollowing"] %}
                     <button class="btn btn-sm btn-dark follow-btn" value="1"
-                            onclick="follow_status('{{ user_data['id'] }}')">
+                    onclick="follow_status('{{ header_data['id'] }}')">
                         Unfollow
                     </button>
                 {% else %}
                     <button class="btn btn-sm btn-primary follow-btn" value="0"
-                            onclick="follow_status('{{ user_data['id'] }}')">Follow
+                    onclick="follow_status('{{ header_data['id'] }}')">
+                        Follow
                     </button>
                 {% endif %}
-                <img class="loading-follow m-t-11" style="display: none;" height="20" width="20"
-                     src="/static/img/loading.webp" alt=""/>
+                <i class="fas fa-spinner fast-spin loading-follow" style="display: none;"></i>
             </div>
         {% endif %}
         <div class="row m-t-15">
@@ -30,7 +30,7 @@
                                 <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
                                      title="{{ media_data['series']['media_levels']['grade_title'] }}"
                                      src="{{ media_data['series']['media_levels']['grade_id'] }}.png" alt=""/>
-                                <a class="account-bar-name text-light" href="/serieslist/{{ user_data['username'] }}">Series</a>
+                                <a class="account-bar-name text-light" href="/serieslist/{{ header_data['username'] }}">Series</a>
                                 <div id="series-level" class='account-bar-level'>
                                     Level {{ '%02d'|format(media_data['series']['media_levels']['level']) }}
                                 </div>
@@ -49,7 +49,7 @@
                                 <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
                                      title="{{ media_data['anime']['media_levels']['grade_title'] }}"
                                      src="{{ media_data['anime']['media_levels']['grade_id'] }}.png"/>
-                                <a class="account-bar-name text-light" href="/animelist/{{ user_data['username'] }}">Anime</a>
+                                <a class="account-bar-name text-light" href="/animelist/{{ header_data['username'] }}">Anime</a>
                                 <div id="anime-level" class='account-bar-level'>
                                     Level {{ '%02d' | format(media_data['anime']['media_levels']['level']) }}</div>
                                 <div class='xp-bar' data-toggle="tooltip"
@@ -67,7 +67,7 @@
                                 <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
                                      title="{{ media_data['movies']['media_levels']['grade_title'] }}"
                                      src="{{ media_data['movies']['media_levels']['grade_id'] }}.png"/>
-                                <a class="account-bar-name text-light" href="/movieslist/{{ user_data['username'] }}">Movies</a>
+                                <a class="account-bar-name text-light" href="/movieslist/{{ header_data['username'] }}">Movies</a>
                                 <div id="movies-level" class='account-bar-level'>
                                     Level {{ '%02d' |format(media_data['movies']['media_levels']['level']) }}
                                 </div>
@@ -85,7 +85,7 @@
                     <li class="m-b-20">
                         <h4>
                             <i class="fas fa-highlighter text-light"></i>&nbsp;&nbsp; Updates
-                            <form id='all_history' style="display: inline;" method="POST" action="/account/{{ user_data['username'] }}">
+                            <form id='all_history' style="display: inline;" method="POST" action="/account/{{ header_data['username'] }}">
                                 <input style='display: none;' name="all_history" value="True">
                                 <a onclick="$('#all_history').submit()" class='fs-15 m-t-10 m-r-2' style='float: right;
                                  color: grey;'>
@@ -95,47 +95,34 @@
                         </h4>
                         <hr class='m-b-8'>
                         {% for update in user_data['media_update'] %}
-                            {% if update['category'] == 'Series' %}
-                                <div class="update-box m-b-5" style="border-bottom: solid 1px #216e7d;">
-                                    <a class="text-light truncate" href="/media_sheet/Series/{{ update['media_id'] }}">
-                                        <i class="fas fa-tv text-series m-r-10" data-toggle="tooltip" title="Series"></i>
-                                        {{ update['media_name'] }}
-                                    </a>
-                            {% elif update['category'] == 'Anime' %}
-                                <div class="update-box m-b-5" style="border-bottom: solid 1px #945141;">
-                                    <a class="text-light truncate" href="/media_sheet/Anime/{{ update['media_id'] }}">
-                                        <i class="fas fa-torii-gate text-anime m-r-14" data-toggle="tooltip" title="Anime"></i>
-                                        {{ update['media_name'] }}
-                                    </a>
-                            {% elif update['category'] == 'Movies' %}
-                                <div class="update-box m-b-5" style="border-bottom: solid 1px #8c7821;">
-                                    <a class="text-light truncate" href="/media_sheet/Movies/{{ update['media_id'] }}">
-                                        <i class="fas fa-film text-movies m-r-12" data-toggle="tooltip" title="Movie"></i>
-                                        {{ update['media_name'] }}
-                                    </a>
-                            {% endif %}
-                                    <div class="m-l-35" style="font-size: 11pt;">
-                                        {% if update['update']|length == 2 %}
-                                            {{ update['update'][0] }} <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
-                                            {{ update['update'][1] }}
-                                        {% else %}
-                                            {{ update['update'][0] }}
-                                        {% endif %}
-                                    </div>
-                                    <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
-                                        <script type="text/javascript">
-                                            var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-                                            var localdate = new Date("{{update['date']}}").toLocaleString("en-GB", {timeZone: tz});
-                                            var d = new Date("{{ update['date'] }}")
-                                            var month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
-                                                "Nov", "Dec"];
-                                            var date_month = month[d.getMonth()];
-                                            var date_day = localdate.slice(0, 2);
-                                            var date_time = localdate.slice(11, 17)
-                                            document.write(date_day + " " + date_month + " at " + date_time)
-                                        </script>
-                                    </span>
+                            <div class="update-box m-b-5" style="border-bottom: solid 1px {{ update['border'] }};">
+                                <a class="text-light truncate" href="/media_sheet/{{ update['category'] }}/{{ update['media_id'] }}">
+                                    <i class="{{ update['icon-color'] }} m-r-10" data-toggle="tooltip"
+                                       title="{{ update['category'] }}"></i>
+                                    {{ update['media_name'] }}
+                                </a>
+                                <div class="m-l-35" style="font-size: 11pt;">
+                                    {% if update['update']|length == 2 %}
+                                        {{ update['update'][0] }} <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
+                                        {{ update['update'][1] }}
+                                    {% else %}
+                                        {{ update['update'][0] }}
+                                    {% endif %}
                                 </div>
+                                <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
+                                    <script type="text/javascript">
+                                        var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+                                        var localdate = new Date("{{update['date']}}").toLocaleString("en-GB", {timeZone: tz});
+                                        var d = new Date("{{ update['date'] }}")
+                                        var month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
+                                            "Nov", "Dec"];
+                                        var date_month = month[d.getMonth()];
+                                        var date_day = localdate.slice(0, 2);
+                                        var date_time = localdate.slice(11, 17)
+                                        document.write(date_day + " " + date_month + " at " + date_time)
+                                    </script>
+                                </span>
+                            </div>
                         {% endfor %}
                     </li>
                     <li class="m-b-20">
@@ -166,7 +153,7 @@
                                     <div class="col-2">{{ user_data['view_count']["movies"] }}</div>
                                 </div>
                             </li>
-                            {% if user_data['id'] == current_user.get_id() %}
+                            {% if header_data['id'] == current_user.get_id() %}
                                 <li class="m-b-10">
                                     <a class="text-light" href="{{ url_for('users.level_grade_data') }}"
                                        target="_blank">
@@ -179,7 +166,7 @@
                                     </a>
                                 </li>
                             {% endif %}
-                            {% if user_data['id'] == current_user.get_id() and current_user.role.value != 'user' %}
+                            {% if header_data['id'] == current_user.get_id() and current_user.role.value != 'user' %}
                                 <li class="m-b-10">
                                     Refresh APScheduler:
                                     <a class="btn btn-sm btn-primary" href="{{ url_for('users.apscheduler_info') }}">
@@ -272,7 +259,7 @@
                     <li class="m-b-20">
                         <div class="stats-size">
                             <h5 class="text-center mb-2">
-                                <a class="text-light" href="/serieslist/{{ user_data['username'] }}">
+                                <a class="text-light" href="/serieslist/{{ header_data['username'] }}">
                                     <b>SERIES</b>
                                 </a>
                             </h5>
@@ -328,31 +315,31 @@
                                 </figure>
                                 <div class="row p-t-5 stat-text">
                                     <div class="col-4">
-                                        <a href="/serieslist/{{ user_data['username'] }}?category=Watching">Watching:</a>
+                                        <a href="/serieslist/{{ header_data['username'] }}?category=Watching">Watching:</a>
                                     </div>
                                     <div class="col-2">
                                         <span>{{ media_data['series']['media_count']['Watching']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a href="/serieslist/{{ user_data['username'] }}?category=Dropped">Dropped:</a>
+                                        <a href="/serieslist/{{ header_data['username'] }}?category=Dropped">Dropped:</a>
                                     </div>
                                     <div class="col-2">
                                         <span>{{ media_data['series']['media_count']['Dropped']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a href="/serieslist/{{ user_data['username'] }}?category=Completed">Completed:</a>
+                                        <a href="/serieslist/{{ header_data['username'] }}?category=Completed">Completed:</a>
                                     </div>
                                     <div class="col-2">
                                         <span>{{ media_data['series']['media_count']['Completed']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a href="/serieslist/{{ user_data['username'] }}?category=Plan to Watch">P. to Watch:</a>
+                                        <a href="/serieslist/{{ header_data['username'] }}?category=Plan to Watch">P. to Watch:</a>
                                     </div>
                                     <div class="col-2">
                                         <span>{{ media_data['series']['media_count']['Plan to Watch']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a href="/serieslist/{{ user_data['username'] }}?category=On Hold">On Hold:</a>
+                                        <a href="/serieslist/{{ header_data['username'] }}?category=On Hold">On Hold:</a>
                                     </div>
                                     <div class="col-2">
                                         <span>{{ media_data['series']['media_count']['On Hold']['count'] }}</span>
@@ -364,7 +351,7 @@
                                         <span>{{ media_data['series']['media_count']['total'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a href="/serieslist/{{ user_data['username'] }}?category=Random">Random:</a>
+                                        <a href="/serieslist/{{ header_data['username'] }}?category=Random">Random:</a>
                                     </div>
                                     <div class="col-2">
                                         <span>{{ media_data['series']['media_count']['Random']['count'] }}</span>
@@ -377,7 +364,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <b>Favorites ({{ favorites[0]|length }}):</b>
+                            <a href="/serieslist/{{ header_data['username'] }}?category=Favorites">
+                                <b>Favorites ({{ favorites[0]|length }}):</b>
+                            </a>
                             <div class="row m-b-16">
                                 <div class="col">
                                     {% for favorite in favorites[0] %}
@@ -394,7 +383,7 @@
                         <hr>
                         <div class="stats-size">
                             <h5 class="text-center mb-2">
-                                <a class="text-light" href="/animelist/{{ user_data['username'] }}">
+                                <a class="text-light" href="/animelist/{{ header_data['username'] }}">
                                     <b>ANIME</b>
                                 </a>
                             </h5>
@@ -443,14 +432,14 @@
                                 </figure>
                                 <div class="row stat-text p-t-5">
                                     <div class="col-4">
-                                        <a href="/animelist/{{ user_data['username'] }}?category=Watching">Watching:</a>
+                                        <a href="/animelist/{{ header_data['username'] }}?category=Watching">Watching:</a>
                                     </div>
                                     <div class="col-2">
                                         <span class="stat-text">{{ media_data['anime']['media_count']['Watching']
                                         ['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a class="stat-text" href="/animelist/{{ user_data['username'] }}?category=Dropped">
+                                        <a class="stat-text" href="/animelist/{{ header_data['username'] }}?category=Dropped">
                                             Dropped:
                                         </a>
                                     </div>
@@ -459,7 +448,7 @@
                                         ['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a class="stat-text" href="/animelist/{{ user_data['username'] }}?category=Completed">
+                                        <a class="stat-text" href="/animelist/{{ header_data['username'] }}?category=Completed">
                                             Completed:
                                         </a>
                                     </div>
@@ -468,7 +457,7 @@
                                         ['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a class="stat-text" href="/animelist/{{ user_data['username'] }}?category=Plan to Watch">
+                                        <a class="stat-text" href="/animelist/{{ header_data['username'] }}?category=Plan to Watch">
                                             P. to Watch:
                                         </a>
                                     </div>
@@ -477,7 +466,7 @@
                                         ['Plan to Watch']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a class="stat-text" href="/animelist/{{ user_data['username'] }}?category=On Hold">
+                                        <a class="stat-text" href="/animelist/{{ header_data['username'] }}?category=On Hold">
                                             On Hold:
                                         </a>
                                     </div>
@@ -495,7 +484,7 @@
                                             {{ media_data['anime']['media_count']['total'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a class="stat-text" href="/animelist/{{ user_data['username'] }}?category=Random">
+                                        <a class="stat-text" href="/animelist/{{ header_data['username'] }}?category=Random">
                                             Random:
                                         </a>
                                     </div>
@@ -511,7 +500,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <b>Favorites ({{ favorites[1]|length }}):</b>
+                            <a href="/animelist/{{ header_data['username'] }}?category=Favorites">
+                                <b>Favorites ({{ favorites[1]|length }}):</b>
+                            </a>
                             <div class="row m-b-16">
                                 <div class="col">
                                     {% for favorite in favorites[1] %}
@@ -528,7 +519,7 @@
                         <hr>
                         <div class="stats-size">
                             <h5 class="text-center mb-2">
-                                <a class="text-light" href="/movieslist/{{ user_data['username'] }}">
+                                <a class="text-light" href="/movieslist/{{ header_data['username'] }}">
                                     <b>MOVIES</b>
                                 </a>
                             </h5>
@@ -567,19 +558,19 @@
                                 </figure>
                                 <div class="row stat-text p-t-5">
                                     <div class="col-4">
-                                        <a href="/movieslist/{{ user_data['username'] }}?category=Completed">Completed:</a>
+                                        <a href="/movieslist/{{ header_data['username'] }}?category=Completed">Completed:</a>
                                     </div>
                                     <div class="col-2">
                                         <span>{{ media_data['movies']['media_count']['Completed']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a href="/movieslist/{{ user_data['username'] }}?category=Plan to Watch">P. to Watch:</a>
+                                        <a href="/movieslist/{{ header_data['username'] }}?category=Plan to Watch">P. to Watch:</a>
                                     </div>
                                     <div class="col-2">
                                         <span>{{ media_data['movies']['media_count']['Plan to Watch']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a href="/movieslist/{{ user_data['username'] }}?category=Completed Animation">
+                                        <a href="/movieslist/{{ header_data['username'] }}?category=Completed Animation">
                                             Completed Anime:
                                         </a>
                                     </div>
@@ -595,7 +586,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <b>Favorites ({{ favorites[2]|length }}):</b>
+                            <a href="/movieslist/{{ header_data['username'] }}?category=Favorites">
+                                <b>Favorites ({{ favorites[2]|length }}):</b>
+                            </a>
                             <div class="row m-b-16">
                                 <div class="col">
                                     {% for favorite in favorites[2] %}
@@ -619,7 +612,7 @@
                         <h4>
                             <i class="fas fa-user-check"></i>&nbsp;&nbsp; Follows
                             <form id='all_follows' style="display: inline;" method="POST"
-                            action="/account/{{ user_data['username'] }}">
+                            action="/account/{{ header_data['username'] }}">
                                 <input style='display: none;' name="all_follows" value="True">
                                 <a onclick="$('#all_follows').submit()" class='fs-15 m-t-10 m-r-2' style='float: right;
                                  color: grey;'>
@@ -648,64 +641,51 @@
                         <hr class='m-b-8'>
                         {% if follows_update_list %}
                             {% for update in follows_update_list %}
-                                {% if update['category'] == 'Series' %}
-                                    <div class="update-box m-b-5" style="border-bottom: solid 1px #216e7d;">
-                                        <a class="text-light truncate" href="/media_sheet/Series/{{ update['media_id'] }}">
-                                            <i class="fas fa-tv text-series m-r-10" data-toggle="tooltip" title="Series"></i>
-                                            {{ update['media_name'] }}
-                                        </a>
-                                {% elif update['category'] == 'Anime' %}
-                                    <div class="update-box m-b-5" style="border-bottom: solid 1px #945141;">
-                                        <a class="text-light truncate" href="/media_sheet/Anime/{{ update['media_id'] }}">
-                                            <i class="fas fa-torii-gate text-anime m-r-14" data-toggle="tooltip" title="Anime"></i>
-                                            {{ update['media_name'] }}
-                                        </a>
-                                {% elif update['category'] == 'Movies' %}
-                                    <div class="update-box m-b-5" style="border-bottom: solid 1px #8c7821;">
-                                        <a class="text-light truncate" href="/media_sheet/Movies/{{ update['media_id'] }}">
-                                            <i class="fas fa-film text-movies m-r-12" data-toggle="tooltip" title="Movie"></i>
-                                            {{ update['media_name'] }}
-                                        </a>
-                                {% endif %}
-                                        <div class="m-l-35" style="font-size: 11pt;">
-                                            {% if update['update']|length == 2 %}
-                                                {{ update['update'][0] }}
-                                                <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
-                                                {{ update['update'][1] }}
-                                            {% else %}
-                                                {{ update['update'][0] }}
-                                            {% endif %}
-                                        </div>
-                                        <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
-                                            <script>
-                                                var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-                                                var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB",
-                                                    {timeZone: tz});
-                                                var d = new Date("{{ update['date'] }}")
-                                                var month = new Array();
-                                                month[0] = "Jan";
-                                                month[1] = "Feb";
-                                                month[2] = "Mar";
-                                                month[3] = "Apr";
-                                                month[4] = "May";
-                                                month[5] = "Jun";
-                                                month[6] = "Jul";
-                                                month[7] = "Aug";
-                                                month[8] = "Sep";
-                                                month[9] = "Oct";
-                                                month[10] = "Nov";
-                                                month[11] = "Dec";
-                                                var date_month = month[d.getMonth()];
-                                                var date_day = localdate.slice(0, 2);
-                                                var date_time = localdate.slice(11, 17)
-                                                document.write(date_day + " " + date_month + " at " + date_time)
-                                            </script>
-                                            by
-                                        </span>
-                                        <a href="{{ url_for('users.account', user_name=update['username']) }}"
-                                           style="color: #359aff; font-size: 10pt;">{{ update['username'] }}
-                                        </a>
+                                <div class="update-box m-b-5" style="border-bottom: solid 1px {{ update['border'] }};">
+                                    <a class="text-light truncate" href="/media_sheet/{{ update['category'] }}/{{ update['media_id'] }}">
+                                        <i class="{{ update['icon-color'] }} m-r-10" data-toggle="tooltip"
+                                           title="{{ update['category'] }}"></i>
+                                        {{ update['media_name'] }}
+                                    </a>
+                                    <div class="m-l-35" style="font-size: 11pt;">
+                                        {% if update['update']|length == 2 %}
+                                            {{ update['update'][0] }}
+                                            <i class="fas fa-long-arrow-alt-right m-l-4 m-r-4"></i>
+                                            {{ update['update'][1] }}
+                                        {% else %}
+                                            {{ update['update'][0] }}
+                                        {% endif %}
                                     </div>
+                                    <span class="m-l-35" style="color: #b3b3b3; font-size: 10pt;">
+                                        <script>
+                                            var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+                                            var localdate = new Date("{{ update['date'] }}").toLocaleString("en-GB",
+                                                {timeZone: tz});
+                                            var d = new Date("{{ update['date'] }}")
+                                            var month = new Array();
+                                            month[0] = "Jan";
+                                            month[1] = "Feb";
+                                            month[2] = "Mar";
+                                            month[3] = "Apr";
+                                            month[4] = "May";
+                                            month[5] = "Jun";
+                                            month[6] = "Jul";
+                                            month[7] = "Aug";
+                                            month[8] = "Sep";
+                                            month[9] = "Oct";
+                                            month[10] = "Nov";
+                                            month[11] = "Dec";
+                                            var date_month = month[d.getMonth()];
+                                            var date_day = localdate.slice(0, 2);
+                                            var date_time = localdate.slice(11, 17)
+                                            document.write(date_day + " " + date_month + " at " + date_time)
+                                        </script>
+                                        by
+                                    </span>
+                                    <a href="/account/{{ update['username'] }}" style="color: #359aff; font-size: 10pt;">
+                                        {{ update['username'] }}
+                                    </a>
+                                </div>
                             {% endfor %}
                         {% else %}
                             <div class="m-b-10" style="color: grey;"><i>No updates to display.</i></div>

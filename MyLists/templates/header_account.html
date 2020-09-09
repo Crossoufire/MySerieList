@@ -10,23 +10,23 @@
 
 {% block content %}
     <div class="header-container">
-        <div class="header-profile-container" {% if user_data['knowledge_info']['frame_level'] < 36 %}
+        <div class="header-profile-container" {% if header_data['knowledge_info']['frame_level'] < 36 %}
             style="left: -10px; {% endif %}">
-            <img class="header-profile-img" src="{{ user_data['profile_picture'] }}" alt=""/>
-            <img class="header-profile-frame" src="{{ user_data['knowledge_info']['frame_id'] }}.png" alt=""/>
-            <div class="header-knowledge-level text-center">{{ user_data['knowledge_info']['level'] }}</div>
+            <img class="header-profile-img" src="{{ header_data['profile_picture'] }}" alt=""/>
+            <img class="header-profile-frame" src="{{ header_data['knowledge_info']['frame_id'] }}.png" alt=""/>
+            <div class="header-knowledge-level text-center">{{ header_data['knowledge_info']['level'] }}</div>
         </div>
-        <div class="header-profile-data"  {% if user_data['knowledge_info']['frame_level'] < 36 %}
+        <div class="header-profile-data"  {% if header_data['knowledge_info']['frame_level'] < 36 %}
             style="left: 200px; {% endif %}">
-            <h2 class="profile-name"><b>{{ user_data['username'] }}</b>
-                {% if user_data['id'] != current_user.get_id() %}
-                    {% if user_data["isfollowing"] %}
+            <h2 class="profile-name"><b>{{ header_data['username'] }}</b>
+                {% if header_data['id'] != current_user.get_id() %}
+                    {% if header_data["isfollowing"] %}
                         <button class="btn btn-sm btn-dark follow-btn" value="1" onclick="follow_status(
-                        '{{ user_data['id'] }}')">Unfollow
+                        '{{ header_data['id'] }}')">Unfollow
                         </button>
                     {% else %}
                         <button class="btn btn-sm btn-primary follow-btn" value="0" onclick="follow_status(
-                        '{{ user_data['id'] }}')">Follow
+                        '{{ header_data['id'] }}')">Follow
                         </button>
                     {% endif %}
                     <img class="loading-follow" style="display: none;" height="20" width="20"
@@ -34,15 +34,15 @@
                 {% endif %}
             </h2>
             <div>
-                <b>Joined: {{ user_data['register'] }}</b><br>
-                <b>Followers: {{ user_data['followers'] }}</b>
+                <b>Joined: {{ header_data['register'] }}</b><br>
+                <b>Followers: {{ header_data['followers'] }}</b>
             </div>
         </div>
         <div class="header-profile-data-mobile text-center">
-            <h4 class="p-0 m-0"><b>{{ user_data['username'] }}&nbsp;</b></h4>
+            <h4 class="p-0 m-0"><b>{{ header_data['username'] }}&nbsp;</b></h4>
             <div class="header-join-follow">
-                <b>Joined: {{ user_data['register'] }}</b><br>
-                <b>Followers: {{ user_data['followers'] }}</b>
+                <b>Joined: {{ header_data['register'] }}</b><br>
+                <b>Followers: {{ header_data['followers'] }}</b>
             </div>
         </div>
     </div>
