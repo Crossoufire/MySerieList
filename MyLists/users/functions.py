@@ -7,11 +7,11 @@ from flask import url_for
 from sqlalchemy import func, text
 from flask_login import current_user
 from _collections import OrderedDict
-from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
-    AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, Movies, Ranks, followers, Frames, SeriesGenre, RoleType
+from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime,\
+    Movies, Ranks, followers, Frames, SeriesGenre, RoleType
 
 
-def get_media_count(user_id, list_type):
+def get_media_count_by_status(user_id, list_type):
     if list_type == ListType.SERIES:
         media_count = db.session.query(SeriesList.status, func.count(SeriesList.status)) \
             .filter_by(user_id=user_id).group_by(SeriesList.status).all()
@@ -46,26 +46,11 @@ def get_media_count(user_id, list_type):
 
 def get_media_total_eps(user_id, list_type):
     if list_type == ListType.SERIES:
-        media_data = db.session.query(SeriesList, SeriesEpisodesPerSeason,
-                                      func.group_concat(SeriesEpisodesPerSeason.episodes)) \
-            .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.media_id == SeriesList.media_id) \
-            .filter(SeriesList.user_id == user_id).group_by(SeriesList.media_id).all()
+        eps_watched = db.session.query(func.sum(SeriesList.eps_watched)).filter(SeriesList.user_id == user_id).all()
     elif list_type == ListType.ANIME:
-        media_data = db.session.query(AnimeList, AnimeEpisodesPerSeason,
-                                      func.group_concat(AnimeEpisodesPerSeason.episodes)) \
-            .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.media_id == AnimeList.media_id) \
-            .filter(AnimeList.user_id == user_id).group_by(AnimeList.media_id)
+        eps_watched = db.session.query(func.sum(AnimeList.eps_watched)).filter(AnimeList.user_id == user_id).all()
 
-    nb_eps_watched = 0
-    for element in media_data:
-        if element[0].status != Status.PLAN_TO_WATCH and element[0].status != Status.RANDOM:
-            episodes = element[2].split(",")
-            episodes = [int(x) for x in episodes]
-            for i in range(1, element[0].current_season):
-                nb_eps_watched += episodes[i-1]
-            nb_eps_watched += element[0].last_episode_watched
-
-    return nb_eps_watched
+    return eps_watched
 
 
 def get_media_score(user_id, list_type):
@@ -285,7 +270,7 @@ def get_media_data(user):
     # Create dict with media as key; values are dict or list of dict with the data
     media_dict = {}
     for list_type in all_lists:
-        media_count = get_media_count(user.id, list_type[1])
+        media_count = get_media_count_by_status(user.id, list_type[1])
         media_levels = get_media_levels(user, list_type[1])
         media_score = get_media_score(user.id, list_type[1])
         media_time = list_type[2]

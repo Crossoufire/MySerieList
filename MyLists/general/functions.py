@@ -7,7 +7,8 @@ from PIL import Image
 from pathlib import Path
 from MyLists import db, app
 from datetime import datetime
-from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, MoviesCollections, get_total_time
+from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, MoviesCollections, get_total_time, \
+    SeriesList, AnimeList, Series, Anime
 
 
 def compute_media_time_spent(list_type):
@@ -19,33 +20,23 @@ def compute_media_time_spent(list_type):
         if list_type != ListType.MOVIES:
             total_time = 0
             for media in media_list:
-                if media[1].status == Status.COMPLETED:
-                    try:
-                        total_time += media[0].episode_duration * media[0].total_episodes * (1 + media[1].rewatched)
-                    except Exception as e:
-                        app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
-                elif media[1].status != Status.PLAN_TO_WATCH or media[1].status != Status.RANDOM:
-                    try:
-                        episodes = [eps.episodes for eps in media[0].eps_per_season]
-                        for i in range(1, media[1].current_season):
-                            total_time += media[0].episode_duration * episodes[i - 1]
-                        total_time += media[1].last_episode_watched * media[0].episode_duration
-                    except Exception as e:
-                        app.logger.info('[ERROR] - {}. [MEDIA] - {}. [LIST EPISODES] - {}. [CURRENT SEASON] - {}.'
-                                        .format(e, media[0].name, episodes, media[1].current_season))
+                try:
+                    total_time += media[0].episode_duration * media[1].eps_watched * (1 + media[1].rewatched)
+                except Exception as e:
+                    app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
         elif list_type == ListType.MOVIES:
             total_time = 0
             for media in media_list:
                 if media[1].status != Status.PLAN_TO_WATCH:
                     try:
-                        total_time += media[0].runtime*(1+media[1].rewatched)
+                        total_time += media[0].runtime*(1 + media[1].rewatched)
                     except Exception as e:
                         app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
 
-        if list_type == ListType.ANIME:
-            user.time_spent_anime = total_time
-        elif list_type == ListType.SERIES:
+        if list_type == ListType.SERIES:
             user.time_spent_series = total_time
+        elif list_type == ListType.ANIME:
+            user.time_spent_anime = total_time
         elif list_type == ListType.MOVIES:
             user.time_spent_movies = total_time
 
@@ -256,3 +247,22 @@ def refresh_collections_movies():
         except:
             continue
     print('Finished refreshing movies collection.')
+
+
+def add_eps_watched():
+    series_list = db.session.query(Series, SeriesList).join(Series, Series.id == SeriesList.media_id).all()
+    anime_list = db.session.query(Anime, AnimeList).join(Anime, Anime.id == AnimeList.media_id).all()
+
+    for series in series_list:
+        season = series[1].current_season
+        eps = series[1].last_episode_watched
+        series[1].eps_watched = sum(series[0].eps_per_season[:season-1]) + eps
+
+    db.session.commit()
+
+    for anime in anime_list:
+        season = anime[1].current_season
+        eps = anime[1].last_episode_watched
+        anime[1].eps_watched = sum(anime[0].eps_per_season[:season-1]) + eps
+
+    db.session.commit()

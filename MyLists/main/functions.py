@@ -79,6 +79,7 @@ def save_new_cover(cover_file, media_type):
 
 def set_last_update(media, media_type, old_status=None, new_status=None, old_season=None, new_season=None,
                     old_episode=None, new_episode=None):
+
     check = UserLastUpdate.query.filter_by(user_id=current_user.id, media_type=media_type, media_id=media.id) \
         .order_by(UserLastUpdate.date.desc()).first()
 
@@ -99,29 +100,17 @@ def set_last_update(media, media_type, old_status=None, new_status=None, old_sea
     db.session.commit()
 
 
-def compute_time_spent(media=None, old_season=None, new_season=None, old_episode=None, new_episode=None, list_type=None,
-                       movie_status=None, movie_delete=False, movie_add=False, new_rewatch=0, old_rewatch=0,
-                       movie_runtime=0):
-
-    def eps_watched(season, episode, all_seasons):
-        nb_eps_watched = 0
-        for i in range(1, season):
-            nb_eps_watched += all_seasons[i-1].episodes
-        nb_eps_watched += episode
-        return nb_eps_watched
+def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0, movie_status=None,
+                       movie_delete=False, movie_add=False, new_rewatch=0, old_rewatch=0, movie_runtime=0):
 
     if list_type == ListType.SERIES:
         old_time = current_user.time_spent_series
-        old_total = eps_watched(old_season, old_episode, media.eps_per_season)
-        new_total = eps_watched(new_season, new_episode, media.eps_per_season)
-        current_user.time_spent_series = old_time + ((new_total-old_total)*media.episode_duration) + \
-                                         (media.total_episodes*media.episode_duration*(new_rewatch-old_rewatch))
+        current_user.time_spent_series = old_time + ((new_watched-old_watched)*media.episode_duration) + (
+                media.total_episodes*media.episode_duration*(new_rewatch-old_rewatch))
     elif list_type == ListType.ANIME:
         old_time = current_user.time_spent_anime
-        old_total = eps_watched(old_season, old_episode, media.eps_per_season)
-        new_total = eps_watched(new_season, new_episode, media.eps_per_season)
-        current_user.time_spent_anime = old_time + ((new_total-old_total)*media.episode_duration) + \
-                                        (media.total_episodes*media.episode_duration*(new_rewatch-old_rewatch))
+        current_user.time_spent_anime = old_time + ((new_watched-old_watched)*media.episode_duration) + (
+                media.total_episodes*media.episode_duration*(new_rewatch-old_rewatch))
     elif list_type == ListType.MOVIES:
         old_time = current_user.time_spent_movies
         if movie_delete:

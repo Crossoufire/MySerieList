@@ -252,7 +252,7 @@ class SeriesList(db.Model):
     rewatched = db.Column(db.Integer, nullable=False, default=0)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
-    episodes_watched = db.Column(db.Integer)
+    eps_watched = db.Column(db.Integer)
     comment = db.Column(db.Text)
 
 
@@ -347,6 +347,7 @@ class AnimeList(db.Model):
     rewatched = db.Column(db.Integer, nullable=False, default=0)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
+    eps_watched = db.Column(db.Integer)
     comment = db.Column(db.Text)
 
 
