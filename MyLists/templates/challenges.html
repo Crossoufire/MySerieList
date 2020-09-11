@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+
+{% endblock css %}
+
+
+{% block content %}
+    <div class="card-deck m-t-40">
+        <div class="card text-white bg-dark mb-3">
+        <div class="card-body">
+            <div class="card-title">
+            <h5># Challenge 1 <div class="float-r fs-16 m-t-4">End date: 10/12/2020</div></h5>
+            </div>
+            <div class="card-text text-light">Watch 10 different movies before the end date.</div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-primary" onclick="challenge(1)">Accept</button>
+            <span class="fas fa-spinner fast-spin loading-chal" style="display: none;"></span>
+            <span class="fas fa-check add-chal" style="display: none;"></span>
+            <i class="float-r m-t-10">XP: 2500</i>
+        </div>
+    </div>
+        <div class="card text-white bg-dark mb-3">
+        <div class="card-body">
+            <div class="card-title">
+            <h5># Challenge 2 <div class="float-r fs-16 m-t-4">End date: 10/12/2020</div></h5>
+            </div>
+            <div class="card-text text-light">Complete 2 Anime with at least 12 episodes each.</div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-primary" onclick="challenge(2)">Accept</button>
+            <span class="fas fa-spinner fast-spin loading-chal" style="display: none;"></span>
+            <span class="fas fa-check add-chal" style="display: none;"></span>
+            <i class="float-r m-t-10">XP: 1000</i>
+        </div>
+    </div>
+        <div class="card text-white bg-dark mb-3">
+        <div class="card-body">
+            <div class="card-title">
+            <h5># Challenge 3 <div class="float-r fs-16 m-t-4">End date: 10/12/2020</div></h5>
+            </div>
+            <div class="card-text text-light">Complete the TV show: "The Shield".</div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-primary" onclick="challenge(3)">Accept</button>
+            <span class="fas fa-spinner fast-spin loading-chal" style="display: none;"></span>
+            <span class="fas fa-check add-chal" style="display: none;"></span>
+            <i class="float-r m-t-10">XP: 5500</i>
+        </div>
+    </div>
+    </div>
+{% endblock content %}
+
+
+{% block script %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/challenges.js') }}"></script>
+{% endblock script %}

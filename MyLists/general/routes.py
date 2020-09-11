@@ -191,6 +191,12 @@ def current_trends():
                            movies_trends=movies_results)
 
 
+@bp.route("/challenges", methods=['POST', 'GET'])
+@login_required
+def challenges():
+    return render_template('challenges.html', title='Challenges')
+
+
 @bp.route("/privacy_policy", methods=['GET'])
 @login_required
 def privacy_policy():
@@ -206,3 +212,21 @@ def about():
 # @bp.route('/service-worker.js')
 # def service_worker():
 #     return app.send_static_file('service-worker.js')
+
+
+# --- AJAX Method --------------------------------------------------------------------------------------------
+
+
+@bp.route("/add_challenges", methods=['GET', 'POST'])
+@login_required
+def add_challenges():
+    try:
+        json_data = request.get_json()
+        challenge_id = int(json_data['challenge_id'])
+    except:
+        return '', 400
+
+    # Check if challenge ID exists in the DB:
+    if challenge_id not in DB:
+        return '', 400
+

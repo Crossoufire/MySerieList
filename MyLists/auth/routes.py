@@ -31,7 +31,6 @@ def home():
             next_page = request.args.get('next')
             if next_page:
                 return redirect(next_page)
-
             return_user_homepage(user.homepage, user.username)
         else:
             flash('Login Failed. Please check username and password.', 'warning')
