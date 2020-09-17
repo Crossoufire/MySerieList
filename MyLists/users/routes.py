@@ -25,10 +25,8 @@ def account(user_name):
         return render_template('all_follows.html', title='Follows', all_follows=all_follows, header_data=header_data)
     elif request.form.get('all_history'):
         updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
-        media_updates = get_updates(updates)
-        user_data = get_user_data(user)
-
-        return render_template('all_history.html', title='History', media_updates=media_updates, user_data=user_data)
+        media_update = get_updates(updates)
+        return render_template('all_history.html', title='History', media_updates=media_update, header_data=header_data)
 
     # Recover user data
     user_data = get_user_data(user)

@@ -12,8 +12,8 @@ from flask import Blueprint, url_for, request, abort, render_template, flash, js
 from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
     save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
-    AnimeList, ListType, SeriesActors, MoviesList, Status, MoviesCollections, RoleType, MoviesGenre, MediaType, \
-    get_media_query, get_next_airing, check_media, User
+    AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MoviesGenre, MediaType, \
+    get_media_query, get_next_airing, check_media, User, get_collection_query
 
 bp = Blueprint('main', __name__)
 
@@ -66,15 +66,27 @@ def mymedialist(media_list, user_name):
 @bp.route("/movies_collection/<string:user_name>", methods=['GET', 'POST'])
 @login_required
 def movies_collection(user_name):
-    # Check if the user can see the <movie_collection_list>
+    # Check if the user can see the <media_list>
     user = current_user.check_autorization(user_name)
 
-    collection_movie = MoviesCollections.get_collection_movies(user.id)
+    # Check the <category>, the <page>, the <medialist> and the <html_template>.
+    page = request.args.get('page', 1, int)
+    category = request.args.get('category', 'Completed')
+
+    # Check the <args> then retrieve the corresponding <media_data>
+    query = get_collection_query(user.id, page)
+
+    # Get the actual page, total number of pages and the total number of media from the query
+    items = query.items
+    info_pages = {'actual_page': query.page,
+                  'total_pages': query.pages,
+                  'total_media': query.total}
 
     completed_collections = []
     ongoing_collections = []
-    for movie in collection_movie:
-        movie_data = {"name": movie[2].name,
+    for movie in items:
+        movie_data = {"id": movie[2].id,
+                      "name": movie[2].name,
                       "total": movie[2].parts,
                       "parts": movie[3],
                       "overview": movie[2].overview,
@@ -83,23 +95,19 @@ def movies_collection(user_name):
         if movie_data['total'] == 1:
             pass
         elif movie_data["total"] == movie_data["parts"]:
-            movie_data["completed"] = True
             completed_collections.append(movie_data)
         else:
-            movie_data["completed"] = False
             ongoing_collections.append(movie_data)
 
-    completed_collections.sort(key=lambda x: (x['parts']), reverse=True)
-    ongoing_collections.sort(key=lambda x: (x['parts'], x['total']), reverse=True)
+    category_collection = []
+    if category == 'Completed':
+        category_collection = sorted(completed_collections, key=lambda x: (x['name'], x['parts']), reverse=True)
+    elif category == 'On Going':
+        category_collection = sorted(ongoing_collections, key=lambda x: (x['parts'], x['total']), reverse=True)
 
-    return render_template('movies_collection.html',
-                           title='Movies collection',
-                           completed_collections=completed_collections,
-                           ongoing_collections=ongoing_collections,
-                           length_completed=len(completed_collections),
-                           length_ongoing=len(ongoing_collections),
-                           username=user_name,
-                           user_id=str(user.id))
+    return render_template('medialist_collections.html', title='Movies collection',
+                           category_collection=category_collection, length_category=len(category_collection),
+                           username=user_name, user_id=str(user.id), info_pages=info_pages, category=category)
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
@@ -117,8 +125,6 @@ def write_comment(media_type, media_id):
         list_type = ListType.ANIME
     elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
-    else:
-        abort(404)
 
     media = check_media(media_id, list_type)
     if not media:
@@ -160,8 +166,6 @@ def media_sheet(media_type, media_id):
         list_type = ListType.ANIME
     elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
-    else:
-        abort(404)
 
     # Check if <media_id> came from TMDB and if in local DB
     tmdb_id = request.args.get('search')
@@ -505,7 +509,7 @@ def update_element_season():
     # Set the new data
     media[1].current_season = new_season
     media[1].last_episode_watched = 1
-    media[1].eps_watched = sum(media[0].eps_per_season[:new_season-1]) + 1
+    media[1].eps_watched = sum([x.episodes for x in media[0].eps_per_season[:new_season-1]]) + 1
     new_watched = sum(media[0].eps_per_season[:new_season-1]) + 1
     app.logger.info('[User {}] - [Media {}] - [ID {}] season updated from {} to {}'
                     .format(current_user.id, list_type.value.replace('list', ''), media_id, old_season, new_season))
@@ -560,7 +564,7 @@ def update_element_episode():
     # Set the new data
     media[1].last_episode_watched = new_episode
     media[1].eps_watched = sum(media[0].eps_per_season[:old_season-1]) + new_episode
-    new_watched = sum(media[0].eps_per_season[:old_season-1]) + new_episode
+    new_watched = sum([x.episodes for x in media[0].eps_per_season[:old_season-1]]) + new_episode
     app.logger.info('[User {}] {} [ID {}] episode updated from {} to {}'
                     .format(current_user.id, list_type.value.replace('list', ''), media_id, old_episode, new_episode))
 

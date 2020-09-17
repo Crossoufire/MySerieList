@@ -419,3 +419,17 @@ option {
     bottom: -24px;
     right: 0;
 }
+
+/* --- Movies Collection CSS ---------------------------- */
+
+.number-seen {
+            position: absolute;
+            bottom: 1px;
+            right: 1px;
+            border-right: black 1px;
+            border-bottom: black 1px;
+            background: #131418;
+            padding-left: 12px;
+            padding-right: 12px;
+            font-size: 14pt;
+        }

@@ -16,16 +16,14 @@ def compute_media_time_spent(list_type):
 
     for user in users:
         media_list = get_total_time(user.id, list_type)
-
+        total_time = 0
         if list_type != ListType.MOVIES:
-            total_time = 0
             for media in media_list:
                 try:
                     total_time += media[0].episode_duration * media[1].eps_watched * (1 + media[1].rewatched)
                 except Exception as e:
                     app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
         elif list_type == ListType.MOVIES:
-            total_time = 0
             for media in media_list:
                 if media[1].status != Status.PLAN_TO_WATCH:
                     try:
@@ -149,14 +147,14 @@ def add_collections_movies():
     print('Started to add movies collection.')
     local_covers_path = Path(app.root_path, "static/covers/movies_collection_covers/")
 
-    all_movies = Movies.query.filter_by().all()
+    all_movies = Movies.query.all()
     for index, movie in enumerate(all_movies):
         print("Movie: {}/{}".format(index + 1, len(all_movies)))
         tmdb_movies_id = movie.themoviedb_id
 
         try:
             response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
-                                    .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']))
+                                    .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']), timeout=10)
 
             data = json.loads(response.text)
 
@@ -164,7 +162,7 @@ def add_collections_movies():
             collection_poster = data["belongs_to_collection"]["poster_path"]
 
             response_collection = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
-                                               .format(collection_id, app.config['THEMOVIEDB_API_KEY']))
+                                               .format(collection_id, app.config['THEMOVIEDB_API_KEY']), timeout=10)
 
             data_collection = json.loads(response_collection.text)
 
@@ -196,22 +194,20 @@ def add_collections_movies():
             movie.collection_id = collection_id
 
             # Test if collection already in MoviesCollection
-            if MoviesCollections.query.filter_by(collection_id=collection_id).first() is not None:
+            if MoviesCollections.query.filter_by(collection_id=collection_id).first():
                 db.session.commit()
                 continue
 
             add_collection = MoviesCollections(collection_id=collection_id,
                                                parts=collection_parts,
                                                name=collection_name,
-                                               movies_names=None,
-                                               releases_dates=None,
                                                poster=collection_poster_id,
                                                overview=collection_overview)
 
             db.session.add(add_collection)
             db.session.commit()
         except:
-            continue
+            pass
     print('Finished adding movies collection.')
 
 
@@ -254,15 +250,22 @@ def add_eps_watched():
     anime_list = db.session.query(Anime, AnimeList).join(Anime, Anime.id == AnimeList.media_id).all()
 
     for series in series_list:
-        season = series[1].current_season
-        eps = series[1].last_episode_watched
-        series[1].eps_watched = sum(series[0].eps_per_season[:season-1]) + eps
-
+        if series[1].status == Status.RANDOM or series[1].status == Status.PLAN_TO_WATCH:
+            series[1].eps_watched = 0
+        else:
+            season = series[1].current_season
+            eps = series[1].last_episode_watched
+            eps_seasons = [x.episodes for x in series[0].eps_per_season]
+            series[1].eps_watched = sum(eps_seasons[:season-1]) + eps
     db.session.commit()
 
     for anime in anime_list:
-        season = anime[1].current_season
-        eps = anime[1].last_episode_watched
-        anime[1].eps_watched = sum(anime[0].eps_per_season[:season-1]) + eps
+        if anime[1].status == Status.RANDOM or anime[1].status == Status.PLAN_TO_WATCH:
+            anime[1].eps_watched = 0
+        else:
+            season = anime[1].current_season
+            eps = anime[1].last_episode_watched
+            eps_seasons = [x.episodes for x in anime[0].eps_per_season]
+            anime[1].eps_watched = sum(eps_seasons[:season - 1]) + eps
 
     db.session.commit()

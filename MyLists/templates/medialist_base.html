@@ -67,6 +67,7 @@
             <select class="m-l-8" onchange="sort_medialist(this)">
                 <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Title</option>
                 <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>
+                <option {% if sort_val == 'rewatch' %}selected="selected"{% endif %} value="rewatch">Rewatch</option>
                 <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>
             </select>
             {% if user_id != current_user.get_id() %}

@@ -9,13 +9,12 @@ from MyLists.models import Status, ListType, User, GlobalStats, RoleType
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
     refresh_db_frames, refresh_db_badges, refresh_db_ranks
 
-
 bp = Blueprint('general', __name__)
 
 
 # noinspection PyArgumentList
 @bp.before_app_first_request
-def create_user():
+def create_first_data():
     db.create_all()
     if User.query.filter_by(id='1').first() is None:
         admin1 = User(username='admin',
@@ -105,23 +104,6 @@ def mylists_stats():
 
         return {'series': series_list, 'anime': anime_list, 'movies': movies_list}
 
-    def get_all_eps_seas(data):
-        total_episodes = 0
-        total_seasons = 0
-        for media in data:
-            if media[0].status != Status.PLAN_TO_WATCH:
-                episodes = media[2].split(',')
-                episodes = [int(x) for x in episodes]
-                if episodes[int(media[0].current_season) - 1] == int(media[0].last_episode_watched):
-                    total_seasons += int(media[0].current_season)
-                else:
-                    total_seasons += int(media[0].current_season) - 1
-                for i in range(1, media[0].current_season):
-                    total_episodes += episodes[i - 1]
-                total_episodes += media[0].last_episode_watched
-
-        return total_episodes, total_seasons
-
     top_media = stats.get_top_media()
     most_present_media = create_dict(top_media)
 
@@ -135,10 +117,8 @@ def mylists_stats():
     top_dropped_media = create_dict(media_dropped)
 
     total_media_eps_seas = stats.get_total_eps_seasons()
-    series_eps, series_seas = get_all_eps_seas(total_media_eps_seas[0])
-    anime_eps, anime_seas = get_all_eps_seas(total_media_eps_seas[1])
-    total_seasons_media = {"series": series_seas, "anime": anime_seas}
-    total_episodes_media = {"series": series_eps, "anime": anime_eps}
+    total_seasons_media = {"series": total_media_eps_seas[0][0][1], "anime": total_media_eps_seas[1][0][1]}
+    total_episodes_media = {"series": total_media_eps_seas[0][0][0], "anime": total_media_eps_seas[1][0][0]}
 
     return render_template("mylists_stats.html",
                            title='MyLists Stats',
@@ -158,7 +138,7 @@ def current_trends():
         tv_info = ApiData().get_trending_tv()
     except Exception as e:
         tv_info = {'results': []}
-        app.logger.error('[ERROR] - Getting the tv shows trending info: {}.'.format(e))
+        app.logger.error('[ERROR] - Getting the Series trending info: {}.'.format(e))
         flash('The current TV trends from TMDB are not available right now.', 'warning')
 
     try:

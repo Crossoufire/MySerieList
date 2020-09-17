@@ -50,7 +50,7 @@ def get_media_total_eps(user_id, list_type):
     elif list_type == ListType.ANIME:
         eps_watched = db.session.query(func.sum(AnimeList.eps_watched)).filter(AnimeList.user_id == user_id).all()
 
-    return eps_watched
+    return eps_watched[0][0]
 
 
 def get_media_score(user_id, list_type):

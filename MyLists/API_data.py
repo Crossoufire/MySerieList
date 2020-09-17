@@ -1,7 +1,6 @@
 import json
 import requests
 import urllib.request
-
 from PIL import Image
 from flask import abort
 from MyLists import app
@@ -11,7 +10,7 @@ from ratelimit import sleep_and_retry, limits
 
 
 class ApiData:
-    def __init__(self, ):
+    def __init__(self):
         self.tmdb_api_key = app.config['THEMOVIEDB_API_KEY']
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
 

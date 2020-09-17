@@ -15,18 +15,19 @@ def load_user(user_id):
 
 
 class Status(enum.Enum):
-    WATCHING = "Watching"
-    COMPLETED = "Completed"
-    COMPLETED_ANIMATION = "Completed Animation"
-    ON_HOLD = "On Hold"
-    RANDOM = "Random"
-    DROPPED = "Dropped"
-    PLAN_TO_WATCH = "Plan to Watch"
+    WATCHING = 'Watching'
+    COMPLETED = 'Completed'
+    COMPLETED_ANIMATION = 'Completed Animation'
+    ON_HOLD = 'On Hold'
+    RANDOM = 'Random'
+    DROPPED = 'Dropped'
+    PLAN_TO_WATCH = 'Plan to Watch'
+    ON_GOING = 'On Going'
 
 
 class ListType(enum.Enum):
-    SERIES = "serieslist"
-    ANIME = "animelist"
+    SERIES = 'serieslist'
+    ANIME = 'animelist'
     MOVIES = 'movieslist'
 
 
@@ -45,9 +46,9 @@ class HomePage(enum.Enum):
 
 
 class RoleType(enum.Enum):
-    ADMIN = "admin"         # Can access to the admin dashboard (/admin)
-    MANAGER = "manager"     # Can lock and edit media (/lock_media & /media_sheet_form)
-    USER = "user"           # Standard user
+    ADMIN = "admin"  # Can access to the admin dashboard (/admin)
+    MANAGER = "manager"  # Can lock and edit media (/lock_media & /media_sheet_form)
+    USER = "user"  # Standard user
 
 
 followers = db.Table('followers',
@@ -113,7 +114,7 @@ class User(db.Model, UserMixin):
 
     def count_notifications(self):
         last_notif_time = self.last_notif_read_time or datetime(1900, 1, 1)
-        return Notifications.query.filter_by(user_id=self.id)\
+        return Notifications.query.filter_by(user_id=self.id) \
             .filter(Notifications.timestamp > last_notif_time).count()
 
     def get_notifications(self):
@@ -388,16 +389,6 @@ class MoviesCollections(db.Model):
     poster = db.Column(db.String(100))
     overview = db.Column(db.String(100))
 
-    @staticmethod
-    def get_collection_movies(user_id):
-        collection_movie = db.session.query(Movies, MoviesList, MoviesCollections,
-                                            func.count(MoviesCollections.collection_id)) \
-            .join(MoviesList, MoviesList.media_id == Movies.id) \
-            .join(MoviesCollections, MoviesCollections.collection_id == Movies.collection_id) \
-            .filter(Movies.collection_id != None, MoviesList.user_id == user_id,
-                    MoviesList.status != Status.PLAN_TO_WATCH).group_by(Movies.collection_id).all()
-        return collection_movie
-
 
 class Movies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -584,10 +575,8 @@ class GlobalStats:
         queries = []
         for list_type in self.truncated_list_type:
             self.get_type(list_type)
-            queries.append(db.session.query(self.media_list, self.media_eps,
-                                            func.group_concat(self.media_eps.episodes))
-                           .join(self.media_eps, self.media_eps.media_id == self.media_list.media_id)
-                           .group_by(self.media_list.id).all())
+            queries.append(db.session.query(func.sum(self.media_list.eps_watched),
+                                            func.sum(self.media_list.current_season)).all())
         return queries
 
 
@@ -614,7 +603,9 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
     elif sort_val == 'score':
         sorting = media_list.score.desc()
     elif sort_val == 'comment':
-        sorting = media_list.comment
+        sorting = media_list.comment.desc()
+    elif sort_val == 'rewatch':
+        sorting = media_list.rewatched.desc()
 
     try:
         category = Status(category)
@@ -630,7 +621,6 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
             .filter(v1.user_id == current_user.id).all()
         com_ids = [r[0].media_id for r in get_common]
         filtering = media_list.media_id.notin_(com_ids)
-        print(filtering)
 
     # Check the <category> to recover the <media_data>
     if category != 'Favorite' and category != 'Search':
@@ -669,7 +659,7 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
                     .order_by(sorting).paginate(page, 25, error_out=True)
         elif option == 'actor':
             query = db.session.query(media, media_list, actors_list) \
-                .join(media, media.id == media_list.media_id)\
+                .join(media, media.id == media_list.media_id) \
                 .join(actors_list, actors_list.media_id == media_list.media_id) \
                 .filter(actors_list.name.like('%' + search + '%'), media_list.user_id == user_id) \
                 .order_by(sorting).paginate(page, 25, error_out=True)
@@ -681,7 +671,7 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
                     .order_by(sorting).paginate(page, 25, error_out=True)
         elif option == 'genre':
             query = db.session.query(media, media_list, genre_list) \
-                .join(media, media.id == media_list.media_id)\
+                .join(media, media.id == media_list.media_id) \
                 .join(genre_list, genre_list.media_id == media_list.media_id) \
                 .filter(genre_list.genre.like('%' + search + '%'), media_list.user_id == user_id) \
                 .order_by(sorting).paginate(page, 25, error_out=True)
@@ -703,6 +693,16 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
                     .order_by(sorting).paginate(page, 25, error_out=True)
 
     return query, cat_value
+
+
+def get_collection_query(user_id, page):
+    query = db.session.query(Movies, MoviesList, MoviesCollections, func.count(MoviesCollections.collection_id)) \
+        .join(MoviesList, MoviesList.media_id == Movies.id) \
+        .join(MoviesCollections, MoviesCollections.collection_id == Movies.collection_id) \
+        .filter(MoviesList.user_id == user_id, MoviesList.status != Status.PLAN_TO_WATCH)\
+        .group_by(Movies.collection_id).paginate(page, 500000, error_out=True)
+
+    return query
 
 
 def get_media_count(user_id, list_type):
