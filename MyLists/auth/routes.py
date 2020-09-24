@@ -93,7 +93,7 @@ def reset_password():
 
 
 @bp.route("/reset_password/<token>", methods=['GET', 'POST'])
-def reset_passord_token(token):
+def reset_password_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('auth.home'))
 
