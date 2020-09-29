@@ -774,7 +774,7 @@ def check_media(media_id, list_type, add=False):
 
     query = db.session.query(media, media_list) \
         .join(media, media.id == media_list.media_id) \
-        .filter(media.id == media_id, media_list.user_id == current_user.id).first()
+        .filter(media_list.user_id == current_user.id, media_list.media_id == media_id).first()
 
     if add:
         query = db.session.query(media).filter(media.id == media_id).first()

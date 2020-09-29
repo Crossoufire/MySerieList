@@ -9,7 +9,8 @@
 
 
 {% block content %}
-    <div class="header-container">
+    <div class="header-container" style="background-image: {% if user_data['username'] == 'Thea' %}
+    url('/static/img/blackhole.gif'){% else %} url('/static/img/profile_background_2.jpg') {% endif %};">
         <div class="header-profile-container" {% if user_data['knowledge_info']['frame_level'] < 36 %}
             style="left: -10px; {% endif %}">
             <img class="header-profile-img" src="{{ user_data['profile_picture'] }}" alt=""/>

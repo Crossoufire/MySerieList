@@ -596,7 +596,7 @@ def change_element_category():
 
     # Recover the media
     media = check_media(media_id, list_type)
-    if not media:
+    if media is None:
         return '', 400
 
     # Get the old status and old rewatch time multiplier
@@ -795,7 +795,7 @@ def add_element():
 
     # Check if the <media>
     media = check_media(media_id, list_type, add=True)
-    if not media:
+    if media is None:
         return '', 400
 
     # Setup the season, episode and category of the media
@@ -866,7 +866,7 @@ def delete_element():
         return '', 400
 
     media = check_media(media_id, list_type)
-    if not media:
+    if media is None:
         return '', 400
 
     # Get the old data
