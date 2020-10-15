@@ -507,10 +507,10 @@ def update_element_season():
     old_watched = media[1].eps_watched
 
     # Set the new data
+    new_watched = sum([x.episodes for x in media[0].eps_per_season[:new_season - 1]]) + 1
     media[1].current_season = new_season
     media[1].last_episode_watched = 1
-    media[1].eps_watched = sum([x.episodes for x in media[0].eps_per_season[:new_season-1]]) + 1
-    new_watched = sum(media[0].eps_per_season[:new_season-1]) + 1
+    media[1].eps_watched = new_watched
     app.logger.info('[User {}] - [Media {}] - [ID {}] season updated from {} to {}'
                     .format(current_user.id, list_type.value.replace('list', ''), media_id, old_season, new_season))
 
@@ -562,9 +562,9 @@ def update_element_episode():
     old_watched = media[1].eps_watched
 
     # Set the new data
+    new_watched = sum([x.episodes for x in media[0].eps_per_season[:old_season - 1]]) + new_episode
     media[1].last_episode_watched = new_episode
-    media[1].eps_watched = sum(media[0].eps_per_season[:old_season-1]) + new_episode
-    new_watched = sum([x.episodes for x in media[0].eps_per_season[:old_season-1]]) + new_episode
+    media[1].eps_watched = new_watched
     app.logger.info('[User {}] {} [ID {}] episode updated from {} to {}'
                     .format(current_user.id, list_type.value.replace('list', ''), media_id, old_episode, new_episode))
 
