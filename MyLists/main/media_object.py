@@ -494,6 +494,7 @@ class MediaDetails:
 class Autocomplete:
     def __init__(self, result):
         self.tmdb_cover_link = "http://image.tmdb.org/t/p/w300"
+        self.igdb_cover_link = "https://images.igdb.com/igdb/image/upload/t_1080p/"
         self.result = result
         self.info = {}
 
@@ -508,6 +509,20 @@ class Autocomplete:
             self.get_tv_dict()
         elif self.result.get('media_type') == 'movie':
             self.get_movies_dict()
+
+        return self.info
+
+    def get_games_autocomplete_dict(self):
+        self.info['igdb_id'] = self.result.get('id')
+        self.info['display_name'] = self.result.get('name')
+        self.info['category'] = 'Games'
+        self.info['type'] = 'game'
+
+        self.info['image_cover'] = url_for('static', filename="covers/series_covers/default.jpg")
+        if self.result.get('cover'):
+            self.info['image_cover'] = "{}{}.jpg".format(self.igdb_cover_link, self.result['cover']['image_id'])
+
+        self.info['platforms'] = self.result.get('platforms', 'Unknown') or 'Unknown'
 
         return self.info
 

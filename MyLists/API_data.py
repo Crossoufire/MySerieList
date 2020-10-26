@@ -27,6 +27,16 @@ class ApiData:
 
         return json.loads(response.text)
 
+    def IGDB_search(self, game_name):
+        headers = {'Client-ID': '5i5pi21s0ninkmp6jj09ix4l6fw5bd',
+                   'Authorization': 'Bearer ' + '46gsxkz0svtqzujd4znmjqilhq0xa5'}
+        body = 'fields id, name, cover.image_id, platforms; search "{}";'.format(game_name)
+        response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers)
+
+        self.status_code(response.status_code)
+
+        return json.loads(response.text)
+
     def get_details_and_credits_data(self, api_id, list_type):
         if list_type != ListType.MOVIES:
             response = requests.get("https://api.themoviedb.org/3/tv/{}?api_key={}&append_to_response=credits"

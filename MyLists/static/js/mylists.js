@@ -49,11 +49,11 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
             let $li, $img;
 
             if (item.nb_results === 0) {
-                $li = $('<li class="disabled bg-dark text-light p-l-5">No results found.</li>')
+                $li = $('<li class="disabled bg-dark text-light p-l-5">No results found.</li>');
                 return $li.appendTo(ul);
             }
 
-            $img = '<img src="'+ item.image_cover +'" style="width: 50px; height: 75px;" alt="">'
+            $img = '<img src="'+ item.image_cover +'" style="width: 50px; height: 75px;" alt="">';
             if (item.category === 'Users') {
                 $img = '<img src="'+ item.image_cover +'" style="width: 50px; height: 50px;" alt="">'
             }

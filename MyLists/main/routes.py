@@ -951,6 +951,7 @@ def autocomplete():
     for user in users:
         users_results.append(Autocomplete(user).get_user_dict())
 
+    # Get the media results
     try:
         media_data = ApiData().TMDb_search(search)
     except Exception as e:
@@ -967,8 +968,21 @@ def autocomplete():
                 continue
             media_results.append(Autocomplete(result).get_autocomplete_dict())
 
+    # Get the games results
+    try:
+        games_data = ApiData().IGDB_search(search)
+    except Exception as e:
+        games_data = {}
+        app.logger.error('[ERROR] - Requesting the IGDB API: {}'.format(e))
+
+    # Get the media results
+    games_results = []
+    if len(games_data) > 0:
+        for result in games_data:
+            games_results.append(Autocomplete(result).get_games_autocomplete_dict())
+
     # Create the <total_results> list
-    total_results = media_results + users_results
+    total_results = media_results + users_results + games_results
     if len(total_results) == 0:
         return jsonify(search_results=[{'nb_results': 0, 'category': None}]), 200
 
