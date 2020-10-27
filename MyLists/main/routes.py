@@ -206,11 +206,11 @@ def media_sheet(media_type, media_id):
         else:
             abort(404)
 
-    # If <media> and <tmdb_id> provived: redirect to get a nice URL.
+    # If <media> and <api_id> provived: redirect to get a nice URL.
     if media and api_id:
         return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media.id))
 
-    media_info = MediaDict(media, list_type).create_media_dict()
+    media_info = MediaDict(media, list_type).create_list_dict()
     title = media_info['display_name']
 
     return render_template(html_template, title=title, data=media_info, media_list=list_type.value)

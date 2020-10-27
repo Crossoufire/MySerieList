@@ -50,7 +50,41 @@ class MediaDict:
         self.list_type = list_type
         self.media_info = {}
 
-    def create_media_dict(self):
+    def create_list_dict(self):
+        if self.list_type != ListType.GAMES:
+            self.media_dict()
+        elif self.list_type == ListType.GAMES:
+            self.games_dict()
+
+        return self.media_info
+
+    def games_dict(self):
+        self.media_info = {"id": self.data.id,
+                           "display_name": self.data.name,
+                           "IGDB_url": self.data.IGDB_url,
+                           "vote_average": self.data.vote_average,
+                           "vote_count": self.data.vote_count,
+                           "synopsis": self.data.summary,
+                           "lock_status": self.data.lock_status,
+                           "collection_name": self.data.collection_name,
+                           "game_engine": self.data.game_engine,
+                           "game_modes": self.data.game_modes,
+                           "player_perspective": self.data.player_perspective,
+                           "first_release_date": self.data.first_release_date,
+                           "storyline": self.data.storyline,
+                           "companies": ', '.join([r.name for r in self.data.companies]),
+                           "genres": ', '.join([r.genre for r in self.data.genres]),
+                           "in_user_list": False,
+                           "time_played": 0,
+                           "score": "---",
+                           "completion": 0,
+                           "favorite": False,
+                           "comment": None}
+
+        self.add_genres()
+        self.add_follow_list()
+
+    def media_dict(self):
         self.media_info = {"id": self.data.id,
                            "homepage": self.data.homepage,
                            "vote_average": self.data.vote_average,
@@ -87,8 +121,6 @@ class MediaDict:
             self.add_tv_dict()
         else:
             self.add_movies_dict()
-
-        return self.media_info
 
     def add_tv_dict(self):
         self.media_info["created_by"] = self.data.created_by
@@ -546,9 +578,9 @@ class MediaDetails:
                               'vote_count': self.media_data.get('total_rating_count', 0) or 0,
                               'summary': self.media_data.get('summary', 'No summary found.') or 'No summary found.',
                               'storyline': self.media_data.get('storyline', 'No storyline found.') or 'No storyline found.',
-                              'collection_name': self.media_data.get('collection').get('name'),
-                              'game_engine': self.media_data.get('game_engines')[0].get('name'),
-                              'player_perspective': self.media_data.get('player_perspectives')[0].get('name'),
+                              'collection_name': self.media_data.get('collection')['name'],
+                              'game_engine': self.media_data.get('game_engines')[0]['name'],
+                              'player_perspective': self.media_data.get('player_perspectives')[0]['name'],
                               'game_modes': ','.join([x['name'] for x in self.media_data.get('game_modes')]),
                               'igdb_id': self.media_data.get('id'),
                               'image_cover': self.get_media_cover()}
@@ -598,7 +630,7 @@ class Autocomplete:
         self.info['igdb_id'] = self.result.get('id')
         self.info['display_name'] = self.result.get('name')
         self.info['category'] = 'Games'
-        self.info['type'] = 'game'
+        self.info['type'] = 'Game'
 
         self.info['image_cover'] = url_for('static', filename="covers/series_covers/default.jpg")
         if self.result.get('cover'):

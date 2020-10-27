@@ -1,5 +1,4 @@
 import enum
-
 from flask import abort
 from datetime import datetime
 from sqlalchemy.orm import aliased
@@ -16,12 +15,17 @@ def load_user(user_id):
 
 class Status(enum.Enum):
     WATCHING = 'Watching'
+    PLAYING = 'Playing'
     COMPLETED = 'Completed'
     COMPLETED_ANIMATION = 'Completed Animation'
+    ENDLESS = 'Endless'
+    MULTIPLAYER = 'Multiplayer'
     ON_HOLD = 'On Hold'
     RANDOM = 'Random'
     DROPPED = 'Dropped'
+    OWNED = 'Owned'
     PLAN_TO_WATCH = 'Plan to Watch'
+    PLAN_TO_PLAY = 'Plan to Play'
     ON_GOING = 'On Going'
 
 
@@ -489,9 +493,9 @@ class Games(db.Model):
     igdb_id = db.Column(db.Integer, nullable=False)
     lock_status = db.Column(db.Boolean, default=1)
 
-    genres = db.relationship('GamesGenreThemes', backref='games', lazy=True)
+    genres = db.relationship('GamesGenre', backref='games', lazy=True)
     platforms = db.relationship('GamesPlatforms', backref='games', lazy=True)
-    companies = db.relationship('GamesPlatforms', backref='games', lazy=True)
+    companies = db.relationship('GamesCompanies', backref='games', lazy=True)
     list_info = db.relationship('GamesList', backref='games', lazy='dynamic')
 
     def get_same_genres(self, genres_list, genre_str):

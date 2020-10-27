@@ -24,31 +24,26 @@
     <div class="col-6">
         <ul class="list-unstyled">
             <li class="m-b-15">
-                <h5 class="mb-1 text-media"><i class="fas fa-star"></i><b>&nbsp; TMDb Score</b></h5>
+                <h5 class="mb-1 text-media"><i class="fas fa-star"></i><b>&nbsp; IGDB Score</b></h5>
                 <i class="fas fa-ticket-alt fa-3x media-ticket" value="{{ data['vote_average'] }}"></i>
                 <div class="movie-vote-average">{{ data['vote_average'] }}</div>
                 <div class="movie-vote-count">({{ data['vote_count']|int }} votes)</div>
             </li>
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-video"></i><b>&nbsp; Directed by</b></h5>
-                <div>{{ data['director'] }}</div>
+                <div>{{ data['companies'] }}</div>
             </li>
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-calendar-check"></i><b>&nbsp; Release date</b></h5>
-                <div>{{ data['release_date'] }}</div>
+                <div>{{ data['first_release_date'] }}</div>
             </li>
             <li class="m-b-15">
-                <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Runtime</b></h5>
-                <div>{{ data['runtime']//60 }} h {{ '%02d'|format(data['runtime']%60) }} min</div>
+                <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Collection Name</b></h5>
+                <div>{{ data['collection_name'] }}</div>
             </li>
             <li>
-                <h5 class="mb-1 text-media"><i class="fas fa-flag"></i><b>&nbsp; Original language</b></h5>
-                {% if data['original_language'] == 'en' %}
-                    <span class="flag-icon flag-icon-us"></span>&nbsp;
-                {% else %}
-                    <span class="flag-icon flag-icon-{{ data['original_language'] }}"></span>
-                {% endif %}
-                &nbsp;<span>{{ data['original_language']|capitalize }}</span>
+                <h5 class="mb-1 text-media"><i class="fas fa-flag"></i><b>&nbsp; Game Engine</b></h5>
+                    <span class="flag-icon flag-icon-{{ data['game_engine'] }}"></span>
             </li>
         </ul>
     </div>
@@ -59,24 +54,16 @@
                 <div>{{ data['genres'] }}</div>
             </li>
             <li class="m-b-15">
-                <h5 class="mb-1 text-media"><i class="fas fa-user"></i><b>&nbsp; Actors</b></h5>
-                {% if data['actors'] == 'Unknown' %}
-                    <div><i>No actors found</i></div>
-                {% else %}
-                    <div>{{ data['actors'] }}</div>
-                {% endif %}
+                <h5 class="mb-1 text-media"><i class="fas fa-user"></i><b>&nbsp; Game Modes</b></h5>
+                <div>{{ data['game_modes'] }}</div>
             </li>
             <li class="m-b-15">
-                <h5 class="mb-1 text-media"><i class="fas fa-tag"></i><b>&nbsp; Tagline</b></h5>
-                <div>{{ data['tagline'] }}</div>
+                <h5 class="mb-1 text-media"><i class="fas fa-tag"></i><b>&nbsp; Player Perspective</b></h5>
+                <div>{{ data['player_perspective'] }}</div>
             </li>
             <li>
-                <h5 class="mb-1 text-media"><i class="fas fa-home"></i><b>&nbsp; Homepage</b></h5>
-                {% if data['homepage'] != 'Unknown' %}
-                    <a style="word-break: break-all;" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a>
-                {% else %}
-                    <i>No homepage available</i>
-                {% endif %}
+                <h5 class="mb-1 text-media"><i class="fas fa-home"></i><b>&nbsp; IGDB link</b></h5>
+                <a style="word-break: break-all;" href="{{ data['IGDB_url'] }}">{{ data['IGDB_url'] }}</a>
             </li>
         </ul>
     </div>
@@ -84,34 +71,11 @@
 
 
 {% block more_info %}
-    <h4><i class="fas fa-dollar-sign"></i>&nbsp;&nbsp; <b>Box-Office</b></h4><hr>
+    <h4><i class="fas fa-dollar-sign"></i>&nbsp;&nbsp; <b>Storyline</b></h4><hr>
     <ul class="text-left p-0">
         <li class="m-b-10">
             <div class="row">
-                <div class="col-5">
-                    <i class="fas fa-coins"></i>&nbsp; Budget
-                </div>
-                <div class="col-7">
-                    {% if data['budget'] != 0 %}
-                        {{ "{:,.0f}".format(data['budget']).replace(',', ' ') }} $
-                    {% else %}
-                        <i>No data available</i>
-                    {% endif %}
-                </div>
-            </div>
-        </li>
-        <li class="m-b-10">
-            <div class="row">
-                <div class="col-5">
-                   <i class="fas fa-coins"></i>&nbsp; Revenue
-                </div>
-                <div class="col-7">
-                   {% if data['revenue'] != 0 %}
-                        {{ "{:,.0f}".format(data['revenue']).replace(',', ' ') }} $
-                    {% else %}
-                        <i>No data available</i>
-                    {% endif %}
-                </div>
+                <div class="col">{{ data['storyline'] }}</div>
             </div>
         </li>
     </ul>
