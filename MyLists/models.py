@@ -29,12 +29,14 @@ class ListType(enum.Enum):
     SERIES = 'serieslist'
     ANIME = 'animelist'
     MOVIES = 'movieslist'
+    GAMES = 'gameslist'
 
 
 class MediaType(enum.Enum):
     SERIES = "Series"
     ANIME = "Anime"
     MOVIES = 'Movies'
+    GAMES = 'Games'
 
 
 class HomePage(enum.Enum):
@@ -464,7 +466,87 @@ class MoviesActors(db.Model):
     name = db.Column(db.String(150))
 
 
-# --- BADGES & RANKS -----------------------------------------------------------------------------------------------
+# --- GAMES -------------------------------------------------------------------------------------------------------
+
+
+class Games(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    image_cover = db.Column(db.String(100), nullable=False)
+    collection_name = db.Column(db.String(50))
+    game_engine = db.Column(db.String(50))
+    game_modes = db.Column(db.String(200))
+    player_perspective = db.Column(db.String(50))
+    vote_average = db.Column(db.Float)
+    vote_count = db.Column(db.Float)
+    first_release_date = db.Column(db.String(30))
+    storyline = db.Column(db.Text)
+    summary = db.Column(db.Text)
+    IGDB_url = db.Column(db.String(200))
+    hltb_main_time = db.Column(db.Float)
+    hltb_main_and_extra_time = db.Column(db.Float)
+    hltb_total_complete_time = db.Column(db.Float)
+    igdb_id = db.Column(db.Integer, nullable=False)
+    lock_status = db.Column(db.Boolean, default=1)
+
+    genres = db.relationship('GamesGenreThemes', backref='games', lazy=True)
+    platforms = db.relationship('GamesPlatforms', backref='games', lazy=True)
+    companies = db.relationship('GamesPlatforms', backref='games', lazy=True)
+    list_info = db.relationship('GamesList', backref='games', lazy='dynamic')
+
+    def get_same_genres(self, genres_list, genre_str):
+        same_genres = db.session.query(Games, GamesGenre) \
+            .join(Games, Games.id == GamesGenre.media_id) \
+            .filter(GamesGenre.genre.in_(genres_list), GamesGenre.media_id != self.id) \
+            .group_by(GamesGenre.media_id) \
+            .having(func.group_concat(GamesGenre.genre.distinct()) == genre_str).limit(8).all()
+        return same_genres
+
+    def in_follows_lists(self, user_id):
+        in_follows_lists = db.session.query(User, GamesList, followers) \
+            .join(User, User.id == followers.c.followed_id) \
+            .join(GamesList, GamesList.user_id == followers.c.followed_id) \
+            .filter(followers.c.follower_id == user_id, GamesList.media_id == self.id).all()
+        return in_follows_lists
+
+    def in_user_list(self, user_id):
+        in_user_list = self.list_info.filter_by(user_id=user_id).first()
+        return in_user_list
+
+
+class GamesList(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
+    status = db.Column(db.Enum(Status), nullable=False)
+    percentage_completion = db.Column(db.Integer)
+    time_played = db.Column(db.Float)
+    favorite = db.Column(db.Boolean)
+    score = db.Column(db.Float)
+    comment = db.Column(db.Text)
+
+
+class GamesGenre(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
+    genre = db.Column(db.String(100), nullable=False)
+
+
+class GamesPlatforms(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
+    name = db.Column(db.String(150))
+
+
+class GamesCompanies(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
+    name = db.Column(db.String(100))
+    publisher = db.Column(db.Boolean)
+    developer = db.Column(db.Boolean)
+
+
+# --- BADGES & RANKS ----------------------------------------------------------------------------------------------
 
 
 class Badges(db.Model):

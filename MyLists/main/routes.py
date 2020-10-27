@@ -13,7 +13,7 @@ from MyLists.main.functions import get_medialist_data, set_last_update, compute_
     save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MoviesGenre, MediaType, \
-    get_media_query, get_next_airing, check_media, User, get_collection_query
+    get_media_query, get_next_airing, check_media, User, get_collection_query, Games
 
 bp = Blueprint('main', __name__)
 
@@ -166,11 +166,15 @@ def media_sheet(media_type, media_id):
         list_type = ListType.ANIME
     elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
+    elif media_type == MediaType.GAMES:
+        list_type = ListType.GAMES
 
-    # Check if <media_id> came from TMDB and if in local DB
-    tmdb_id = request.args.get('search')
+    # Check if <media_id> came from an API and if in local DB
+    api_id = request.args.get('search')
 
-    if tmdb_id:
+    if api_id and list_type == ListType.GAMES:
+        search = {'igdb_id': media_id}
+    elif api_id and list_type != ListType.GAMES:
         search = {'themoviedb_id': media_id}
     else:
         search = {'id': media_id}
@@ -183,10 +187,13 @@ def media_sheet(media_type, media_id):
     elif list_type == ListType.MOVIES:
         media = Movies.query.filter_by(**search).first()
         html_template = 'media_sheet_movies.html'
+    elif list_type == ListType.GAMES:
+        media = Games.query.filter_by(**search).first()
+        html_template = 'media_sheet_games.html'
 
-    # If not <media> and a <tmdb_id> is provived: add media to DB, else abort.
+    # If <media> does not exist and <api_id> is provived: Add the media to DB, else abort.
     if not media:
-        if tmdb_id:
+        if api_id:
             try:
                 media_api_data = ApiData().get_details_and_credits_data(media_id, list_type)
                 media_details = MediaDetails(media_api_data, list_type).get_media_details()
@@ -200,7 +207,7 @@ def media_sheet(media_type, media_id):
             abort(404)
 
     # If <media> and <tmdb_id> provived: redirect to get a nice URL.
-    if media and tmdb_id:
+    if media and api_id:
         return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media.id))
 
     media_info = MediaDict(media, list_type).create_media_dict()
@@ -958,7 +965,6 @@ def autocomplete():
         media_data = {}
         app.logger.error('[ERROR] - Requesting the TMDB API: {}'.format(e))
 
-    # Get the media results
     media_results = []
     if media_data.get('total_results', 0) or 0 > 0:
         for i, result in enumerate(media_data["results"]):
@@ -975,7 +981,6 @@ def autocomplete():
         games_data = {}
         app.logger.error('[ERROR] - Requesting the IGDB API: {}'.format(e))
 
-    # Get the media results
     games_results = []
     if len(games_data) > 0:
         for result in games_data:

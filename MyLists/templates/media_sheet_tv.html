@@ -3,7 +3,7 @@
 
 {% block medialist_cat_drop %}
     <select id="category-dropdown" class="text-light text-center cat-drop"
-    onchange="changeCategoryTV('{{ data['id'] }}', this,'{{ data['eps_per_season'] }}', '{{ media_list }}')">
+    onchange="changeCategoryTV('{{ data['id'] }}', this, '{{ data['eps_per_season'] }}', '{{ media_list }}')">
         <option {% if data['status'] == 'Watching' %} selected="selected" {% endif %}>Watching</option>
         <option {% if data['status'] == 'Completed' %} selected="selected" {% endif %}>Completed</option>
         <option {% if data['status'] == 'On Hold' %} selected="selected" {% endif %}>On Hold</option>

@@ -322,6 +322,31 @@ class MediaDetails:
 
         return genres_list
 
+    def get_games_genres(self):
+        genres = self.media_data.get('genres') or None
+        genres_list = []
+        if genres:
+            for i in range(0, len(genres)):
+                genres_dict = {'genre': genres[i]['name']}
+                genres_list.append(genres_dict)
+        else:
+            genres_dict = {'genre': 'No genres found.'}
+            genres_list.append(genres_dict)
+
+        themes = self.media_data.get('themes') or None
+        themes_list = []
+        if themes:
+            for i in range(0, len(themes)):
+                themes_dict = {'genre': themes[i]['name']}
+                themes_list.append(themes_dict)
+        else:
+            themes_dict = {'genre': 'No genres found.'}
+            themes_list.append(themes_dict)
+
+        fusion_list = genres_list + themes_list
+
+        return fusion_list
+
     def get_anime_genres(self):
         a_genres_list = []
         try:
@@ -373,6 +398,36 @@ class MediaDetails:
                 if element['job'] == 'Director':
                     self.media_details['director_name'] = element['name']
                     break
+
+    def get_games_platforms(self):
+        platforms = self.media_data.get('platforms') or None
+        platforms_list = []
+        if platforms:
+            for platform in platforms:
+                platform_dict = {'name': platform["name"]}
+                platforms_list.append(platform_dict)
+        else:
+            platform_dict = {'name': 'Unknown'}
+            platforms_list.append(platform_dict)
+
+        return platforms_list
+
+    def get_games_companies(self):
+        companies = self.media_data.get('involved_companies') or None
+        companies_list = []
+        if companies:
+            for company in companies:
+                companies_dict = {'name': company["company"]["name"],
+                                  'publisher': company["publisher"],
+                                  'developer': company["developer"]}
+                companies_list.append(companies_dict)
+        else:
+            companies_dict = {'name': 'Unknown',
+                              'publisher': False,
+                              'developper': False}
+            companies_list.append(companies_dict)
+
+        return companies_list
 
     def get_collection_info(self):
 
@@ -482,11 +537,38 @@ class MediaDetails:
                          'genres_data': genres_list,
                          'actors_data': actors_list}
 
+    def get_games_details(self):
+        self.media_data = self.media_data[0]
+        self.media_details = {'name': self.media_data.get('name', 'Unknown') or 'Unknown',
+                              'first_release_date': self.media_data.get('first_release_date', 'Unknown') or 'Unknown',
+                              'IGDB_url': self.media_data.get('url', 'Unknown') or 'Unknown',
+                              'vote_average': self.media_data.get('total_rating', 0) or 0,
+                              'vote_count': self.media_data.get('total_rating_count', 0) or 0,
+                              'summary': self.media_data.get('summary', 'No summary found.') or 'No summary found.',
+                              'storyline': self.media_data.get('storyline', 'No storyline found.') or 'No storyline found.',
+                              'collection_name': self.media_data.get('collection').get('name'),
+                              'game_engine': self.media_data.get('game_engines')[0].get('name'),
+                              'player_perspective': self.media_data.get('player_perspectives')[0].get('name'),
+                              'game_modes': ','.join([x['name'] for x in self.media_data.get('game_modes')]),
+                              'igdb_id': self.media_data.get('id'),
+                              'image_cover': self.get_media_cover()}
+
+        companies_list = self.get_games_companies()
+        genres_list = self.get_games_genres()
+        platforms_list = self.get_games_platforms()
+
+        self.all_data = {'games_data': self.media_details,
+                         'companies_data': companies_list,
+                         'genres_data': genres_list,
+                         'platforms_data': platforms_list}
+
     def get_media_details(self):
-        if self.list_type != ListType.MOVIES:
+        if self.list_type == ListType.SERIES or self.list_type == ListType.ANIME:
             self.get_tv_details()
         elif self.list_type == ListType.MOVIES:
             self.get_movies_details()
+        elif self.list_type == ListType.GAMES:
+            self.get_games_details()
 
         return self.all_data
 

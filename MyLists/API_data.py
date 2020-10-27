@@ -38,12 +38,21 @@ class ApiData:
         return json.loads(response.text)
 
     def get_details_and_credits_data(self, api_id, list_type):
-        if list_type != ListType.MOVIES:
+        if list_type == ListType.SERIES or list_type == ListType.ANIME:
             response = requests.get("https://api.themoviedb.org/3/tv/{}?api_key={}&append_to_response=credits"
                                     .format(api_id, self.tmdb_api_key))
         elif list_type == ListType.MOVIES:
             response = requests.get("https://api.themoviedb.org/3/movie/{}?api_key={}&append_to_response=credits"
                                     .format(api_id, self.tmdb_api_key))
+        elif list_type == ListType.GAMES:
+            headers = {'Client-ID': '5i5pi21s0ninkmp6jj09ix4l6fw5bd',
+                       'Authorization': 'Bearer ' + '46gsxkz0svtqzujd4znmjqilhq0xa5'}
+            body = 'fields name, cover.image_id, collection.name, game_engines.name, game_modes.name, ' \
+                   'platforms.name, genres.name, player_perspectives.name, total_rating, total_rating_count, ' \
+                   'first_release_date, involved_companies.company.name, involved_companies.developer, ' \
+                   'involved_companies.publisher, storyline, summary, themes.name, url, status; where id={};'\
+                .format(api_id)
+            response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers)
 
         self.status_code(response.status_code)
 

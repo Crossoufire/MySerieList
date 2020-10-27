@@ -190,6 +190,65 @@ function changeCategoryMovies(element_id, cat_selector, genres) {
 }
 
 
+// --- Change the TV category ------------------------------------------
+function changeCategoryGames(element_id, cat_selector, seas_data, media_list) {
+    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
+    $('#cat-loading').show();
+    $('#your-medialist-data').addClass('disabled');
+
+    if (new_cat === 'Completed') {
+        $('#rewatch-row').show('slow');
+    } else {
+        $('#rewatch-row').hide('slow');
+        $('#rewatched-dropdown').val("0");
+    }
+
+    $.ajax ({
+        type: "POST",
+        url: "/change_element_category",
+        contentType: "application/json",
+        data: JSON.stringify({status: new_cat, element_id: element_id, element_type: media_list }),
+        dataType: "json",
+        success: function() {
+            $('#season-row').show();
+            $('#episode-row').show();
+            $('#cat-check').show().delay(1500).fadeOut();
+            $('#your-medialist-data').removeClass('disabled');
+
+            if (new_cat === 'Completed') {
+                let season_data = JSON.parse("["+seas_data+"]");
+                let episode_drop = $('#episode-dropdown');
+                let seasons_length = $('#season-dropdown').children('option').length;
+                let seasons_index = (seasons_length - 1);
+                $('#season-dropdown').prop('selectedIndex', seasons_index);
+
+                episode_drop[0].length = 1;
+
+                for (let i = 2; i <= season_data[0][seasons_index]; i++) {
+                    let opt = document.createElement("option");
+                    opt.className = "";
+                    (i <= 9) ? opt.innerHTML = "E0"+i : opt.innerHTML = "E"+i;
+                    episode_drop[0].appendChild(opt);
+                }
+                $('#episode-dropdown').prop('selectedIndex', season_data[0][seasons_index]-1);
+            }
+            else if (new_cat === 'Random' || new_cat === 'Plan to Watch') {
+                $('#season-dropdown').val("0");
+                $('#episode-dropdown').val("0");
+                $('#season-row').hide();
+                $('#episode-row').hide();
+            }
+        },
+        error: function() {
+            error_ajax_message('Error changing your media status. Please try again later.');
+        },
+        complete: function () {
+            $('#cat-loading').hide();
+        }
+    });
+}
+
+
 // --- Update season ---------------------------------------------------
 function updateSeason(element_id, value, seas_data, media_list) {
     $('#season-loading').show();

@@ -20,6 +20,8 @@ $(function() {
                 form.action = '/media_sheet/Movies/' + ui.item.tmdb_id + '?search=True';
             } else if (ui.item.type === 'User') {
                 form.action = '/account/' + ui.item.display_name;
+            } else if (ui.item.type === 'Game') {
+                form.action = '/media_sheet/Games/' + ui.item.igdb_id + '?search=True';
             }
             document.body.appendChild(form);
             form.submit();
@@ -93,9 +95,9 @@ function display_notifications(data) {
             // Add the time and date for the follow
             let tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
             let localdate = new Date(resp[i]['timestamp']).toLocaleString("en-GB", {timeZone: tz});
-            let d = new Date(resp[i]['timestamp'])
+            let d = new Date(resp[i]['timestamp']);
             let month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            let timestamp = localdate.slice(0, 2) + " " + month[d.getMonth()] + " at " + localdate.slice(11, 17)
+            let timestamp = localdate.slice(0, 2) + " " + month[d.getMonth()] + " at " + localdate.slice(11, 17);
 
             // Add H-line between notifications except for the last one
             if (i + 1 === resp.length) {
