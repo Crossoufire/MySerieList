@@ -25,13 +25,17 @@
         <ul class="list-unstyled">
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-star"></i><b>&nbsp; IGDB Score</b></h5>
-                <i class="fas fa-ticket-alt fa-3x media-ticket" value="{{ data['vote_average'] }}"></i>
+                <i class="fas fa-gamepad fa-3x media-ticket" value="{{ data['vote_average']|round(2) }}"></i>
                 <div class="movie-vote-average">{{ data['vote_average'] }}</div>
                 <div class="movie-vote-count">({{ data['vote_count']|int }} votes)</div>
             </li>
             <li class="m-b-15">
-                <h5 class="mb-1 text-media"><i class="fas fa-video"></i><b>&nbsp; Directed by</b></h5>
-                <div>{{ data['companies'] }}</div>
+                <h5 class="mb-1 text-media"><i class="fas fa-money-bill-wave-alt"></i><b>&nbsp; Publisher</b></h5>
+                <div>{{ ', '.join(data['publisher']) }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-terminal"></i><b>&nbsp; Developer</b></h5>
+                <div>{{ ', '.join(data['developer']) }}</div>
             </li>
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-calendar-check"></i><b>&nbsp; Release date</b></h5>

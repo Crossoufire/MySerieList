@@ -72,14 +72,21 @@ class MediaDict:
                            "player_perspective": self.data.player_perspective,
                            "first_release_date": self.data.first_release_date,
                            "storyline": self.data.storyline,
-                           "companies": ', '.join([r.name for r in self.data.companies]),
                            "genres": ', '.join([r.genre for r in self.data.genres]),
+                           "publisher": [],
+                           "developer": [],
                            "in_user_list": False,
                            "time_played": 0,
                            "score": "---",
                            "completion": 0,
                            "favorite": False,
                            "comment": None}
+
+        for company in self.data.companies:
+            if company.publisher is True:
+                self.media_info['publisher'].append(company.name)
+            if company.developer is True:
+                self.media_info['developer'].append(company.name)
 
         self.add_genres()
         self.add_follow_list()
