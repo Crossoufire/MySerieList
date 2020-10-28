@@ -132,4 +132,7 @@ MyLists/static/covers/movies_covers/*
 MyLists/static/covers/movies_collection_covers/*
 !MyLists/static/covers/movies_collection_covers/default.jpg
 
+MyLists/static/covers/games_covers/*
+!MyLists/static/covers/games_covers/default.jpg
+
 start.sh

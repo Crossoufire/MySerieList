@@ -11,7 +11,7 @@ from MyLists.models import MediaType, ListType, Status, get_media_count, UserLas
 
 
 def check_cat_type(list_type, status):
-    if list_type != ListType.MOVIES:
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
         if status == 'Watching':
             return Status.WATCHING
         elif status == 'Completed':
@@ -33,6 +33,25 @@ def check_cat_type(list_type, status):
             return Status.COMPLETED_ANIMATION
         elif status == 'Plan to Watch':
             return Status.PLAN_TO_WATCH
+        else:
+            return None
+    elif list_type == ListType.GAMES:
+        if status == 'Playing':
+            return Status.PLAYING
+        elif status == 'Completed':
+            return Status.COMPLETED
+        elif status == 'On Hold':
+            return Status.ON_HOLD
+        elif status == 'Endless':
+            return Status.ENDLESS
+        elif status == 'Multiplayer':
+            return Status.MULTIPLAYER
+        elif status == 'Owned':
+            return Status.OWNED
+        elif status == 'Dropped':
+            return Status.DROPPED
+        elif status == 'Plan to Play':
+            return Status.PLAN_TO_PLAY
         else:
             return None
 
@@ -100,8 +119,9 @@ def set_last_update(media, media_type, old_status=None, new_status=None, old_sea
     db.session.commit()
 
 
-def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0, movie_status=None,
-                       movie_delete=False, movie_add=False, new_rewatch=0, old_rewatch=0, movie_runtime=0):
+def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0, movie_status=None, new_gametime=0,
+                       movie_delete=False, movie_add=False, old_gametime=0, new_rewatch=0, old_rewatch=0,
+                       movie_runtime=0):
 
     if list_type == ListType.SERIES:
         old_time = current_user.time_spent_series
@@ -124,7 +144,9 @@ def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0,
                 current_user.time_spent_movies = old_time + movie_runtime + media.runtime*(new_rewatch-old_rewatch)
             else:
                 current_user.time_spent_movies = old_time - movie_runtime + media.runtime*(new_rewatch-old_rewatch)
-
+    elif list_type == ListType.GAMES:
+        old_time = current_user.time_spent_games
+        current_user.time_spent_games = old_time + new_gametime - old_gametime
     db.session.commit()
 
 

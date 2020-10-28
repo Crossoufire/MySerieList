@@ -63,6 +63,17 @@
                         {% block medialist_eps_seas_drop scoped %}
                         {% endblock medialist_eps_seas_drop %}
                         <div class="m-l-35 m-r-55 m-t-8 m-b-8" style="border: 1px solid grey;"></div>
+                        <div id="comp-row" class="row m-l-30 m-r-25" data-toggle="tooltip" title="100% completion?">
+                            <div class="col-4">
+                                <b>100%</b>
+                            </div>
+                            <div class="col-8">
+                                <input type="checkbox" name="comp-check" onchange="updateCompletion('{{ data['id'] }}')"
+                                {% if data['completion'] == True %}checked{% endif %}/>
+                                <i id="comp-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+                                &nbsp;<i id="comp-check" class="fas fa-check" style="display: none;"></i>
+                            </div>
+                        </div>
                         <div id="score-row" class="row m-l-30 m-r-25" data-toggle="tooltip" title="Score /10">
                             <div class="col-4">
                                 <b>Score:</b>
@@ -87,7 +98,7 @@
                         </div>
                         <div id="rewatch-row" class="row m-l-30 m-r-25" data-toggle="tooltip" title="How many
                         time you rewatched this media. Do not count the inital completion."
-                        {% if data['status'] == 'Completed'or data['status'] == 'Completed Animation' %}
+                        {% if (data['status'] == 'Completed' or data['status'] == 'Completed Animation') and media_list != 'gameslist' %}
                         {% else %} style="display: none;" {% endif %}>
                             <div class="col-4">
                                 <b>Rewatched:</b>

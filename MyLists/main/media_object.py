@@ -60,6 +60,7 @@ class MediaDict:
 
     def games_dict(self):
         self.media_info = {"id": self.data.id,
+                           "cover": 'games_covers/{}'.format(self.data.image_cover),
                            "display_name": self.data.name,
                            "IGDB_url": self.data.IGDB_url,
                            "vote_average": self.data.vote_average,
@@ -70,17 +71,18 @@ class MediaDict:
                            "game_engine": self.data.game_engine,
                            "game_modes": self.data.game_modes,
                            "player_perspective": self.data.player_perspective,
-                           "first_release_date": self.data.first_release_date,
                            "storyline": self.data.storyline,
                            "genres": ', '.join([r.genre for r in self.data.genres]),
+                           "media_type": 'Games',
                            "publisher": [],
                            "developer": [],
                            "in_user_list": False,
-                           "time_played": 0,
                            "score": "---",
-                           "completion": 0,
                            "favorite": False,
-                           "comment": None}
+                           "status": Status.OWNED.value,
+                           "comment": None,
+                           "time_played": 0.,
+                           "completion": False}
 
         for company in self.data.companies:
             if company.publisher is True:
@@ -88,8 +90,28 @@ class MediaDict:
             if company.developer is True:
                 self.media_info['developer'].append(company.name)
 
+        self.media_info["first_release_date"] = datetime.utcfromtimestamp(int(self.data.first_release_date))\
+            .strftime('%d %b %Y')
+
         self.add_genres()
         self.add_follow_list()
+
+        in_user_list = self.add_user_list()
+        if in_user_list:
+            self.media_info["in_user_list"] = True
+            self.media_info["score"] = in_user_list.score
+            self.media_info["favorite"] = in_user_list.favorite
+            self.media_info["status"] = in_user_list.status.value
+            self.media_info["comment"] = in_user_list.comment
+            self.media_info["completion"] = in_user_list.completion
+
+            total_time = str(in_user_list.time_played)
+            total_time = total_time.split('.')
+            hours = total_time[0]
+            minutes = int((float(total_time[1])/100)*60)
+
+            self.media_info["t_played_h"] = hours
+            self.media_info["t_played_m"] = minutes
 
     def media_dict(self):
         self.media_info = {"id": self.data.id,
@@ -285,8 +307,12 @@ class MediaDetails:
         self.all_data = {}
 
     def get_media_cover(self):
-        media_cover_path = self.media_data.get('poster_path') or None
         media_cover_name = 'default.jpg'
+        if self.list_type != ListType.GAMES:
+            media_cover_path = self.media_data.get('poster_path') or None
+        elif self.list_type == ListType.GAMES:
+            media_cover_path = self.media_data.get('cover')['image_id'] or None
+
         if media_cover_path:
             media_cover_name = '{}.jpg'.format(secrets.token_hex(8))
             try:
@@ -585,10 +611,10 @@ class MediaDetails:
                               'vote_count': self.media_data.get('total_rating_count', 0) or 0,
                               'summary': self.media_data.get('summary', 'No summary found.') or 'No summary found.',
                               'storyline': self.media_data.get('storyline', 'No storyline found.') or 'No storyline found.',
-                              'collection_name': self.media_data.get('collection')['name'],
-                              'game_engine': self.media_data.get('game_engines')[0]['name'],
-                              'player_perspective': self.media_data.get('player_perspectives')[0]['name'],
-                              'game_modes': ','.join([x['name'] for x in self.media_data.get('game_modes')]),
+                              'collection_name': self.media_data.get('collection', {'name': 'Unknown'})['name'] or 'Unknown',
+                              'game_engine': self.media_data.get('game_engines', [{'name': 'Unknown'}])[0]['name'] or 'Unknown',
+                              'player_perspective': self.media_data.get('player_perspectives', [{'name': 'Unknown'}])[0]['name'] or 'Unknown',
+                              'game_modes': ','.join([x['name'] for x in self.media_data.get('game_modes', [{'name': 'Unknown'}])]),
                               'igdb_id': self.media_data.get('id'),
                               'image_cover': self.get_media_cover()}
 

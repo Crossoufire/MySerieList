@@ -13,7 +13,7 @@ from MyLists.main.functions import get_medialist_data, set_last_update, compute_
     save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MoviesGenre, MediaType, \
-    get_media_query, get_next_airing, check_media, User, get_collection_query, Games
+    get_media_query, get_next_airing, check_media, User, get_collection_query, Games, GamesList
 
 bp = Blueprint('main', __name__)
 
@@ -200,7 +200,7 @@ def media_sheet(media_type, media_id):
                 media = AddtoDB(media_details, list_type).add_media_to_db()
             except Exception as e:
                 app.logger.error('[ERROR] - Occured trying to add media ({}) ID [{}] to DB: {}'
-                                 .format(list_type.value, media_id, e))
+                                 .format(media_type.value, media_id, e))
                 flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
                 return redirect(request.referrer)
         else:
@@ -615,16 +615,20 @@ def change_element_category():
     if not media:
         return '', 400
 
-    # Get the old status and old rewatch time multiplier
+    # Get the old status
     old_status = media[1].status
-    old_rewatch = media[1].rewatched
 
-    # Set the new status and reset the rewatched time multiplier
+    # Set the new status
     media[1].status = new_status
-    media[1].rewatched = 0
+
+    if list_type != ListType.GAMES:
+        # Get the old rewatched
+        old_rewatch = media[1].rewatched
+        # Reset the rewatched time multiplier
+        media[1].rewatched = 0
 
     # Set and change accordingly <last_episode_watched>, <current_season> and <eps_watched> for anime and series
-    if list_type != ListType.MOVIES:
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
         old_watched = media[1].eps_watched
         if new_status == Status.COMPLETED:
             media[1].current_season = len(media[0].eps_per_season)
@@ -640,10 +644,10 @@ def change_element_category():
             new_watched = old_watched
 
     # Set the last updates
-    set_last_update(media=media[0], media_type=list_type, old_status=old_status, new_status=new_status)
+    # set_last_update(media=media[0], media_type=list_type, old_status=old_status, new_status=new_status)
 
     # Compute the new time spent
-    if list_type != ListType.MOVIES:
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
         compute_time_spent(media=media[0], list_type=list_type, old_watched=old_watched, new_watched=new_watched,
                            old_rewatch=old_rewatch)
     elif list_type == ListType.MOVIES:
@@ -695,6 +699,78 @@ def update_score():
                     .format(current_user.id, media_id, old_score, new_score))
 
     # Commit the changes
+    db.session.commit()
+
+    return '', 204
+
+
+@bp.route('/update_playtime', methods=['POST'])
+@login_required
+def update_playtime():
+    try:
+        json_data = request.get_json()
+        hours = int(json_data['hours'])
+        minutes = int(json_data['min'])
+        media_id = int(json_data['media_id'])
+        media_list = json_data['media_type']
+    except:
+        return '', 400
+
+    # Check if <media_list> exist and valid
+    try:
+        list_type = ListType(media_list)
+    except ValueError:
+        return '', 400
+
+    media = check_media(media_id, list_type)
+    if not media:
+        return '', 400
+
+    # Get the old data
+    old_playtime = media[1].time_played
+
+    # Set the new data
+    media[1].time_played = '{}.{}'.format(hours, int((minutes*100)/60))
+    app.logger.info('[{}] Series ID {} playtime updated'.format(current_user.id, media_id))
+
+    # Commit the changes
+    db.session.commit()
+
+    return '', 204
+
+
+@bp.route('/update_completion', methods=['POST'])
+@login_required
+def update_completion():
+    try:
+        json_data = request.get_json()
+        media_id = int(json_data['element_id'])
+        media_list = json_data['media_list']
+        completion = bool(json_data['data'])
+    except:
+        return '', 400
+
+    # Check if the <media_list> exist and is valid
+    try:
+        list_type = ListType(media_list)
+    except ValueError:
+        return '', 400
+
+    # Check if the <media_id> is in the current user's list
+    if list_type == ListType.SERIES:
+        media = SeriesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
+    elif list_type == ListType.ANIME:
+        media = AnimeList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
+    elif list_type == ListType.MOVIES:
+        media = MoviesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
+    elif list_type == ListType.GAMES:
+        media = GamesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
+
+    if not media:
+        return '', 400
+
+    # Add <completion> and commit the changes
+    media.completion = completion
     db.session.commit()
 
     return '', 204
@@ -773,6 +849,8 @@ def add_favorite():
         media = AnimeList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
     elif list_type == ListType.MOVIES:
         media = MoviesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
+    elif list_type == ListType.GAMES:
+        media = GamesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
 
     if not media:
         return '', 400
@@ -795,13 +873,13 @@ def add_element():
     except:
         return '', 400
 
-    # Check if the media_list exist and is valid
+    # Check if the <media_list> exist and is valid
     try:
         list_type = ListType(media_list)
     except ValueError:
         return '', 400
 
-    # Check if status is valid compared to <list_type>
+    # Check if <status> is valid compared to <list_type>
     new_status = check_cat_type(list_type, media_cat)
     if not new_status:
         return '', 400
@@ -811,8 +889,8 @@ def add_element():
     if not media:
         return '', 400
 
-    # Setup the season, episode and category of the media
-    if list_type != ListType.MOVIES:
+    # Setup the <season>, <episode> and <category> of the <media>
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
         new_season = 1
         new_episode = 1
         new_watched = 1
@@ -828,7 +906,7 @@ def add_element():
             if MoviesGenre.query.filter_by(media_id=media.id, genre="Animation").first():
                 new_status = Status.COMPLETED_ANIMATION
 
-    # Add media to the user
+    # Add <media> to the <user>
     if list_type == ListType.SERIES:
         user_list = SeriesList(user_id=current_user.id,
                                media_id=media.id,
@@ -847,6 +925,12 @@ def add_element():
         user_list = MoviesList(user_id=current_user.id,
                                media_id=media.id,
                                status=new_status)
+    elif list_type == ListType.GAMES:
+        user_list = GamesList(user_id=current_user.id,
+                              media_id=media.id,
+                              status=new_status,
+                              completion=False,
+                              time_played=0.)
 
     # Commit the changes
     db.session.add(user_list)
@@ -855,13 +939,15 @@ def add_element():
                     .format(current_user.id, list_type.value.replace('list', ''), media_id, new_status.value))
 
     # Set the last update
-    set_last_update(media=media, media_type=list_type, new_status=new_status)
+    # set_last_update(media=media, media_type=list_type, new_status=new_status)
 
     # Compute the new time spent
-    if list_type != ListType.MOVIES:
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
         compute_time_spent(media=media, new_watched=new_watched, list_type=list_type)
     elif list_type == ListType.MOVIES:
         compute_time_spent(media=media, list_type=list_type, movie_status=new_status, movie_add=True)
+    elif list_type == ListType.GAMES:
+        compute_time_spent(media=media, list_type=list_type)
 
     return '', 204
 

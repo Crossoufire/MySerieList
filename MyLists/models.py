@@ -49,6 +49,7 @@ class HomePage(enum.Enum):
     MYSERIESLIST = "serieslist"
     MYANIMELIST = "animelist"
     MYMOVIESLIST = "movieslist"
+    MYGAMESLIST = "gameslist"
 
 
 class RoleType(enum.Enum):
@@ -74,12 +75,14 @@ class User(db.Model, UserMixin):
     time_spent_series = db.Column(db.Integer, nullable=False, default=0)
     time_spent_movies = db.Column(db.Integer, nullable=False, default=0)
     time_spent_anime = db.Column(db.Integer, nullable=False, default=0)
+    time_spent_games = db.Column(db.Integer, nullable=False, default=0)
     private = db.Column(db.Boolean, nullable=False, default=False)
     active = db.Column(db.Boolean, nullable=False, default=False)
     profile_views = db.Column(db.Integer, nullable=False, default=0)
     series_views = db.Column(db.Integer, nullable=False, default=0)
     anime_views = db.Column(db.Integer, nullable=False, default=0)
     movies_views = db.Column(db.Integer, nullable=False, default=0)
+    games_views = db.Column(db.Integer, nullable=False, default=0)
     biography = db.Column(db.Text)
     transition_email = db.Column(db.String(120))
     activated_on = db.Column(db.DateTime)
@@ -523,7 +526,7 @@ class GamesList(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
-    percentage_completion = db.Column(db.Integer)
+    completion = db.Column(db.Boolean)
     time_played = db.Column(db.Float)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
@@ -859,6 +862,9 @@ def check_media(media_id, list_type, add=False):
     elif list_type == ListType.MOVIES:
         media = Movies
         media_list = MoviesList
+    elif list_type == ListType.GAMES:
+        media = Games
+        media_list = GamesList
 
     query = db.session.query(media, media_list) \
         .join(media, media.id == media_list.media_id) \

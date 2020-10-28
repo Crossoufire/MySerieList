@@ -2,8 +2,16 @@
 
 // --- Add the media to the user ---------------------------------------
 function addToUser(element_id, media_type) {
-    let category = media_type === 'movieslist' ? 'Completed' : 'Watching';
+    let category;
     let $medialist = $('#your-medialist-data');
+
+    if (media_type === 'serieslist' || media_type === 'animelist') {
+        category = 'Watching'
+    } else if (media_type === 'movieslist') {
+        category = 'Completed'
+    } else if (media_type === 'gameslist') {
+        category = 'Owned'
+    }
 
     $medialist.addClass('disabled');
     $('#loading-add-list').hide();
@@ -190,57 +198,25 @@ function changeCategoryMovies(element_id, cat_selector, genres) {
 }
 
 
-// --- Change the TV category ------------------------------------------
-function changeCategoryGames(element_id, cat_selector, seas_data, media_list) {
-    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
+// --- Change the Game category ----------------------------------------
+function changeCategoryGames(element_id, cat_selector) {
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
 
-    if (new_cat === 'Completed') {
-        $('#rewatch-row').show('slow');
-    } else {
-        $('#rewatch-row').hide('slow');
-        $('#rewatched-dropdown').val("0");
-    }
+    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
 
     $.ajax ({
         type: "POST",
         url: "/change_element_category",
         contentType: "application/json",
-        data: JSON.stringify({status: new_cat, element_id: element_id, element_type: media_list }),
+        data: JSON.stringify({status: new_cat, element_id: element_id, element_type: 'gameslist' }),
         dataType: "json",
         success: function() {
-            $('#season-row').show();
-            $('#episode-row').show();
             $('#cat-check').show().delay(1500).fadeOut();
             $('#your-medialist-data').removeClass('disabled');
-
-            if (new_cat === 'Completed') {
-                let season_data = JSON.parse("["+seas_data+"]");
-                let episode_drop = $('#episode-dropdown');
-                let seasons_length = $('#season-dropdown').children('option').length;
-                let seasons_index = (seasons_length - 1);
-                $('#season-dropdown').prop('selectedIndex', seasons_index);
-
-                episode_drop[0].length = 1;
-
-                for (let i = 2; i <= season_data[0][seasons_index]; i++) {
-                    let opt = document.createElement("option");
-                    opt.className = "";
-                    (i <= 9) ? opt.innerHTML = "E0"+i : opt.innerHTML = "E"+i;
-                    episode_drop[0].appendChild(opt);
-                }
-                $('#episode-dropdown').prop('selectedIndex', season_data[0][seasons_index]-1);
-            }
-            else if (new_cat === 'Random' || new_cat === 'Plan to Watch') {
-                $('#season-dropdown').val("0");
-                $('#episode-dropdown').val("0");
-                $('#season-row').hide();
-                $('#episode-row').hide();
-            }
         },
         error: function() {
-            error_ajax_message('Error changing your media status. Please try again later.');
+            error_ajax_message('Error changing your game status. Please try again later.');
         },
         complete: function () {
             $('#cat-loading').hide();
@@ -314,6 +290,34 @@ function updateEpisode(element_id, episode, media_list) {
 }
 
 
+// --- Update completion --------------------------------------------------
+function updateCompletion(element_id) {
+    $('#comp-loading').show();
+    $('#your-medialist-data').addClass('disabled');
+
+    let comp_value = $("input[type=checkbox][name=comp-check]:checked").val()
+    comp_value = comp_value === 'on';
+
+    $.ajax ({
+        type: "POST",
+        url: "/update_completion",
+        contentType: "application/json",
+        data: JSON.stringify({data: comp_value, element_id: element_id, media_list: 'gameslist' }),
+        dataType: "json",
+        success: function() {
+            $('#comp-check').show().delay(1500).fadeOut();
+            $('#your-medialist-data').removeClass('disabled');
+        },
+        error: function() {
+            error_ajax_message('Error updating the completion of the game. Please try again later.');
+        },
+        complete: function () {
+            $('#comp-loading').hide();
+        }
+    });
+}
+
+
 // --- Update rewatched data -------------------------------------------
 function updateRewatched(element_id, rewatch, media_list) {
     $('#rewatched-loading').show();
@@ -356,6 +360,31 @@ function updateScore(element_id, score, media_list) {
         },
         complete: function () {
             $('#score-loading').hide();
+        }
+    });
+}
+
+
+// --- Update time played ----------------------------------------------
+function updatePlaytime(media_id) {
+    $('#time-loading').show();
+    let hours = $('#time_h').val();
+    let minutes = $('#time_m').val();
+
+    $.ajax ({
+        type: "POST",
+        url: "/update_playtime",
+        contentType: "application/json",
+        data: JSON.stringify({hours: hours, min: minutes, media_id: media_id, media_type: 'gameslist' }),
+        dataType: "json",
+        success: function() {
+            $('#time-check').show().delay(1500).fadeOut();
+        },
+        error: function() {
+            error_ajax_message('Error updating the time played. Please try again later.');
+        },
+        complete: function () {
+            $('#time-loading').hide();
         }
     });
 }
