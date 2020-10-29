@@ -253,6 +253,16 @@ class MediaListDict:
             self.cover_path = url_for('static', filename='covers/anime_covers/')
         elif self.list_type == ListType.MOVIES:
             self.cover_path = url_for('static', filename='covers/movies_covers/')
+        elif self.list_type == ListType.GAMES:
+            self.cover_path = url_for('static', filename='covers/games_covers/')
+
+    def redirect_medialist(self):
+        if self.list_type != ListType.GAMES:
+            self.create_medialist_dict()
+        elif self.list_type == ListType.GAMES:
+            self.create_gameslist_dict()
+
+        return self.media_info
 
     def create_medialist_dict(self):
         self.media_info = {"id": self.data[0].id,
@@ -286,7 +296,25 @@ class MediaListDict:
         if self.list_type != ListType.MOVIES:
             self.add_tv_dict()
 
-        return self.media_info
+    def create_gameslist_dict(self):
+        self.media_info = {"id": self.data[0].id,
+                           "name": self.data[0].name,
+                           "igdb_id": self.data[0].igdb_id,
+                           "cover": "{}{}".format(self.cover_path, self.data[0].image_cover),
+                           "score": self.data[1].score,
+                           "favorite": self.data[1].favorite,
+                           "completion": self.data[1].completion,
+                           "comment": self.data[1].comment,
+                           "category": self.data[1].status.value,
+                           "time_played": self.data[1].time_played,
+                           "common": False,
+                           "media": "Games"}
+
+        if not self.media_info['score'] or self.media_info['score'] == -1:
+            self.media_info['score'] = '---'
+
+        if self.data[0].id in self.common_media:
+            self.media_info['common'] = True
 
     def add_tv_dict(self):
         self.media_info['media'] = 'Series'

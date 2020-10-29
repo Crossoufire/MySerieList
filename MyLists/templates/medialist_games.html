@@ -1,0 +1,33 @@
+{% extends 'medialist_base.html' %}
+
+
+{% block button %}
+    <a class="btn btn-sm {% if category == 'Playing' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Playing&sort={{ sort_val }}&filter={{ filter_val }}">PLAYING</a>
+    <a class="btn btn-sm {% if category == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Completed&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED</a>
+    <a class="btn btn-sm {% if category == 'On Hold' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=On Hold&sort={{ sort_val }}&filter={{ filter_val }}">ON HOLD</a>
+    <a class="btn btn-sm {% if category == 'Endless' %}btn-selected-fav {% else %} btn-header-fav{% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Endless&sort={{ sort_val }}&filter={{ filter_val }}">ENDLESS</a>
+    <a class="btn btn-sm {% if category == 'Multiplayer' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Multiplayer&sort={{ sort_val }}&filter={{ filter_val }}">MULTIPLAYER</a>
+    <a class="btn btn-sm {% if category == 'Dropped' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Dropped&sort={{ sort_val }}&filter={{ filter_val }}">DROPPED</a>
+    <a class="btn btn-sm {% if category == 'Owned' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Owned&sort={{ sort_val }}&filter={{ filter_val }}">OWNED</a>
+    <a class="btn btn-sm {% if category == 'Plan to Play' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Plan to Play&sort={{ sort_val }}&filter={{ filter_val }}">PLAN TO PLAY</a>
+    <a class="btn btn-sm {% if category == 'Favorite' %}btn-selected-fav {% else %} btn-header-fav{% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Favorite&sort={{ sort_val }}&filter={{ filter_val }}">FAVORITES</a>
+{% endblock button %}
+
+
+{% block data %}
+    {{ data['genres'] }}-{{ media_list }}-{{ data['id'] }}
+{% endblock data %}
+
+
+{% block javascript %}
+    <script src="{{ url_for('static', filename='js/medialist_games.js') }}"></script>
+{% endblock javascript %}

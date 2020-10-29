@@ -7,25 +7,29 @@ from flask import url_for
 from sqlalchemy import func, text
 from flask_login import current_user
 from _collections import OrderedDict
-from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime,\
-    Movies, Ranks, followers, Frames, SeriesGenre, RoleType
+from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
+    Movies, Ranks, followers, Frames, SeriesGenre, RoleType, GamesList, Games
 
 
 def get_media_count_by_status(user_id, list_type):
     if list_type == ListType.SERIES:
         media_count = db.session.query(SeriesList.status, func.count(SeriesList.status)) \
             .filter_by(user_id=user_id).group_by(SeriesList.status).all()
-    if list_type == ListType.ANIME:
+    elif list_type == ListType.ANIME:
         media_count = db.session.query(AnimeList.status, func.count(AnimeList.status)) \
             .filter_by(user_id=user_id).group_by(AnimeList.status).all()
-    if list_type == ListType.MOVIES:
+    elif list_type == ListType.MOVIES:
         media_count = db.session.query(MoviesList.status, func.count(MoviesList.status)) \
             .filter_by(user_id=user_id).group_by(MoviesList.status).all()
+    elif list_type == ListType.GAMES:
+        media_count = db.session.query(GamesList.status, func.count(GamesList.status)) \
+            .filter_by(user_id=user_id).group_by(GamesList.status).all()
 
     data = {}
     total = sum(x[1] for x in media_count)
-    categories = [Status.WATCHING, Status.COMPLETED, Status.COMPLETED_ANIMATION,
-                  Status.ON_HOLD, Status.RANDOM, Status.DROPPED, Status.PLAN_TO_WATCH]
+    categories = [Status.PLAYING, Status.WATCHING, Status.COMPLETED, Status.COMPLETED_ANIMATION, Status.ON_HOLD,
+                  Status.RANDOM, Status.DROPPED, Status.PLAN_TO_WATCH, Status.PLAN_TO_PLAY, Status.ENDLESS,
+                  Status.MULTIPLAYER, Status.OWNED]
     for media in media_count:
         if media[0] in categories:
             data[media[0].value] = {"count": media[1],
@@ -58,14 +62,18 @@ def get_media_score(user_id, list_type):
         media_score = db.session.query(func.count(SeriesList.score), func.count(SeriesList.media_id),
                                        func.sum(SeriesList.score)) \
             .filter(SeriesList.user_id == user_id, SeriesList.status != Status.PLAN_TO_WATCH).all()
-    if list_type == ListType.ANIME:
+    elif list_type == ListType.ANIME:
         media_score = db.session.query(func.count(AnimeList.score), func.count(AnimeList.media_id),
                                        func.sum(AnimeList.score)) \
             .filter(AnimeList.user_id == user_id, AnimeList.status != Status.PLAN_TO_WATCH).all()
-    if list_type == ListType.MOVIES:
+    elif list_type == ListType.MOVIES:
         media_score = db.session.query(func.count(MoviesList.score), func.count(MoviesList.media_id),
                                        func.sum(MoviesList.score)) \
             .filter(MoviesList.user_id == user_id, MoviesList.status != Status.PLAN_TO_WATCH).all()
+    elif list_type == ListType.GAMES:
+        media_score = db.session.query(func.count(GamesList.score), func.count(GamesList.media_id),
+                                       func.sum(GamesList.score)) \
+            .filter(GamesList.user_id == user_id, GamesList.status != Status.PLAN_TO_PLAY).all()
 
     try:
         percentage = int(int(media_score[0][0])/int(media_score[0][1])*100)
@@ -101,7 +109,12 @@ def get_favorites(user_id):
         .filter(MoviesList.user_id == user_id, MoviesList.favorite == True).group_by(MoviesList.media_id).all()
     random.shuffle(movies_favorites)
 
-    favorites = [series_favorites, anime_favorites, movies_favorites]
+    games_favorites = db.session.query(Games, GamesList) \
+        .join(Games, Games.id == GamesList.media_id) \
+        .filter(GamesList.user_id == user_id, GamesList.favorite == True).group_by(GamesList.media_id).all()
+    random.shuffle(movies_favorites)
+
+    favorites = [series_favorites, anime_favorites, movies_favorites, games_favorites]
 
     return favorites
 
@@ -113,6 +126,8 @@ def get_media_levels(user, list_type):
         total_time_min = user.time_spent_anime
     elif list_type == ListType.MOVIES:
         total_time_min = user.time_spent_movies
+    elif list_type == ListType.GAMES:
+        total_time_min = user.time_spent_games
 
     # Compute the corresponding level and percentage from the media time
     element_level_tmp = "{:.2f}".format(round((((400+80*total_time_min)**(1/2))-20)/40, 2))
@@ -138,8 +153,9 @@ def get_media_levels(user, list_type):
 def get_knowledge_grade(user):
     # Compute the corresponding level and percentage from the media time
     knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
-                      int((((400+80*user.time_spent_anime)**(1/2))-20)/40) +\
-                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
+                      int((((400+80*user.time_spent_anime)**(1/2))-20)/40) + \
+                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40) + \
+                      int((((400+80*user.time_spent_games)**(1/2))-20)/40)
 
     query_rank = Ranks.query.filter_by(level=knowledge_level, type='knowledge_rank\n').first()
     if query_rank:
@@ -158,7 +174,8 @@ def get_knowledge_frame(user):
     # Compute the corresponding level and percentage from the media time
     knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
                       int((((400+80*user.time_spent_anime)**(1/2))-20)/40) +\
-                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
+                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40) + \
+                      int((((400+80*user.time_spent_games)**(1/2))-20)/40)
 
     frame_level = round(knowledge_level/8, 0) + 1
     query_frame = Frames.query.filter_by(level=frame_level).first()
@@ -208,6 +225,10 @@ def get_updates(last_update):
             element_data["category"] = "Movies"
             element_data["icon-color"] = "fas fa-film text-movies"
             element_data["border"] = "#8c7821"
+        elif element.media_type == ListType.GAMES:
+            element_data["category"] = "Games"
+            element_data["icon-color"] = "fas fa-gamepad text-dark"
+            element_data["border"] = "#255255"
 
         update.append(element_data)
 
@@ -251,7 +272,8 @@ def get_user_data(user):
     view_count = {"profile": profile_view_count,
                   "series": user.series_views,
                   "anime": user.anime_views,
-                  "movies": user.movies_views}
+                  "movies": user.movies_views,
+                  "games": user.games_views}
 
     # Recover the overview user's last update
     last_update = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).limit(7)
@@ -265,7 +287,7 @@ def get_user_data(user):
 
 def get_media_data(user):
     all_lists = [["series", ListType.SERIES, user.time_spent_series], ["anime", ListType.ANIME, user.time_spent_anime],
-                 ["movies", ListType.MOVIES, user.time_spent_movies]]
+                 ["movies", ListType.MOVIES, user.time_spent_movies], ["games", ListType.GAMES, user.time_spent_games]]
 
     # Create dict with media as key; values are dict or list of dict with the data
     media_dict = {}
@@ -276,7 +298,7 @@ def get_media_data(user):
         media_time = list_type[2]
 
         media_total_eps = None
-        if list_type[1] != ListType.MOVIES:
+        if list_type[1] == ListType.SERIES or list_type[1] == ListType.ANIME:
             media_total_eps = get_media_total_eps(user.id, list_type[1])
 
         # Each media_data dict contains all the data for one type of media
@@ -287,7 +309,7 @@ def get_media_data(user):
                       'media_levels': media_levels,
                       'media_score': media_score}
 
-        # return a media_dict with 3 keys (anime, series, movies) with media_data as values
+        # return a media_dict with 4 keys (anime, series, movies, games) with media_data as values
         media_dict['{}'.format(list_type[0])] = media_data
 
     return media_dict

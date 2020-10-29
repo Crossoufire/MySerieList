@@ -17,16 +17,29 @@
                        href="/animelist/{{ username }}" title="Anime list"></a>
                     <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
                        href="/movieslist/{{ username }}" title="Movies list"></a>
+                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon text-dark" data-toggle="tooltip"
+                       href="/gameslist/{{ username }}" title="Games list"></a>
                 {% elif media_list == 'animelist' %}
                     <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
                        href="/serieslist/{{ username }}" title="Series list"></a>
                     <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
                        href="/movieslist/{{ username }}" title="Movies list"></a>
-                {% else %}
+                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon text-dark" data-toggle="tooltip"
+                       href="/gameslist/{{ username }}" title="Games list"></a>
+                {% elif media_list == 'movieslist' %}
                     <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
                        href="/serieslist/{{ username }}" title="Series list"></a>
                     <a class="fas fa-lg fa-torii-gate m-r-8 return-icon text-anime" data-toggle="tooltip"
                        href="/animelist/{{ username }}" title="Anime list"></a>
+                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon text-dark" data-toggle="tooltip"
+                       href="/gameslist/{{ username }}" title="Games list"></a>
+                {% elif media_list == 'gameslist' %}
+                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
+                       href="/serieslist/{{ username }}" title="Series list"></a>
+                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon text-anime" data-toggle="tooltip"
+                       href="/animelist/{{ username }}" title="Anime list"></a>
+                    <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
+                       href="/movieslist/{{ username }}" title="Movies list"></a>
                 {% endif %}
             </div>
             {% if user_id != current_user.get_id() %}
@@ -69,6 +82,7 @@
                 <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>
                 <option {% if sort_val == 'rewatch' %}selected="selected"{% endif %} value="rewatch">Rewatch</option>
                 <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>
+                <option {% if sort_val == 'playtime' %}selected="selected"{% endif %} value="playtime">Playtime</option>
             </select>
             {% if user_id != current_user.get_id() %}
                 <input id="shared-check" class="m-l-15" type="checkbox" value="{{ filter_val }}" onclick="filter_medialist()"
@@ -206,10 +220,10 @@
             let option_val = document.getElementById("select-option").value;
             {% if search %}
                 window.location.replace('/{{ media_list }}/{{ username }}?category=Search&query={{ search }}' +
-                '&option='+option_val+'&sort='+sort_val+'&filter={{ filter_val }}')
+                '&option='+option_val+'&sort='+sort_val+'&filter={{ filter_val }}');
             {% else %}
                 window.location.replace('/{{ media_list }}/{{ username }}?category={{ category }}' +
-                '&sort='+sort_val+'&filter={{ filter_val }}')
+                '&sort='+sort_val+'&filter={{ filter_val }}');
             {% endif %}
         }
 
@@ -221,10 +235,10 @@
             }
             {% if search %}
                 window.location.replace('/{{ media_list }}/{{ username }}?category=Search&query={{ search }}' +
-                '&option='+option_val+'&sort={{ sort_val }}&filter='+now)
+                '&option='+option_val+'&sort={{ sort_val }}&filter='+now);
             {% else %}
                 window.location.replace('/{{ media_list }}/{{ username }}?category={{ category }}' +
-                '&sort={{ sort_val }}&filter='+now)
+                '&sort={{ sort_val }}&filter='+now);
             {% endif %}
         }
     </script>

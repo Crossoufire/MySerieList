@@ -61,7 +61,7 @@ def get_medialist_data(list_type, all_media_data, user_id):
 
     media_data_list = []
     for media_data in all_media_data:
-        add_data = MediaListDict(media_data, common_media, list_type).create_medialist_dict()
+        add_data = MediaListDict(media_data, common_media, list_type).redirect_medialist()
         media_data_list.append(add_data)
 
     try:

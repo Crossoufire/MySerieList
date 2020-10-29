@@ -33,7 +33,7 @@ def mymedialist(media_list, user_name):
     # Add views_count to the profile
     current_user.add_view_count(user, list_type)
 
-    # Check the <category>, the <page>, the <medialist> and the <html_template>.
+    # Check the <category>, the <page>, the <media_list> and the <html_template>.
     page = request.args.get('page', 1, int)
     sort_val = request.args.get('sort', 'title')
     search = request.args.get('query')
@@ -44,6 +44,9 @@ def mymedialist(media_list, user_name):
     if list_type == ListType.MOVIES:
         category = request.args.get('category', 'Completed')
         html_template = 'medialist_movies.html'
+    elif list_type == ListType.GAMES:
+        category = request.args.get('category', 'Playing')
+        html_template = 'medialist_games.html'
 
     # Check the <args> then retrieve the corresponding <media_data>
     query, category = get_media_query(user.id, page, list_type, category, search, option, sort_val, filter_val)

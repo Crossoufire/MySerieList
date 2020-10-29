@@ -37,12 +37,6 @@ def account(user_name):
     # Recover the Favorites
     favorites = get_favorites(user.id)
 
-    # badges
-    badges = ['/static/img/Achievements/1_years.png', '/static/img/Achievements/movies.png',
-              '/static/img/Achievements/days.png', '/static/img/Achievements/episodes.png',
-              '/static/img/Achievements/favorites.png', '/static/img/Achievements/top_5.png',
-              '/static/img/Achievements/followers.png', '/static/img/Achievements/image1.png']
-
     return render_template('account.html',
                            title=user.username+"'s account",
                            header_data=header_data,
@@ -50,8 +44,7 @@ def account(user_name):
                            favorites=favorites,
                            media_data=media_data,
                            follows_list=follows_list,
-                           follows_update_list=follows_update_list,
-                           badges=badges)
+                           follows_update_list=follows_update_list)
 
 
 @bp.route("/account/more_stats/<user_name>", methods=['GET', 'POST'])

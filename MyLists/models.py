@@ -685,6 +685,11 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
         media_list = MoviesList
         actors_list = MoviesActors
         genre_list = MoviesGenre
+    elif list_type == ListType.GAMES:
+        media = Games
+        media_list = GamesList
+        actors_list = GamesPlatforms
+        genre_list = GamesGenre
 
     # Check the <sorting> value
     if sort_val == 'title':
@@ -801,6 +806,8 @@ def get_media_count(user_id, list_type):
         media_list = AnimeList
     elif list_type == ListType.MOVIES:
         media_list = MoviesList
+    elif list_type == ListType.GAMES:
+        media_list = GamesList
 
     v1, v2 = aliased(media_list), aliased(media_list)
     count_total = media_list.query.filter_by(user_id=user_id).count()
