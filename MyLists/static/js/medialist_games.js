@@ -86,3 +86,60 @@ function ChargeButtonsOther(card) {
     $card.find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
     $card.find('.mask').hide();
 }
+
+
+// --- Update time played --------------------------------------------------
+function updatePlaytime(media_id) {
+    $('#'+media_id+'-time-loading').show();
+    let hours = $('#'+media_id+'-time_h').val();
+    let minutes = $('#'+media_id+'-time_m').val();
+
+    $.ajax ({
+        type: "POST",
+        url: "/update_playtime",
+        contentType: "application/json",
+        data: JSON.stringify({hours: hours, min: minutes, media_id: media_id, media_type: 'gameslist' }),
+        dataType: "json",
+        success: function() {
+            $('#'+media_id+'-time-check').show().delay(1500).fadeOut();
+        },
+        error: function() {
+            error_ajax_message('Error updating the time played. Please try again later.');
+        },
+        complete: function () {
+            $('#'+media_id+'-time-loading').hide();
+        }
+    });
+}
+
+
+// --- Update completion --------------------------------------------------
+function updateCompletion(info, element_id) {
+    let comp_value = false
+
+    if ($.trim($(info).html()).includes('<strike>')) {
+        comp_value = true
+    }
+
+    $.ajax ({
+        type: "POST",
+        url: "/update_completion",
+        contentType: "application/json",
+        data: JSON.stringify({data: comp_value, element_id: element_id, media_list: 'gameslist' }),
+        dataType: "json",
+        success: function() {
+            if ($.trim($(info).html()).includes('<strike>')) {
+                document.getElementById('comp_'+element_id).innerHTML = "<b>100%</b>";
+                $(info).attr('style', 'color: goldenrod;');
+            } else {
+                document.getElementById('comp_'+element_id).innerHTML = "<strike>100%</strike>";
+                $(info).attr('style', 'color: lightgray;');
+            }
+        },
+        error: function() {
+            error_ajax_message('Error updating the completion of the game. Please try again later.');
+        },
+        complete: function () {
+        }
+    });
+}

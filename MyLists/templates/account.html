@@ -690,8 +690,8 @@
                                                   class="value"></span>
                                         </span>
                                         <span class="block" data-toggle="tooltip" title="Plan to Play">
-                                            <span id="{{ media_data['games']['media_count']['Plan to play']
-                                            ['percent'] }}%" class="value"></span>
+                                            <span id="{{ media_data['games']['media_count']['Plan to Play']['percent'] }}%"
+                                                  class="value"></span>
                                         </span>
                                     {% endif %}
                                 </figure>
@@ -770,11 +770,11 @@
                                 </div>
                             </div>
                             <a href="/gameslist/{{ header_data['username'] }}?category=Favorite">
-                                <b>Favorites ({{ favorites[1]|length }}):</b>
+                                <b>Favorites ({{ favorites[3]|length }}):</b>
                             </a>
                             <div class="row m-b-16">
                                 <div class="col">
-                                    {% for favorite in favorites[1] %}
+                                    {% for favorite in favorites[3] %}
                                         {% if loop.index < 11 %}
                                             <a href="/media_sheet/Games/{{ favorite[0].id }}">
                                                 <img class="favorite-img" data-toggle="tooltip" title="{{ favorite[0].name }}"

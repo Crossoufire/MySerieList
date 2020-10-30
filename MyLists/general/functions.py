@@ -17,7 +17,7 @@ def compute_media_time_spent(list_type):
     for user in users:
         media_list = get_total_time(user.id, list_type)
         total_time = 0
-        if list_type != ListType.MOVIES:
+        if list_type == ListType.SERIES or list_type == ListType.ANIME:
             for media in media_list:
                 try:
                     total_time += media[0].episode_duration * media[1].eps_watched * (1 + media[1].rewatched)
@@ -30,6 +30,13 @@ def compute_media_time_spent(list_type):
                         total_time += media[0].runtime*(1 + media[1].rewatched)
                     except Exception as e:
                         app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
+        elif list_type == ListType.GAMES:
+            for media in media_list:
+                if media[1].status != Status.PLAN_TO_PLAY:
+                    try:
+                        total_time += media[1].time_played
+                    except Exception as e:
+                        app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
 
         if list_type == ListType.SERIES:
             user.time_spent_series = total_time
@@ -37,6 +44,8 @@ def compute_media_time_spent(list_type):
             user.time_spent_anime = total_time
         elif list_type == ListType.MOVIES:
             user.time_spent_movies = total_time
+        elif list_type == ListType.GAMES:
+            user.time_spent_games = total_time
 
         db.session.commit()
 

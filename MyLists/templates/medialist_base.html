@@ -129,24 +129,22 @@
                     </div>
                     <div class="bottom-card-info{% if media_list =='movieslist' %}-movie {% endif %}">
                         <div class="row no-gutters" style="opacity: 0.7;">
-                            <div class="col">
+                            <div class="col-3" style="padding: 0;">
                                 <a class="fa-heart {% if data['favorite'] %} fas favorited {% else %}
                                 far {% endif %} {% if user_id != current_user.get_id() %}
                                 disabled {% endif %}" data-toggle='tooltip' title="Favorite"
                                    onclick="addFavorite(this,'{{ data['id'] }}','{{ media_list }}')">
                                 </a>
                             </div>
-                            <div class="col">
+                            <div class="col-3" style="padding: 0;">
                                 <a id="score_{{ data['id'] }}" class="{% if user_id != current_user.get_id() %}
                                 disabled {% endif %}" data-toggle="tooltip" title="Score /10"
                                    onclick="scoreDrop(this, {{ data['id'] }}, '{{ media_list }}')">
                                     {{ data['score'] }}
                                 </a>
                             </div>
-                            <div class="col">
-                                <span id="com_{{ data['id'] }}" style="display: none;">
-                                    {{ data['comment'] }}
-                                </span>
+                            <div class="col-2" style="padding: 0;">
+                                <span id="com_{{ data['id'] }}" style="display: none;">{{ data['comment'] }}</span>
                                 {% if user_id == current_user.get_id() %}
                                     <a class="fa-comment-alt text-light {% if data['comment'] %} fas commented {% else %}
                                     far {% endif %}" data-toggle='tooltip' title="Comments"
@@ -163,13 +161,24 @@
                                     </a>
                                 {% endif %}
                             </div>
-                            <div class="col" {% if data['category'] == 'Completed' or data['category'] == 'Completed Animation' %}
-                            style="display: block;" {% else %}style="display: none;"{% endif %}>
-                                <a id="rew_{{ data['id'] }}" class="{% if user_id != current_user.get_id() %}
-                                disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this media.
-                                Do not count the inital completion." onclick="rewatchDrop(this, {{ data['id'] }},
-                                '{{ media_list }}')">
-                                    {{ data['rewatched'] }}
+{#                            <div class="col" {% if data['category'] == 'Completed' or data['category'] == 'Completed Animation' %}#}
+{#                                 style="display: block;" {% else %}style="display: none;"{% endif %}>#}
+{#                                <a id="rew_{{ data['id'] }}" class="{% if user_id != current_user.get_id() %}#}
+{#                                disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this media.#}
+{#                                Do not count the inital completion." onclick="rewatchDrop(this, {{ data['id'] }},#}
+{#                                '{{ media_list }}')">#}
+{#                                    {{ data['rewatched'] }}#}
+{#                                </a>#}
+{#                            </div>#}
+                            <div class="col-4" style="padding: 0;">
+                                <a id="comp_{{ data['id'] }}" class="{% if user_id != current_user.get_id() %}
+                                disabled {% endif %}" data-toggle="tooltip" title="100% completion?"
+                                   onclick="updateCompletion(this, {{ data['id'] }})">
+                                    {% if data['completion'] %}
+                                        <b style="color: goldenrod;">100%</b>
+                                    {% else %}
+                                        <strike>100%</strike>
+                                    {% endif %}
                                 </a>
                             </div>
                         </div>

@@ -306,7 +306,8 @@ class MediaListDict:
                            "completion": self.data[1].completion,
                            "comment": self.data[1].comment,
                            "category": self.data[1].status.value,
-                           "time_played": self.data[1].time_played,
+                           "t_played_h": str(self.data[1].time_played/60).split('.')[0],
+                           "t_played_m": int(self.data[1].time_played % 60),
                            "common": False,
                            "media": "Games"}
 

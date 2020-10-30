@@ -54,6 +54,7 @@ def create_first_data():
     compute_media_time_spent(ListType.SERIES)
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
+    compute_media_time_spent(ListType.GAMES)
 
 
 @bp.route("/admin", methods=['GET'])

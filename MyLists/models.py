@@ -527,7 +527,7 @@ class GamesList(db.Model):
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
     completion = db.Column(db.Boolean)
-    time_played = db.Column(db.Float)
+    time_played = db.Column(db.Integer)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
     comment = db.Column(db.Text)
@@ -851,6 +851,9 @@ def get_total_time(user_id, list_type):
     elif list_type == ListType.MOVIES:
         media = Movies
         media_list = MoviesList
+    elif list_type == ListType.GAMES:
+        media = Games
+        media_list = GamesList
 
     query = db.session.query(media, media_list) \
         .join(media, media.id == media_list.media_id) \

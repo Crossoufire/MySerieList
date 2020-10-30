@@ -733,8 +733,11 @@ def update_playtime():
     old_playtime = media[1].time_played
 
     # Set the new data
-    media[1].time_played = '{}.{}'.format(hours, int((minutes*100)/60))
+    new_playtime = (hours*60) + minutes
+    media[1].time_played = new_playtime
     app.logger.info('[{}] Series ID {} playtime updated'.format(current_user.id, media_id))
+
+    compute_time_spent(media=media[0], list_type=list_type, old_gametime=old_playtime, new_gametime=new_playtime)
 
     # Commit the changes
     db.session.commit()
