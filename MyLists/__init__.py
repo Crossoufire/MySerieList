@@ -23,6 +23,7 @@ try:
     server = config['Mail']['server']
     port = int(config['Mail']['port'])
     themoviedb_key = config['TheMovieDB']['api_key']
+    steam_key = config['Steam']['api_key']
     twitter_oauth = [config['OAuth']['twitter_id'], config['OAuth']['twitter_secret']]
 except Exception as e:
     print("Config file error: {}. Please read the README to configure the config.ini file properly.\nExit.".format(e))
@@ -49,6 +50,8 @@ app.config['MAIL_USERNAME'] = email
 app.config['MAIL_PASSWORD'] = password
 
 app.config['THEMOVIEDB_API_KEY'] = themoviedb_key
+app.config['STEAM_API_KEY'] = steam_key
+
 app.config['OAUTH_CREDENTIALS'] = {
     'twitter': {
         'id': twitter_oauth[0],
@@ -66,7 +69,6 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'auth.home'
 login_manager.login_message_category = 'info'
 app.url_map.strict_slashes = False
-
 
 from MyLists.auth.routes import bp as auth_bp
 app.register_blueprint(auth_bp)

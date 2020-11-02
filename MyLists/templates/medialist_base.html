@@ -17,21 +17,21 @@
                        href="/animelist/{{ username }}" title="Anime list"></a>
                     <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
                        href="/movieslist/{{ username }}" title="Movies list"></a>
-                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon text-dark" data-toggle="tooltip"
+                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon-games text-games" data-toggle="tooltip"
                        href="/gameslist/{{ username }}" title="Games list"></a>
                 {% elif media_list == 'animelist' %}
                     <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
                        href="/serieslist/{{ username }}" title="Series list"></a>
                     <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
                        href="/movieslist/{{ username }}" title="Movies list"></a>
-                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon text-dark" data-toggle="tooltip"
+                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon-games text-games" data-toggle="tooltip"
                        href="/gameslist/{{ username }}" title="Games list"></a>
                 {% elif media_list == 'movieslist' %}
                     <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
                        href="/serieslist/{{ username }}" title="Series list"></a>
                     <a class="fas fa-lg fa-torii-gate m-r-8 return-icon text-anime" data-toggle="tooltip"
                        href="/animelist/{{ username }}" title="Anime list"></a>
-                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon text-dark" data-toggle="tooltip"
+                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon-games text-games" data-toggle="tooltip"
                        href="/gameslist/{{ username }}" title="Games list"></a>
                 {% elif media_list == 'gameslist' %}
                     <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
@@ -59,12 +59,21 @@
                 <input id="search-input" class="modded-input" placeholder="&#128269; Search..."
                 onfocus="this.placeholder = '';" onblur="this.placeholder = '&#128269; Search...';">
                 <select id="select-option" class="search-select">
-                    <option {% if option == 'title' %}selected="selected"{% endif %} value="title">Title</option>
-                    {% if media_list == 'movieslist' %}
+                    {% if media_list == 'gameslist' %}
+                        <option {% if option == 'title' %}selected="selected"{% endif %} value="title">Name</option>
+                        <option {% if option == 'genre' %}selected="selected"{% endif %} value="genre">Genre</option>
+                        <option {% if option == 'developer' %}selected="selected"{% endif %} value="developer">Developer</option>
+                        <option {% if option == 'collection' %}selected="selected"{% endif %} value="collection">Collection</option>
+                    {% elif media_list == 'animelist' or media_list == 'serieslist' %}
+                        <option {% if option == 'title' %}selected="selected"{% endif %} value="title">Title</option>
+                        <option {% if option == 'actor' %}selected="selected"{% endif %} value="actor">Actor</option>
+                        <option {% if option == 'genre' %}selected="selected"{% endif %} value="genre">Genre</option>
+                    {% elif media_list == 'movieslist' %}
+                        <option {% if option == 'title' %}selected="selected"{% endif %} value="title">Title</option>
                         <option {% if option == 'director' %}selected="selected"{% endif %} value="director">Director</option>
+                        <option {% if option == 'actor' %}selected="selected"{% endif %} value="actor">Actor</option>
+                        <option {% if option == 'genre' %}selected="selected"{% endif %} value="genre">Genre</option>
                     {% endif %}
-                    <option {% if option == 'actor' %}selected="selected"{% endif %} value="actor">Actor</option>
-                    <option {% if option == 'genre' %}selected="selected"{% endif %} value="genre">Genre</option>
                 </select>
             </div>
         </div>
@@ -74,15 +83,12 @@
         </div>
     </div>
     <div class="{% if media_list == 'serieslist' %}bg-series-opa {% elif media_list == 'animelist' %}bg-anime-opa
-    {% else %}bg-movies-opa {% endif %} p-t-4 p-b-4">
+    {% elif media_list == 'movieslist' %}bg-movies-opa {% else %}bg-games-opa{% endif %} p-t-4 p-b-4">
         <div class="mobile-sorting">
             <label class="m-l-10 mb-0"><b>Sort by:</b></label>
             <select class="m-l-8" onchange="sort_medialist(this)">
-                <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Title</option>
-                <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>
-                <option {% if sort_val == 'rewatch' %}selected="selected"{% endif %} value="rewatch">Rewatch</option>
-                <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>
-                <option {% if sort_val == 'playtime' %}selected="selected"{% endif %} value="playtime">Playtime</option>
+                {% block sorting_list scoped %}
+                {% endblock sorting_list %}
             </select>
             {% if user_id != current_user.get_id() %}
                 <input id="shared-check" class="m-l-15" type="checkbox" value="{{ filter_val }}" onclick="filter_medialist()"

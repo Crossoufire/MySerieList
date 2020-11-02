@@ -1,6 +1,5 @@
 
 /* --- Main CSS ----------------------------------------- */
-
 hr {
     border-top: 1px solid rgba(44, 57, 70, 1);
     margin-top: 1px;
@@ -10,13 +9,14 @@ a {
     color: lightgray;
 }
 
+
 /* --- Header ------------------------------------------- */
 .header-container {
     position: relative;
     height: 240px;
     background-image: url('/static/img/profile_background_2.jpg');
     background-size: cover;
-    border-bottom: 2px solid grey;
+    border-bottom: 2px solid #808080;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -181,6 +181,12 @@ a {
 .block:nth-of-type(6) {
 	background-color: #962D3E;
 }
+.block:nth-of-type(7) {
+	background-color: #48792c;
+}
+.block:nth-of-type(8) {
+	background-color: #32345d;
+}
 
 .block-movie {
     height: 30px;
@@ -234,6 +240,15 @@ a {
     background-color: grey;
 }
 
+.truncate {
+    width: 100%;
+    margin-bottom: -8px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 @media (max-width: 768px) {
     .media-container {
         position: relative;
@@ -259,7 +274,8 @@ a {
     }
 }
 
-/*!* --- Levels ------------------------------------------- *!*/
+
+/* --- Levels ------------------------------------------- */
 .account-bar-wrapper {
     width: 100%;
 }
@@ -315,85 +331,4 @@ a {
     font-size: 12px;
     line-height: 10px;
     text-align: right;
-}
-
-.truncate {
-    width: 100%;
-    margin-bottom: -8px;
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-
-
-
-.badges {
-	width: 3.5em;
-	height: 3.5em;
-	border-radius: 20%;
-    box-shadow: 6px 8px 10px 1px rgba(0, 0, 0, 0.43);
-}
-
-.dada {
-    color: white;
-    font-weight: 500;
-    text-align: center;
-    padding-top: 15px;
-}
-
-.blue {
-    background: dodgerblue;
-    color: deepskyblue;
-}
-
-.orange {
-  background: darkorange;
-  color: orange;
-}
-
-.gold {
-  background: gold;
-  color: gold;
-}
-
-.red {
-  background: red;
-  color: red;
-}
-
-.purple {
-  background: mediumpurple;
-  color: slategray;
-}
-
-.green {
-  background: yellowgreen;
-  color: darkslategray;
-}
-
-.crimson {
-  background: crimson;
-  color: firebrick;
-}
-
-.steel {
-  background: steelblue;
-  color: gold;
-}
-
-.pink {
-  background: hotpink;
-  color: palevioletred;
-}
-
-.rebecca {
-  background: rebeccapurple;
-  color: rebeccapurple;
-}
-
-.gainsboro {
-  background: gainsboro;
-  color: orangered;
 }

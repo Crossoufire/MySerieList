@@ -83,6 +83,7 @@ class User(db.Model, UserMixin):
     anime_views = db.Column(db.Integer, nullable=False, default=0)
     movies_views = db.Column(db.Integer, nullable=False, default=0)
     games_views = db.Column(db.Integer, nullable=False, default=0)
+    steamID = db.Column(db.String(30))
     biography = db.Column(db.Text)
     transition_email = db.Column(db.String(120))
     activated_on = db.Column(db.DateTime)
@@ -493,6 +494,7 @@ class Games(db.Model):
     hltb_main_time = db.Column(db.Float)
     hltb_main_and_extra_time = db.Column(db.Float)
     hltb_total_complete_time = db.Column(db.Float)
+    steam_id = db.Column(db.Integer)
     igdb_id = db.Column(db.Integer, nullable=False)
     lock_status = db.Column(db.Boolean, default=1)
 
@@ -614,7 +616,7 @@ class GlobalStats:
     @staticmethod
     def get_total_time_spent():
         times_spent = db.session.query(func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
-                                       func.sum(User.time_spent_movies)) \
+                                       func.sum(User.time_spent_movies), func.sum(User.time_spent_games)) \
             .filter(User.role != RoleType.ADMIN, User.active == True).all()
         return times_spent
 
@@ -688,12 +690,14 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
     elif list_type == ListType.GAMES:
         media = Games
         media_list = GamesList
-        actors_list = GamesPlatforms
         genre_list = GamesGenre
+        companies_list = GamesCompanies
 
     # Check the <sorting> value
     if sort_val == 'title':
         sorting = media.name
+    elif sort_val == 'playtime':
+        sorting = media_list.time_played.desc()
     elif sort_val == 'score':
         sorting = media_list.score.desc()
     elif sort_val == 'comment':
@@ -740,17 +744,28 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
     elif category == 'Search':
         cat_value = "Search results for '{}'".format(search)
         if option == 'title':
-            query = db.session.query(media, media_list) \
-                .join(media, media.id == media_list.media_id) \
-                .filter(or_(media.name.like('%' + search + '%'), media.original_name.like('%' + search + '%')),
-                        media_list.user_id == user_id) \
-                .order_by(sorting).paginate(page, 25, error_out=True)
-            if filter_val == 'not_check':
+            if list_type != ListType.GAMES:
                 query = db.session.query(media, media_list) \
                     .join(media, media.id == media_list.media_id) \
                     .filter(or_(media.name.like('%' + search + '%'), media.original_name.like('%' + search + '%')),
-                            media_list.user_id == user_id, filtering) \
+                            media_list.user_id == user_id) \
                     .order_by(sorting).paginate(page, 25, error_out=True)
+                if filter_val == 'not_check':
+                    query = db.session.query(media, media_list) \
+                        .join(media, media.id == media_list.media_id) \
+                        .filter(or_(media.name.like('%' + search + '%'), media.original_name.like('%' + search + '%')),
+                                media_list.user_id == user_id, filtering) \
+                        .order_by(sorting).paginate(page, 25, error_out=True)
+            else:
+                query = db.session.query(media, media_list) \
+                    .join(media, media.id == media_list.media_id) \
+                    .filter(media.name.like('%' + search + '%'), media_list.user_id == user_id) \
+                    .order_by(sorting).paginate(page, 25, error_out=True)
+                if filter_val == 'not_check':
+                    query = db.session.query(media, media_list) \
+                        .join(media, media.id == media_list.media_id) \
+                        .filter(media.name.like('%' + search + '%'), media_list.user_id == user_id, filtering) \
+                        .order_by(sorting).paginate(page, 25, error_out=True)
         elif option == 'actor':
             query = db.session.query(media, media_list, actors_list) \
                 .join(media, media.id == media_list.media_id) \
@@ -784,6 +799,29 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
                 query = db.session.query(media, media_list) \
                     .join(media, media.id == media_list.media_id) \
                     .filter(media.director_name.like('%' + search + '%'), media_list.user_id == user_id, filtering) \
+                    .order_by(sorting).paginate(page, 25, error_out=True)
+        elif option == 'developer':
+            query = db.session.query(media, media_list, companies_list) \
+                .join(media, media.id == media_list.media_id) \
+                .join(companies_list, companies_list.media_id == media_list.media_id) \
+                .filter(and_(companies_list.name.like('%' + search + '%'), companies_list.developer == True),
+                        media_list.user_id == user_id) \
+                .order_by(sorting).paginate(page, 25, error_out=True)
+            if filter_val == 'not_check':
+                query = db.session.query(media, media_list, companies_list) \
+                    .join(media, media.id == media_list.media_id) \
+                    .join(companies_list, companies_list.media_id == media_list.media_id) \
+                    .filter(companies_list.name.like('%' + search + '%'), media_list.user_id == user_id, filtering) \
+                    .order_by(sorting).paginate(page, 25, error_out=True)
+        elif option == 'collection':
+            query = db.session.query(media, media_list) \
+                .join(media, media.id == media_list.media_id) \
+                .filter(media.collection_name.like('%' + search + '%'), media_list.user_id == user_id) \
+                .order_by(sorting).paginate(page, 25, error_out=True)
+            if filter_val == 'not_check':
+                query = db.session.query(media, media_list) \
+                    .join(media, media.id == media_list.media_id) \
+                    .filter(media.collection_name.like('%' + search + '%'), media_list.user_id == user_id, filtering) \
                     .order_by(sorting).paginate(page, 25, error_out=True)
 
     return query, cat_value

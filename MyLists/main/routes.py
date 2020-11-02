@@ -35,16 +35,17 @@ def mymedialist(media_list, user_name):
 
     # Check the <category>, the <page>, the <media_list> and the <html_template>.
     page = request.args.get('page', 1, int)
-    sort_val = request.args.get('sort', 'title')
     search = request.args.get('query')
     filter_val = request.args.get('filter', 'check')
     option = request.args.get('option', None)
     html_template = 'medialist_tv.html'
     category = request.args.get('category', 'Watching')
+    sort_val = request.args.get('sort', 'title')
     if list_type == ListType.MOVIES:
         category = request.args.get('category', 'Completed')
         html_template = 'medialist_movies.html'
     elif list_type == ListType.GAMES:
+        sort_val = request.args.get('sort', 'playtime')
         category = request.args.get('category', 'Playing')
         html_template = 'medialist_games.html'
 
@@ -128,6 +129,8 @@ def write_comment(media_type, media_id):
         list_type = ListType.ANIME
     elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
+    elif media_type == MediaType.GAMES:
+        list_type = ListType.GAMES
 
     media = check_media(media_id, list_type)
     if not media:
@@ -647,7 +650,7 @@ def change_element_category():
             new_watched = old_watched
 
     # Set the last updates
-    # set_last_update(media=media[0], media_type=list_type, old_status=old_status, new_status=new_status)
+    set_last_update(media=media[0], media_type=list_type, old_status=old_status, new_status=new_status)
 
     # Compute the new time spent
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
@@ -936,7 +939,7 @@ def add_element():
                               media_id=media.id,
                               status=new_status,
                               completion=False,
-                              time_played=0.)
+                              time_played=0)
 
     # Commit the changes
     db.session.add(user_list)
@@ -945,7 +948,7 @@ def add_element():
                     .format(current_user.id, list_type.value.replace('list', ''), media_id, new_status.value))
 
     # Set the last update
-    # set_last_update(media=media, media_type=list_type, new_status=new_status)
+    set_last_update(media=media, media_type=list_type, new_status=new_status)
 
     # Compute the new time spent
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
@@ -979,15 +982,18 @@ def delete_element():
         return '', 400
 
     # Get the old data
-    old_rewatch = media[1].rewatched
+    if list_type != ListType.GAMES:
+        old_rewatch = media[1].rewatched
 
     # Compute the new time spent
-    if list_type != ListType.MOVIES:
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
         old_watched = media[1].eps_watched
         compute_time_spent(media=media[0], old_watched=old_watched, list_type=list_type, old_rewatch=old_rewatch)
     elif list_type == ListType.MOVIES:
         compute_time_spent(media=media[0], list_type=list_type, movie_status=media[1].status, movie_delete=True,
                            old_rewatch=old_rewatch)
+    elif list_type == ListType.GAMES:
+        compute_time_spent(media=media[0], list_type=list_type, old_gametime=media[1].time_played)
 
     # Delete the media from the user's list
     db.session.delete(media[1])
@@ -1029,6 +1035,8 @@ def lock_media():
         media = Anime.query.filter_by(id=media_id).first()
     elif list_type == ListType.MOVIES:
         media = Movies.query.filter_by(id=media_id).first()
+    elif list_type == ListType.GAMES:
+        media = Games.query.filter_by(id=media_id).first()
 
     if not media:
         return '', 400
@@ -1076,6 +1084,8 @@ def autocomplete():
     games_results = []
     if len(games_data) > 0:
         for result in games_data:
+            if len(games_results) >= 5:
+                break
             games_results.append(Autocomplete(result).get_games_autocomplete_dict())
 
     # Create the <total_results> list

@@ -1,12 +1,14 @@
 import pytz
 import random
 import operator
-
 from MyLists import db
 from flask import url_for
-from sqlalchemy import func, text
 from flask_login import current_user
 from _collections import OrderedDict
+from MyLists.API_data import ApiData
+from sqlalchemy import func, text, or_
+from MyLists.main.add_db import AddtoDB
+from MyLists.main.media_object import MediaDetails
 from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
     Movies, Ranks, followers, Frames, SeriesGenre, RoleType, GamesList, Games
 
@@ -227,8 +229,8 @@ def get_updates(last_update):
             element_data["border"] = "#8c7821"
         elif element.media_type == ListType.GAMES:
             element_data["category"] = "Games"
-            element_data["icon-color"] = "fas fa-gamepad text-dark"
-            element_data["border"] = "#255255"
+            element_data["icon-color"] = "fas fa-gamepad text-games"
+            element_data["border"] = "#196219"
 
         update.append(element_data)
 
@@ -537,3 +539,50 @@ def get_all_follows_data(user):
         follows_to_display = current_user.followed.all()
 
     return follows_to_display
+
+
+def cestparti(games_to_add):
+    games_added = []
+    games_not_added = []
+    games_already_inlist = []
+    for i, game in enumerate(games_to_add):
+        status = Status(games_to_add[game].split(',')[0])
+        playtime = int(games_to_add[game].split(',')[1])
+        name = games_to_add[game].split(',')[2]
+
+        print(name)
+
+        media = db.session.query(Games).filter(or_(Games.steam_id == game, Games.name == name)).first()
+        if media:
+            in_user_list = GamesList.query.filter_by(user_id=current_user.id, media_id=media.id).first()
+            if not in_user_list:
+                user_list = GamesList(user_id=current_user.id,
+                                      media_id=media.id,
+                                      status=status,
+                                      completion=False,
+                                      time_played=playtime)
+                db.session.add(user_list)
+                games_added.append(name)
+            else:
+                games_already_inlist.append(name)
+                continue
+        else:
+            games_api_data = ApiData().recover_steam_games(int(game))
+
+            if games_api_data is None or len(games_api_data) == 0:
+                games_not_added.append(name)
+                continue
+
+            media_details = MediaDetails(games_api_data, ListType.GAMES).get_media_details()
+            media = AddtoDB(media_details, ListType.GAMES).add_media_to_db()
+
+            user_list = GamesList(user_id=current_user.id,
+                                  media_id=media.id,
+                                  status=status,
+                                  completion=False,
+                                  time_played=playtime)
+            db.session.add(user_list)
+            db.session.commit()
+            games_added.append(name)
+
+    return games_not_added, games_already_inlist, games_added

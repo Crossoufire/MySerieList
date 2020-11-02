@@ -535,6 +535,7 @@
 .text-series {color: #216e7d;}
 .text-anime {color: #945141;}
 .text-movies {color: #8c7821;}
+.text-games {color: #196219;}
 .text-media {color: #a6b2c4;}
 .text-hov-white:hover {color: white;}
 .text-up {text-transform: uppercase;}
@@ -548,14 +549,17 @@
 .bg-series {background: #216e7d;}
 .bg-anime {background: #945141;}
 .bg-movies {background: #8c7821;}
+.bg-games {background: #196219;}
 .bg-medialist {background: #675353;}
 .bg-dark {background-color: #2c3946 !important;}
 .bg-series-opa{background-color: rgba(33, 110, 125, 0.8);}
 .bg-anime-opa{background-color: rgba(148, 81, 65, 0.8);}
 .bg-movies-opa{background-color: rgba(140, 120, 33, 0.8);}
+.bg-games-opa{background-color: rgba(25, 98, 25, 0.8);}
 .bot-series {border-bottom: solid 1px #216e7d;}
 .bot-anime {border-bottom: solid 1px #945141;}
 .bot-movies {border-bottom: solid 1px #8c7821;}
+.bot-games {border-bottom: solid 1px #196219;}
 
 
 /* --- Shape -------------------------------------------- */

@@ -1,6 +1,14 @@
 {% extends 'medialist_base.html' %}
 
 
+{% block sorting_list %}
+    <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Title</option>
+    <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>
+    <option {% if sort_val == 'rewatch' %}selected="selected"{% endif %} value="rewatch">Rewatch</option>
+    <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>
+{% endblock sorting_list %}
+
+
 {% block button %}
     <a class="btn btn-sm {% if category == 'Watching' %}btn-selected{% else %} btn-header{% endif %}"
     href="/{{ media_list }}/{{ username }}?category=Watching&sort={{ sort_val }}&filter={{ filter_val }}">WATCHING</a>

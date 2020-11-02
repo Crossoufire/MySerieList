@@ -1,37 +1,88 @@
 
 
-// --- Create the cat buttons list -----------------------------------------
+// --- Create the buttons category list ------------------------------------
 function chargeButtons(card) {
     removeCat();
 
-    let completed = "block;";
-    let plan_to_watch = "block;";
-    let category = $('#'+card.id).attr('cat');
+    let dis_playing = "block;";
+    let dis_completed = "block;";
+    let dis_on_hold = "block;";
+    let dis_endless = "block;";
+    let dis_multiplayer = "block;";
+    let dis_owned = "block;";
+    let dis_dropped = "block;";
+    let dis_plan_to_play = "block;";
+    let $card = $('#'+card.id);
+    let category = $card.attr('cat');
 
-    if (category === 'Completed' || category === 'Completed Animation') {
-        completed = "none;";
-    } else {
-        plan_to_watch = "none;";
+    if (category === 'Playing') {
+        dis_playing = "none;";
+    }
+    else if (category === 'Completed') {
+        dis_completed = "none;";
+    }
+    else if (category === 'On Hold') {
+        dis_on_hold = "none;";
+    }
+    else if (category === 'Endless') {
+        dis_endless = "none;";
+    }
+    else if (category === 'Multiplayer') {
+        dis_multiplayer = "none;";
+    }
+    else if (category === 'Dropped') {
+        dis_dropped = "none;";
+    }
+    else if (category === 'Owned') {
+        dis_owned = "none;";
+    }
+    else if (category === 'Plan to Play') {
+        dis_plan_to_play = "none;";
     }
 
-    $(card).find('.view.overlay').prepend(
+    $card.find('.view.overlay').prepend(
         '<a class="card-btn-top-right fas fa-times" onclick="removeCat()"></a>' +
         '<ul class="card-cat-buttons">' +
-            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: ' + completed +'" ' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_playing+'" ' +
+            'onclick="changeCategory(\'Playing\', \''+card.id+'\')">' +
+                'Playing' +
+            '</li>' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_completed+'" ' +
             'onclick="changeCategory(\'Completed\', \''+card.id+'\')">' +
                 'Completed' +
             '</li>' +
-            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: ' + plan_to_watch +'" ' +
-            'onclick="changeCategory(\'Plan to Watch\', \''+card.id+'\')">' +
-                'Plan to Watch' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_on_hold+'" ' +
+            'onclick="changeCategory(\'On Hold\', \''+card.id+'\')">' +
+                'On Hold' +
+            '</li>' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_endless+'" ' +
+            'onclick="changeCategory(\'Endless\', \''+card.id+'\')">' +
+                'Endless' +
+            '</li>' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_multiplayer+'" ' +
+            'onclick="changeCategory(\'Multiplayer\', \''+card.id+'\')">' +
+                'Multiplayer' +
+            '</li>' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_dropped+'" ' +
+            'onclick="changeCategory(\'Dropped\', \''+card.id+'\')">' +
+                'Dropped' +
+            '</li>' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_owned+'" ' +
+            'onclick="changeCategory(\'Owned\', \''+card.id+'\')">' +
+                'Owned' +
+            '</li>' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_plan_to_play+'" ' +
+            'onclick="changeCategory(\'Plan to Play\', \''+card.id+'\')">' +
+                'Plan to Play' +
             '</li>' +
         "</ul>");
 
-    $(card).find('.card-btn-top-left').hide();
-    $(card).find('.card-btn-toop-right').hide();
-    $(card).find('.bottom-card-cat-movie').hide();
-    $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
-    $(card).find('.mask').hide();
+    $card.find('.card-btn-toop-right').hide();
+    $card.find('.card-btn-top-left').hide();
+    $card.find('.bottom-card-cat').hide();
+    $card.find('.bottom-card-info').hide();
+    $card.find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
+    $card.find('.mask').hide();
 }
 
 
@@ -53,7 +104,7 @@ function changeCategory(new_category, card_id) {
             $card.remove();
         },
         error: function () {
-            error_ajax_message('Error trying to change the media category. Please try again later.');
+            error_ajax_message('Error trying to change the game category. Please try again later.');
         },
         complete: function () {
             removeCat();
@@ -66,25 +117,49 @@ function changeCategory(new_category, card_id) {
 // --- Charge the categories buttons from other lists ----------------------
 function ChargeButtonsOther(card) {
     removeCat();
-    let $card = $('#'+card.id)
 
     $(card).find('.view.overlay').prepend(
         '<a class="card-btn-top-right fas fa-times" onclick="removeCat()"></a>' +
         '<ul class="card-cat-buttons">' +
             '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
+            'onclick="AddCatUser(\'Playing\', \''+card.id+'\')">' +
+                'Playing' +
+            '</li>' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
             'onclick="AddCatUser(\'Completed\', \''+card.id+'\')">' +
                 'Completed' +
             '</li>' +
             '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
-            'onclick="AddCatUser(\'Plan to Watch\', \''+card.id+'\')">' +
-                'Plan to Watch' +
+            'onclick="AddCatUser(\'On Hold\', \''+card.id+'\')">' +
+                'On Hold' +
+            '</li>' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
+            'onclick="AddCatUser(\'Endless\', \''+card.id+'\')">' +
+                'Endless' +
+            '</li>' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
+            'onclick="AddCatUser(\'Multiplayer\', \''+card.id+'\')">' +
+                'Multiplayer' +
+            '</li>' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
+            'onclick="AddCatUser(\'Dropped\', \''+card.id+'\')">' +
+                'Dropped' +
+            '</li>' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
+            'onclick="AddCatUser(\'Owned\', \''+card.id+'\')">' +
+                'Owned' +
+            '</li>' +
+            '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
+            'onclick="AddCatUser(\'Plan to Play\', \''+card.id+'\')">' +
+                'Plan to Play' +
             '</li>' +
         "</ul>");
 
-    $card.find('.card-btn-top-left').hide();
-    $card.find('.bottom-card-cat-movie').hide();
-    $card.find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
-    $card.find('.mask').hide();
+    $(card).find('.card-btn-top-left').hide();
+    $(card).find('.bottom-card-info').hide();
+    $(card).find('.bottom-card-cat').hide();
+    $(card).find('.card-img-top').attr('style', 'filter: brightness(20%); height: auto;');
+    $(card).find('.mask').hide();
 }
 
 

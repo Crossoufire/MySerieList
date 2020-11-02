@@ -1,4 +1,4 @@
-{% extends "header_account.html" %}
+{% extends "account_header.html" %}
 
 
 {% block data %}
@@ -92,7 +92,7 @@
                                 </div>
                                 <div class="xp-bar" data-toggle="tooltip" title="{{ media_data['games']
                                 ['media_levels']['level_percent'] }}%">
-                                    <div class="xp-bar-fill bg-movies" style="width: {{ media_data['games']
+                                    <div class="xp-bar-fill bg-games" style="width: {{ media_data['games']
                                     ['media_levels']['level_percent'] }}%;">
                                     </div>
                                 </div>
@@ -697,34 +697,12 @@
                                 </figure>
                                 <div class="row stat-text p-t-5">
                                     <div class="col-4">
-                                        <a href="/gameslist/{{ header_data['username'] }}?category=Playing">Playing:</a>
+                                        <a href="/gameslist/{{ header_data['username'] }}?category=Playing">
+                                            Playing:
+                                        </a>
                                     </div>
                                     <div class="col-2">
                                         <span class="stat-text">{{ media_data['games']['media_count']['Playing']['count'] }}</span>
-                                    </div>
-                                    <div class="col-4">
-                                        <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=Dropped">
-                                            Dropped:
-                                        </a>
-                                    </div>
-                                    <div class="col-2">
-                                        <span class="stat-text">{{ media_data['games']['media_count']['Dropped']['count'] }}</span>
-                                    </div>
-                                    <div class="col-4">
-                                        <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=Completed">
-                                            Completed:
-                                        </a>
-                                    </div>
-                                    <div class="col-2">
-                                        <span class="stat-text">{{ media_data['games']['media_count']['Completed']['count'] }}</span>
-                                    </div>
-                                    <div class="col-4">
-                                        <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=Plan to Play">
-                                            P. to Play:
-                                        </a>
-                                    </div>
-                                    <div class="col-2">
-                                        <span class="stat-text">{{ media_data['games']['media_count']['Plan to Play']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
                                         <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=On Hold">
@@ -735,21 +713,20 @@
                                         <span class="stat-text">{{ media_data['games']['media_count']['On Hold']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <span class="stat-text" data-toggle="tooltip" title="Without plan to play">
-                                            Total Games:
-                                        </span>
-                                    </div>
-                                    <div class="col-2">
-                                        <span class="stat-text" data-toggle="tooltip" title="Without plan to play">
-                                            {{ media_data['games']['media_count']['total'] }}</span>
-                                    </div>
-                                    <div class="col-4">
-                                        <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=Owned">
-                                            Owned:
+                                        <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=Completed">
+                                            Completed:
                                         </a>
                                     </div>
                                     <div class="col-2">
-                                        <span class="stat-text">{{ media_data['games']['media_count']['Owned']['count'] }}</span>
+                                        <span class="stat-text">{{ media_data['games']['media_count']['Completed']['count'] }}</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=Dropped">
+                                            Dropped:
+                                        </a>
+                                    </div>
+                                    <div class="col-2">
+                                        <span class="stat-text">{{ media_data['games']['media_count']['Dropped']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
                                         <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=Multiplayer">
@@ -766,6 +743,31 @@
                                     </div>
                                     <div class="col-2">
                                         <span class="stat-text">{{ media_data['games']['media_count']['Endless']['count'] }}</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=Owned">
+                                            Owned:
+                                        </a>
+                                    </div>
+                                    <div class="col-2">
+                                        <span class="stat-text">{{ media_data['games']['media_count']['Owned']['count'] }}</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=Plan to Play">
+                                            P. to Play:
+                                        </a>
+                                    </div>
+                                    <div class="col-2">
+                                        <span class="stat-text">{{ media_data['games']['media_count']['Plan to Play']['count'] }}</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <span class="stat-text" data-toggle="tooltip" title="Without plan to play">
+                                            Total Games:
+                                        </span>
+                                    </div>
+                                    <div class="col-2">
+                                        <span class="stat-text" data-toggle="tooltip" title="Without plan to play">
+                                            {{ media_data['games']['media_count']['total'] }}</span>
                                     </div>
                                 </div>
                             </div>

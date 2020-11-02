@@ -88,6 +88,11 @@ option {
     padding: 13px 13px 13px 13px;
 }
 
+.return-icon-games {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 13px 10px 13px 10px;
+}
+
 .return-icon-tv {
     background: rgba(0, 0, 0, 0.8);
     padding: 13px 10px 13px 10px;

@@ -7,7 +7,7 @@ from MyLists.general.trending_data import TrendingData
 from flask import render_template, flash, request, abort
 from MyLists.models import Status, ListType, User, GlobalStats, RoleType
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
-    refresh_db_frames, refresh_db_badges, refresh_db_ranks
+    refresh_db_frames, refresh_db_badges, refresh_db_ranks, add_hltb_time, add_manual_games
 
 bp = Blueprint('general', __name__)
 
@@ -55,6 +55,8 @@ def create_first_data():
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
     compute_media_time_spent(ListType.GAMES)
+    add_hltb_time()
+    # add_manual_games()
 
 
 @bp.route("/admin", methods=['GET'])
@@ -72,11 +74,12 @@ def mylists_stats():
 
     times_spent = stats.get_total_time_spent()
     if times_spent[0]:
-        total_time = {"total": int((times_spent[0][0]/60)+(times_spent[0][1]/60)+(times_spent[0][2]/60)),
+        total_time = {"total": int((times_spent[0][0]/60)+(times_spent[0][1]/60)+(times_spent[0][2]/60) +
+                                   (times_spent[0][3]/60)),
                       "series": int(times_spent[0][0]/60), "anime": int(times_spent[0][1]/60),
-                      "movies": int(times_spent[0][2]/60)}
+                      "movies": int(times_spent[0][2]/60), "games": int(times_spent[0][3]/60)}
     else:
-        total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0}
+        total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0, "games": 0}
 
     def create_dict(data, genres=False):
         series_list, anime_list, movies_list = [], [], []
@@ -210,4 +213,3 @@ def add_challenges():
     # Check if challenge ID exists in the DB:
     if challenge_id not in DB:
         return '', 400
-

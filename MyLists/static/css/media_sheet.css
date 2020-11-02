@@ -1,3 +1,5 @@
+
+
 body > li {
     font-weight: 400;
 }
@@ -37,7 +39,7 @@ ul {
     background: #131418;
     border: transparent;
     cursor: pointer;
-    width: 125px;
+    width: 130px;
 }
 
 .wrapper {
@@ -149,16 +151,20 @@ ul {
     left: 74px;
 }
 
-.time-played-input {
-    width: 43px;
+.time-h-played-input {
+    width: 41px;
     background-color: #131418;
     border: none;
     color: lightgray;
     text-align: center;
 }
 
-.time-played-input:focus{
-    outline: none;
+.time-m-played-input {
+    width: 25px;
+    background-color: #131418;
+    border: none;
+    color: lightgray;
+    text-align: center;
 }
 
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {

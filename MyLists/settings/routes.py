@@ -31,6 +31,11 @@ def settings():
                 current_user.private = settings_form.isprivate.data
                 app.logger.info('[{}] Settings updated: Old private mode = {}. New private mode = {}'
                                 .format(current_user.id, old_value, settings_form.isprivate.data))
+            if settings_form.steamID.data != current_user.steamID:
+                old_steamID = current_user.steamID
+                current_user.steamID = settings_form.steamID.data
+                app.logger.info('[{}] Settings updated: Old steamID = {}. New steamID = {}'
+                                .format(current_user.id, old_steamID, current_user.username))
 
             old_homepage = current_user.homepage
             current_user.homepage = HomePage(settings_form.homepage.data)
@@ -42,6 +47,7 @@ def settings():
             settings_form.username.data = current_user.username
             settings_form.isprivate.data = current_user.private
             settings_form.homepage.data = current_user.homepage.value
+            settings_form.steamID.data = current_user.steamID
 
         return render_template('settings.html',
                                title='Your settings',
@@ -66,6 +72,11 @@ def settings():
                 current_user.private = settings_form.isprivate.data
                 app.logger.info('[{}] Settings updated: Old private mode = {}. New private mode = {}'
                                 .format(current_user.id, old_value, settings_form.isprivate.data))
+            if settings_form.steamID.data != current_user.steamID:
+                old_steamID = current_user.steamID
+                current_user.steamID = settings_form.steamID.data
+                app.logger.info('[{}] Settings updated: Old steamID = {}. New steamID = {}'
+                                .format(current_user.id, old_steamID, current_user.username))
 
             old_homepage = current_user.homepage
             current_user.homepage = HomePage(settings_form.homepage.data)
@@ -93,6 +104,7 @@ def settings():
             settings_form.email.data = current_user.email
             settings_form.isprivate.data = current_user.private
             settings_form.homepage.data = current_user.homepage.value
+            settings_form.steamID.data = current_user.steamID
 
         if password_form.submit_password.data and password_form.validate():
             hashed_password = bcrypt.generate_password_hash(password_form.confirm_new_password.data).decode('utf-8')

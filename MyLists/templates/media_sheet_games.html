@@ -1,31 +1,33 @@
 {% extends 'media_sheet_base.html' %}
 
 
-{% block medialist_cat_drop %}
-    <select id="category-dropdown" class="text-light text-center cat-drop"
-    onchange="changeCategoryGames('{{ data['id'] }}', this)">
-        <option {% if data['status'] == 'Playing' %} selected="selected" {% endif %}>Playing</option>
-        <option {% if data['status'] == 'Completed' %} selected="selected" {% endif %}>Completed</option>
-        <option {% if data['status'] == 'Endless' %} selected="selected" {% endif %}>Endless</option>
-        <option {% if data['status'] == 'Multiplayer' %} selected="selected" {% endif %}>Multiplayer</option>
-        <option {% if data['status'] == 'On Hold' %} selected="selected" {% endif %}>On Hold</option>
-        <option {% if data['status'] == 'Dropped' %} selected="selected" {% endif %}>Dropped</option>
-        <option {% if data['status'] == 'Owned' %} selected="selected" {% endif %}>Owned</option>
-        <option {% if data['status'] == 'Plan to Play' %} selected="selected"{% endif %}>Plan to Play</option>
-    </select>
-{% endblock medialist_cat_drop %}
-
-
-{% block medialist_eps_seas_drop %}
-    <div class="row m-l-20 m-r-25"{% if data['status'] == 'Plan to Play' %} style="display: none;"{% endif %}>
-        <div class="col-5">
-            <b>Played:</b>
+{% block medialist_info %}
+    <div class="row m-l-15 m-r-15">
+        <div class="col-4"><b>Status:</b></div>
+        <div class="col-8">
+            <label for="category-dropdown"></label>
+             <select id="category-dropdown" class="text-light text-center cat-drop"
+              onchange="changeCategoryGames('{{ data['id'] }}', this)">
+                <option {% if data['status'] == 'Playing' %} selected="selected" {% endif %}>Playing</option>
+                <option {% if data['status'] == 'Completed' %} selected="selected" {% endif %}>Completed</option>
+                <option {% if data['status'] == 'Endless' %} selected="selected" {% endif %}>Endless</option>
+                <option {% if data['status'] == 'Multiplayer' %} selected="selected" {% endif %}>Multiplayer</option>
+                <option {% if data['status'] == 'On Hold' %} selected="selected" {% endif %}>On Hold</option>
+                <option {% if data['status'] == 'Dropped' %} selected="selected" {% endif %}>Dropped</option>
+                <option {% if data['status'] == 'Owned' %} selected="selected" {% endif %}>Owned</option>
+                <option {% if data['status'] == 'Plan to Play' %} selected="selected"{% endif %}>Plan to Play</option>
+            </select>
+            <i id="cat-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+            &nbsp;<i id="cat-check" class="fas fa-check" style="display: none;"></i>
         </div>
-        <div class="col-7">
-            <input id="time_h" type="number" name="time_h" class="time-played-input" max="9999" maxlength="4"
-                   placeholder="00" pattern="[0-9]*" value="{{ data['t_played_h'] }}">h
-            <input  id="time_m" type="number" name="time_m" class="time-played-input" max="59" maxlength="2"
-                    placeholder="00" pattern="[0-9]*" value="{{ data['t_played_m'] }}">m
+    </div>
+    <div class="row m-l-15 m-r-15"{% if data['status'] == 'Plan to Play' %} style="display: none;"{% endif %}>
+        <div class="col-4"><b>Played:</b></div>
+        <div class="col-8">
+            <input id="time_h" type="number" name="time_h" class="time-h-played-input" placeholder="00"
+                   value="{{ data['t_played_h'] }}">h
+            <input  id="time_m" type="number" name="time_m" class="time-m-played-input" placeholder="00"
+                    value="{{ data['t_played_m'] }}">m
         </div>
     </div>
     <div class="text-center">
@@ -33,7 +35,37 @@
         <i id="time-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
         &nbsp;<i id="time-check" class="fas fa-check" style="display: none;"></i>
     </div>
-{% endblock medialist_eps_seas_drop %}
+    <div class="m-l-25 m-r-35 m-t-8 m-b-8" style="border: 1px solid grey;"></div>
+    <div id="comp-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="100% completion?">
+        <div class="col-4"><b>100%</b></div>
+        <div class="col-8">
+            <input type="checkbox" name="comp-check" onchange="updateCompletion('{{ data['id'] }}')"
+            {% if data['completion'] == True %}checked{% endif %} class="m-l-12"/>
+            <i id="comp-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+            &nbsp;<i id="comp-check" class="fas fa-check" style="display: none;"></i>
+        </div>
+    </div>
+    <div id="score-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="Score /10">
+        <div class="col-4"><b>Score:</b></div>
+        <div class="col-8">
+            &nbsp;<select id="score-dropdown" class="text-light text-center cat-drop"
+            onchange="updateScore('{{ data['id'] }}', this, '{{ media_list }}')">
+                <option {% if data['score'] == None or data['score'] == -1 %} selected="selected"
+                {% endif %}value="---">
+                    &nbsp;---&nbsp;
+                </option>
+                {% for i in range(0, 21) %}
+                    <option {% if (i-(i/2)) == data['score'] %} selected="selected" {% endif %}
+                    value="{{ (i-(i/2)) }}">
+                        &nbsp;{{ (i-(i/2)) }}&nbsp;
+                    </option>
+                {% endfor %}
+            </select>
+            <i id="score-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+            &nbsp;<i id="score-check" class="fas fa-check" style="display: none;"></i>
+        </div>
+    </div>
+{% endblock medialist_info %}
 
 
 {% block information %}
@@ -100,11 +132,29 @@
         <li class="m-b-10">
             <div class="row">
                 <div class="col-5"><b>Main game</b></div>
-                <div class="col-7"><i>No info.</i></div>
+                <div class="col-7">
+                    {% if not data['hltb_main'] %}
+                        <i>No data.</i>
+                    {% else %}
+                        {{ (data['hltb_main']/60)|int }} h
+                    {% endif %}
+                </div>
                 <div class="col-5"><b>Main + Extra</b></div>
-                <div class="col-7"><i>No info.</i></div>
+                <div class="col-7">
+                     {% if not data['hltb_main'] %}
+                        <i>No data.</i>
+                    {% else %}
+                        {{ (data['hltb_main_extra']/60)|int }} h
+                    {% endif %}
+                </div>
                 <div class="col-5"><b>100%</b></div>
-                <div class="col-7"><i>No info.</i></div>
+                <div class="col-7">
+                    {% if not data['hltb_main'] %}
+                        <i>No data.</i>
+                    {% else %}
+                        {{ (data['hltb_complete']/60)|int }} h
+                    {% endif %}
+                </div>
             </div>
         </li>
     </ul>

@@ -31,15 +31,20 @@ def latin_alphabet(original_name):
             return False
 
 
-def change_air_format(date, media_sheet=False):
-    if media_sheet:
+def change_air_format(date, media_sheet=False, games=False):
+    if media_sheet and not games:
         try:
             return datetime.strptime(date, '%Y-%m-%d').strftime("%b %Y")
         except:
             return 'Unknown'
-    else:
+    elif not media_sheet and not games:
         try:
             return datetime.strptime(date, '%Y-%m-%d').strftime("%d %b %Y")
+        except:
+            return 'Unknown'
+    elif games:
+        try:
+            return datetime.utcfromtimestamp(int(date)).strftime('%d %b %Y')
         except:
             return 'Unknown'
 
@@ -73,6 +78,11 @@ class MediaDict:
                            "player_perspective": self.data.player_perspective,
                            "storyline": self.data.storyline,
                            "genres": ', '.join([r.genre for r in self.data.genres]),
+                           "platforms": ', '.join([r.name for r in self.data.platforms]),
+                           "hltb_main": self.data.hltb_main_time,
+                           "hltb_main_extra": self.data.hltb_main_and_extra_time,
+                           "hltb_complete": self.data.hltb_total_complete_time,
+                           "cover_path": 'games_covers',
                            "media_type": 'Games',
                            "publisher": [],
                            "developer": [],
@@ -90,8 +100,7 @@ class MediaDict:
             if company.developer is True:
                 self.media_info['developer'].append(company.name)
 
-        self.media_info["first_release_date"] = datetime.utcfromtimestamp(int(self.data.first_release_date))\
-            .strftime('%d %b %Y')
+        self.media_info["first_release_date"] = change_air_format(self.data.first_release_date, games=True)
 
         self.add_genres()
         self.add_follow_list()
@@ -104,14 +113,8 @@ class MediaDict:
             self.media_info["status"] = in_user_list.status.value
             self.media_info["comment"] = in_user_list.comment
             self.media_info["completion"] = in_user_list.completion
-
-            total_time = str(in_user_list.time_played)
-            total_time = total_time.split('.')
-            hours = total_time[0]
-            minutes = int((float(total_time[1])/100)*60)
-
-            self.media_info["t_played_h"] = hours
-            self.media_info["t_played_m"] = minutes
+            self.media_info["t_played_h"] = int(in_user_list.time_played/60)
+            self.media_info["t_played_m"] = '{:02d}'.format(int(in_user_list.time_played % 60))
 
     def media_dict(self):
         self.media_info = {"id": self.data.id,
@@ -518,7 +521,7 @@ class MediaDetails:
         else:
             companies_dict = {'name': 'Unknown',
                               'publisher': False,
-                              'developper': False}
+                              'developer': False}
             companies_list.append(companies_dict)
 
         return companies_list
@@ -645,7 +648,14 @@ class MediaDetails:
                               'player_perspective': self.media_data.get('player_perspectives', [{'name': 'Unknown'}])[0]['name'] or 'Unknown',
                               'game_modes': ','.join([x['name'] for x in self.media_data.get('game_modes', [{'name': 'Unknown'}])]),
                               'igdb_id': self.media_data.get('id'),
+                              'steam_id': None,
                               'image_cover': self.get_media_cover()}
+
+        # Recover the Steam API ID (category = 1 in the IGDB API)
+        for external_data in self.media_data.get('external_games', []) or []:
+            if external_data['category'] == 1:
+                self.media_details['steam_id'] = external_data['uid']
+                break
 
         companies_list = self.get_games_companies()
         genres_list = self.get_games_genres()
@@ -698,7 +708,7 @@ class Autocomplete:
         if self.result.get('cover'):
             self.info['image_cover'] = "{}{}.jpg".format(self.igdb_cover_link, self.result['cover']['image_id'])
 
-        self.info['platforms'] = self.result.get('platforms', 'Unknown') or 'Unknown'
+        self.info['date'] = change_air_format(self.result.get('first_release_date'), games=True)
 
         return self.info
 

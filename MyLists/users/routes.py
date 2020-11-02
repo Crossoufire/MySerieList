@@ -1,12 +1,15 @@
 import json
-
 from MyLists import app, db
 from datetime import datetime
+from MyLists.API_data import ApiData
+from MyLists.main.add_db import AddtoDB
+from MyLists.main.media_object import MediaDetails
 from flask_login import login_required, current_user
 from flask import Blueprint, flash, redirect, request, render_template, abort
-from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications, RoleType
+from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications, RoleType, Status, GamesList, \
+    Games
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
-    get_knowledge_frame, get_updates, get_favorites, get_all_follows_data, get_header_data
+    get_knowledge_frame, get_updates, get_favorites, get_all_follows_data, get_header_data, cestparti
 
 bp = Blueprint('users', __name__)
 
@@ -22,11 +25,11 @@ def account(user_name):
 
     if request.form.get('all_follows'):
         all_follows = get_all_follows_data(user)
-        return render_template('all_follows.html', title='Follows', all_follows=all_follows, header_data=header_data)
+        return render_template('account_all_follows.html', title='Follows', all_follows=all_follows, header_data=header_data)
     elif request.form.get('all_history'):
         updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
         media_update = get_updates(updates)
-        return render_template('all_history.html', title='History', media_updates=media_update, header_data=header_data)
+        return render_template('account_all_history.html', title='History', media_updates=media_update, header_data=header_data)
 
     # Recover user data
     user_data = get_user_data(user)
@@ -62,7 +65,7 @@ def more_stats(user_name):
 @bp.route("/hall_of_fame", methods=['GET', 'POST'])
 @login_required
 def hall_of_fame():
-    users = User.query.filter(User.id >= "2", User.active == True).order_by(User.username.asc()).all()
+    users = User.query.filter(User.role != RoleType.ADMIN, User.active == True).order_by(User.username.asc()).all()
 
     # Get the follows of the current account
     follows_list = []
@@ -74,6 +77,7 @@ def hall_of_fame():
         series_level = get_media_levels(user, ListType.SERIES)
         anime_level = get_media_levels(user, ListType.ANIME)
         movies_level = get_media_levels(user, ListType.MOVIES)
+        games_level = get_media_levels(user, ListType.GAMES)
         knowledge_frame = get_knowledge_frame(user)
 
         user_data = {"id": user.id,
@@ -82,6 +86,7 @@ def hall_of_fame():
                      "series_data": series_level,
                      "anime_data": anime_level,
                      "movies_data": movies_level,
+                     "games_data": games_level,
                      'knowledge_frame': knowledge_frame}
 
         if user.id in follows_list:
@@ -122,6 +127,43 @@ def level_grade_data():
 def knowledge_frame_data():
     ranks = Frames.query.all()
     return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
+
+
+@bp.route("/add_steam_games", methods=['GET', 'POST'])
+@login_required
+def add_steam_games():
+    if request.method == 'POST':
+        games_not_added, games_already_inlist, games_added = cestparti(dict(request.form))
+        flash("Games not added: {}".format(games_not_added), 'warning')
+
+        return redirect("/account/{}".format(current_user.username))
+
+    steamID = db.session.query(User.steamID).filter_by(id=current_user.id).first()
+
+    if not steamID:
+        flash('no steamID found. add your steamID in the settings parameters.')
+
+    try:
+        steam_data = ApiData().games_from_steam_list(steamID[0])
+    except Exception as e:
+        app.logger.error('[ERROR] - Requesting the Steam API: {}'.format(e))
+        return flash('Requesting the Steam API', 'warning')
+
+    games_count = steam_data.get('response', {'game_count': 0}).get('game_count', 0) or 0
+
+    steam_games_list = []
+    steam_user_games = steam_data.get('response', {'games': []}).get('games', []) or []
+    for game in steam_user_games:
+        user_games_data = {'appid': game['appid'],
+                           'name': game['name'],
+                           'playtime': game['playtime_forever'],
+                           'icon_path': "http://media.steampowered.com/steamcommunity/public/images/apps/"
+                                        "{0}/{1}.jpg".format(game['appid'], game['img_icon_url'])
+                           }
+
+        steam_games_list.append(user_games_data)
+
+    return render_template('steam_games.html', games_list=steam_games_list, games_count=games_count)
 
 
 @bp.route("/apscheduler_info", methods=['GET', 'POST'])

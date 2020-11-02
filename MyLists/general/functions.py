@@ -5,10 +5,17 @@ import urllib.request
 
 from PIL import Image
 from pathlib import Path
+
+from flask_login import current_user
+
 from MyLists import db, app
 from datetime import datetime
+
+from MyLists.API_data import ApiData
+from MyLists.main.add_db import AddtoDB
+from MyLists.main.media_object import MediaDetails
 from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, MoviesCollections, get_total_time, \
-    SeriesList, AnimeList, Series, Anime
+    SeriesList, AnimeList, Series, Anime, Games, GamesList
 
 
 def compute_media_time_spent(list_type):
@@ -278,3 +285,72 @@ def add_eps_watched():
             anime[1].eps_watched = sum(eps_seasons[:season - 1]) + eps
 
     db.session.commit()
+
+
+def add_hltb_time():
+    list_all_hltb_games = []
+    path = Path(app.root_path, 'static/csv_data/HLTB_games.csv')
+    with open(path, encoding='utf-8') as fp:
+        for line in fp:
+            list_all_hltb_games.append(line.split(";"))
+
+    all_games = Games.query.all()
+    for game in all_games:
+        for htlb_game in list_all_hltb_games:
+            if game.name == htlb_game[1]:
+                print(game.name)
+                try:
+                    game.hltb_main_time = float(htlb_game[2])*60
+                except:
+                    pass
+                try:
+                    game.hltb_main_and_extra_time = float(htlb_game[3])*60
+                except:
+                    pass
+                try:
+                    game.hltb_total_complete_time = float(htlb_game[4])*60
+                except:
+                    pass
+                db.session.commit()
+
+
+def add_manual_games():
+    headers = {'Client-ID': '5i5pi21s0ninkmp6jj09ix4l6fw5bd',
+               'Authorization': 'Bearer ' + '46gsxkz0svtqzujd4znmjqilhq0xa5'}
+
+    list_all_manual_games = []
+    path = Path(app.root_path, 'static/csv_data/amazon_games.csv')
+    with open(path, encoding='utf-8') as fp:
+        for line in fp:
+            list_all_manual_games.append(line.strip())
+
+    all_games = Games.query.all()
+    all_games_name = [x.name for x in all_games]
+    for game in list_all_manual_games:
+        if game in all_games_name:
+            continue
+        else:
+            try:
+                body = 'fields name, cover.image_id, collection.name, game_engines.name, game_modes.name, ' \
+                       'platforms.name, genres.name, player_perspectives.name, total_rating, total_rating_count, ' \
+                       'first_release_date, involved_companies.company.name, involved_companies.developer, ' \
+                       'involved_companies.publisher, storyline, summary, themes.name, url, external_games.uid,' \
+                       ' external_games.category; where name="{}";'.format(game)
+
+                response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers)
+                data = json.loads(response.text)
+
+                media_details = MediaDetails(data, ListType.GAMES).get_media_details()
+                media = AddtoDB(media_details, ListType.GAMES).add_media_to_db()
+
+                in_user_list = GamesList.query.filter_by(user_id=current_user.id, media_id=media.id).first()
+                if not in_user_list:
+                    user_list = GamesList(user_id=current_user.id,
+                                          media_id=media.id,
+                                          status=Status.OWNED,
+                                          completion=False,
+                                          time_played=0)
+                    db.session.add(user_list)
+                    db.session.commit()
+            except:
+                continue
