@@ -1,6 +1,5 @@
 import json
 import pytz
-
 from MyLists import db, app
 from datetime import datetime
 from MyLists.API_data import ApiData
@@ -9,11 +8,11 @@ from flask_login import login_required, current_user
 from MyLists.main.forms import EditMediaData, MediaComment
 from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
-from MyLists.main.functions import get_medialist_data, set_last_update, compute_time_spent, check_cat_type, \
-    save_new_cover
+from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover, \
+    get_medialist_data
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
-    AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MoviesGenre, MediaType, \
-    get_media_query, get_next_airing, check_media, User, get_collection_query, Games, GamesList
+    AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MoviesGenre, MediaType, get_next_airing, \
+    check_media, User, get_collection_query, Games, GamesList, get_media_query \
 
 bp = Blueprint('main', __name__)
 
@@ -21,7 +20,7 @@ bp = Blueprint('main', __name__)
 @bp.route("/<string:media_list>/<string:user_name>", methods=['GET', 'POST'])
 @login_required
 def mymedialist(media_list, user_name):
-    # Check if the user can see the <media_list>
+    # Check if the <user> can see the <media_list>
     user = current_user.check_autorization(user_name)
 
     # Check if <media_list> is valid
@@ -34,17 +33,19 @@ def mymedialist(media_list, user_name):
     current_user.add_view_count(user, list_type)
 
     # Check the <category>, the <page>, the <media_list> and the <html_template>.
-    page = request.args.get('page', 1, int)
     search = request.args.get('query')
-    filter_val = request.args.get('filter', 'check')
+    page = request.args.get('page', 1, int)
     option = request.args.get('option', None)
-    html_template = 'medialist_tv.html'
-    category = request.args.get('category', 'Watching')
     sort_val = request.args.get('sort', 'title')
+    filter_val = request.args.get('filter', 'check')
+    category = request.args.get('category', 'Watching')
+    html_template = 'medialist_tv.html'
+
+    # Get the <media_list> object
     if list_type == ListType.MOVIES:
         category = request.args.get('category', 'Completed')
         html_template = 'medialist_movies.html'
-    elif list_type == ListType.GAMES:
+    if list_type == ListType.GAMES:
         sort_val = request.args.get('sort', 'playtime')
         category = request.args.get('category', 'Playing')
         html_template = 'medialist_games.html'

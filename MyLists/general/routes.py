@@ -55,7 +55,7 @@ def create_first_data():
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
     compute_media_time_spent(ListType.GAMES)
-    add_hltb_time()
+    # add_hltb_time()
     # add_manual_games()
 
 

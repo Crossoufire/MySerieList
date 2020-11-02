@@ -1,14 +1,11 @@
 import secrets
 import pykakasi
-from sqlalchemy import and_
-from sqlalchemy.orm import aliased
-
-from MyLists import app, db
+from MyLists import app
 from flask import url_for
 from datetime import datetime
 from flask_login import current_user
 from MyLists.API_data import ApiData
-from MyLists.models import ListType, Status, RoleType
+from MyLists.models import ListType, Status
 
 
 def latin_alphabet(original_name):
@@ -752,77 +749,39 @@ class Autocomplete:
 # --- Tests ----------------------------------------------------------------------------------------------
 
 
-class MediaLists(object):
-    def __init__(self, user, list_type, db_data=None):
-        self.list_type = list_type
-        self.db_data = db_data
-        self.cover_path = None
-        self.media_list = None
-        self.role = user.role
-        self.media_dict = {}
-        self.user = user
-
-    def add_view_count(self):
-        pass
-
-    def get_media_count(self):
-        v1, v2 = aliased(self.media_list), aliased(self.media_list)
-        count_total = self.media_list.query.filter_by(user_id=self.user.id).count()
-        count_versus = db.session.query(v1, v2) \
-            .join(v2, and_(v2.user_id == self.user.id, v2.media_id == v1.media_id)) \
-            .filter(v1.user_id == current_user.id).all()
-        common_ids = [r[0].media_id for r in count_versus]
-
-        return common_ids, int(count_total)
-
-    def create_tv_list_dict(self):
-        self.media_dict = {"id": self.db_data[0].id,
-                           "tmdb_id": self.db_data[0].themoviedb_id,
-                           "cover": "{}{}".format(self.cover_path, self.db_data[0].image_cover),
-                           "score": self.db_data[1].score,
-                           "favorite": self.db_data[1].favorite,
-                           "rewatched": self.db_data[1].rewatched,
-                           "comment": self.db_data[1].comment,
-                           "category": self.db_data[1].status.value,
-                           "common": False}
-
-        if not self.media_dict['score'] or self.media_dict['score'] == -1:
-            self.media_dict['score'] = '---'
-
-        return_latin = latin_alphabet(self.db_data[0].original_name)
-        if return_latin is True:
-            self.media_dict["display_name"] = self.db_data[0].original_name
-            self.media_dict["other_name"] = self.db_data[0].name
-        elif return_latin is False:
-            self.media_dict["display_name"] = self.db_data[0].name
-            self.media_dict["other_name"] = self.db_data[0].original_name
-        else:
-            self.media_dict["display_name"] = self.db_data[0].name
-            self.media_dict["other_name"] = return_latin
-
-        if self.db_data[0].id in self.common_media:
-            self.media_dict['common'] = True
-
-        self.media_dict["last_episode_watched"] = self.db_data[1].last_episode_watched
-        self.media_dict["eps_per_season"] = [eps.episodes for eps in self.db_data[0].eps_per_season]
-        self.media_dict["current_season"] = self.db_data[1].current_season
-
-    def create_movies_list_dict(self):
-        pass
-
-    def create_games_list_dict(self):
-        pass
-
-
-class AnimeList(MediaLists):
-    def add_view_count(self):
-        if self.role != RoleType.ADMIN and self.user.id != current_user.id:
-            self.user.anime_views += 1
-            db.session.commit()
-
-    def get_media_count(self):
-        self.media_list = AnimeList
-
-    def create_tv_list_dict(self):
-        self.cover_path = url_for('static', filename='covers/anime_covers/')
-        self.media_dict["media"] = "Anime"
+# class MediaLists(object):
+#     lists_type = None
+#
+#     def __init__(self, list_type, user):
+#         self.list_type = list_type
+#         self.user = user
+#
+#     @classmethod
+#     def get_list_type(cls, list_type, user):
+#         if cls.lists_type is None:
+#             cls.lists_type = {}
+#             for lists_type_class in cls.__subclasses__():
+#                 tata = lists_type_class(user)
+#                 cls.lists_type[tata.list_type] = tata
+#         return cls.lists_type[list_type]
+#
+#     def add_view_count(self):
+#         pass
+#
+#     def get_media_count(self):
+#         pass
+#
+#
+# class AnimeLists(MediaLists):
+#     def __init__(self, user):
+#         super(AnimeLists, self).__init__(ListType.ANIME, user)
+#         self.user = user
+#
+#     def add_view_count(self):
+#         if self.user.role != RoleType.ADMIN and self.user.id != current_user.id:
+#             self.user.anime_views += 1
+#             db.session.commit()
+#
+#     def get_media_count(self):
+#         common_ids, count_total = get_media_count(self.user, AnimeList)
+#         return common_ids, count_total
