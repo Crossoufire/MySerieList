@@ -157,6 +157,8 @@ class User(db.Model, UserMixin):
                 user.anime_views += 1
             elif list_type == ListType.MOVIES:
                 user.movies_views += 1
+            elif list_type == ListType.GAMES:
+                user.movies_views += 1
             db.session.commit()
 
     @staticmethod
