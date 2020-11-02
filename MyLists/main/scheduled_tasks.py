@@ -1,6 +1,5 @@
 import os
 import json
-
 from pathlib import Path
 from MyLists import app, db
 from sqlalchemy import and_, desc
@@ -206,19 +205,17 @@ def refresh_element_data(api_id, list_type):
     # Check the episodes/seasons
     if list_type != ListType.MOVIES:
         if list_type == ListType.SERIES:
-            element = Series.query.filter_by(themoviedb_id=api_id).first()
-            old_seas_eps = \
-                [n.episodes for n in SeriesEpisodesPerSeason.query.filter_by(media_id=element.id).all()]
+            media = Series.query.filter_by(themoviedb_id=api_id).first()
+            old_seas_eps = [n.episodes for n in SeriesEpisodesPerSeason.query.filter_by(media_id=media.id).all()]
         elif list_type == ListType.ANIME:
-            element = Anime.query.filter_by(themoviedb_id=api_id).first()
-            old_seas_eps = \
-                [n.episodes for n in AnimeEpisodesPerSeason.query.filter_by(media_id=element.id).all()]
+            media = Anime.query.filter_by(themoviedb_id=api_id).first()
+            old_seas_eps = [n.episodes for n in AnimeEpisodesPerSeason.query.filter_by(media_id=media.id).all()]
 
         new_seas_eps = [d['episodes'] for d in data['seasons_data']]
 
         if new_seas_eps != old_seas_eps:
             if list_type == ListType.SERIES:
-                users_list = SeriesList.query.filter_by(media_id=element.id).all()
+                users_list = SeriesList.query.filter_by(media_id=media.id).all()
 
                 for user in users_list:
                     episodes_watched = get_total_eps(user, old_seas_eps)
@@ -231,8 +228,7 @@ def refresh_element_data(api_id, list_type):
                             user.current_season = data['seasons_data'][i]['season']
                             break
                         elif count > episodes_watched:
-                            user.last_episode_watched = data['seasons_data'][i]['episodes'] - \
-                                                        (count - episodes_watched)
+                            user.last_episode_watched = data['seasons_data'][i]['episodes']-(count-episodes_watched)
                             user.current_season = data['seasons_data'][i]['season']
                             break
                         elif count < episodes_watched:
@@ -244,17 +240,17 @@ def refresh_element_data(api_id, list_type):
                                 break
                     db.session.commit()
 
-                SeriesEpisodesPerSeason.query.filter_by(media_id=element.id).delete()
+                SeriesEpisodesPerSeason.query.filter_by(media_id=media.id).delete()
                 db.session.commit()
 
                 for seas in data['seasons_data']:
-                    season = SeriesEpisodesPerSeason(media_id=element.id,
+                    season = SeriesEpisodesPerSeason(media_id=media.id,
                                                      season=seas['season'],
                                                      episodes=seas['episodes'])
                     db.session.add(season)
                 db.session.commit()
             elif list_type == ListType.ANIME:
-                users_list = AnimeList.query.filter_by(media_id=element.id).all()
+                users_list = AnimeList.query.filter_by(media_id=media.id).all()
 
                 for user in users_list:
                     episodes_watched = get_total_eps(user, old_seas_eps)
@@ -267,8 +263,7 @@ def refresh_element_data(api_id, list_type):
                             user.current_season = data['seasons_data'][i]['season']
                             break
                         elif count > episodes_watched:
-                            user.last_episode_watched = data['seasons_data'][i]['episodes'] - (
-                                    count - episodes_watched)
+                            user.last_episode_watched = data['seasons_data'][i]['episodes']-(count-episodes_watched)
                             user.current_season = data['seasons_data'][i]['season']
                             break
                         elif count < episodes_watched:
@@ -280,11 +275,11 @@ def refresh_element_data(api_id, list_type):
                                 break
                     db.session.commit()
 
-                AnimeEpisodesPerSeason.query.filter_by(media_id=element.id).delete()
+                AnimeEpisodesPerSeason.query.filter_by(media_id=media.id).delete()
                 db.session.commit()
 
                 for seas in data['seasons_data']:
-                    season = AnimeEpisodesPerSeason(media_id=element.id,
+                    season = AnimeEpisodesPerSeason(media_id=media.id,
                                                     season=seas['season'],
                                                     episodes=seas['episodes'])
                     db.session.add(season)

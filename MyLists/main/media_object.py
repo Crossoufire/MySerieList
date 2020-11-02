@@ -1,6 +1,5 @@
 import secrets
 import pykakasi
-
 from MyLists import app
 from flask import url_for
 from datetime import datetime
@@ -240,6 +239,7 @@ class MediaListDict:
         except:
             self.media_info['current_season'] = 1
             self.media_info['last_episode_watched'] = 1
+
 
 class MediaDetails:
     def __init__(self, media_data, list_type, updating=False):
