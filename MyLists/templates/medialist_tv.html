@@ -25,27 +25,21 @@
 
 
 {% block seas_eps_drop %}
-    <div class="seas-eps-drop-container" {% if category == 'Plan to Watch'
-    or category == 'Random' %} style="display: none;"{% endif %}>
-        <select id="S_{{ data['id'] }}" class="seas-eps-drop
-         {% if user_id != current_user.get_id() %} disabled{% endif %}"
-                onchange="updateSeason('{{ data['id'] }}', this)">
+    <div class="seas-eps-drop-container" {% if category == 'Plan to Watch'or category == 'Random' %} style="display: none;"{% endif %}>
+        <select id="S_{{ data['id'] }}" class="seas-eps-drop {% if user_id != current_user.get_id() %} disabled{% endif %}"
+         onchange="updateSeason('{{ data['id'] }}', this)">
             {% for i in range(data['eps_per_season']|length) %}
-                <option class="seas-eps-drop-options" {% if i + 1 == data['current_season'] %}
-                        selected="selected"{% endif %}>
+                <option class="seas-eps-drop-options"{% if i + 1 == data['current_season'] %} selected="selected"{% endif %}>
                     {{ "S{:02}".format(i + 1) }}
                 </option>
             {% endfor %}
         </select>
-
         <span style="border-right: 2px solid gray;"></span>
-
-        <select id="E_{{ data['id'] }}" class="text-light text-center p-0 seas-eps-drop
-         {% if user_id != current_user.get_id() %} disabled{% endif %}"
-                onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
+        <select id="E_{{ data['id'] }}" class="text-light text-center p-0 seas-eps-drop{% if user_id != current_user.get_id() %}
+         disabled{% endif %}" onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
             {% if category == 'Plan to Watch' or category == 'Random' %}
                 {% for i in range(0, data['eps_per_season'][data['current_season'] - 1]) %}
-                    <option class="seas-eps-drop-options" {% if i + 1 == 1 %} selected="selected" {% endif %}>
+                    <option class="seas-eps-drop-options" {% if i + 1 == 1 %}selected="selected"{% endif %}>
                         {{ "E{:02}".format(i + 1) }}
                     </option>
                 {% endfor %}

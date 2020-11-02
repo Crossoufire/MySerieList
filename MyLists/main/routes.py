@@ -1,6 +1,5 @@
 import json
 import pytz
-
 from MyLists import db, app
 from datetime import datetime
 from MyLists.API_data import ApiData

@@ -232,10 +232,14 @@ class MediaListDict:
         if self.list_type == ListType.ANIME:
             self.media_info['media'] = 'Anime'
 
-        self.media_info["last_episode_watched"] = self.data[1].last_episode_watched
-        self.media_info["eps_per_season"] = [eps.episodes for eps in self.data[0].eps_per_season]
-        self.media_info["current_season"] = self.data[1].current_season
-
+        self.media_info['last_episode_watched'] = self.data[1].last_episode_watched
+        self.media_info['eps_per_season'] = [eps.episodes for eps in self.data[0].eps_per_season]
+        self.media_info['current_season'] = self.data[1].current_season
+        try:
+            self.media_info['eps_per_season'][self.media_info['current_season'] - 1]
+        except:
+            self.media_info['current_season'] = 1
+            self.media_info['last_episode_watched'] = 1
 
 class MediaDetails:
     def __init__(self, media_data, list_type, updating=False):
