@@ -6,6 +6,12 @@
     <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Name</option>
     <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>
     <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>
+    <option {% if sort_val == 'first_release_date_desc' %}selected="selected"{% endif %} value="first_release_date_desc">
+        Release date desc
+    </option>
+     <option {% if sort_val == 'first_release_date_asc' %}selected="selected"{% endif %} value="first_release_date_asc">
+        Release date asc
+    </option>
 {% endblock sorting_list %}
 
 

@@ -706,6 +706,18 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
         sorting = media_list.comment.desc()
     elif sort_val == 'rewatch':
         sorting = media_list.rewatched.desc()
+    elif sort_val == 'first_air_date_desc':
+        sorting = media.first_air_date.desc()
+    elif sort_val == 'first_air_date_asc':
+        sorting = media.first_air_date.asc()
+    elif sort_val == 'release_date_desc':
+        sorting = media.release_date.desc()
+    elif sort_val == 'release_date_asc':
+        sorting = media.release_date.asc()
+    elif sort_val == 'first_release_date_desc':
+        sorting = media.first_release_date.desc()
+    elif sort_val == 'first_release_date_asc':
+        sorting = media.first_release_date.asc()
 
     try:
         category = Status(category)

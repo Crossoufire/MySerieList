@@ -6,7 +6,7 @@ from MyLists.API_data import ApiData
 from MyLists.main.add_db import AddtoDB
 from flask_login import login_required, current_user
 from MyLists.main.forms import EditMediaData, MediaComment
-from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaLists
+from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover, \
     get_medialist_data
@@ -28,9 +28,6 @@ def mymedialist(media_list, user_name):
         list_type = ListType(media_list)
     except ValueError:
         abort(404)
-
-    a = MediaLists.get_list_type(list_type, user)
-    a.recover_query(filter_val=True, sort_val='title', category=Status.COMPLETED, page=1, search=None, option='title')
 
     # Add views_count to the profile
     current_user.add_view_count(user, list_type)
@@ -64,6 +61,8 @@ def mymedialist(media_list, user_name):
 
     # Shape into dict the <media_data>
     media_data = get_medialist_data(list_type, items, user.id)
+
+    print(sort_val)
 
     return render_template(html_template, title="{}'s {}".format(user_name, media_list),
                            media_data=media_data["media_data"], common_elements=media_data["common_elements"],
