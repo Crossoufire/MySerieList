@@ -112,7 +112,12 @@ def mylists_stats():
             if media[0].status != Status.PLAN_TO_WATCH:
                 episodes = media[2].split(',')
                 episodes = [int(x) for x in episodes]
-                if episodes[int(media[0].current_season) - 1] == int(media[0].last_episode_watched):
+                try:
+                    eps_info = episodes[int(media[0].current_season) - 1]
+                except Exception as e:
+                    app.logger.info('Error for this media: {} ; e: {}'.format(media[0].__dict__, e))
+                    eps_info = 1
+                if eps_info == int(media[0].last_episode_watched):
                     total_seasons += int(media[0].current_season)
                 else:
                     total_seasons += int(media[0].current_season) - 1
