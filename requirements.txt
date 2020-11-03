@@ -26,5 +26,3 @@ pytz
 rauth
 configparser
 ratelimit
-rq
-redis
