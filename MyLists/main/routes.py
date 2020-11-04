@@ -45,7 +45,7 @@ def mymedialist(media_list, user_name):
     if list_type == ListType.MOVIES:
         category = request.args.get('category', 'Completed')
         html_template = 'medialist_movies.html'
-    if list_type == ListType.GAMES:
+    elif list_type == ListType.GAMES:
         sort_val = request.args.get('sort', 'playtime')
         category = request.args.get('category', 'Playing')
         html_template = 'medialist_games.html'
@@ -61,8 +61,6 @@ def mymedialist(media_list, user_name):
 
     # Shape into dict the <media_data>
     media_data = get_medialist_data(list_type, items, user.id)
-
-    print(sort_val)
 
     return render_template(html_template, title="{}'s {}".format(user_name, media_list),
                            media_data=media_data["media_data"], common_elements=media_data["common_elements"],
@@ -241,19 +239,16 @@ def media_sheet_form(media_type, media_id):
 
     if media_type == MediaType.SERIES:
         list_type = ListType.SERIES
+        media = Series.query.filter_by(id=media_id).first()
     elif media_type == MediaType.ANIME:
         list_type = ListType.ANIME
+        media = Anime.query.filter_by(id=media_id).first()
     elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
-    else:
-        abort(404)
-
-    if list_type == ListType.SERIES:
-        media = Series.query.filter_by(id=media_id).first()
-    elif list_type == ListType.ANIME:
-        media = Anime.query.filter_by(id=media_id).first()
-    elif list_type == ListType.MOVIES:
         media = Movies.query.filter_by(id=media_id).first()
+    elif media_type == MediaType.GAMES:
+        list_type = ListType.GAMES
+        media = Games.query.filter_by(id=media_id).first()
 
     if not media:
         abort(404)
@@ -423,11 +418,18 @@ def search_media():
     try:
         data_search = ApiData().TMDb_search(search)
     except Exception as e:
+        data_search = {}
         app.logger.error('[SYSTEM] - Error requesting the TMDB API: {}'.format(e))
-        flash('Sorry, an error occured, the API is unreachable for now.', 'warning')
-        return redirect(request.referrer)
+        flash('Sorry, an error occured, the TMDB API is unreachable for now.', 'warning')
 
-    if data_search.get("total_results", 0) == 0:
+    try:
+        data_search_games = ApiData().IGDB_search(search)
+    except Exception as e:
+        data_search_games = []
+        app.logger.error('[SYSTEM] - Error requesting the IGDB API: {}'.format(e))
+        flash('Sorry, an error occured, the IGDB API is unreachable for now.', 'warning')
+
+    if data_search.get("total_results", 0) == 0 and len(data_search_games) == 0:
         flash('Sorry, no results found for your query.', 'warning')
         return redirect(request.referrer)
 
@@ -440,7 +442,7 @@ def search_media():
         media_data = {'name': result.get('original_title') or result.get('original_name'),
                       'overview': result.get('overview'),
                       'first_air_date': result.get('first_air_date') or result.get('release_date'),
-                      'tmdb_id': result['id']}
+                      'api_id': result['id']}
 
         # Modify the first_air_date / release_date format
         if media_data['first_air_date'] == '':
@@ -470,6 +472,33 @@ def search_media():
                 media_data['name'] = result['title']
             movies_results.append(media_data)
 
+    # Recover 1 page of results (20 max?)
+    games_results = []
+    for result in data_search_games:
+        game_data = {'name': result.get('name'),
+                     'overview': result.get('summary'),
+                     'first_air_date': result.get('first_release_date'),
+                     'api_id': result['id']}
+
+        # Modify the <first_release_date> format
+        try:
+            game_data['first_air_date'] = datetime.utcfromtimestamp(int(result.get('first_release_date')))\
+                .strftime('%d %b %Y')
+        except:
+            game_data['first_air_date'] = 'Unknown'
+
+        # Recover the poster_path or take a default image
+        if result.get('cover', {}).get('image_id'):
+            game_data['poster_path'] = "{}{}.jpg".format('https://images.igdb.com/igdb/image/upload/t_1080p/',
+                                                         result['cover']['image_id'])
+        else:
+            game_data['poster_path'] = url_for('static', filename="covers/anime_covers/default.jpg")
+
+        # Put data in different lists in function of media type
+        game_data['url'] = result.get('url')
+
+        games_results.append(game_data)
+
     # Get the plateform to display the appropriate template
     platform = str(request.user_agent.platform)
     if platform == "iphone" or platform == "android" or platform == 'None' or not platform:
@@ -482,6 +511,7 @@ def search_media():
                            series_results=series_results,
                            anime_results=anime_results,
                            movies_results=movies_results,
+                           games_results=games_results,
                            search=search)
 
 

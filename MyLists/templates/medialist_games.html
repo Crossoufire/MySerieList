@@ -6,12 +6,7 @@
     <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Name</option>
     <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>
     <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>
-    <option {% if sort_val == 'first_release_date_desc' %}selected="selected"{% endif %} value="first_release_date_desc">
-        Release date desc
-    </option>
-     <option {% if sort_val == 'first_release_date_asc' %}selected="selected"{% endif %} value="first_release_date_asc">
-        Release date asc
-    </option>
+    <option {% if sort_val == 'first_release_date' %}selected="selected"{% endif %} value="first_release_date">Release date</option>
 {% endblock sorting_list %}
 
 
@@ -39,13 +34,12 @@
 
 {% block seas_eps_drop scoped %}
     <div class="seas-eps-drop-container" {% if category == 'Plan to Play' %} style="display: none;"{% endif %}>
-        <input id="{{ data['id'] }}-time_h" class="time-played-input" type="number" name="time_h" max="9999"
-               maxlength="4" placeholder="00" pattern="[0-9]*" value="{{ data['t_played_h'] }}">h
-        <input id="{{ data['id'] }}-time_m" class="time-played-input-m" type="number" name="time_m" max="59"
-               maxlength="2" placeholder="00" pattern="[0-9]*" value="{{ data['t_played_m'] }}">min
-        <span class="m-l-8 m-r-8">|</span>
-        <a class="fas fa-upload" onclick="updatePlaytime({{ data['id'] }})" data-toggle="tooltip"
-           title="Update playtime"></a>
+        <input id="{{ data['id'] }}-time_h" class="time-played-input" type="number" name="time_h" placeholder="00"
+               value="{{ data['t_played_h'] }}" onkeyup="test('{{ data['id'] }}-upload')">h
+        <input id="{{ data['id'] }}-time_m" class="time-played-input-m" type="number" name="time_m" placeholder="00"
+               value="{{ "%02d" % data['t_played_m'] }}" onkeyup="test('{{ data['id'] }}-upload')">min
+        <a id="{{ data['id'] }}-upload" class="fas fa-upload on-right" onclick="updatePlaytime({{ data['id'] }})"
+           data-toggle="tooltip" title="Update playtime" style="display: none;"></a>
         <i id="{{ data['id'] }}-time-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
         &nbsp;<i id="{{ data['id'] }}-time-check" class="fas fa-check" style="display: none;"></i>
     </div>
@@ -59,4 +53,18 @@
 
 {% block javascript %}
     <script src="{{ url_for('static', filename='js/medialist_games.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            $("input[type='number']").each(function() {
+               $(this).attr("style", "width: "+$(this).val().length + 3+"px;");
+            });
+            $("input[type='number']").bind('keyup', function () {
+                $(this).attr("style", "width: "+$(this).val().length + 3+"px;");
+            });
+        });
+
+        function test(element_id) {
+            $('#'+element_id).show();
+        }
+    </script>
 {% endblock javascript %}

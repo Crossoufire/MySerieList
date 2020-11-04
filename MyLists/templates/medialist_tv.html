@@ -6,12 +6,7 @@
     <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>
     <option {% if sort_val == 'rewatch' %}selected="selected"{% endif %} value="rewatch">Rewatch</option>
     <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>
-    <option {% if sort_val == 'first_air_date_desc' %}selected="selected"{% endif %} value="first_air_date_desc">
-        Release date desc
-    </option>
-     <option {% if sort_val == 'first_air_date_asc' %}selected="selected"{% endif %} value="first_air_date_asc">
-        Release date asc
-    </option>
+    <option {% if sort_val == 'first_air_date' %}selected="selected"{% endif %} value="first_air_date">Release date</option>
 {% endblock sorting_list %}
 
 

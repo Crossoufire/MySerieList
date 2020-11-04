@@ -94,9 +94,9 @@ class MediaDict:
                            "completion": False}
 
         for company in self.data.companies:
-            if company.publisher is True:
+            if company.publisher:
                 self.media_info['publisher'].append(company.name)
-            if company.developer is True:
+            if company.developer:
                 self.media_info['developer'].append(company.name)
 
         self.media_info["first_release_date"] = change_air_format(self.data.first_release_date, games=True)
@@ -342,7 +342,7 @@ class MediaDetails:
         if self.list_type != ListType.GAMES:
             media_cover_path = self.media_data.get('poster_path') or None
         elif self.list_type == ListType.GAMES:
-            media_cover_path = self.media_data.get('cover')['image_id'] or None
+            media_cover_path = self.media_data.get('cover', {'image_id': None}).get('image_id') or None
 
         if media_cover_path:
             media_cover_name = '{}.jpg'.format(secrets.token_hex(8))

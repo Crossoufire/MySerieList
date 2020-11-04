@@ -80,6 +80,8 @@ def save_new_cover(cover_file, media_type):
         cover_path = 'static/covers/anime_covers/'
     elif media_type == MediaType.MOVIES:
         cover_path = 'static/covers/movies_covers/'
+    elif media_type == MediaType.GAMES:
+        cover_path = 'static/covers/games_covers/'
 
     _, f_ext = os.path.splitext(cover_file.filename)
     picture_fn = secrets.token_hex(8) + f_ext

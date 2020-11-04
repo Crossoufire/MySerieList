@@ -246,7 +246,7 @@ function rewatchDrop(rewatch, data_id, media_list) {
 
 
 // --- Change/delete the rewatch dropdown ------------------------------
-$(document).on('change focusout','.rewatch-drop',function(event) {
+$(document).on('change focusout', '.rewatch-drop', function(event) {
     let value = parseInt(this.value);
     let media_id = $(this).attr('values').split(',')[0];
     let media_list = $(this).attr('values').split(',')[1];

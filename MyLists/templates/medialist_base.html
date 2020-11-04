@@ -85,7 +85,7 @@
     {% elif media_list == 'movieslist' %}bg-movies-opa {% else %}bg-games-opa{% endif %} p-t-4 p-b-4">
         <div class="mobile-sorting">
             <label class="m-l-10 mb-0"><b>Sort by:</b></label>
-            <select class="m-l-8" onchange="sort_medialist(this)">
+            <select class="m-l-8 search-select" onchange="sort_medialist(this)">
                 {% block sorting_list scoped %}
                 {% endblock sorting_list %}
             </select>

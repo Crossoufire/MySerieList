@@ -152,7 +152,6 @@ ul {
 }
 
 .time-h-played-input {
-    width: 41px;
     background-color: #131418;
     border: none;
     color: lightgray;
@@ -160,7 +159,6 @@ ul {
 }
 
 .time-m-played-input {
-    width: 25px;
     background-color: #131418;
     border: none;
     color: lightgray;

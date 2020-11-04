@@ -449,7 +449,6 @@ option {
             font-size: 14pt;
         }
 
-
 .time-played-input {
     width: 43px;
     background-color: #0a262d;
@@ -459,7 +458,7 @@ option {
 }
 
 .time-played-input-m {
-    width: 25px;
+    width: 35px;
     background-color: #0a262d;
     border: none;
     color: lightgray;
@@ -476,5 +475,10 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 }
 
 input[type=number] {
-    -moz-appearance:textfield;
+    -moz-appearance: textfield;
+}
+
+.on-right {
+    float: right;
+    margin: 3px 7px 0 0;
 }

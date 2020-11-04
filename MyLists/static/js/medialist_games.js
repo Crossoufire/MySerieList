@@ -183,6 +183,7 @@ function updatePlaytime(media_id) {
         },
         complete: function () {
             $('#'+media_id+'-time-loading').hide();
+            $('#'+media_id+'-upload').hide();
         }
     });
 }
@@ -190,7 +191,7 @@ function updatePlaytime(media_id) {
 
 // --- Update completion --------------------------------------------------
 function updateCompletion(info, element_id) {
-    let comp_value = false
+    let comp_value = false;
 
     if ($.trim($(info).html()).includes('<strike>')) {
         comp_value = true

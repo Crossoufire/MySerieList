@@ -34,7 +34,7 @@ class ApiData:
     def IGDB_search(self, game_name):
         headers = {'Client-ID': '5i5pi21s0ninkmp6jj09ix4l6fw5bd',
                    'Authorization': 'Bearer ' + '46gsxkz0svtqzujd4znmjqilhq0xa5'}
-        body = 'fields id, name, cover.image_id, first_release_date; search "{}";'.format(game_name)
+        body = 'fields id, name, cover.image_id, first_release_date, summary, url; search "{}";'.format(game_name)
         response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers)
 
         self.status_code(response.status_code)
