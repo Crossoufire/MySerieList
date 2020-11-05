@@ -5,9 +5,9 @@ from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from MyLists.general.trending_data import TrendingData
 from flask import render_template, flash, request, abort
-from MyLists.models import Status, ListType, User, GlobalStats, RoleType
+from MyLists.models import ListType, User, GlobalStats, RoleType
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
-    refresh_db_frames, refresh_db_badges, refresh_db_ranks, add_hltb_time, add_manual_games
+    refresh_db_frames, refresh_db_badges, refresh_db_ranks, add_hltb_time
 
 bp = Blueprint('general', __name__)
 
@@ -50,13 +50,13 @@ def create_first_data():
     refresh_db_frames()
     refresh_db_badges()
     refresh_db_ranks()
-    db.session.commit()
     compute_media_time_spent(ListType.SERIES)
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
     compute_media_time_spent(ListType.GAMES)
-    # add_hltb_time()
+    add_hltb_time()
     # add_manual_games()
+    db.session.commit()
 
 
 @bp.route("/admin", methods=['GET'])
@@ -73,52 +73,50 @@ def mylists_stats():
     stats = GlobalStats()
 
     times_spent = stats.get_total_time_spent()
+
     if times_spent[0]:
-        total_time = {"total": int((times_spent[0][0]/60)+(times_spent[0][1]/60)+(times_spent[0][2]/60) +
-                                   (times_spent[0][3]/60)),
-                      "series": int(times_spent[0][0]/60), "anime": int(times_spent[0][1]/60),
-                      "movies": int(times_spent[0][2]/60), "games": int(times_spent[0][3]/60)}
+        total_time = {"total": sum(times_spent[0]), "series": int(times_spent[0][0]/60),
+                      "anime": int(times_spent[0][1]/60), "movies": int(times_spent[0][2]/60),
+                      "games": int(times_spent[0][3]/60)}
     else:
         total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0, "games": 0}
 
-    def create_dict(data, genres=False):
-        series_list, anime_list, movies_list = [], [], []
+    def create_dict(data):
+        series_list, anime_list, movies_list, games_list = [], [], [], []
         for i in range(5):
             try:
-                if genres:
-                    series_list.append({"info": data[0][i][0].genre, "quantity": data[0][i][2]})
-                else:
-                    series_list.append({"info": data[0][i][0].name, "quantity": data[0][i][2]})
+                series_list.append({"info": data[0][i][0], "quantity": data[0][i][2]})
             except:
                 series_list.append({"info": "-", "quantity": "-"})
             try:
-                if genres:
-                    anime_list.append({"info": data[1][i][0].genre, "quantity": data[1][i][2]})
-                else:
-                    anime_list.append({"info": data[1][i][0].name, "quantity": data[1][i][2]})
+                anime_list.append({"info": data[1][i][0], "quantity": data[1][i][2]})
             except:
                 anime_list.append({"info": "-", "quantity": "-"})
             try:
-                if genres:
-                    movies_list.append({"info": data[2][i][0].genre, "quantity": data[2][i][2]})
-                else:
-                    movies_list.append({"info": data[2][i][0].name, "quantity": data[2][i][2]})
+                movies_list.append({"info": data[2][i][0], "quantity": data[2][i][2]})
             except:
                 movies_list.append({"info": "-", "quantity": "-"})
+            try:
+                games_list.append({"info": data[i][0], "quantity": data[i][2]})
+            except:
+                games_list.append({"info": "-", "quantity": "-"})
 
-        return {'series': series_list, 'anime': anime_list, 'movies': movies_list}
+        return {'series': series_list, 'anime': anime_list, 'movies': movies_list, 'games': games_list}
 
     top_media = stats.get_top_media()
     most_present_media = create_dict(top_media)
 
     media_genres = stats.get_top_genres()
-    most_genres_media = create_dict(media_genres, genres=True)
+    most_genres_media = create_dict(media_genres)
 
     media_actors = stats.get_top_actors()
     most_actors_media = create_dict(media_actors)
 
     media_dropped = stats.get_top_dropped()
     top_dropped_media = create_dict(media_dropped)
+
+    games_companies = stats.get_top_companies()
+    top_companies_games = create_dict(games_companies)
 
     total_media_eps_seas = stats.get_total_eps_seasons()
     total_seasons_media = {"series": total_media_eps_seas[0][0][1], "anime": total_media_eps_seas[1][0][1]}
@@ -132,7 +130,8 @@ def mylists_stats():
                            top_dropped_media=top_dropped_media,
                            total_seasons_media=total_seasons_media,
                            total_episodes_media=total_episodes_media,
-                           most_genres_media=most_genres_media)
+                           most_genres_media=most_genres_media,
+                           top_companies_games=top_companies_games)
 
 
 @bp.route("/current_trends", methods=['GET'])

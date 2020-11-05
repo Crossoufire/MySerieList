@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy.orm import aliased
 from MyLists import app, db, login_manager
 from flask_login import UserMixin, current_user
-from sqlalchemy import func, desc, text, and_, or_
+from sqlalchemy import func, desc, text, and_, or_, inspect
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 
@@ -588,15 +588,24 @@ class Frames(db.Model):
 
 class GlobalStats:
     def __init__(self):
-        self.all_list_type = [ListType.SERIES, ListType.ANIME, ListType.MOVIES]
         self.truncated_list_type = [ListType.SERIES, ListType.ANIME]
+        self.games_truncated_list_type = [ListType.SERIES, ListType.ANIME, ListType.MOVIES]
         self.media = None
         self.media_genre = None
         self.media_actors = None
         self.media_eps = None
         self.media_list = None
+        self.media_companies = None
 
-    def get_type(self, list_type):
+    @classmethod
+    def get_total_time_spent(cls):
+        times_spent = db.session.query(func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
+                                       func.sum(User.time_spent_movies), func.sum(User.time_spent_games)) \
+            .filter(User.role != RoleType.ADMIN, User.active == True).all()
+
+        return times_spent
+
+    def get_query_data(self, list_type):
         if list_type == ListType.SERIES:
             self.media = Series
             self.media_genre = SeriesGenre
@@ -614,19 +623,17 @@ class GlobalStats:
             self.media_genre = MoviesGenre
             self.media_actors = MoviesActors
             self.media_list = MoviesList
-
-    @staticmethod
-    def get_total_time_spent():
-        times_spent = db.session.query(func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
-                                       func.sum(User.time_spent_movies), func.sum(User.time_spent_games)) \
-            .filter(User.role != RoleType.ADMIN, User.active == True).all()
-        return times_spent
+        elif list_type == ListType.GAMES:
+            self.media = Games
+            self.media_genre = GamesGenre
+            self.media_companies = GamesCompanies
+            self.media_list = GamesList
 
     def get_top_media(self):
         queries = []
-        for list_type in self.all_list_type:
-            self.get_type(list_type)
-            queries.append(db.session.query(self.media, self.media_list,
+        for list_type in ListType:
+            self.get_query_data(list_type)
+            queries.append(db.session.query(self.media.name, self.media_list,
                                             func.count(self.media_list.media_id == self.media.id).label("count"))
                            .join(self.media_list, self.media_list.media_id == self.media.id)
                            .group_by(self.media_list.media_id).order_by(text("count desc")).limit(5).all())
@@ -634,9 +641,9 @@ class GlobalStats:
 
     def get_top_genres(self):
         queries = []
-        for list_type in self.all_list_type:
-            self.get_type(list_type)
-            queries.append(db.session.query(self.media_genre, self.media_list,
+        for list_type in ListType:
+            self.get_query_data(list_type)
+            queries.append(db.session.query(self.media_genre.genre, self.media_list,
                                             func.count(self.media_genre.genre).label('count'))
                            .join(self.media_genre, self.media_genre.media_id == self.media_list.media_id)
                            .group_by(self.media_genre.genre).order_by(text('count desc')).limit(5).all())
@@ -644,9 +651,9 @@ class GlobalStats:
 
     def get_top_actors(self):
         queries = []
-        for list_type in self.all_list_type:
-            self.get_type(list_type)
-            queries.append(db.session.query(self.media_actors, self.media_list,
+        for list_type in self.games_truncated_list_type:
+            self.get_query_data(list_type)
+            queries.append(db.session.query(self.media_actors.name, self.media_list,
                                             func.count(self.media_actors.name).label('count'))
                            .join(self.media_actors, self.media_actors.media_id == self.media_list.media_id)
                            .group_by(self.media_actors.name).filter(self.media_actors.name != 'Unknown')
@@ -656,21 +663,36 @@ class GlobalStats:
     def get_top_dropped(self):
         queries = []
         for list_type in self.truncated_list_type:
-            self.get_type(list_type)
-            queries.append(db.session.query(self.media, self.media_list,
+            self.get_query_data(list_type)
+            queries.append(db.session.query(self.media.name, self.media_list,
                                             func.count(self.media_list.media_id == self.media.id).label('count'))
                            .join(self.media_list, self.media_list.media_id == self.media.id)
                            .filter(self.media_list.status == Status.DROPPED).group_by(self.media_list.media_id)
                            .order_by(text('count desc')).limit(5).all())
         return queries
 
+    def get_top_companies(self):
+        self.get_query_data(ListType.GAMES)
+        query = db.session.query(self.media_companies.name, self.media_list,
+                                 func.count(self.media_companies.name).label('count'))\
+            .join(self.media_companies, self.media_companies.media_id == self.media_list.media_id)\
+            .group_by(self.media_companies.name).filter(self.media_companies.name != 'Unknown')\
+            .order_by(text('count desc')).limit(5).all()
+
+        return query
+
     def get_total_eps_seasons(self):
         queries = []
         for list_type in self.truncated_list_type:
-            self.get_type(list_type)
+            self.get_query_data(list_type)
             queries.append(db.session.query(func.sum(self.media_list.eps_watched),
                                             func.sum(self.media_list.current_season)).all())
         return queries
+
+
+def _object_as_dict(obj):
+        return {c.key: getattr(obj, c.key)
+                for c in inspect(obj).mapper.column_attrs}
 
 
 def get_media_query(user_id, page, list_type, category, search, option, sort_val, filter_val):

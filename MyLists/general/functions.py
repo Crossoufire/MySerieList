@@ -2,16 +2,11 @@ import json
 import secrets
 import requests
 import urllib.request
-
 from PIL import Image
 from pathlib import Path
-
-from flask_login import current_user
-
 from MyLists import db, app
 from datetime import datetime
-
-from MyLists.API_data import ApiData
+from flask_login import current_user
 from MyLists.main.add_db import AddtoDB
 from MyLists.main.media_object import MediaDetails
 from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, MoviesCollections, get_total_time, \
@@ -53,8 +48,6 @@ def compute_media_time_spent(list_type):
             user.time_spent_movies = total_time
         elif list_type == ListType.GAMES:
             user.time_spent_games = total_time
-
-        db.session.commit()
 
 
 # ---------------------------------------- DB add/refresh from CSV data ---------------------------------------------- #
@@ -298,7 +291,6 @@ def add_hltb_time():
     for game in all_games:
         for htlb_game in list_all_hltb_games:
             if game.name == htlb_game[1]:
-                print(game.name)
                 try:
                     game.hltb_main_time = float(htlb_game[2])*60
                 except:
@@ -311,7 +303,8 @@ def add_hltb_time():
                     game.hltb_total_complete_time = float(htlb_game[4])*60
                 except:
                     pass
-                db.session.commit()
+
+    db.session.commit()
 
 
 def add_manual_games():
