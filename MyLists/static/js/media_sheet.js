@@ -385,6 +385,8 @@ function updatePlaytime(media_id) {
         },
         complete: function () {
             $('#time-loading').hide();
+            $('.aa').delay(1500).fadeOut();
+            $('#upload-time').delay(1500).fadeOut();
         }
     });
 }
@@ -453,7 +455,7 @@ $(document).ready(function () {
         }
     });
 
-    // --- Fill the movie ticket ------------------------------------------
+    // --- Fill the media icon score ------------------------------------------
     let $media_ticket = $('.media-ticket');
     let gradient = $media_ticket.attr('value');
     $media_ticket.attr('style', add_gradient(gradient));

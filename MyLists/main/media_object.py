@@ -1,4 +1,6 @@
 import secrets
+from pathlib import Path
+
 import pykakasi
 from MyLists import app
 from flask import url_for
@@ -91,7 +93,9 @@ class MediaDict:
                            "status": Status.OWNED.value,
                            "comment": None,
                            "time_played": 0.,
-                           "completion": False}
+                           "completion": False,
+                           't_played_h': 0,
+                           't_played_m': 0}
 
         for company in self.data.companies:
             if company.publisher:
@@ -300,7 +304,7 @@ class MediaListDict:
 
     def create_gameslist_dict(self):
         self.media_info = {"id": self.data[0].id,
-                           "name": self.data[0].name,
+                           "display_name": self.data[0].name,
                            "igdb_id": self.data[0].igdb_id,
                            "cover": "{}{}".format(self.cover_path, self.data[0].image_cover),
                            "score": self.data[1].score,
@@ -308,8 +312,8 @@ class MediaListDict:
                            "completion": self.data[1].completion,
                            "comment": self.data[1].comment,
                            "category": self.data[1].status.value,
-                           "t_played_h": str(self.data[1].time_played/60).split('.')[0],
-                           "t_played_m": int(self.data[1].time_played % 60),
+                           "t_played_h": str(self.data[1].time_played/60).split('.')[0] or 0,
+                           "t_played_m": int(self.data[1].time_played % 60) or 0,
                            "common": False,
                            "media": "Games"}
 
@@ -655,6 +659,28 @@ class MediaDetails:
             if external_data['category'] == 1:
                 self.media_details['steam_id'] = external_data['uid']
                 break
+
+        # Recover HLTB_time:
+        list_all_hltb_games = []
+        path = Path(app.root_path, 'static/csv_data/HLTB_games.csv')
+        with open(path, encoding='utf-8') as fp:
+            for line in fp:
+                list_all_hltb_games.append(line.split(";"))
+
+        for htlb_game in list_all_hltb_games:
+            if self.media_details['name'] == htlb_game[1]:
+                try:
+                    self.media_details['hltb_main_time'] = float(htlb_game[2])*60
+                except:
+                    pass
+                try:
+                    self.media_details['hltb_main_and_extra_time'] = float(htlb_game[3]) * 60
+                except:
+                    pass
+                try:
+                    self.media_details['hltb_total_complete_time'] = float(htlb_game[4]) * 60
+                except:
+                    pass
 
         companies_list = self.get_games_companies()
         genres_list = self.get_games_genres()

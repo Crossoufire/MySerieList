@@ -204,6 +204,21 @@
 
 
 {% block script %}
+    <script>
+        $(document).ready(function () {
+            $("input[type='number']").each(function() {
+               $(this).attr("style", "width: "+$(this).val().length + 3+"px;");
+            });
+            $("input[type='number']").bind('keyup', function () {
+                $(this).attr("style", "width: "+$(this).val().length + 3+"px;");
+            });
+        });
+
+        function show_button() {
+            $('.aa').show();
+            $('#upload-time').show();
+        }
+    </script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/media_sheet.js') }}"></script>
 {% endblock script %}
 

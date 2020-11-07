@@ -1,16 +1,16 @@
 import os
 import json
-
 from pathlib import Path
-from MyLists import app, db
 from sqlalchemy import and_, desc
+from MyLists import app, db #, crontab
 from MyLists.API_data import ApiData
 from datetime import datetime, timedelta
 from MyLists.main.media_object import MediaDetails
 from MyLists.general.functions import compute_media_time_spent
 from MyLists.models import Series, SeriesList, SeriesActors, SeriesGenre, SeriesNetwork, SeriesEpisodesPerSeason, \
     UserLastUpdate, Notifications, ListType, Anime, AnimeList, AnimeActors, AnimeGenre, AnimeNetwork, \
-    AnimeEpisodesPerSeason, Movies, MoviesList, MoviesActors, MoviesGenre, MoviesCollections, Status
+    AnimeEpisodesPerSeason, Movies, MoviesList, MoviesActors, MoviesGenre, MoviesCollections, Status, Games, GamesList, \
+    GamesCompanies, GamesGenre, GamesPlatforms
 
 
 def remove_non_list_media():
@@ -74,6 +74,25 @@ def remove_non_list_media():
 
         app.logger.info('Removed movie with ID: [{}]'.format(deletion))
     app.logger.info('Total movies removed: {}'.format(count))
+
+    # GAMES DELETIONS
+    games = db.session.query(Games, GamesList).outerjoin(GamesList, GamesList.media_id == Games.id).all()
+    count = 0
+    to_delete = []
+    for game in games:
+        if not game[1]:
+            to_delete.append(game[0].id)
+    for deletion in to_delete:
+        Games.query.filter_by(id=deletion).delete()
+        GamesCompanies.query.filter_by(media_id=deletion).delete()
+        GamesGenre.query.filter_by(media_id=deletion).delete()
+        GamesPlatforms.query.filter_by(media_id=deletion).delete()
+        UserLastUpdate.query.filter_by(media_type=ListType.GAMES, media_id=deletion).delete()
+        Notifications.query.filter_by(media_type='gameslist', media_id=deletion).delete()
+        count += 1
+
+        app.logger.info('Removed game with ID: [{}]'.format(deletion))
+    app.logger.info('Total games removed: {}'.format(count))
 
     db.session.commit()
     app.logger.info('[SYSTEM] - Finished Automatic media remover')
@@ -164,6 +183,26 @@ def remove_old_covers():
             count += 1
 
     app.logger.info('Total old movies collections covers deleted: {}'.format(count))
+
+    # GAMES OLD COVERS
+    games = Games.query.all()
+    path_games_covers = Path(app.root_path, 'static/covers/games_covers/')
+
+    images_in_db = []
+    for game in games:
+        images_in_db.append(game.image_cover)
+
+    images_saved = []
+    for file in os.listdir(path_games_covers):
+        images_saved.append(file)
+
+    count = 0
+    for image in images_saved:
+        if image not in images_in_db and image != 'default.jpg':
+            os.remove('{0}/{1}'.format(path_games_covers, image))
+            app.logger.info('Removed old game cover with name: {}'.format(image))
+            count += 1
+    app.logger.info('Total old games covers deleted: {}'.format(count))
     app.logger.info('[SYSTEM] - Finished automatic covers remover')
     app.logger.info('###################################################################')
 
@@ -182,7 +221,7 @@ def get_total_eps(user, eps_per_season):
 
 def refresh_element_data(api_id, list_type):
     media_data = ApiData().get_details_and_credits_data(api_id, list_type)
-    if list_type != ListType.MOVIES:
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
         data = MediaDetails(media_data, list_type, updating=True).get_media_details()
         if not data['tv_data']:
             return None
@@ -525,7 +564,7 @@ def automatic_movies_locking():
 
 # ---------------------------------------------------------------------------------------------------------------
 
-
+# @crontab.job(minute="0", hour="3")
 def scheduled_task():
     remove_non_list_media()
     remove_old_covers()
@@ -538,3 +577,4 @@ def scheduled_task():
     compute_media_time_spent(ListType.SERIES)
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
+    compute_media_time_spent(ListType.GAMES)

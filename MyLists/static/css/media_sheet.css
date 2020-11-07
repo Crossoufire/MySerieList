@@ -151,14 +151,16 @@ ul {
     left: 74px;
 }
 
-.time-h-played-input {
+.time-played-input {
+    width: 43px;
     background-color: #131418;
     border: none;
     color: lightgray;
     text-align: center;
 }
 
-.time-m-played-input {
+.time-played-input-m {
+    width: 35px;
     background-color: #131418;
     border: none;
     color: lightgray;

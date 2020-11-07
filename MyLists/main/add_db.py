@@ -35,32 +35,28 @@ class AddtoDB:
 
     def add_actors_to_db(self):
         for actor in self.media_details['actors_data']:
+            actor.update({'media_id': self.media.id})
             if self.list_type == ListType.SERIES:
-                actor.update({'media_id': self.media.id})
                 db.session.add(SeriesActors(**actor))
             elif self.list_type == ListType.ANIME:
-                actor.update({'media_id': self.media.id})
                 db.session.add(AnimeActors(**actor))
             elif self.list_type == ListType.MOVIES:
-                actor.update({'media_id': self.media.id})
                 db.session.add(MoviesActors(**actor))
 
     def add_networks_to_db(self):
         for network in self.media_details['networks_data']:
+            network.update({'media_id': self.media.id})
             if self.list_type == ListType.SERIES:
-                network.update({'media_id': self.media.id})
                 db.session.add(SeriesNetwork(**network))
             elif self.list_type == ListType.ANIME:
-                network.update({'media_id': self.media.id})
                 db.session.add(AnimeNetwork(**network))
 
     def add_seasons_to_db(self):
         for season in self.media_details['seasons_data']:
+            season.update({'media_id': self.media.id})
             if self.list_type == ListType.SERIES:
-                season.update({'media_id': self.media.id})
                 db.session.add(SeriesEpisodesPerSeason(**season))
             elif self.list_type == ListType.ANIME:
-                season.update({'media_id': self.media.id})
                 db.session.add(AnimeEpisodesPerSeason(**season))
 
     def add_collection_to_db(self):

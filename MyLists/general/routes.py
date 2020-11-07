@@ -54,7 +54,7 @@ def create_first_data():
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
     compute_media_time_spent(ListType.GAMES)
-    add_hltb_time()
+    # add_hltb_time()
     # add_manual_games()
     db.session.commit()
 
@@ -138,9 +138,9 @@ def mylists_stats():
 @login_required
 def current_trends():
     try:
-        tv_info = ApiData().get_trending_tv()
+        series_info = ApiData().get_trending_tv()
     except Exception as e:
-        tv_info = {'results': []}
+        series_info = {'results': []}
         app.logger.error('[ERROR] - Getting the Series trending info: {}.'.format(e))
         flash('The current TV trends from TMDB are not available right now.', 'warning')
 
@@ -158,7 +158,7 @@ def current_trends():
         app.logger.error('[ERROR] - Getting the movies trending info: {}.'.format(e))
         flash('The current movies trends from TMDB are not available right now.', 'warning')
 
-    series_results = TrendingData(tv_info).get_trending_tv()
+    series_results = TrendingData(series_info).get_trending_series()
     anime_results = TrendingData(anime_info).get_trending_anime()
     movies_results = TrendingData(movies_info).get_trending_movies()
 
@@ -192,9 +192,9 @@ def about():
     return render_template('about.html', title='About MyLists')
 
 
-# @bp.route('/service-worker.js')
-# def service_worker():
-#     return app.send_static_file('service-worker.js')
+@bp.route('/service-worker.js')
+def service_worker():
+    return app.send_static_file('service-worker.js')
 
 
 # --- AJAX Method --------------------------------------------------------------------------------------------

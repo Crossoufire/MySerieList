@@ -7,7 +7,7 @@ from MyLists.models import User, UserLastUpdate, Series, SeriesList, SeriesEpiso
     Movies, MoviesGenre, MoviesList, MoviesActors, RoleType
 
 
-# ------------------------------------------------------- USER ------------------------------------------------------- #
+# --- USER ----------------------------------------------------------------------- #
 
 class UserAdminView(ModelView):
     def is_accessible(self):
@@ -28,7 +28,7 @@ class LastUpdateAdminView(ModelView):
     column_sortable_list = ('user_id', 'media_name', 'date')
 
 
-# ------------------------------------------------------ SERIES ------------------------------------------------------ #
+# --- SERIES --------------------------------------------------------------------- #
 
 class SeriesAdminView(ModelView):
     def is_accessible(self):
@@ -84,7 +84,7 @@ class SeriesActorsAdminView(ModelView):
     column_sortable_list = ('media_id', 'name')
 
 
-# ------------------------------------------------------ ANIME ------------------------------------------------------- #
+# --- ANIME ---------------------------------------------------------------------- #
 
 class AnimeAdminView(ModelView):
     def is_accessible(self):
@@ -143,7 +143,7 @@ class AnimeActorsAdminView(ModelView):
     column_sortable_list = ('media_id', 'name')
 
 
-# ------------------------------------------------------ MOVIES ------------------------------------------------------ #
+# --- MOVIES --------------------------------------------------------------------- #
 
 class MoviesAdminView(ModelView):
     def is_accessible(self):
@@ -183,7 +183,7 @@ class MoviesActorsAdminView(ModelView):
     column_sortable_list = ('id', 'media_id', 'name')
 
 
-# -------------------------------------------------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------------- #
 
 
 # Override of the index flask-admin view:

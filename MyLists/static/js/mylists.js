@@ -246,17 +246,17 @@ $(document).ready(function() {
 
 
 // --- Service Worker for PWA -----------------------------------------------
-// if ('serviceWorker' in navigator) {
-//     navigator.serviceWorker
-//         .register('service-worker.js', {
-//             scope: '.'
-//         })
-//         .then(function(registration) {
-//             console.log('ServiceWorker registration successful with scope: ', registration.scope);
-//         }, function(err) {
-//             console.log('ServiceWorker registration failed: ', err);
-//         })
-//         .catch(function(err) {
-//             console.error('Unable to register service worker.', err);
-//         });
-// }
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+        .register('service-worker.js', {
+            scope: '.'
+        })
+        .then(function(registration) {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function(err) {
+            console.log('ServiceWorker registration failed: ', err);
+        })
+        .catch(function(err) {
+            console.error('Unable to register service worker.', err);
+        });
+}

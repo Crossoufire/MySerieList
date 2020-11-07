@@ -7,12 +7,14 @@ import email.utils as em
 from flask_mail import Mail
 from flask_caching import Cache
 from flask_bcrypt import Bcrypt
+# from flask_crontab import Crontab
 from flask_compress import Compress
 from flask_login import LoginManager
 from email.message import EmailMessage
 from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
 from logging.handlers import SMTPHandler, RotatingFileHandler
+
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -31,8 +33,7 @@ except Exception as e:
 
 
 app = Flask(__name__)
-Compress(app)
-cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+
 
 app.config['SECRET_KEY'] = flask_secret
 app.config['SESSION_COOKIE_SECURE'] = False
@@ -59,12 +60,16 @@ app.config['OAUTH_CREDENTIALS'] = {
     }
 }
 
+
 mail = Mail(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-scheduler = APScheduler()
-scheduler.init_app(app)
-scheduler.start()
+# scheduler = APScheduler()
+# scheduler.init_app(app)
+# scheduler.start()
+compress = Compress(app)
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+# crontab = Crontab(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'auth.home'
 login_manager.login_message_category = 'info'

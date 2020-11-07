@@ -1,76 +1,46 @@
 import os
 import secrets
-
 from PIL import Image
 from MyLists import db, app
 from datetime import datetime
 from flask_login import current_user
-from MyLists.main.media_object import MediaListDict
 from MyLists.main.scheduled_tasks import scheduled_task
-from MyLists.models import MediaType, ListType, Status, get_media_count, UserLastUpdate
+from MyLists.models import MediaType, ListType, Status, UserLastUpdate
 
 
 def check_cat_type(list_type, status):
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        if status == 'Watching':
-            return Status.WATCHING
-        elif status == 'Completed':
-            return Status.COMPLETED
-        elif status == 'On Hold':
-            return Status.ON_HOLD
-        elif status == 'Random':
-            return Status.RANDOM
-        elif status == 'Dropped':
-            return Status.DROPPED
-        elif status == 'Plan to Watch':
-            return Status.PLAN_TO_WATCH
-        else:
+        tv_status_dict = {'Watching': Status.WATCHING,
+                          'Completed': Status.COMPLETED,
+                          'On Hold': Status.ON_HOLD,
+                          'Random': Status.RANDOM,
+                          'Dropped': Status.DROPPED,
+                          'Plan to Watch': Status.PLAN_TO_WATCH}
+        try:
+            return tv_status_dict[status]
+        except KeyError:
             return None
     elif list_type == ListType.MOVIES:
-        if status == 'Completed':
-            return Status.COMPLETED
-        elif status == 'Completed Animation':
-            return Status.COMPLETED_ANIMATION
-        elif status == 'Plan to Watch':
-            return Status.PLAN_TO_WATCH
-        else:
+        movie_status_dict = {'Completed': Status.COMPLETED,
+                             'Completed Animation': Status.COMPLETED_ANIMATION,
+                             'Plan to Watch': Status.PLAN_TO_WATCH}
+        try:
+            return movie_status_dict[status]
+        except KeyError:
             return None
     elif list_type == ListType.GAMES:
-        if status == 'Playing':
-            return Status.PLAYING
-        elif status == 'Completed':
-            return Status.COMPLETED
-        elif status == 'On Hold':
-            return Status.ON_HOLD
-        elif status == 'Endless':
-            return Status.ENDLESS
-        elif status == 'Multiplayer':
-            return Status.MULTIPLAYER
-        elif status == 'Owned':
-            return Status.OWNED
-        elif status == 'Dropped':
-            return Status.DROPPED
-        elif status == 'Plan to Play':
-            return Status.PLAN_TO_PLAY
-        else:
+        games_status_dict = {'Playing': Status.PLAYING,
+                             'Completed': Status.COMPLETED,
+                             'On Hold': Status.ON_HOLD,
+                             'Multiplayer': Status.MULTIPLAYER,
+                             'Endless': Status.ENDLESS,
+                             'Dropped': Status.DROPPED,
+                             'Owned': Status.OWNED,
+                             'Plan to Play': Status.PLAN_TO_PLAY}
+        try:
+            return games_status_dict[status]
+        except KeyError:
             return None
-
-
-def get_medialist_data(list_type, all_media_data, user_id):
-    common_media, total_media = get_media_count(user_id, list_type)
-
-    media_data_list = []
-    for media_data in all_media_data:
-        add_data = MediaListDict(media_data, common_media, list_type).redirect_medialist()
-        media_data_list.append(add_data)
-
-    try:
-        percentage = int((len(common_media)/total_media)*100)
-    except ZeroDivisionError:
-        percentage = 0
-
-    return {"media_data": media_data_list,
-            "common_elements": [len(common_media), total_media, percentage]}
 
 
 def save_new_cover(cover_file, media_type):
@@ -155,4 +125,4 @@ def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0,
 # ------- Python Scheduler -----------------------------------------------------------------------------------------
 
 
-app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='refresh_all_data', hour=3, minute=00)
+# app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='refresh_all_data', hour=3, minute=00)

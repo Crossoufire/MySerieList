@@ -5,8 +5,7 @@ from PIL import Image
 from flask import abort
 from MyLists import app
 from pathlib import Path
-from flask_login import current_user
-from MyLists.models import ListType, User
+from MyLists.models import ListType
 from ratelimit import sleep_and_retry, limits
 
 

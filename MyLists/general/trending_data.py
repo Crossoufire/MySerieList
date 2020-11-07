@@ -23,7 +23,7 @@ class TrendingData:
     def change_air_format(date):
         return datetime.strptime(date, '%Y-%m-%d').strftime("%d %b %Y")
 
-    def get_media_cover(self, anime=False):
+    def _get_media_cover(self, anime=False):
         media_cover = url_for('static', filename="covers/series_covers/default.jpg")
         if not anime:
             poster_path = self.result.get('poster_path') or None
@@ -36,7 +36,7 @@ class TrendingData:
 
         return media_cover
 
-    def get_trending_tv(self):
+    def get_trending_series(self):
         series_results = []
         for i, self.result in enumerate(self.trending_data['results']):
             self.media_data = {'overview': self.result.get('overview', 'Unknown') or 'Unknown',
@@ -51,7 +51,7 @@ class TrendingData:
             if self.media_data['release_date'] != 'Unknown':
                 self.media_data['release_date'] = self.change_air_format(self.result.get('first_air_date'))
 
-            self.media_data['poster_path'] = self.get_media_cover()
+            self.media_data['poster_path'] = self._get_media_cover()
             self.media_data['tmdb_link'] = "{}/{}".format(self.tv_tmdb_link, self.result.get('id'))
             self.media_data['media_type'] = 'serieslist'
 
@@ -66,7 +66,7 @@ class TrendingData:
         for i, self.result in enumerate(self.trending_data['top']):
             self.media_data = {'display_name': self.result.get('title', 'Unknown') or 'Unknown',
                                'release_date': self.result.get('start_date', 'Unknown') or 'Unknown',
-                               'poster_path': self.get_media_cover(anime=True), 'tmdb_link': self.result.get("url"),
+                               'poster_path': self._get_media_cover(anime=True), 'tmdb_link': self.result.get("url"),
                                "overview": "There is no synopsis from this API. You can check it on "
                                            "<b><i>MyAnimeList</i></b> by clicking on the title."}
 
@@ -91,7 +91,7 @@ class TrendingData:
             if self.media_data["release_date"] != 'Unknown':
                 self.media_data['release_date'] = self.change_air_format(self.result.get('release_date'))
 
-            self.media_data['poster_path'] = self.get_media_cover()
+            self.media_data['poster_path'] = self._get_media_cover()
             self.media_data['tmdb_link'] = "{}/{}".format(self.movie_tmdb_link, self.result.get('id'))
             self.media_data['media_type'] = 'movieslist'
 

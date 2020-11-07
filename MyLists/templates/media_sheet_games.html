@@ -24,14 +24,17 @@
     <div class="row m-l-15 m-r-15"{% if data['status'] == 'Plan to Play' %} style="display: none;"{% endif %}>
         <div class="col-4"><b>Played:</b></div>
         <div class="col-8">
-            <input id="time_h" type="number" name="time_h" class="time-h-played-input" placeholder="00"
-                   value="{{ data['t_played_h'] }}" onkeyup="this.style.width = ((this.value.length + 1) * 8) + 'px';">h
-            <input  id="time_m" type="number" name="time_m" class="time-m-played-input" placeholder="00"
-                    value="{{ data['t_played_m'] }}" onkeyup="this.style.width = ((this.value.length + 1) * 8) + 'px';">m
+            <input id="time_h" class="time-played-input" type="number" name="time_h" placeholder="00"
+               value="{{ data['t_played_h'] }}" onkeyup="show_button()">h
+            <input id="time_m" class="time-played-input-m" type="number" name="time_m" placeholder="00"
+               value="{{ "%02d" % data['t_played_m']|int }}" onkeyup="show_button()">min
         </div>
     </div>
-    <div class="text-center">
-        <div class="btn btn-smaller btn-warning text-dark" onclick="updatePlaytime({{ data['id'] }})">Update time</div>
+    <div class="text-center aa" style="display: none;">
+        <div id="upload-time" class="btn btn-smaller btn-warning text-dark" style="display: none;"
+             onclick="updatePlaytime({{ data['id'] }})">
+            Update time
+        </div>
         <i id="time-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
         &nbsp;<i id="time-check" class="fas fa-check" style="display: none;"></i>
     </div>
@@ -73,7 +76,7 @@
         <ul class="list-unstyled">
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-star"></i><b>&nbsp; IGDB Score</b></h5>
-                <i class="fas fa-scroll fa-3x media-ticket" value="{{ data['vote_average']|int }}"></i>
+                <i class="fas fa-scroll fa-3x media-ticket" value="{{ (data['vote_average']/10)|int }}"></i>
                 <div class="game-vote-average">{{ data['vote_average']|int }}</div>
                 <div class="movie-vote-count">({{ data['vote_count']|int }} votes)</div>
             </li>
@@ -141,7 +144,7 @@
                 </div>
                 <div class="col-5"><b>Main + Extra</b></div>
                 <div class="col-7">
-                     {% if not data['hltb_main'] %}
+                     {% if not data['hltb_main_extra'] %}
                         <i>No data.</i>
                     {% else %}
                         {{ (data['hltb_main_extra']/60)|int }} h
@@ -149,7 +152,7 @@
                 </div>
                 <div class="col-5"><b>100%</b></div>
                 <div class="col-7">
-                    {% if not data['hltb_main'] %}
+                    {% if not data['hltb_complete'] %}
                         <i>No data.</i>
                     {% else %}
                         {{ (data['hltb_complete']/60)|int }} h

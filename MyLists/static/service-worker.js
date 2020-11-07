@@ -1,6 +1,6 @@
 
 const CACHE_NAME = 'static-cache';
-const FILES_TO_CACHE = 'static/emails/email_update.html';
+const FILES_TO_CACHE = ['/static/emails/email_update.html'];
 
 
 self.addEventListener('install', (evt) => {
@@ -48,3 +48,23 @@ self.addEventListener('fetch', (evt) => {
         })
     );
 });
+
+
+self.addEventListener('fetch', function(event) {
+    event.respondWith(
+        fetch(event.request).catch(function() {
+            return caches.match(event.request);
+        })
+    );
+});
+
+
+self.addEventListener('fetch', function(event) {
+    event.respondWith(
+        caches.match(event.request).then(function(response) {
+            return response || fetch(event.request);
+        })
+    );
+});
+
+

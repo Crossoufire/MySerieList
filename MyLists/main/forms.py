@@ -27,6 +27,24 @@ class EditMediaData(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class EditGamesData(FlaskForm):
+    cover = FileField('Game cover', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    name = StringField('Name')
+    collection_name = StringField('Collection name')
+    companies = StringField('Companies')
+    platforms = StringField('Platforms')
+    first_release_date = StringField('First release date')
+    game_engine = StringField('Game engine')
+    game_modes = StringField('Game modes')
+    player_perspective = StringField('Player perspective')
+    hltb_main_time = StringField('Main time')
+    hltb_main_and_extra_time = StringField('Main + Extra time')
+    hltb_total_complete_time = StringField('Complete time')
+    genres = StringField('Genres')
+    synopsis = TextAreaField('Summary')
+    submit = SubmitField('Submit')
+
+
 class MediaComment(FlaskForm):
     comment = TextAreaField('Comment')
     submit = SubmitField('Submit')

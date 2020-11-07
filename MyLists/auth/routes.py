@@ -3,9 +3,8 @@ from datetime import datetime
 from MyLists.models import User
 from MyLists import app, bcrypt, db
 from MyLists.auth.oauth import OAuthSignIn
-from MyLists.decorators import check_if_auth
-from MyLists.auth.functions import return_user_homepage
 from MyLists.auth.emails import send_register_email, send_reset_email
+from MyLists.auth.functions import return_user_homepage, check_if_auth
 from flask_login import login_user, current_user, logout_user, login_required
 from flask import Blueprint, flash, request, redirect, url_for, render_template
 from MyLists.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
@@ -33,7 +32,7 @@ def home():
             next_page = request.args.get('next')
             if next_page:
                 return redirect(next_page)
-            return_user_homepage(user.homepage, user.username)
+            return return_user_homepage(user.homepage, user.username)
         else:
             flash('Login Failed. Please check username and password.', 'warning')
     elif register_form.validate_on_submit():

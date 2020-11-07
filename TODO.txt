@@ -14,15 +14,22 @@ User Last Updates:
 Media sheet:
   Add: Airing dates for each seasons
   Enhance: Add Genres to the metadata edit
-	
+
 Account:
   Enhance: Possibility to change background image
   Add: New achievements system
   Enhance: Notification system (follow's level up)
-	
+
 General:
   Add: Contact form
   Add: Collection Movies to finish (70%)
   Enhance: Change the hamburger display to a vertical panel in mobile
   Add: If API down, user can still add media but check in our database instead of API
   Enhance: Create one admin with admin view (HoF, Stats, admin and settings) and one standard user
+
+
+Add rpi monitor to the website
+Add redis queue
+Change mylists stats
+Finish the PWA
+From aps to cron
