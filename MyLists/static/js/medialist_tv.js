@@ -1,6 +1,6 @@
 
 
-// --- Create the buttons category list ------------------------------------
+// --- Create the buttons category list --------------------
 function chargeButtons(card) {
     removeCat();
 
@@ -70,7 +70,7 @@ function chargeButtons(card) {
 }
 
 
-// --- Change the category -------------------------------------------------
+// --- Change the category ---------------------------------
 function changeCategory(new_category, card_id) {
     removeCat();
 
@@ -100,7 +100,7 @@ function changeCategory(new_category, card_id) {
 }
 
 
-// --- Update episode ------------------------------------------------------
+// --- Update episode --------------------------------------
 function updateEpisode(element_id, episode, media_list) {
     let selected_episode = episode.selectedIndex;
     let check_img = $('<div style="position: absolute; z-index: 200; top: 65%; width: 100%;' +
@@ -125,7 +125,7 @@ function updateEpisode(element_id, episode, media_list) {
 }
 
 
-// --- Update season -------------------------------------------------------
+// --- Update season ---------------------------------------
 function updateSeason(element_id, value) {
     let $card = $('#card_'+element_id);
     let selected_season = value.selectedIndex;
@@ -169,7 +169,7 @@ function updateSeason(element_id, value) {
 }
 
 
-// --- Charge the categories buttons from other lists ----------------------
+// --- Charge the categories buttons from other lists ------
 function ChargeButtonsOther(card) {
     removeCat();
 

@@ -5,18 +5,18 @@
     <div class="account-wrapper m-b-60">
         {% if header_data['id'] != current_user.get_id() %}
             <div class="follow-btn-mobile">
-                {% if user_data["isfollowing"] %}
-                    <button class="btn btn-sm btn-dark follow-btn" value="1"
-                    onclick="follow_status('{{ header_data['id'] }}')">
+                {% if header_data["isfollowing"] %}
+                    <button id="follow_{{ header_data['id'] }}" class="btn btn-sm btn-dark follow-btn" value="1"
+                     onclick="follow_status(this, '{{ header_data['id'] }}')">
                         Unfollow
                     </button>
                 {% else %}
-                    <button class="btn btn-sm btn-primary follow-btn" value="0"
-                    onclick="follow_status('{{ header_data['id'] }}')">
+                    <button id="follow_{{ header_data['id'] }}" class="btn btn-sm btn-primary follow-btn" value="0"
+                     onclick="follow_status(this, '{{ header_data['id'] }}')">
                         Follow
                     </button>
                 {% endif %}
-                <i class="fas fa-spinner fast-spin loading-follow" style="display: none;"></i>
+                <i id="load_{{ header_data['id'] }}" class="fas fa-spinner fast-spin" style="display: none;"></i>
             </div>
         {% endif %}
         <div class="row m-t-15">

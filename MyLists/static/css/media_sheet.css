@@ -1,5 +1,5 @@
 
-
+/* --- Main CSS ----------------------------------------- */
 body > li {
     font-weight: 400;
 }
@@ -8,172 +8,16 @@ ul {
     list-style-type: none;
 }
 
-.eps-per-season {
-    overflow-y : auto;
-    max-height: 270px;
-}
-
 .vertical_line {
     width: 5px;
     border-left: 2px solid darkgray;
     height: 100wh;
 }
 
-.favorited {
-    cursor: pointer;
-    color: #cd0303;
-    float: right;
-}
-
-.no-fav {
-    cursor: pointer;
-    color: #929292;
-    float: right;
-}
-
-.btn-smaller {
-    padding: 8px !important;
-}
-
-.cat-drop {
-    background: #131418;
-    border: transparent;
-    cursor: pointer;
-    width: 130px;
-}
-
 .wrapper {
     width: 1100px;
     margin-left: auto;
     margin-right: auto;
-}
-
-.box {
-    width: 53px;
-    height: 75px;
-}
-
-.loading-img {
-    height: 20px;
-    width: 20px;
-}
-
-.fas.fa-check {
-    color: green;
-}
-
-.comment-position {
-    position: relative;
-    padding: 0 7px 0 7px;
-    background: #131418;
-    top: -20px;
-    left: 2px;
-}
-
-.comment-style {
-    text-align: justify;
-    text-justify: inter-word;
-}
-
-.far.fa-edit {
-    float: right;
-    color: #929292;
-}
-
-.follow-margin-mobile {
-    margin-left: 21px;
-}
-
-.follow-img {
-    border-radius: 50%;
-    background-color: grey;
-    height: 55px;
-    width: 55px;
-}
-
-.f-favorited {
-    color: #cd0303;
-}
-
-.f-no-fav {
-    color: #929292;
-}
-
-.follow-div {
-    background: #242428;
-    padding: 5px 20px 15px 20px;
-}
-
-.commentary {
-    margin-bottom: 0;
-}
-
-.movie-vote-average {
-    color: black;
-    font-weight: 1000;
-    position: absolute;
-    top: 53px;
-    left: 43px;
-    transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-}
-
-.game-vote-average {
-    color: black;
-    font-weight: 1000;
-    position: absolute;
-    top: 49px;
-    left: 46px;
-    font-size: 14pt;
-    transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-}
-
-.movie-vote-count {
-    position: absolute;
-    top: 40px;
-    left: 80px;
-}
-
-.tv-vote-average {
-    color: lightgray;
-    font-weight: 1000;
-    position: absolute;
-    top: 46px;
-    left: 43px;
-    transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-}
-
-.tv-vote-count {
-    position: absolute;
-    top: 37px;
-    left: 74px;
-}
-
-.time-played-input {
-    width: 43px;
-    background-color: #131418;
-    border: none;
-    color: lightgray;
-    text-align: center;
-}
-
-.time-played-input-m {
-    width: 35px;
-    background-color: #131418;
-    border: none;
-    color: lightgray;
-    text-align: center;
-}
-
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type=number] {
-    -moz-appearance:textfield;
 }
 
 @media (max-width: 1100px) {
@@ -206,4 +50,172 @@ input[type=number] {
     .follow-margin-mobile {
         margin-left: 2px;
     }
+}
+
+
+/* --- User's list -------------------------------------- */
+.favorited {
+    cursor: pointer;
+    color: #cd0303;
+    float: right;
+}
+
+.no-fav {
+    cursor: pointer;
+    color: #929292;
+    float: right;
+}
+
+.btn-smaller {
+    padding: 8px !important;
+}
+
+.cat-drop {
+    background: #131418;
+    border: transparent;
+    cursor: pointer;
+    width: 130px;
+}
+
+.loading-img {
+    height: 20px;
+    width: 20px;
+}
+
+.fas.fa-check {
+    color: green;
+}
+
+
+/* --- User's comments ---------------------------------- */
+.far.fa-edit {
+    float: right;
+    color: #929292;
+}
+
+.comment-position {
+    position: relative;
+    padding: 0 7px 0 7px;
+    background: #131418;
+    top: -20px;
+    left: 2px;
+}
+
+.comment-style {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+
+/* --- User's TV media ---------------------------------- */
+.eps-per-season {
+    overflow-y : auto;
+    max-height: 270px;
+}
+
+.box {
+    width: 53px;
+    height: 75px;
+}
+
+
+/* --- User's Game media -------------------------------- */
+.time-played-input {
+    width: 43px;
+    background-color: #131418;
+    border: none;
+    color: lightgray;
+    text-align: center;
+}
+
+.time-played-input-m {
+    width: 35px;
+    background-color: #131418;
+    border: none;
+    color: lightgray;
+    text-align: center;
+}
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+}
+
+
+/* --- Follows ------------------------------------------ */
+.follow-margin-mobile {
+    margin-left: 21px;
+}
+
+.follow-img {
+    border-radius: 50%;
+    background-color: grey;
+    height: 55px;
+    width: 55px;
+}
+
+.follow-div {
+    background: #242428;
+    padding: 5px 20px 15px 20px;
+}
+
+.f-favorited {
+    color: #cd0303;
+}
+
+.f-no-fav {
+    color: #929292;
+}
+
+.commentary {
+    margin-bottom: 0;
+}
+
+
+/* --- Central media data ------------------------------- */
+.movie-vote-average {
+    color: black;
+    font-weight: 1000;
+    position: absolute;
+    top: 53px;
+    left: 43px;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+}
+
+.movie-vote-count {
+    position: absolute;
+    top: 40px;
+    left: 80px;
+}
+
+.game-vote-average {
+    color: black;
+    font-weight: 1000;
+    position: absolute;
+    top: 49px;
+    left: 46px;
+    font-size: 14pt;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+}
+
+.tv-vote-average {
+    color: lightgray;
+    font-weight: 1000;
+    position: absolute;
+    top: 46px;
+    left: 43px;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+}
+
+.tv-vote-count {
+    position: absolute;
+    top: 37px;
+    left: 74px;
 }

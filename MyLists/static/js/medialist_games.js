@@ -1,6 +1,6 @@
 
 
-// --- Create the buttons category list ------------------------------------
+// --- Create the buttons category list --------------------
 function chargeButtons(card) {
     removeCat();
 
@@ -86,7 +86,7 @@ function chargeButtons(card) {
 }
 
 
-// --- Change the category -------------------------------------------------
+// --- Change the category ---------------------------------
 function changeCategory(new_category, card_id) {
     let $card = $('#'+card_id);
     let media_list = $card.attr('values').split('-')[1];
@@ -114,7 +114,7 @@ function changeCategory(new_category, card_id) {
 }
 
 
-// --- Charge the categories buttons from other lists ----------------------
+// --- Charge the categories buttons from other lists ------
 function ChargeButtonsOther(card) {
     removeCat();
 
@@ -163,7 +163,7 @@ function ChargeButtonsOther(card) {
 }
 
 
-// --- Update time played --------------------------------------------------
+// --- Update time played ----------------------------------
 function updatePlaytime(media_id) {
     $('#'+media_id+'-time-loading').show();
     let hours = $('#'+media_id+'-time_h').val();
@@ -189,7 +189,7 @@ function updatePlaytime(media_id) {
 }
 
 
-// --- Update completion --------------------------------------------------
+// --- Update completion -----------------------------------
 function updateCompletion(info, element_id) {
     let comp_value = false;
 

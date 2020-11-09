@@ -1,49 +1,8 @@
 
 
-// --- Follow status -------------------------------------------------------------------------------------
-function follow_status(follow_id) {
-    let status;
-    let $follow_button = $('.follow-btn');
-
-    status = $follow_button.prop('value') !== '1';
-    $follow_button.addClass('disabled');
-    $('.loading-follow').show();
-
-    $.ajax ({
-        type: "POST",
-        url: "/follow_status",
-        contentType: "application/json",
-        data: JSON.stringify({follow_id: follow_id, follow_status: status}),
-        dataType: "json",
-        success: function() {
-            if (status === false) {
-                $follow_button.text('Follow');
-                $follow_button.prop('value', '0');
-                $follow_button.addClass('btn-primary').removeClass('btn-dark');
-                $follow_button.removeClass('disabled');
-            } else {
-                $follow_button.text('Unfollow');
-                $follow_button.prop('value', '1');
-                $follow_button.removeClass('btn-primary').addClass('btn-dark');
-                $follow_button.removeClass('disabled');
-            }
-        },
-        error: function() {
-            error_ajax_message('Error updating the following status. Please try again later.');
-        },
-        complete: function() {
-            $('.loading-follow').hide();
-        }
-    });
-}
-
-
-// --- On document load -----------------------------------------------------------------------------------
+// --- On document load ------------------------------------
 $(document).ready(function() {
-    // --- Time spent data -------------------------------------
     let time_data = $('#time-spent-pie').attr('values').split(', ');
-
-    // --- Time spent pie graph --------------------------------
     let config_pie = {
         type: 'pie',
         data: {
@@ -82,7 +41,7 @@ $(document).ready(function() {
                             let y = mid_radius * Math.sin(mid_angle);
 
                             ctx.fillStyle = '#fff';
-                            if (i === 4){ // Darker text color for lighter background
+                            if (i === 4) { // Darker text color for lighter background
                                 ctx.fillStyle = '#444';
                             }
                             let percent = String(Math.round(dataset.data[i]/total*100)) + "%";
@@ -108,7 +67,6 @@ $(document).ready(function() {
     let ctx = document.getElementById('media-time').getContext('2d');
     new Chart(ctx, config_pie);
 
-    // --- Stats for the figure (series/anime/movies) ----------
     $('.value').each(function() {
         let text = $(this).attr('id');
         $(this).parent().css('width', text);

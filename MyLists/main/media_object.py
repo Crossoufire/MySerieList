@@ -1,6 +1,4 @@
 import secrets
-from pathlib import Path
-
 import pykakasi
 from MyLists import app
 from flask import url_for

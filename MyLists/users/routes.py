@@ -2,12 +2,9 @@ import json
 from MyLists import app, db
 from datetime import datetime
 from MyLists.API_data import ApiData
-from MyLists.main.add_db import AddtoDB
-from MyLists.main.media_object import MediaDetails
 from flask_login import login_required, current_user
 from flask import Blueprint, flash, redirect, request, render_template, abort
-from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications, RoleType, Status, GamesList, \
-    Games, Series
+from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications, RoleType
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
     get_knowledge_frame, get_updates, get_favorites, get_all_follows_data, get_header_data, cestparti
 

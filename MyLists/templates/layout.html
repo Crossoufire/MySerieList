@@ -41,9 +41,8 @@
 
     <!--- Custom CSS ------------------------------------------------------->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mylists.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
     {% block css %}
-    {% endblock %}
+    {% endblock css %}
 
     {% if title %}
         <title>MyLists - {{ title }}</title>
@@ -227,7 +226,7 @@
 <main role="main" class="container">
     <div class="content">
         {% block content %}
-        {% endblock %}
+        {% endblock content %}
     </div>
 </main>
 

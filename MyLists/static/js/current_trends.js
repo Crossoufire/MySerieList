@@ -1,6 +1,6 @@
 
 
-// --- Show more media from 6 to 12 per media type -------------------------
+// --- Show more media: 6 to 12 ----------------------------
 function showmore(show, media) {
     let $show = $('#'+show);
 
@@ -10,7 +10,7 @@ function showmore(show, media) {
 }
 
 
-// --- Show less media from 12 to 6 per media type -------------------------
+// --- Show less media: 12 to 6 ----------------------------
 function showless(show, media) {
     let $show = $('#'+show);
     let i = 0;
@@ -29,7 +29,7 @@ function showless(show, media) {
 }
 
 
-// --- Change anime img size ----------------------------------------------
+// --- Change anime img size -------------------------------
 $(document).ready(function() {
     function resizeAnimeImg() {
         let $anime_img = $('.img-anime');

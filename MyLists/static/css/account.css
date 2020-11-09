@@ -1,5 +1,11 @@
 
 /* --- Main CSS ----------------------------------------- */
+.vertical-line {
+    width: 5px;
+    border-left: 2px solid rgba(44, 57, 70, 1);
+    height: 100wh;
+}
+
 hr {
     border-top: 1px solid rgba(44, 57, 70, 1);
     margin-top: 1px;
@@ -7,6 +13,19 @@ hr {
 
 a {
     color: lightgray;
+}
+
+@media (max-width: 650px) {
+    .account-wrapper {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+@media (max-width: 490px) {
+    .account-wrapper {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
 }
 
 
@@ -78,16 +97,6 @@ a {
     display: none;
 }
 
-.badges-container {
-    position: absolute;
-    height: 90%;
-    right: 0;
-    left: 750px;
-    top: 5%;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
 .follow-btn {
     display: inline-block;
 }
@@ -119,7 +128,6 @@ a {
     .header-knowledge-level {
         bottom: 20px;
     }
-
     .header-profile-data {
         display: none;
     }
@@ -131,11 +139,9 @@ a {
         transform: translate(-50%, -50%);
         -ms-transform: translate(-50%, -50%);
     }
-
     .header-join-follow {
         font-size: 14px;
     }
-
     .follow-btn-mobile {
         display: flex !important;
         justify-content: center;
@@ -143,15 +149,84 @@ a {
 }
 
 
-/* --- Overview ----------------------------------------- */
-.vertical-line {
-    width: 5px;
-    border-left: 2px solid rgba(44, 57, 70, 1);
-    height: 100wh;
+/* --- Levels ------------------------------------------- */
+#series-level {
+    margin-left: 20px;
 }
 
-.mobile-time {
-    font-size: 20px;
+#movies-level {
+    margin-left: 13px;
+}
+
+#anime-level {
+    margin-left: 18px;
+}
+
+.account-bar-wrapper {
+    width: 100%;
+}
+
+.account-bar {
+    height: 100%;
+    margin: 0 auto;
+}
+
+.account-bar-name {
+    font-size: 12pt;
+    margin: 0 0 0 5px;
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.account-bar-level {
+    font-size: 12pt;
+    margin: 0 0 0;
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.account-bar-next-level {
+    display: inline-block;
+    font-size: 12pt;
+}
+
+.xp-bar {
+    height: 10px;
+    width: 65%;
+    background: grey;
+    margin: 0 0 0 5px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.xp-bar-fill {
+    height: 100%;
+    width: 0.1%;
+    font-size: 12px;
+    line-height: 10px;
+    text-align: right;
+}
+
+
+/* --- Updates ------------------------------------------ */
+.update-box {
+    padding: 0 8px 8px 8px;
+}
+
+.truncate {
+    width: 100%;
+    margin-bottom: -8px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* --- Central Statistics ------------------------------- */
+.media-container {
+    position: relative;
+    height: 200px;
 }
 
 .block {
@@ -210,43 +285,9 @@ a {
     color: lightgray;
 }
 
-.update-box {
-    padding: 0 8px 8px 8px;
-}
-
-.media-container {
-    position: relative;
-    height: 200px;
-}
-
-.giveMeEllipsis {
-   overflow: hidden;
-   width: 200px;
-   text-overflow: ellipsis;
-   display: -webkit-box;
-   -webkit-box-orient: vertical;
-   -webkit-line-clamp: 1; /* number of lines to show */
-}
-
 .favorite-img {
     height: 89px;
     width: auto;
-}
-
-.follow-img {
-    border-radius: 50%;
-    height: 60px;
-    width: 60px;
-    background-color: grey;
-}
-
-.truncate {
-    width: 100%;
-    margin-bottom: -8px;
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 @media (max-width: 768px) {
@@ -255,80 +296,17 @@ a {
         height: 200px;
     }
 }
-@media (max-width: 650px) {
-    .account-wrapper {
-        padding-left: 0;
-        padding-right: 0;
-    }
-}
 @media (max-width: 490px) {
     .stat-text {
         font-size: 10pt;
     }
-    .account-wrapper {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-    .mobile-time {
-        font-size: 15px;
-    }
 }
 
 
-/* --- Levels ------------------------------------------- */
-.account-bar-wrapper {
-    width: 100%;
-}
-
-.account-bar {
-    height: 100%;
-    margin: 0 auto;
-}
-
-.account-bar-name {
-    font-size: 12pt;
-    margin: 0 0 0 5px;
-    display: inline-block;
-    vertical-align: bottom;
-}
-
-.account-bar-level {
-    font-size: 12pt;
-    margin: 0 0 0;
-    display: inline-block;
-    vertical-align: bottom;
-}
-
-#series-level {
-    margin-left: 20px;
-}
-
-#movies-level {
-    margin-left: 13px;
-}
-
-#anime-level {
-    margin-left: 18px;
-}
-
-.account-bar-next-level {
-    display: inline-block;
-    font-size: 12pt;
-}
-
-.xp-bar {
-    height: 10px;
-    width: 65%;
-    background: grey;
-    margin: 0 0 0 5px;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.xp-bar-fill {
-    height: 100%;
-    width: 0.1%;
-    font-size: 12px;
-    line-height: 10px;
-    text-align: right;
+/* --- Follows ------------------------------------------ */
+.follow-img {
+    border-radius: 50%;
+    height: 60px;
+    width: 60px;
+    background-color: grey;
 }

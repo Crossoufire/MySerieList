@@ -1,6 +1,6 @@
 
 
-// --- Datatable functions ------------------------------------------
+// --- Datatable functions ---------------------------------
 $(document).ready(function () {
     $('#all_history').DataTable({
         "bPaginate": true,
@@ -20,7 +20,7 @@ $(document).ready(function () {
 });
 
 
-// --- Datatable functions ------------------------------------------
+// --- Datatable functions ---------------------------------
 $(document).ready(function () {
     $('#steam_games').DataTable({
         "bPaginate": false,

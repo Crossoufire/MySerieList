@@ -1,5 +1,5 @@
 
-// --- Autocomplete ---------------------------------------------------------
+// --- Autocomplete ----------------------------------------
 $(function() {
     $('#autocomplete').catcomplete({
         delay: 250,
@@ -83,7 +83,45 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
     });
 
 
-// --- Notification ---------------------------------------------------------
+// --- Follow status ---------------------------------------
+function follow_status(button, follow_id) {
+    let status;
+    let $follow_button = $(button);
+
+    status = $follow_button.prop('value') !== '1';
+    $follow_button.addClass('disabled');
+    $('#load_'+follow_id).show();
+
+    $.ajax ({
+        type: "POST",
+        url: "/follow_status",
+        contentType: "application/json",
+        data: JSON.stringify({follow_id: follow_id, follow_status: status}),
+        dataType: "json",
+        success: function() {
+            if (status === false) {
+                $follow_button.text('Follow');
+                $follow_button.prop('value', '0');
+                $follow_button.addClass('btn-primary').removeClass('btn-dark btn-smaller');
+                $follow_button.removeClass('disabled');
+            } else {
+                $follow_button.text('Unfollow');
+                $follow_button.prop('value', '1');
+                $follow_button.removeClass('btn-primary').addClass('btn-dark btn-smaller');
+                $follow_button.removeClass('disabled');
+            }
+        },
+        error: function() {
+            error_ajax_message('Error updating the following status. Please try again later.');
+        },
+        complete: function() {
+            $('#load_'+follow_id).hide();
+        }
+    });
+}
+
+
+// --- Notification ----------------------------------------
 function display_notifications(data) {
     let add_hr;
     let resp = data.results;
@@ -188,7 +226,7 @@ function display_notifications(data) {
 }
 
 
-// --- AJAX Notification ----------------------------------------------------
+// --- AJAX Notification -----------------------------------
 function notifications() {
     $('.notif-items').remove();
     $('#loading-image').show();
@@ -212,7 +250,7 @@ function notifications() {
 }
 
 
-// --- Ajax error handling --------------------------------------------------
+// --- Ajax error handling ---------------------------------
 function error_ajax_message(message) {
     $('.content-message').prepend(
         '<div class="alert alert-danger alert-dismissible m-t-15">' +
@@ -224,13 +262,13 @@ function error_ajax_message(message) {
 }
 
 
-// --- Tooltip initialization -----------------------------------------------
+// --- Tooltip initialization ------------------------------
 $(function () {
     $('[data-toggle="tooltip"]').tooltip()
 });
 
 
-// --- Left dropdown for notifictaions on mobile  ---------------------------
+// --- Left dropdown for notifictaions on mobile  ----------
 $(document).ready(function() {
     function a() {
         if ($(window).width() < 991) {
@@ -245,7 +283,7 @@ $(document).ready(function() {
 });
 
 
-// --- Service Worker for PWA -----------------------------------------------
+// --- Service Worker for PWA ------------------------------
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
         .register('service-worker.js', {

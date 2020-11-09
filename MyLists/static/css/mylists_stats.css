@@ -1,14 +1,11 @@
 
+/* --- Table CSS ---------------------------------------- */
 table.table-sm td, table.table-sm th {
     padding: 5px;
 }
 
 table.table th {
     font-size: 12pt;
-}
-
-div.col-sm-12 {
-    margin-top: 15px;
 }
 
 table.table a {
@@ -26,6 +23,12 @@ table.table a {
     vertical-align: middle;
 }
 
+div.col-sm-12 {
+    margin-top: 15px;
+}
+
+
+/* --- General CSS -------------------------------------- */
 .seasons-eps-container {
     position: relative;
     margin-left: auto;
