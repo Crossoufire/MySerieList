@@ -62,9 +62,10 @@ class AddtoDB:
     def add_collection_to_db(self):
         collection = self.media_details['collection_info']
         if collection:
-            collection_update = MoviesCollections.query.filter_by(collection_id=collection['collection_id']).first()
+            col_id = collection['collection_id']
+            collection_update = MoviesCollections.query.filter_by(collection_id=col_id).first()
             if collection_update:
-                MoviesCollections.query.filter_by(collection_id=collection['collection_id']).update(collection)
+                MoviesCollections.query.filter_by(collection_id=col_id).update(collection)
             else:
                 db.session.add(MoviesCollections(**collection))
 

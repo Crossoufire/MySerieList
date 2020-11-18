@@ -210,8 +210,9 @@ def add_collections_movies():
             add_collection = MoviesCollections(collection_id=collection_id,
                                                parts=collection_parts,
                                                name=collection_name,
-                                               poster=collection_poster_id,
-                                               overview=collection_overview)
+                                               image_cover=collection_poster_id,
+                                               synopsis=collection_overview,
+                                               parts_names=',')
 
             db.session.add(add_collection)
             db.session.commit()

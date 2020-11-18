@@ -396,10 +396,12 @@ class AnimeActors(db.Model):
 class MoviesCollections(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     collection_id = db.Column(db.Integer, db.ForeignKey('movies.collection_id'), nullable=False)
-    parts = db.Column(db.Integer)
     name = db.Column(db.String(100))
-    poster = db.Column(db.String(100))
-    overview = db.Column(db.String(100))
+    image_cover = db.Column(db.String(100))
+    synopsis = db.Column(db.String(100))
+    parts = db.Column(db.Integer)
+    parts_names = db.Column(db.String(100))
+    parts_release_dates = db.Column(db.String(100))
 
 
 class Movies(db.Model):
