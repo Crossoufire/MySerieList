@@ -133,8 +133,7 @@
                                         var tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
                                         var localdate = new Date("{{update['date']}}").toLocaleString("en-GB", {timeZone: tz});
                                         var d = new Date("{{ update['date'] }}");
-                                        var month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
-                                            "Nov", "Dec"];
+                                        var month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
                                         var date_month = month[d.getMonth()];
                                         var date_day = localdate.slice(0, 2);
                                         var date_time = localdate.slice(11, 17);

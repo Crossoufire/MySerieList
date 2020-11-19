@@ -129,8 +129,11 @@
                 <hr>
             </div>
         </div>
-        <div class="follow-margin-mobile">
-            <h4><i class="fas fa-user-check"></i>&nbsp;&nbsp;<b>In follow's list</b></h4><hr>
+        {% block movie_collection %}
+        {% endblock movie_collection %}
+        <div class="follow-margin-mobile m-t-40 m-b-30">
+            <h4><i class="fas fa-user-check"></i>&nbsp;&nbsp;<b>In follow's list</b></h4>
+            <hr>
             <div class="row" style="margin-top: -5px;">
                 {% for follow in data['in_follows_lists'] %}
                     <div class="col col-lg-4 col-md-4 col-sm-6 col-12 m-b-35">

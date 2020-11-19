@@ -429,7 +429,7 @@ class Movies(db.Model):
     collection_movies = db.relationship('MoviesCollections',
                                         primaryjoin=(MoviesCollections.collection_id == collection_id),
                                         backref='movies',
-                                        lazy='dynamic')
+                                        lazy=True)
     genres = db.relationship('MoviesGenre', backref='movies', lazy=True)
     actors = db.relationship('MoviesActors', backref='movies', lazy=True)
     list_info = db.relationship('MoviesList', backref='movies', lazy='dynamic')
