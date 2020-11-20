@@ -531,9 +531,9 @@ class MediaDetails:
     def get_collection_info(self):
 
         def get_collection_data(co_id):
-            collection_data = ApiData().get_collection_data(co_id)
+            col_data = ApiData().get_collection_data(co_id)
 
-            collection_cover_path = collection_data.get('poster_path') or None
+            collection_cover_path = col_data.get('poster_path') or None
             collection_cover_name = 'default.jpg'
             if collection_cover_path:
                 collection_cover_name = '{}.jpg'.format(secrets.token_hex(8))
@@ -545,18 +545,19 @@ class MediaDetails:
                     collection_cover_name = 'default.jpg'
 
             collection_info = {'collection_id': co_id,
-                               'parts': len(collection_data.get('parts')),
-                               'name': collection_data.get('name', 'Unknown') or 'Unknown',
-                               'poster': collection_cover_name,
-                               'overview': collection_data.get('overview')}
+                               'parts': len(col_data.get('parts')),
+                               'name': col_data.get('name', 'Unknown') or 'Unknown',
+                               'image_cover': collection_cover_name,
+                               'synopsis': col_data.get('overview'),
+                               'parts_names': ','.join([x['title'] for x in col_data['parts']]),
+                               'parts_release_dates': ','.join([x['release_date'] for x in col_data['parts']])}
 
             return collection_info
 
         collection_id = self.media_data.get("belongs_to_collection") or None
-
         self.media_details['collection_id'] = None
         collection_info = None
-        if collection_id:
+        if collection_id is not None:
             self.media_details['collection_id'] = collection_id['id']
             collection_info = get_collection_data(collection_id['id'])
 

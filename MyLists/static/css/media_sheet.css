@@ -146,6 +146,21 @@ input[type=number] {
 }
 
 
+/* --- Movies collection -------------------------------- */
+.collapsible {
+    padding: 5px;
+}
+
+.collapsible:hover {
+    background-color: black;
+}
+
+.movies-col-collapser {
+    display: none;
+    overflow: hidden;
+}
+
+
 /* --- Follows ------------------------------------------ */
 .follow-margin-mobile {
     margin-left: 21px;

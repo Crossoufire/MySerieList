@@ -158,22 +158,22 @@
 {% endblock more_info %}
 
 
-{#                {% if media_list == 'movieslist' and data['collection_data'][0] %}#}
-{#                    <h4 class="m-l-21 m-r-15"><i class="fas fa-box-open m-t-8"></i>&nbsp;&nbsp;#}
-{#                        <b>{{ data['collection_data'][0].name }}</b>#}
-{#                    </h4>#}
-{#                    <hr class="m-l-20 m-r-24">#}
-{#                    <div class="m-b-30">#}
-{#                        {% set release = data['collection_data'][0].releases_dates.split(',') %}#}
-{#                        {% for name in data['collection_data'][0].movies_names.split(',') %}#}
-{#                            <div class="row m-l-5 m-r-5">#}
-{#                                <div class="col-9">#}
-{#                                    <b>{{ name }}</b>#}
-{#                                </div>#}
-{#                                <div class="col-3">#}
-{#                                    <b>{{ release[loop.index0].split('-')[0] }}</b>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        {% endfor %}#}
-{#                    </div>#}
-{#                {% endif %}#}
+{% block movie_collection %}
+    {% if data['collection_data'][0] %}
+        <h4 class="collapsible follow-margin-mobile m-t-25" style="cursor: pointer;" onclick="show_hide_content()">
+            <i class="fas fa-box-open"></i>&nbsp;&nbsp;<b>{{ data['collection_data'][0].name }}</b>
+            <i class="change-sign float-r fas fa-sm fa-plus" style="margin-top: 5px;"></i>
+        </h4>
+        <hr class="follow-margin-mobile" style="margin-top: -5px;">
+        <div class="movies-col-collapser" style="margin-left: 50px;">
+            {% set release = data['collection_data'][0].parts_release_dates.split(',') %}
+            <div class="row no-gutters">
+                {% for name in data['collection_data'][0].parts_names.split(',') %}
+                    <div class="col-4">
+                        <b>{{ name }}</b>&nbsp; - &nbsp;<b>{{ release[loop.index0].split('-')[0] }}</b>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock movie_collection %}

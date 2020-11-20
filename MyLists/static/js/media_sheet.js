@@ -424,6 +424,21 @@ function lock_media(element_id, element_type) {
 }
 
 
+// --- Collapsible movies collection -----------------------
+function show_hide_content() {
+    let content = $('.movies-col-collapser');
+    let change_sign = $('.change-sign');
+
+    if (content.css('display') === 'none') {
+        content.slideDown(300);
+        change_sign.attr('class', 'change-sign float-r fas fa-sm fa-minus');
+    } else {
+        content.slideUp(300);
+        change_sign.attr('class', 'change-sign float-r fas fa-sm fa-plus');
+    }
+}
+
+
 $(document).ready(function () {
     // --- Random box color --------------------------------
     let colors, boxes, i;
