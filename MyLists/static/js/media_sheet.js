@@ -142,7 +142,7 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
                 for (let i = 2; i <= season_data[0][seasons_index]; i++) {
                     let opt = document.createElement("option");
                     opt.className = "";
-                    (i <= 9) ? opt.innerHTML = "E0"+i : opt.innerHTML = "E"+i;
+                    (i <= 9) ? opt.innerHTML = "&nbsp;0"+i+"&nbsp;" : opt.innerHTML = "&nbsp;"+i+"&nbsp;";
                     episode_drop[0].appendChild(opt);
                 }
                 $('#episode-dropdown').prop('selectedIndex', season_data[0][seasons_index]-1);

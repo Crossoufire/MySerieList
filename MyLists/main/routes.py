@@ -77,7 +77,7 @@ def mymedialist(media_list, user_name):
                            sort_val=sort_val, filter_val=filter_val, search=search)
 
 
-@bp.route("/movies_collection/<string:user_name>", methods=['GET', 'POST'])
+@bp.route("/moviescollectionlist/<string:user_name>", methods=['GET', 'POST'])
 @login_required
 def movies_collection(user_name):
     # Check if the user can see the <media_list>
@@ -100,11 +100,11 @@ def movies_collection(user_name):
     ongoing_collections = []
     for movie in items:
         movie_data = {"id": movie[2].id,
-                      "name": movie[2].name,
+                      "display_name": movie[2].name,
                       "total": movie[2].parts,
                       "parts": movie[3],
                       "overview": movie[2].overview,
-                      "poster": '/static/covers/movies_collection_covers/' + movie[2].poster}
+                      "cover": '/static/covers/movies_collection_covers/' + movie[2].poster}
 
         if movie_data['total'] == 1:
             pass
@@ -113,15 +113,18 @@ def movies_collection(user_name):
         else:
             ongoing_collections.append(movie_data)
 
-    category_collection = []
+    media_data = []
     if category == 'Completed':
-        category_collection = sorted(completed_collections, key=lambda x: (x['name'], x['parts']), reverse=True)
-    elif category == 'On Going':
-        category_collection = sorted(ongoing_collections, key=lambda x: (x['parts'], x['total']), reverse=True)
+        media_data = sorted(completed_collections, key=lambda x: (x['display_name'], x['parts']), reverse=True)
 
-    return render_template('medialist_collections.html', title='Movies collection',
-                           category_collection=category_collection, length_category=len(category_collection),
-                           username=user_name, user_id=str(user.id), info_pages=info_pages, category=category)
+    elif category == 'On Going':
+        media_data = sorted(ongoing_collections, key=lambda x: (x['parts'], x['total']), reverse=True)
+
+    info_pages['total_media'] = len(media_data)
+
+    return render_template('medialist_collections.html', title='Movies collection', media_data=media_data,
+                           username=user_name, user_id=str(user.id), info_pages=info_pages, category=category,
+                           media_list='moviescollectionlist')
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])

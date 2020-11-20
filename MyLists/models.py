@@ -18,6 +18,7 @@ class ListType(enum.Enum):
     ANIME = 'animelist'
     MOVIES = 'movieslist'
     GAMES = 'gameslist'
+    MOVIES_C = 'moviescollectionlist'
 
 
 class Status(enum.Enum):

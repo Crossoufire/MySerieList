@@ -1,51 +1,30 @@
-{% extends 'layout.html' %}
+{% extends 'medialist_base.html' %}
 
 
-{% block css %}
-    <link href="{{ url_for('static', filename='css/mymedialist.css') }}" rel="stylesheet">
-{% endblock css %}
+{% block sorting_list %}
+    <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Title</option>
+    <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>
+    <option {% if sort_val == 'rewatch' %}selected="selected"{% endif %} value="rewatch">Rewatch</option>
+    <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>
+    <option {% if sort_val == 'release_date' %}selected="selected"{% endif %} value="release_date">Release date</option>
+{% endblock sorting_list %}
 
 
-{% block content %}
-    <div class="back-image p-b-15">
-        <div class="d-flex flex-wrap p-t-50" style="justify-content: center;">
-            <a class="btn btn-sm {% if category == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"
-            href="/movies_collection/{{ username }}?category=Completed">COMPLETED</a>
-            <a class="btn btn-sm {% if category == 'On Going' %} btn-selected {% else %} btn-header {% endif %}"
-            href="/movies_collection/{{ username }}?category=On Going">ON GOING</a>
-        </div>
-    </div>
-    <h2 class="text-center m-t-50 mb-0">{{ category|upper }} ({{ length_category }})</h2>
-    <hr class="mt-2 pb-3 mb-0">
-    <div class="row infinite-scroll-container m-b-30">
-        {% for data in category_collection  %}
-            <div id="card_{{ data['id'] }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
-                <div class="card bg-transparent">
-                    <div class="view overlay">
-                        <img class="card-img-top" src="{{ data['poster'] }}" height="300" width="200"
-                             style="height: auto;" alt=""/>
-                        <a class="mask flex-center rgba-black-strong">
-                            <span class="font-mask text-center text-light">{{ data['name'] }}</span>
-                        </a>
-                    </div>
-                    <div class="number-seen">
-                        <span>{{ data['parts'] }}/{{ data['total'] }}</span>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
-
-    <div class="scroller-status">
-        <p class="infinite-scroll-error text-center"></p>
-    </div>
-    <p class="pagination">
-        <a class="pagination__next" href="/movies_collection/{{ username }}?category={{ category }}&page=2"></a>
-    </p>
-{% endblock content %}
+{% block button %}
+    <a class="btn btn-sm {% if category == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Completed&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED</a>
+    <a class="btn btn-sm {% if category == 'On Going' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=On Going&sort={{ sort_val }}&filter={{ filter_val }}">ON GOING</a>
+{% endblock button %}
 
 
-{% block script %}
+{% block data %}
+    {{ media_list }}-{{ data['id'] }}
+{% endblock data %}
+
+
+{% block javascript %}
+    <script src="{{ url_for('static', filename='js/medialist_movies.js') }}"></script>
     <script>
         // --- Row gutters -----------------------------------------------------
         (function ($) {
@@ -62,4 +41,4 @@
             $window.resize(resize).trigger('resize');
         })(jQuery);
     </script>
-{% endblock script %}
+{% endblock javascript %}

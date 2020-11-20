@@ -207,18 +207,6 @@ def remove_old_covers():
     app.logger.info('###################################################################')
 
 
-def get_total_eps(user, eps_per_season):
-    if user.status == Status.PLAN_TO_WATCH or user.status == Status.RANDOM:
-        nb_eps_watched = 1
-    else:
-        nb_eps_watched = 0
-        for i in range(1, user.current_season):
-            nb_eps_watched += eps_per_season[i - 1]
-        nb_eps_watched += user.last_episode_watched
-
-    return nb_eps_watched
-
-
 def refresh_element_data(api_id, list_type):
     media_data = ApiData().get_details_and_credits_data(api_id, list_type)
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
@@ -259,7 +247,7 @@ def refresh_element_data(api_id, list_type):
                 users_list = SeriesList.query.filter_by(media_id=element.id).all()
 
                 for user in users_list:
-                    episodes_watched = get_total_eps(user, old_seas_eps)
+                    episodes_watched = user.eps_watched
 
                     count = 0
                     for i in range(0, len(data['seasons_data'])):
@@ -280,7 +268,6 @@ def refresh_element_data(api_id, list_type):
                                 user.last_episode_watched = data['seasons_data'][i]['episodes']
                                 user.current_season = data['seasons_data'][i]['season']
                                 break
-                    db.session.commit()
 
                 SeriesEpisodesPerSeason.query.filter_by(media_id=element.id).delete()
                 db.session.commit()
@@ -295,7 +282,7 @@ def refresh_element_data(api_id, list_type):
                 users_list = AnimeList.query.filter_by(media_id=element.id).all()
 
                 for user in users_list:
-                    episodes_watched = get_total_eps(user, old_seas_eps)
+                    episodes_watched = user.eps_watched
 
                     count = 0
                     for i in range(0, len(data['seasons_data'])):
@@ -316,7 +303,6 @@ def refresh_element_data(api_id, list_type):
                                 user.last_episode_watched = data['seasons_data'][i]['episodes']
                                 user.current_season = data['seasons_data'][i]['season']
                                 break
-                    db.session.commit()
 
                 AnimeEpisodesPerSeason.query.filter_by(media_id=element.id).delete()
                 db.session.commit()
