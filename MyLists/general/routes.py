@@ -5,7 +5,8 @@ from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from MyLists.general.trending_data import TrendingData
 from flask import render_template, flash, request, abort
-from MyLists.models import ListType, User, GlobalStats, RoleType
+from MyLists.main.scheduled_tasks import update_Mylists_stats
+from MyLists.models import ListType, User, RoleType, MyListsStats
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
     refresh_db_frames, refresh_db_badges, refresh_db_ranks
 
@@ -57,6 +58,7 @@ def create_first_data():
     compute_media_time_spent(ListType.GAMES)
     # add_hltb_time()
     # add_manual_games()
+    update_Mylists_stats()
     db.session.commit()
 
 
@@ -71,68 +73,9 @@ def admin():
 @bp.route("/mylists_stats", methods=['GET'])
 @login_required
 def mylists_stats():
-    stats = GlobalStats()
+    all_stats = MyListsStats.query.first()
 
-    times_spent = stats.get_total_time_spent()
-
-    if times_spent[0]:
-        total_time = {"total": sum(times_spent[0]), "series": int(times_spent[0][0]/60),
-                      "anime": int(times_spent[0][1]/60), "movies": int(times_spent[0][2]/60),
-                      "games": int(times_spent[0][3]/60)}
-    else:
-        total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0, "games": 0}
-
-    def create_dict(data):
-        series_list, anime_list, movies_list, games_list = [], [], [], []
-        for i in range(5):
-            try:
-                series_list.append({"info": data[0][i][0], "quantity": data[0][i][2]})
-            except:
-                series_list.append({"info": "-", "quantity": "-"})
-            try:
-                anime_list.append({"info": data[1][i][0], "quantity": data[1][i][2]})
-            except:
-                anime_list.append({"info": "-", "quantity": "-"})
-            try:
-                movies_list.append({"info": data[2][i][0], "quantity": data[2][i][2]})
-            except:
-                movies_list.append({"info": "-", "quantity": "-"})
-            try:
-                games_list.append({"info": data[i][0], "quantity": data[i][2]})
-            except:
-                games_list.append({"info": "-", "quantity": "-"})
-
-        return {'series': series_list, 'anime': anime_list, 'movies': movies_list, 'games': games_list}
-
-    top_media = stats.get_top_media()
-    most_present_media = create_dict(top_media)
-
-    media_genres = stats.get_top_genres()
-    most_genres_media = create_dict(media_genres)
-
-    media_actors = stats.get_top_actors()
-    most_actors_media = create_dict(media_actors)
-
-    media_dropped = stats.get_top_dropped()
-    top_dropped_media = create_dict(media_dropped)
-
-    games_companies = stats.get_top_companies()
-    top_companies_games = create_dict(games_companies)
-
-    total_media_eps_seas = stats.get_total_eps_seasons()
-    total_seasons_media = {"series": total_media_eps_seas[0][0][1], "anime": total_media_eps_seas[1][0][1]}
-    total_episodes_media = {"series": total_media_eps_seas[0][0][0], "anime": total_media_eps_seas[1][0][0]}
-
-    return render_template("mylists_stats.html",
-                           title='MyLists Stats',
-                           total_time=total_time,
-                           most_present_media=most_present_media,
-                           most_actors_media=most_actors_media,
-                           top_dropped_media=top_dropped_media,
-                           total_seasons_media=total_seasons_media,
-                           total_episodes_media=total_episodes_media,
-                           most_genres_media=most_genres_media,
-                           top_companies_games=top_companies_games)
+    return render_template("mylists_stats.html", title='MyLists Stats', data=all_stats)
 
 
 @bp.route("/current_trends", methods=['GET'])
