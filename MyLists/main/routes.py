@@ -211,12 +211,24 @@ def media_sheet(media_type, media_id):
         media = Games.query.filter_by(**search).first()
         html_template = 'media_sheet_games.html'
 
-    # If <media> does not exist and <api_id> is provived: Add the media to DB, else abort.
+    # If <media> does not exist and <api_id> is provived: Add the <media> to DB, else abort.
     if not media:
         if api_id:
             try:
                 media_api_data = ApiData().get_details_and_credits_data(media_id, list_type)
+            except Exception as e:
+                app.logger.error('[ERROR] - Impossible to get the details and credits from API ({}) ID [{}]: {}'
+                                 .format(media_type.value, media_id, e))
+                flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
+                return redirect(request.referrer)
+            try:
                 media_details = MediaDetails(media_api_data, list_type).get_media_details()
+            except Exception as e:
+                app.logger.error('[ERROR] - Occured trying to parse the API data to dict ({}) ID [{}]: {}'
+                                 .format(media_type.value, media_id, e))
+                flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
+                return redirect(request.referrer)
+            try:
                 media = AddtoDB(media_details, list_type).add_media_to_db()
             except Exception as e:
                 app.logger.error('[ERROR] - Occured trying to add media ({}) ID [{}] to DB: {}'

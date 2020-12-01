@@ -3,6 +3,7 @@ import secrets
 import requests
 import urllib.request
 from PIL import Image
+from tqdm import tqdm
 from pathlib import Path
 from MyLists import db, app
 from datetime import datetime
@@ -10,7 +11,7 @@ from flask_login import current_user
 from MyLists.main.add_db import AddtoDB
 from MyLists.main.media_object import MediaDetails
 from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, MoviesCollections, get_total_time, \
-    SeriesList, AnimeList, Series, Anime, Games, GamesList
+    SeriesList, AnimeList, Series, Anime, Games, GamesList, MoviesCollectionsParts, MoviesList
 
 
 def compute_media_time_spent(list_type):
@@ -157,40 +158,25 @@ def add_collections_movies():
     local_covers_path = Path(app.root_path, "static/covers/movies_collection_covers/")
 
     all_movies = Movies.query.all()
-    for index, movie in enumerate(all_movies):
-        print("Movie: {}/{}".format(index + 1, len(all_movies)))
+    for movie in tqdm(all_movies):
         tmdb_movies_id = movie.themoviedb_id
 
         try:
             response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
-                                    .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']), timeout=10)
+                                    .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']), timeout=15)
 
-            data = json.loads(response.text)
+            collection_api_data = json.loads(response.text)
 
-            collection_id = data["belongs_to_collection"]["id"]
-            collection_poster = data["belongs_to_collection"]["poster_path"]
+            collection_id = collection_api_data["belongs_to_collection"]["id"]
+            collection_poster = collection_api_data["belongs_to_collection"]["poster_path"]
 
-            response_collection = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
-                                               .format(collection_id, app.config['THEMOVIEDB_API_KEY']), timeout=10)
+            response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
+                                    .format(collection_id, app.config['THEMOVIEDB_API_KEY']), timeout=15)
 
-            data_collection = json.loads(response_collection.text)
+            collection_api_data = json.loads(response.text)
 
-            collection_name = data_collection["name"]
-            collection_overview = data_collection["overview"]
-
-            remove = 0
-            utc_now = datetime.utcnow()
-            for part in data_collection["parts"]:
-                part_date = part['release_date']
-                try:
-                    part_date_datetime = datetime.strptime(part_date, '%Y-%m-%d')
-                    difference = (utc_now - part_date_datetime).total_seconds()
-                    if float(difference) < 0:
-                        remove += 1
-                except:
-                    pass
-
-            collection_parts = len(data_collection["parts"]) - remove
+            collection_name = collection_api_data["name"]
+            collection_overview = collection_api_data["overview"]
             collection_poster_id = "{}.jpg".format(secrets.token_hex(8))
 
             urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(collection_poster),
@@ -208,16 +194,24 @@ def add_collections_movies():
                 continue
 
             add_collection = MoviesCollections(collection_id=collection_id,
-                                               parts=collection_parts,
                                                name=collection_name,
                                                image_cover=collection_poster_id,
-                                               synopsis=collection_overview,
-                                               parts_names=',')
+                                               synopsis=collection_overview)
 
             db.session.add(add_collection)
             db.session.commit()
+
+            MoviesCollectionsParts.query.filter_by(collection_id=collection_id).delete()
+            for part in collection_api_data['parts']:
+                dict_data = {'collection_id': collection_id,
+                             'part_name': part['title'],
+                             'part_release_date': part['release_date'],
+                             'part_tmdb_id': part['id']}
+                db.session.add(MoviesCollectionsParts(**dict_data))
+            db.session.commit()
         except:
             pass
+
     print('Finished adding movies collection.')
 
 

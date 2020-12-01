@@ -1,7 +1,7 @@
 from MyLists import db
 from MyLists.models import ListType, Series, Anime, SeriesGenre, AnimeGenre, AnimeActors, SeriesActors, SeriesNetwork, \
     AnimeNetwork, SeriesEpisodesPerSeason, AnimeEpisodesPerSeason, Movies, MoviesGenre, MoviesActors, \
-    MoviesCollections, Games, GamesGenre, GamesCompanies, GamesPlatforms
+    MoviesCollections, Games, GamesGenre, GamesCompanies, GamesPlatforms, MoviesCollectionsParts
 
 
 class AddtoDB:
@@ -63,11 +63,17 @@ class AddtoDB:
         collection = self.media_details['collection_info']
         if collection:
             col_id = collection['collection_id']
+            collection_parts = collection['parts_list']
+            collection.pop('parts_list', None)
             collection_update = MoviesCollections.query.filter_by(collection_id=col_id).first()
             if collection_update:
                 MoviesCollections.query.filter_by(collection_id=col_id).update(collection)
             else:
                 db.session.add(MoviesCollections(**collection))
+
+            MoviesCollectionsParts.query.filter_by(collection_id=col_id).delete()
+            for part in collection_parts:
+                db.session.add(MoviesCollectionsParts(**part))
 
     def add_games_companies_to_db(self):
         for company in self.media_details['companies_data']:
@@ -97,7 +103,6 @@ class AddtoDB:
 
     def add_movies_to_db(self):
         self.media = Movies(**self.media_details['movies_data'])
-
         db.session.add(self.media)
         db.session.commit()
 

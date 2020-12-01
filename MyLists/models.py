@@ -394,15 +394,25 @@ class AnimeActors(db.Model):
 # --- MOVIES -------------------------------------------------------------------------------------------------------
 
 
+class MoviesCollectionsParts(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    collection_id = db.Column(db.Integer, db.ForeignKey('movies_collections.collection_id'), nullable=False)
+    part_name = db.Column(db.String(500))
+    part_release_date = db.Column(db.String(500))
+    part_tmdb_id = db.Column(db.String(100))
+
+
 class MoviesCollections(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     collection_id = db.Column(db.Integer, db.ForeignKey('movies.collection_id'), nullable=False)
     name = db.Column(db.String(100))
     image_cover = db.Column(db.String(100))
     synopsis = db.Column(db.String(100))
-    parts = db.Column(db.Integer)
-    parts_names = db.Column(db.String(100))
-    parts_release_dates = db.Column(db.String(100))
+    collection_parts = db.relationship('MoviesCollectionsParts',
+                                       primaryjoin=(MoviesCollectionsParts.collection_id == collection_id),
+                                       order_by="MoviesCollectionsParts.part_release_date",
+                                       backref='movies_collections',
+                                       lazy=True)
 
 
 class Movies(db.Model):
@@ -822,11 +832,7 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
 
 
 def get_collection_query(user_id, page):
-    query = db.session.query(Movies, MoviesList, MoviesCollections, func.count(MoviesCollections.collection_id)) \
-        .join(MoviesList, MoviesList.media_id == Movies.id) \
-        .join(MoviesCollections, MoviesCollections.collection_id == Movies.collection_id) \
-        .filter(MoviesList.user_id == user_id, MoviesList.status != Status.PLAN_TO_WATCH)\
-        .group_by(Movies.collection_id).paginate(page, 500000, error_out=True)
+    query = "Aucune putain d'idée sa race la pute"
 
     return query
 

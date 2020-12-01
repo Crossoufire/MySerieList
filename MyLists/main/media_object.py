@@ -49,6 +49,7 @@ def change_air_format(date, media_sheet=False, games=False):
             return 'Unknown'
 
 
+# Parsing the DB data to the <MediaSheet> route
 class MediaDict:
     def __init__(self, media_data, list_type):
         self.data = media_data
@@ -213,12 +214,18 @@ class MediaDict:
         self.media_info["budget"] = self.data.budget
         self.media_info["revenue"] = self.data.revenue
         self.media_info["tagline"] = self.data.tagline
-        self.media_info["collection_data"] = self.data.collection_movies
+        self.media_info["tmdb_id"] = self.data.themoviedb_id
         self.media_info['release_date'] = 'Unknown'
         self.media_info["status"] = Status.COMPLETED.value
 
         # Change <release_date> format
         self.media_info['release_date'] = change_air_format(self.data.release_date)
+
+        # Add the collection parts
+        movie_collection = self.data.collection_movies
+        if movie_collection:
+            self.media_info["collection_name"] = movie_collection[0]
+            self.media_info["collection_parts"] = movie_collection[0].collection_parts
 
         in_user_list = self.add_user_list()
         if in_user_list:
@@ -245,6 +252,7 @@ class MediaDict:
         return self.data.in_user_list(current_user.id)
 
 
+# Parsing the DB data to the <MediaList> route
 class MediaListDict:
     def __init__(self, media_data, common_media, list_type):
         self.data = media_data
@@ -332,6 +340,7 @@ class MediaListDict:
         self.media_info["current_season"] = self.data[1].current_season
 
 
+# Parsing the <API_data> to dict
 class MediaDetails:
     def __init__(self, media_data, list_type, updating=False):
         self.media_data = media_data
@@ -531,9 +540,9 @@ class MediaDetails:
     def get_collection_info(self):
 
         def get_collection_data(co_id):
-            col_data = ApiData().get_collection_data(co_id)
+            col_api_data = ApiData().get_collection_data(co_id)
 
-            collection_cover_path = col_data.get('poster_path') or None
+            collection_cover_path = col_api_data.get('poster_path') or None
             collection_cover_name = 'default.jpg'
             if collection_cover_path:
                 collection_cover_name = '{}.jpg'.format(secrets.token_hex(8))
@@ -544,15 +553,21 @@ class MediaDetails:
                     app.logger.error('[ERROR] - Trying to recover the poster for collection: {}'.format(e))
                     collection_cover_name = 'default.jpg'
 
-            collection_info = {'collection_id': co_id,
-                               'parts': len(col_data.get('parts')),
-                               'name': col_data.get('name', 'Unknown') or 'Unknown',
-                               'image_cover': collection_cover_name,
-                               'synopsis': col_data.get('overview'),
-                               'parts_names': ','.join([x['title'] for x in col_data['parts']]),
-                               'parts_release_dates': ','.join([x['release_date'] for x in col_data['parts']])}
+            collection_parts_list = []
+            for part in col_api_data.get('parts'):
+                part_dict = {'collection_id': co_id,
+                             'part_name': part['title'],
+                             'part_release_date': part['release_date'],
+                             'part_tmdb_id': part['id']}
+                collection_parts_list.append(part_dict)
 
-            return collection_info
+            collection_dict = {'collection_id': co_id,
+                               'name': col_api_data.get('name', 'Unknown') or 'Unknown',
+                               'synopsis': col_api_data.get('overview'),
+                               'image_cover': collection_cover_name,
+                               'parts_list': collection_parts_list}
+
+            return collection_dict
 
         collection_id = self.media_data.get("belongs_to_collection") or None
         self.media_details['collection_id'] = None
@@ -702,6 +717,7 @@ class MediaDetails:
         return self.all_data
 
 
+# Parsing the <API_data> to dict to display the autocomplete
 class Autocomplete:
     def __init__(self, result):
         self.tmdb_cover_link = "http://image.tmdb.org/t/p/w300"

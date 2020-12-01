@@ -7,8 +7,7 @@ from MyLists.general.trending_data import TrendingData
 from flask import render_template, flash, request, abort
 from MyLists.models import ListType, User, GlobalStats, RoleType
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
-    refresh_db_frames, refresh_db_badges, refresh_db_ranks
-
+    refresh_db_frames, refresh_db_badges, refresh_db_ranks, add_collections_movies, add_collections_id_to_movieslist
 
 bp = Blueprint('general', __name__)
 
@@ -55,6 +54,7 @@ def create_first_data():
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
     compute_media_time_spent(ListType.GAMES)
+    # add_collections_movies()
     # add_hltb_time()
     # add_manual_games()
     db.session.commit()
