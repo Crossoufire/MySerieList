@@ -9,8 +9,8 @@ from MyLists.main.media_object import MediaDetails
 from MyLists.general.functions import compute_media_time_spent
 from MyLists.models import Series, SeriesList, SeriesActors, SeriesGenre, SeriesNetwork, SeriesEpisodesPerSeason, \
     UserLastUpdate, Notifications, ListType, Anime, AnimeList, AnimeActors, AnimeGenre, AnimeNetwork, \
-    AnimeEpisodesPerSeason, Movies, MoviesList, MoviesActors, MoviesGenre, MoviesCollections, Status, Games, GamesList, \
-    GamesCompanies, GamesGenre, GamesPlatforms
+    AnimeEpisodesPerSeason, Movies, MoviesList, MoviesActors, MoviesGenre, GlobalStats, Status, Games, GamesList, \
+    GamesCompanies, GamesGenre, GamesPlatforms, MoviesCollections, MyListsStats
 
 
 def remove_non_list_media():
@@ -548,6 +548,77 @@ def automatic_movies_locking():
     app.logger.info('###################################################################')
 
 
+def update_Mylists_stats():
+    stats = GlobalStats()
+
+    def create_dict(data):
+        series_list, anime_list, movies_list, games_list = [], [], [], []
+        for i in range(5):
+            try:
+                series_list.append({"info": data[0][i][0], "quantity": data[0][i][2]})
+            except:
+                series_list.append({"info": "-", "quantity": "-"})
+            try:
+                anime_list.append({"info": data[1][i][0], "quantity": data[1][i][2]})
+            except:
+                anime_list.append({"info": "-", "quantity": "-"})
+            try:
+                movies_list.append({"info": data[2][i][0], "quantity": data[2][i][2]})
+            except:
+                movies_list.append({"info": "-", "quantity": "-"})
+            try:
+                games_list.append({"info": data[i][0], "quantity": data[i][2]})
+            except:
+                games_list.append({"info": "-", "quantity": "-"})
+
+        return {'series': series_list, 'anime': anime_list, 'movies': movies_list, 'games': games_list}
+
+    times_spent = stats.get_total_time_spent()
+    total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0, "games": 0}
+    if times_spent[0]:
+        total_time = {"total": sum(times_spent[0]), "series": int(times_spent[0][0]/60),
+                      "anime": int(times_spent[0][1]/60), "movies": int(times_spent[0][2]/60),
+                      "games": int(times_spent[0][3]/60)}
+
+    top_media = stats.get_top_media()
+    most_present_media = create_dict(top_media)
+
+    media_genres = stats.get_top_genres()
+    most_genres_media = create_dict(media_genres)
+
+    media_actors = stats.get_top_actors()
+    most_actors_media = create_dict(media_actors)
+
+    media_directors = stats.get_top_directors()
+    most_directors_media = create_dict(media_directors)
+
+    media_dropped = stats.get_top_dropped()
+    top_dropped_media = create_dict(media_dropped)
+
+    games_companies = stats.get_top_companies()
+    top_companies_games = create_dict(games_companies)
+
+    total_media_eps_seas = stats.get_total_eps_seasons()
+    total_seasons_media = {"series": total_media_eps_seas[0][0][1], "anime": total_media_eps_seas[1][0][1]}
+    total_episodes_media = {"series": total_media_eps_seas[0][0][0], "anime": total_media_eps_seas[1][0][0]}
+
+    total_movies = stats.get_total_movies()
+    total_movies_dict = {'movies': total_movies}
+
+    stats_to_add = MyListsStats(total_time=total_time,
+                                top_media=most_present_media,
+                                top_genres=most_genres_media,
+                                top_actors=most_actors_media,
+                                top_directors=most_directors_media,
+                                top_dropped=top_dropped_media,
+                                top_games_companies=top_companies_games,
+                                total_episodes=total_episodes_media,
+                                total_seasons=total_seasons_media,
+                                total_movies=total_movies_dict)
+    db.session.add(stats_to_add)
+    db.session.commit()
+
+
 # ---------------------------------------------------------------------------------------------------------------
 
 # @crontab.job(minute="0", hour="3")
@@ -564,3 +635,5 @@ def scheduled_task():
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
     compute_media_time_spent(ListType.GAMES)
+
+    update_Mylists_stats()

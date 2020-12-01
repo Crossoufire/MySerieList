@@ -596,6 +596,24 @@ class Frames(db.Model):
     image_id = db.Column(db.String(50), nullable=False)
 
 
+# --- STATS and TRENDS --------------------------------------------------------------------------------------------
+
+
+class MyListsStats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    total_time = db.Column(db.Text)
+    top_media = db.Column(db.Text)
+    top_genres = db.Column(db.Text)
+    top_actors = db.Column(db.Text)
+    top_directors = db.Column(db.Text)
+    top_dropped = db.Column(db.Text)
+    top_games_companies = db.Column(db.Text)
+    total_episodes = db.Column(db.Text)
+    total_seasons = db.Column(db.Text)
+    total_movies = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 # --- OTHERS ------------------------------------------------------------------------------------------------------
 
 
@@ -673,6 +691,15 @@ class GlobalStats:
                            .order_by(text('count desc')).limit(5).all())
         return queries
 
+    def get_top_directors(self):
+        self.get_query_data(ListType.MOVIES)
+        query = db.session.query(self.media.director_name, self.media_list,
+                                 func.count(self.media.director_name).label('count'))\
+            .group_by(self.media.director_name).filter(self.media.director_name != 'Unknown')\
+            .order_by(text('count desc')).limit(5).all()
+
+        return [[], [], query]
+
     def get_top_dropped(self):
         queries = []
         for list_type in self.truncated_list_type:
@@ -702,10 +729,11 @@ class GlobalStats:
                                             func.sum(self.media_list.current_season)).all())
         return queries
 
+    def get_total_movies(self):
+        self.get_query_data(ListType.MOVIES)
+        total_movies = db.session.query(func.count(self.media)).all()
 
-def _object_as_dict(obj):
-        return {c.key: getattr(obj, c.key)
-                for c in inspect(obj).mapper.column_attrs}
+        return total_movies[0]
 
 
 def get_media_query(user_id, page, list_type, category, search, option, sort_val, filter_val):
