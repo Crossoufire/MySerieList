@@ -471,6 +471,7 @@ class MoviesList(db.Model):
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
     rewatched = db.Column(db.Integer, nullable=False, default=0)
+    eps_watched = db.Column(db.Integer)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
     comment = db.Column(db.Text)
@@ -695,7 +696,7 @@ class GlobalStats:
         self.get_query_data(ListType.MOVIES)
         query = db.session.query(self.media.director_name, self.media_list,
                                  func.count(self.media.director_name).label('count'))\
-            .group_by(self.media.director_name).filter(self.media.director_name != 'Unknown')\
+            .filter(self.media.director_name != 'Unknown')\
             .order_by(text('count desc')).limit(5).all()
 
         return [[], [], query]
@@ -719,7 +720,7 @@ class GlobalStats:
             .group_by(self.media_companies.name).filter(self.media_companies.name != 'Unknown')\
             .order_by(text('count desc')).limit(5).all()
 
-        return query
+        return [[], [], [], query]
 
     def get_total_eps_seasons(self):
         queries = []
@@ -731,9 +732,12 @@ class GlobalStats:
 
     def get_total_movies(self):
         self.get_query_data(ListType.MOVIES)
-        total_movies = db.session.query(func.count(self.media)).all()
+        total_movies = db.session.query(self.media, func.count(self.media.id)).all()
+        t_movies = 0
+        if total_movies:
+            t_movies = total_movies[0][1]
 
-        return total_movies[0]
+        return t_movies
 
 
 def get_media_query(user_id, page, list_type, category, search, option, sort_val, filter_val):

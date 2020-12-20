@@ -22,18 +22,23 @@ def account(user_name):
 
     if request.form.get('all_follows'):
         all_follows = get_all_follows_data(user)
-        return render_template('account_all_follows.html', title='Follows', all_follows=all_follows, header_data=header_data)
+        return render_template('account_all_follows.html', title='Follows', all_follows=all_follows,
+                               header_data=header_data)
     elif request.form.get('all_history'):
         updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
         media_update = get_updates(updates)
-        return render_template('account_all_history.html', title='History', media_updates=media_update, header_data=header_data)
+        return render_template('account_all_history.html', title='History', media_updates=media_update,
+                               header_data=header_data)
 
     # Recover user data
     user_data = get_user_data(user)
+
     # Recover media data
     media_data = get_media_data(user)
+
     # Recover follows data and last updates
     follows_list, follows_update_list = get_follows_data(user)
+
     # Recover the Favorites
     favorites = get_favorites(user.id)
 

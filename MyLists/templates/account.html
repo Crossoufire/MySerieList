@@ -234,11 +234,12 @@
                                     </div>
                                     <div class="col-6 m-b-10">
                                         <i class="fas fa-play"></i>
-                                        <b class="m-l-3">&nbsp; Episodes</b>
+                                        <b class="m-l-3">&nbsp; Eps/Movies</b>
                                     </div>
                                     <div class="col-6 m-b-10">
                                         {{ media_data['series']['media_total_eps']+
-                                        media_data['anime']['media_total_eps'] }}
+                                        media_data['anime']['media_total_eps'] +
+                                        media_data['movies']['media_total_eps'] }}
                                     </div>
                                     <div class="col-6 m-b-10">
                                         <i class="fas fa-align-justify"></i>
@@ -262,7 +263,7 @@
                                         {% set b = media_data['anime']['media_score']['mean_score'] %}
                                         {% set c = media_data['movies']['media_score']['mean_score'] %}
                                         {% set e = media_data['games']['media_score']['mean_score'] %}
-                                        {% set d = 3 %}
+                                        {% set d = 4 %}
                                         {% if media_data['series']['media_score']['mean_score'] == '-' %}
                                             {% set a = 0 %}
                                             {% set d = d - 1 %}
@@ -509,12 +510,12 @@
                                         ['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">
+                                        <span class="stat-text">
                                             Total Anime:
                                         </span>
                                     </div>
                                     <div class="col-2">
-                                        <span class="stat-text" data-toggle="tooltip" title="Without plan to watch">
+                                        <span class="stat-text">
                                             {{ media_data['anime']['media_count']['total'] }}</span>
                                     </div>
                                     <div class="col-4">
@@ -612,11 +613,16 @@
                                         <span>{{ media_data['movies']['media_count']['Completed Animation']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <span data-toggle="tooltip" title="Without plan to watch">Total movies:</span>
+                                        <span>Total movies:</span>
                                     </div>
                                     <div class="col-2">
-                                        <span data-toggle="tooltip" title="Without plan to watch">
-                                            {{ media_data['movies']['media_count']['total'] }}</span>
+                                        <span>{{ media_data['movies']['media_count']['total'] }}</span>
+                                    </div>
+                                     <div class="col-4">
+                                        <span>Total Seen:</span>
+                                    </div>
+                                    <div class="col-2">
+                                        <span>{{ media_data['movies']['media_total_eps'] }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -760,12 +766,12 @@
                                         <span class="stat-text">{{ media_data['games']['media_count']['Plan to Play']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <span class="stat-text" data-toggle="tooltip" title="Without plan to play">
+                                        <span class="stat-text">
                                             Total Games:
                                         </span>
                                     </div>
                                     <div class="col-2">
-                                        <span class="stat-text" data-toggle="tooltip" title="Without plan to play">
+                                        <span class="stat-text">
                                             {{ media_data['games']['media_count']['total'] }}</span>
                                     </div>
                                 </div>

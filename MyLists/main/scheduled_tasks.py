@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from pathlib import Path
 from sqlalchemy import and_, desc
 from MyLists import app, db #, crontab
@@ -567,11 +568,11 @@ def update_Mylists_stats():
             except:
                 movies_list.append({"info": "-", "quantity": "-"})
             try:
-                games_list.append({"info": data[i][0], "quantity": data[i][2]})
+                games_list.append({"info": data[3][i][0], "quantity": data[3][i][2]})
             except:
                 games_list.append({"info": "-", "quantity": "-"})
 
-        return {'series': series_list, 'anime': anime_list, 'movies': movies_list, 'games': games_list}
+        return {"series": series_list, "anime": anime_list, "movies": movies_list, "games": games_list}
 
     times_spent = stats.get_total_time_spent()
     total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0, "games": 0}
@@ -603,18 +604,18 @@ def update_Mylists_stats():
     total_episodes_media = {"series": total_media_eps_seas[0][0][0], "anime": total_media_eps_seas[1][0][0]}
 
     total_movies = stats.get_total_movies()
-    total_movies_dict = {'movies': total_movies}
+    total_movies_dict = {"movies": total_movies}
 
-    stats_to_add = MyListsStats(total_time=total_time,
-                                top_media=most_present_media,
-                                top_genres=most_genres_media,
-                                top_actors=most_actors_media,
-                                top_directors=most_directors_media,
-                                top_dropped=top_dropped_media,
-                                top_games_companies=top_companies_games,
-                                total_episodes=total_episodes_media,
-                                total_seasons=total_seasons_media,
-                                total_movies=total_movies_dict)
+    stats_to_add = MyListsStats(total_time=json.dumps(total_time),
+                                top_media=json.dumps(most_present_media),
+                                top_genres=json.dumps(most_genres_media),
+                                top_actors=json.dumps(most_actors_media),
+                                top_directors=json.dumps(most_directors_media),
+                                top_dropped=json.dumps(top_dropped_media),
+                                top_games_companies=json.dumps(top_companies_games),
+                                total_episodes=json.dumps(total_episodes_media),
+                                total_seasons=json.dumps(total_seasons_media),
+                                total_movies=json.dumps(total_movies_dict))
     db.session.add(stats_to_add)
     db.session.commit()
 
@@ -637,3 +638,4 @@ def scheduled_task():
     compute_media_time_spent(ListType.GAMES)
 
     update_Mylists_stats()
+

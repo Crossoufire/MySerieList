@@ -97,8 +97,8 @@ def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0,
 
     if list_type == ListType.SERIES:
         old_time = current_user.time_spent_series
-        current_user.time_spent_series = old_time + ((new_watched-old_watched)*media.episode_duration) + (
-                media.total_episodes*media.episode_duration*(new_rewatch-old_rewatch))
+        current_user.time_spent_series = old_time + ((new_watched-old_watched) * media.episode_duration) + (
+                media.total_episodes * media.episode_duration * (new_rewatch - old_rewatch))
     elif list_type == ListType.ANIME:
         old_time = current_user.time_spent_anime
         current_user.time_spent_anime = old_time + ((new_watched-old_watched)*media.episode_duration) + (
@@ -122,7 +122,6 @@ def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0,
     db.session.commit()
 
 
-# ------- Python Scheduler -----------------------------------------------------------------------------------------
-
+# --- Python Scheduler -----------------------------------------------------------------------------------------
 
 # app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='refresh_all_data', hour=3, minute=00)

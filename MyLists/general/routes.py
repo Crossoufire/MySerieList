@@ -1,3 +1,6 @@
+import json
+import time
+
 from flask import Blueprint
 from datetime import datetime
 from MyLists import db, bcrypt, app
@@ -8,7 +11,7 @@ from flask import render_template, flash, request, abort
 from MyLists.main.scheduled_tasks import update_Mylists_stats
 from MyLists.models import ListType, User, RoleType, MyListsStats
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
-    refresh_db_frames, refresh_db_badges, refresh_db_ranks, add_collections_movies, add_collections_id_to_movieslist
+    refresh_db_frames, refresh_db_badges, refresh_db_ranks, add_eps_watched
 
 bp = Blueprint('general', __name__)
 
@@ -51,14 +54,19 @@ def create_first_data():
     refresh_db_frames()
     refresh_db_badges()
     refresh_db_ranks()
+
+    # add_eps_watched()
+    # add_collections_movies()
+    # add_hltb_time()
+    # add_manual_games()
+
     compute_media_time_spent(ListType.SERIES)
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
     compute_media_time_spent(ListType.GAMES)
-    # add_collections_movies()
-    # add_hltb_time()
-    # add_manual_games()
-    update_Mylists_stats()
+
+    # update_Mylists_stats()
+
     db.session.commit()
 
 
@@ -75,7 +83,21 @@ def admin():
 def mylists_stats():
     all_stats = MyListsStats.query.first()
 
-    return render_template("mylists_stats.html", title='MyLists Stats', data=all_stats)
+    total_time = json.loads(all_stats.total_time)
+    top_media = json.loads(all_stats.top_media)
+    top_genres = json.loads(all_stats.top_genres)
+    top_actors = json.loads(all_stats.top_actors)
+    top_directors = json.loads(all_stats.top_directors)
+    top_dropped = json.loads(all_stats.top_dropped)
+    top_games_companies = json.loads(all_stats.top_games_companies)
+    total_episodes = json.loads(all_stats.total_episodes)
+    total_seasons = json.loads(all_stats.total_seasons)
+    total_movies = json.loads(all_stats.total_movies)
+
+    return render_template("mylists_stats.html", title='MyLists Stats', total_time=total_time, top_media=top_media,
+                           top_genres=top_genres, top_actors=top_actors, top_directors=top_directors,
+                           top_dropped=top_dropped, total_episodes=total_episodes, total_movies=total_movies,
+                           top_games_companies=top_games_companies, total_seasons=total_seasons)
 
 
 @bp.route("/current_trends", methods=['GET'])

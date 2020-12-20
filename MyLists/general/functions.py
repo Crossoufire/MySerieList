@@ -23,14 +23,14 @@ def compute_media_time_spent(list_type):
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
             for media in media_list:
                 try:
-                    total_time += media[0].episode_duration * media[1].eps_watched * (1 + media[1].rewatched)
+                    total_time += media[0].episode_duration * media[1].eps_watched
                 except Exception as e:
                     app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
         elif list_type == ListType.MOVIES:
             for media in media_list:
                 if media[1].status != Status.PLAN_TO_WATCH:
                     try:
-                        total_time += media[0].runtime*(1 + media[1].rewatched)
+                        total_time += media[0].runtime * media[1].eps_watched
                     except Exception as e:
                         app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
         elif list_type == ListType.GAMES:
@@ -252,15 +252,17 @@ def refresh_collections_movies():
 def add_eps_watched():
     series_list = db.session.query(Series, SeriesList).join(Series, Series.id == SeriesList.media_id).all()
     anime_list = db.session.query(Anime, AnimeList).join(Anime, Anime.id == AnimeList.media_id).all()
+    movies_list = db.session.query(Movies, MoviesList).join(Movies, Movies.id == MoviesList.media_id).all()
 
     for series in series_list:
         if series[1].status == Status.RANDOM or series[1].status == Status.PLAN_TO_WATCH:
             series[1].eps_watched = 0
         else:
             season = series[1].current_season
+            rewatched = series[1].rewatched
             eps = series[1].last_episode_watched
             eps_seasons = [x.episodes for x in series[0].eps_per_season]
-            series[1].eps_watched = sum(eps_seasons[:season-1]) + eps
+            series[1].eps_watched = (sum(eps_seasons[:season-1]) + eps) + (rewatched * series[0].total_episodes)
     db.session.commit()
 
     for anime in anime_list:
@@ -268,10 +270,16 @@ def add_eps_watched():
             anime[1].eps_watched = 0
         else:
             season = anime[1].current_season
+            rewatched = anime[1].rewatched
             eps = anime[1].last_episode_watched
             eps_seasons = [x.episodes for x in anime[0].eps_per_season]
-            anime[1].eps_watched = sum(eps_seasons[:season - 1]) + eps
+            anime[1].eps_watched = (sum(eps_seasons[:season-1]) + eps) + (rewatched * anime[0].total_episodes)
 
+    for movie in movies_list:
+        if movie[1].status == Status.PLAN_TO_WATCH:
+            movie[1].eps_watched = 0
+        else:
+            movie[1].eps_watched = 1 + movie[1].rewatched
     db.session.commit()
 
 

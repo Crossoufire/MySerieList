@@ -610,10 +610,10 @@ def update_element_season():
     old_watched = media[1].eps_watched
 
     # Set the new data
-    new_watched = sum([x.episodes for x in media[0].eps_per_season[:new_season - 1]]) + 1
+    new_watched = sum([x.episodes for x in media[0].eps_per_season[:new_season-1]]) + 1
     media[1].current_season = new_season
     media[1].last_episode_watched = 1
-    media[1].eps_watched = new_watched
+    media[1].eps_watched = new_watched + (media[1].rewatched * media[0].total_episodes)
     app.logger.info('[User {}] - [Media {}] - [ID {}] season updated from {} to {}'
                     .format(current_user.id, list_type.value.replace('list', ''), media_id, old_season, new_season))
 
@@ -665,9 +665,9 @@ def update_element_episode():
     old_watched = media[1].eps_watched
 
     # Set the new data
-    new_watched = sum([x.episodes for x in media[0].eps_per_season[:old_season - 1]]) + new_episode
+    new_watched = sum([x.episodes for x in media[0].eps_per_season[:old_season-1]]) + new_episode
     media[1].last_episode_watched = new_episode
-    media[1].eps_watched = new_watched
+    media[1].eps_watched = new_watched + (media[1].rewatched * media[0].total_episodes)
     app.logger.info('[User {}] {} [ID {}] episode updated from {} to {}'
                     .format(current_user.id, list_type.value.replace('list', ''), media_id, old_episode, new_episode))
 
@@ -738,6 +738,11 @@ def change_element_category():
             new_watched = 0
         else:
             new_watched = old_watched
+    elif list_type == ListType.MOVIES:
+        if new_status == Status.COMPLETED or new_status == Status.COMPLETED_ANIMATION:
+            media[1].eps_watched = 1
+        else:
+            media[1].eps_watched = 0
 
     # Set the last updates
     set_last_update(media=media[0], media_type=list_type, old_status=old_status, new_status=new_status)
@@ -907,6 +912,12 @@ def update_rewatch():
     media[1].rewatched = new_rewatch
     app.logger.info('[{}] Series ID {} re-watched {}x times'.format(current_user.id, media_id, new_rewatch))
 
+    # total eps/movies watched
+    if list_type != ListType.MOVIES:
+        media[1].eps_watched = media[0].total_episodes + (new_rewatch * media[0].total_episodes)
+    elif list_type == ListType.MOVIES:
+        media[1].eps_watched = 1 + new_rewatch
+
     # Commit the changes
     db.session.commit()
 
@@ -989,10 +1000,10 @@ def add_element():
         return '', 400
 
     # Setup the <season>, <episode> and <category> of the <media>
+    new_watched = 1
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
         new_season = 1
         new_episode = 1
-        new_watched = 1
         if new_status == Status.COMPLETED:
             new_season = len(media.eps_per_season)
             new_episode = media.eps_per_season[-1].episodes
@@ -1004,6 +1015,10 @@ def add_element():
         if new_status == Status.COMPLETED:
             if MoviesGenre.query.filter_by(media_id=media.id, genre="Animation").first():
                 new_status = Status.COMPLETED_ANIMATION
+        else:
+            new_watched = 0
+    elif list_type == ListType.GAMES:
+        new_watched = 0
 
     # Add <media> to the <user>
     if list_type == ListType.SERIES:
@@ -1023,7 +1038,8 @@ def add_element():
     elif list_type == ListType.MOVIES:
         user_list = MoviesList(user_id=current_user.id,
                                media_id=media.id,
-                               status=new_status)
+                               status=new_status,
+                               eps_watched=new_watched)
     elif list_type == ListType.GAMES:
         user_list = GamesList(user_id=current_user.id,
                               media_id=media.id,
@@ -1041,12 +1057,13 @@ def add_element():
     set_last_update(media=media, media_type=list_type, new_status=new_status)
 
     # Compute the new time spent
-    if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        compute_time_spent(media=media, new_watched=new_watched, list_type=list_type)
-    elif list_type == ListType.MOVIES:
-        compute_time_spent(media=media, list_type=list_type, movie_status=new_status, movie_add=True)
-    elif list_type == ListType.GAMES:
-        compute_time_spent(media=media, list_type=list_type)
+    # if list_type == ListType.SERIES or list_type == ListType.ANIME:
+    #     compute_time_spent(media=media, new_watched=new_watched, list_type=list_type)
+    # elif list_type == ListType.MOVIES:
+    #     compute_time_spent(media=media, list_type=list_type, movie_status=new_status, movie_add=True)
+    # elif list_type == ListType.GAMES:
+    #     compute_time_spent(media=media, list_type=list_type)
+    compute_time_spent(media=media,  list_type=list_type, watched=new_watched)
 
     return '', 204
 
