@@ -285,7 +285,7 @@ def get_media_data(user):
                       'media_levels': media_levels,
                       'media_score': media_score}
 
-        # return a media_dict with 4 keys (anime, series, movies, games) with media_data as values
+        # return a media_dict with 3 keys (anime, series, movies) with media_data as values
         media_dict[f'{list_type[0]}'] = media_data
 
     return media_dict

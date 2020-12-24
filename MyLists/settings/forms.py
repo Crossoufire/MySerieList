@@ -15,8 +15,8 @@ class UpdateAccountForm(FlaskForm):
     isprivate = BooleanField('Private mode')
     steamID = StringField('SteamID')
     homepage = SelectField('Default homepage', choices=[('serieslist', 'MySeriesList'), ('animelist', 'MyAnimeList'),
-                                                        ('movieslist', 'MyMoviesList'), ('gameslist', 'MyGamesList'),
-                                                        ('account', 'Account'), ('hall_of_fame', 'Hall of Fame')])
+                                                        ('movieslist', 'MyMoviesList'), ('account', 'Account'),
+                                                        ('hall_of_fame', 'Hall of Fame')])
     submit_account = SubmitField('Update account')
 
     def validate_username(self, username):
@@ -38,8 +38,8 @@ class UpdateAccountOauthForm(FlaskForm):
     isprivate = BooleanField('Private mode')
     steamID = StringField('SteamID')
     homepage = SelectField('Default homepage', choices=[('serieslist', 'MySeriesList'), ('animelist', 'MyAnimeList'),
-                                                        ('movieslist', 'MyMoviesList'), ('gameslist', 'MyGamesList'),
-                                                        ('account', 'Account'), ('hall_of_fame', 'Hall of Fame')])
+                                                        ('movieslist', 'MyMoviesList'), ('account', 'Account'),
+                                                        ('hall_of_fame', 'Hall of Fame')])
     submit_account = SubmitField('Update account')
 
     def validate_username(self, username):

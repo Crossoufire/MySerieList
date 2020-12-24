@@ -19,7 +19,6 @@ Account:
 
 General:
   Add: Contact form
-  Add: Collection Movies to finish (70%)
   Enhance: Change the hamburger display to a vertical panel in mobile
   Add: If API down, user can still add media but check in our database instead of API
   Enhance: Create one admin with admin view (HoF, Stats, admin and settings) and one standard user

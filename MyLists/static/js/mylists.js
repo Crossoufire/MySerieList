@@ -1,5 +1,5 @@
 
-// --- Autocomplete ----------------------------------------
+// --- Autocomplete ----------------------------------------------------------------
 $(function() {
     $('#autocomplete').catcomplete({
         delay: 250,
@@ -22,8 +22,6 @@ $(function() {
                 form.action = '/media_sheet/Anime/' + ui.item.tmdb_id + '?search=True';
             } else if (ui.item.type === 'Movie') {
                 form.action = '/media_sheet/Movies/' + ui.item.tmdb_id + '?search=True';
-            } else if (ui.item.type === 'Game') {
-                form.action = '/media_sheet/Games/' + ui.item.igdb_id + '?search=True';
             } else if (ui.item.type === 'User') {
                 form.action = '/account/' + ui.item.display_name;
             }
@@ -83,7 +81,7 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
     });
 
 
-// --- Follow status ---------------------------------------
+// --- Follow status --------------------------------------------------------------
 function follow_status(button, follow_id) {
     let status;
     let $follow_button = $(button);
@@ -121,7 +119,7 @@ function follow_status(button, follow_id) {
 }
 
 
-// --- Notification ----------------------------------------
+// --- Notification ----------------------------------------------------------------
 function display_notifications(data) {
     let add_hr;
     let resp = data.results;
@@ -226,7 +224,7 @@ function display_notifications(data) {
 }
 
 
-// --- AJAX Notification -----------------------------------
+// --- AJAX Notification --------------------------------------------------------------
 function notifications() {
     $('.notif-items').remove();
     $('#loading-image').show();
@@ -250,7 +248,7 @@ function notifications() {
 }
 
 
-// --- Ajax error handling ---------------------------------
+// --- Ajax error handling ---------------------------------------------------------
 function error_ajax_message(message) {
     $('.content-message').prepend(
         '<div class="alert alert-danger alert-dismissible m-t-15">' +
@@ -262,13 +260,13 @@ function error_ajax_message(message) {
 }
 
 
-// --- Tooltip initialization ------------------------------
+// --- Tooltip initialization ------------------------------------------------------
 $(function () {
     $('[data-toggle="tooltip"]').tooltip()
 });
 
 
-// --- Left dropdown for notifictaions on mobile  ----------
+// --- Left dropdown for notifictaions on mobile  ----------------------------------
 $(document).ready(function() {
     function a() {
         if ($(window).width() < 991) {
@@ -283,7 +281,7 @@ $(document).ready(function() {
 });
 
 
-// --- Service Worker for PWA ------------------------------
+// --- Service Worker for PWA ------------------------------------------------------
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
         .register('service-worker.js', {

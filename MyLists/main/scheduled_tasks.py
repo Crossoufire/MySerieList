@@ -564,6 +564,5 @@ def scheduled_task():
     compute_media_time_spent(ListType.SERIES)
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
-    compute_media_time_spent(ListType.GAMES)
 
     update_Mylists_stats()

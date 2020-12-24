@@ -866,8 +866,7 @@ def delete_element():
         return '', 400
 
     # Get the old data
-    if list_type != ListType.GAMES:
-        old_rewatch = media[1].rewatched
+    old_rewatch = media[1].rewatched
 
     # Compute the new time spent
     if list_type == ListType.SERIES or list_type == ListType.ANIME:

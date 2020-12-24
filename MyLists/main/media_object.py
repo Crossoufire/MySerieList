@@ -30,20 +30,15 @@ def latin_alphabet(original_name):
             return False
 
 
-def change_air_format(date, media_sheet=False, games=False):
-    if media_sheet and not games:
+def change_air_format(date, media_sheet=False):
+    if media_sheet:
         try:
             return datetime.strptime(date, '%Y-%m-%d').strftime("%b %Y")
         except:
             return 'Unknown'
-    elif not media_sheet and not games:
+    else:
         try:
             return datetime.strptime(date, '%Y-%m-%d').strftime("%d %b %Y")
-        except:
-            return 'Unknown'
-    elif games:
-        try:
-            return datetime.utcfromtimestamp(int(date)).strftime('%d %b %Y')
         except:
             return 'Unknown'
 

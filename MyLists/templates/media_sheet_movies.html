@@ -156,26 +156,3 @@
         </li>
     </ul>
 {% endblock more_info %}
-
-
-{% block movie_collection %}
-    {% if data['collection_name'] %}
-        <h4 class="collapsible follow-margin-mobile m-t-25" style="cursor: pointer;" onclick="show_hide_content()">
-            <i class="fas fa-box-open"></i>&nbsp;&nbsp;<b>{{ data['collection_name'].name }}</b>
-            <i class="change-sign float-r fas fa-sm fa-plus" style="margin-top: 5px;"></i>
-        </h4>
-        <hr class="follow-margin-mobile" style="margin-top: -5px;">
-        <div class="movies-col-collapser" style="margin-left: 50px;">
-            <div class="row no-gutters">
-                {% for part in data['collection_parts'] %}
-                    <div class="col-4">
-                        <a {% if data['tmdb_id']|int != part.part_tmdb_id|int %}
-                            href="/media_sheet/Movies/{{ part.part_tmdb_id }}?search=True" {% endif %}>
-                            <b>{{ part.part_name }}</b>&nbsp; - &nbsp;<b>{{ part.part_release_date.split('-')[0] }}</b>
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    {% endif %}
-{% endblock movie_collection %}

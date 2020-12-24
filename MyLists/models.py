@@ -130,7 +130,7 @@ class User(db.Model, UserMixin):
         if self.role != RoleType.ADMIN and user.role == RoleType.ADMIN:
             abort(404)
 
-        # Check if the current account can see the target account's movies collection
+        # Check if the current account can see the target's account
         if self.id == user.id or self.role == RoleType.ADMIN:
             pass
         elif user.private and not self.is_following(user):
@@ -415,7 +415,7 @@ class Movies(db.Model):
     def in_follows_lists(self, user_id):
         in_follows_lists = db.session.query(User, MoviesList, followers) \
             .join(User, User.id == followers.c.followed_id) \
-            .join(AnimeList, MoviesList.user_id == followers.c.followed_id) \
+            .join(MoviesList, MoviesList.user_id == followers.c.followed_id) \
             .filter(followers.c.follower_id == user_id, MoviesList.media_id == self.id).all()
         return in_follows_lists
 
