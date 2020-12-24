@@ -19,7 +19,6 @@
                 <th class="text-center">Series</th>
                 <th class="text-center">Anime</th>
                 <th class="text-center">Movies</th>
-                <th class="text-center">Games</th>
                 <th class="text-center"></th>
             </tr>
             </thead>
@@ -71,14 +70,6 @@
                             <img class="grade_picture" src="{{ user['movies_data']['grade_id'] }}.png" alt="">
                             <br>
                             {{ user['movies_data']['level'] }}
-                        </a>
-                    </td>
-                    <td>
-                        <a class="text-light {% if user['isprivate'] and not user['isfollowing']
-                            and current_user.id != 1 %} disabled {% endif %}" href="/gameslist/{{ user['username'] }}">
-                            <img class="grade_picture" src="{{ user['games_data']['grade_id'] }}.png" alt="">
-                            <br>
-                            {{ user['games_data']['level'] }}
                         </a>
                     </td>
                     <td>

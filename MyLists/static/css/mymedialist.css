@@ -88,11 +88,6 @@ option {
     padding: 13px 13px 13px 13px;
 }
 
-.return-icon-games {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 13px 10px 13px 10px;
-}
-
 .return-icon-tv {
     background: rgba(0, 0, 0, 0.8);
     padding: 13px 10px 13px 10px;
@@ -185,16 +180,6 @@ option {
     display: inline-block;
     position: absolute;
     text-align: center;
-    bottom: -25px;
-    width: 100%;
-    left: 0;
-}
-
-.playtime-container {
-    background-color: #0a262d;
-    border: 1px solid black;
-    display: inline-block;
-    position: absolute;
     bottom: -25px;
     width: 100%;
     left: 0;
@@ -380,26 +365,6 @@ option {
     border: grey 2px solid !important;
 }
 
-.time-played-input {
-    width: 43px;
-    background-color: #0a262d;
-    border: none;
-    color: lightgray;
-    text-align: center;
-}
-
-.time-played-input-m {
-    width: 35px;
-    background-color: #0a262d;
-    border: none;
-    color: lightgray;
-    text-align: center;
-}
-
-.time-played-input:focus, .time-played-input-m:focus {
-    outline: none;
-}
-
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
@@ -467,18 +432,4 @@ input[type=number] {
     width: 100%;
     bottom: -24px;
     right: 0;
-}
-
-
-/* --- Movies Collection CSS ---------------------------- */
-.number-seen {
-    position: absolute;
-    bottom: 1px;
-    right: 1px;
-    border-right: black 1px;
-    border-bottom: black 1px;
-    background: #131418;
-    padding-left: 12px;
-    padding-right: 12px;
-    font-size: 14pt;
 }

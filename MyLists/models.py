@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy.orm import aliased
 from MyLists import app, db, login_manager
 from flask_login import UserMixin, current_user
-from sqlalchemy import func, desc, text, and_, or_, inspect
+from sqlalchemy import func, desc, text, and_, or_
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 
@@ -17,31 +17,22 @@ class ListType(enum.Enum):
     SERIES = 'serieslist'
     ANIME = 'animelist'
     MOVIES = 'movieslist'
-    GAMES = 'gameslist'
-    MOVIES_C = 'moviescollectionlist'
 
 
 class Status(enum.Enum):
     WATCHING = 'Watching'
-    PLAYING = 'Playing'
     COMPLETED = 'Completed'
     COMPLETED_ANIMATION = 'Completed Animation'
-    ENDLESS = 'Endless'
-    MULTIPLAYER = 'Multiplayer'
     ON_HOLD = 'On Hold'
     RANDOM = 'Random'
     DROPPED = 'Dropped'
-    OWNED = 'Owned'
     PLAN_TO_WATCH = 'Plan to Watch'
-    PLAN_TO_PLAY = 'Plan to Play'
-    ON_GOING = 'On Going'
 
 
 class MediaType(enum.Enum):
     SERIES = "Series"
     ANIME = "Anime"
     MOVIES = 'Movies'
-    GAMES = 'Games'
 
 
 class HomePage(enum.Enum):
@@ -50,13 +41,12 @@ class HomePage(enum.Enum):
     MYSERIESLIST = "serieslist"
     MYANIMELIST = "animelist"
     MYMOVIESLIST = "movieslist"
-    MYGAMESLIST = "gameslist"
 
 
 class RoleType(enum.Enum):
-    ADMIN = "admin"  # Can access to the admin dashboard (/admin)
-    MANAGER = "manager"  # Can lock and edit media (/lock_media & /media_sheet_form)
-    USER = "user"  # Standard user
+    ADMIN = "admin"         # Can access to the admin dashboard (/admin)
+    MANAGER = "manager"     # Can lock and edit media (/lock_media & /media_sheet_form)
+    USER = "user"           # Standard user
 
 
 followers = db.Table('followers',
@@ -76,15 +66,12 @@ class User(db.Model, UserMixin):
     time_spent_series = db.Column(db.Integer, nullable=False, default=0)
     time_spent_movies = db.Column(db.Integer, nullable=False, default=0)
     time_spent_anime = db.Column(db.Integer, nullable=False, default=0)
-    time_spent_games = db.Column(db.Integer, nullable=False, default=0)
     private = db.Column(db.Boolean, nullable=False, default=False)
     active = db.Column(db.Boolean, nullable=False, default=False)
     profile_views = db.Column(db.Integer, nullable=False, default=0)
     series_views = db.Column(db.Integer, nullable=False, default=0)
     anime_views = db.Column(db.Integer, nullable=False, default=0)
     movies_views = db.Column(db.Integer, nullable=False, default=0)
-    games_views = db.Column(db.Integer, nullable=False, default=0)
-    steamID = db.Column(db.String(30))
     biography = db.Column(db.Text)
     transition_email = db.Column(db.String(120))
     activated_on = db.Column(db.DateTime)
@@ -159,8 +146,6 @@ class User(db.Model, UserMixin):
                 user.anime_views += 1
             elif list_type == ListType.MOVIES:
                 user.movies_views += 1
-            elif list_type == ListType.GAMES:
-                user.games_views += 1
             db.session.commit()
 
     @staticmethod
@@ -394,27 +379,6 @@ class AnimeActors(db.Model):
 # --- MOVIES -------------------------------------------------------------------------------------------------------
 
 
-class MoviesCollectionsParts(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    collection_id = db.Column(db.Integer, db.ForeignKey('movies_collections.collection_id'), nullable=False)
-    part_name = db.Column(db.String(500))
-    part_release_date = db.Column(db.String(500))
-    part_tmdb_id = db.Column(db.String(100))
-
-
-class MoviesCollections(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    collection_id = db.Column(db.Integer, db.ForeignKey('movies.collection_id'), nullable=False)
-    name = db.Column(db.String(100))
-    image_cover = db.Column(db.String(100))
-    synopsis = db.Column(db.String(100))
-    collection_parts = db.relationship('MoviesCollectionsParts',
-                                       primaryjoin=(MoviesCollectionsParts.collection_id == collection_id),
-                                       order_by="MoviesCollectionsParts.part_release_date",
-                                       backref='movies_collections',
-                                       lazy=True)
-
-
 class Movies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -434,13 +398,8 @@ class Movies(db.Model):
     tagline = db.Column(db.String(30))
     image_cover = db.Column(db.String(100), nullable=False)
     themoviedb_id = db.Column(db.Integer, nullable=False)
-    collection_id = db.Column(db.Integer)
     lock_status = db.Column(db.Boolean, default=0)
 
-    collection_movies = db.relationship('MoviesCollections',
-                                        primaryjoin=(MoviesCollections.collection_id == collection_id),
-                                        backref='movies',
-                                        lazy=True)
     genres = db.relationship('MoviesGenre', backref='movies', lazy=True)
     actors = db.relationship('MoviesActors', backref='movies', lazy=True)
     list_info = db.relationship('MoviesList', backref='movies', lazy='dynamic')
@@ -490,87 +449,6 @@ class MoviesActors(db.Model):
     name = db.Column(db.String(150))
 
 
-# --- GAMES -------------------------------------------------------------------------------------------------------
-
-
-class Games(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    image_cover = db.Column(db.String(100), nullable=False)
-    collection_name = db.Column(db.String(50))
-    game_engine = db.Column(db.String(50))
-    game_modes = db.Column(db.String(200))
-    player_perspective = db.Column(db.String(50))
-    vote_average = db.Column(db.Float)
-    vote_count = db.Column(db.Float)
-    first_release_date = db.Column(db.String(30))
-    storyline = db.Column(db.Text)
-    summary = db.Column(db.Text)
-    IGDB_url = db.Column(db.String(200))
-    hltb_main_time = db.Column(db.Float)
-    hltb_main_and_extra_time = db.Column(db.Float)
-    hltb_total_complete_time = db.Column(db.Float)
-    steam_id = db.Column(db.Integer)
-    igdb_id = db.Column(db.Integer, nullable=False)
-    lock_status = db.Column(db.Boolean, default=1)
-
-    genres = db.relationship('GamesGenre', backref='games', lazy=True)
-    platforms = db.relationship('GamesPlatforms', backref='games', lazy=True)
-    companies = db.relationship('GamesCompanies', backref='games', lazy=True)
-    list_info = db.relationship('GamesList', backref='games', lazy='dynamic')
-
-    def get_same_genres(self, genres_list, genre_str):
-        same_genres = db.session.query(Games, GamesGenre) \
-            .join(Games, Games.id == GamesGenre.media_id) \
-            .filter(GamesGenre.genre.in_(genres_list), GamesGenre.media_id != self.id) \
-            .group_by(GamesGenre.media_id) \
-            .having(func.group_concat(GamesGenre.genre.distinct()) == genre_str).limit(8).all()
-        return same_genres
-
-    def in_follows_lists(self, user_id):
-        in_follows_lists = db.session.query(User, GamesList, followers) \
-            .join(User, User.id == followers.c.followed_id) \
-            .join(GamesList, GamesList.user_id == followers.c.followed_id) \
-            .filter(followers.c.follower_id == user_id, GamesList.media_id == self.id).all()
-        return in_follows_lists
-
-    def in_user_list(self, user_id):
-        in_user_list = self.list_info.filter_by(user_id=user_id).first()
-        return in_user_list
-
-
-class GamesList(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
-    status = db.Column(db.Enum(Status), nullable=False)
-    completion = db.Column(db.Boolean)
-    time_played = db.Column(db.Integer)
-    favorite = db.Column(db.Boolean)
-    score = db.Column(db.Float)
-    comment = db.Column(db.Text)
-
-
-class GamesGenre(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
-    genre = db.Column(db.String(100), nullable=False)
-
-
-class GamesPlatforms(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
-    name = db.Column(db.String(150))
-
-
-class GamesCompanies(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
-    name = db.Column(db.String(100))
-    publisher = db.Column(db.Boolean)
-    developer = db.Column(db.Boolean)
-
-
 # --- BADGES & RANKS ----------------------------------------------------------------------------------------------
 
 
@@ -608,7 +486,6 @@ class MyListsStats(db.Model):
     top_actors = db.Column(db.Text)
     top_directors = db.Column(db.Text)
     top_dropped = db.Column(db.Text)
-    top_games_companies = db.Column(db.Text)
     total_episodes = db.Column(db.Text)
     total_seasons = db.Column(db.Text)
     total_movies = db.Column(db.Text)
@@ -621,18 +498,16 @@ class MyListsStats(db.Model):
 class GlobalStats:
     def __init__(self):
         self.truncated_list_type = [ListType.SERIES, ListType.ANIME]
-        self.games_truncated_list_type = [ListType.SERIES, ListType.ANIME, ListType.MOVIES]
         self.media = None
         self.media_genre = None
         self.media_actors = None
         self.media_eps = None
         self.media_list = None
-        self.media_companies = None
 
     @classmethod
     def get_total_time_spent(cls):
         times_spent = db.session.query(func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
-                                       func.sum(User.time_spent_movies), func.sum(User.time_spent_games)) \
+                                       func.sum(User.time_spent_movies)) \
             .filter(User.role != RoleType.ADMIN, User.active == True).all()
 
         return times_spent
@@ -655,11 +530,6 @@ class GlobalStats:
             self.media_genre = MoviesGenre
             self.media_actors = MoviesActors
             self.media_list = MoviesList
-        elif list_type == ListType.GAMES:
-            self.media = Games
-            self.media_genre = GamesGenre
-            self.media_companies = GamesCompanies
-            self.media_list = GamesList
 
     def get_top_media(self):
         queries = []
@@ -683,7 +553,7 @@ class GlobalStats:
 
     def get_top_actors(self):
         queries = []
-        for list_type in self.games_truncated_list_type:
+        for list_type in ListType:
             self.get_query_data(list_type)
             queries.append(db.session.query(self.media_actors.name, self.media_list,
                                             func.count(self.media_actors.name).label('count'))
@@ -711,16 +581,6 @@ class GlobalStats:
                            .filter(self.media_list.status == Status.DROPPED).group_by(self.media_list.media_id)
                            .order_by(text('count desc')).limit(5).all())
         return queries
-
-    def get_top_companies(self):
-        self.get_query_data(ListType.GAMES)
-        query = db.session.query(self.media_companies.name, self.media_list,
-                                 func.count(self.media_companies.name).label('count'))\
-            .join(self.media_companies, self.media_companies.media_id == self.media_list.media_id)\
-            .group_by(self.media_companies.name).filter(self.media_companies.name != 'Unknown')\
-            .order_by(text('count desc')).limit(5).all()
-
-        return [[], [], [], query]
 
     def get_total_eps_seasons(self):
         queries = []
@@ -762,13 +622,6 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
         genre_list = MoviesGenre
         add_sort_option = {'rewatch': media_list.rewatched.desc(),
                            'release_date': media.release_date.desc()}
-    elif list_type == ListType.GAMES:
-        media = Games
-        media_list = GamesList
-        genre_list = GamesGenre
-        companies_list = GamesCompanies
-        add_sort_option = {'playtime': media_list.time_played.desc(),
-                           'first_release_date': media.first_release_date.desc()}
 
     if filter_val == 'check':
         filter_val = False
@@ -814,18 +667,11 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
     elif category == 'Search':
         cat_value = "Search results for '{}'".format(search)
         if option == 'title':
-            if list_type != ListType.GAMES:
-                query = db.session.query(media, media_list) \
-                    .join(media, media.id == media_list.media_id) \
-                    .filter(or_(media.name.like('%' + search + '%'), media.original_name.like('%' + search + '%')),
-                            media_list.user_id == user_id, media_list.media_id.notin_(com_ids)) \
-                    .order_by(sorting).paginate(page, 25, error_out=True)
-            else:
-                query = db.session.query(media, media_list) \
-                    .join(media, media.id == media_list.media_id) \
-                    .filter(media.name.like('%' + search + '%'), media_list.user_id == user_id,
-                            media_list.media_id.notin_(com_ids)) \
-                    .order_by(sorting).paginate(page, 25, error_out=True)
+            query = db.session.query(media, media_list) \
+                .join(media, media.id == media_list.media_id) \
+                .filter(or_(media.name.like('%' + search + '%'), media.original_name.like('%' + search + '%')),
+                        media_list.user_id == user_id, media_list.media_id.notin_(com_ids)) \
+                .order_by(sorting).paginate(page, 25, error_out=True)
         elif option == 'actor':
             query = db.session.query(media, media_list, actors_list) \
                 .join(media, media.id == media_list.media_id) \
@@ -846,27 +692,8 @@ def get_media_query(user_id, page, list_type, category, search, option, sort_val
                 .filter(media.director_name.like('%' + search + '%'), media_list.user_id == user_id,
                         media_list.media_id.notin_(com_ids)) \
                 .order_by(sorting).paginate(page, 25, error_out=True)
-        elif option == 'developer':
-            query = db.session.query(media, media_list, companies_list) \
-                .join(media, media.id == media_list.media_id) \
-                .join(companies_list, companies_list.media_id == media_list.media_id) \
-                .filter(companies_list.name.like('%' + search + '%'), media_list.user_id == user_id,
-                        media_list.media_id.notin_(com_ids))\
-                .order_by(sorting).paginate(page, 25, error_out=True)
-        elif option == 'collection':
-            query = db.session.query(media, media_list) \
-                .join(media, media.id == media_list.media_id) \
-                .filter(media.collection_name.like('%' + search + '%'), media_list.user_id == user_id,
-                        media_list.media_id.notin_(com_ids)) \
-                .order_by(sorting).paginate(page, 25, error_out=True)
 
     return query, cat_value
-
-
-def get_collection_query(user_id, page):
-    query = "Aucune putain d'idée sa race la pute"
-
-    return query
 
 
 def get_media_count(user_id, list_type):
@@ -876,8 +703,6 @@ def get_media_count(user_id, list_type):
         media_list = AnimeList
     elif list_type == ListType.MOVIES:
         media_list = MoviesList
-    elif list_type == ListType.GAMES:
-        media_list = GamesList
 
     v1, v2 = aliased(media_list), aliased(media_list)
     count_total = media_list.query.filter_by(user_id=user_id).count()
@@ -921,9 +746,6 @@ def get_total_time(user_id, list_type):
     elif list_type == ListType.MOVIES:
         media = Movies
         media_list = MoviesList
-    elif list_type == ListType.GAMES:
-        media = Games
-        media_list = GamesList
 
     query = db.session.query(media, media_list) \
         .join(media, media.id == media_list.media_id) \
@@ -942,9 +764,6 @@ def check_media(media_id, list_type, add=False):
     elif list_type == ListType.MOVIES:
         media = Movies
         media_list = MoviesList
-    elif list_type == ListType.GAMES:
-        media = Games
-        media_list = GamesList
 
     if add:
         query = db.session.query(media).filter(media.id == media_id).first()

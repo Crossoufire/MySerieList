@@ -119,48 +119,6 @@ ul {
 }
 
 
-/* --- User's Game media -------------------------------- */
-.time-played-input {
-    width: 43px;
-    background-color: #131418;
-    border: none;
-    color: lightgray;
-    text-align: center;
-}
-
-.time-played-input-m {
-    width: 35px;
-    background-color: #131418;
-    border: none;
-    color: lightgray;
-    text-align: center;
-}
-
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type=number] {
-    -moz-appearance:textfield;
-}
-
-
-/* --- Movies collection -------------------------------- */
-.collapsible {
-    padding: 5px;
-}
-
-.collapsible:hover {
-    background-color: black;
-}
-
-.movies-col-collapser {
-    display: none;
-    overflow: hidden;
-}
-
-
 /* --- Follows ------------------------------------------ */
 .follow-margin-mobile {
     margin-left: 21px;

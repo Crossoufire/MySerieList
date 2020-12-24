@@ -7,7 +7,6 @@ import email.utils as em
 from flask_mail import Mail
 from flask_caching import Cache
 from flask_bcrypt import Bcrypt
-# from flask_crontab import Crontab
 from flask_compress import Compress
 from flask_login import LoginManager
 from email.message import EmailMessage
@@ -25,7 +24,6 @@ try:
     server = config['Mail']['server']
     port = int(config['Mail']['port'])
     themoviedb_key = config['TheMovieDB']['api_key']
-    steam_key = config['Steam']['api_key']
     twitter_oauth = [config['OAuth']['twitter_id'], config['OAuth']['twitter_secret']]
 except Exception as e:
     print("Config file error: {}. Please read the README to configure the config.ini file properly.\nExit.".format(e))
@@ -51,7 +49,6 @@ app.config['MAIL_USERNAME'] = email
 app.config['MAIL_PASSWORD'] = password
 
 app.config['THEMOVIEDB_API_KEY'] = themoviedb_key
-app.config['STEAM_API_KEY'] = steam_key
 
 app.config['OAUTH_CREDENTIALS'] = {
     'twitter': {
@@ -64,12 +61,11 @@ app.config['OAUTH_CREDENTIALS'] = {
 mail = Mail(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-# scheduler = APScheduler()
-# scheduler.init_app(app)
-# scheduler.start()
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
 compress = Compress(app)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
-# crontab = Crontab(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'auth.home'
 login_manager.login_message_category = 'info'
@@ -96,19 +92,8 @@ app.register_blueprint(settings_bp)
 
 if not app.debug and not app.testing:
     class SSLSMTPHandler(SMTPHandler):
-        # def getSubject(self, record):
-        #     if record.args.get('API') == 'Jikan':
-        #         try:
-        #             qte = record.__dict__['qte']
-        #         except:
-        #             qte = ''
-        #         self.subject = 'MyLists - Exceptions Occurred - {} Jikan errors'.format(qte)
-        #
-        #     return self.subject
-
         def emit(self, record):
             """ Emit a record. """
-            # print(self.getSubject(record), "oui")
             try:
                 port = self.mailport
                 if not port:
@@ -138,34 +123,6 @@ if not app.debug and not app.testing:
 
     mail_handler.setLevel(logging.ERROR)
     app.logger.addHandler(mail_handler)
-
-    # class MyMemoryhandler(MemoryHandler):
-    #     def shouldFlush(self, record):
-    #         if record.args.get('API') != 'Jikan' or len(self.buffer) >= self.capacity:
-    #             return True
-    #         return False
-    #
-    #     def flush(self):
-    #         self.acquire()
-    #         try:
-    #             if self.capacity > len(self.buffer) > 1:
-    #                 self.buffer[0].__dict__.update({'qte': len(self.buffer)-1})
-    #                 self.target.handle(self.buffer[0])
-    #                 self.target.handle(self.buffer[-1])
-    #             elif len(self.buffer) >= self.capacity:
-    #                 self.buffer[0].__dict__.update({'qte': len(self.buffer)})
-    #                 self.target.handle(self.buffer[0])
-    #             else:
-    #                 for rec in self.buffer:
-    #                     self.target.handle(rec)
-    #             self.buffer = []
-    #         finally:
-    #             self.release()
-
-    # buffered_handler = MyMemoryhandler(20)
-    # buffered_handler.setLevel(logging.ERROR)
-    # buffered_handler.setTarget(mail_handler)
-    # app.logger.addHandler(buffered_handler)
 
     handler = RotatingFileHandler("MyLists/static/log/mylists.log", maxBytes=3000000, backupCount=15)
     handler.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s"))

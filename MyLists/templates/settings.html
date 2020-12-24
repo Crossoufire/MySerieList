@@ -40,14 +40,6 @@
                     {% endfor %}
                 </div>
                 <div class="m-t-30">
-                    {{ settings_form.steamID.label }}<br>
-                    {{ settings_form.steamID(size=28) }}<br>
-                    {% for error in settings_form.steamID.errors %}
-                        <span style="color: red;">[{{ error }}]</span>
-                    {% endfor %}
-                    <a href="/add_steam_games">Add steam games</a>
-                </div>
-                <div class="m-t-30">
                     {{ settings_form.homepage.label }}: &nbsp&nbsp&nbsp {{ settings_form.homepage }}<br>
                     {% for error in settings_form.homepage.errors %}
                         <span style="color: red;">[{{ error }}]</span>

@@ -1,7 +1,6 @@
 import os
 import imghdr
 import secrets
-
 from pathlib import Path
 from flask import url_for
 from MyLists import app, mail

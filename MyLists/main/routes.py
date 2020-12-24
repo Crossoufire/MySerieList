@@ -5,13 +5,13 @@ from datetime import datetime
 from MyLists.API_data import ApiData
 from MyLists.main.add_db import AddtoDB
 from flask_login import login_required, current_user
-from MyLists.main.forms import EditMediaData, MediaComment, EditGamesData
+from MyLists.main.forms import EditMediaData, MediaComment
 from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaListDict
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MoviesGenre, MediaType, get_next_airing, \
-    check_media, User, get_collection_query, Games, GamesList, get_media_query, get_media_count
+    check_media, User, get_media_query, get_media_count
 
 bp = Blueprint('main', __name__)
 
@@ -44,10 +44,6 @@ def mymedialist(media_list, user_name):
     if list_type == ListType.MOVIES:
         category = request.args.get('category', 'Completed')
         html_template = 'medialist_movies.html'
-    elif list_type == ListType.GAMES:
-        sort_val = request.args.get('sort', 'playtime')
-        category = request.args.get('category', 'Playing')
-        html_template = 'medialist_games.html'
 
     # Check the <args> then retrieve the corresponding <media_data>
     query, category = get_media_query(user.id, page, list_type, category, search, option, sort_val, filter_val)
@@ -77,56 +73,6 @@ def mymedialist(media_list, user_name):
                            sort_val=sort_val, filter_val=filter_val, search=search)
 
 
-@bp.route("/moviescollectionlist/<string:user_name>", methods=['GET', 'POST'])
-@login_required
-def movies_collection(user_name):
-    # Check if the user can see the <media_list>
-    user = current_user.check_autorization(user_name)
-
-    # Check the <category>, the <page>, the <medialist> and the <html_template>.
-    page = request.args.get('page', 1, int)
-    category = request.args.get('category', 'Completed')
-
-    # Check the <args> then retrieve the corresponding <media_data>
-    query = get_collection_query(user.id, page)
-
-    # Get the actual page, total number of pages and the total number of media from the query
-    items = query.items
-    info_pages = {'actual_page': query.page,
-                  'total_pages': query.pages,
-                  'total_media': query.total}
-
-    completed_collections = []
-    ongoing_collections = []
-    for movie in items:
-        movie_data = {"id": movie[2].id,
-                      "display_name": movie[2].name,
-                      "total": movie[2].parts,
-                      "parts": movie[3],
-                      "overview": movie[2].overview,
-                      "cover": '/static/covers/movies_collection_covers/' + movie[2].poster}
-
-        if movie_data['total'] == 1:
-            pass
-        elif movie_data["total"] == movie_data["parts"]:
-            completed_collections.append(movie_data)
-        else:
-            ongoing_collections.append(movie_data)
-
-    media_data = []
-    if category == 'Completed':
-        media_data = sorted(completed_collections, key=lambda x: (x['display_name'], x['parts']), reverse=True)
-
-    elif category == 'On Going':
-        media_data = sorted(ongoing_collections, key=lambda x: (x['parts'], x['total']), reverse=True)
-
-    info_pages['total_media'] = len(media_data)
-
-    return render_template('medialist_collections.html', title='Movies collection', media_data=media_data,
-                           username=user_name, user_id=str(user.id), info_pages=info_pages, category=category,
-                           media_list='moviescollectionlist')
-
-
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
 @login_required
 def write_comment(media_type, media_id):
@@ -142,8 +88,6 @@ def write_comment(media_type, media_id):
         list_type = ListType.ANIME
     elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
-    elif media_type == MediaType.GAMES:
-        list_type = ListType.GAMES
 
     media = check_media(media_id, list_type)
     if not media:
@@ -186,15 +130,11 @@ def media_sheet(media_type, media_id):
         list_type = ListType.ANIME
     elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
-    elif media_type == MediaType.GAMES:
-        list_type = ListType.GAMES
 
     # Check if <media_id> came from an API and if in local DB
     api_id = request.args.get('search')
 
-    if api_id and list_type == ListType.GAMES:
-        search = {'igdb_id': media_id}
-    elif api_id and list_type != ListType.GAMES:
+    if api_id:
         search = {'themoviedb_id': media_id}
     else:
         search = {'id': media_id}
@@ -207,9 +147,6 @@ def media_sheet(media_type, media_id):
     elif list_type == ListType.MOVIES:
         media = Movies.query.filter_by(**search).first()
         html_template = 'media_sheet_movies.html'
-    elif list_type == ListType.GAMES:
-        media = Games.query.filter_by(**search).first()
-        html_template = 'media_sheet_games.html'
 
     # If <media> does not exist and <api_id> is provived: Add the <media> to DB, else abort.
     if not media:
@@ -255,7 +192,6 @@ def media_sheet_form(media_type, media_id):
         abort(403)
 
     form = EditMediaData()
-    gameform = EditGamesData()
 
     # Check if <media_type> is valid
     try:
@@ -272,91 +208,59 @@ def media_sheet_form(media_type, media_id):
     elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
         media = Movies.query.filter_by(id=media_id).first()
-    elif media_type == MediaType.GAMES:
-        list_type = ListType.GAMES
-        media = Games.query.filter_by(id=media_id).first()
 
     if not media:
         abort(404)
 
     if request.method == 'GET':
-        if list_type != ListType.GAMES:
-            form.original_name.data = media.original_name
-            form.name.data = media.name
-            form.homepage.data = media.homepage
-            form.synopsis.data = media.synopsis
-            # form.genres.data = ', '.join([r.genre for r in media.genres])
-            form.actors.data = ', '.join([r.name for r in media.actors])
-            if list_type != ListType.MOVIES:
-                form.created_by.data = media.created_by
-                form.first_air_date.data = media.first_air_date
-                form.last_air_date.data = media.last_air_date
-                form.production_status.data = media.status
-                form.duration.data = media.episode_duration
-                form.origin_country.data = media.origin_country
-                form.networks.data = ', '.join([r.network for r in media.networks])
-            elif list_type == ListType.MOVIES:
-                form.directed_by.data = media.director_name
-                form.release_date.data = media.release_date
-                form.duration.data = media.runtime
-                form.original_language.data = media.original_language
-                form.tagline.data = media.tagline
-                form.budget.data = media.budget
-                form.revenue.data = media.revenue
-        elif list_type == ListType.GAMES:
-            gameform.name.data = media.name
-            gameform.collection_name.data = media.collection_name
-            gameform.first_release_date.data = media.first_release_date
-            gameform.game_engine.data = media.game_engine
-            gameform.game_modes.data = media.game_modes
-            gameform.companies.data = ', '.join([r.name for r in media.companies])
-            gameform.platforms.data = ', '.join([r.name for r in media.platforms])
-            gameform.player_perspective.data = media.player_perspective
-            gameform.hltb_main_time.data = media.hltb_main_time
-            gameform.hltb_main_and_extra_time.data = media.hltb_main_and_extra_time
-            gameform.hltb_total_complete_time.data = media.hltb_total_complete_time
-            gameform.genres.data = ', '.join([r.genre for r in media.genres])
-            gameform.synopsis.data = media.summary
+        form.original_name.data = media.original_name
+        form.name.data = media.name
+        form.homepage.data = media.homepage
+        form.synopsis.data = media.synopsis
+        # form.genres.data = ', '.join([r.genre for r in media.genres])
+        form.actors.data = ', '.join([r.name for r in media.actors])
+        if list_type != ListType.MOVIES:
+            form.created_by.data = media.created_by
+            form.first_air_date.data = media.first_air_date
+            form.last_air_date.data = media.last_air_date
+            form.production_status.data = media.status
+            form.duration.data = media.episode_duration
+            form.origin_country.data = media.origin_country
+            form.networks.data = ', '.join([r.network for r in media.networks])
+        elif list_type == ListType.MOVIES:
+            form.directed_by.data = media.director_name
+            form.release_date.data = media.release_date
+            form.duration.data = media.runtime
+            form.original_language.data = media.original_language
+            form.tagline.data = media.tagline
+            form.budget.data = media.budget
+            form.revenue.data = media.revenue
     if form.validate_on_submit():
         if form.cover.data:
             media.image_cover = save_new_cover(form.cover.data, media_type)
-        if list_type != ListType.GAMES:
-            media.original_name = form.original_name.data
-            media.name = form.name.data
-            media.homepage = form.homepage.data
-            media.synopsis = form.synopsis.data
-
-            if list_type != ListType.MOVIES:
-                media.created_by = form.created_by.data
-                media.first_air_date = form.first_air_date.data
-                media.last_air_date = form.last_air_date.data
-                media.status = form.production_status.data
-                media.episode_duration = form.duration.data
-                media.origin_country = form.origin_country.data
-            elif list_type == ListType.MOVIES:
-                media.director_name = form.directed_by.data
-                media.release_date = form.release_date.data
-                media.runtime = form.duration.data
-                media.original_language = form.original_language.data
-                media.tagline = form.tagline.data
-                media.budget = form.budget.data
-                media.revenue = form.revenue.data
-        elif list_type == ListType.GAMES:
-            media.name = gameform.name.data
-            media.collection_name = gameform.collection_name.data
-            media.first_release_date = gameform.first_release_date.data
-            media.game_engine = gameform.game_engine.data
-            media.game_modes = gameform.game_modes.data
-            media.player_perspective = gameform.player_perspective.data
-            media.hltb_main_time = gameform.hltb_main_time.data
-            media.hltb_main_and_extra_time = gameform.hltb_main_and_extra_time.data
-            media.hltb_total_complete_time = gameform.hltb_total_complete_time.data
-            media.summary = gameform.synopsis.data
+        media.original_name = form.original_name.data
+        media.name = form.name.data
+        media.homepage = form.homepage.data
+        media.synopsis = form.synopsis.data
+        if list_type != ListType.MOVIES:
+            media.created_by = form.created_by.data
+            media.first_air_date = form.first_air_date.data
+            media.last_air_date = form.last_air_date.data
+            media.status = form.production_status.data
+            media.episode_duration = form.duration.data
+            media.origin_country = form.origin_country.data
+        elif list_type == ListType.MOVIES:
+            media.director_name = form.directed_by.data
+            media.release_date = form.release_date.data
+            media.runtime = form.duration.data
+            media.original_language = form.original_language.data
+            media.tagline = form.tagline.data
+            media.budget = form.budget.data
+            media.revenue = form.revenue.data
 
         db.session.commit()
 
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            # Actors
             if [r.name for r in media.actors] == form.actors.data.split(', '):
                 pass
             else:
@@ -426,13 +330,10 @@ def media_sheet_form(media_type, media_id):
                                                    network=network)
                     db.session.add(add_network)
                 db.session.commit()
-        elif list_type != ListType.GAMES:
-            pass
 
         return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media_id))
 
-    return render_template('media_sheet_form.html', title='Media Form', form=form, gameform=gameform,
-                           media_type=media_type.value)
+    return render_template('media_sheet_form.html', title='Media Form', form=form, media_type=media_type.value)
 
 
 @bp.route("/your_next_airing", methods=['GET', 'POST'])
@@ -479,14 +380,7 @@ def search_media():
         app.logger.error('[SYSTEM] - Error requesting the TMDB API: {}'.format(e))
         flash('Sorry, an error occured, the TMDB API is unreachable for now.', 'warning')
 
-    try:
-        data_search_games = ApiData().IGDB_search(search)
-    except Exception as e:
-        data_search_games = []
-        app.logger.error('[SYSTEM] - Error requesting the IGDB API: {}'.format(e))
-        flash('Sorry, an error occured, the IGDB API is unreachable for now.', 'warning')
-
-    if data_search.get("total_results", 0) == 0 and len(data_search_games) == 0:
+    if data_search.get("total_results", 0) == 0:
         flash('Sorry, no results found for your query.', 'warning')
         return redirect(request.referrer)
 
@@ -529,33 +423,6 @@ def search_media():
                 media_data['name'] = result['title']
             movies_results.append(media_data)
 
-    # Recover 1 page of results (20 max?)
-    games_results = []
-    for result in data_search_games:
-        game_data = {'name': result.get('name'),
-                     'overview': result.get('summary'),
-                     'first_air_date': result.get('first_release_date'),
-                     'api_id': result['id']}
-
-        # Modify the <first_release_date> format
-        try:
-            game_data['first_air_date'] = datetime.utcfromtimestamp(int(result.get('first_release_date')))\
-                .strftime('%d %b %Y')
-        except:
-            game_data['first_air_date'] = 'Unknown'
-
-        # Recover the poster_path or take a default image
-        if result.get('cover', {}).get('image_id'):
-            game_data['poster_path'] = "{}{}.jpg".format('https://images.igdb.com/igdb/image/upload/t_1080p/',
-                                                         result['cover']['image_id'])
-        else:
-            game_data['poster_path'] = url_for('static', filename="covers/anime_covers/default.jpg")
-
-        # Put data in different lists in function of media type
-        game_data['url'] = result.get('url')
-
-        games_results.append(game_data)
-
     # Get the plateform to display the appropriate template
     platform = str(request.user_agent.platform)
     if platform == "iphone" or platform == "android" or platform == 'None' or not platform:
@@ -568,7 +435,6 @@ def search_media():
                            series_results=series_results,
                            anime_results=anime_results,
                            movies_results=movies_results,
-                           games_results=games_results,
                            search=search)
 
 
@@ -717,11 +583,10 @@ def change_element_category():
     # Set the new status
     media[1].status = new_status
 
-    if list_type != ListType.GAMES:
-        # Get the old rewatched
-        old_rewatch = media[1].rewatched
-        # Reset the rewatched time multiplier
-        media[1].rewatched = 0
+    # Get the old rewatched
+    old_rewatch = media[1].rewatched
+    # Reset the rewatched time multiplier
+    media[1].rewatched = 0
 
     # Set and change accordingly <last_episode_watched>, <current_season> and <eps_watched> for anime and series
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
@@ -800,81 +665,6 @@ def update_score():
                     .format(current_user.id, media_id, old_score, new_score))
 
     # Commit the changes
-    db.session.commit()
-
-    return '', 204
-
-
-@bp.route('/update_playtime', methods=['POST'])
-@login_required
-def update_playtime():
-    try:
-        json_data = request.get_json()
-        hours = int(json_data['hours'])
-        minutes = int(json_data['min'])
-        media_id = int(json_data['media_id'])
-        media_list = json_data['media_type']
-    except:
-        return '', 400
-
-    # Check if <media_list> exist and valid
-    try:
-        list_type = ListType(media_list)
-    except ValueError:
-        return '', 400
-
-    media = check_media(media_id, list_type)
-    if not media:
-        return '', 400
-
-    # Get the old data
-    old_playtime = media[1].time_played
-
-    # Set the new data
-    new_playtime = (hours*60) + minutes
-    media[1].time_played = new_playtime
-    app.logger.info('[{}] Series ID {} playtime updated'.format(current_user.id, media_id))
-
-    compute_time_spent(media=media[0], list_type=list_type, old_gametime=old_playtime, new_gametime=new_playtime)
-
-    # Commit the changes
-    db.session.commit()
-
-    return '', 204
-
-
-@bp.route('/update_completion', methods=['POST'])
-@login_required
-def update_completion():
-    try:
-        json_data = request.get_json()
-        media_id = int(json_data['element_id'])
-        media_list = json_data['media_list']
-        completion = bool(json_data['data'])
-    except:
-        return '', 400
-
-    # Check if the <media_list> exist and is valid
-    try:
-        list_type = ListType(media_list)
-    except ValueError:
-        return '', 400
-
-    # Check if the <media_id> is in the current user's list
-    if list_type == ListType.SERIES:
-        media = SeriesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
-    elif list_type == ListType.ANIME:
-        media = AnimeList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
-    elif list_type == ListType.MOVIES:
-        media = MoviesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
-    elif list_type == ListType.GAMES:
-        media = GamesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
-
-    if not media:
-        return '', 400
-
-    # Add <completion> and commit the changes
-    media.completion = completion
     db.session.commit()
 
     return '', 204
@@ -959,8 +749,6 @@ def add_favorite():
         media = AnimeList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
     elif list_type == ListType.MOVIES:
         media = MoviesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
-    elif list_type == ListType.GAMES:
-        media = GamesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
 
     if not media:
         return '', 400
@@ -1017,8 +805,6 @@ def add_element():
                 new_status = Status.COMPLETED_ANIMATION
         else:
             new_watched = 0
-    elif list_type == ListType.GAMES:
-        new_watched = 0
 
     # Add <media> to the <user>
     if list_type == ListType.SERIES:
@@ -1040,12 +826,6 @@ def add_element():
                                media_id=media.id,
                                status=new_status,
                                eps_watched=new_watched)
-    elif list_type == ListType.GAMES:
-        user_list = GamesList(user_id=current_user.id,
-                              media_id=media.id,
-                              status=new_status,
-                              completion=False,
-                              time_played=0)
 
     # Commit the changes
     db.session.add(user_list)
@@ -1057,13 +837,10 @@ def add_element():
     set_last_update(media=media, media_type=list_type, new_status=new_status)
 
     # Compute the new time spent
-    # if list_type == ListType.SERIES or list_type == ListType.ANIME:
-    #     compute_time_spent(media=media, new_watched=new_watched, list_type=list_type)
-    # elif list_type == ListType.MOVIES:
-    #     compute_time_spent(media=media, list_type=list_type, movie_status=new_status, movie_add=True)
-    # elif list_type == ListType.GAMES:
-    #     compute_time_spent(media=media, list_type=list_type)
-    compute_time_spent(media=media,  list_type=list_type, watched=new_watched)
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
+        compute_time_spent(media=media, new_watched=new_watched, list_type=list_type)
+    elif list_type == ListType.MOVIES:
+        compute_time_spent(media=media, list_type=list_type, movie_status=new_status, movie_add=True)
 
     return '', 204
 
@@ -1099,8 +876,6 @@ def delete_element():
     elif list_type == ListType.MOVIES:
         compute_time_spent(media=media[0], list_type=list_type, movie_status=media[1].status, movie_delete=True,
                            old_rewatch=old_rewatch)
-    elif list_type == ListType.GAMES:
-        compute_time_spent(media=media[0], list_type=list_type, old_gametime=media[1].time_played)
 
     # Delete the media from the user's list
     db.session.delete(media[1])
@@ -1142,8 +917,6 @@ def lock_media():
         media = Anime.query.filter_by(id=media_id).first()
     elif list_type == ListType.MOVIES:
         media = Movies.query.filter_by(id=media_id).first()
-    elif list_type == ListType.GAMES:
-        media = Games.query.filter_by(id=media_id).first()
 
     if not media:
         return '', 400
@@ -1181,22 +954,8 @@ def autocomplete():
                 continue
             media_results.append(Autocomplete(result).get_autocomplete_dict())
 
-    # Get the games results
-    try:
-        games_data = ApiData().IGDB_search(search)
-    except Exception as e:
-        games_data = {}
-        app.logger.error('[ERROR] - Requesting the IGDB API: {}'.format(e))
-
-    games_results = []
-    if len(games_data) > 0:
-        for result in games_data:
-            if len(games_results) >= 5:
-                break
-            games_results.append(Autocomplete(result).get_games_autocomplete_dict())
-
     # Create the <total_results> list
-    total_results = media_results + users_results + games_results
+    total_results = media_results + users_results
     if len(total_results) == 0:
         return jsonify(search_results=[{'nb_results': 0, 'category': None}]), 200
 

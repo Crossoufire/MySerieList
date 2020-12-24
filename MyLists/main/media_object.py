@@ -1,7 +1,6 @@
 import secrets
 import pykakasi
 from MyLists import app
-from pathlib import Path
 from flask import url_for
 from datetime import datetime
 from flask_login import current_user
@@ -57,67 +56,8 @@ class MediaDict:
         self.media_info = {}
 
     def create_list_dict(self):
-        if self.list_type != ListType.GAMES:
-            self.media_dict()
-        elif self.list_type == ListType.GAMES:
-            self.games_dict()
-
+        self.media_dict()
         return self.media_info
-
-    def games_dict(self):
-        self.media_info = {"id": self.data.id,
-                           "cover": 'games_covers/{}'.format(self.data.image_cover),
-                           "display_name": self.data.name,
-                           "IGDB_url": self.data.IGDB_url,
-                           "vote_average": self.data.vote_average,
-                           "vote_count": self.data.vote_count,
-                           "synopsis": self.data.summary,
-                           "lock_status": self.data.lock_status,
-                           "collection_name": self.data.collection_name,
-                           "game_engine": self.data.game_engine,
-                           "game_modes": self.data.game_modes,
-                           "player_perspective": self.data.player_perspective,
-                           "storyline": self.data.storyline,
-                           "genres": ', '.join([r.genre for r in self.data.genres]),
-                           "platforms": ', '.join([r.name for r in self.data.platforms]),
-                           "hltb_main": self.data.hltb_main_time,
-                           "hltb_main_extra": self.data.hltb_main_and_extra_time,
-                           "hltb_complete": self.data.hltb_total_complete_time,
-                           "cover_path": 'games_covers',
-                           "media_type": 'Games',
-                           "publisher": [],
-                           "developer": [],
-                           "in_user_list": False,
-                           "score": "---",
-                           "favorite": False,
-                           "status": Status.OWNED.value,
-                           "comment": None,
-                           "time_played": 0.,
-                           "completion": False,
-                           't_played_h': 0,
-                           't_played_m': 0}
-
-        for company in self.data.companies:
-            if company.publisher:
-                self.media_info['publisher'].append(company.name)
-            if company.developer:
-                self.media_info['developer'].append(company.name)
-
-        self.media_info["first_release_date"] = change_air_format(self.data.first_release_date, games=True)
-
-        self.add_genres()
-        self.add_follow_list()
-
-        in_user_list = self.add_user_list()
-        if in_user_list:
-            self.media_info["in_user_list"] = True
-            self.media_info["score"] = in_user_list.score
-            self.media_info["favorite"] = in_user_list.favorite
-            self.media_info["status"] = in_user_list.status.value
-            self.media_info["comment"] = in_user_list.comment
-            self.media_info["completion"] = in_user_list.completion
-            self.media_info["t_played_h"] = int(in_user_list.time_played/60)
-            self.media_info["t_played_m"] = '{:02d}'.format(int(in_user_list.time_played % 60))
 
     def media_dict(self):
         self.media_info = {"id": self.data.id,
@@ -221,12 +161,6 @@ class MediaDict:
         # Change <release_date> format
         self.media_info['release_date'] = change_air_format(self.data.release_date)
 
-        # Add the collection parts
-        movie_collection = self.data.collection_movies
-        if movie_collection:
-            self.media_info["collection_name"] = movie_collection[0]
-            self.media_info["collection_parts"] = movie_collection[0].collection_parts
-
         in_user_list = self.add_user_list()
         if in_user_list:
             self.media_info["in_user_list"] = True
@@ -266,15 +200,9 @@ class MediaListDict:
             self.cover_path = url_for('static', filename='covers/anime_covers/')
         elif self.list_type == ListType.MOVIES:
             self.cover_path = url_for('static', filename='covers/movies_covers/')
-        elif self.list_type == ListType.GAMES:
-            self.cover_path = url_for('static', filename='covers/games_covers/')
 
     def redirect_medialist(self):
-        if self.list_type != ListType.GAMES:
-            self.create_medialist_dict()
-        elif self.list_type == ListType.GAMES:
-            self.create_gameslist_dict()
-
+        self.create_medialist_dict()
         return self.media_info
 
     def create_medialist_dict(self):
@@ -309,27 +237,6 @@ class MediaListDict:
         if self.list_type != ListType.MOVIES:
             self.add_tv_dict()
 
-    def create_gameslist_dict(self):
-        self.media_info = {"id": self.data[0].id,
-                           "display_name": self.data[0].name,
-                           "igdb_id": self.data[0].igdb_id,
-                           "cover": "{}{}".format(self.cover_path, self.data[0].image_cover),
-                           "score": self.data[1].score,
-                           "favorite": self.data[1].favorite,
-                           "completion": self.data[1].completion,
-                           "comment": self.data[1].comment,
-                           "category": self.data[1].status.value,
-                           "t_played_h": str(self.data[1].time_played/60).split('.')[0] or 0,
-                           "t_played_m": int(self.data[1].time_played % 60) or 0,
-                           "common": False,
-                           "media": "Games"}
-
-        if not self.media_info['score'] or self.media_info['score'] == -1:
-            self.media_info['score'] = '---'
-
-        if self.data[0].id in self.common_media:
-            self.media_info['common'] = True
-
     def add_tv_dict(self):
         self.media_info['media'] = 'Series'
         if self.list_type == ListType.ANIME:
@@ -351,10 +258,7 @@ class MediaDetails:
 
     def get_media_cover(self):
         media_cover_name = 'default.jpg'
-        if self.list_type != ListType.GAMES:
-            media_cover_path = self.media_data.get('poster_path') or None
-        elif self.list_type == ListType.GAMES:
-            media_cover_path = self.media_data.get('cover', {'image_id': None}).get('image_id') or None
+        media_cover_path = self.media_data.get('poster_path') or None
 
         if media_cover_path:
             media_cover_name = '{}.jpg'.format(secrets.token_hex(8))
@@ -430,31 +334,6 @@ class MediaDetails:
 
         return genres_list
 
-    def get_games_genres(self):
-        genres = self.media_data.get('genres') or None
-        genres_list = []
-        if genres:
-            for i in range(0, len(genres)):
-                genres_dict = {'genre': genres[i]['name']}
-                genres_list.append(genres_dict)
-        else:
-            genres_dict = {'genre': 'No genres found.'}
-            genres_list.append(genres_dict)
-
-        themes = self.media_data.get('themes') or None
-        themes_list = []
-        if themes:
-            for i in range(0, len(themes)):
-                themes_dict = {'genre': themes[i]['name']}
-                themes_list.append(themes_dict)
-        else:
-            themes_dict = {'genre': 'No genres found.'}
-            themes_list.append(themes_dict)
-
-        fusion_list = genres_list + themes_list
-
-        return fusion_list
-
     def get_anime_genres(self):
         a_genres_list = []
         try:
@@ -506,77 +385,6 @@ class MediaDetails:
                 if element['job'] == 'Director':
                     self.media_details['director_name'] = element['name']
                     break
-
-    def get_games_platforms(self):
-        platforms = self.media_data.get('platforms') or None
-        platforms_list = []
-        if platforms:
-            for platform in platforms:
-                platform_dict = {'name': platform["name"]}
-                platforms_list.append(platform_dict)
-        else:
-            platform_dict = {'name': 'Unknown'}
-            platforms_list.append(platform_dict)
-
-        return platforms_list
-
-    def get_games_companies(self):
-        companies = self.media_data.get('involved_companies') or None
-        companies_list = []
-        if companies:
-            for company in companies:
-                companies_dict = {'name': company["company"]["name"],
-                                  'publisher': company["publisher"],
-                                  'developer': company["developer"]}
-                companies_list.append(companies_dict)
-        else:
-            companies_dict = {'name': 'Unknown',
-                              'publisher': False,
-                              'developer': False}
-            companies_list.append(companies_dict)
-
-        return companies_list
-
-    def get_collection_info(self):
-
-        def get_collection_data(co_id):
-            col_api_data = ApiData().get_collection_data(co_id)
-
-            collection_cover_path = col_api_data.get('poster_path') or None
-            collection_cover_name = 'default.jpg'
-            if collection_cover_path:
-                collection_cover_name = '{}.jpg'.format(secrets.token_hex(8))
-                try:
-                    ApiData().save_api_cover(collection_cover_path, collection_cover_name, ListType.MOVIES,
-                                             collection=True)
-                except Exception as e:
-                    app.logger.error('[ERROR] - Trying to recover the poster for collection: {}'.format(e))
-                    collection_cover_name = 'default.jpg'
-
-            collection_parts_list = []
-            for part in col_api_data.get('parts'):
-                part_dict = {'collection_id': co_id,
-                             'part_name': part['title'],
-                             'part_release_date': part['release_date'],
-                             'part_tmdb_id': part['id']}
-                collection_parts_list.append(part_dict)
-
-            collection_dict = {'collection_id': co_id,
-                               'name': col_api_data.get('name', 'Unknown') or 'Unknown',
-                               'synopsis': col_api_data.get('overview'),
-                               'image_cover': collection_cover_name,
-                               'parts_list': collection_parts_list}
-
-            return collection_dict
-
-        collection_id = self.media_data.get("belongs_to_collection") or None
-        self.media_details['collection_id'] = None
-        collection_info = None
-        if collection_id is not None:
-            self.media_details['collection_id'] = collection_id['id']
-            collection_info = get_collection_data(collection_id['id'])
-
-        return collection_info
 
     def get_tv_details(self):
         self.media_details = {'name': self.media_data.get('name', 'Unknown') or 'Unknown',
@@ -639,7 +447,6 @@ class MediaDetails:
                               'image_cover': self.get_media_cover()}
 
         self.get_director_name()
-        collection_info = self.get_collection_info()
 
         genres_list = []
         actors_list = []
@@ -648,71 +455,14 @@ class MediaDetails:
             actors_list = self.get_actors()
 
         self.all_data = {'movies_data': self.media_details,
-                         'collection_info': collection_info,
                          'genres_data': genres_list,
                          'actors_data': actors_list}
-
-    def get_games_details(self):
-        self.media_data = self.media_data[0]
-        self.media_details = {'name': self.media_data.get('name', 'Unknown') or 'Unknown',
-                              'first_release_date': self.media_data.get('first_release_date', 'Unknown') or 'Unknown',
-                              'IGDB_url': self.media_data.get('url', 'Unknown') or 'Unknown',
-                              'vote_average': self.media_data.get('total_rating', 0) or 0,
-                              'vote_count': self.media_data.get('total_rating_count', 0) or 0,
-                              'summary': self.media_data.get('summary', 'No summary found.') or 'No summary found.',
-                              'storyline': self.media_data.get('storyline', 'No storyline found.') or 'No storyline found.',
-                              'collection_name': self.media_data.get('collection', {'name': 'Unknown'})['name'] or 'Unknown',
-                              'game_engine': self.media_data.get('game_engines', [{'name': 'Unknown'}])[0]['name'] or 'Unknown',
-                              'player_perspective': self.media_data.get('player_perspectives', [{'name': 'Unknown'}])[0]['name'] or 'Unknown',
-                              'game_modes': ','.join([x['name'] for x in self.media_data.get('game_modes', [{'name': 'Unknown'}])]),
-                              'igdb_id': self.media_data.get('id'),
-                              'steam_id': None,
-                              'image_cover': self.get_media_cover()}
-
-        # Recover the Steam API ID (category = 1 in the IGDB API)
-        for external_data in self.media_data.get('external_games', []) or []:
-            if external_data['category'] == 1:
-                self.media_details['steam_id'] = external_data['uid']
-                break
-
-        # Recover HLTB_time:
-        list_all_hltb_games = []
-        path = Path(app.root_path, 'static/csv_data/HLTB_games.csv')
-        with open(path, encoding='utf-8') as fp:
-            for line in fp:
-                list_all_hltb_games.append(line.split(";"))
-
-        for htlb_game in list_all_hltb_games:
-            if self.media_details['name'] == htlb_game[1]:
-                try:
-                    self.media_details['hltb_main_time'] = float(htlb_game[2])*60
-                except:
-                    pass
-                try:
-                    self.media_details['hltb_main_and_extra_time'] = float(htlb_game[3]) * 60
-                except:
-                    pass
-                try:
-                    self.media_details['hltb_total_complete_time'] = float(htlb_game[4]) * 60
-                except:
-                    pass
-
-        companies_list = self.get_games_companies()
-        genres_list = self.get_games_genres()
-        platforms_list = self.get_games_platforms()
-
-        self.all_data = {'games_data': self.media_details,
-                         'companies_data': companies_list,
-                         'genres_data': genres_list,
-                         'platforms_data': platforms_list}
 
     def get_media_details(self):
         if self.list_type == ListType.SERIES or self.list_type == ListType.ANIME:
             self.get_tv_details()
         elif self.list_type == ListType.MOVIES:
             self.get_movies_details()
-        elif self.list_type == ListType.GAMES:
-            self.get_games_details()
 
         return self.all_data
 
@@ -721,7 +471,6 @@ class MediaDetails:
 class Autocomplete:
     def __init__(self, result):
         self.tmdb_cover_link = "http://image.tmdb.org/t/p/w300"
-        self.igdb_cover_link = "https://images.igdb.com/igdb/image/upload/t_1080p/"
         self.result = result
         self.info = {}
 
@@ -736,20 +485,6 @@ class Autocomplete:
             self.get_tv_dict()
         elif self.result.get('media_type') == 'movie':
             self.get_movies_dict()
-
-        return self.info
-
-    def get_games_autocomplete_dict(self):
-        self.info['igdb_id'] = self.result.get('id')
-        self.info['display_name'] = self.result.get('name')
-        self.info['category'] = 'Games'
-        self.info['type'] = 'Game'
-
-        self.info['image_cover'] = url_for('static', filename="covers/series_covers/default.jpg")
-        if self.result.get('cover'):
-            self.info['image_cover'] = "{}{}.jpg".format(self.igdb_cover_link, self.result['cover']['image_id'])
-
-        self.info['date'] = change_air_format(self.result.get('first_release_date'), games=True)
 
         return self.info
 

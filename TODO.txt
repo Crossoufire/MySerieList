@@ -1,7 +1,4 @@
 
-Movies Collection:
-	Add: Movies collection
-
 Settings:
   Enhance: Better CSS
 
@@ -28,7 +25,6 @@ General:
   Enhance: Create one admin with admin view (HoF, Stats, admin and settings) and one standard user
 
 
-Add rpi monitor to the website
 Add redis queue
 Change mylists stats
 Finish the PWA

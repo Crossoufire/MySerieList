@@ -28,19 +28,6 @@ def check_cat_type(list_type, status):
             return movie_status_dict[status]
         except KeyError:
             return None
-    elif list_type == ListType.GAMES:
-        games_status_dict = {'Playing': Status.PLAYING,
-                             'Completed': Status.COMPLETED,
-                             'On Hold': Status.ON_HOLD,
-                             'Multiplayer': Status.MULTIPLAYER,
-                             'Endless': Status.ENDLESS,
-                             'Dropped': Status.DROPPED,
-                             'Owned': Status.OWNED,
-                             'Plan to Play': Status.PLAN_TO_PLAY}
-        try:
-            return games_status_dict[status]
-        except KeyError:
-            return None
 
 
 def save_new_cover(cover_file, media_type):
@@ -50,8 +37,6 @@ def save_new_cover(cover_file, media_type):
         cover_path = 'static/covers/anime_covers/'
     elif media_type == MediaType.MOVIES:
         cover_path = 'static/covers/movies_covers/'
-    elif media_type == MediaType.GAMES:
-        cover_path = 'static/covers/games_covers/'
 
     _, f_ext = os.path.splitext(cover_file.filename)
     picture_fn = secrets.token_hex(8) + f_ext
@@ -91,9 +76,8 @@ def set_last_update(media, media_type, old_status=None, new_status=None, old_sea
     db.session.commit()
 
 
-def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0, movie_status=None, new_gametime=0,
-                       movie_delete=False, movie_add=False, old_gametime=0, new_rewatch=0, old_rewatch=0,
-                       movie_runtime=0):
+def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0, movie_status=None, movie_delete=False,
+                       movie_add=False, new_rewatch=0, old_rewatch=0, movie_runtime=0):
 
     if list_type == ListType.SERIES:
         old_time = current_user.time_spent_series
@@ -116,12 +100,10 @@ def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0,
                 current_user.time_spent_movies = old_time + movie_runtime + media.runtime*(new_rewatch-old_rewatch)
             else:
                 current_user.time_spent_movies = old_time - movie_runtime + media.runtime*(new_rewatch-old_rewatch)
-    elif list_type == ListType.GAMES:
-        old_time = current_user.time_spent_games
-        current_user.time_spent_games = old_time + new_gametime - old_gametime
+
     db.session.commit()
 
 
 # --- Python Scheduler -----------------------------------------------------------------------------------------
 
-# app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='refresh_all_data', hour=3, minute=00)
+app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='refresh_all_data', hour=3, minute=00)

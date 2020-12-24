@@ -95,40 +95,6 @@
                 <div class="col-12 m-t-10 text-center">{{ form.submit(class="btn btn-outline-info") }}</div>
             </div>
         </form>
-    {% elif media_type == 'Games' %}
-        <form method="POST" action="" enctype="multipart/form-data" class="form m-b-50">
-            {{ form.hidden_tag() }}
-            <div class="row">
-                <div class="col-3 p-2 m-t-8">{{ gameform.cover.label }}:</div>
-                <div class="col-9 p-2">{{ gameform.cover(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ gameform.name.label }}:</div>
-                <div class="col-9 p-2">{{ gameform.name(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ gameform.companies.label }}:</div>
-                <div class="col-9 p-2">{{ gameform.companies(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ gameform.first_release_date.label }}:</div>
-                <div class="col-9 p-2">{{ gameform.first_release_date(size=70) }}</div>
-                {#                <div class="col-3 p-2 m-t-8">{{ gameform.genres.label }}:</div>#}
-                {#                <div class="col-9 p-2">{{ gameform.genres(size=70) }}</div>#}
-                <div class="col-3 p-2 m-t-8">{{ gameform.platforms.label }}:</div>
-                <div class="col-9 p-2">{{ gameform.platforms(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ gameform.game_engine.label }}:</div>
-                <div class="col-9 p-2">{{ gameform.game_engine(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ gameform.game_modes.label }}:</div>
-                <div class="col-9 p-2">{{ gameform.game_modes(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ gameform.player_perspective.label }}:</div>
-                <div class="col-9 p-2">{{ gameform.player_perspective(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ gameform.hltb_main_time.label }}:</div>
-                <div class="col-9 p-2">{{ gameform.hltb_main_time(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ gameform.hltb_main_and_extra_time.label }}:</div>
-                <div class="col-9 p-2">{{ gameform.hltb_main_and_extra_time(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ gameform.hltb_total_complete_time.label }}:</div>
-                <div class="col-9 p-2">{{ gameform.hltb_total_complete_time(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ gameform.synopsis.label }}:</div>
-                <div class="col-9 p-2">{{ gameform.synopsis(class="text-justify text-light", rows="5", cols="72",
-                style="background: #21263b; border: transparent;") }}</div>
-                <div class="col-12 m-t-10 text-center">{{ gameform.submit(class="btn btn-outline-info") }}</div>
-            </div>
-        </form>
     {% endif %}
 {% endblock content %}
 

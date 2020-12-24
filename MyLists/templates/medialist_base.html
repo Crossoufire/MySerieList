@@ -17,31 +17,16 @@
                        href="/animelist/{{ username }}" title="Anime list"></a>
                     <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
                        href="/movieslist/{{ username }}" title="Movies list"></a>
-                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon-games text-games" data-toggle="tooltip"
-                       href="/gameslist/{{ username }}" title="Games list"></a>
                 {% elif media_list == 'animelist' %}
                     <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
                        href="/serieslist/{{ username }}" title="Series list"></a>
                     <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
                        href="/movieslist/{{ username }}" title="Movies list"></a>
-                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon-games text-games" data-toggle="tooltip"
-                       href="/gameslist/{{ username }}" title="Games list"></a>
                 {% elif media_list == 'movieslist' %}
                     <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
                        href="/serieslist/{{ username }}" title="Series list"></a>
                     <a class="fas fa-lg fa-torii-gate m-r-8 return-icon text-anime" data-toggle="tooltip"
                        href="/animelist/{{ username }}" title="Anime list"></a>
-                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon-games text-games" data-toggle="tooltip"
-                       href="/gameslist/{{ username }}" title="Games list"></a>
-                    <a class="fas fa-lg fa-box m-r-8 return-icon text-movies" data-toggle="tooltip"
-                       href="/moviescollectionlist/{{ username }}" title="Movies Collections"></a>
-                {% elif media_list == 'gameslist' %}
-                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
-                       href="/serieslist/{{ username }}" title="Series list"></a>
-                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon text-anime" data-toggle="tooltip"
-                       href="/animelist/{{ username }}" title="Anime list"></a>
-                    <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
-                       href="/movieslist/{{ username }}" title="Movies list"></a>
                 {% endif %}
             </div>
             {% if user_id != current_user.get_id() %}
@@ -61,19 +46,11 @@
                 <input id="search-input" class="modded-input" placeholder="&#128269; Search..."
                 onfocus="this.placeholder = '';" onblur="this.placeholder = '&#128269; Search...';">
                 <select id="select-option" class="search-select">
-                    {% if media_list == 'gameslist' %}
-                        <option {% if option == 'title' %}selected="selected"{% endif %} value="title">Name</option>
-                        <option {% if option == 'genre' %}selected="selected"{% endif %} value="genre">Genre</option>
-                        <option {% if option == 'developer' %}selected="selected"{% endif %} value="developer">Developer</option>
-                    {% elif media_list == 'animelist' or media_list == 'serieslist' %}
-                        <option {% if option == 'title' %}selected="selected"{% endif %} value="title">Title</option>
-                        <option {% if option == 'actor' %}selected="selected"{% endif %} value="actor">Actor</option>
-                        <option {% if option == 'genre' %}selected="selected"{% endif %} value="genre">Genre</option>
-                    {% elif media_list == 'movieslist' %}
-                        <option {% if option == 'title' %}selected="selected"{% endif %} value="title">Title</option>
+                    <option {% if option == 'title' %}selected="selected"{% endif %} value="title">Title</option>
+                    <option {% if option == 'actor' %}selected="selected"{% endif %} value="actor">Actor</option>
+                    <option {% if option == 'genre' %}selected="selected"{% endif %} value="genre">Genre</option>
+                    {% if media_list == 'movieslist' %}
                         <option {% if option == 'director' %}selected="selected"{% endif %} value="director">Director</option>
-                        <option {% if option == 'actor' %}selected="selected"{% endif %} value="actor">Actor</option>
-                        <option {% if option == 'genre' %}selected="selected"{% endif %} value="genre">Genre</option>
                     {% endif %}
                 </select>
             </div>
@@ -84,7 +61,7 @@
         </div>
     </div>
     <div class="{% if media_list == 'serieslist' %}bg-series-opa {% elif media_list == 'animelist' %}bg-anime-opa
-    {% elif media_list == 'movieslist' %}bg-movies-opa {% else %}bg-games-opa{% endif %} p-t-4 p-b-4">
+        {% else %}bg-movies-opa{% endif %} p-t-4 p-b-4">
         <div class="mobile-sorting">
             <label class="m-l-10 mb-0"><b>Sort by:</b></label>
             <select class="m-l-8 search-select" onchange="sort_medialist(this)">
@@ -135,13 +112,6 @@
                         {% endif %}
                     </div>
                     <div class="bottom-card-info{% if media_list =='movieslist' %}-movie {% endif %}">
-                    {% if media_list == 'moviescollectionlist' %}
-                        <div class="row no-gutters" style="opacity: 0.7;">
-                            <div class="col-12" style="padding: 0;">
-                                <div>{{ data['parts'] }}/{{ data['total'] }}</div>
-                            </div>
-                        </div>
-                    {% else %}
                         <div class="row no-gutters" style="opacity: 0.7;">
                             <div class="col-3" style="padding: 0;">
                                 <a class="fa-heart {% if data['favorite'] %} fas favorited {% else %}
@@ -170,37 +140,20 @@
                                     <a class="fa-comment-alt text-light {% if data['comment'] %} fas commented {% else %}
                                     far disabled{% endif %}" data-toggle='tooltip' title="Comments"
                                     {% if data['comment'] %} onclick="showComment(card_{{ data['id'] }},
-                                    '{{ data['media'] }}', '{{ data['id'] }}', false)"
-                                    {% endif %}>
+                                    '{{ data['media'] }}', '{{ data['id'] }}', false)"{% endif %}>
                                     </a>
                                 {% endif %}
                             </div>
-                            {% if media_list != 'gameslist' %}
-                                <div class="col-4" {% if data['category'] == 'Completed' or data['category'] ==
-                                 'Completed Animation' %} style="display: block;" {% else %} style="display: none;"
-                                {% endif %}>
-                                    <a id="rew_{{ data['id'] }}" class="{% if user_id != current_user.get_id() %}
-                                     disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this
-                                     media. Do not count the inital completion." onclick="rewatchDrop(this,
-                                     {{ data['id'] }}, '{{ media_list }}')">
-                                        {{ data['rewatched'] }}
-                                    </a>
-                                </div>
-                            {% else %}
-                                <div class="col-4" style="padding: 0;">
-                                    <a id="comp_{{ data['id'] }}" class="{% if user_id != current_user.get_id() %}
-                                    disabled {% endif %}" data-toggle="tooltip" title="100% completion?"
-                                       onclick="updateCompletion(this, {{ data['id'] }})">
-                                        {% if data['completion'] %}
-                                            <b style="color: goldenrod;">100%</b>
-                                        {% else %}
-                                            <strike>100%</strike>
-                                        {% endif %}
-                                    </a>
-                                </div>
-                            {% endif %}
+                            <div class="col-4" {% if data['category'] == 'Completed' or data['category'] ==
+                             'Completed Animation' %} style="display: block;" {% else %} style="display: none;"{% endif %}>
+                                <a id="rew_{{ data['id'] }}" class="{% if user_id != current_user.get_id() %}
+                                 disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this
+                                 media. Do not count the inital completion." onclick="rewatchDrop(this,
+                                 {{ data['id'] }}, '{{ media_list }}')">
+                                    {{ data['rewatched'] }}
+                                </a>
+                            </div>
                         </div>
-                    {% endif %}
                     </div>
                     {% block seas_eps_drop scoped %}
                     {% endblock seas_eps_drop %}

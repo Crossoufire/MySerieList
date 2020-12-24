@@ -13,12 +13,12 @@ $(document).ready(function () {
         data: {
             datasets: [{
                 data: time_data,
-                backgroundColor: ['#216e7d', '#945141', '#8c7821', '#196219'],
+                backgroundColor: ['#216e7d', '#945141', '#8c7821'],
                 borderColor: 'black',
                 borderWidth: 1,
                 label: 'by_media'
             }],
-            labels: ['Series', 'Anime', 'Movies', 'Games']
+            labels: ['Series', 'Anime', 'Movies']
         },
         options: {
             events: false,
@@ -48,7 +48,7 @@ $(document).ready(function () {
                             let y = mid_radius * Math.sin(mid_angle);
 
                             ctx.fillStyle = '#fff';
-                            if (i === 4) { // Darker text color for lighter background
+                            if (i === 3) { // Darker text color for lighter background
                                 ctx.fillStyle = '#444';
                             }
                             let percent = String(Math.round(dataset.data[i] / total * 100)) + "%";

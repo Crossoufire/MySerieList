@@ -3,14 +3,11 @@ import random
 import operator
 from MyLists import db
 from flask import url_for
+from sqlalchemy import func
 from flask_login import current_user
 from _collections import OrderedDict
-from MyLists.API_data import ApiData
-from sqlalchemy import func, text, or_
-from MyLists.main.add_db import AddtoDB
-from MyLists.main.media_object import MediaDetails
 from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
-    Movies, Ranks, followers, Frames, SeriesGenre, RoleType, GamesList, Games
+    Movies, Ranks, followers, Frames, RoleType
 
 
 def get_media_count_by_status(user_id, list_type):
@@ -20,8 +17,6 @@ def get_media_count_by_status(user_id, list_type):
         status = AnimeList.status
     elif list_type == ListType.MOVIES:
         status = MoviesList.status
-    elif list_type == ListType.GAMES:
-        status = GamesList.status
 
     media_count = db.session.query(status, func.count(status)).filter_by(user_id=user_id).group_by(status).all()
 
@@ -70,9 +65,6 @@ def get_media_score(user_id, list_type):
     elif list_type == ListType.MOVIES:
         media = MoviesList
         status = Status.PLAN_TO_WATCH
-    elif list_type == ListType.GAMES:
-        media = GamesList
-        status = Status.PLAN_TO_PLAY
 
     media_score = db.session.query(func.count(media.score), func.count(media.media_id), func.sum(media.score)) \
         .filter(media.user_id == user_id, media.status != status).all()
@@ -109,12 +101,7 @@ def get_favorites(user_id):
         .filter(MoviesList.user_id == user_id, MoviesList.favorite == True).group_by(MoviesList.media_id).all()
     random.shuffle(movies_favorites)
 
-    games_favorites = db.session.query(Games, GamesList) \
-        .join(Games, Games.id == GamesList.media_id) \
-        .filter(GamesList.user_id == user_id, GamesList.favorite == True).group_by(GamesList.media_id).all()
-    random.shuffle(movies_favorites)
-
-    favorites = [series_favorites, anime_favorites, movies_favorites, games_favorites]
+    favorites = [series_favorites, anime_favorites, movies_favorites]
 
     return favorites
 
@@ -126,8 +113,6 @@ def get_media_levels(user, list_type):
         total_time_min = user.time_spent_anime
     elif list_type == ListType.MOVIES:
         total_time_min = user.time_spent_movies
-    elif list_type == ListType.GAMES:
-        total_time_min = user.time_spent_games
 
     # Compute the corresponding level and percentage from the media time
     element_level_tmp = "{:.2f}".format(round((((400+80*total_time_min)**(1/2))-20)/40, 2))
@@ -154,8 +139,7 @@ def get_knowledge_grade(user):
     # Compute the corresponding level and percentage from the media time
     knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
                       int((((400+80*user.time_spent_anime)**(1/2))-20)/40) + \
-                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40) + \
-                      int((((400+80*user.time_spent_games)**(1/2))-20)/40)
+                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
 
     query_rank = Ranks.query.filter_by(level=knowledge_level, type='knowledge_rank\n').first()
     if query_rank:
@@ -174,8 +158,7 @@ def get_knowledge_frame(user):
     # Compute the corresponding level and percentage from the media time
     knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
                       int((((400+80*user.time_spent_anime)**(1/2))-20)/40) +\
-                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40) + \
-                      int((((400+80*user.time_spent_games)**(1/2))-20)/40)
+                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
 
     frame_level = round(knowledge_level/8, 0) + 1
     query_frame = Frames.query.filter_by(level=frame_level).first()
@@ -225,10 +208,6 @@ def get_updates(last_update):
             element_data["category"] = "Movies"
             element_data["icon-color"] = "fas fa-film text-movies"
             element_data["border"] = "#8c7821"
-        elif element.media_type == ListType.GAMES:
-            element_data["category"] = "Games"
-            element_data["icon-color"] = "fas fa-gamepad text-games"
-            element_data["border"] = "#196219"
 
         update.append(element_data)
 
@@ -272,8 +251,7 @@ def get_user_data(user):
     view_count = {"profile": profile_view_count,
                   "series": user.series_views,
                   "anime": user.anime_views,
-                  "movies": user.movies_views,
-                  "games": user.games_views}
+                  "movies": user.movies_views}
 
     # Recover the overview user's last update
     last_update = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).limit(7)
@@ -288,8 +266,7 @@ def get_user_data(user):
 def get_media_data(user):
     all_lists = [['series', ListType.SERIES, user.time_spent_series],
                  ['anime', ListType.ANIME, user.time_spent_anime],
-                 ['movies', ListType.MOVIES, user.time_spent_movies],
-                 ['games', ListType.GAMES, user.time_spent_games]]
+                 ['movies', ListType.MOVIES, user.time_spent_movies]]
 
     # Create dict with media as key. Dict values are dict or list of dict
     media_dict = {}
@@ -392,11 +369,11 @@ def get_more_stats(user):
     #     .filter(MoviesList.user_id == current_user.id)\
     #     .group_by(func.strftime('%Y', Movies.release_date)).order_by(text('year desc')).all()
 
-    test = db.session.query(SeriesGenre.genre, func.count(SeriesGenre.genre).label('count')) \
-        .join(SeriesList, SeriesGenre.media_id == SeriesList.media_id) \
-        .join(Series, Series.id == SeriesList.media_id) \
-        .filter(SeriesList.user_id == current_user.id)\
-        .group_by(SeriesGenre.genre).order_by(text('count desc')).all()
+    # test = db.session.query(SeriesGenre.genre, func.count(SeriesGenre.genre).label('count')) \
+    #     .join(SeriesList, SeriesGenre.media_id == SeriesList.media_id) \
+    #     .join(Series, Series.id == SeriesList.media_id) \
+    #     .filter(SeriesList.user_id == current_user.id)\
+    #     .group_by(SeriesGenre.genre).order_by(text('count desc')).all()
 
     anime_data = db.session.query(Anime, AnimeList) \
         .join(AnimeList, AnimeList.media_id == Anime.id) \
@@ -536,50 +513,3 @@ def get_all_follows_data(user):
         follows_to_display = current_user.followed.all()
 
     return follows_to_display
-
-
-def cestparti(games_to_add):
-    games_added = []
-    games_not_added = []
-    games_already_inlist = []
-    for i, game in enumerate(games_to_add):
-        status = Status(games_to_add[game].split(',')[0])
-        playtime = int(games_to_add[game].split(',')[1])
-        name = games_to_add[game].split(',')[2]
-
-        print(name)
-
-        media = db.session.query(Games).filter(or_(Games.steam_id == game, Games.name == name)).first()
-        if media:
-            in_user_list = GamesList.query.filter_by(user_id=current_user.id, media_id=media.id).first()
-            if not in_user_list:
-                user_list = GamesList(user_id=current_user.id,
-                                      media_id=media.id,
-                                      status=status,
-                                      completion=False,
-                                      time_played=playtime)
-                db.session.add(user_list)
-                games_added.append(name)
-            else:
-                games_already_inlist.append(name)
-                continue
-        else:
-            games_api_data = ApiData().recover_steam_games(int(game))
-
-            if games_api_data is None or len(games_api_data) == 0:
-                games_not_added.append(name)
-                continue
-
-            media_details = MediaDetails(games_api_data, ListType.GAMES).get_media_details()
-            media = AddtoDB(media_details, ListType.GAMES).add_media_to_db()
-
-            user_list = GamesList(user_id=current_user.id,
-                                  media_id=media.id,
-                                  status=status,
-                                  completion=False,
-                                  time_played=playtime)
-            db.session.add(user_list)
-            db.session.commit()
-            games_added.append(name)
-
-    return games_not_added, games_already_inlist, games_added

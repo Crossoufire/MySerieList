@@ -1,6 +1,4 @@
 import json
-import time
-
 from flask import Blueprint
 from datetime import datetime
 from MyLists import db, bcrypt, app
@@ -56,14 +54,10 @@ def create_first_data():
     refresh_db_ranks()
 
     # add_eps_watched()
-    # add_collections_movies()
-    # add_hltb_time()
-    # add_manual_games()
 
     compute_media_time_spent(ListType.SERIES)
     compute_media_time_spent(ListType.ANIME)
     compute_media_time_spent(ListType.MOVIES)
-    compute_media_time_spent(ListType.GAMES)
 
     # update_Mylists_stats()
 
@@ -89,7 +83,6 @@ def mylists_stats():
     top_actors = json.loads(all_stats.top_actors)
     top_directors = json.loads(all_stats.top_directors)
     top_dropped = json.loads(all_stats.top_dropped)
-    top_games_companies = json.loads(all_stats.top_games_companies)
     total_episodes = json.loads(all_stats.total_episodes)
     total_seasons = json.loads(all_stats.total_seasons)
     total_movies = json.loads(all_stats.total_movies)
@@ -97,7 +90,7 @@ def mylists_stats():
     return render_template("mylists_stats.html", title='MyLists Stats', total_time=total_time, top_media=top_media,
                            top_genres=top_genres, top_actors=top_actors, top_directors=top_directors,
                            top_dropped=top_dropped, total_episodes=total_episodes, total_movies=total_movies,
-                           top_games_companies=top_games_companies, total_seasons=total_seasons)
+                           total_seasons=total_seasons)
 
 
 @bp.route("/current_trends", methods=['GET'])

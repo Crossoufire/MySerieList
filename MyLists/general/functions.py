@@ -1,17 +1,7 @@
-import json
-import secrets
-import requests
-import urllib.request
-from PIL import Image
-from tqdm import tqdm
 from pathlib import Path
 from MyLists import db, app
-from datetime import datetime
-from flask_login import current_user
-from MyLists.main.add_db import AddtoDB
-from MyLists.main.media_object import MediaDetails
-from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, MoviesCollections, get_total_time, \
-    SeriesList, AnimeList, Series, Anime, Games, GamesList, MoviesCollectionsParts, MoviesList
+from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, get_total_time, SeriesList, \
+    AnimeList, Series, Anime, MoviesList
 
 
 def compute_media_time_spent(list_type):
@@ -33,13 +23,6 @@ def compute_media_time_spent(list_type):
                         total_time += media[0].runtime * media[1].eps_watched
                     except Exception as e:
                         app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
-        elif list_type == ListType.GAMES:
-            for media in media_list:
-                if media[1].status != Status.PLAN_TO_PLAY:
-                    try:
-                        total_time += media[1].time_played
-                    except Exception as e:
-                        app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
 
         if list_type == ListType.SERIES:
             user.time_spent_series = total_time
@@ -47,8 +30,6 @@ def compute_media_time_spent(list_type):
             user.time_spent_anime = total_time
         elif list_type == ListType.MOVIES:
             user.time_spent_movies = total_time
-        elif list_type == ListType.GAMES:
-            user.time_spent_games = total_time
 
 
 # ---------------------------------------- DB add/refresh from CSV data ---------------------------------------------- #
@@ -153,102 +134,6 @@ def refresh_db_frames():
         frames[i - 1].image_id = list_all_frames[i][1]
 
 
-def add_collections_movies():
-    print('Started to add movies collection.')
-    local_covers_path = Path(app.root_path, "static/covers/movies_collection_covers/")
-
-    all_movies = Movies.query.all()
-    for movie in tqdm(all_movies):
-        tmdb_movies_id = movie.themoviedb_id
-
-        try:
-            response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
-                                    .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']), timeout=15)
-
-            collection_api_data = json.loads(response.text)
-
-            collection_id = collection_api_data["belongs_to_collection"]["id"]
-            collection_poster = collection_api_data["belongs_to_collection"]["poster_path"]
-
-            response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
-                                    .format(collection_id, app.config['THEMOVIEDB_API_KEY']), timeout=15)
-
-            collection_api_data = json.loads(response.text)
-
-            collection_name = collection_api_data["name"]
-            collection_overview = collection_api_data["overview"]
-            collection_poster_id = "{}.jpg".format(secrets.token_hex(8))
-
-            urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(collection_poster),
-                                       "{}/{}".format(local_covers_path, collection_poster_id))
-
-            img = Image.open("{}/{}".format(local_covers_path, collection_poster_id))
-            img = img.resize((300, 450), Image.ANTIALIAS)
-            img.save("{0}/{1}".format(local_covers_path, collection_poster_id), quality=90)
-
-            movie.collection_id = collection_id
-
-            # Test if collection already in MoviesCollection
-            if MoviesCollections.query.filter_by(collection_id=collection_id).first():
-                db.session.commit()
-                continue
-
-            add_collection = MoviesCollections(collection_id=collection_id,
-                                               name=collection_name,
-                                               image_cover=collection_poster_id,
-                                               synopsis=collection_overview)
-
-            db.session.add(add_collection)
-            db.session.commit()
-
-            MoviesCollectionsParts.query.filter_by(collection_id=collection_id).delete()
-            for part in collection_api_data['parts']:
-                dict_data = {'collection_id': collection_id,
-                             'part_name': part['title'],
-                             'part_release_date': part['release_date'],
-                             'part_tmdb_id': part['id']}
-                db.session.add(MoviesCollectionsParts(**dict_data))
-            db.session.commit()
-        except:
-            pass
-
-    print('Finished adding movies collection.')
-
-
-def refresh_collections_movies():
-    print('Started to refresh movies collection.')
-
-    all_collection_movies = MoviesCollections.query.filter_by().all()
-    for index, collection in enumerate(all_collection_movies):
-        print("Movie: {}/{}".format(index + 1, len(all_collection_movies)))
-        try:
-            response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
-                                    .format(collection.collection_id, app.config['THEMOVIEDB_API_KEY']))
-
-            data = json.loads(response.text)
-
-            remove = 0
-            utc_now = datetime.utcnow()
-            for part in data["parts"]:
-                part_date = part['release_date']
-                try:
-                    part_date_datetime = datetime.strptime(part_date, '%Y-%m-%d')
-                    difference = (utc_now - part_date_datetime).total_seconds()
-                    if float(difference) < 0:
-                        remove += 1
-                except:
-                    remove += 1
-
-            collection.parts = len(data["parts"]) - remove
-            collection.movies_names = ', '.join([part['title'] for part in data["parts"]])
-            collection.releases_dates = ', '.join([part['release_date'] for part in data["parts"]])
-
-            db.session.commit()
-        except:
-            continue
-    print('Finished refreshing movies collection.')
-
-
 def add_eps_watched():
     series_list = db.session.query(Series, SeriesList).join(Series, Series.id == SeriesList.media_id).all()
     anime_list = db.session.query(Anime, AnimeList).join(Anime, Anime.id == AnimeList.media_id).all()
@@ -281,72 +166,3 @@ def add_eps_watched():
         else:
             movie[1].eps_watched = 1 + movie[1].rewatched
     db.session.commit()
-
-
-def add_hltb_time():
-    list_all_hltb_games = []
-    path = Path(app.root_path, 'static/csv_data/HLTB_games.csv')
-    with open(path, encoding='utf-8') as fp:
-        for line in fp:
-            list_all_hltb_games.append(line.split(";"))
-
-    all_games = Games.query.all()
-    for game in all_games:
-        for htlb_game in list_all_hltb_games:
-            if game.name == htlb_game[1]:
-                try:
-                    game.hltb_main_time = float(htlb_game[2])*60
-                except:
-                    pass
-                try:
-                    game.hltb_main_and_extra_time = float(htlb_game[3])*60
-                except:
-                    pass
-                try:
-                    game.hltb_total_complete_time = float(htlb_game[4])*60
-                except:
-                    pass
-
-    db.session.commit()
-
-
-def add_manual_games():
-    headers = {'Client-ID': '5i5pi21s0ninkmp6jj09ix4l6fw5bd',
-               'Authorization': 'Bearer ' + '46gsxkz0svtqzujd4znmjqilhq0xa5'}
-
-    list_all_manual_games = []
-    path = Path(app.root_path, 'static/csv_data/amazon_games.csv')
-    with open(path, encoding='utf-8') as fp:
-        for line in fp:
-            list_all_manual_games.append(line.strip())
-
-    all_games = Games.query.all()
-    all_games_name = [x.name for x in all_games]
-    for game in list_all_manual_games:
-        if game in all_games_name:
-            continue
-        else:
-            try:
-                body = 'fields name, cover.image_id, collection.name, game_engines.name, game_modes.name, ' \
-                       'platforms.name, genres.name, player_perspectives.name, total_rating, total_rating_count, ' \
-                       'first_release_date, involved_companies.company.name, involved_companies.developer, ' \
-                       'involved_companies.publisher, storyline, summary, themes.name, url, external_games.uid,' \
-                       ' external_games.category; where name="{}";'.format(game)
-
-                response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers)
-                data = json.loads(response.text)
-
-                media_details = MediaDetails(data, ListType.GAMES).get_media_details()
-                media = AddtoDB(media_details, ListType.GAMES).add_media_to_db()
-
-                in_user_list = GamesList.query.filter_by(user_id=current_user.id, media_id=media.id).first()
-                if not in_user_list:
-                    user_list = GamesList(user_id=current_user.id,
-                                          media_id=media.id,
-                                          status=Status.OWNED,
-                                          completion=False,
-                                          time_played=0)
-                    db.session.add(user_list)
-                    db.session.commit()
-            except:
-                continue
