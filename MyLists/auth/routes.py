@@ -37,7 +37,6 @@ def home():
             flash('Login Failed. Please check username and password.', 'warning')
     elif register_form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(register_form.register_password.data).decode('utf-8')
-        # noinspection PyArgumentList
         user = User(username=register_form.register_username.data,
                     oauth_id='{}'.format(random.randint(0, 16846876000056)),
                     email=register_form.register_email.data,
@@ -146,7 +145,6 @@ def oauth_callback(provider):
 
     user = User.query.filter_by(oauth_id=social_id).first()
     if not user:
-        # noinspection PyArgumentList
         user = User(username=username,
                     oauth_id=social_id,
                     email=email,

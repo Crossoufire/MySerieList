@@ -167,7 +167,7 @@ if not app.debug and not app.testing:
     # buffered_handler.setTarget(mail_handler)
     # app.logger.addHandler(buffered_handler)
 
-    handler = RotatingFileHandler("MyLists/static/log/mylists.log", maxBytes=3000000, backupCount=5)
+    handler = RotatingFileHandler("MyLists/static/log/mylists.log", maxBytes=3000000, backupCount=15)
     handler.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s"))
     handler.setLevel(logging.INFO)
     app.logger.setLevel(logging.INFO)
