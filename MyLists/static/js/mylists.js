@@ -36,7 +36,9 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
             this.widget().menu('option', 'items', '> :not(.ui-autocomplete-category)');
         },
         _renderMenu: function (ul, items) {
-            var that = this, categories = [];
+            var that = this;
+            var categories = [];
+
             $.each(items, function (index, item) {
                 if (categories.indexOf(item.category) < 0 && item.category !== null) {
                     ul.append('<li class="ui-autocomplete-category">' + item.category + '</li>');
@@ -44,13 +46,20 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
                 }
                 that._renderItemData(ul, item);
             });
+
+            if (items[0].nb_results !== 0) {
+                var search = $('#autocomplete').val();
+                $('<li class="text-center p-t-5 p-b-5" style="background: #22748d;">' +
+                     '<a class="text-light" href="/search_media?search='+search+'&page=1">More results</a>' +
+                  '</li>').appendTo(ul);
+            }
         },
         _renderItemData(ul, item) {
-        return this._renderItem(ul, item).data("ui-autocomplete-item", item);
+            return this._renderItem(ul, item).data("ui-autocomplete-item", item);
         },
         _renderItem: function (ul, item) {
             ul.addClass('autocomplete-ul');
-            let $li, $img, info;
+            let $li, $img;
 
             if (item.nb_results === 0) {
                 $li = $('<li class="disabled bg-dark text-light p-l-5">No results found.</li>');

@@ -369,12 +369,13 @@ def your_next_airing():
 @login_required
 def search_media():
     search = request.args.get('search')
+    page = request.args.get('page', 1)
 
     if not search or len(search) == 0:
         return redirect(request.referrer)
 
     try:
-        data_search = ApiData().TMDb_search(search)
+        data_search = ApiData().TMDb_search(search, page=page)
     except Exception as e:
         data_search = {}
         app.logger.error('[SYSTEM] - Error requesting the TMDB API: {}'.format(e))

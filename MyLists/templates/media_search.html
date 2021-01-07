@@ -7,7 +7,13 @@
 
 
 {% block content %}
-    <h2 class="font-weight-light mt-1 mb-0 p-t-50">Search <b>></b> Results for <i>{{ search }}</i></h2>
+    <h2 class="font-weight-light mt-1 mb-0 p-t-50">
+        Search <b>></b> Results for <i>{{ search }}</i>
+    </h2>
+    <div class="float-r btn btn-small btn-primary">
+        Next page
+    </div>
+
     <ul class="nav nav-tabs md-tabs m-t-40" id="media-tab">
         <li class="nav-item">
             <div class="nav-link active" id="series-tab" data-toggle="tab"

@@ -19,9 +19,9 @@ class ApiData:
         if status_code != 200:
             abort(status_code)
 
-    def TMDb_search(self, media_name):
-        response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
-                                .format(self.tmdb_api_key, media_name))
+    def TMDb_search(self, media_name, page=1):
+        response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}&page={2}"
+                                .format(self.tmdb_api_key, media_name, page))
 
         self.status_code(response.status_code)
 

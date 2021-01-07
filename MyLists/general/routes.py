@@ -14,7 +14,6 @@ from MyLists.general.functions import compute_media_time_spent, add_badges_to_db
 bp = Blueprint('general', __name__)
 
 
-# noinspection PyArgumentList
 @bp.before_app_first_request
 def create_first_data():
     db.create_all()
@@ -54,11 +53,7 @@ def create_first_data():
     refresh_db_ranks()
 
     # add_eps_watched()
-
-    compute_media_time_spent(ListType.SERIES)
-    compute_media_time_spent(ListType.ANIME)
-    compute_media_time_spent(ListType.MOVIES)
-
+    compute_media_time_spent()
     # update_Mylists_stats()
 
     db.session.commit()
