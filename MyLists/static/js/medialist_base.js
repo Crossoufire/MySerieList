@@ -302,5 +302,5 @@ $infini_scroll.infiniteScroll({
     path: '.pagination__next',
     append: '.card-container',
     status: '.scroller-status',
-    hideNav: '.pagination',
+    hideNav: '.pagination.end',
 });

@@ -32,7 +32,7 @@ def compute_media_time_spent(list_type):
             user.time_spent_movies = total_time
 
 
-# ---------------------------------------- DB add/refresh from CSV data ---------------------------------------------- #
+# ---------------------------------------- DB add/refresh from CSV data ------------------------------------------- #
 
 
 def add_ranks_to_db():

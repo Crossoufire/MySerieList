@@ -50,7 +50,8 @@
                     </td>
                     <td>
                         <a class="text-light {% if user['isprivate'] and not user['isfollowing']
-                            and current_user.id != 1 %} disabled {% endif %}" href="/serieslist/{{ user['username'] }}">
+                           and current_user.id != 1 %} disabled {% endif %}"
+                           href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=user['username']) }}">
                             <img class="grade_picture" src="{{ user['series_data']['grade_id'] }}.png" alt="">
                             <br>
                             {{ user['series_data']['level'] }}
@@ -58,7 +59,8 @@
                     </td>
                     <td>
                         <a class="text-light {% if user['isprivate'] and not user['isfollowing']
-                            and current_user.id != 1 %} disabled {% endif %}" href="/animelist/{{ user['username'] }}">
+                           and current_user.id != 1 %} disabled {% endif %}"
+                           href="{{ url_for('main.mymedialist', media_list='animelist', user_name=user['username']) }}">
                             <img class="grade_picture" src="{{ user['anime_data']['grade_id'] }}.png" alt="">
                             <br>
                             {{ user['anime_data']['level'] }}
@@ -66,7 +68,8 @@
                     </td>
                     <td>
                         <a class="text-light {% if user['isprivate'] and not user['isfollowing']
-                            and current_user.id != 1 %} disabled {% endif %}" href="/movieslist/{{ user['username'] }}">
+                            and current_user.id != 1 %} disabled {% endif %}"
+                           href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=user['username']) }}">
                             <img class="grade_picture" src="{{ user['movies_data']['grade_id'] }}.png" alt="">
                             <br>
                             {{ user['movies_data']['level'] }}

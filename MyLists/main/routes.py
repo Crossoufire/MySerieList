@@ -16,9 +16,76 @@ from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwo
 bp = Blueprint('main', __name__)
 
 
-@bp.route("/<string:media_list>/<string:user_name>", methods=['GET', 'POST'])
+_MOVIES_GENRES = ["All", "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", "Family",
+                  "Fantasy", "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "TV Movie",
+                  "Thriller", "War", "Western"]
+
+_SERIES_GENRES = ["All", "Action & Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", "Family", "Kids",
+                  "Mystery", "News", "Reality", "Sci-Fi & Fantasy", "Soap", "Talk", "War & Politics", "Western"]
+
+# @bp.route("/<string:media_list>/<string:user_name>", methods=['GET', 'POST'])
+# @login_required
+# def mymedialist(media_list, user_name):
+#     # Check if the <user> can see the <media_list>
+#     user = current_user.check_autorization(user_name)
+#
+#     # Check if <media_list> is valid
+#     try:
+#         list_type = ListType(media_list)
+#     except ValueError:
+#         abort(404)
+#
+#     # Add views_count to the profile
+#     current_user.add_view_count(user, list_type)
+#
+#     # Check the <category>, the <page>, the <media_list> and the <html_template>.
+#     search = request.args.get('query')
+#     page = request.args.get('page', 1, int)
+#     option = request.args.get('option', None)
+#     sort_val = request.args.get('sort', 'title')
+#     filter_val = request.args.get('filter', 'check')
+#     category = request.args.get('category', 'Watching')
+#     html_template = 'medialist_tv.html'
+#
+#     # Get the <media_list> object
+#     if list_type == ListType.MOVIES:
+#         category = request.args.get('category', 'Completed')
+#         html_template = 'medialist_movies.html'
+#
+#     # Check the <args> then retrieve the corresponding <media_data>
+#     query, category = get_media_query(user.id, page, list_type, category, search, option, sort_val, filter_val)
+#
+#     # Get the actual page, total number of pages and the total number of media from the query
+#     items = query.items
+#     info_pages = {'actual_page': query.page, 'total_pages': query.pages, 'total_media': query.total}
+#
+#     # Get <common_media> and <total_media>
+#     common_media, total_media = get_media_count(user.id, list_type)
+#
+#     try:
+#         percentage = int((len(common_media)/total_media)*100)
+#     except ZeroDivisionError:
+#         percentage = 0
+#     common_elements = [len(common_media), total_media, percentage]
+#
+#     # Recover the data to a dict
+#     items_data_list = []
+#     for item in items:
+#         add_data = MediaListDict(item, common_media, list_type).redirect_medialist()
+#         items_data_list.append(add_data)
+#
+#     return render_template(html_template, title="{}'s {}".format(user_name, media_list), media_data=items_data_list,
+#                            common_elements=common_elements, media_list=media_list, username=user_name,
+#                            user_id=str(user.id), info_pages=info_pages, category=category, option=option,
+#                            sort_val=sort_val, filter_val=filter_val, search=search)
+
+
+@bp.route("/<string:media_list>/<string:user_name>/", methods=['GET', 'POST'])
+@bp.route("/<string:media_list>/<string:user_name>/<string:category>/", methods=['GET', 'POST'])
+@bp.route("/<string:media_list>/<string:user_name>/<string:category>/genre/<string:genre>/by/<string:sorting>"
+          "/page/<int:page_val>", methods=['GET', 'POST'])
 @login_required
-def mymedialist(media_list, user_name):
+def mymedialist(media_list, user_name, category='Watching', genre='All', sorting='title', page_val=1):
     # Check if the <user> can see the <media_list>
     user = current_user.check_autorization(user_name)
 
@@ -31,22 +98,17 @@ def mymedialist(media_list, user_name):
     # Add views_count to the profile
     current_user.add_view_count(user, list_type)
 
-    # Check the <category>, the <page>, the <media_list> and the <html_template>.
-    search = request.args.get('query')
-    page = request.args.get('page', 1, int)
-    option = request.args.get('option', None)
-    sort_val = request.args.get('sort', 'title')
-    filter_val = request.args.get('filter', 'check')
-    category = request.args.get('category', 'Watching')
-    html_template = 'medialist_tv.html'
+    filter_val = True
 
-    # Get the <media_list> object
+    # Recover the template
+    html_template = 'medialist_tv.html'
     if list_type == ListType.MOVIES:
-        category = request.args.get('category', 'Completed')
+        if category == 'Watching':
+            category = 'Completed'
         html_template = 'medialist_movies.html'
 
     # Check the <args> then retrieve the corresponding <media_data>
-    query, category = get_media_query(user.id, page, list_type, category, search, option, sort_val, filter_val)
+    query, category = get_media_query(user.id, page_val, list_type, category, sorting, genre)
 
     # Get the actual page, total number of pages and the total number of media from the query
     items = query.items
@@ -69,8 +131,8 @@ def mymedialist(media_list, user_name):
 
     return render_template(html_template, title="{}'s {}".format(user_name, media_list), media_data=items_data_list,
                            common_elements=common_elements, media_list=media_list, username=user_name,
-                           user_id=str(user.id), info_pages=info_pages, category=category, option=option,
-                           sort_val=sort_val, filter_val=filter_val, search=search)
+                           user_id=str(user.id), info_pages=info_pages, category=category, sorting=sorting,
+                           genre=genre, page=page_val, filter_val=filter_val, all_genres=_MOVIES_GENRES)
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])

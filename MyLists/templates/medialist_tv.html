@@ -1,4 +1,43 @@
-{% extends 'medialist_base.html' %}
+{% extends 'medialist_base_2.html' %}
+
+
+{% block categories %}
+    <a class="nav-link m-l-50 m-r-8 text-light"
+       {% if category == 'Watching' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
+       href="/{{ media_list }}/{{ username }}/Watching/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+        <b>WATCHING</b>
+    </a>
+    <a class="nav-link m-l-8 m-r-8 text-light"
+       {% if category == 'Completed' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
+       href="/{{ media_list }}/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+        <b>COMPLETED</b>
+    </a>
+    <a class="nav-link m-l-8 m-r-8 text-light"
+       {% if category == 'On Hold' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
+       href="/{{ media_list }}/{{ username }}/On Hold/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+        <b>ON HOLD</b>
+    </a>
+    <a class="nav-link m-l-8 m-r-8 text-light"
+       {% if category == 'Random' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
+       href="/{{ media_list }}/{{ username }}/Random/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+        <b>RANDOM</b>
+    </a>
+    <a class="nav-link m-l-8 m-r-8 text-light"
+       {% if category == 'Dropped' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
+       href="/{{ media_list }}/{{ username }}/Dropped/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+        <b>DROPPED</b>
+    </a>
+    <a class="nav-link m-l-8 m-r-8 text-light"
+       {% if category == 'Plan to Watch' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
+       href="/{{ media_list }}/{{ username }}/Plan to Watch/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+        <b>PLAN TO WATCH</b>
+    </a>
+    <a class="nav-link m-l-8 m-r-8 {% if media_list == 'serieslist' %}text-series {% elif media_list == 'animelist' %}
+     text-anime{% endif %} font-weight-bold" {% if category == 'Favorite' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
+       href="/{{ media_list }}/{{ username }}/Favorite/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+        <b>FAVORITES</b>
+    </a>
+{% endblock categories %}
 
 
 {% block sorting_list %}

@@ -1,4 +1,28 @@
-{% extends 'medialist_base.html' %}
+{% extends 'medialist_base_2.html' %}
+
+
+{% block categories %}
+    <a class="nav-link m-l-50 m-r-8 text-light"
+       {% if category == 'Completed' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
+       href="/movieslist/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+        <b>COMPLETED</b>
+    </a>
+    <a class="nav-link m-l-8 m-r-8 text-light"
+       {% if category == 'Completed Animation' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
+       href="/movieslist/{{ username }}/Completed Animation/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+        <b>COMPLETED ANIMATION</b>
+    </a>
+    <a class="nav-link m-l-8 m-r-8 text-light"
+       {% if category == 'Plan to Watch' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
+       href="/movieslist/{{ username }}/Plan to Watch/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+        <b>PLAN TO WATCH</b>
+    </a>
+    <a class="nav-link m-l-8 m-r-8 text-movies font-weight-bold"
+       {% if category == 'Favorite' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
+       href="/movieslist/{{ username }}/Favorite/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+        <b>FAVORITES</b>
+    </a>
+{% endblock categories %}
 
 
 {% block sorting_list %}

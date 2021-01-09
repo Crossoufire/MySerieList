@@ -60,23 +60,91 @@
             {% endblock button %}
         </div>
     </div>
-    <div class="{% if media_list == 'serieslist' %}bg-series-opa {% elif media_list == 'animelist' %}bg-anime-opa
-        {% else %}bg-movies-opa{% endif %} p-t-4 p-b-4">
-        <div class="mobile-sorting">
-            <label class="m-l-10 mb-0"><b>Sort by:</b></label>
-            <select class="m-l-8 search-select" onchange="sort_medialist(this)">
-                {% block sorting_list scoped %}
-                {% endblock sorting_list %}
-            </select>
+{#    <div class="{% if media_list == 'serieslist' %}bg-series-opa {% elif media_list == 'animelist' %}bg-anime-opa#}
+{#    {% else %}bg-movies-opa{% endif %} p-t-4 p-b-4">#}
+{#        <div class="mobile-sorting">#}
+{#            <label class="m-l-10 mb-0"><b>Sort by:</b></label>#}
+{#            <select class="m-l-8 search-select" onchange="sort_medialist(this)">#}
+{#                {% block sorting_list scoped %}#}
+{#                {% endblock sorting_list %}#}
+{#            </select>#}
+{#            {% if user_id != current_user.get_id() %}#}
+{#                <input id="shared-check" class="m-l-15" type="checkbox" value="{{ filter_val }}"#}
+{#                       onclick="filter_medialist()" {% if filter_val == 'check' %}checked {% endif %}>#}
+{#                <b> Show Shared</b>#}
+{#            {% endif %}#}
+{#            <div class="t-pages float-r m-r-10"><b>Total pages: {{ info_pages['total_pages'] }}</b></div>#}
+{#        </div>#}
+{#    </div>#}
+
+    <nav>
+        <div class="mobile-sorting text-right m-t-10">
             {% if user_id != current_user.get_id() %}
-                <input id="shared-check" class="m-l-15" type="checkbox" value="{{ filter_val }}" onclick="filter_medialist()"
-                {% if filter_val == 'check' %}checked {% endif %}>
+                <input id="shared-check" class="m-l-15" type="checkbox" value="{{ filter_val }}"
+                       onclick="filter_medialist()" {% if filter_val == 'check' %}checked {% endif %}>
                 <b> Show Shared</b>
             {% endif %}
-            <div class="t-pages float-r m-r-10"><b>Total pages: {{ info_pages['total_pages'] }}</b></div>
+            <li class="nav-item dropdown" style="list-style-type: none; display: inline-block;">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown">genre: {{ genre }}</a>
+                <div class="dropdown-menu bg-dark text-light">
+                    <a class="dropdown-item" href="/movieslist/Cross/Completed/by/title/page/1">
+                        <div>All</div>
+                    </a>
+                    <a class="dropdown-item" href="/movieslist/Cross/Completed/by/title/page/1">
+                        <div>Action</div>
+                    </a>
+                    <a class="dropdown-item"
+                        href="/movieslist/Cross/Completed/genre/Comedy/by/release_date/page/1">
+                        <div>Comedy</div>
+                    </a>
+                    <a class="dropdown-item" href="/movieslist/Cross/Completed/by/rewatch/page/1">
+                        <div>Science-Fiction</div>
+                    </a>
+                    <a class="dropdown-item"
+                        href="/movieslist/Cross/Completed/genre/drama/by/release_date/page/1">
+                        <div>Drama</div>
+                    </a>
+                    <a class="dropdown-item"
+                       href="/movieslist/Cross/Completed/genre/war/by/release_date/page/1">
+                        <div>War</div>
+                    </a>
+                </div>
+            </li>
+            <li class="nav-item dropdown" style="list-style-type: none; display: inline-block;">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown">Sort by: {{ sorting|upper }}</a>
+                <div class="dropdown-menu bg-dark text-light">
+                    <a class="dropdown-item" href="/movieslist/Cross/Completed/by/title/page/1">
+                        <div>Title</div>
+                    </a>
+                    <a class="dropdown-item" href="/movieslist/Cross/Completed/by/score/page/1">
+                        <div>Score</div>
+                    </a>
+                    <a class="dropdown-item" href="/movieslist/Cross/Completed/by/rewatch/page/1">
+                        <div>Rewatch</div>
+                    </a>
+                    <a class="dropdown-item" href="/movieslist/Cross/Completed/by/comment/page/1">
+                        <div>Comments</div>
+                    </a>
+                    <a class="dropdown-item" href="/movieslist/Cross/Completed/by/release_date/page/1">
+                        <div>Release date</div>
+                    </a>
+                </div>
+            </li>
         </div>
-    </div>
-    <h2 class="text-center m-t-50 mb-0">{{ category|upper }} ({{ info_pages['total_media'] }})</h2>
+        <hr style="border-top-color: grey; margin-top: -5px;">
+    </nav>
+
+    <ul class="pagination flex-wrap mt-4" style="justify-content: center; font-weight: 400;">
+        {% for i in range(info_pages['total_pages']) %}
+            <li class="page-item {% if i + 1 == info_pages['actual_page'] %}active {% endif %}">
+                <a class="page-link text-light" href="/movieslist/Cross/Completed/sort_by/{{ sorting }}/page/{{ i + 1 }}">
+                    {{ '{:02d}'.format(i + 1) }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2 class="text-center m-t-30 mb-0">{{ category|upper }} ({{ info_pages['total_media'] }})</h2>
     <hr class="mt-2 pb-3 mb-0">
     <div class="row infinite-scroll-container m-b-60">
         {% for data in media_data  %}
@@ -162,18 +230,18 @@
         {% endfor %}
     </div>
 
-    <div class="scroller-status">
-        <p class="infinite-scroll-error text-center"></p>
-    </div>
-    <p class="pagination">
-        {% if search %}
-            <a class="pagination__next"
-               href="/{{ media_list }}/{{ username }}?category=Search&query={{ search }}&option={{ option }}&sort={{ sort_val }}&filter={{ filter_val }}&page=2"></a>
-        {% else %}
-            <a class="pagination__next"
-               href="/{{ media_list }}/{{ username }}?category={{ category }}&sort={{ sort_val }}&filter={{ filter_val }}&page=2"></a>
-        {% endif %}
-    </p>
+{#    <div class="scroller-status">#}
+{#        <p class="infinite-scroll-error text-center"></p>#}
+{#    </div>#}
+{#    <p class="pagination end">#}
+{#        {% if search %}#}
+{#            <a class="pagination__next"#}
+{#               href="/{{ media_list }}/{{ username }}?category=Search&query={{ search }}&option={{ option }}&sort={{ sort_val }}&filter={{ filter_val }}&page=2"></a>#}
+{#        {% else %}#}
+{#            <a class="pagination__next"#}
+{#               href="/{{ media_list }}/{{ username }}?category={{ category }}&sort={{ sort_val }}&filter={{ filter_val }}&page=2"></a>#}
+{#        {% endif %}#}
+{#    </p>#}
 {% endblock content %}
 
 

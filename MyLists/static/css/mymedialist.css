@@ -4,6 +4,35 @@ option {
     background: rgba(0, 0, 0, 0.8);
 }
 
+.category-nav {
+    background: #202222;
+    border-radius: 7px;
+}
+
+.border-genre-sorting {
+    margin-top: -5px;
+}
+
+.li-genre-sort {
+    list-style-type: none;
+    display: inline-block;
+}
+
+.pagination-css {
+    justify-content: center;
+    font-weight: 400;
+}
+
+.category-color {
+    font-weight: 400;
+    color: lightgrey;
+}
+
+.common-color {
+    display: inline-block;
+    color: darkgrey;
+}
+
 .back-image {
     background-image: url('/static/img/profile_background.jpg');
     background-size: cover;
