@@ -4,32 +4,32 @@ from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames
     AnimeList, Series, Anime, MoviesList
 
 
-def compute_media_time_spent(list_type):
+def compute_media_time_spent():
     users = User.query.all()
 
     for user in users:
-        media_list = get_total_time(user.id, list_type)
-        total_time = 0
-        if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            for media in media_list:
-                try:
-                    total_time += media[0].episode_duration * media[1].eps_watched
-                except Exception as e:
-                    app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
-        elif list_type == ListType.MOVIES:
-            for media in media_list:
-                if media[1].status != Status.PLAN_TO_WATCH:
+        for list_type in ListType:
+            media_list = get_total_time(user.id, list_type)
+            total_time = 0
+            if list_type == ListType.SERIES or list_type == ListType.ANIME:
+                for media in media_list:
+                    try:
+                        total_time += media[0].episode_duration * media[1].eps_watched
+                    except Exception as e:
+                        app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
+            elif list_type == ListType.MOVIES:
+                for media in media_list:
                     try:
                         total_time += media[0].runtime * media[1].eps_watched
                     except Exception as e:
                         app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
 
-        if list_type == ListType.SERIES:
-            user.time_spent_series = total_time
-        elif list_type == ListType.ANIME:
-            user.time_spent_anime = total_time
-        elif list_type == ListType.MOVIES:
-            user.time_spent_movies = total_time
+            if list_type == ListType.SERIES:
+                user.time_spent_series = total_time
+            elif list_type == ListType.ANIME:
+                user.time_spent_anime = total_time
+            elif list_type == ListType.MOVIES:
+                user.time_spent_movies = total_time
 
 
 # ---------------------------------------- DB add/refresh from CSV data ------------------------------------------- #

@@ -560,9 +560,5 @@ def scheduled_task():
     new_releasing_series()
     new_releasing_anime()
     automatic_movies_locking()
-
-    compute_media_time_spent(ListType.SERIES)
-    compute_media_time_spent(ListType.ANIME)
-    compute_media_time_spent(ListType.MOVIES)
-
+    compute_media_time_spent()
     update_Mylists_stats()
