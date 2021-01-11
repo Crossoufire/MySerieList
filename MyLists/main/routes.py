@@ -1,5 +1,6 @@
 import json
 import pytz
+from random import shuffle
 from MyLists import db, app
 from datetime import datetime
 from MyLists.API_data import ApiData
@@ -471,15 +472,18 @@ def search_media():
         # Put data in different lists in function of media type
         if result['media_type'] == 'tv':
             media_data['url'] = f"https://www.themoviedb.org/tv/{result['id']}"
+            media_data['media'] = 'Series'
             if result['origin_country'] == 'JP' or result['original_language'] == 'ja' \
                     and 16 in result['genre_ids']:
                 media_data['media_type'] = ListType.ANIME.value
                 media_data['name'] = result['name']
+                media_data['media'] = 'Anime'
                 anime_results.append(media_data)
             else:
                 media_data['media_type'] = ListType.SERIES.value
                 series_results.append(media_data)
         elif result['media_type'] == 'movie':
+            media_data['media'] = 'Movies'
             media_data['media_type'] = ListType.MOVIES.value
             media_data['url'] = f"https://www.themoviedb.org/movie/{result['id']}"
             if result['original_language'] == 'ja' and 16 in result['genre_ids']:
@@ -491,13 +495,14 @@ def search_media():
     if platform == "iphone" or platform == "android" or platform == 'None' or not platform:
         template = 'media_search_mobile.html'
     else:
-        template = 'media_search.html'
+        template = 'media_search_2.html'
+
+    all_results = series_results + anime_results + movies_results
+    shuffle(all_results)
 
     return render_template(template,
                            title="Media search",
-                           series_results=series_results,
-                           anime_results=anime_results,
-                           movies_results=movies_results,
+                           all_results=all_results,
                            search=search)
 
 
