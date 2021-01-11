@@ -6,17 +6,14 @@
     <style rel="stylesheet">
         {% if media_list == 'serieslist' %}
             hr {
-                margin-top: 5px;
                 border-top: 1px solid #216e7d;
             }
         {% elif media_list == 'animelist' %}
             hr {
-                margin-top: 5px;
                 border-top: 1px solid #945141;
             }
         {% elif media_list == 'movieslist' %}
             hr {
-                margin-top: 5px;
                 border-top: 1px solid #8c7821;
             }
         {% endif %}
@@ -31,38 +28,45 @@
                data-toggle="tooltip" title="{{ username }}"></a>
             {% if media_list == 'serieslist' %}
                 <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip"
-                   href="/animelist/{{ username }}/Watching/genre/All/by/title/page/1" title="Anime list"></a>
+                   href="/animelist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Anime list"></a>
                 <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip"
-                   href="/movieslist/{{ username }}/Completed/genre/All/by/title/page/1" title="Movies list"></a>
+                   href="/movieslist/{{ username }}/Completed/genre/All/by/title-A-Z/page/1" title="Movies list"></a>
             {% elif media_list == 'animelist' %}
                 <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip"
-                   href="/serieslist/{{ username }}/Watching/genre/All/by/title/page/1" title="Series list"></a>
+                   href="/serieslist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Series list"></a>
                 <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip"
-                   href="/movieslist/{{ username }}/Completed/genre/All/by/title/page/1" title="Movies list"></a>
+                   href="/movieslist/{{ username }}/Completed/genre/All/by/title-A-Z/page/1" title="Movies list"></a>
             {% elif media_list == 'movieslist' %}
                 <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip"
-                   href="/serieslist/{{ username }}/Watching/genre/All/by/title/page/1" title="Series list"></a>
+                   href="/serieslist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Series list"></a>
                 <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip"
-                   href="/animelist/{{ username }}/Watching/genre/All/by/title/page/1" title="Anime list"></a>
+                   href="/animelist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Anime list"></a>
             {% endif %}
             {% block categories scoped %}
             {% endblock categories %}
         </ul>
     </nav>
-    <div class="mobile-sorting text-right m-t-30">
+
+    <div class="float-l m-t-30">
+        <form method="GET">
+            <input class="modded-input" name="q" placeholder="&#128269; Search..." value="{{ search_q }}"
+               onfocus="this.placeholder = '';" onblur="this.placeholder = '&#128269; Search...';">
+        </form>
+    </div>
+    <div class="float-r m-t-30">
         {% if user_id != current_user.get_id() %}
             <a class="text-light m-r-15"
-            href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
-                <input type="checkbox" name="tata" value="{{ filter_val }}" {% if filter_val == True %}checked {% endif %}>
-                <b> Show Shared</b>
-            </a>
+        href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+            <input type="checkbox" name="tata" value="{{ filter_val }}" {% if filter_val == True %}checked {% endif %}>
+            <b> Show Shared</b>
+        </a>
         {% endif %}
         <li class="nav-item dropdown li-genre-sort">
             <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Genre: {{ genre|upper }}</b></a>
-            <div class="dropdown-menu" style="background: #0f0f0f;">
+            <div class="dropdown-menu" style="background-color: #0f0f0f; overflow: auto; max-height: 400px;">
                 {% for genre in all_genres %}
                     <a class="dropdown-item text-light"
-                       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+                       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/1">
                         <div>{{ genre }}</div>
                     </a>
                 {% endfor %}
@@ -72,29 +76,35 @@
             <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Sort by: {{ sorting|upper }}</b></a>
             <div class="dropdown-menu" style="background: #0f0f0f;">
                 <a class="dropdown-item text-light"
-                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title/page/{{ page }}">
+                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-A-Z/page/1">
                     <div>Title A-Z</div>
                 </a>
                 <a class="dropdown-item text-light"
-                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score/page/{{ page }}">
-                    <div>Score</div>
+                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-Z-A/page/1">
+                    <div>Title Z-A</div>
                 </a>
                 <a class="dropdown-item text-light"
-                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/rewatch/page/{{ page }}">
-                    <div>Rewatch</div>
+                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_desc/page/1">
+                    <div>Score desc</div>
                 </a>
                 <a class="dropdown-item text-light"
-                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/comment/page/{{ page }}">
+                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_asc/page/1">
+                    <div>Score asc</div>
+                </a>
+                <a class="dropdown-item text-light"
+                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/rewatched/page/1">
+                    <div>Rewatched</div>
+                </a>
+                <a class="dropdown-item text-light"
+                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/comments/page/1">
                     <div>Comments</div>
                 </a>
-                <a class="dropdown-item text-light"
-                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/release_date/page/{{ page }}">
-                    <div>Release date</div>
-                </a>
+                {% block sorting_list %}
+                {% endblock sorting_list %}
             </div>
         </li>
     </div>
-    <hr class="border-genre-sorting">
+    <hr style="margin-top: 62px;">
 
     {% if info_pages['total_pages'] != 1 %}
         <ul class="pagination flex-wrap mt-4 pagination-css">

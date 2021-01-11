@@ -1,30 +1,30 @@
 
-Settings:
-  Enhance: Better CSS
-
 Trends:
-  Add: Trending table (automatic update at 3:AM)
-
-User Last Updates:
-  Add: Delete media information
+    Add: A trending table (with automatic update at 3:00 AM)
 
 Media sheet:
-  Add: Airing dates for each seasons
-  Enhance: Add Genres to the metadata edit
+    Enhance: Add genres modif to the metadata edit
 
 Account:
-  Enhance: Possibility to change background image
-  Add: New achievements system
-  Enhance: Notification system (follow's level up)
+    Enhance: Possibility to change background image
+    Add: New achievements system
+
+MyLists Stats:
+    Enhance: Better CSS and presentation
+
+More Stats:
+    Add: More stats
+    Enchance: Better python and CSS
 
 General:
-  Add: Contact form
-  Enhance: Change the hamburger display to a vertical panel in mobile
-  Add: If API down, user can still add media but check in our database instead of API
-  Enhance: Create one admin with admin view (HoF, Stats, admin and settings) and one standard user
+    Enhance: Change the hamburger display to a vertical panel in mobile
+    Add: If API down, user can still add media but check in local database instead of API
+    Enhance: followed level up notification
+    Enhance: From APScheduler to CRON
+    Add: Use redis queue
+    Add: Finish the PWA
 
-
-Add redis queue
-Change mylists stats
-Finish the PWA
-From aps to cron
+On going:
+    Add: Search in medialist
+    Fix: If genre is 'all' not showing everything
+    Add: Show shared

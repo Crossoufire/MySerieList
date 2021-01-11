@@ -4,46 +4,58 @@
 {% block categories %}
     <a class="nav-link m-l-50 m-r-8 text-light"
        {% if category == 'Completed' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/movieslist/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+       href="/movieslist/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>COMPLETED</b>
     </a>
     <a class="nav-link m-l-8 m-r-8 text-light"
        {% if category == 'Completed Animation' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/movieslist/{{ username }}/Completed Animation/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+       href="/movieslist/{{ username }}/Completed Animation/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>COMPLETED ANIMATION</b>
     </a>
     <a class="nav-link m-l-8 m-r-8 text-light"
        {% if category == 'Plan to Watch' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/movieslist/{{ username }}/Plan to Watch/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+       href="/movieslist/{{ username }}/Plan to Watch/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>PLAN TO WATCH</b>
     </a>
     <a class="nav-link m-l-8 m-r-8 text-movies font-weight-bold"
        {% if category == 'Favorite' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/movieslist/{{ username }}/Favorite/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+       href="/movieslist/{{ username }}/Favorite/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>FAVORITES</b>
     </a>
 {% endblock categories %}
 
 
 {% block sorting_list %}
-    <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Title</option>
-    <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>
-    <option {% if sort_val == 'rewatch' %}selected="selected"{% endif %} value="rewatch">Rewatch</option>
-    <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>
-    <option {% if sort_val == 'release_date' %}selected="selected"{% endif %} value="release_date">Release date</option>
+    <a class="dropdown-item text-light"
+       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/release_date_desc/page/1">
+        <div>Release dates desc</div>
+    </a>
+    <a class="dropdown-item text-light"
+       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/release_date_asc/page/1">
+        <div>Release dates asc</div>
+    </a>
 {% endblock sorting_list %}
 
 
-{% block button %}
-    <a class="btn btn-sm {% if category == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"
-    href="/{{ media_list }}/{{ username }}?category=Completed&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED</a>
-    <a class="btn btn-sm {% if category == 'Completed Animation' %} btn-selected {% else %} btn-header {% endif %}"
-    href="/{{ media_list }}/{{ username }}?category=Completed Animation&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED ANIMATION</a>
-    <a class="btn btn-sm {% if category == 'Plan to Watch' %} btn-selected {% else %} btn-header {% endif %}"
-    href="/{{ media_list }}/{{ username }}?category=Plan to Watch&sort={{ sort_val }}&filter={{ filter_val }}">PLAN TO WATCH</a>
-    <a class="btn btn-sm {% if category == 'Favorite' %}btn-selected-fav {% else %} btn-header-fav{% endif %}"
-    href="/{{ media_list }}/{{ username }}?category=Favorite&sort={{ sort_val }}&filter={{ filter_val }}">FAVORITES</a>
-{% endblock button %}
+{#{% block sorting_list %}#}
+{#    <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Title</option>#}
+{#    <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>#}
+{#    <option {% if sort_val == 'rewatch' %}selected="selected"{% endif %} value="rewatch">Rewatch</option>#}
+{#    <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>#}
+{#    <option {% if sort_val == 'release_date' %}selected="selected"{% endif %} value="release_date">Release date</option>#}
+{#{% endblock sorting_list %}#}
+{##}
+{##}
+{#{% block button %}#}
+{#    <a class="btn btn-sm {% if category == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"#}
+{#    href="/{{ media_list }}/{{ username }}?category=Completed&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED</a>#}
+{#    <a class="btn btn-sm {% if category == 'Completed Animation' %} btn-selected {% else %} btn-header {% endif %}"#}
+{#    href="/{{ media_list }}/{{ username }}?category=Completed Animation&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED ANIMATION</a>#}
+{#    <a class="btn btn-sm {% if category == 'Plan to Watch' %} btn-selected {% else %} btn-header {% endif %}"#}
+{#    href="/{{ media_list }}/{{ username }}?category=Plan to Watch&sort={{ sort_val }}&filter={{ filter_val }}">PLAN TO WATCH</a>#}
+{#    <a class="btn btn-sm {% if category == 'Favorite' %}btn-selected-fav {% else %} btn-header-fav{% endif %}"#}
+{#    href="/{{ media_list }}/{{ username }}?category=Favorite&sort={{ sort_val }}&filter={{ filter_val }}">FAVORITES</a>#}
+{#{% endblock button %}#}
 
 
 {% block data %}

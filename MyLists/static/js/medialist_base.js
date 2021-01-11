@@ -294,13 +294,3 @@ $(document).ready(function() {
     }
     $(window).resize(gutter).trigger('resize');
 });
-
-
-// --- Init Infinite Scroll --------------------------------
-$infini_scroll = $('.infinite-scroll-container');
-$infini_scroll.infiniteScroll({
-    path: '.pagination__next',
-    append: '.card-container',
-    status: '.scroller-status',
-    hideNav: '.pagination.end',
-});

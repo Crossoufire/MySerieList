@@ -60,10 +60,8 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle fs-18" data-toggle="dropdown">MyLists</a>
                         <div class="dropdown-menu medialist-dropdown">
-{#                            <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',#}
-{#                                    media_list='serieslist', user_name=current_user.username) }}">#}
                             <a class="dropdown-item text-light"
-                               href="/serieslist/{{ current_user.username }}/Watching/genre/All/by/title/page/1">
+                               href="/serieslist/{{ current_user.username }}/Watching/genre/All/by/title-A-Z/page/1">
                                 <div class="row">
                                     <div class="col-3" style="margin-right: -5px;">
                                         <i class="fas fa-tv text-series"></i>
@@ -71,10 +69,8 @@
                                     <div class="col-9">SeriesList</div>
                                 </div>
                             </a>
-{#                            <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',#}
-{#                                media_list='animelist', user_name=current_user.username) }}">#}
                             <a class="dropdown-item text-light"
-                               href="/animelist/{{ current_user.username }}/Watching/genre/All/by/title/page/1">
+                               href="/animelist/{{ current_user.username }}/Watching/genre/All/by/title-A-Z/page/1">
                                 <div class="row">
                                     <div class="col-3" style="margin-right: -5px;">
                                         <i class="fas fa-torii-gate text-anime"></i>
@@ -82,10 +78,8 @@
                                     <div class="col-9">AnimeList</div>
                                 </div>
                             </a>
-{#                            <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',#}
-{#                                media_list='movieslist', user_name=current_user.username) }}">#}
                             <a class="dropdown-item text-light"
-                               href="/movieslist/{{ current_user.username }}/Completed/genre/All/by/title/page/1">
+                               href="/movieslist/{{ current_user.username }}/Completed/genre/All/by/title-A-Z/page/1">
                                 <div class="row">
                                     <div class="col-3" style="margin-right: -5px;">
                                         <i class="fas fa-film text-movies"></i>

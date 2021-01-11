@@ -4,67 +4,79 @@
 {% block categories %}
     <a class="nav-link m-l-50 m-r-8 text-light"
        {% if category == 'Watching' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/{{ media_list }}/{{ username }}/Watching/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+       href="/{{ media_list }}/{{ username }}/Watching/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>WATCHING</b>
     </a>
     <a class="nav-link m-l-8 m-r-8 text-light"
        {% if category == 'Completed' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/{{ media_list }}/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+       href="/{{ media_list }}/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>COMPLETED</b>
     </a>
     <a class="nav-link m-l-8 m-r-8 text-light"
        {% if category == 'On Hold' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/{{ media_list }}/{{ username }}/On Hold/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+       href="/{{ media_list }}/{{ username }}/On Hold/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>ON HOLD</b>
     </a>
     <a class="nav-link m-l-8 m-r-8 text-light"
        {% if category == 'Random' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/{{ media_list }}/{{ username }}/Random/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+       href="/{{ media_list }}/{{ username }}/Random/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>RANDOM</b>
     </a>
     <a class="nav-link m-l-8 m-r-8 text-light"
        {% if category == 'Dropped' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/{{ media_list }}/{{ username }}/Dropped/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+       href="/{{ media_list }}/{{ username }}/Dropped/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>DROPPED</b>
     </a>
     <a class="nav-link m-l-8 m-r-8 text-light"
        {% if category == 'Plan to Watch' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/{{ media_list }}/{{ username }}/Plan to Watch/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+       href="/{{ media_list }}/{{ username }}/Plan to Watch/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>PLAN TO WATCH</b>
     </a>
     <a class="nav-link m-l-8 m-r-8 {% if media_list == 'serieslist' %}text-series {% elif media_list == 'animelist' %}
      text-anime{% endif %} font-weight-bold" {% if category == 'Favorite' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/{{ media_list }}/{{ username }}/Favorite/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+       href="/{{ media_list }}/{{ username }}/Favorite/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>FAVORITES</b>
     </a>
 {% endblock categories %}
 
 
 {% block sorting_list %}
-    <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Title</option>
-    <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>
-    <option {% if sort_val == 'rewatch' %}selected="selected"{% endif %} value="rewatch">Rewatch</option>
-    <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>
-    <option {% if sort_val == 'first_air_date' %}selected="selected"{% endif %} value="first_air_date">Release date</option>
+    <a class="dropdown-item text-light"
+       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/first_air_date_desc/page/1">
+        <div>First Air Date desc</div>
+    </a>
+    <a class="dropdown-item text-light"
+       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/first_air_date_asc/page/1">
+        <div>First Air Date asc</div>
+    </a>
 {% endblock sorting_list %}
 
 
-{% block button %}
-    <a class="btn btn-sm {% if category == 'Watching' %}btn-selected{% else %} btn-header{% endif %}"
-    href="/{{ media_list }}/{{ username }}?category=Watching&sort={{ sort_val }}&filter={{ filter_val }}">WATCHING</a>
-    <a class="btn btn-sm {% if category == 'Completed' %}btn-selected {% else %} btn-header{% endif %}"
-    href="/{{ media_list }}/{{ username }}?category=Completed&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED</a>
-    <a class="btn btn-sm {% if category == 'On Hold' %}btn-selected {% else %} btn-header{% endif %}"
-    href="/{{ media_list }}/{{ username }}?category=On Hold&sort={{ sort_val }}&filter={{ filter_val }}">ON HOLD</a>
-    <a class="btn btn-sm {% if category == 'Random' %}btn-selected {% else %} btn-header{% endif %}"
-    href="/{{ media_list }}/{{ username }}?category=Random&sort={{ sort_val }}&filter={{ filter_val }}">RANDOM</a>
-    <a class="btn btn-sm {% if category == 'Dropped' %}btn-selected {% else %} btn-header{% endif %}"
-    href="/{{ media_list }}/{{ username }}?category=Dropped&sort={{ sort_val }}&filter={{ filter_val }}">DROPPED</a>
-    <a class="btn btn-sm {% if category == 'Plan to Watch' %}btn-selected {% else %} btn-header {% endif %}"
-    href="/{{ media_list }}/{{ username }}?category=Plan to Watch&sort={{ sort_val }}&filter={{ filter_val }}">PLAN TO WATCH</a>
-    <a class="btn btn-sm {% if category == 'Favorite' %}btn-selected-fav {% else %} btn-header-fav{% endif %}"
-    href="/{{ media_list }}/{{ username }}?category=Favorite&sort={{ sort_val }}&filter={{ filter_val }}">FAVORITES</a>
-{% endblock button %}
+{#{% block sorting_list %}#}
+{#    <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Title</option>#}
+{#    <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>#}
+{#    <option {% if sort_val == 'rewatch' %}selected="selected"{% endif %} value="rewatch">Rewatch</option>#}
+{#    <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>#}
+{#    <option {% if sort_val == 'first_air_date' %}selected="selected"{% endif %} value="first_air_date">Release date</option>#}
+{#{% endblock sorting_list %}#}
+
+
+{#{% block button %}#}
+{#    <a class="btn btn-sm {% if category == 'Watching' %}btn-selected{% else %} btn-header{% endif %}"#}
+{#    href="/{{ media_list }}/{{ username }}?category=Watching&sort={{ sort_val }}&filter={{ filter_val }}">WATCHING</a>#}
+{#    <a class="btn btn-sm {% if category == 'Completed' %}btn-selected {% else %} btn-header{% endif %}"#}
+{#    href="/{{ media_list }}/{{ username }}?category=Completed&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED</a>#}
+{#    <a class="btn btn-sm {% if category == 'On Hold' %}btn-selected {% else %} btn-header{% endif %}"#}
+{#    href="/{{ media_list }}/{{ username }}?category=On Hold&sort={{ sort_val }}&filter={{ filter_val }}">ON HOLD</a>#}
+{#    <a class="btn btn-sm {% if category == 'Random' %}btn-selected {% else %} btn-header{% endif %}"#}
+{#    href="/{{ media_list }}/{{ username }}?category=Random&sort={{ sort_val }}&filter={{ filter_val }}">RANDOM</a>#}
+{#    <a class="btn btn-sm {% if category == 'Dropped' %}btn-selected {% else %} btn-header{% endif %}"#}
+{#    href="/{{ media_list }}/{{ username }}?category=Dropped&sort={{ sort_val }}&filter={{ filter_val }}">DROPPED</a>#}
+{#    <a class="btn btn-sm {% if category == 'Plan to Watch' %}btn-selected {% else %} btn-header {% endif %}"#}
+{#    href="/{{ media_list }}/{{ username }}?category=Plan to Watch&sort={{ sort_val }}&filter={{ filter_val }}">PLAN TO WATCH</a>#}
+{#    <a class="btn btn-sm {% if category == 'Favorite' %}btn-selected-fav {% else %} btn-header-fav{% endif %}"#}
+{#    href="/{{ media_list }}/{{ username }}?category=Favorite&sort={{ sort_val }}&filter={{ filter_val }}">FAVORITES</a>#}
+{#{% endblock button %}#}
 
 
 {% block data %}

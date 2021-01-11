@@ -696,40 +696,44 @@ class GlobalStats:
 #     return query, cat_value
 
 
-def get_media_query(user_id, page, list_type, category, sort_val, genre):
+def get_media_query(user_id, page, list_type, category, sort_val, genre, q):
     if list_type == ListType.SERIES:
         media = Series
         media_list = SeriesList
-        actors_list = SeriesActors
+        media_actors = SeriesActors
         media_genre = SeriesGenre
-        add_sort_option = {'rewatch': media_list.rewatched.desc(),
-                           'first_air_date': media.first_air_date.desc()}
+        sort_option = {'first_air_date_desc': media.first_air_date.desc(),
+                       'first_air_date_asc': media.first_air_date.asc()}
     elif list_type == ListType.ANIME:
         media = Anime
         media_list = AnimeList
-        actors_list = AnimeActors
+        media_actors = AnimeActors
         media_genre = AnimeGenre
-        add_sort_option = {'rewatch': media_list.rewatched.desc(),
-                           'first_air_date': media.first_air_date.desc()}
+        sort_option = {'first_air_date_desc': media.first_air_date.desc(),
+                       'first_air_date_asc': media.first_air_date.asc()}
     elif list_type == ListType.MOVIES:
         media = Movies
         media_list = MoviesList
         media_genre = MoviesGenre
-        add_sort_option = {'rewatch': media_list.rewatched.desc(),
-                           'release_date': media.release_date.desc()}
+        media_actors = MoviesActors
+        sort_option = {'release_date_asc': media.release_date.asc(),
+                       'release_date_desc': media.release_date.desc()}
 
-    filter_val = False
-
-    sorting_dict = {'title': media.name,
-                    'score': media_list.score.desc(),
-                    'comment': media_list.comment.desc()}
-    sorting_dict.update(add_sort_option)
+    # Create a sorting dict and update the unique values
+    sorting_dict = {'title-A-Z': media.name.asc(),
+                    'title-Z-A': media.name.desc(),
+                    'score_desc': media_list.score.desc(),
+                    'score_asc': media_list.score.asc(),
+                    'comments': media_list.comment.desc(),
+                    'rewatched': media_list.rewatched.desc()}
+    sorting_dict.update(sort_option)
 
     try:
         sorting = sorting_dict[sort_val]
     except KeyError:
-        sorting = media.name
+        sorting = media.name.asc()
 
+    # Check the category
     try:
         category = Status(category)
         cat_value = category.value
@@ -741,6 +745,7 @@ def get_media_query(user_id, page, list_type, category, sort_val, genre):
         genre_filter = text('')
 
     # Check the <filter_val> value
+    filter_val = False
     com_ids = [-1]
     if filter_val:
         v1, v2 = aliased(media_list), aliased(media_list)
@@ -758,10 +763,20 @@ def get_media_query(user_id, page, list_type, category, sort_val, genre):
                     genre_filter) \
             .group_by(media.id).order_by(sorting).paginate(page, 50, error_out=True)
     elif category == 'Favorite':
-        query = db.session.query(media, media_list) \
+        query = db.session.query(media, media_list, media_genre) \
             .join(media, media.id == media_list.media_id) \
-            .filter(media_list.favorite, media_list.user_id == user_id, media_list.media_id.notin_(com_ids)) \
-            .order_by(sorting).paginate(page, 25, error_out=True)
+            .join(media_genre, media_genre.media_id == media_list.media_id) \
+            .filter(media_list.user_id == user_id, media_list.favorite, media_list.media_id.notin_(com_ids),
+                    genre_filter) \
+            .group_by(media.id).order_by(sorting).paginate(page, 50, error_out=True)
+    elif category == 'Search':
+        query = db.session.query(media, media_list, media_genre, media_actors) \
+            .join(media, media.id == media_list.media_id) \
+            .join(media_genre, media_genre.media_id == media_list.media_id) \
+            .join(media_actors, media_actors.media_id == media_list.media_id) \
+            .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter,
+                    or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'))) \
+            .group_by(media.id).order_by(sorting).paginate(page, 50, error_out=True)
 
     return query, cat_value
 

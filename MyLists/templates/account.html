@@ -7,18 +7,15 @@
             <div class="follow-btn-mobile">
                 {% if header_data["isfollowing"] %}
                     <button id="follow_{{ header_data['id'] }}" class="btn btn-sm btn-dark follow-btn" value="1"
-                     onclick="follow_status(this, '{{ header_data['id'] }}')">
-                        Unfollow
-                    </button>
+                     onclick="follow_status(this, '{{ header_data['id'] }}')">Unfollow</button>
                 {% else %}
                     <button id="follow_{{ header_data['id'] }}" class="btn btn-sm btn-primary follow-btn" value="0"
-                     onclick="follow_status(this, '{{ header_data['id'] }}')">
-                        Follow
-                    </button>
+                     onclick="follow_status(this, '{{ header_data['id'] }}')">Follow</button>
                 {% endif %}
                 <i id="load_{{ header_data['id'] }}" class="fas fa-spinner fast-spin" style="display: none;"></i>
             </div>
         {% endif %}
+
         <div class="row m-t-15">
             <div class="col-xl-3 col-lg col-md-5">
                 <ul class="list-unstyled">
