@@ -53,8 +53,6 @@ def mymedialist(media_list, user_name, category='Watching', genre='All', sorting
     if search_query is not None:
         category = 'Search'
 
-    print(category)
-
     # Recover the template
     html_template = 'medialist_tv.html'
     if list_type == ListType.SERIES:
@@ -410,7 +408,7 @@ def search_media():
         return redirect(request.referrer)
 
     # Recover 1 page of results (20 max) without peoples
-    series_results, anime_results, movies_results = [], [], []
+    media_results = []
     for result in data_search["results"]:
         if result.get('known_for_department'):
             continue
@@ -439,17 +437,17 @@ def search_media():
                 media_data['media_type'] = ListType.ANIME.value
                 media_data['name'] = result['name']
                 media_data['media'] = 'Anime'
-                anime_results.append(media_data)
+                media_results.append(media_data)
             else:
                 media_data['media_type'] = ListType.SERIES.value
-                series_results.append(media_data)
+                media_results.append(media_data)
         elif result['media_type'] == 'movie':
             media_data['media'] = 'Movies'
             media_data['media_type'] = ListType.MOVIES.value
             media_data['url'] = f"https://www.themoviedb.org/movie/{result['id']}"
             if result['original_language'] == 'ja' and 16 in result['genre_ids']:
                 media_data['name'] = result['title']
-            movies_results.append(media_data)
+            media_results.append(media_data)
 
     # Get the plateform to display the appropriate template
     platform = str(request.user_agent.platform)
@@ -458,13 +456,12 @@ def search_media():
     else:
         template = 'media_search_2.html'
 
-    all_results = series_results + anime_results + movies_results
-    shuffle(all_results)
-
     return render_template(template,
                            title="Media search",
-                           all_results=all_results,
-                           search=search)
+                           all_results=media_results,
+                           search=search,
+                           page=int(page),
+                           total_results=data_search['total_results'])
 
 
 # --- AJAX Methods ----------------------------------------------------------------------------------

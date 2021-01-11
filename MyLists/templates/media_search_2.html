@@ -23,20 +23,22 @@
             min-height: 225px;
             width: 150px;
         }
+        .card-hashtag {
+            position: absolute;
+            bottom: -8px;
+            right: 16px;
+        }
     </style>
 {% endblock css %}
 
 
 {% block content %}
-    <h2 class="font-weight-light mt-1 mb-0 p-t-50">
-        Search <b>></b> Results for <i>{{ search }}</i>
+    <h2 class="font-weight-light m-l-8 mt-1 mb-0 p-t-50">
+        Search <b>></b> Results for <i>"{{ search }}"</i>
+        <div class="float-r fs-18 m-t-15 m-r-8">Total: {{ total_results }} results</div>
     </h2>
-    <div class="float-r btn btn-small btn-primary">
-        Next page
-    </div>
-
-    <div class="m-b-50">
-        <div class="d-flex flex-wrap justify-content-center m-t-30">
+    <hr style="margin-top: 3px;">
+    <div class="d-flex flex-wrap justify-content-center m-t-30">
             {% for media in all_results %}
                 <a class="card mb-4 {% if media['media_type'] == 'serieslist' %}card-series
                 {% elif media['media_type'] == 'animelist' %}card-anime{% else %}card-movies{% endif %}"
@@ -62,13 +64,18 @@
                                         <i>No overview accessible for this content.</i>
                                     {% endif %}
                                 </p>
-
+                                <p class="card-hashtag text-light fs-20">#{{ media['media']|replace('s', '') }}</p>
                             </div>
                         </div>
                     </div>
                 </a>
             {% endfor %}
         </div>
+    <div class="text-center m-b-50">
+        {% if page > 1 %}
+            <a class="btn btn-primary" href="/search_media?search={{ search }}&page={{ page - 1 }}">Previous page</a>
+        {% endif %}
+        <a class="btn btn-primary" href="/search_media?search={{ search }}&page={{ page + 1 }}">Next page</a>
     </div>
 
 {% endblock content %}
