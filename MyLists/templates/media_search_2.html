@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+    <link href="{{ url_for('static', filename='css/search_media.css') }}" rel="stylesheet">
+    <style>
+        .card-series {
+            background: #216c7d;
+            width: 700px;
+            border-radius: 0;
+        }
+        .card-anime {
+            background: #945141;
+            width: 700px;
+            border-radius: 0;
+        }
+        .card-movies {
+            background: #8c7821;
+            width: 700px;
+            border-radius: 0;
+        }
+        .img-min-height {
+            min-height: 225px;
+            width: 150px;
+        }
+    </style>
+{% endblock css %}
+
+
+{% block content %}
+    <h2 class="font-weight-light mt-1 mb-0 p-t-50">
+        Search <b>></b> Results for <i>{{ search }}</i>
+    </h2>
+    <div class="float-r btn btn-small btn-primary">
+        Next page
+    </div>
+
+    <div class="m-b-50">
+        <div class="d-flex flex-wrap justify-content-center m-t-30">
+            {% for media in all_results %}
+                <a class="card mb-4 {% if media['media_type'] == 'serieslist' %}card-series
+                {% elif media['media_type'] == 'animelist' %}card-anime{% else %}card-movies{% endif %}"
+                href="/media_sheet/{{ media['media'] }}/{{ media['api_id'] }}?search=True">
+                    <div class="row no-gutters">
+                        <div class="col-3 p-3">
+                            <img class="img-min-height" src="{{ media['poster_path'] }}" alt=""/>
+                        </div>
+                        <div class="col-9">
+                            <div class="card-body p-3">
+                                <h5 class="card-title">
+                                    <div class="text-light fs-20 giveMeEllipsis2">
+                                        {{ media['name'] }}
+                                    </div>
+                                    <div class="fs-15 text-grey">
+                                        <i>{{ media['first_air_date'] }}</i>
+                                    </div>
+                                </h5>
+                                <p class="fs-15 text-light giveMeEllipsis-3 m-b-0">
+                                    {% if media['overview'] %}
+                                        {{ media['overview'] }}
+                                    {% else %}
+                                        <i>No overview accessible for this content.</i>
+                                    {% endif %}
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock content %}
+
+
+{% block script %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/media_search.js') }}"></script>
+{% endblock script %}
