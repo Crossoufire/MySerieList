@@ -202,7 +202,7 @@ def get_updates(last_update):
             element_data["border"] = "#216e7d"
         elif element.media_type == ListType.ANIME:
             element_data["category"] = "Anime"
-            element_data["icon-color"] = "fas torii-gate text-anime"
+            element_data["icon-color"] = "fas fa-torii-gate text-anime"
             element_data["border"] = "#945141"
         elif element.media_type == ListType.MOVIES:
             element_data["category"] = "Movies"

@@ -1,4 +1,4 @@
-{% extends 'medialist_base_2.html' %}
+{% extends 'medialist_base.html' %}
 
 
 {% block categories %}
@@ -38,6 +38,39 @@
         <b>FAVORITES</b>
     </a>
 {% endblock categories %}
+
+
+{% block categories_mob %}
+    <a class="btn text-light{% if category == 'Watching' %} btn-primary{% endif %}"
+       href="/{{ media_list }}/{{ username }}/Watching/genre/{{ genre }}/by/{{ sorting }}/page/1">
+        <b>WATCHING</b>
+    </a>
+    <a class="btn text-light{% if category == 'Completed' %} btn-primary{% endif %}"
+       href="/{{ media_list }}/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/1">
+        <b>COMPLETED</b>
+    </a>
+    <a class="btn text-light{% if category == 'On Hold' %} btn-primary{% endif %}"
+       href="/{{ media_list }}/{{ username }}/On Hold/genre/{{ genre }}/by/{{ sorting }}/page/1">
+        <b>ON HOLD</b>
+    </a>
+    <a class="btn text-light{% if category == 'Random' %} btn-primary{% endif %}"
+       href="/{{ media_list }}/{{ username }}/Random/genre/{{ genre }}/by/{{ sorting }}/page/1">
+        <b>RANDOM</b>
+    </a>
+    <a class="btn text-light{% if category == 'Dropped' %} btn-primary{% endif %}"
+       href="/{{ media_list }}/{{ username }}/Dropped/genre/{{ genre }}/by/{{ sorting }}/page/1">
+        <b>DROPPED</b>
+    </a>
+    <a class="btn text-light{% if category == 'Plan to Watch' %} btn-primary{% endif %}"
+       href="/{{ media_list }}/{{ username }}/Plan to Watch/genre/{{ genre }}/by/{{ sorting }}/page/1">
+        <b>PLAN TO WATCH</b>
+    </a>
+    <a class="btn {% if media_list == 'serieslist' %}text-series {% elif media_list == 'animelist' %}
+     text-anime{% endif %} font-weight-bold{% if category == 'Favorite' %} btn-primary text-light{% endif %}"
+       href="/{{ media_list }}/{{ username }}/Favorite/genre/{{ genre }}/by/{{ sorting }}/page/1">
+        <b>FAVORITES</b>
+    </a>
+{% endblock categories_mob %}
 
 
 {% block sorting_list %}

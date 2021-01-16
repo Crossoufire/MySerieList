@@ -1,15 +1,14 @@
 import json
 import pytz
-from random import shuffle
 from MyLists import db, app
 from datetime import datetime
 from MyLists.API_data import ApiData
 from MyLists.main.add_db import AddtoDB
 from flask_login import login_required, current_user
 from MyLists.main.forms import EditMediaData, MediaComment
-from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect, g
-from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaListDict
+from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
+from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaListDict
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MoviesGenre, MediaType, get_next_airing, \
     check_media, User, get_media_query, get_media_count
@@ -49,7 +48,6 @@ def mymedialist(media_list, user_name, category='Watching', genre='All', sorting
 
     # Go to the search category if query is not none
     search_query = request.args.get('q')
-    print(search_query)
     if search_query is not None:
         category = 'Search'
 
@@ -88,11 +86,18 @@ def mymedialist(media_list, user_name, category='Watching', genre='All', sorting
         add_data = MediaListDict(item, common_media, list_type).redirect_medialist()
         items_data_list.append(add_data)
 
+    # Get the plateform to display the appropriate template
+    mobile = False
+    platform = str(request.user_agent.platform)
+    if platform == "iphone" or platform == "android" or platform == 'None' or not platform:
+        mobile = True
+
+    print(mobile)
+
     return render_template(html_template, title="{}'s {}".format(user_name, media_list), media_data=items_data_list,
                            common_elements=common_elements, media_list=media_list, username=user_name,
                            user_id=str(user.id), info_pages=info_pages, category=category, sorting=sorting,
-                           genre=genre, page=page_val, filter_val=filter_val, all_genres=all_genres,
-                           search_q=search_query)
+                           genre=genre, page=page_val, filter_val=filter_val, all_genres=all_genres, mobile=mobile)
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
@@ -450,14 +455,14 @@ def search_media():
             media_results.append(media_data)
 
     # Get the plateform to display the appropriate template
+    mobile = False
     platform = str(request.user_agent.platform)
     if platform == "iphone" or platform == "android" or platform == 'None' or not platform:
-        template = 'media_search_mobile.html'
-    else:
-        template = 'media_search_2.html'
+        mobile = True
 
-    return render_template(template,
-                           title="Media search",
+    return render_template('media_search.html',
+                           title="Search",
+                           mobile=mobile,
                            all_results=media_results,
                            search=search,
                            page=int(page),
