@@ -1,16 +1,119 @@
 
-/* --- Header CSS --------------------------------------- */
-option {
+/* --- Icon/Common Header CSS -------------------------------------- */
+.icon-header {
+    background: #2a2b2d;
+    border-radius: 10px;
+    text-align: left;
+    margin-top: 40px;
+}
+
+.return-icon {
     background: rgba(0, 0, 0, 0.8);
+    padding: 13px 13px 13px 13px;
+    border-radius: 20%;
 }
 
-.category-nav {
-    background: #202222;
-    border-radius: 7px;
+.return-icon-tv {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 13px 10px 13px 10px;
+    border-radius: 20%;
 }
 
-.border-genre-sorting {
-    margin-top: -5px;
+.common-media-pos {
+    float: right;
+    background: #2a2b2d;
+    border-radius: 10px;
+}
+
+.common-media {
+    background: rgba(0, 0, 0, 0.7);
+    min-width: 300px;
+    padding: 5px 5px 5px 5px;
+    color: darkgrey;
+    font-weight: 400;
+}
+
+.common-media-meter {
+	height: 8px;
+	background: rgba(5, 5, 5, 0.6);
+}
+
+.common-media-meter-bar {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    background-color: forestgreen;
+}
+
+@media (max-width: 500px) {
+    .icon-header {
+        text-align: center;
+        border-radius: 0;
+    }
+    .common-media-pos {
+        float: none;
+        margin-top: 20px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 80%;
+    }
+}
+
+
+/* --- Categories Header CSS --------------------------------------- */
+.cat-header {
+    background: #242623;
+    border-radius: 10px;
+    margin-top: 40px;
+    text-align: center;
+}
+
+.cat-btn {
+    display: inline-block;
+    padding: 5px 0 5px 0;
+    margin: 0 15px 0 15px;
+    color: lightgray;
+    font-weight: 300;
+    font-size: 14pt;
+    cursor: pointer;
+    background-color: transparent;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    -moz-box-shadow: none !important;
+}
+
+.cat-btn:hover {
+    color: white;
+}
+
+.btn-selected {
+    background-color: none;
+    border-bottom: 4px solid #264e27;
+}
+
+@media (max-width: 500px) {
+    .cat-header {
+        border-radius: 0;
+    }
+    .cat-btn {
+        display: inline-block;
+        padding: 5px 10px 5px 10px;
+        background-color: #403e3e;
+        margin: 5px;
+        border-radius: 10px;
+        font-size: 11pt;
+    }
+    .btn-selected {
+        background-color: #402222;
+        border-bottom: none;
+    }
+}
+
+
+/* --- Search/Genres/Sort Header CSS ------------------------------- */
+.genre-sort-pos{
+    float: right;
 }
 
 .li-genre-sort {
@@ -18,34 +121,22 @@ option {
     display: inline-block;
 }
 
-.pagination-css {
-    justify-content: center;
-    font-weight: 400;
-}
-
-.category-color {
-    font-weight: 400;
-    color: lightgrey;
-}
-
-.common-color {
-    display: inline-block;
-    color: darkgrey;
+.hr-genre-sort {
+    margin-top: 72px;
 }
 
 .dropdown-item:hover {
     background-color: black;
 }
 
-.back-image {
-    background-image: url('/static/img/profile_background.jpg');
-    background-size: cover;
-    height: 210px;
+.genre-drop {
+    background-color: #0f0f0f;
+    overflow: auto;
+    max-height: 400px;
 }
 
-.header-bar {
-    border-color: darkgrey;
-    margin: 15px 20px 0 20px;
+.sort-drop {
+    background-color: #0f0f0f;
 }
 
 .modded-input {
@@ -65,115 +156,35 @@ option {
     opacity: 1;
 }
 
-.btn-header {
-    background-color: rgba(0, 0, 0, 0.7);
+@media (max-width: 500px) {
+    .genre-sort-pos {
+        float: none;
+        text-align: center;
+    }
+    .hr-genre-sort {
+        margin: 0;
+    }
+    .genre-drop {
+        max-height: 250px;
+    }
 }
 
-.btn-header-fav {
-    background-color: rgba(140, 15, 15, 0.7);
-}
 
-.btn-header:hover, .btn-header-fav:hover {
-    color: white;
-}
-
-.btn-selected {
-    background-color: darkslategrey;
-}
-
-.btn-selected-fav {
-    background-color: darkred;
-}
-
-.btn-selected:hover, .btn-selected-fav:hover {
-    color: white;
-}
-
-.common-media {
-    background: rgba(0, 0, 0, 0.7);
-    min-width: 300px;
-    padding: 5px 5px 5px 5px;
-    color: darkgrey;
+/* --- Pagination Header CSS --------------------------------------- */
+.pagination-css {
+    justify-content: center;
     font-weight: 400;
 }
 
-.common-media-meter {
-	height: 8px;
-	background: rgba(50, 50, 50, 0.8);
-}
 
-.common-media-meter-bar {
-    display: block;
-    position: relative;
-    overflow: hidden;
-    height: 100%;
-    background-color: forestgreen;
-}
-
-.search-select {
-    background: rgba(0, 0, 0, 0.7);
-    color: darkgray;
-    margin-left: 10px;
-}
-
-.return-icon {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 13px 13px 13px 13px;
-}
-
-.return-icon-tv {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 13px 10px 13px 10px;
-}
-
-@media (max-width: 769px) {
-    .modded-input {
-        width: 40vw;
-    }
-}
-@media (max-width: 592px) {
-    .center-mobile {
-        justify-content: center;
-    }
-    .icons-mobile {
-        margin-left: 0;
-    }
-}
-@media (max-width: 469px) {
-    .back-image {
-        height: 260px;
-    }
-}
-@media (max-width: 451px) {
-    .modded-input {
-        width: 75vw;
-    }
-    .back-image {
-        height: 300px;
-    }
-}
-@media (max-width: 412px) {
-    .modded-input {
-        width: 60vw;
-    }
-    .back-image {
-        height: 340px;
-    }
-    .mobile-sorting {
-        text-align: center;
-    }
-    .mobile-sorting > label {
-        margin-left: 0 !important;
-    }
-    .t-pages {
-        text-align: center;
-        margin-top: 5px;
-        float: none !important;
-    }
+/* --- Media Header CSS -------------------------------------------- */
+.category-color {
+    font-weight: 400;
+    color: lightgrey;
 }
 
 
-/* --- Card CSS ----------------------------------------- */
+/* --- Card CSS ---------------------------------------------------- */
 .card {
     border-radius: 0 !important;
     margin-bottom: 50px;
@@ -441,7 +452,7 @@ input[type=number] {
 }
 
 
-/* --- Your next airing CSS ----------------------------- */
+/* --- Next airing CSS --------------------------------------------- */
 .absolute-data {
     background-color: #21263b;
     border-top: solid 1px black;

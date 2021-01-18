@@ -86,18 +86,10 @@ def mymedialist(media_list, user_name, category='Watching', genre='All', sorting
         add_data = MediaListDict(item, common_media, list_type).redirect_medialist()
         items_data_list.append(add_data)
 
-    # Get the plateform to display the appropriate template
-    mobile = False
-    platform = str(request.user_agent.platform)
-    if platform == "iphone" or platform == "android" or platform == 'None' or not platform:
-        mobile = True
-
-    print(mobile)
-
     return render_template(html_template, title="{}'s {}".format(user_name, media_list), media_data=items_data_list,
                            common_elements=common_elements, media_list=media_list, username=user_name,
                            user_id=str(user.id), info_pages=info_pages, category=category, sorting=sorting,
-                           genre=genre, page=page_val, filter_val=filter_val, all_genres=all_genres, mobile=mobile)
+                           genre=genre, page=page_val, filter_val=filter_val, all_genres=all_genres)
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])

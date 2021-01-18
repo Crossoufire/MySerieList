@@ -2,24 +2,20 @@
 
 
 {% block categories %}
-    <a class="nav-link m-l-50 m-r-8 text-light"
-       {% if category == 'Completed' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/movieslist/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/1">
+    <a class="cat-btn {% if category == 'Completed' %}btn-selected{% endif %}"
+       href="/{{ media_list }}/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>COMPLETED</b>
     </a>
-    <a class="nav-link m-l-8 m-r-8 text-light"
-       {% if category == 'Completed Animation' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/movieslist/{{ username }}/Completed Animation/genre/{{ genre }}/by/{{ sorting }}/page/1">
+    <a class="cat-btn {% if category == 'Completed Animation' %}btn-selected{% endif %}"
+       href="/{{ media_list }}/{{ username }}/Completed Animation/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>COMPLETED ANIMATION</b>
     </a>
-    <a class="nav-link m-l-8 m-r-8 text-light"
-       {% if category == 'Plan to Watch' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/movieslist/{{ username }}/Plan to Watch/genre/{{ genre }}/by/{{ sorting }}/page/1">
+    <a class="cat-btn {% if category == 'Plan to Watch' %}btn-selected{% endif %}"
+       href="/{{ media_list }}/{{ username }}/Plan to Watch/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>PLAN TO WATCH</b>
     </a>
-    <a class="nav-link m-l-8 m-r-8 text-movies font-weight-bold"
-       {% if category == 'Favorite' %} style="border-bottom: #8c7821 3px solid;" {% endif %}
-       href="/movieslist/{{ username }}/Favorite/genre/{{ genre }}/by/{{ sorting }}/page/1">
+    <a class="cat-btn {% if category == 'Favorite' %}btn-selected{% endif %}"
+       href="/{{ media_list }}/{{ username }}/Favorite/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>FAVORITES</b>
     </a>
 {% endblock categories %}
