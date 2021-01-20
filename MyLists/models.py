@@ -740,7 +740,7 @@ def get_media_query(user_id, page, list_type, category, sort_val, genre, q):
     except:
         cat_value = category
 
-    genre_filter = media_genre.genre.like('%' + genre + '%')
+    genre_filter = media_genre.genre.like(genre)
     if genre == 'All':
         genre_filter = text('')
 
@@ -761,14 +761,14 @@ def get_media_query(user_id, page, list_type, category, sort_val, genre, q):
             .join(media_genre, media_genre.media_id == media_list.media_id) \
             .filter(media_list.user_id == user_id, media_list.status == category, media_list.media_id.notin_(com_ids),
                     genre_filter) \
-            .group_by(media.id).order_by(sorting).paginate(page, 50, error_out=True)
+            .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
     elif category == 'Favorite':
         query = db.session.query(media, media_list, media_genre) \
             .join(media, media.id == media_list.media_id) \
             .join(media_genre, media_genre.media_id == media_list.media_id) \
             .filter(media_list.user_id == user_id, media_list.favorite, media_list.media_id.notin_(com_ids),
                     genre_filter) \
-            .group_by(media.id).order_by(sorting).paginate(page, 50, error_out=True)
+            .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
     elif category == 'Search':
         query = db.session.query(media, media_list, media_genre, media_actors) \
             .join(media, media.id == media_list.media_id) \
@@ -776,7 +776,7 @@ def get_media_query(user_id, page, list_type, category, sort_val, genre, q):
             .join(media_actors, media_actors.media_id == media_list.media_id) \
             .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter,
                     or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'))) \
-            .group_by(media.id).order_by(sorting).paginate(page, 50, error_out=True)
+            .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
 
     return query, cat_value
 
@@ -816,7 +816,8 @@ def get_next_airing(list_type):
     query = db.session.query(media, media_list) \
         .join(media, media.id == media_list.media_id) \
         .filter(media_data > datetime.utcnow(), media_list.user_id == current_user.id,
-                and_(media_list.status != Status.RANDOM, media_list.status != Status.DROPPED)).all()
+                and_(media_list.status != Status.RANDOM, media_list.status != Status.DROPPED)) \
+        .order_by(media_data.asc()).all()
 
     return query
 

@@ -26,8 +26,19 @@ _ANIME_GENRES = ['All', 'Action', 'Adventure', 'Cars', 'Comedy', 'Dementia', 'De
                  'Samurai', 'Romance', 'School', 'Sci-Fi', "Shoujo", 'Shounen', 'Space', 'Sports', 'Super Power',
                  'Vampire', 'Harem', 'Slice Of Life', 'Supernatural', 'Military', 'Police', 'Psychological',
                  'Thriller', 'Seinen', 'Josei']
+_SORTING = {'title-A-Z': 'title A-Z',
+            'title-Z-A': 'title Z-A',
+            'score_desc': 'score 🠗',
+            'score_asc': 'score 🠕',
+            'comments': 'comments',
+            'rewatched': 'rewatch',
+            'release_date_desc': 'release date 🠗',
+            'release_date_asc': 'release date 🠕',
+            'first_air_date_desc': 'first air date 🠗',
+            'first_air_date_asc': 'first air date 🠕'}
 
 
+@bp.route("/<string:media_list>/<string:user_name>/search", methods=['GET', 'POST'])
 @bp.route("/<string:media_list>/<string:user_name>/", methods=['GET', 'POST'])
 @bp.route("/<string:media_list>/<string:user_name>/<string:category>/", methods=['GET', 'POST'])
 @bp.route("/<string:media_list>/<string:user_name>/<string:category>/genre/<string:genre>/by/<string:sorting>"
@@ -86,10 +97,16 @@ def mymedialist(media_list, user_name, category='Watching', genre='All', sorting
         add_data = MediaListDict(item, common_media, list_type).redirect_medialist()
         items_data_list.append(add_data)
 
+    try:
+        sorting_bis = _SORTING[sorting]
+    except KeyError:
+        abort(400)
+
     return render_template(html_template, title="{}'s {}".format(user_name, media_list), media_data=items_data_list,
                            common_elements=common_elements, media_list=media_list, username=user_name,
                            user_id=str(user.id), info_pages=info_pages, category=category, sorting=sorting,
-                           genre=genre, page=page_val, filter_val=filter_val, all_genres=all_genres)
+                           genre=genre, page=page_val, filter_val=filter_val, all_genres=all_genres,
+                           sorting_bis=sorting_bis)
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])

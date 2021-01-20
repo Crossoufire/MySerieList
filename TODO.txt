@@ -29,6 +29,3 @@ General:
 On going:
     Add: Show shared
     Add: Search in medialist
-    Fix: Change sorting display name
-    Fix: Change category url name
-    Fix: If genre is 'all' not showing everything

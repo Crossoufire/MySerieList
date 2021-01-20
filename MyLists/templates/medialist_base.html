@@ -22,57 +22,61 @@
 
 
 {% block content %}
-    <div class="icon-header p-2">
-        <a class="fas fa-lg fa-user m-r-10 m-l-12 return-icon text-grey" href="/account/{{ username }}"
-           data-toggle="tooltip" title="{{ username }}"></a>
-        {% if media_list == 'serieslist' %}
-            <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip"
-               href="/animelist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Anime list"></a>
-            <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip"
-               href="/movieslist/{{ username }}/Completed/genre/All/by/title-A-Z/page/1" title="Movies list"></a>
-        {% elif media_list == 'animelist' %}
-            <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip"
-               href="/serieslist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Series list"></a>
-            <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip"
-               href="/movieslist/{{ username }}/Completed/genre/All/by/title-A-Z/page/1" title="Movies list"></a>
-        {% elif media_list == 'movieslist' %}
-            <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip"
-               href="/serieslist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Series list"></a>
-            <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip"
-               href="/animelist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Anime list"></a>
-        {% endif %}
+    <div class="row no-gutters m-t-30">
+        <div class="col-2">
+            <a class="fas fa-lg fa-user m-r-10 return-icon text-grey" href="/account/{{ username }}"
+               data-toggle="tooltip" title="{{ username }}"></a>
+            {% if media_list == 'serieslist' %}
+                <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip"
+                   href="/animelist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Anime list"></a>
+                <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip"
+                   href="/movieslist/{{ username }}/Completed/genre/All/by/title-A-Z/page/1" title="Movies list"></a>
+            {% elif media_list == 'animelist' %}
+                <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip"
+                   href="/serieslist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Series list"></a>
+                <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip"
+                   href="/movieslist/{{ username }}/Completed/genre/All/by/title-A-Z/page/1" title="Movies list"></a>
+            {% elif media_list == 'movieslist' %}
+                <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip"
+                   href="/serieslist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Series list"></a>
+                <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip"
+                   href="/animelist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Anime list"></a>
+            {% endif %}
+        </div>
+        <div class="col-8 text-center">
+            <form method="GET">
+                <input class="modded-input" name="q" placeholder="&#128269; Search..." value="{{ search_q }}"
+                 onfocus="this.placeholder = '';" onblur="this.placeholder = '&#128269; Search...';">
+            </form>
+        </div>
         {% if user_id != current_user.get_id() %}
-            <div class="common-media-pos text-light m-t-4 m-r-15">
-                <div>You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)</div>
+            <div class="col-2">
+                <div class="text-center" style="color: lightgrey;">
+                    {{ common_elements[0] }}/{{ common_elements[1] }} shared ({{ common_elements[2] }}%)
+                </div>
                 <div class="common-media-meter">
                     <span class="common-media-meter-bar" style="width: {{ common_elements[2] }}%;"></span>
                 </div>
             </div>
         {% endif %}
     </div>
-    <div class="cat-header p-2">
+
+    <div class="text-center m-t-40 m-b-20 p-1" style="background: #34383c;">
         {% block categories scoped %}
         {% endblock categories %}
     </div>
 
-
-{#    <div class="float-l m-t-30">#}
-{#        <form method="GET">#}
-{#            <input class="modded-input" name="q" placeholder="&#128269; Search..." value="{{ search_q }}"#}
-{#               onfocus="this.placeholder = '';" onblur="this.placeholder = '&#128269; Search...';">#}
-{#        </form>#}
-{#    </div>#}
-
-    <div class="genre-sort-pos m-t-40">
-{#        {% if user_id != current_user.get_id() %}#}
-{#            <a class="text-light m-r-15"#}
-{#            href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">#}
-{#            <input type="checkbox" name="tata" value="{{ filter_val }}" {% if filter_val == True %}checked {% endif %}>#}
-{#            <b> Show Shared</b>#}
-{#        </a>#}
-{#        {% endif %}#}
-        <li class="nav-item dropdown li-genre-sort">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Genre: {{ genre|upper }}</b></a>
+    <h4 class="text-left m-t-45 mb-0 category-color">{{ category|upper }} ({{ info_pages['total_media'] }})</h4>
+    <div class="float-r m-t-45">
+        {% if user_id != current_user.get_id() %}
+            <a class="text-grey m-r-15"
+            href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
+                <input type="checkbox" name="tata" value="{{ filter_val }}" {% if filter_val == True %}checked {% endif %}>
+                <b> Shared</b>
+            </a>
+        {% endif %}
+        <li class="nav-item dropdown li-genre-sort text-grey">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Genre {{ genre|upper }}</b></a>
             <div class="dropdown-menu genre-drop">
                 {% for genre in all_genres %}
                     <a class="dropdown-item text-light"
@@ -82,8 +86,8 @@
                 {% endfor %}
             </div>
         </li>
-        <li class="nav-item dropdown li-genre-sort">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Sort by: {{ sorting|upper }}</b></a>
+        <li class="nav-item dropdown li-genre-sort text-grey">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Sort by {{ sorting_bis|upper }}</b></a>
             <div class="dropdown-menu sort-drop">
                 <a class="dropdown-item text-light"
                    href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-A-Z/page/1">
@@ -95,11 +99,11 @@
                 </a>
                 <a class="dropdown-item text-light"
                    href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_desc/page/1">
-                    <div>Score desc</div>
+                    <div>Score 🠗</div>
                 </a>
                 <a class="dropdown-item text-light"
                    href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_asc/page/1">
-                    <div>Score asc</div>
+                    <div>Score 🠕</div>
                 </a>
                 <a class="dropdown-item text-light"
                    href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/rewatched/page/1">
@@ -114,23 +118,7 @@
             </div>
         </li>
     </div>
-    <hr class="hr-genre-sort">
-
-    <ul class="pagination flex-wrap m-t-50 pagination-css">
-        {% for i in range(info_pages['total_pages']) %}
-            <li class="page-item {% if i + 1 == info_pages['actual_page'] %}active {% endif %}">
-                <a class="page-link text-light"
-                href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/{{ i + 1 }}">
-                    {{ '{:02d}'.format(i + 1) }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
-
-    <h4 class="text-left m-t-35 mb-0 category-color">
-        {{ category|upper }} ({{ info_pages['total_media'] }})
-    </h4>
-    <hr class="mt-2 pb-3 mb-0 top-global">
+    <hr class="mt-2 pb-3 mb-0">
 
     <div class="row m-b-40">
         {% for data in media_data  %}

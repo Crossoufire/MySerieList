@@ -10,19 +10,11 @@
 .return-icon {
     background: rgba(0, 0, 0, 0.8);
     padding: 13px 13px 13px 13px;
-    border-radius: 20%;
 }
 
 .return-icon-tv {
     background: rgba(0, 0, 0, 0.8);
     padding: 13px 10px 13px 10px;
-    border-radius: 20%;
-}
-
-.common-media-pos {
-    float: right;
-    background: #2a2b2d;
-    border-radius: 10px;
 }
 
 .common-media {
@@ -88,8 +80,7 @@
 }
 
 .btn-selected {
-    background-color: none;
-    border-bottom: 4px solid #264e27;
+    color: lightskyblue;
 }
 
 @media (max-width: 500px) {
@@ -112,10 +103,6 @@
 
 
 /* --- Search/Genres/Sort Header CSS ------------------------------- */
-.genre-sort-pos{
-    float: right;
-}
-
 .li-genre-sort {
     list-style-type: none;
     display: inline-block;
@@ -143,6 +130,7 @@
     background: transparent;
     color: lightgray;
     border: none;
+    border-bottom: 1px solid #3b3434;
     padding: 5px;
     width: 15vw;
 }
@@ -176,11 +164,24 @@
     font-weight: 400;
 }
 
+.pagination .page-item.active .page-link {
+   background-color: #3c3b3b !important;
+}
+
+.page-link {
+    padding: 8px;
+}
+
+.page-link:hover {
+   background-color: #3c3b3b !important;
+}
+
 
 /* --- Media Header CSS -------------------------------------------- */
 .category-color {
     font-weight: 400;
     color: lightgrey;
+    display: inline-block;
 }
 
 
