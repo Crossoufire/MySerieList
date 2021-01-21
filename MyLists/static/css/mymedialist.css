@@ -1,12 +1,5 @@
 
 /* --- Icon/Common Header CSS -------------------------------------- */
-.icon-header {
-    background: #2a2b2d;
-    border-radius: 10px;
-    text-align: left;
-    margin-top: 40px;
-}
-
 .return-icon {
     background: rgba(0, 0, 0, 0.8);
     padding: 13px 13px 13px 13px;
@@ -39,16 +32,23 @@
 }
 
 @media (max-width: 500px) {
-    .icon-header {
-        text-align: center;
-        border-radius: 0;
-    }
     .common-media-pos {
         float: none;
         margin-top: 20px;
         margin-left: auto;
         margin-right: auto;
         width: 80%;
+    }
+    .mobile-margin {
+        margin: 10px 0 10px 0;
+    }
+    .mobile-shared {
+        width: 70vw;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .mobile-center {
+        text-align: center;
     }
 }
 
@@ -132,7 +132,7 @@
     border: none;
     border-bottom: 1px solid #3b3434;
     padding: 5px;
-    width: 15vw;
+    width: 25vmin;
 }
 
 .modded-input:focus {

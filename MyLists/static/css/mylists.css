@@ -35,29 +35,37 @@ hr {
 
 .form-control {
     background: transparent;
-    border-color: darkgray;
-    border-radius: 0;
-    border-top: 0;
-    border-left: 0;
-    border-right: 0;
+    border-radius: 8px;
+    border: 1px solid darkgray;
     color: #fff;
+    width: 22vmin !important;
 }
 
 .form-control:focus {
     background: transparent;
-    border-color: darkgray;
-    color: antiquewhite;
-    border-radius: 0;
-    border-top: 0;
-    border-left: 0;
-    border-right: 0;
-    box-shadow: 0 0 0 0;
+    border-radius: 8px;
+    border: 1px solid darkgray;
+    color: #fff;
+}
+
+.search-icon-pos {
+    position: absolute;
+    left: 330px;
+    background-color: lightslategrey;
+    padding: 10px;
+    border-radius: 7px 0 0 7px;
+    border-left: darkgray;
 }
 
 @media (max-width: 991px) {
     body {
         min-height: calc(100vh - 43px);
         margin: 43px 0 0;
+    }
+    .search-ipad-mobile {
+        min-width: 90vw;
+        margin-left: auto;
+        margin-right: auto;
     }
 }
 @media (max-width: 490px) {
@@ -98,11 +106,6 @@ hr {
 }
 
 @media (max-width: 991px) {
-    .tatayo {
-        min-width: 90vw;
-        margin-left: auto;
-        margin-right: auto;
-    }
     .nav-form {
         margin-left: auto;
         margin-right: auto;
@@ -201,7 +204,7 @@ hr {
 }
 
 .ui-autocomplete-category {
-    background-color: #2b1818;
+    background-color: #2a2d31;
     color: lightgray;
     padding: 3px 0 3px 8px;
     border-bottom: solid black 1px;

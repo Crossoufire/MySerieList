@@ -23,7 +23,7 @@
 
 {% block content %}
     <div class="row no-gutters m-t-30">
-        <div class="col-2">
+        <div class="col-xl-2 col-lg-3 col-md-3 col-sm-12 mobile-margin mobile-center">
             <a class="fas fa-lg fa-user m-r-10 return-icon text-grey" href="/account/{{ username }}"
                data-toggle="tooltip" title="{{ username }}"></a>
             {% if media_list == 'serieslist' %}
@@ -43,25 +43,27 @@
                    href="/animelist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Anime list"></a>
             {% endif %}
         </div>
-        <div class="col-8 text-center">
+        <div class="col-xl-8 col-lg-6 col-md-6 col-sm-12 text-center mobile-margin">
             <form method="GET">
                 <input class="modded-input" name="q" placeholder="&#128269; Search..." value="{{ search_q }}"
                  onfocus="this.placeholder = '';" onblur="this.placeholder = '&#128269; Search...';">
             </form>
         </div>
         {% if user_id != current_user.get_id() %}
-            <div class="col-2">
-                <div class="text-center" style="color: lightgrey;">
+            <div class="col-xl-2 col-lg-3 col-md-3 col-sm-12 mobile-margin">
+                <div class="mobile-shared">
+                    <div class="text-center" style="color: lightgrey;">
                     {{ common_elements[0] }}/{{ common_elements[1] }} shared ({{ common_elements[2] }}%)
                 </div>
-                <div class="common-media-meter">
+                    <div class="common-media-meter">
                     <span class="common-media-meter-bar" style="width: {{ common_elements[2] }}%;"></span>
+                </div>
                 </div>
             </div>
         {% endif %}
     </div>
 
-    <div class="text-center m-t-40 m-b-20 p-1" style="background: #34383c;">
+    <div class="text-center m-t-30 m-b-20 p-1" style="background: #34383c;">
         {% block categories scoped %}
         {% endblock categories %}
     </div>

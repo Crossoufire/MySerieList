@@ -58,7 +58,7 @@
             {% if current_user.is_authenticated %}
                 <ul class="navbar-nav mr-auto m-l-10">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle fs-18" data-toggle="dropdown">MyLists</a>
+                        <a class="nav-link dropdown-toggle fs-22" data-toggle="dropdown">MyLists</a>
                         <div class="dropdown-menu medialist-dropdown">
                             <a class="dropdown-item text-light"
                                href="/serieslist/{{ current_user.username }}/Watching/genre/All/by/title-A-Z/page/1">
@@ -94,10 +94,10 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="nav-collapse">
-                    <form class="form-inline my-2 my-lg-0 nav-form" action="{{ url_for('main.search_media') }}">
+                    <form class="form-inline nav-form" action="{{ url_for('main.search_media') }}">
                         <label for="autocomplete"></label>
-                        <input id="autocomplete" class="form-control tatayo" name="search"
-                               placeholder="Search media or users">
+                        <input id="autocomplete" class="form-control search-ipad-mobile" name="search"
+                               placeholder="Search media, users...">
                     </form>
                     <ul class="navbar-nav mr-auto nav-ul-1">
                         <li class="nav-item nav-li-1">
@@ -174,7 +174,6 @@
                         </li>
                     </ul>
                 </div>
-
             {% else %}
                 <a class="navbar-brand m-l-10" href="{{ url_for('auth.home') }}">MyLists</a>
                 {% if request.path == '/' %}
