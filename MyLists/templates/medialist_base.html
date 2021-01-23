@@ -23,7 +23,7 @@
 
 {% block content %}
     <div class="row no-gutters m-t-30">
-        <div class="col-xl-2 col-lg-3 col-md-3 col-sm-12 mobile-margin mobile-center">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mobile-margin mobile-center">
             <a class="fas fa-lg fa-user m-r-10 return-icon text-grey" href="/account/{{ username }}"
                data-toggle="tooltip" title="{{ username }}"></a>
             {% if media_list == 'serieslist' %}
@@ -42,25 +42,18 @@
                 <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip"
                    href="/animelist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Anime list"></a>
             {% endif %}
+            {% if user_id != current_user.get_id() %}
+                <div class="shared-pie" data-toggle="tooltip"
+                     title="{{ common_elements[0] }}/{{ common_elements[1] }} shared ({{ common_elements[2] }}%)"
+                     style="background: conic-gradient(#8a7a6c {{ common_elements[2] }}%, #040404 0);"></div>
+            {% endif %}
         </div>
-        <div class="col-xl-8 col-lg-6 col-md-6 col-sm-12 text-center mobile-margin">
-            <form method="GET">
-                <input class="modded-input" name="q" placeholder="&#128269; Search..." value="{{ search_q }}"
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 input-container mobile-margin">
+            <form method="GET" action="/{{ media_list }}/{{ username }}/Search/genre/{{ genre }}/by/{{ sorting }}/page/1">
+                <input class="modded-input" name="q" placeholder="&#128269; Search..."
                  onfocus="this.placeholder = '';" onblur="this.placeholder = '&#128269; Search...';">
             </form>
         </div>
-        {% if user_id != current_user.get_id() %}
-            <div class="col-xl-2 col-lg-3 col-md-3 col-sm-12 mobile-margin">
-                <div class="mobile-shared">
-                    <div class="text-center" style="color: lightgrey;">
-                    {{ common_elements[0] }}/{{ common_elements[1] }} shared ({{ common_elements[2] }}%)
-                </div>
-                    <div class="common-media-meter">
-                    <span class="common-media-meter-bar" style="width: {{ common_elements[2] }}%;"></span>
-                </div>
-                </div>
-            </div>
-        {% endif %}
     </div>
 
     <div class="text-center m-t-30 m-b-20 p-1" style="background: #34383c;">
@@ -68,51 +61,49 @@
         {% endblock categories %}
     </div>
 
-    <h4 class="text-left m-t-45 mb-0 category-color">{{ category|upper }} ({{ info_pages['total_media'] }})</h4>
-    <div class="float-r m-t-45">
-        {% if user_id != current_user.get_id() %}
-            <a class="text-grey m-r-15"
-            href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/{{ page }}">
-                <input type="checkbox" name="tata" value="{{ filter_val }}" {% if filter_val == True %}checked {% endif %}>
-                <b> Shared</b>
-            </a>
-        {% endif %}
+    <h4 class="cat-title">
+        {{ category|upper }} {% if category == 'Search' %} RESULTS FOR "{{ search_query }}" {% endif %}
+        ({{ info_pages['total_media'] }})
+    </h4>
+    <div class="sort-container">
+{#        {% if user_id != current_user.get_id() %}#}
+{#            <a class="m-r-15" style="display: inline-block;"#}
+{#               href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/#}
+{#                {{ sorting }}/page/1?filter={{ filter_val }}">#}
+{#                <b class="text-grey"> Shared#}
+{#                    <i class="fas fa-{% if filter_val == True %}check{% else %}times{% endif %}"></i>#}
+{#                </b>#}
+{#            </a>#}
+{#        {% endif %}#}
         <li class="nav-item dropdown li-genre-sort text-grey">
             <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Genre {{ genre|upper }}</b></a>
             <div class="dropdown-menu genre-drop">
                 {% for genre in all_genres %}
-                    <a class="dropdown-item text-light"
-                       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/1">
+                    <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
                         <div>{{ genre }}</div>
                     </a>
                 {% endfor %}
             </div>
         </li>
         <li class="nav-item dropdown li-genre-sort text-grey">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Sort by {{ sorting_bis|upper }}</b></a>
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Sort {{ sorting_bis|upper }}</b></a>
             <div class="dropdown-menu sort-drop">
-                <a class="dropdown-item text-light"
-                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-A-Z/page/1">
+                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-A-Z/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
                     <div>Title A-Z</div>
                 </a>
-                <a class="dropdown-item text-light"
-                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-Z-A/page/1">
+                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-Z-A/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
                     <div>Title Z-A</div>
                 </a>
-                <a class="dropdown-item text-light"
-                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_desc/page/1">
+                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_desc/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
                     <div>Score 🠗</div>
                 </a>
-                <a class="dropdown-item text-light"
-                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_asc/page/1">
+                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_asc/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
                     <div>Score 🠕</div>
                 </a>
-                <a class="dropdown-item text-light"
-                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/rewatched/page/1">
+                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/rewatched/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
                     <div>Rewatched</div>
                 </a>
-                <a class="dropdown-item text-light"
-                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/comments/page/1">
+                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/comments/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
                     <div>Comments</div>
                 </a>
                 {% block sorting_list %}
@@ -128,12 +119,11 @@
                  cat="{{ data['category'] }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
                 <div class="card bg-transparent">
                     <div class="view overlay">
-                        <img class="card-img-top" src="{{ data['cover'] }}" height="300" width="200"
-                             style="height: auto;" alt=""/>
+                        <img class="card-img-top" src="{{ data['cover'] }}" style="height: auto;" alt=""/>
                         <a class="mask flex-center rgba-black-strong" href="/media_sheet/{{ data['media'] }}/{{ data['id'] }}">
                             <span class="font-mask text-center text-light">{{ data['display_name'] }}</span>
                         </a>
-                        {% if search %}
+                        {% if category == 'Search' %}
                             <div class="bottom-card-cat{% if media_list =='movieslist' %}-movie {% endif %}">
                                 {{ data['category'] }}
                             </div>
@@ -207,15 +197,15 @@
     </div>
 
     <ul class="pagination flex-wrap m-b-50 pagination-css">
-            {% for i in range(info_pages['total_pages']) %}
-                <li class="page-item {% if i + 1 == info_pages['actual_page'] %}active {% endif %}">
-                    <a class="page-link text-light"
-                       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/{{ i + 1 }}">
-                        {{ '{:02d}'.format(i + 1) }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
+        {% for i in range(info_pages['total_pages']) %}
+            <li class="page-item {% if i + 1 == info_pages['actual_page'] %}active {% endif %}">
+                <a class="page-link text-light"
+                   href="/{{ media_list }}/{{ username }}/Search/genre/{{ genre }}/by/{{ sorting }}/page/{{ i + 1 }}{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
+                    {{ '{:02d}'.format(i + 1) }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock content %}
 
 

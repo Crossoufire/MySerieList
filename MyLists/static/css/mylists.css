@@ -38,7 +38,7 @@ hr {
     border-radius: 8px;
     border: 1px solid darkgray;
     color: #fff;
-    width: 22vmin !important;
+    width: 25vmin !important;
 }
 
 .form-control:focus {

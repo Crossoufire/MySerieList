@@ -8,8 +8,8 @@
 
 {% block content %}
     <div class="m-t-30 ml-auto mr-auto m-b-50">
-        <h3 class="font-weight-light text-center mt-1 mb-0 p-t-30">YOUR NEXT SERIES TO AIR</h3>
-        <hr class="mt-2 mb-4" style="border-top: 1px solid #216e7d;">
+        <h3 class="mt-1 mb-0 p-t-30"><b>NEXT SERIES TO AIR</b></h3>
+        <hr class="mt-2 mb-4 top-series">
         <div class="row">
             {% for series in airing_series %}
                 <div class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
@@ -37,8 +37,8 @@
             <div class="text-center m-b-40"><i><b>No next airing found in your series list.</b></i></div>
         {% endif %}
 
-        <h3 class="font-weight-light text-center mt-1 mb-0 p-t-20">YOUR NEXT ANIME TO AIR</h3>
-        <hr class="mt-2 mb-4" style="border-top: 1px solid #945141;">
+        <h3 class="mt-1 mb-0 p-t-20"><b>NEXT ANIME TO AIR</b></h3>
+        <hr class="mt-2 mb-4 top-anime">
         <div class="row">
             {% for series in airing_anime %}
                 <div class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
@@ -66,8 +66,8 @@
             <div class="text-center m-b-40"><i><b>No next airing found in your anime list.</b></i></div>
         {% endif %}
 
-        <h3 class="font-weight-light text-center mt-1 mb-0 p-t-20">YOUR NEXT MOVIES TO AIR</h3>
-        <hr class="mt-2 mb-4" style="border-top: 1px solid #8c7821;">
+        <h3 class="mt-1 mb-0 p-t-20"><b>NEXT MOVIES TO AIR</b></h3>
+        <hr class="mt-2 mb-4 top-movies">
         <div class="row">
             {% for series in airing_movies %}
                 <div class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
@@ -87,7 +87,7 @@
             {% endfor %}
         </div>
         {% if not airing_movies %}
-            <div class="text-center m-b-40"><i><b>No next airing found in your movies list.</b></i></div>
+            <div class="text-center m-b-50"><i><b>No next airing found in your movies list.</b></i></div>
         {% endif %}
     </div>
 {% endblock content %}

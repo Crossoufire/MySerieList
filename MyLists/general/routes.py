@@ -138,8 +138,3 @@ def privacy_policy():
 @login_required
 def about():
     return render_template('about.html', title='About MyLists')
-
-
-@bp.route('/service-worker.js')
-def service_worker():
-    return app.send_static_file('service-worker.js')

@@ -23,11 +23,11 @@
 
 {% block sorting_list %}
     <a class="dropdown-item text-light"
-       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/release_date_desc/page/1">
+       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/release_date_desc/page/1{% if category == 'search' %}?q={{ search_query }}{% endif %}">
         <div>Release dates 🠗</div>
     </a>
     <a class="dropdown-item text-light"
-       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/release_date_asc/page/1">
+       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/release_date_asc/page/1{% if category == 'search' %}?q={{ search_query }}{% endif %}">
         <div>Release dates 🠕</div>
     </a>
 {% endblock sorting_list %}

@@ -38,13 +38,12 @@ _SORTING = {'title-A-Z': 'title A-Z',
             'first_air_date_asc': 'first air date 🠕'}
 
 
-@bp.route("/<string:media_list>/<string:user_name>/search", methods=['GET', 'POST'])
 @bp.route("/<string:media_list>/<string:user_name>/", methods=['GET', 'POST'])
 @bp.route("/<string:media_list>/<string:user_name>/<string:category>/", methods=['GET', 'POST'])
 @bp.route("/<string:media_list>/<string:user_name>/<string:category>/genre/<string:genre>/by/<string:sorting>"
           "/page/<int:page_val>", methods=['GET', 'POST'])
 @login_required
-def mymedialist(media_list, user_name, category='Watching', genre='All', sorting='title-A-Z', page_val=1):
+def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', sorting='title-A-Z', page_val=1):
     # Check if the <user> can see the <media_list>
     user = current_user.check_autorization(user_name)
 
@@ -52,15 +51,21 @@ def mymedialist(media_list, user_name, category='Watching', genre='All', sorting
     try:
         list_type = ListType(media_list)
     except ValueError:
-        abort(404)
+        abort(400)
 
     # Add views_count to the profile
     current_user.add_view_count(user, list_type)
 
-    # Go to the search category if query is not none
-    search_query = request.args.get('q')
-    if search_query is not None:
-        category = 'Search'
+    # Select <search> category if query is not none
+    q = request.args.get('q')
+    if q:
+        category = Status.SEARCH
+
+    # Check the sorting value
+    try:
+        sorting_bis = _SORTING[sorting]
+    except KeyError:
+        abort(400)
 
     # Recover the template
     html_template = 'medialist_tv.html'
@@ -70,13 +75,12 @@ def mymedialist(media_list, user_name, category='Watching', genre='All', sorting
         all_genres = _ANIME_GENRES
     elif list_type == ListType.MOVIES:
         all_genres = _MOVIES_GENRES
-        if category == 'Watching':
-            category = 'Completed'
+        if category == Status.WATCHING:
+            category = Status.COMPLETED
         html_template = 'medialist_movies.html'
 
-    filter_val = True
     # Retrieve the corresponding media_data
-    query, category = get_media_query(user.id, page_val, list_type, category, sorting, genre, search_query)
+    query, category = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
 
     # Get the actual page, total number of pages and the total number of media from the query
     items = query.items
@@ -97,16 +101,10 @@ def mymedialist(media_list, user_name, category='Watching', genre='All', sorting
         add_data = MediaListDict(item, common_media, list_type).redirect_medialist()
         items_data_list.append(add_data)
 
-    try:
-        sorting_bis = _SORTING[sorting]
-    except KeyError:
-        abort(400)
-
     return render_template(html_template, title="{}'s {}".format(user_name, media_list), media_data=items_data_list,
-                           common_elements=common_elements, media_list=media_list, username=user_name,
+                           common_elements=common_elements, media_list=media_list, username=user_name, genre=genre,
                            user_id=str(user.id), info_pages=info_pages, category=category, sorting=sorting,
-                           genre=genre, page=page_val, filter_val=filter_val, all_genres=all_genres,
-                           sorting_bis=sorting_bis)
+                           page=page_val, all_genres=all_genres, sorting_bis=sorting_bis, search_query=q)
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
