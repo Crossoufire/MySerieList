@@ -20,6 +20,7 @@ class ListType(enum.Enum):
 
 
 class Status(enum.Enum):
+    ALL = 'All'
     WATCHING = 'Watching'
     COMPLETED = 'Completed'
     COMPLETED_ANIMATION = 'Completed Animation'
@@ -662,12 +663,18 @@ def get_media_query(user_id, list_type, category, genre, sort_val, page, q):
         com_ids = [r[0].media_id for r in get_common]
 
     # Recover the <media_data> from the selected <category>
-    if category != Status.FAVORITE and category != Status.SEARCH:
+    if category != Status.FAVORITE and category != Status.SEARCH and category != Status.ALL:
         query = db.session.query(media, media_list, media_genre) \
             .join(media, media.id == media_list.media_id) \
             .join(media_genre, media_genre.media_id == media_list.media_id) \
             .filter(media_list.user_id == user_id, media_list.status == category, media_list.media_id.notin_(com_ids),
                     genre_filter) \
+            .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
+    elif category == Status.ALL:
+        query = db.session.query(media, media_list, media_genre) \
+            .join(media, media.id == media_list.media_id) \
+            .join(media_genre, media_genre.media_id == media_list.media_id) \
+            .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter) \
             .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
     elif category == Status.FAVORITE:
         query = db.session.query(media, media_list, media_genre) \

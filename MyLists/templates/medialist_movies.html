@@ -2,6 +2,10 @@
 
 
 {% block categories %}
+    <a class="cat-btn {% if category == 'All' %}btn-selected{% endif %}"
+       href="/{{ media_list }}/{{ username }}/All/genre/{{ genre }}/by/{{ sorting }}/page/1">
+        <b>ALL</b>
+    </a>
     <a class="cat-btn {% if category == 'Completed' %}btn-selected{% endif %}"
        href="/{{ media_list }}/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/1">
         <b>COMPLETED</b>

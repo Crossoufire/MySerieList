@@ -119,11 +119,11 @@
                  cat="{{ data['category'] }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
                 <div class="card bg-transparent">
                     <div class="view overlay">
-                        <img class="card-img-top" src="{{ data['cover'] }}" style="height: auto;" alt=""/>
+                        <img class="card-img-top" height="300" width="200" src="{{ data['cover'] }}" style="height: auto;" alt=""/>
                         <a class="mask flex-center rgba-black-strong" href="/media_sheet/{{ data['media'] }}/{{ data['id'] }}">
                             <span class="font-mask text-center text-light">{{ data['display_name'] }}</span>
                         </a>
-                        {% if category == 'Search' %}
+                        {% if category == 'Search' or category == 'All' %}
                             <div class="bottom-card-cat{% if media_list =='movieslist' %}-movie {% endif %}">
                                 {{ data['category'] }}
                             </div>
@@ -200,7 +200,7 @@
         {% for i in range(info_pages['total_pages']) %}
             <li class="page-item {% if i + 1 == info_pages['actual_page'] %}active {% endif %}">
                 <a class="page-link text-light"
-                   href="/{{ media_list }}/{{ username }}/Search/genre/{{ genre }}/by/{{ sorting }}/page/{{ i + 1 }}{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
+                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/{{ i + 1 }}{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
                     {{ '{:02d}'.format(i + 1) }}
                 </a>
             </li>

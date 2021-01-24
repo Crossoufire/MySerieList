@@ -181,8 +181,6 @@
 .card-img-top {
     border: 1px solid black;
     border-radius: 0 !important;
-    height: 300px;
-    width: 200px;
 }
 
 .card-ribbon {
