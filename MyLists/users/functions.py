@@ -44,13 +44,11 @@ def get_media_total_eps(user_id, list_type):
         media = AnimeList
     elif list_type == ListType.MOVIES:
         media = MoviesList
-    else:
-        return
 
     query = db.session.query(func.sum(media.eps_watched)).filter(media.user_id == user_id).all()
-    eps_watched = 0
-    if query:
-        eps_watched = query[0][0]
+    eps_watched = query[0][0]
+    if eps_watched is None:
+        eps_watched = 0
 
     return eps_watched
 
