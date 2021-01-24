@@ -33,6 +33,7 @@ a {
 .header-container {
     position: relative;
     height: 240px;
+    background-image: url('/static/img/profile_background_2.jpg');
     background-size: cover;
     border-bottom: 2px solid #808080;
     background-position: center;
