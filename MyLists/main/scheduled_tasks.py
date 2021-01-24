@@ -9,7 +9,7 @@ from MyLists.main.media_object import MediaDetails
 from MyLists.general.functions import compute_media_time_spent
 from MyLists.models import Series, SeriesList, SeriesActors, SeriesGenre, SeriesNetwork, SeriesEpisodesPerSeason, \
     UserLastUpdate, Notifications, ListType, Anime, AnimeList, AnimeActors, AnimeGenre, AnimeNetwork, \
-    AnimeEpisodesPerSeason, Movies, MoviesList, MoviesActors, MoviesGenre, MoviesCollections, Status
+    AnimeEpisodesPerSeason, Movies, MoviesList, MoviesActors, MoviesGenre, GlobalStats, Status, MyListsStats
 
 
 def remove_non_list_media():
@@ -143,51 +143,18 @@ def remove_old_covers():
             count += 1
     app.logger.info('Total old movies covers deleted: {}'.format(count))
 
-    # MOVIES COLLECTION OLD COVERS
-    movies_collec = MoviesCollections.query.all()
-    path_movies_collec_covers = Path(app.root_path, 'static/covers/movies_collection_covers/')
-
-    images_in_db = []
-    for movie in movies_collec:
-        images_in_db.append(movie.poster)
-
-    images_saved = []
-    for file in os.listdir(path_movies_collec_covers):
-        images_saved.append(file)
-
-    count = 0
-    for image in images_saved:
-        if image not in images_in_db and image != 'default.jpg':
-            os.remove('{0}/{1}'.format(path_movies_collec_covers, image))
-            app.logger.info('Removed old movie collection cover with name: {}'.format(image))
-            count += 1
-
-    app.logger.info('Total old movies collections covers deleted: {}'.format(count))
     app.logger.info('[SYSTEM] - Finished automatic covers remover')
     app.logger.info('###################################################################')
 
 
-def get_total_eps(user, eps_per_season):
-    if user.status == Status.PLAN_TO_WATCH or user.status == Status.RANDOM:
-        nb_eps_watched = 1
-    else:
-        nb_eps_watched = 0
-        for i in range(1, user.current_season):
-            nb_eps_watched += eps_per_season[i - 1]
-        nb_eps_watched += user.last_episode_watched
-
-    return nb_eps_watched
-
-
 def refresh_element_data(api_id, list_type):
-    if list_type != ListType.MOVIES:
-        media_data = ApiData().get_details_and_credits_data(api_id, list_type)
-        data = MediaDetails(media_data, list_type, updating=True).get_tv_details()
+    media_data = ApiData().get_details_and_credits_data(api_id, list_type)
+    if list_type == ListType.SERIES or list_type == ListType.ANIME:
+        data = MediaDetails(media_data, list_type, updating=True).get_media_details()
         if not data['tv_data']:
             return None
     elif list_type == ListType.MOVIES:
-        media_data = ApiData().get_details_and_credits_data(api_id, list_type)
-        data = MediaDetails(media_data, list_type, updating=True).get_movies_details()
+        data = MediaDetails(media_data, list_type, updating=True).get_media_details()
         if not data['movies_data']:
             return None
 
@@ -218,7 +185,7 @@ def refresh_element_data(api_id, list_type):
                 users_list = SeriesList.query.filter_by(media_id=media.id).all()
 
                 for user in users_list:
-                    episodes_watched = get_total_eps(user, old_seas_eps)
+                    episodes_watched = user.eps_watched
 
                     count = 0
                     for i in range(0, len(data['seasons_data'])):
@@ -238,7 +205,6 @@ def refresh_element_data(api_id, list_type):
                                 user.last_episode_watched = data['seasons_data'][i]['episodes']
                                 user.current_season = data['seasons_data'][i]['season']
                                 break
-                    db.session.commit()
 
                 SeriesEpisodesPerSeason.query.filter_by(media_id=media.id).delete()
                 db.session.commit()
@@ -253,7 +219,7 @@ def refresh_element_data(api_id, list_type):
                 users_list = AnimeList.query.filter_by(media_id=media.id).all()
 
                 for user in users_list:
-                    episodes_watched = get_total_eps(user, old_seas_eps)
+                    episodes_watched = user.eps_watched
 
                     count = 0
                     for i in range(0, len(data['seasons_data'])):
@@ -273,7 +239,6 @@ def refresh_element_data(api_id, list_type):
                                 user.last_episode_watched = data['seasons_data'][i]['episodes']
                                 user.current_season = data['seasons_data'][i]['season']
                                 break
-                    db.session.commit()
 
                 AnimeEpisodesPerSeason.query.filter_by(media_id=media.id).delete()
                 db.session.commit()
@@ -519,8 +484,69 @@ def automatic_movies_locking():
     app.logger.info('###################################################################')
 
 
-# ---------------------------------------------------------------------------------------------------------------
+def update_Mylists_stats():
+    stats = GlobalStats()
 
+    def create_dict(data):
+        series_list, anime_list, movies_list = [], [], []
+        for i in range(5):
+            try:
+                series_list.append({"info": data[0][i][0], "quantity": data[0][i][2]})
+            except:
+                series_list.append({"info": "-", "quantity": "-"})
+            try:
+                anime_list.append({"info": data[1][i][0], "quantity": data[1][i][2]})
+            except:
+                anime_list.append({"info": "-", "quantity": "-"})
+            try:
+                movies_list.append({"info": data[2][i][0], "quantity": data[2][i][2]})
+            except:
+                movies_list.append({"info": "-", "quantity": "-"})
+
+        return {"series": series_list, "anime": anime_list, "movies": movies_list}
+
+    times_spent = stats.get_total_time_spent()
+    total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0}
+    if times_spent[0]:
+        total_time = {"total": sum(times_spent[0]), "series": int(times_spent[0][0]/60),
+                      "anime": int(times_spent[0][1]/60), "movies": int(times_spent[0][2]/60)}
+
+    top_media = stats.get_top_media()
+    most_present_media = create_dict(top_media)
+
+    media_genres = stats.get_top_genres()
+    most_genres_media = create_dict(media_genres)
+
+    media_actors = stats.get_top_actors()
+    most_actors_media = create_dict(media_actors)
+
+    media_directors = stats.get_top_directors()
+    most_directors_media = create_dict(media_directors)
+
+    media_dropped = stats.get_top_dropped()
+    top_dropped_media = create_dict(media_dropped)
+
+    total_media_eps_seas = stats.get_total_eps_seasons()
+    total_seasons_media = {"series": total_media_eps_seas[0][0][1], "anime": total_media_eps_seas[1][0][1]}
+    total_episodes_media = {"series": total_media_eps_seas[0][0][0], "anime": total_media_eps_seas[1][0][0]}
+
+    total_movies = stats.get_total_movies()
+    total_movies_dict = {"movies": total_movies}
+
+    stats_to_add = MyListsStats(total_time=json.dumps(total_time),
+                                top_media=json.dumps(most_present_media),
+                                top_genres=json.dumps(most_genres_media),
+                                top_actors=json.dumps(most_actors_media),
+                                top_directors=json.dumps(most_directors_media),
+                                top_dropped=json.dumps(top_dropped_media),
+                                total_episodes=json.dumps(total_episodes_media),
+                                total_seasons=json.dumps(total_seasons_media),
+                                total_movies=json.dumps(total_movies_dict))
+    db.session.add(stats_to_add)
+    db.session.commit()
+
+
+# ---------------------------------------------------------------------------------------------------------------
 
 def scheduled_task():
     remove_non_list_media()
@@ -530,7 +556,5 @@ def scheduled_task():
     new_releasing_series()
     new_releasing_anime()
     automatic_movies_locking()
-
-    compute_media_time_spent(ListType.SERIES)
-    compute_media_time_spent(ListType.ANIME)
-    compute_media_time_spent(ListType.MOVIES)
+    compute_media_time_spent()
+    update_Mylists_stats()

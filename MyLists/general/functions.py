@@ -1,58 +1,38 @@
-import json
-import secrets
-import requests
-import urllib.request
-
-from PIL import Image
 from pathlib import Path
 from MyLists import db, app
-from datetime import datetime
-from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, MoviesCollections, get_total_time
+from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, get_total_time, SeriesList, \
+    AnimeList, Series, Anime, MoviesList
 
 
-def compute_media_time_spent(list_type):
+def compute_media_time_spent():
     users = User.query.all()
 
     for user in users:
-        media_list = get_total_time(user.id, list_type)
-
-        if list_type != ListType.MOVIES:
+        for list_type in ListType:
+            media_list = get_total_time(user.id, list_type)
             total_time = 0
-            for media in media_list:
-                if media[1].status == Status.COMPLETED:
+            if list_type == ListType.SERIES or list_type == ListType.ANIME:
+                for media in media_list:
                     try:
-                        total_time += media[0].episode_duration * media[0].total_episodes * (1 + media[1].rewatched)
+                        total_time += media[0].episode_duration * media[1].eps_watched
                     except Exception as e:
                         app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
-                elif media[1].status != Status.PLAN_TO_WATCH or media[1].status != Status.RANDOM:
+            elif list_type == ListType.MOVIES:
+                for media in media_list:
                     try:
-                        episodes = [eps.episodes for eps in media[0].eps_per_season]
-                        for i in range(1, media[1].current_season):
-                            total_time += media[0].episode_duration * episodes[i - 1]
-                        total_time += media[1].last_episode_watched * media[0].episode_duration
-                    except Exception as e:
-                        app.logger.info('[ERROR] - {}. [MEDIA] - {}. [LIST EPISODES] - {}. [CURRENT SEASON] - {}.'
-                                        .format(e, media[0].name, episodes, media[1].current_season))
-        elif list_type == ListType.MOVIES:
-            total_time = 0
-            for media in media_list:
-                if media[1].status != Status.PLAN_TO_WATCH:
-                    try:
-                        total_time += media[0].runtime*(1+media[1].rewatched)
+                        total_time += media[0].runtime * media[1].eps_watched
                     except Exception as e:
                         app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
 
-        if list_type == ListType.ANIME:
-            user.time_spent_anime = total_time
-        elif list_type == ListType.SERIES:
-            user.time_spent_series = total_time
-        elif list_type == ListType.MOVIES:
-            user.time_spent_movies = total_time
-
-        db.session.commit()
+            if list_type == ListType.SERIES:
+                user.time_spent_series = total_time
+            elif list_type == ListType.ANIME:
+                user.time_spent_anime = total_time
+            elif list_type == ListType.MOVIES:
+                user.time_spent_movies = total_time
 
 
-# ---------------------------------------- DB add/refresh from CSV data ---------------------------------------------- #
+# ---------------------------------------- DB add/refresh from CSV data ------------------------------------------- #
 
 
 def add_ranks_to_db():
@@ -154,105 +134,35 @@ def refresh_db_frames():
         frames[i - 1].image_id = list_all_frames[i][1]
 
 
-def add_collections_movies():
-    print('Started to add movies collection.')
-    local_covers_path = Path(app.root_path, "static/covers/movies_collection_covers/")
+def add_eps_watched():
+    series_list = db.session.query(Series, SeriesList).join(Series, Series.id == SeriesList.media_id).all()
+    anime_list = db.session.query(Anime, AnimeList).join(Anime, Anime.id == AnimeList.media_id).all()
+    movies_list = db.session.query(Movies, MoviesList).join(Movies, Movies.id == MoviesList.media_id).all()
 
-    all_movies = Movies.query.filter_by().all()
-    for index, movie in enumerate(all_movies):
-        print("Movie: {}/{}".format(index + 1, len(all_movies)))
-        tmdb_movies_id = movie.themoviedb_id
+    for series in series_list:
+        if series[1].status == Status.RANDOM or series[1].status == Status.PLAN_TO_WATCH:
+            series[1].eps_watched = 0
+        else:
+            season = series[1].current_season
+            rewatched = series[1].rewatched
+            eps = series[1].last_episode_watched
+            eps_seasons = [x.episodes for x in series[0].eps_per_season]
+            series[1].eps_watched = (sum(eps_seasons[:season-1]) + eps) + (rewatched * series[0].total_episodes)
+    db.session.commit()
 
-        try:
-            response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}"
-                                    .format(tmdb_movies_id, app.config['THEMOVIEDB_API_KEY']))
+    for anime in anime_list:
+        if anime[1].status == Status.RANDOM or anime[1].status == Status.PLAN_TO_WATCH:
+            anime[1].eps_watched = 0
+        else:
+            season = anime[1].current_season
+            rewatched = anime[1].rewatched
+            eps = anime[1].last_episode_watched
+            eps_seasons = [x.episodes for x in anime[0].eps_per_season]
+            anime[1].eps_watched = (sum(eps_seasons[:season-1]) + eps) + (rewatched * anime[0].total_episodes)
 
-            data = json.loads(response.text)
-
-            collection_id = data["belongs_to_collection"]["id"]
-            collection_poster = data["belongs_to_collection"]["poster_path"]
-
-            response_collection = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
-                                               .format(collection_id, app.config['THEMOVIEDB_API_KEY']))
-
-            data_collection = json.loads(response_collection.text)
-
-            collection_name = data_collection["name"]
-            collection_overview = data_collection["overview"]
-
-            remove = 0
-            utc_now = datetime.utcnow()
-            for part in data_collection["parts"]:
-                part_date = part['release_date']
-                try:
-                    part_date_datetime = datetime.strptime(part_date, '%Y-%m-%d')
-                    difference = (utc_now - part_date_datetime).total_seconds()
-                    if float(difference) < 0:
-                        remove += 1
-                except:
-                    pass
-
-            collection_parts = len(data_collection["parts"]) - remove
-            collection_poster_id = "{}.jpg".format(secrets.token_hex(8))
-
-            urllib.request.urlretrieve("http://image.tmdb.org/t/p/w300{}".format(collection_poster),
-                                       "{}/{}".format(local_covers_path, collection_poster_id))
-
-            img = Image.open("{}/{}".format(local_covers_path, collection_poster_id))
-            img = img.resize((300, 450), Image.ANTIALIAS)
-            img.save("{0}/{1}".format(local_covers_path, collection_poster_id), quality=90)
-
-            movie.collection_id = collection_id
-
-            # Test if collection already in MoviesCollection
-            if MoviesCollections.query.filter_by(collection_id=collection_id).first() is not None:
-                db.session.commit()
-                continue
-
-            add_collection = MoviesCollections(collection_id=collection_id,
-                                               parts=collection_parts,
-                                               name=collection_name,
-                                               movies_names=None,
-                                               releases_dates=None,
-                                               poster=collection_poster_id,
-                                               overview=collection_overview)
-
-            db.session.add(add_collection)
-            db.session.commit()
-        except:
-            continue
-    print('Finished adding movies collection.')
-
-
-def refresh_collections_movies():
-    print('Started to refresh movies collection.')
-
-    all_collection_movies = MoviesCollections.query.filter_by().all()
-    for index, collection in enumerate(all_collection_movies):
-        print("Movie: {}/{}".format(index + 1, len(all_collection_movies)))
-        try:
-            response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
-                                    .format(collection.collection_id, app.config['THEMOVIEDB_API_KEY']))
-
-            data = json.loads(response.text)
-
-            remove = 0
-            utc_now = datetime.utcnow()
-            for part in data["parts"]:
-                part_date = part['release_date']
-                try:
-                    part_date_datetime = datetime.strptime(part_date, '%Y-%m-%d')
-                    difference = (utc_now - part_date_datetime).total_seconds()
-                    if float(difference) < 0:
-                        remove += 1
-                except:
-                    remove += 1
-
-            collection.parts = len(data["parts"]) - remove
-            collection.movies_names = ', '.join([part['title'] for part in data["parts"]])
-            collection.releases_dates = ', '.join([part['release_date'] for part in data["parts"]])
-
-            db.session.commit()
-        except:
-            continue
-    print('Finished refreshing movies collection.')
+    for movie in movies_list:
+        if movie[1].status == Status.PLAN_TO_WATCH:
+            movie[1].eps_watched = 0
+        else:
+            movie[1].eps_watched = 1 + movie[1].rewatched
+    db.session.commit()

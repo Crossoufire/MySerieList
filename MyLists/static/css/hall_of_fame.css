@@ -1,5 +1,5 @@
 
-
+/* --- Table CSS ---------------------------------------- */
 option {
     background-color: #131418;
 }
@@ -22,11 +22,6 @@ table.table a {
     text-align: center;
     vertical-align: middle;
     padding: 40px 0 40px 0 !important;
-}
-
-.btn-badges {
-    background-color: #4d0000;
-    color: white !important;
 }
 
 .current_user {

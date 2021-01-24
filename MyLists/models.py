@@ -1,5 +1,4 @@
 import enum
-
 from flask import abort
 from datetime import datetime
 from sqlalchemy.orm import aliased
@@ -14,20 +13,23 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-class Status(enum.Enum):
-    WATCHING = "Watching"
-    COMPLETED = "Completed"
-    COMPLETED_ANIMATION = "Completed Animation"
-    ON_HOLD = "On Hold"
-    RANDOM = "Random"
-    DROPPED = "Dropped"
-    PLAN_TO_WATCH = "Plan to Watch"
-
-
 class ListType(enum.Enum):
-    SERIES = "serieslist"
-    ANIME = "animelist"
+    SERIES = 'serieslist'
+    ANIME = 'animelist'
     MOVIES = 'movieslist'
+
+
+class Status(enum.Enum):
+    ALL = 'All'
+    WATCHING = 'Watching'
+    COMPLETED = 'Completed'
+    COMPLETED_ANIMATION = 'Completed Animation'
+    ON_HOLD = 'On Hold'
+    RANDOM = 'Random'
+    DROPPED = 'Dropped'
+    PLAN_TO_WATCH = 'Plan to Watch'
+    SEARCH = 'Search'
+    FAVORITE = 'Favorite'
 
 
 class MediaType(enum.Enum):
@@ -113,7 +115,7 @@ class User(db.Model, UserMixin):
 
     def count_notifications(self):
         last_notif_time = self.last_notif_read_time or datetime(1900, 1, 1)
-        return Notifications.query.filter_by(user_id=self.id)\
+        return Notifications.query.filter_by(user_id=self.id) \
             .filter(Notifications.timestamp > last_notif_time).count()
 
     def get_notifications(self):
@@ -131,7 +133,7 @@ class User(db.Model, UserMixin):
         if self.role != RoleType.ADMIN and user.role == RoleType.ADMIN:
             abort(404)
 
-        # Check if the current account can see the target account's movies collection
+        # Check if the current account can see the target's account
         if self.id == user.id or self.role == RoleType.ADMIN:
             pass
         elif user.private and not self.is_following(user):
@@ -252,6 +254,7 @@ class SeriesList(db.Model):
     rewatched = db.Column(db.Integer, nullable=False, default=0)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
+    eps_watched = db.Column(db.Integer)
     comment = db.Column(db.Text)
 
 
@@ -346,6 +349,7 @@ class AnimeList(db.Model):
     rewatched = db.Column(db.Integer, nullable=False, default=0)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
+    eps_watched = db.Column(db.Integer)
     comment = db.Column(db.Text)
 
 
@@ -378,25 +382,6 @@ class AnimeActors(db.Model):
 # --- MOVIES -------------------------------------------------------------------------------------------------------
 
 
-class MoviesCollections(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    collection_id = db.Column(db.Integer, db.ForeignKey('movies.collection_id'), nullable=False)
-    parts = db.Column(db.Integer)
-    name = db.Column(db.String(100))
-    poster = db.Column(db.String(100))
-    overview = db.Column(db.String(100))
-
-    @staticmethod
-    def get_collection_movies(user_id):
-        collection_movie = db.session.query(Movies, MoviesList, MoviesCollections,
-                                            func.count(MoviesCollections.collection_id)) \
-            .join(MoviesList, MoviesList.media_id == Movies.id) \
-            .join(MoviesCollections, MoviesCollections.collection_id == Movies.collection_id) \
-            .filter(Movies.collection_id != None, MoviesList.user_id == user_id,
-                    MoviesList.status != Status.PLAN_TO_WATCH).group_by(Movies.collection_id).all()
-        return collection_movie
-
-
 class Movies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -416,13 +401,8 @@ class Movies(db.Model):
     tagline = db.Column(db.String(30))
     image_cover = db.Column(db.String(100), nullable=False)
     themoviedb_id = db.Column(db.Integer, nullable=False)
-    collection_id = db.Column(db.Integer)
     lock_status = db.Column(db.Boolean, default=0)
 
-    collection_movies = db.relationship('MoviesCollections',
-                                        primaryjoin=(MoviesCollections.collection_id == collection_id),
-                                        backref='movies',
-                                        lazy='dynamic')
     genres = db.relationship('MoviesGenre', backref='movies', lazy=True)
     actors = db.relationship('MoviesActors', backref='movies', lazy=True)
     list_info = db.relationship('MoviesList', backref='movies', lazy='dynamic')
@@ -438,7 +418,7 @@ class Movies(db.Model):
     def in_follows_lists(self, user_id):
         in_follows_lists = db.session.query(User, MoviesList, followers) \
             .join(User, User.id == followers.c.followed_id) \
-            .join(AnimeList, MoviesList.user_id == followers.c.followed_id) \
+            .join(MoviesList, MoviesList.user_id == followers.c.followed_id) \
             .filter(followers.c.follower_id == user_id, MoviesList.media_id == self.id).all()
         return in_follows_lists
 
@@ -453,6 +433,7 @@ class MoviesList(db.Model):
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
     rewatched = db.Column(db.Integer, nullable=False, default=0)
+    eps_watched = db.Column(db.Integer)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
     comment = db.Column(db.Text)
@@ -471,7 +452,7 @@ class MoviesActors(db.Model):
     name = db.Column(db.String(150))
 
 
-# --- BADGES & RANKS -----------------------------------------------------------------------------------------------
+# --- BADGES & RANKS ----------------------------------------------------------------------------------------------
 
 
 class Badges(db.Model):
@@ -497,12 +478,28 @@ class Frames(db.Model):
     image_id = db.Column(db.String(50), nullable=False)
 
 
+# --- STATS and TRENDS --------------------------------------------------------------------------------------------
+
+
+class MyListsStats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    total_time = db.Column(db.Text)
+    top_media = db.Column(db.Text)
+    top_genres = db.Column(db.Text)
+    top_actors = db.Column(db.Text)
+    top_directors = db.Column(db.Text)
+    top_dropped = db.Column(db.Text)
+    total_episodes = db.Column(db.Text)
+    total_seasons = db.Column(db.Text)
+    total_movies = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 # --- OTHERS ------------------------------------------------------------------------------------------------------
 
 
 class GlobalStats:
     def __init__(self):
-        self.all_list_type = [ListType.SERIES, ListType.ANIME, ListType.MOVIES]
         self.truncated_list_type = [ListType.SERIES, ListType.ANIME]
         self.media = None
         self.media_genre = None
@@ -510,7 +507,15 @@ class GlobalStats:
         self.media_eps = None
         self.media_list = None
 
-    def get_type(self, list_type):
+    @classmethod
+    def get_total_time_spent(cls):
+        times_spent = db.session.query(func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
+                                       func.sum(User.time_spent_movies)) \
+            .filter(User.role != RoleType.ADMIN, User.active == True).all()
+
+        return times_spent
+
+    def get_query_data(self, list_type):
         if list_type == ListType.SERIES:
             self.media = Series
             self.media_genre = SeriesGenre
@@ -529,18 +534,11 @@ class GlobalStats:
             self.media_actors = MoviesActors
             self.media_list = MoviesList
 
-    @staticmethod
-    def get_total_time_spent():
-        times_spent = db.session.query(func.sum(User.time_spent_series), func.sum(User.time_spent_anime),
-                                       func.sum(User.time_spent_movies)) \
-            .filter(User.role != RoleType.ADMIN, User.active == True).all()
-        return times_spent
-
     def get_top_media(self):
         queries = []
-        for list_type in self.all_list_type:
-            self.get_type(list_type)
-            queries.append(db.session.query(self.media, self.media_list,
+        for list_type in ListType:
+            self.get_query_data(list_type)
+            queries.append(db.session.query(self.media.name, self.media_list,
                                             func.count(self.media_list.media_id == self.media.id).label("count"))
                            .join(self.media_list, self.media_list.media_id == self.media.id)
                            .group_by(self.media_list.media_id).order_by(text("count desc")).limit(5).all())
@@ -548,9 +546,9 @@ class GlobalStats:
 
     def get_top_genres(self):
         queries = []
-        for list_type in self.all_list_type:
-            self.get_type(list_type)
-            queries.append(db.session.query(self.media_genre, self.media_list,
+        for list_type in ListType:
+            self.get_query_data(list_type)
+            queries.append(db.session.query(self.media_genre.genre, self.media_list,
                                             func.count(self.media_genre.genre).label('count'))
                            .join(self.media_genre, self.media_genre.media_id == self.media_list.media_id)
                            .group_by(self.media_genre.genre).order_by(text('count desc')).limit(5).all())
@@ -558,20 +556,29 @@ class GlobalStats:
 
     def get_top_actors(self):
         queries = []
-        for list_type in self.all_list_type:
-            self.get_type(list_type)
-            queries.append(db.session.query(self.media_actors, self.media_list,
+        for list_type in ListType:
+            self.get_query_data(list_type)
+            queries.append(db.session.query(self.media_actors.name, self.media_list,
                                             func.count(self.media_actors.name).label('count'))
                            .join(self.media_actors, self.media_actors.media_id == self.media_list.media_id)
                            .group_by(self.media_actors.name).filter(self.media_actors.name != 'Unknown')
                            .order_by(text('count desc')).limit(5).all())
         return queries
 
+    def get_top_directors(self):
+        self.get_query_data(ListType.MOVIES)
+        query = db.session.query(self.media.director_name, self.media_list,
+                                 func.count(self.media.director_name).label('count'))\
+            .filter(self.media.director_name != 'Unknown')\
+            .order_by(text('count desc')).limit(5).all()
+
+        return [[], [], query]
+
     def get_top_dropped(self):
         queries = []
         for list_type in self.truncated_list_type:
-            self.get_type(list_type)
-            queries.append(db.session.query(self.media, self.media_list,
+            self.get_query_data(list_type)
+            queries.append(db.session.query(self.media.name, self.media_list,
                                             func.count(self.media_list.media_id == self.media.id).label('count'))
                            .join(self.media_list, self.media_list.media_id == self.media.id)
                            .filter(self.media_list.status == Status.DROPPED).group_by(self.media_list.media_id)
@@ -581,124 +588,119 @@ class GlobalStats:
     def get_total_eps_seasons(self):
         queries = []
         for list_type in self.truncated_list_type:
-            self.get_type(list_type)
-            queries.append(db.session.query(self.media_list, self.media_eps,
-                                            func.group_concat(self.media_eps.episodes))
-                           .join(self.media_eps, self.media_eps.media_id == self.media_list.media_id)
-                           .group_by(self.media_list.id).all())
+            self.get_query_data(list_type)
+            queries.append(db.session.query(func.sum(self.media_list.eps_watched),
+                                            func.sum(self.media_list.current_season)).all())
         return queries
 
+    def get_total_movies(self):
+        self.get_query_data(ListType.MOVIES)
+        total_movies = db.session.query(self.media, func.count(self.media.id)).all()
+        t_movies = 0
+        if total_movies:
+            t_movies = total_movies[0][1]
 
-def get_media_query(user_id, page, list_type, category, search, option, sort_val, filter_val):
+        return t_movies
+
+
+def get_media_query(user_id, list_type, category, genre, sort_val, page, q):
     if list_type == ListType.SERIES:
         media = Series
         media_list = SeriesList
-        actors_list = SeriesActors
-        genre_list = SeriesGenre
+        media_actors = SeriesActors
+        media_genre = SeriesGenre
+        sort_option = {'first_air_date_desc': media.first_air_date.desc(),
+                       'first_air_date_asc': media.first_air_date.asc()}
     elif list_type == ListType.ANIME:
         media = Anime
         media_list = AnimeList
-        actors_list = AnimeActors
-        genre_list = AnimeGenre
+        media_actors = AnimeActors
+        media_genre = AnimeGenre
+        sort_option = {'first_air_date_desc': media.first_air_date.desc(),
+                       'first_air_date_asc': media.first_air_date.asc()}
     elif list_type == ListType.MOVIES:
         media = Movies
         media_list = MoviesList
-        actors_list = MoviesActors
-        genre_list = MoviesGenre
+        media_genre = MoviesGenre
+        media_actors = MoviesActors
+        sort_option = {'release_date_asc': media.release_date.asc(),
+                       'release_date_desc': media.release_date.desc()}
 
-    # Check the <sorting> value
-    if sort_val == 'title':
-        sorting = media.name
-    elif sort_val == 'score':
-        sorting = media_list.score.desc()
-    elif sort_val == 'comment':
-        sorting = media_list.comment
+    # Create a sorting dict and update the unique values
+    sorting_dict = {'title-A-Z': media.name.asc(),
+                    'title-Z-A': media.name.desc(),
+                    'score_desc': media_list.score.desc(),
+                    'score_asc': media_list.score.asc(),
+                    'comments': media_list.comment.desc(),
+                    'rewatched': media_list.rewatched.desc()}
+    sorting_dict.update(sort_option)
 
+    try:
+        sorting = sorting_dict[sort_val]
+    except KeyError:
+        abort(400)
+
+    # Check the category
     try:
         category = Status(category)
         cat_value = category.value
     except:
-        cat_value = category
+        abort(400)
 
-    # Check the <filter> value
-    if filter_val == 'not_check':
+    # Check the genre
+    genre_filter = media_genre.genre.like(genre)
+    if genre == 'All':
+        genre_filter = text('')
+
+    # Check the <filter_val> value - NOT USED FOR NOW
+    filter_val = False
+    com_ids = [-1]
+    if filter_val:
         v1, v2 = aliased(media_list), aliased(media_list)
         get_common = db.session.query(v1, v2) \
             .join(v2, and_(v2.user_id == user_id, v2.media_id == v1.media_id)) \
             .filter(v1.user_id == current_user.id).all()
         com_ids = [r[0].media_id for r in get_common]
-        filtering = media_list.media_id.notin_(com_ids)
-        print(filtering)
 
-    # Check the <category> to recover the <media_data>
-    if category != 'Favorite' and category != 'Search':
-        query = db.session.query(media, media_list) \
-            .join(media_list, media_list.media_id == media.id) \
-            .filter(media_list.user_id == user_id, media_list.status == category) \
-            .group_by(media.id).order_by(sorting).paginate(page, 50, error_out=True)
-        if filter_val == 'not_check':
-            query = db.session.query(media, media_list) \
-                .join(media_list, media_list.media_id == media.id) \
-                .filter(media_list.user_id == user_id, media_list.status == category, filtering) \
-                .group_by(media.id).order_by(sorting).paginate(page, 50, error_out=True)
-    elif category == 'Favorite':
-        query = db.session.query(media, media_list) \
+    # Recover the <media_data> from the selected <category>
+    if category != Status.FAVORITE and category != Status.SEARCH and category != Status.ALL:
+        query = db.session.query(media, media_list, media_genre) \
             .join(media, media.id == media_list.media_id) \
-            .filter(media_list.favorite, media_list.user_id == user_id) \
-            .order_by(sorting).paginate(page, 25, error_out=True)
-        if filter_val == 'not_check':
-            query = db.session.query(media, media_list) \
+            .join(media_genre, media_genre.media_id == media_list.media_id) \
+            .filter(media_list.user_id == user_id, media_list.status == category, media_list.media_id.notin_(com_ids),
+                    genre_filter) \
+            .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
+    elif category == Status.ALL:
+        query = db.session.query(media, media_list, media_genre) \
+            .join(media, media.id == media_list.media_id) \
+            .join(media_genre, media_genre.media_id == media_list.media_id) \
+            .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter) \
+            .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
+    elif category == Status.FAVORITE:
+        query = db.session.query(media, media_list, media_genre) \
+            .join(media, media.id == media_list.media_id) \
+            .join(media_genre, media_genre.media_id == media_list.media_id) \
+            .filter(media_list.user_id == user_id, media_list.favorite, media_list.media_id.notin_(com_ids),
+                    genre_filter) \
+            .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
+    elif category == Status.SEARCH:
+        if list_type != ListType.MOVIES:
+            query = db.session.query(media, media_list, media_genre, media_actors) \
                 .join(media, media.id == media_list.media_id) \
-                .filter(media_list.favorite, media_list.user_id == user_id, filtering) \
-                .order_by(sorting).paginate(page, 25, error_out=True)
-    elif category == 'Search':
-        cat_value = "Search results for '{}'".format(search)
-        if option == 'title':
-            query = db.session.query(media, media_list) \
+                .join(media_genre, media_genre.media_id == media_list.media_id) \
+                .join(media_actors, media_actors.media_id == media_list.media_id) \
+                .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter,
+                        or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'))) \
+                .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
+        else:
+            query = db.session.query(media, media_list, media_genre, media_actors) \
                 .join(media, media.id == media_list.media_id) \
-                .filter(or_(media.name.like('%' + search + '%'), media.original_name.like('%' + search + '%')),
-                        media_list.user_id == user_id) \
-                .order_by(sorting).paginate(page, 25, error_out=True)
-            if filter_val == 'not_check':
-                query = db.session.query(media, media_list) \
-                    .join(media, media.id == media_list.media_id) \
-                    .filter(or_(media.name.like('%' + search + '%'), media.original_name.like('%' + search + '%')),
-                            media_list.user_id == user_id, filtering) \
-                    .order_by(sorting).paginate(page, 25, error_out=True)
-        elif option == 'actor':
-            query = db.session.query(media, media_list, actors_list) \
-                .join(media, media.id == media_list.media_id)\
-                .join(actors_list, actors_list.media_id == media_list.media_id) \
-                .filter(actors_list.name.like('%' + search + '%'), media_list.user_id == user_id) \
-                .order_by(sorting).paginate(page, 25, error_out=True)
-            if filter_val == 'not_check':
-                query = db.session.query(media, media_list, actors_list) \
-                    .join(media, media.id == media_list.media_id) \
-                    .join(actors_list, actors_list.media_id == media_list.media_id) \
-                    .filter(actors_list.name.like('%' + search + '%'), media_list.user_id == user_id, filtering) \
-                    .order_by(sorting).paginate(page, 25, error_out=True)
-        elif option == 'genre':
-            query = db.session.query(media, media_list, genre_list) \
-                .join(media, media.id == media_list.media_id)\
-                .join(genre_list, genre_list.media_id == media_list.media_id) \
-                .filter(genre_list.genre.like('%' + search + '%'), media_list.user_id == user_id) \
-                .order_by(sorting).paginate(page, 25, error_out=True)
-            if filter_val == 'not_check':
-                query = db.session.query(media, media_list, genre_list) \
-                    .join(media, media.id == media_list.media_id) \
-                    .join(genre_list, genre_list.media_id == media_list.media_id) \
-                    .filter(genre_list.genre.like('%' + search + '%'), media_list.user_id == user_id, filtering) \
-                    .order_by(sorting).paginate(page, 25, error_out=True)
-        elif option == 'director':
-            query = db.session.query(media, media_list) \
-                .join(media, media.id == media_list.media_id) \
-                .filter(media.director_name.like('%' + search + '%'), media_list.user_id == user_id) \
-                .order_by(sorting).paginate(page, 25, error_out=True)
-            if filter_val == 'not_check':
-                query = db.session.query(media, media_list) \
-                    .join(media, media.id == media_list.media_id) \
-                    .filter(media.director_name.like('%' + search + '%'), media_list.user_id == user_id, filtering) \
-                    .order_by(sorting).paginate(page, 25, error_out=True)
+                .join(media_genre, media_genre.media_id == media_list.media_id) \
+                .join(media_actors, media_actors.media_id == media_list.media_id) \
+                .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter,
+                        or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'),
+                        media.director_name.like('%' + q + '%'))) \
+                .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
 
     return query, cat_value
 
@@ -738,7 +740,8 @@ def get_next_airing(list_type):
     query = db.session.query(media, media_list) \
         .join(media, media.id == media_list.media_id) \
         .filter(media_data > datetime.utcnow(), media_list.user_id == current_user.id,
-                and_(media_list.status != Status.RANDOM, media_list.status != Status.DROPPED)).all()
+                and_(media_list.status != Status.RANDOM, media_list.status != Status.DROPPED)) \
+        .order_by(media_data.asc()).all()
 
     return query
 
@@ -772,11 +775,11 @@ def check_media(media_id, list_type, add=False):
         media = Movies
         media_list = MoviesList
 
-    query = db.session.query(media, media_list) \
-        .join(media, media.id == media_list.media_id) \
-        .filter(media_list.user_id == current_user.id, media_list.media_id == media_id).first()
-
     if add:
         query = db.session.query(media).filter(media.id == media_id).first()
+    else:
+        query = db.session.query(media, media_list) \
+            .join(media, media.id == media_list.media_id) \
+            .filter(media.id == media_id, media_list.user_id == current_user.id).first()
 
     return query

@@ -1,6 +1,13 @@
 
-
 /* --- Card CSS ----------------------------------------- */
+.card {
+    border-radius: 0;
+}
+
+.card-img {
+    border-radius: 0;
+}
+
 .card-hashtag {
     position: absolute;
     bottom: -8px;
@@ -46,14 +53,6 @@
     margin: 0;
     padding: 0;
     width: 440px;
-}
-
-.card {
-    border-radius: 0;
-}
-
-.card-img {
-    border-radius: 0;
 }
 
 @media (max-width: 601px) {

@@ -1,6 +1,6 @@
 
 
-// --- Series Canvas Data -------------------------------------------------
+// --- Series Canvas Data ----------------------------------
 let series_episodes_labels = $('#episodes-series-bar').attr('values-y').split(', ');
 let series_episodes_data = $('#episodes-series-bar').attr('values-x').split(', ');
 series_episodes_labels.pop();
@@ -254,7 +254,7 @@ let series_genres_ctx = document.getElementById('genres-series').getContext('2d'
 new Chart(series_genres_ctx, series_genres_config);
 
 
-// --- Anime Canvas Data -------------------------------------------------
+// --- Anime Canvas Data -----------------------------------
 let anime_episodes_labels = $('#episodes-anime-bar').attr('values-y').split(', ');
 let anime_episodes_data = $('#episodes-anime-bar').attr('values-x').split(', ');
 anime_episodes_labels.pop();
@@ -508,7 +508,7 @@ let anime_genres_ctx = document.getElementById('genres-anime').getContext('2d');
 new Chart(anime_genres_ctx, anime_genres_config);
 
 
-// --- Movies Canvas Data -------------------------------------------------
+// --- Movies Canvas Data ----------------------------------
 let movies_lengths_labels = $('#lengths-movies-bar').attr('values-y').split(', ');
 let movies_lengths_data = $('#lengths-movies-bar').attr('values-x').split(', ');
 movies_lengths_labels.pop();
@@ -762,7 +762,7 @@ let movies_genres_ctx = document.getElementById('genres-movies').getContext('2d'
 new Chart(movies_genres_ctx, movies_genres_config);
 
 
-// --- Media genres container size -------------------------------------------------
+// --- Media genres container size -------------------------
 let series_height = 40*series_genres_data.length + 'px';
 let anime_height = 40*anime_genres_data.length + 'px';
 let movies_height = 40*movies_genres_data.length + 'px';

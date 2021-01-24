@@ -1,5 +1,13 @@
 
+/* --- Main CSS ----------------------------------------- */
+.vertical_line {
+    width: 5px;
+    border-left: 2px solid rgba(44, 57, 70, 1);
+    height: 100wh;
+}
 
+
+/* --- Series ------------------------------------------- */
 .series-container {
     position: relative;
     height: 400px;
@@ -12,6 +20,8 @@
     margin-top: -15px;
 }
 
+
+/* --- Anime -------------------------------------------- */
 .anime-container {
     position: relative;
     height: 400px;
@@ -24,6 +34,8 @@
     margin-top: -15px;
 }
 
+
+/* --- Movies ------------------------------------------- */
 .movies-container {
     position: relative;
     height: 400px;
@@ -36,8 +48,4 @@
     margin-top: -15px;
 }
 
-.vertical_line {
-    width: 5px;
-    border-left: 2px solid rgba(44, 57, 70, 1);
-    height: 100wh;
-}
+

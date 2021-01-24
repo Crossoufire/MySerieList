@@ -1,6 +1,6 @@
 
 
-// --- Create the buttons category list ------------------------------------
+// --- Create the buttons category list --------------------
 function chargeButtons(card) {
     removeCat();
 
@@ -70,11 +70,11 @@ function chargeButtons(card) {
 }
 
 
-// --- Change the category -------------------------------------------------
+// --- Change the category ---------------------------------
 function changeCategory(new_category, card_id) {
     removeCat();
 
-    let $card = $('#'+card_id)
+    let $card = $('#'+card_id);
     let media_list = $card.attr('values').split('-')[1];
     let element_id = $card.attr('values').split('-')[2];
     let load_img = $card.find('.view.overlay');
@@ -100,9 +100,13 @@ function changeCategory(new_category, card_id) {
 }
 
 
-// --- Update episode ------------------------------------------------------
+// --- Update episode --------------------------------------
 function updateEpisode(element_id, episode, media_list) {
-    let selected_episode = episode.selectedIndex
+    let selected_episode = episode.selectedIndex;
+    let check_img = $('<div style="position: absolute; z-index: 200; top: 65%; width: 100%;' +
+        'background-color: black; opacity: 0.60;">' +
+        '<div class="central-loading fas fa-2x fa-check" style="color: green;"></div>' +
+        '</div>');
 
     $.ajax ({
         type: "POST",
@@ -111,6 +115,8 @@ function updateEpisode(element_id, episode, media_list) {
         data: JSON.stringify({episode: selected_episode, element_id: element_id, element_type: media_list }),
         dataType: "json",
         success: function() {
+            check_img.prependTo($('#card_'+element_id).find('.view.overlay'));
+            check_img.delay(800).fadeOut(300, function() { this.remove(); });
         },
         error: function () {
             error_ajax_message("Error updating the media's episode. Please try again later.")
@@ -119,12 +125,16 @@ function updateEpisode(element_id, episode, media_list) {
 }
 
 
-// --- Update season -------------------------------------------------------
+// --- Update season ---------------------------------------
 function updateSeason(element_id, value) {
-    let $card = $('#card_'+element_id)
+    let $card = $('#card_'+element_id);
     let selected_season = value.selectedIndex;
     let seas_data = $card.attr('values').split('-')[0];
     let media_list = $card.attr('values').split('-')[1];
+    let check_img = $('<div style="position: absolute; z-index: 200; top: 65%; width: 100%;' +
+    'background-color: black; opacity: 0.60;">' +
+    '<div class="central-loading fas fa-2x fa-check" style="color: green;"></div>' +
+    '</div>');
 
     $.ajax ({
         type: "POST",
@@ -133,6 +143,9 @@ function updateSeason(element_id, value) {
         data: JSON.stringify({season: selected_season, element_id: element_id, element_type: media_list }),
         dataType: "json",
         success: function() {
+            check_img.prependTo($('#card_'+element_id).find('.view.overlay'));
+            check_img.delay(800).fadeOut(300, function() { this.remove(); });
+
             let episode_drop = $('#E_'+element_id);
             let season_data = JSON.parse("[" + seas_data + "]");
 
@@ -156,7 +169,7 @@ function updateSeason(element_id, value) {
 }
 
 
-// --- Charge the categories buttons from other lists ----------------------
+// --- Charge the categories buttons from other lists ------
 function ChargeButtonsOther(card) {
     removeCat();
 

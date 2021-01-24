@@ -1,8 +1,8 @@
 
-
+/* --- Main CSS ----------------------------------------- */
 td {
     text-align: center;
-    padding: 5px 0px 5px 0px !important;
+    padding: 5px 0 5px 0 !important;
     border-bottom: 1px solid grey;
 }
 

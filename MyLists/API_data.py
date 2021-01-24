@@ -1,7 +1,6 @@
 import json
 import requests
 import urllib.request
-
 from PIL import Image
 from flask import abort
 from MyLists import app
@@ -11,7 +10,7 @@ from ratelimit import sleep_and_retry, limits
 
 
 class ApiData:
-    def __init__(self, ):
+    def __init__(self):
         self.tmdb_api_key = app.config['THEMOVIEDB_API_KEY']
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
 
@@ -20,20 +19,20 @@ class ApiData:
         if status_code != 200:
             abort(status_code)
 
-    def TMDb_search(self, media_name):
-        response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}"
-                                .format(self.tmdb_api_key, media_name))
+    def TMDb_search(self, media_name, page=1):
+        response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}&page={2}"
+                                .format(self.tmdb_api_key, media_name, page))
 
         self.status_code(response.status_code)
 
         return json.loads(response.text)
 
     def get_details_and_credits_data(self, api_id, list_type):
-        if list_type != ListType.MOVIES:
-            response = requests.get("https://api.themoviedb.org/3/tv/{0}?api_key={1}&append_to_response=credits"
+        if list_type == ListType.SERIES or list_type == ListType.ANIME:
+            response = requests.get("https://api.themoviedb.org/3/tv/{}?api_key={}&append_to_response=credits"
                                     .format(api_id, self.tmdb_api_key))
         elif list_type == ListType.MOVIES:
-            response = requests.get("https://api.themoviedb.org/3/movie/{0}?api_key={1}&append_to_response=credits"
+            response = requests.get("https://api.themoviedb.org/3/movie/{}?api_key={}&append_to_response=credits"
                                     .format(api_id, self.tmdb_api_key))
 
         self.status_code(response.status_code)
@@ -75,24 +74,13 @@ class ApiData:
 
         return json.loads(response.text)
 
-    def get_collection_data(self, collection_id):
-        response = requests.get("https://api.themoviedb.org/3/collection/{0}?api_key={1}"
-                                .format(collection_id, self.tmdb_api_key))
-
-        self.status_code(response.status_code)
-
-        return json.loads(response.text)
-
-    def save_api_cover(self, media_cover_path, media_cover_name, list_type, collection=False):
+    def save_api_cover(self, media_cover_path, media_cover_name, list_type):
         if list_type == ListType.SERIES:
             local_covers_path = Path(app.root_path, "static/covers/series_covers/")
         elif list_type == ListType.ANIME:
             local_covers_path = Path(app.root_path, "static/covers/anime_covers/")
         elif list_type == ListType.MOVIES:
-            if collection:
-                local_covers_path = Path(app.root_path, "static/covers/movies_collection_covers")
-            else:
-                local_covers_path = Path(app.root_path, "static/covers/movies_covers")
+            local_covers_path = Path(app.root_path, "static/covers/movies_covers")
 
         urllib.request.urlretrieve(f"{self.tmdb_poster_base_url}{media_cover_path}",
                                    f"{local_covers_path}/{media_cover_name}")

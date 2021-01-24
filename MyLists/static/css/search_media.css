@@ -1,12 +1,11 @@
 
-
-/* --- Card CSS ----------------------------------------- */
+/* --- Card CSS ------------------------------------------------------------- */
 .giveMeEllipsis {
    overflow: hidden;
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 3;     /* number of lines to show */
+   -webkit-line-clamp: 3;   /* number of lines to show */
 }
 
 .giveMeEllipsis2 {
@@ -14,7 +13,7 @@
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 2;     /* number of lines to show */
+   -webkit-line-clamp: 2;   /* number of lines to show */
 }
 
 .giveMeEllipsis-3 {
@@ -22,5 +21,38 @@
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 4;     /* number of lines to show */
+   -webkit-line-clamp: 4;   /* number of lines to show */
+}
+
+.card-series {
+   background: #216c7d;
+   width: 700px;
+   border-radius: 0;
+}
+
+.card-anime {
+   background: #945141;
+   width: 700px;
+   border-radius: 0;
+}
+
+.card-movies {
+   background: #8c7821;
+   width: 700px;
+   border-radius: 0;
+}
+
+.img-min-height {
+   min-height: 225px;
+   width: 150px;
+}
+
+.card-hashtag {
+   position: absolute;
+   bottom: -8px;
+   right: 16px;
+}
+
+.btn-small {
+   padding: 8px 15px 8px 15px;
 }

@@ -1,103 +1,88 @@
 import pytz
 import random
 import operator
-
 from MyLists import db
 from flask import url_for
-from sqlalchemy import func, text
+from sqlalchemy import func
 from flask_login import current_user
 from _collections import OrderedDict
 from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
-    AnimeEpisodesPerSeason, SeriesEpisodesPerSeason, Movies, Ranks, followers, Frames, SeriesGenre
+    Movies, Ranks, followers, Frames, RoleType
 
 
-def get_media_count(user_id, list_type):
+def get_media_count_by_status(user_id, list_type):
     if list_type == ListType.SERIES:
-        media_count = db.session.query(SeriesList.status, func.count(SeriesList.status)) \
-            .filter_by(user_id=user_id).group_by(SeriesList.status).all()
-    if list_type == ListType.ANIME:
-        media_count = db.session.query(AnimeList.status, func.count(AnimeList.status)) \
-            .filter_by(user_id=user_id).group_by(AnimeList.status).all()
-    if list_type == ListType.MOVIES:
-        media_count = db.session.query(MoviesList.status, func.count(MoviesList.status)) \
-            .filter_by(user_id=user_id).group_by(MoviesList.status).all()
+        status = SeriesList.status
+    elif list_type == ListType.ANIME:
+        status = AnimeList.status
+    elif list_type == ListType.MOVIES:
+        status = MoviesList.status
 
-    data = {}
+    media_count = db.session.query(status, func.count(status)).filter_by(user_id=user_id).group_by(status).all()
+
     total = sum(x[1] for x in media_count)
-    categories = [Status.WATCHING, Status.COMPLETED, Status.COMPLETED_ANIMATION,
-                  Status.ON_HOLD, Status.RANDOM, Status.DROPPED, Status.PLAN_TO_WATCH]
+    data = {'total': total,
+            'nodata': False}
+    if total == 0:
+        data['nodata'] = True
+
     for media in media_count:
-        if media[0] in categories:
-            data[media[0].value] = {"count": media[1],
-                                    "percent": (media[1]/total)*100}
-    for media in categories:
+        data[media[0].value] = {"count": media[1],
+                                "percent": (media[1]/total)*100}
+    for media in Status:
         if media.value not in data.keys():
             data[media.value] = {"count": 0,
                                  "percent": 0}
-
-    data['total'] = total
-    if total == 0:
-        data['nodata'] = True
-    else:
-        data['nodata'] = False
 
     return data
 
 
 def get_media_total_eps(user_id, list_type):
     if list_type == ListType.SERIES:
-        media_data = db.session.query(SeriesList, SeriesEpisodesPerSeason,
-                                      func.group_concat(SeriesEpisodesPerSeason.episodes)) \
-            .join(SeriesEpisodesPerSeason, SeriesEpisodesPerSeason.media_id == SeriesList.media_id) \
-            .filter(SeriesList.user_id == user_id).group_by(SeriesList.media_id).all()
+        media = SeriesList
     elif list_type == ListType.ANIME:
-        media_data = db.session.query(AnimeList, AnimeEpisodesPerSeason,
-                                      func.group_concat(AnimeEpisodesPerSeason.episodes)) \
-            .join(AnimeEpisodesPerSeason, AnimeEpisodesPerSeason.media_id == AnimeList.media_id) \
-            .filter(AnimeList.user_id == user_id).group_by(AnimeList.media_id)
+        media = AnimeList
+    elif list_type == ListType.MOVIES:
+        media = MoviesList
+    else:
+        return
 
-    nb_eps_watched = 0
-    for element in media_data:
-        if element[0].status != Status.PLAN_TO_WATCH and element[0].status != Status.RANDOM:
-            episodes = element[2].split(",")
-            episodes = [int(x) for x in episodes]
-            for i in range(1, element[0].current_season):
-                nb_eps_watched += episodes[i-1]
-            nb_eps_watched += element[0].last_episode_watched
+    query = db.session.query(func.sum(media.eps_watched)).filter(media.user_id == user_id).all()
+    eps_watched = 0
+    if query:
+        eps_watched = query[0][0]
 
-    return nb_eps_watched
+    return eps_watched
 
 
 def get_media_score(user_id, list_type):
     if list_type == ListType.SERIES:
-        media_score = db.session.query(func.count(SeriesList.score), func.count(SeriesList.media_id),
-                                       func.sum(SeriesList.score)) \
-            .filter(SeriesList.user_id == user_id, SeriesList.status != Status.PLAN_TO_WATCH).all()
-    if list_type == ListType.ANIME:
-        media_score = db.session.query(func.count(AnimeList.score), func.count(AnimeList.media_id),
-                                       func.sum(AnimeList.score)) \
-            .filter(AnimeList.user_id == user_id, AnimeList.status != Status.PLAN_TO_WATCH).all()
-    if list_type == ListType.MOVIES:
-        media_score = db.session.query(func.count(MoviesList.score), func.count(MoviesList.media_id),
-                                       func.sum(MoviesList.score)) \
-            .filter(MoviesList.user_id == user_id, MoviesList.status != Status.PLAN_TO_WATCH).all()
+        media = SeriesList
+        status = Status.PLAN_TO_WATCH
+    elif list_type == ListType.ANIME:
+        media = AnimeList
+        status = Status.PLAN_TO_WATCH
+    elif list_type == ListType.MOVIES:
+        media = MoviesList
+        status = Status.PLAN_TO_WATCH
+
+    media_score = db.session.query(func.count(media.score), func.count(media.media_id), func.sum(media.score)) \
+        .filter(media.user_id == user_id, media.status != status).all()
 
     try:
-        percentage = int(int(media_score[0][0])/int(media_score[0][1])*100)
+        percentage = int(float(media_score[0][0])/float(media_score[0][1])*100)
     except (ZeroDivisionError, TypeError):
         percentage = '-'
 
     try:
-        mean_score = round(int(media_score[0][2])/int(media_score[0][0]), 2)
+        mean_score = round(float(media_score[0][2])/float(media_score[0][0]), 2)
     except (ZeroDivisionError, TypeError):
         mean_score = '-'
 
-    data = {'scored_media': media_score[0][0],
+    return {'scored_media': media_score[0][0],
             'total_media': media_score[0][1],
             'percentage': percentage,
             'mean_score': mean_score}
-
-    return data
 
 
 def get_favorites(user_id):
@@ -153,7 +138,7 @@ def get_media_levels(user, list_type):
 def get_knowledge_grade(user):
     # Compute the corresponding level and percentage from the media time
     knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
-                      int((((400+80*user.time_spent_anime)**(1/2))-20)/40) +\
+                      int((((400+80*user.time_spent_anime)**(1/2))-20)/40) + \
                       int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
 
     query_rank = Ranks.query.filter_by(level=knowledge_level, type='knowledge_rank\n').first()
@@ -212,11 +197,17 @@ def get_updates(last_update):
         element_data["media_id"] = element.media_id
 
         if element.media_type == ListType.SERIES:
-            element_data["category"] = "series"
+            element_data["category"] = "Series"
+            element_data["icon-color"] = "fas fa-tv text-series"
+            element_data["border"] = "#216e7d"
         elif element.media_type == ListType.ANIME:
-            element_data["category"] = "anime"
+            element_data["category"] = "Anime"
+            element_data["icon-color"] = "fas fa-torii-gate text-anime"
+            element_data["border"] = "#945141"
         elif element.media_type == ListType.MOVIES:
-            element_data["category"] = "movie"
+            element_data["category"] = "Movies"
+            element_data["icon-color"] = "fas fa-film text-movies"
+            element_data["border"] = "#8c7821"
 
         update.append(element_data)
 
@@ -226,64 +217,65 @@ def get_updates(last_update):
 # ----------------------------------------------------------------------------------------------------------
 
 
-def get_user_data(user):
-    # Recover the view count of the account and the media lists
-    if current_user.id != 1 and user.id != current_user.id:
-        user.profile_views += 1
-        profile_view_count = user.profile_views
-        db.session.commit()
-    else:
-        profile_view_count = user.profile_views
-    view_count = {"profile": profile_view_count,
-                  "series": user.series_views,
-                  "anime": user.anime_views,
-                  "movies": user.movies_views}
-
+def get_header_data(user):
     # Check if the current user follows the user's account
+    isfollowing = False
     if user.id != current_user.id and current_user.is_following(user):
         isfollowing = True
-    else:
-        isfollowing = False
 
-    # Recover the number of person that follows you
+    # Recover the number of person that follows the user
     followers = user.followers.count()
 
     # Recover the knowledge frame and level of the user
     knowledge_info = get_knowledge_frame(user)
 
+    # Header info
+    header_data = {"id": str(user.id),
+                   "username": user.username,
+                   "profile_picture": url_for('static', filename='profile_pics/{0}'.format(user.image_file)),
+                   "register": user.registered_on.strftime("%d %b %Y"),
+                   "followers": followers,
+                   "isfollowing": isfollowing,
+                   "knowledge_info": knowledge_info}
+
+    return header_data
+
+
+def get_user_data(user):
+    # Recover the view count of the account and the media lists
+    profile_view_count = user.profile_views
+    if current_user.role != RoleType.ADMIN and user.id != current_user.id:
+        user.profile_views += 1
+        profile_view_count = user.profile_views
+        db.session.commit()
+    view_count = {"profile": profile_view_count,
+                  "series": user.series_views,
+                  "anime": user.anime_views,
+                  "movies": user.movies_views}
+
     # Recover the overview user's last update
     last_update = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).limit(7)
     media_update = get_updates(last_update)
 
-    user_data = {"id": str(user.id),
-                 "username": user.username,
-                 "profile_picture": url_for('static', filename='profile_pics/{0}'.format(user.image_file)),
-                 "register": user.registered_on.strftime("%d %b %Y"),
-                 "followers": followers,
-                 "isfollowing": isfollowing,
-                 "knowledge_info": knowledge_info,
-                 "media_update": media_update,
+    user_data = {"media_update": media_update,
                  "view_count": view_count}
 
     return user_data
 
 
 def get_media_data(user):
-    all_lists = [["series", ListType.SERIES, user.time_spent_series], ["anime", ListType.ANIME, user.time_spent_anime],
-                 ["movies", ListType.MOVIES, user.time_spent_movies]]
+    all_lists = [['series', ListType.SERIES, user.time_spent_series],
+                 ['anime', ListType.ANIME, user.time_spent_anime],
+                 ['movies', ListType.MOVIES, user.time_spent_movies]]
 
-    # Create dict with media as key; values are dict or list of dict with the data
+    # Create dict with media as key. Dict values are dict or list of dict
     media_dict = {}
     for list_type in all_lists:
-        media_count = get_media_count(user.id, list_type[1])
+        media_count = get_media_count_by_status(user.id, list_type[1])
         media_levels = get_media_levels(user, list_type[1])
         media_score = get_media_score(user.id, list_type[1])
         media_time = list_type[2]
-
-        if list_type[1] != ListType.MOVIES:
-            media_total_eps = get_media_total_eps(user.id, list_type[1])
-        else:
-            media_total_eps = None
+        media_total_eps = get_media_total_eps(user.id, list_type[1])
 
         # Each media_data dict contains all the data for one type of media
         media_data = {'time_spent_hour': round(media_time/60),
@@ -294,7 +286,7 @@ def get_media_data(user):
                       'media_score': media_score}
 
         # return a media_dict with 3 keys (anime, series, movies) with media_data as values
-        media_dict['{}'.format(list_type[0])] = media_data
+        media_dict[f'{list_type[0]}'] = media_data
 
     return media_dict
 
@@ -377,11 +369,11 @@ def get_more_stats(user):
     #     .filter(MoviesList.user_id == current_user.id)\
     #     .group_by(func.strftime('%Y', Movies.release_date)).order_by(text('year desc')).all()
 
-    test = db.session.query(SeriesGenre.genre, func.count(SeriesGenre.genre).label('count')) \
-        .join(SeriesList, SeriesGenre.media_id == SeriesList.media_id) \
-        .join(Series, Series.id == SeriesList.media_id) \
-        .filter(SeriesList.user_id == current_user.id)\
-        .group_by(SeriesGenre.genre).order_by(text('count desc')).all()
+    # test = db.session.query(SeriesGenre.genre, func.count(SeriesGenre.genre).label('count')) \
+    #     .join(SeriesList, SeriesGenre.media_id == SeriesList.media_id) \
+    #     .join(Series, Series.id == SeriesList.media_id) \
+    #     .filter(SeriesList.user_id == current_user.id)\
+    #     .group_by(SeriesGenre.genre).order_by(text('count desc')).all()
 
     anime_data = db.session.query(Anime, AnimeList) \
         .join(AnimeList, AnimeList.media_id == Anime.id) \

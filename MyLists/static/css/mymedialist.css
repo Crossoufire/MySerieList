@@ -1,59 +1,15 @@
 
-/* --- Header CSS --------------------------------------- */
-option {
+/* --- Icon/Search/Shared Header CSS ------------------------------- */
+.return-icon {
     background: rgba(0, 0, 0, 0.8);
+    padding: 13px 13px 13px 13px;
+    vertical-align: middle;
 }
 
-.back-image {
-    background-image: url('/static/img/profile_background.jpg');
-    background-size: cover;
-    height: 210px;
-}
-
-.header-bar {
-    border-color: darkgrey;
-    margin: 15px 20px 0 20px;
-}
-
-.modded-input {
+.return-icon-tv {
     background: rgba(0, 0, 0, 0.8);
-    color: lightgray;
-    border: none;
-    padding: 5px;
-    width: 20vw;
-}
-
-.modded-input:focus {
-    outline: none;
-}
-
-.modded-input::placeholder {
-    color: darkgray;
-    opacity: 1;
-}
-
-.btn-header {
-    background-color: rgba(0, 0, 0, 0.7);
-}
-
-.btn-header-fav {
-    background-color: rgba(140, 15, 15, 0.7);
-}
-
-.btn-header:hover, .btn-header-fav:hover {
-    color: white;
-}
-
-.btn-selected {
-    background-color: darkslategrey;
-}
-
-.btn-selected-fav {
-    background-color: darkred;
-}
-
-.btn-selected:hover, .btn-selected-fav:hover {
-    color: white;
+    padding: 13px 10px 13px 10px;
+    vertical-align: middle;
 }
 
 .common-media {
@@ -66,7 +22,7 @@ option {
 
 .common-media-meter {
 	height: 8px;
-	background: rgba(50, 50, 50, 0.8);
+	background: rgba(5, 5, 5, 0.6);
 }
 
 .common-media-meter-bar {
@@ -77,70 +33,146 @@ option {
     background-color: forestgreen;
 }
 
-.search-select {
-    background: rgba(0, 0, 0, 0.7);
+.input-container {
+    text-align: right;
+}
+
+.modded-input {
+    background: transparent;
+    color: lightgray;
+    border: none;
+    border-bottom: 1px solid #3b3434;
+    padding: 5px;
+    width: 25vmin;
+}
+
+.modded-input:focus {
+    outline: none;
+}
+
+.modded-input::placeholder {
     color: darkgray;
-    margin-left: 10px;
+    opacity: 1;
 }
 
-.return-icon {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 13px 13px 13px 13px;
+.shared-pie {
+    display: inline-block;
+    vertical-align: middle;
+    width: 41px;
+    height: 41px;
+    border-radius: 50%;
 }
 
-.return-icon-tv {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 13px 10px 13px 10px;
-}
-
-@media (max-width: 769px) {
-    .modded-input {
-        width: 40vw;
+@media (max-width: 500px) {
+    .common-media-pos {
+        float: none;
+        margin-top: 20px auto 0 auto;
+        width: 80%;
     }
-}
-@media (max-width: 592px) {
-    .center-mobile {
-        justify-content: center;
+    .mobile-margin {
+        margin: 10px 0 10px 0;
     }
-    .icons-mobile {
-        margin-left: 0;
-    }
-}
-@media (max-width: 469px) {
-    .back-image {
-        height: 260px;
-    }
-}
-@media (max-width: 451px) {
-    .modded-input {
-        width: 75vw;
-    }
-    .back-image {
-        height: 300px;
-    }
-}
-@media (max-width: 412px) {
-    .modded-input {
-        width: 60vw;
-    }
-    .back-image {
-        height: 340px;
-    }
-    .mobile-sorting {
+    .mobile-center {
         text-align: center;
     }
-    .mobile-sorting > label {
-        margin-left: 0 !important;
+    .modded-input {
+        width: 80vmin;
     }
-    .t-pages {
+    .input-container {
         text-align: center;
-        margin-top: 5px;
-        float: none !important;
     }
 }
 
 
-/* --- Card CSS ----------------------------------------- */
+/* --- Categories Header CSS --------------------------------------- */
+.cat-btn {
+    display: inline-block;
+    padding: 5px 0 5px 0;
+    margin: 0 15px 0 15px;
+    color: lightgray;
+    font-weight: 300;
+    font-size: 14pt;
+    cursor: pointer;
+    background-color: transparent;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    -moz-box-shadow: none !important;
+}
+
+.cat-btn:hover {
+    color: white;
+}
+
+.btn-selected {
+    color: lightseagreen;
+}
+
+@media (max-width: 500px) {
+    .cat-btn {
+        display: inline-block;
+        padding: 5px 10px 5px 10px;
+        margin: 5px;
+        font-size: 11pt;
+    }
+}
+
+
+/* --- Filtering/Sorting Header CSS -------------------------------- */
+.li-genre-sort {
+    list-style-type: none;
+    display: inline-block;
+}
+
+.dropdown-item:hover {
+    background-color: black;
+}
+
+.genre-drop {
+    background-color: #0f0f0f;
+    overflow: auto;
+    max-height: 400px;
+}
+
+.sort-drop {
+    background-color: #0f0f0f;
+}
+
+.sort-container {
+    float: right;
+    margin-top: 45px;
+}
+
+@media (max-width: 500px) {
+    .genre-drop {
+        max-height: 250px;
+    }
+    .sort-container {
+        float: none;
+        margin: 10px 0 -12px 0;
+        text-align: center;
+    }
+}
+
+
+/* --- Media Header CSS -------------------------------------------- */
+.cat-title {
+    font-weight: 400;
+    color: lightgrey;
+    display: inline-block;
+    text-align: left;
+    margin: 45px 0 0 0;
+}
+
+@media (max-width: 500px) {
+    .cat-title {
+        display: block;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+}
+
+
+/* --- Card CSS ---------------------------------------------------- */
 .card {
     border-radius: 0 !important;
     margin-bottom: 50px;
@@ -365,6 +397,20 @@ option {
     border: grey 2px solid !important;
 }
 
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.on-right {
+    float: right;
+    margin: 3px 7px 0 0;
+}
+
 @media (max-width: 1025px) {
     .card {
         margin-bottom: 24px;
@@ -394,7 +440,26 @@ option {
 }
 
 
-/* --- Your next airing CSS ----------------------------- */
+/* --- Pagination Header CSS --------------------------------------- */
+.pagination-css {
+    justify-content: center;
+    font-weight: 400;
+}
+
+.pagination .page-item.active .page-link {
+   background-color: #3c3b3b !important;
+}
+
+.page-link {
+    padding: 8px;
+}
+
+.page-link:hover {
+   background-color: #3c3b3b !important;
+}
+
+
+/* --- Next airing CSS --------------------------------------------- */
 .absolute-data {
     background-color: #21263b;
     border-top: solid 1px black;

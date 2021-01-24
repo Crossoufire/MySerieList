@@ -16,10 +16,10 @@
         <li>40 frames. You gain a frame each 8 levels.</li>
         <li>Equation is: Frame = (lvl(Series)+lvl(Anime)+lvl(Movies))/8.</li>
         <li>Knowledge frame are based on the sum of the different levels.</li>
-        <li>You earn a new frame until level 320.</li>
+        <li>You earn a new frame until level 312.</li>
     </ul>
 
-    <div class="table-responsive-sm m-t-30 table-style-2">
+    <div class="table-responsive-sm m-t-30 m-b-50 table-style-2">
         <table class="table text-light">
             <thead>
             <tr>
@@ -34,7 +34,13 @@
                         <img height='150' width="150" src="static/img/icon_frames/new/{{ rank.image_id }}.png" alt="">
                     </td>
                     <td class="text-center" style="vertical-align: middle;">
-                        <strong class="text-center align-middle fs-25">{{ rank.level*8 }}</strong>
+                        {% if 8*rank.level < 320 %}
+                            <strong class="text-center align-middle fs-25">
+                                {{ 8*(-1+rank.level) }} - {{ -1 + 8*(rank.level) }}
+                            </strong>
+                        {% else %}
+                            <strong class="text-center align-middle fs-25">{{ 8*(-1+rank.level) }} +</strong>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

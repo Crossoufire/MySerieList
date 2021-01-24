@@ -1,9 +1,16 @@
 
 
-// --- Add the media to the user ---------------------------------------
+// --- Add the media to the user ---------------------------
 function addToUser(element_id, media_type) {
-    let category = media_type === 'movieslist' ? 'Completed' : 'Watching';
+    let category;
     let $medialist = $('#your-medialist-data');
+
+    if (media_type === 'serieslist' || media_type === 'animelist') {
+        category = 'Watching'
+    }
+    else if (media_type === 'movieslist') {
+        category = 'Completed'
+    }
 
     $medialist.addClass('disabled');
     $('#loading-add-list').hide();
@@ -30,7 +37,7 @@ function addToUser(element_id, media_type) {
 }
 
 
-// --- Remove the media to the user ------------------------------------
+// --- Remove the media to the user ------------------------
 function removeFromUser(element_id, media_type) {
     $('#your-medialist-data').addClass('disabled');
     $('#loading-remove-list').show();
@@ -64,7 +71,7 @@ function removeFromUser(element_id, media_type) {
 }
 
 
-// --- Set media to favorite -------------------------------------------
+// --- Set media to favorite -------------------------------
 function addFavorite(element_id, media_type) {
     let favorite;
     favorite = !!$('#favorite').hasClass('far');
@@ -94,7 +101,7 @@ function addFavorite(element_id, media_type) {
 }
 
 
-// --- Change the TV category ------------------------------------------
+// --- Change the TV category ------------------------------
 function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
     let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
     $('#cat-loading').show();
@@ -102,7 +109,8 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
 
     if (new_cat === 'Completed') {
         $('#rewatch-row').show('slow');
-    } else {
+    }
+    else {
         $('#rewatch-row').hide('slow');
         $('#rewatched-dropdown').val("0");
     }
@@ -131,7 +139,7 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
                 for (let i = 2; i <= season_data[0][seasons_index]; i++) {
                     let opt = document.createElement("option");
                     opt.className = "";
-                    (i <= 9) ? opt.innerHTML = "E0"+i : opt.innerHTML = "E"+i;
+                    (i <= 9) ? opt.innerHTML = "&nbsp;0"+i+"&nbsp;" : opt.innerHTML = "&nbsp;"+i+"&nbsp;";
                     episode_drop[0].appendChild(opt);
                 }
                 $('#episode-dropdown').prop('selectedIndex', season_data[0][seasons_index]-1);
@@ -153,7 +161,7 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
 }
 
 
-// --- Change the Movie category ---------------------------------------
+// --- Change the Movie category ---------------------------
 function changeCategoryMovies(element_id, cat_selector, genres) {
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
@@ -165,7 +173,8 @@ function changeCategoryMovies(element_id, cat_selector, genres) {
 
     if (new_cat === 'Completed') {
         $('#rewatch-row').show('slow');
-    } else {
+    }
+    else {
         $('#rewatch-row').hide('slow');
         $('#rewatched-dropdown').val("0");
     }
@@ -190,7 +199,7 @@ function changeCategoryMovies(element_id, cat_selector, genres) {
 }
 
 
-// --- Update season ---------------------------------------------------
+// --- Update season ---------------------------------------
 function updateSeason(element_id, value, seas_data, media_list) {
     $('#season-loading').show();
     $('#your-medialist-data').addClass('disabled');
@@ -230,7 +239,7 @@ function updateSeason(element_id, value, seas_data, media_list) {
 }
 
 
-// --- Update episode --------------------------------------------------
+// --- Update episode --------------------------------------
 function updateEpisode(element_id, episode, media_list) {
     $('#eps-loading').show();
     $('#your-medialist-data').addClass('disabled');
@@ -255,7 +264,7 @@ function updateEpisode(element_id, episode, media_list) {
 }
 
 
-// --- Update rewatched data -------------------------------------------
+// --- Update rewatched data -------------------------------
 function updateRewatched(element_id, rewatch, media_list) {
     $('#rewatched-loading').show();
 
@@ -278,7 +287,7 @@ function updateRewatched(element_id, rewatch, media_list) {
 }
 
 
-// --- Update score data -----------------------------------------------
+// --- Update score data -----------------------------------
 function updateScore(element_id, score, media_list) {
     $('#score-loading').show();
     let value = score.options[score.selectedIndex].value;
@@ -302,7 +311,7 @@ function updateScore(element_id, score, media_list) {
 }
 
 
-// --- Lock the media --------------------------------------------------
+// --- Lock the media --------------------------------------
 function lock_media(element_id, element_type) {
     let lock_status;
 
@@ -331,7 +340,7 @@ function lock_media(element_id, element_type) {
 
 
 $(document).ready(function () {
-    // --- Random box color -----------------------------------------------------
+    // --- Random box color --------------------------------
     let colors, boxes, i;
     colors = ['#5d6566', '#536872', '#708090', '#5d7282', '#36454f'];
     boxes = document.querySelectorAll(".box");
@@ -340,7 +349,7 @@ $(document).ready(function () {
         boxes[i].style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
     }
 
-    // --- Get the color of the status -------------------------------------
+    // --- Get the color of the status ---------------------
     $('.follow-div').each(function () {
         if ($(this).find('.follow-status').attr('value') === 'Watching') {
             $(this).find('.fa-list').attr('style', 'color: #334D5C;');
@@ -365,7 +374,7 @@ $(document).ready(function () {
         }
     });
 
-    // --- Fill the movie ticket ------------------------------------------
+    // --- Fill the media icon score -----------------------
     let $media_ticket = $('.media-ticket');
     let gradient = $media_ticket.attr('value');
     $media_ticket.attr('style', add_gradient(gradient));

@@ -1,42 +1,5 @@
 
 
-// --- Follow status -----------------------------------------------
-function follow_status(follow_id, button, index) {
-    let status;
-
-    status = $(button).prop('value') !== '1';
-    $('#loading-follow-'+index).show();
-    $(button).addClass('disabled');
-
-    $.ajax ({
-        type: "POST",
-        url: "/follow_status",
-        contentType: "application/json",
-        data: JSON.stringify({follow_id: follow_id, follow_status: status}),
-        dataType: "json",
-        success: function() {
-            if (status === false) {
-                $(button).text('Follow');
-                $(button).prop('value', '0');
-                $(button).addClass('btn-primary').removeClass('btn-dark btn-smaller');
-                $(button).removeClass('disabled');
-            } else {
-                $(button).text('Unfollow');
-                $(button).prop('value', '1');
-                $(button).removeClass('btn-primary').addClass('btn-dark btn-smaller');
-                $(button).removeClass('disabled');
-            }
-        },
-        error: function () {
-            error_ajax_message('Error updating the following status. Please try again later.');
-        },
-        complete: function() {
-            $('#loading-follow-'+index).hide();
-        }
-    });
-}
-
-
 // --- Datatable ---------------------------------------------------
 $(document).ready(function () {
     $('#hall_of_fame').DataTable({

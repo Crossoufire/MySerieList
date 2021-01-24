@@ -1,3 +1,4 @@
+import json
 from flask import Blueprint
 from datetime import datetime
 from MyLists import db, bcrypt, app
@@ -5,17 +6,16 @@ from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from MyLists.general.trending_data import TrendingData
 from flask import render_template, flash, request, abort
-from MyLists.models import Status, ListType, User, GlobalStats, RoleType
+from MyLists.main.scheduled_tasks import update_Mylists_stats
+from MyLists.models import ListType, User, RoleType, MyListsStats
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
-    refresh_db_frames, refresh_db_badges, refresh_db_ranks
-
+    refresh_db_frames, refresh_db_badges, refresh_db_ranks, add_eps_watched
 
 bp = Blueprint('general', __name__)
 
 
-# noinspection PyArgumentList
 @bp.before_app_first_request
-def create_user():
+def create_first_data():
     db.create_all()
     if User.query.filter_by(id='1').first() is None:
         admin1 = User(username='admin',
@@ -51,10 +51,12 @@ def create_user():
     refresh_db_frames()
     refresh_db_badges()
     refresh_db_ranks()
+
+    # add_eps_watched()
+    compute_media_time_spent()
+    # update_Mylists_stats()
+
     db.session.commit()
-    compute_media_time_spent(ListType.SERIES)
-    compute_media_time_spent(ListType.ANIME)
-    compute_media_time_spent(ListType.MOVIES)
 
 
 @bp.route("/admin", methods=['GET'])
@@ -68,102 +70,32 @@ def admin():
 @bp.route("/mylists_stats", methods=['GET'])
 @login_required
 def mylists_stats():
-    stats = GlobalStats()
+    all_stats = MyListsStats.query.first()
 
-    times_spent = stats.get_total_time_spent()
-    if times_spent[0]:
-        total_time = {"total": int((times_spent[0][0]/60)+(times_spent[0][1]/60)+(times_spent[0][2]/60)),
-                      "series": int(times_spent[0][0]/60), "anime": int(times_spent[0][1]/60),
-                      "movies": int(times_spent[0][2]/60)}
-    else:
-        total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0}
+    total_time = json.loads(all_stats.total_time)
+    top_media = json.loads(all_stats.top_media)
+    top_genres = json.loads(all_stats.top_genres)
+    top_actors = json.loads(all_stats.top_actors)
+    top_directors = json.loads(all_stats.top_directors)
+    top_dropped = json.loads(all_stats.top_dropped)
+    total_episodes = json.loads(all_stats.total_episodes)
+    total_seasons = json.loads(all_stats.total_seasons)
+    total_movies = json.loads(all_stats.total_movies)
 
-    def create_dict(data, genres=False):
-        series_list, anime_list, movies_list = [], [], []
-        for i in range(5):
-            try:
-                if genres:
-                    series_list.append({"info": data[0][i][0].genre, "quantity": data[0][i][2]})
-                else:
-                    series_list.append({"info": data[0][i][0].name, "quantity": data[0][i][2]})
-            except:
-                series_list.append({"info": "-", "quantity": "-"})
-            try:
-                if genres:
-                    anime_list.append({"info": data[1][i][0].genre, "quantity": data[1][i][2]})
-                else:
-                    anime_list.append({"info": data[1][i][0].name, "quantity": data[1][i][2]})
-            except:
-                anime_list.append({"info": "-", "quantity": "-"})
-            try:
-                if genres:
-                    movies_list.append({"info": data[2][i][0].genre, "quantity": data[2][i][2]})
-                else:
-                    movies_list.append({"info": data[2][i][0].name, "quantity": data[2][i][2]})
-            except:
-                movies_list.append({"info": "-", "quantity": "-"})
-
-        return {'series': series_list, 'anime': anime_list, 'movies': movies_list}
-
-    def get_all_eps_seas(data):
-        total_episodes = 0
-        total_seasons = 0
-        for media in data:
-            if media[0].status != Status.PLAN_TO_WATCH:
-                episodes = media[2].split(',')
-                episodes = [int(x) for x in episodes]
-                try:
-                    eps_info = episodes[int(media[0].current_season) - 1]
-                except Exception as e:
-                    app.logger.info('Error for this media: {} ; e: {}'.format(media[0].__dict__, e))
-                    eps_info = 1
-                if eps_info == int(media[0].last_episode_watched):
-                    total_seasons += int(media[0].current_season)
-                else:
-                    total_seasons += int(media[0].current_season) - 1
-                for i in range(1, media[0].current_season):
-                    total_episodes += episodes[i - 1]
-                total_episodes += media[0].last_episode_watched
-
-        return total_episodes, total_seasons
-
-    top_media = stats.get_top_media()
-    most_present_media = create_dict(top_media)
-
-    media_genres = stats.get_top_genres()
-    most_genres_media = create_dict(media_genres, genres=True)
-
-    media_actors = stats.get_top_actors()
-    most_actors_media = create_dict(media_actors)
-
-    media_dropped = stats.get_top_dropped()
-    top_dropped_media = create_dict(media_dropped)
-
-    total_media_eps_seas = stats.get_total_eps_seasons()
-    series_eps, series_seas = get_all_eps_seas(total_media_eps_seas[0])
-    anime_eps, anime_seas = get_all_eps_seas(total_media_eps_seas[1])
-    total_seasons_media = {"series": series_seas, "anime": anime_seas}
-    total_episodes_media = {"series": series_eps, "anime": anime_eps}
-
-    return render_template("mylists_stats.html",
-                           title='MyLists Stats',
-                           total_time=total_time,
-                           most_present_media=most_present_media,
-                           most_actors_media=most_actors_media,
-                           top_dropped_media=top_dropped_media,
-                           total_seasons_media=total_seasons_media,
-                           total_episodes_media=total_episodes_media,
-                           most_genres_media=most_genres_media)
+    return render_template("mylists_stats.html", title='MyLists Stats', total_time=total_time, top_media=top_media,
+                           top_genres=top_genres, top_actors=top_actors, top_directors=top_directors,
+                           top_dropped=top_dropped, total_episodes=total_episodes, total_movies=total_movies,
+                           total_seasons=total_seasons)
 
 
 @bp.route("/current_trends", methods=['GET'])
 @login_required
 def current_trends():
     try:
-        tv_info = ApiData().get_trending_tv()
+        series_info = ApiData().get_trending_tv()
     except Exception as e:
-        tv_info = {'results': []}
-        app.logger.error('[ERROR] - Getting the tv shows trending info: {}.'.format(e))
+        series_info = {'results': []}
+        app.logger.error('[ERROR] - Getting the Series trending info: {}.'.format(e))
         flash('The current TV trends from TMDB are not available right now.', 'warning')
 
     try:
@@ -180,7 +112,7 @@ def current_trends():
         app.logger.error('[ERROR] - Getting the movies trending info: {}.'.format(e))
         flash('The current movies trends from TMDB are not available right now.', 'warning')
 
-    series_results = TrendingData(tv_info).get_trending_tv()
+    series_results = TrendingData(series_info).get_trending_series()
     anime_results = TrendingData(anime_info).get_trending_anime()
     movies_results = TrendingData(movies_info).get_trending_movies()
 
@@ -206,8 +138,3 @@ def privacy_policy():
 @login_required
 def about():
     return render_template('about.html', title='About MyLists')
-
-
-# @bp.route('/service-worker.js')
-# def service_worker():
-#     return app.send_static_file('service-worker.js')

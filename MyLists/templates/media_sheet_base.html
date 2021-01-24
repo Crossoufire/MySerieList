@@ -14,7 +14,7 @@
                 margin-top: 5px;
                 border-top: 1px solid #945141;
             }
-        {% else %}
+        {% elif media_list == 'movieslist' %}
             hr {
                 margin-top: 5px;
                 border-top: 1px solid #8c7821;
@@ -38,82 +38,24 @@
                 <div class="text-center">
                     <img class="media-cover" src="/static/covers/{{ data['cover'] }}" alt=""/>
                 </div>
-                <div class="m-b-10 m-t-10">
+                <div class="m-b-10 m-t-15">
                     <div id="your-medialist-data" class="m-t-5 p-2" {% if not data['in_user_list'] %}
-                    style="display: none;" {% endif %}>
+                     style="display: none;"{% endif %}>
                         <h4 id="fav-title" class="m-l-15 m-r-15">
-                            <i class="fas fa-list m-t-10"></i>&nbsp;&nbsp; <b>List Info</b>
-                            <i id="favorite" class="fa-heart m-t-10 {% if data['favorite'] %} fas favorited {% else %}
+                            <i class="fas fa-list"></i>&nbsp;&nbsp; <b>List Info</b>
+                            <i id="favorite" class="fa-heart m-t-3 {% if data['favorite'] %} fas favorited {% else %}
                              far no-fav{% endif %}" data-toggle="tooltip" title="Favorite"
                              onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></i>
                         </h4>
                         <hr class="m-l-15 m-r-15 m-b-8">
-                        <div class="row m-l-30 m-r-25">
-                            <div class="col-4">
-                                <b>Status:</b>
-                            </div>
-                            <div class="col-8">
-                                <label for="category-dropdown"></label>
-                                {% block medialist_cat_drop scoped %}
-                                {% endblock medialist_cat_drop %}
-                                <i id="cat-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
-                                &nbsp;<i id="cat-check" class="fas fa-check" style="display: none;"></i>
-                            </div>
-                        </div>
-                        {% block medialist_eps_seas_drop scoped %}
-                        {% endblock medialist_eps_seas_drop %}
-                        <div class="m-l-35 m-r-55 m-t-8 m-b-8" style="border: 1px solid grey;"></div>
-                        <div id="score-row" class="row m-l-30 m-r-25" data-toggle="tooltip" title="Score /10">
-                            <div class="col-4">
-                                <b>Score:</b>
-                            </div>
-                            <div class="col-8">
-                                &nbsp;<select id="score-dropdown" class="text-light text-center cat-drop"
-                                onchange="updateScore('{{ data['id'] }}', this, '{{ media_list }}')">
-                                    <option {% if data['score'] == None or data['score'] == -1 %} selected="selected"
-                                    {% endif %}value="---">
-                                        &nbsp;---&nbsp;
-                                    </option>
-                                    {% for i in range(0, 21) %}
-                                        <option {% if (i-(i/2)) == data['score'] %} selected="selected" {% endif %}
-                                        value="{{ (i-(i/2)) }}">
-                                            &nbsp;{{ (i-(i/2)) }}&nbsp;
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                                <i id="score-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
-                                &nbsp;<i id="score-check" class="fas fa-check" style="display: none;"></i>
-                            </div>
-                        </div>
-                        <div id="rewatch-row" class="row m-l-30 m-r-25" data-toggle="tooltip" title="How many
-                        time you rewatched this media. Do not count the inital completion."
-                        {% if data['status'] == 'Completed'or data['status'] == 'Completed Animation' %}
-                        {% else %} style="display: none;" {% endif %}>
-                            <div class="col-4">
-                                <b>Rewatched:</b>
-                            </div>
-                            <div class="col-8">
-                                <label for="rewatched-dropdown"></label>
-                                <select id="rewatched-dropdown" class="text-light text-center cat-drop"
-                                onchange="updateRewatched('{{ data['id'] }}', this, '{{ media_list }}')">
-                                    {% for i in range(0, 11) %}
-                                        {% if i == data['rewatched'] %}
-                                            <option selected="selected" value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
-                                        {% else %}
-                                            <option value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                                <i id="rewatched-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
-                                &nbsp;<i id="rewatched-check" class="fas fa-check" style="display: none;"></i>
-                            </div>
-                        </div>
+                        {% block medialist_info scoped %}
+                        {% endblock medialist_info %}
                         <h4 id="comment-title" class="m-l-15 m-r-15 m-t-15">
-                            <i class="fas fa-pen-alt m-t-10"></i>&nbsp; <b>Comment</b>
-                            <a class="far fa-edit m-t-10"
-                            href="/comment/{{ data['media_type'] }}/{{ data['id'] }}?from=media" data-toggle="tooltip"
-                            title="Add/Edit Comment"></a>
-                        </h4>
+        <i class="fas fa-pen-alt m-t-10"></i>&nbsp; <b>Comment</b>
+        <a class="far fa-edit m-t-10"
+        href="/comment/{{ data['media_type'] }}/{{ data['id'] }}?from=media" data-toggle="tooltip"
+        title="Add/Edit Comment"></a>
+    </h4>
                         <hr class="m-l-15 m-r-15 m-b-8">
                         <p class="comment-style m-l-20 m-r-20">
                             {% if data['comment'] %}
@@ -137,10 +79,10 @@
                         </button>
                         <i id="loading-add-list" class="fas fa-spinner fast-spin" style="display: none;"></i>
                     </div>
-                    <div id="add-media" class="alert alert-success p-2" style="display: none;">Media added to your list</div>
-                    <div id="remove-media" class="alert alert-warning p-2" style="display: none;">Media removed from your list</div>
-                    <div id="add-fav" class="alert alert-success p-2" style="display: none;">Media added to your favorite</div>
-                    <div id="remove-fav" class="alert alert-warning p-2" style="display: none;">Media removed from your favorite</div>
+                    <div id="add-media" class="alert alert-success p-2" style="display: none;">Media added.</div>
+                    <div id="remove-media" class="alert alert-warning p-2" style="display: none;">Media removed.</div>
+                    <div id="add-fav" class="alert alert-success p-2" style="display: none;">Added to your favorites.</div>
+                    <div id="remove-fav" class="alert alert-warning p-2" style="display: none;">Removed from your favorites.</div>
                 </div>
             </div>
             <div class="col-lg-8 col-md-7 col-sm-12" style="margin-top: -10px;">
@@ -182,8 +124,9 @@
                 <hr>
             </div>
         </div>
-        <div class="follow-margin-mobile">
-            <h4><i class="fas fa-user-check"></i>&nbsp;&nbsp;<b>In follow's list</b></h4><hr>
+        <div class="follow-margin-mobile m-t-40 m-b-30">
+            <h4><i class="fas fa-user-check"></i>&nbsp;&nbsp;<b>In follow's list</b></h4>
+            <hr>
             <div class="row" style="margin-top: -5px;">
                 {% for follow in data['in_follows_lists'] %}
                     <div class="col col-lg-4 col-md-4 col-sm-6 col-12 m-b-35">
@@ -257,6 +200,21 @@
 
 
 {% block script %}
+    <script>
+        $(document).ready(function () {
+            $("input[type='number']").each(function() {
+               $(this).attr("style", "width: "+$(this).val().length + 3+"px;");
+            });
+            $("input[type='number']").bind('keyup', function () {
+                $(this).attr("style", "width: "+$(this).val().length + 3+"px;");
+            });
+        });
+
+        function show_button() {
+            $('.aa').show();
+            $('#upload-time').show();
+        }
+    </script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/media_sheet.js') }}"></script>
 {% endblock script %}
 

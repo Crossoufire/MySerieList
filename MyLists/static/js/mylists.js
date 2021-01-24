@@ -1,68 +1,134 @@
 
-
-// --- Autocomplete ---------------------------------------------------------
+// --- Autocomplete ----------------------------------------------------------------
 $(function() {
-    $("#autocomplete").catcomplete({
-        delay: 200,
+    $('#autocomplete').catcomplete({
+        delay: 250,
         minLength: 2,
-        source: function(request, response) {
-            $.getJSON("/autocomplete", {
-                q: request.term,
-            },
-            function(data) {
-                response(data.search_results);
-            });
+        source: function (request, response){
+            $.getJSON("/autocomplete",
+                {
+                    q: request.term,
+                },
+                function (data) {
+                    response(data.search_results);
+                });
         },
-        select: function(event, ui) {
-            let form = document.createElement("form");
-            form.method = "POST";
-            form.action = "/media_sheet/"+ui.item.media_type+"/"+ui.item.tmdb_id+"?search=True";
+        select: function (event, ui){
+            let form = document.createElement('form');
+            form.method = 'POST';
+            if (ui.item.type === 'Series') {
+                form.action = '/media_sheet/Series/' + ui.item.tmdb_id + '?search=True';
+            } else if (ui.item.type === 'Anime') {
+                form.action = '/media_sheet/Anime/' + ui.item.tmdb_id + '?search=True';
+            } else if (ui.item.type === 'Movie') {
+                form.action = '/media_sheet/Movies/' + ui.item.tmdb_id + '?search=True';
+            } else if (ui.item.type === 'User') {
+                form.action = '/account/' + ui.item.display_name;
+            }
             document.body.appendChild(form);
             form.submit();
         }
     });
 });
-$.widget("custom.catcomplete", $.ui.autocomplete, {
-    "_renderItem": function(ul, item) {
-        ul.addClass('autocomplete-ul');
-        let media, $li;
-        if (item.media_type === "serieslist") {
-            media = 'TV Show';
-            item.media_type = 'Series';
+$.widget('custom.catcomplete', $.ui.autocomplete, {
+        _create: function (){
+            this._super();
+            this.widget().menu('option', 'items', '> :not(.ui-autocomplete-category)');
+        },
+        _renderMenu: function (ul, items) {
+            var that = this;
+            var categories = [];
 
-        } else if (item.media_type === "animelist") {
-            media = 'Anime';
-            item.media_type = 'Anime';
-        } else {
-            media = 'Movie';
-            item.media_type = 'Movies';
-        }
-        if (item.nb_results === 0) {
-            let a = "No results found.";
-            $li = $('<li class="disabled bg-dark text-light p-l-5">'+ a + '</li>');
-        } else {
+            $.each(items, function (index, item) {
+                if (categories.indexOf(item.category) < 0 && item.category !== null) {
+                    ul.append('<li class="ui-autocomplete-category">' + item.category + '</li>');
+                    categories.push(item.category);
+                }
+                that._renderItemData(ul, item);
+            });
+
+            if (items[0].nb_results !== 0) {
+                var search = $('#autocomplete').val();
+                $('<li class="text-center p-t-5 p-b-5" style="background: #22748d;">' +
+                     '<a class="text-light" href="/search_media?search='+search+'&page=1">More results</a>' +
+                  '</li>').appendTo(ul);
+            }
+        },
+        _renderItemData(ul, item) {
+            return this._renderItem(ul, item).data("ui-autocomplete-item", item);
+        },
+        _renderItem: function (ul, item) {
+            ul.addClass('autocomplete-ul');
+            let $li, $img;
+
+            if (item.nb_results === 0) {
+                $li = $('<li class="disabled bg-dark text-light p-l-5">No results found.</li>');
+                return $li.appendTo(ul);
+            }
+
+            $img = '<img src="'+ item.image_cover +'" style="width: 50px; height: 75px;" alt="">';
+            if (item.category === 'Users') {
+                $img = '<img src="'+ item.image_cover +'" style="width: 50px; height: 50px;" alt="">'
+            }
+
             $li = $('<li class="bg-dark p-t-2 p-b-2" style="border-bottom: solid black 1px;">');
-
             $li.append(
                 '<div class="row">' +
                     '<div class="col" style="min-width: 60px; max-width: 60px;">' +
-                        '<img src="'+item.poster_path+'" alt="" style="width: 50px; height: 75px;">' +
+                        $img +
                     '</div>' +
-                    '<div class="col">' +
-                        '<a class="text-light">' + item.display_name +
-                            '<br>' +
-                            '<span style="font-size: 10pt;">' + media + ' | ' + item.first_air_date + '</span>' +
-                        '</a>' +
-                    '</div>' +
+                        '<div class="col">' +
+                            '<a class="text-light">' + item.display_name +
+                                '<br>' +
+                                '<span style="font-size: 10pt;">' + item.type + ' | ' + item.date + '</span>' +
+                            '</a>' +
+                        '</div>' +
                 '</div>');
+
+            return $li.appendTo(ul);
         }
-
-        return $li.appendTo(ul);
-    }
-});
+    });
 
 
-// --- Notification ---------------------------------------------------------
+// --- Follow status --------------------------------------------------------------
+function follow_status(button, follow_id) {
+    let status;
+    let $follow_button = $(button);
+
+    status = $follow_button.prop('value') !== '1';
+    $follow_button.addClass('disabled');
+    $('#load_'+follow_id).show();
+
+    $.ajax ({
+        type: "POST",
+        url: "/follow_status",
+        contentType: "application/json",
+        data: JSON.stringify({follow_id: follow_id, follow_status: status}),
+        dataType: "json",
+        success: function() {
+            if (status === false) {
+                $follow_button.text('Follow');
+                $follow_button.prop('value', '0');
+                $follow_button.addClass('btn-primary').removeClass('btn-dark btn-smaller');
+                $follow_button.removeClass('disabled');
+            } else {
+                $follow_button.text('Unfollow');
+                $follow_button.prop('value', '1');
+                $follow_button.removeClass('btn-primary').addClass('btn-dark btn-smaller');
+                $follow_button.removeClass('disabled');
+            }
+        },
+        error: function() {
+            error_ajax_message('Error updating the following status. Please try again later.');
+        },
+        complete: function() {
+            $('#load_'+follow_id).hide();
+        }
+    });
+}
+
+
+// --- Notification ----------------------------------------------------------------
 function display_notifications(data) {
     let add_hr;
     let resp = data.results;
@@ -78,9 +144,9 @@ function display_notifications(data) {
             // Add the time and date for the follow
             let tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
             let localdate = new Date(resp[i]['timestamp']).toLocaleString("en-GB", {timeZone: tz});
-            let d = new Date(resp[i]['timestamp'])
+            let d = new Date(resp[i]['timestamp']);
             let month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            let timestamp = localdate.slice(0, 2) + " " + month[d.getMonth()] + " at " + localdate.slice(11, 17)
+            let timestamp = localdate.slice(0, 2) + " " + month[d.getMonth()] + " at " + localdate.slice(11, 17);
 
             // Add H-line between notifications except for the last one
             if (i + 1 === resp.length) {
@@ -167,7 +233,7 @@ function display_notifications(data) {
 }
 
 
-// --- AJAX Notification ----------------------------------------------------
+// --- AJAX Notification --------------------------------------------------------------
 function notifications() {
     $('.notif-items').remove();
     $('#loading-image').show();
@@ -191,7 +257,7 @@ function notifications() {
 }
 
 
-// --- Ajax error handling --------------------------------------------------
+// --- Ajax error handling ---------------------------------------------------------
 function error_ajax_message(message) {
     $('.content-message').prepend(
         '<div class="alert alert-danger alert-dismissible m-t-15">' +
@@ -203,13 +269,13 @@ function error_ajax_message(message) {
 }
 
 
-// --- Tooltip initialization -----------------------------------------------
+// --- Tooltip initialization ------------------------------------------------------
 $(function () {
     $('[data-toggle="tooltip"]').tooltip()
 });
 
 
-// --- Left dropdown for notifictaions on mobile  ---------------------------
+// --- Left dropdown for notifictaions on mobile  ----------------------------------
 $(document).ready(function() {
     function a() {
         if ($(window).width() < 991) {
@@ -222,20 +288,3 @@ $(document).ready(function() {
 
     $(window).resize(a).trigger('resize');
 });
-
-
-// --- Service Worker for PWA -----------------------------------------------
-// if ('serviceWorker' in navigator) {
-//     navigator.serviceWorker
-//         .register('service-worker.js', {
-//             scope: '.'
-//         })
-//         .then(function(registration) {
-//             console.log('ServiceWorker registration successful with scope: ', registration.scope);
-//         }, function(err) {
-//             console.log('ServiceWorker registration failed: ', err);
-//         })
-//         .catch(function(err) {
-//             console.error('Unable to register service worker.', err);
-//         });
-// }

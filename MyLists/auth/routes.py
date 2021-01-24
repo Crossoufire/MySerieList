@@ -3,8 +3,8 @@ from datetime import datetime
 from MyLists.models import User
 from MyLists import app, bcrypt, db
 from MyLists.auth.oauth import OAuthSignIn
-from MyLists.auth.functions import return_user_homepage
 from MyLists.auth.emails import send_register_email, send_reset_email
+from MyLists.auth.functions import return_user_homepage, check_if_auth
 from flask_login import login_user, current_user, logout_user, login_required
 from flask import Blueprint, flash, request, redirect, url_for, render_template
 from MyLists.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
@@ -14,6 +14,7 @@ bp = Blueprint('auth', __name__)
 
 
 @bp.route("/", methods=['GET', 'POST'])
+@check_if_auth
 def home():
     login_form = LoginForm()
     register_form = RegistrationForm()
@@ -31,14 +32,11 @@ def home():
             next_page = request.args.get('next')
             if next_page:
                 return redirect(next_page)
-
-            return_user_homepage(user.homepage, user.username)
+            return return_user_homepage(user.homepage, user.username)
         else:
             flash('Login Failed. Please check username and password.', 'warning')
-
-    if register_form.validate_on_submit():
+    elif register_form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(register_form.register_password.data).decode('utf-8')
-        # noinspection PyArgumentList
         user = User(username=register_form.register_username.data,
                     oauth_id='{}'.format(random.randint(0, 16846876000056)),
                     email=register_form.register_email.data,
@@ -56,9 +54,6 @@ def home():
             flash("An error occured while sending your register e-mail. Admin were advised. Please try again later.")
         return redirect(url_for('auth.home'))
 
-    if current_user.is_authenticated:
-        return return_user_homepage(current_user.homepage, current_user.username)
-
     return render_template('home.html', login_form=login_form, register_form=register_form)
 
 
@@ -72,11 +67,9 @@ def logout():
 
 
 @bp.route("/reset_password", methods=['GET', 'POST'])
+@check_if_auth
 def reset_password():
     form = ResetPasswordRequestForm()
-
-    if current_user.is_authenticated:
-        return redirect(url_for('auth.home'))
 
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -93,10 +86,8 @@ def reset_password():
 
 
 @bp.route("/reset_password/<token>", methods=['GET', 'POST'])
+@check_if_auth
 def reset_password_token(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('auth.home'))
-
     user = User.verify_reset_token(token)
     if not user:
         flash('That is an invalid or an expired token.', 'warning')
@@ -115,10 +106,8 @@ def reset_password_token(token):
 
 
 @bp.route("/register_account/<token>", methods=['GET'])
+@check_if_auth
 def register_account_token(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('auth.home'))
-
     user = User.verify_reset_token(token)
     if not user or user.active:
         flash('That is an invalid or an expired token.', 'warning')
@@ -134,20 +123,16 @@ def register_account_token(token):
 
 
 @bp.route('/oauth_authorize/<provider>', methods=['GET', 'POST'])
+@check_if_auth
 def oauth_authorize(provider):
-    if current_user.is_authenticated:
-        return return_user_homepage(current_user.homepage, current_user.username)
-
     oauth = OAuthSignIn.get_provider(provider)
 
     return oauth.authorize()
 
 
 @bp.route('/oauth_callback/<provider>', methods=['GET', 'POST'])
+@check_if_auth
 def oauth_callback(provider):
-    if current_user.is_authenticated:
-        return return_user_homepage(current_user.homepage, current_user.username)
-
     oauth = OAuthSignIn.get_provider(provider)
     social_id, username, email = oauth.callback()
 
@@ -160,7 +145,6 @@ def oauth_callback(provider):
 
     user = User.query.filter_by(oauth_id=social_id).first()
     if not user:
-        # noinspection PyArgumentList
         user = User(username=username,
                     oauth_id=social_id,
                     email=email,

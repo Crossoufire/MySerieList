@@ -1,28 +1,31 @@
 
-Movies Collection:
-	Add: Movies collection
-
-Settings:
-  Enhance: Better CSS
-
 Trends:
-  Add: Trending table (automatic update at 3:AM)
-
-User Last Updates:
-  Add: Delete media information
+    Add: A trending table (with automatic update at 3:00 AM)
+    Enhance: Better CSS and presentation
 
 Media sheet:
-  Add: Airing dates for each seasons
-  Enhance: Add Genres to the metadata edit
-	
+    Enhance: Add genres modif to the metadata edit
+
 Account:
-  Enhance: Possibility to change background image
-  Add: New achievements system
-  Enhance: Notification system (follow's level up)
-	
+    Add: New achievements system
+    Enhance: Possibility to change background image
+
+MyLists Stats:
+    Enhance: Better CSS and presentation
+
+Personal More Stats:
+    Add: More stats
+    Add: A Personal stats table (with automatic update at 3:00 AM)
+    Enchance: Better python and CSS
+
 General:
-  Add: Contact form
-  Add: Collection Movies to finish (70%)
-  Enhance: Change the hamburger display to a vertical panel in mobile
-  Add: If API down, user can still add media but check in our database instead of API
-  Enhance: Create one admin with admin view (HoF, Stats, admin and settings) and one standard user
+    Add: Use redis queue
+    Add: Finish the PWA
+    Add: If API down, user can still add media but check in local database instead of API
+    Enhance: Change the hamburger display to a vertical panel in mobile
+    Enhance: followed level up notification
+    Enhance: From APScheduler to CRON
+
+On going:
+    Add: Show shared
+    Add: Search in medialist

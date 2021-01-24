@@ -8,13 +8,13 @@
 
 
 {% block content %}
-    <h2 class="font-weight-light text-center mt-1 mb-0 p-t-50">HALL OF FAME</h2>
+    <h3 class="mb-0 m-t-50"><b>HALL OF FAME</b></h3>
     <hr class="mt-2 mb-0">
     <div class="m-t-30 hof ml-auto mr-auto m-b-60">
         <table id="hall_of_fame" class="table table-responsive-sm text-light">
             <thead>
             <tr>
-                <th class="text-center"></th>
+                <th class="text-center">Global grade</th>
                 <th class="text-center">Username</th>
                 <th class="text-center">Series</th>
                 <th class="text-center">Anime</th>
@@ -50,7 +50,8 @@
                     </td>
                     <td>
                         <a class="text-light {% if user['isprivate'] and not user['isfollowing']
-                            and current_user.id != 1 %} disabled {% endif %}" href="/serieslist/{{ user['username'] }}">
+                           and current_user.id != 1 %} disabled {% endif %}"
+                           href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=user['username']) }}">
                             <img class="grade_picture" src="{{ user['series_data']['grade_id'] }}.png" alt="">
                             <br>
                             {{ user['series_data']['level'] }}
@@ -58,7 +59,8 @@
                     </td>
                     <td>
                         <a class="text-light {% if user['isprivate'] and not user['isfollowing']
-                            and current_user.id != 1 %} disabled {% endif %}" href="/animelist/{{ user['username'] }}">
+                           and current_user.id != 1 %} disabled {% endif %}"
+                           href="{{ url_for('main.mymedialist', media_list='animelist', user_name=user['username']) }}">
                             <img class="grade_picture" src="{{ user['anime_data']['grade_id'] }}.png" alt="">
                             <br>
                             {{ user['anime_data']['level'] }}
@@ -66,7 +68,8 @@
                     </td>
                     <td>
                         <a class="text-light {% if user['isprivate'] and not user['isfollowing']
-                            and current_user.id != 1 %} disabled {% endif %}" href="/movieslist/{{ user['username'] }}">
+                            and current_user.id != 1 %} disabled {% endif %}"
+                           href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=user['username']) }}">
                             <img class="grade_picture" src="{{ user['movies_data']['grade_id'] }}.png" alt="">
                             <br>
                             {{ user['movies_data']['level'] }}
@@ -76,16 +79,15 @@
                         {% if user['isprivate'] and not user['isfollowing'] and current_user.id != 1 %}
                         {% else %}
                             {% if user["isfollowing"] and not user['iscurrentuser'] %}
-                                <button class="btn btn-sm btn-dark btn-smaller" value="1"
-                                        onclick="follow_status('{{ user['id'] }}', this, {{ loop.index }})">Unfollow
+                                <button id="follow_{{ user['id'] }}" class="btn btn-sm btn-dark btn-smaller" value="1"
+                                 onclick="follow_status(this, '{{ user['id'] }}')">Unfollow
                                 </button>
                             {% elif not user["isfollowing"] and not user['iscurrentuser'] %}
-                                <button class="btn btn-sm btn-primary" value="0"
-                                        onclick="follow_status('{{ user['id'] }}', this,{{ loop.index }})">Follow
+                                <button id="follow_{{ user['id'] }}" class="btn btn-sm btn-primary" value="0"
+                                        onclick="follow_status(this, '{{ user['id'] }}')">Follow
                                 </button>
                             {% endif %}
-                            <img id='loading-follow-{{ loop.index }}' style="display: none;" height="20" width="20"
-                                 src="/static/img/loading.webp" alt=""/>
+                            <i id="load_{{ user['id'] }}" class="fas fa-spinner fast-spin" style="display: none;"></i>
                         {% endif %}
                     </td>
                 </tr>

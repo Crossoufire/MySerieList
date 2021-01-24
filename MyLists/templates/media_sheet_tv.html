@@ -1,25 +1,27 @@
 {% extends 'media_sheet_base.html' %}
 
 
-{% block medialist_cat_drop %}
-    <select id="category-dropdown" class="text-light text-center cat-drop"
-    onchange="changeCategoryTV('{{ data['id'] }}', this,'{{ data['eps_per_season'] }}', '{{ media_list }}')">
-        <option {% if data['status'] == 'Watching' %} selected="selected" {% endif %}>Watching</option>
-        <option {% if data['status'] == 'Completed' %} selected="selected" {% endif %}>Completed</option>
-        <option {% if data['status'] == 'On Hold' %} selected="selected" {% endif %}>On Hold</option>
-        <option {% if data['status'] == 'Random' %} selected="selected" {% endif %}>Random</option>
-        <option {% if data['status'] == 'Dropped' %} selected="selected" {% endif %}>Dropped</option>
-        <option {% if data['status'] == 'Plan to Watch' %} selected="selected"{% endif %}>Plan to Watch</option>
-    </select>
-{% endblock medialist_cat_drop %}
-
-
-{% block medialist_eps_seas_drop %}
-    <div id="season-row" class="row m-l-30 m-r-25" {% if data['status'] == 'Plan to Watch'
-    or data['status'] == 'Random' %} style="display: none;" {% endif %}>
-        <div class="col-4">
-            <b>Season:</b>
+{% block medialist_info %}
+    <div class="row m-l-15 m-r-15">
+        <div class="col-4"><b>Status:</b></div>
+        <div class="col-8">
+            <label for="category-dropdown"></label>
+            <select id="category-dropdown" class="text-light text-center cat-drop"
+             onchange="changeCategoryTV('{{ data['id'] }}', this, '{{ data['eps_per_season'] }}', '{{ media_list }}')">
+                <option {% if data['status'] == 'Watching' %} selected="selected" {% endif %}>Watching</option>
+                <option {% if data['status'] == 'Completed' %} selected="selected" {% endif %}>Completed</option>
+                <option {% if data['status'] == 'On Hold' %} selected="selected" {% endif %}>On Hold</option>
+                <option {% if data['status'] == 'Random' %} selected="selected" {% endif %}>Random</option>
+                <option {% if data['status'] == 'Dropped' %} selected="selected" {% endif %}>Dropped</option>
+                <option {% if data['status'] == 'Plan to Watch' %} selected="selected"{% endif %}>Plan to Watch</option>
+            </select>
+            <i id="cat-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+            &nbsp;<i id="cat-check" class="fas fa-check" style="display: none;"></i>
         </div>
+    </div>
+    <div id="season-row" class="row m-l-15 m-r-15" {% if data['status'] == 'Plan to Watch'
+     or data['status'] == 'Random' %} style="display: none;" {% endif %}>
+        <div class="col-4"><b>Season:</b></div>
         <div class="col-8">
             <label for="season-dropdown"></label>
             <select id="season-dropdown" class="text-light text-center cat-drop"
@@ -38,11 +40,9 @@
             &nbsp;<i id="season-check" class="fas fa-check" style="display: none;"></i>
         </div>
     </div>
-    <div id="episode-row" class="row m-l-30 m-r-25" {% if data['status'] == 'Plan to Watch'
-    or data['status'] == 'Random' %} style="display: none;" {% endif %}>
-        <div class="col-4">
-            <b>Episode:</b>
-        </div>
+    <div id="episode-row" class="row m-l-15 m-r-15" {% if data['status'] == 'Plan to Watch'
+     or data['status'] == 'Random' %} style="display: none;" {% endif %}>
+        <div class="col-4"><b>Episode:</b></div>
         <div class="col-8">
             <label for="episode-dropdown"></label>
             <select id="episode-dropdown" class="text-light text-center cat-drop"
@@ -77,7 +77,48 @@
             &nbsp;<i id="eps-check" class="fas fa-check" style="display: none;"></i>
         </div>
     </div>
-{% endblock medialist_eps_seas_drop %}
+    <div class="m-l-25 m-r-35 m-t-8 m-b-8" style="border: 1px solid grey;"></div>
+    <div id="score-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="Score /10">
+        <div class="col-4"><b>Score:</b></div>
+        <div class="col-8">
+            &nbsp;<select id="score-dropdown" class="text-light text-center cat-drop"
+            onchange="updateScore('{{ data['id'] }}', this, '{{ media_list }}')">
+                <option {% if data['score'] == None or data['score'] == -1 %} selected="selected"
+                {% endif %}value="---">
+                    &nbsp;---&nbsp;
+                </option>
+                {% for i in range(0, 21) %}
+                    <option {% if (i-(i/2)) == data['score'] %} selected="selected" {% endif %}
+                    value="{{ (i-(i/2)) }}">
+                        &nbsp;{{ (i-(i/2)) }}&nbsp;
+                    </option>
+                {% endfor %}
+            </select>
+            <i id="score-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+            &nbsp;<i id="score-check" class="fas fa-check" style="display: none;"></i>
+        </div>
+    </div>
+    <div id="rewatch-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="How many time you rewatched this media.
+     Do not count the inital completion." {% if data['status'] == 'Completed' or data['status'] == 'Completed Animation'
+     %} {% else %} style="display: none;" {% endif %}>
+        <div class="col-4"><b>Rewatched:</b></div>
+        <div class="col-8">
+            <label for="rewatched-dropdown"></label>
+            <select id="rewatched-dropdown" class="text-light text-center cat-drop"
+            onchange="updateRewatched('{{ data['id'] }}', this, '{{ media_list }}')">
+                {% for i in range(0, 11) %}
+                    {% if i == data['rewatched'] %}
+                        <option selected="selected" value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
+                    {% else %}
+                        <option value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <i id="rewatched-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+            &nbsp;<i id="rewatched-check" class="fas fa-check" style="display: none;"></i>
+        </div>
+    </div>
+{% endblock medialist_info %}
 
 
 {% block information %}
