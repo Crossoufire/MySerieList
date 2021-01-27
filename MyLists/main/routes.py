@@ -970,7 +970,7 @@ def autocomplete():
     search = request.args.get('q')
 
     # Get the users results
-    users = User.query.filter(User.username.like('%'+search+'%'), User.active == True).all()
+    users = User.query.filter(User.username.like('%' + search + '%'), User.active == True).all()
     users_results = []
     for user in users:
         users_results.append(Autocomplete(user).get_user_dict())
