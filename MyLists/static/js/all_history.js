@@ -2,7 +2,7 @@
 
 // --- Datatable functions ---------------------------------
 $(document).ready(function () {
-    $('#all_history').DataTable({
+    $('#all-history').DataTable({
         "bPaginate": true,
         "bLengthChange": true,
         "bFilter": true,

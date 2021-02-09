@@ -99,8 +99,7 @@
         </div>
     </div>
     <div id="rewatch-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="How many time you rewatched this media.
-     Do not count the inital completion." {% if data['status'] == 'Completed' or data['status'] == 'Completed Animation'
-     %} {% else %} style="display: none;" {% endif %}>
+     Do not count the inital completion." {% if data['status'] == 'Completed' %}{% else %}style="display: none;"{% endif %}>
         <div class="col-4"><b>Rewatched:</b></div>
         <div class="col-8">
             <label for="rewatched-dropdown"></label>

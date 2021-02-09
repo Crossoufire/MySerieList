@@ -7,9 +7,9 @@
 
 
 {% block data %}
-    <h4><i class="fas fa-chart-pie m-t-15"></i>&nbsp;&nbsp;More Statistics</h4>
+    <h4><i class="fas fa-chart-pie m-t-15"></i>&nbsp;&nbsp; More Statistics</h4>
     <hr>
-    <a class="text-light" href="/account/{{ user_data['username'] }}">
+    <a class="text-light" href="/account/{{ header_data['username'] }}">
         <i class="fas fa-caret-left"></i>&nbsp;&nbsp; <b>Return to account</b>
     </a>
     <ul id="media-tab" class="nav nav-tabs md-tabs m-t-25">
@@ -30,20 +30,14 @@
         <div id="series" class="tab-pane fade show active">
             <div class="row m-t-30">
                 <div class="col">
-                    <h4><i class="fas fa-caret-square-right"></i>&nbsp&nbspEpisodes</h4>
-                    <h6>Number of TV shows watched according to the amount of episodes present in the show
-                        (counting only the episodes watched by th user).<br>
-                        <i><u>Example:</u> 1-19: 14 | Means you have watched 14 series which contains
-                            between 1 and 19 episodes.</i>
-                    </h6>
+                    <h4><i class="fas fa-caret-square-right"></i>&nbsp;&nbsp; Series vs number of episodes</h4>
                     <hr class="m-0 p-0" style="border-color: #216e7d;">
                     {% if stats['Series_episodes'] != {} %}
                         <div class="series-container">
-                            <canvas id="episodes-series"></canvas>
-                            <span id="episodes-series-bar"
-                                  values-y="{% for key in stats['Series_episodes'].keys() %} {{ key }}, {% endfor %}"
-                                  values-x="
-                                  {% for value in stats['Series_episodes'].values() %}{{ value }}, {% endfor %}">
+                            <canvas id="eps-series"></canvas>
+                            <span id="eps-series-bar"
+                                  values-y="{% for key in stats['Series_eps'].keys() %} {{ key }}, {% endfor %}"
+                                  values-x="{% for value in stats['Series_eps'].values() %}{{ value }}, {% endfor %}">
                             </span>
                         </div>
                     {% else %}
@@ -54,11 +48,7 @@
                 </div>
                 <div class="vertical_line"></div>
                 <div class="col">
-                    <h4><i class="fas fa-calendar-times"></i>&nbsp&nbspPeriods</h4>
-                    <h6>Number of TV shows watched according to the considered period. from 1960-1969 to 2020+.<br>
-                        <i><u>Example:</u> 2000-2009: 26 | Means that you have watched 26 series which were aired
-                            between 2000 and 2009</i>
-                    </h6>
+                    <h4><i class="fas fa-calendar-times"></i>&nbsp;&nbsp; Series vs release date</h4>
                     <hr class="m-0 p-0" style="border-color: #216e7d;">
                     {% if stats['Series_periods'] != {} %}
                         <div class="series-container">
@@ -67,7 +57,7 @@
                                   values-y="{% for key in stats['Series_periods'].keys() %} {{ key }}, {% endfor %}"
                                   values-x="
                                   {% for value in stats['Series_periods'].values() %}{{ value }}, {% endfor %}">
-                        </span>
+                            </span>
                         </div>
                     {% else %}
                         <div class="m-t-20">
@@ -76,8 +66,7 @@
                     {% endif %}
                 </div>
             </div>
-            <h4><i class="fas fa-theater-masks m-t-30"></i>&nbsp&nbspGenres</h4>
-            <h6>Time by genre in hours. If a series contains several genres, all genres are counted.</h6>
+            <h4><i class="fas fa-theater-masks m-t-30"></i>&nbsp;&nbsp; Watched time by genres</h4>
             <hr class="m-0 p-0" style="border-color: #216e7d;">
             {% if stats['Series_genres'] != {} %}
                 <div class="series-genres-container m-b-40">
@@ -96,20 +85,14 @@
         <div id="anime" class="tab-pane fade">
             <div class="row m-t-30">
                 <div class="col">
-                    <h4><i class="fas fa-caret-square-right"></i>&nbsp&nbspEpisodes</h4>
-                    <h6>Number of Anime watched according to the amount of episodes present in the show
-                        (counting only the episodes watched by th user).<br>
-                        <i><u>Example:</u> 1-19: 14 | Means you have watched 14 anime which contains
-                            between 1 and 19 episodes.</i>
-                    </h6>
+                    <h4><i class="fas fa-caret-square-right"></i>&nbsp;&nbsp; Anime vs number of episodes</h4>
                     <hr class="m-0 p-0" style="border-color: #945141;">
                     {% if stats['Anime_episodes'] != {} %}
                         <div class="anime-container">
-                            <canvas id="episodes-anime"></canvas>
-                            <span id="episodes-anime-bar"
-                                  values-y="{% for key in stats['Anime_episodes'].keys() %} {{ key }}, {% endfor %}"
-                                  values-x="
-                                  {% for value in stats['Anime_episodes'].values() %}{{ value }}, {% endfor %}">
+                            <canvas id="eps-anime"></canvas>
+                            <span id="eps-anime-bar"
+                                  values-y="{% for key in stats['Anime_eps'].keys() %} {{ key }}, {% endfor %}"
+                                  values-x="{% for value in stats['Anime_eps'].values() %}{{ value }}, {% endfor %}">
                             </span>
                         </div>
                     {% else %}
@@ -120,19 +103,14 @@
                 </div>
                 <div class="vertical_line"></div>
                 <div class="col">
-                    <h4><i class="fas fa-calendar-times"></i>&nbsp&nbspPeriods</h4>
-                    <h6>Number of Anime watched according to the considered period. from 1960-1969 to 2020+.<br>
-                        <i><u>Example:</u> 2000-2009: 26 | Means that you have watched 26 anime which were aired
-                            between 2000 and 2009</i>
-                    </h6>
+                    <h4><i class="fas fa-calendar-times"></i>&nbsp;&nbsp; Series vs release date</h4>
                     <hr class="m-0 p-0" style="border-color: #945141;">
                     {% if stats['Anime_periods'] != {} %}
                         <div class="anime-container">
                             <canvas id="periods-anime"></canvas>
                             <span id="periods-anime-bar"
                                   values-y="{% for key in stats['Anime_periods'].keys() %} {{ key }}, {% endfor %}"
-                                  values-x="
-                                  {% for value in stats['Anime_periods'].values() %}{{ value }}, {% endfor %}">
+                                  values-x="{% for value in stats['Anime_periods'].values() %}{{ value }}, {% endfor %}">
                             </span>
                         </div>
                     {% else %}
@@ -143,11 +121,10 @@
                 </div>
             </div>
 
-            <h4><i class="fas fa-theater-masks m-t-30"></i>&nbsp&nbspGenres</h4>
-            <h6>Time by genre in hours. If an anime contains several genres, all genres are counted.</h6>
+            <h4><i class="fas fa-theater-masks m-t-30"></i>&nbsp;&nbsp; Watched time by genres</h4>
             <hr class="m-0 p-0" style="border-color: #945141;">
             {% if stats['Anime_genres'] != {} %}
-                <div class="anime-genres-container m-b-40">
+                <div class="anime-genres-container m-b-50">
                     <canvas id="genres-anime"></canvas>
                     <span id="genres-anime-bar"
                           values-y="{% for key in stats['Anime_genres'] %} {{ key[0] }}, {% endfor %}"
@@ -163,11 +140,7 @@
         <div id="movies" class="tab-pane fade">
             <div class="row m-t-30">
                 <div class="col">
-                    <h4><i class="fas fa-caret-square-right"></i>&nbsp&nbspLengths</h4>
-                    <h6>Number of Movies watched by user sorted by duration. from >1h to 3h+.<br>
-                        <i><u>Example:</u> 1h30-1h59: 241 | Means that you have watched 241 movies that
-                            last between 1h30 and 1h59.</i>
-                    </h6>
+                    <h4><i class="fas fa-caret-square-right"></i>&nbsp;&nbsp; Movies Duration</h4>
                     <hr class="m-0 p-0" style="border-color: #8c7821;">
                     {% if stats['Movies_times'] != {} %}
                         <div class="movies-container">
@@ -185,19 +158,14 @@
                 </div>
                 <div class="vertical_line"></div>
                 <div class="col">
-                    <h4><i class="fas fa-calendar-times"></i>&nbsp&nbspPeriods</h4>
-                    <h6>Number of Movies watched according to the considered period. from 1960-1969 to 2020+.<br>
-                        <i><u>Example:</u> 2000-2009: 26 | Means that you have watched 26 movies which were aired
-                            between 2000 and 2009</i>
-                    </h6>
+                    <h4><i class="fas fa-calendar-times"></i>&nbsp;&nbsp; Movies vs release date</h4>
                     <hr class="m-0 p-0" style="border-color: #8c7821;">
                     {% if stats['Movies_periods'] != {} %}
                         <div class="movies-container">
                             <canvas id="periods-movies"></canvas>
                             <span id="periods-movies-bar"
                                   values-y="{% for key in stats['Movies_periods'].keys() %} {{ key }}, {% endfor %}"
-                                  values-x="
-                                  {% for value in stats['Movies_periods'].values() %}{{ value }}, {% endfor %}">
+                                  values-x="{% for value in stats['Movies_periods'].values() %}{{ value }}, {% endfor %}">
                             </span>
                         </div>
                     {% else %}
@@ -208,8 +176,7 @@
                 </div>
             </div>
 
-            <h4><i class="fas fa-theater-masks m-t-30"></i>&nbsp&nbspGenres</h4>
-            <h6>Time by genre in hours. If an movie contains several genres, all genres are counted.</h6>
+            <h4><i class="fas fa-theater-masks m-t-30"></i>&nbsp;&nbsp; Watched time by genres</h4>
             <hr class="m-0 p-0" style="border-color: #8c7821;">
             {% if stats['Movies_genres'] != {} %}
                 <div class="movies-genres-container m-b-40">

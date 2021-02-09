@@ -23,7 +23,6 @@ class Status(enum.Enum):
     ALL = 'All'
     WATCHING = 'Watching'
     COMPLETED = 'Completed'
-    COMPLETED_ANIMATION = 'Completed Animation'
     ON_HOLD = 'On Hold'
     RANDOM = 'Random'
     DROPPED = 'Dropped'

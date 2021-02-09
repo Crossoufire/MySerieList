@@ -22,7 +22,6 @@ def check_cat_type(list_type, status):
             return None
     elif list_type == ListType.MOVIES:
         movie_status_dict = {'Completed': Status.COMPLETED,
-                             'Completed Animation': Status.COMPLETED_ANIMATION,
                              'Plan to Watch': Status.PLAN_TO_WATCH}
         try:
             return movie_status_dict[status]
@@ -90,13 +89,13 @@ def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0,
     elif list_type == ListType.MOVIES:
         old_time = current_user.time_spent_movies
         if movie_delete:
-            if movie_status == Status.COMPLETED or movie_status == Status.COMPLETED_ANIMATION:
+            if movie_status == Status.COMPLETED:
                 current_user.time_spent_movies = old_time - media.runtime + media.runtime*(new_rewatch-old_rewatch)
         elif movie_add:
-            if movie_status == Status.COMPLETED or movie_status == Status.COMPLETED_ANIMATION:
+            if movie_status == Status.COMPLETED:
                 current_user.time_spent_movies = old_time + media.runtime
         else:
-            if movie_status == Status.COMPLETED or movie_status == Status.COMPLETED_ANIMATION:
+            if movie_status == Status.COMPLETED:
                 current_user.time_spent_movies = old_time + movie_runtime + media.runtime*(new_rewatch-old_rewatch)
             else:
                 current_user.time_spent_movies = old_time - movie_runtime + media.runtime*(new_rewatch-old_rewatch)

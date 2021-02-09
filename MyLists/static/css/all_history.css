@@ -5,7 +5,7 @@ option {
 }
 
 @media (min-width: 901px) {
-    .all_history {
+    .all-history {
         width: 900px;
     }
 }

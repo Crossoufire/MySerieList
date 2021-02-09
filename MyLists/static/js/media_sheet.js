@@ -165,11 +165,7 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
 function changeCategoryMovies(element_id, cat_selector, genres) {
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
-
     let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
-    if (new_cat === 'Completed' && genres.includes("Animation")) {
-        new_cat = 'Completed Animation';
-    }
 
     if (new_cat === 'Completed') {
         $('#rewatch-row').show('slow');
@@ -340,7 +336,7 @@ function lock_media(element_id, element_type) {
 
 
 $(document).ready(function () {
-    // --- Random box color --------------------------------
+    // --- Random box color ---------------------------------------------------------
     let colors, boxes, i;
     colors = ['#5d6566', '#536872', '#708090', '#5d7282', '#36454f'];
     boxes = document.querySelectorAll(".box");
@@ -349,7 +345,7 @@ $(document).ready(function () {
         boxes[i].style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
     }
 
-    // --- Get the color of the status ---------------------
+    // --- Get the color of the status ----------------------------------------------
     $('.follow-div').each(function () {
         if ($(this).find('.follow-status').attr('value') === 'Watching') {
             $(this).find('.fa-list').attr('style', 'color: #334D5C;');
@@ -368,9 +364,6 @@ $(document).ready(function () {
         }
         else if ($(this).find('.follow-status').attr('value') === 'Plan to Watch') {
             $(this).find('.fa-list').attr('style', 'color: #962D3E;');
-        }
-        else if ($(this).find('.follow-status').attr('value') === 'Completed Animation') {
-            $(this).find('.fa-list').attr('style', 'color: #22748d;');
         }
     });
 

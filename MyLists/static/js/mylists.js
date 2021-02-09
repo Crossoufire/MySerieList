@@ -36,6 +36,7 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
             this.widget().menu('option', 'items', '> :not(.ui-autocomplete-category)');
         },
         _renderMenu: function (ul, items) {
+            var search;
             var that = this;
             var categories = [];
 
@@ -48,7 +49,7 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
             });
 
             if (items[0].nb_results !== 0) {
-                var search = $('#autocomplete').val();
+                search = $('#autocomplete').val();
                 $('<li class="text-center p-t-5 p-b-5" style="background: #22748d;">' +
                      '<a class="text-light" href="/search_media?search='+search+'&page=1">More results</a>' +
                   '</li>').appendTo(ul);

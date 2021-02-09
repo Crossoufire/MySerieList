@@ -10,8 +10,8 @@ from flask import Blueprint, url_for, request, abort, render_template, flash, js
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
 from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaListDict
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
-    AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MoviesGenre, MediaType, get_next_airing, \
-    check_media, User, get_media_query, get_media_count
+    AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MediaType, get_next_airing, check_media, User, \
+    get_media_query, get_media_count
 
 bp = Blueprint('main', __name__)
 
@@ -642,7 +642,7 @@ def change_element_category():
         else:
             new_watched = old_watched
     elif list_type == ListType.MOVIES:
-        if new_status == Status.COMPLETED or new_status == Status.COMPLETED_ANIMATION:
+        if new_status == Status.COMPLETED:
             media[1].eps_watched = 1
         else:
             media[1].eps_watched = 0
@@ -730,7 +730,7 @@ def update_rewatch():
         return '', 400
 
     media = check_media(media_id, list_type)
-    if not media or (media[1].status != Status.COMPLETED and media[1].status != Status.COMPLETED_ANIMATION):
+    if not media or media[1].status != Status.COMPLETED:
         return '', 400
 
     # Get the old data
@@ -838,10 +838,7 @@ def add_element():
             new_episode = 0
             new_watched = 0
     elif list_type == ListType.MOVIES:
-        if new_status == Status.COMPLETED:
-            if MoviesGenre.query.filter_by(media_id=media.id, genre="Animation").first():
-                new_status = Status.COMPLETED_ANIMATION
-        else:
+        if new_status != Status.COMPLETED:
             new_watched = 0
 
     # Add <media> to the <user>
@@ -970,7 +967,7 @@ def autocomplete():
     search = request.args.get('q')
 
     # Get the users results
-    users = User.query.filter(User.username.like('%'+search+'%'), User.active == True).all()
+    users = User.query.filter(User.username.like('%'+search+'%')).all()
     users_results = []
     for user in users:
         users_results.append(Autocomplete(user).get_user_dict())

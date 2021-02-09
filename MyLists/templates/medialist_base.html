@@ -178,8 +178,8 @@
                                     </a>
                                 {% endif %}
                             </div>
-                            <div class="col" {% if data['category'] == 'Completed' or data['category'] ==
-                             'Completed Animation' %} style="display: block;" {% else %} style="display: none;"{% endif %}>
+                            <div class="col" {% if data['category'] == 'Completed' %}style="display: block;"
+                            {% else %} style="display: none;"{% endif %}>
                                 <a id="rew_{{ data['id'] }}" class="{% if user_id != current_user.get_id() %}
                                  disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this
                                  media. Do not count the inital completion." onclick="rewatchDrop(this,

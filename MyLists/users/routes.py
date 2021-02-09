@@ -57,10 +57,17 @@ def more_stats(user_name):
     # Check if the user can see the <media_list>
     user = current_user.check_autorization(user_name)
 
+    # Recover the stats data
     stats = get_more_stats(user)
+
+    # Recover the account header data
+    header_data = get_header_data(user)
+
+    # Recover the user data
     user_data = get_user_data(user)
 
-    return render_template('more_stats.html', title='More stats', stats=stats, user_data=user_data)
+    return render_template('more_stats.html', title='More stats', stats=stats, user_data=user_data,
+                           header_data=header_data)
 
 
 @bp.route("/hall_of_fame", methods=['GET', 'POST'])

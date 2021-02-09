@@ -333,7 +333,7 @@ def get_follows_data(user):
 def get_more_stats(user):
 
     def get_episodes_and_time(element):
-        if element[1].status == Status.COMPLETED or element[1].status == Status.COMPLETED_ANIMATION:
+        if element[1].status == Status.COMPLETED:
             try:
                 return [1, element[0].runtime]
             except:
@@ -354,24 +354,6 @@ def get_more_stats(user):
     series_data = db.session.query(Series, SeriesList) \
         .join(SeriesList, SeriesList.media_id == Series.id) \
         .filter(SeriesList.user_id == user.id)
-
-    # test = db.session.query(func.strftime('%Y', Series.first_air_date).label('year'),
-    #                         func.count(Series.first_air_date))\
-    #     .join(SeriesList, Series.id == SeriesList.media_id)\
-    #     .filter(SeriesList.user_id == current_user.id)\
-    #     .group_by(func.strftime('%Y', Series.first_air_date)).order_by(text('year desc')).all()
-
-    # test = db.session.query(func.strftime('%Y', Movies.release_date).label('year'),
-    #                         func.count(Movies.release_date))\
-    #     .join(MoviesList, Movies.id == MoviesList.media_id)\
-    #     .filter(MoviesList.user_id == current_user.id)\
-    #     .group_by(func.strftime('%Y', Movies.release_date)).order_by(text('year desc')).all()
-
-    # test = db.session.query(SeriesGenre.genre, func.count(SeriesGenre.genre).label('count')) \
-    #     .join(SeriesList, SeriesGenre.media_id == SeriesList.media_id) \
-    #     .join(Series, Series.id == SeriesList.media_id) \
-    #     .filter(SeriesList.user_id == current_user.id)\
-    #     .group_by(SeriesGenre.genre).order_by(text('count desc')).all()
 
     anime_data = db.session.query(Anime, AnimeList) \
         .join(AnimeList, AnimeList.media_id == Anime.id) \
@@ -481,11 +463,11 @@ def get_more_stats(user):
         if index == 0:
             data.update({'Series_genres': genres_time,
                          'Series_periods': periods_time,
-                         'Series_episodes': episodes_time})
+                         'Series_eps': episodes_time})
         elif index == 1:
             data.update({'Anime_genres': genres_time,
                          'Anime_periods': periods_time,
-                         'Anime_episodes': episodes_time})
+                         'Anime_eps': episodes_time})
         else:
             data.update({'Movies_genres': genres_time,
                          'Movies_periods': periods_time,

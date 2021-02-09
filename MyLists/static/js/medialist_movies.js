@@ -8,7 +8,7 @@ function chargeButtons(card) {
     let plan_to_watch = "block;";
     let category = $('#'+card.id).attr('cat');
 
-    if (category === 'Completed' || category === 'Completed Animation') {
+    if (category === 'Completed') {
         completed = "none;";
     } else {
         plan_to_watch = "none;";

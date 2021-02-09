@@ -486,7 +486,7 @@ class Autocomplete:
     def get_user_dict(self):
         self.info = {'display_name': self.result.username,
                      'image_cover': '/static/profile_pics/' + self.result.image_file,
-                     'date': datetime.strftime(self.result.activated_on, '%d %b %Y'),
+                     'date': datetime.strftime(self.result.registered_on, '%d %b %Y'),
                      'category': 'Users',
                      'type': 'User'}
 
