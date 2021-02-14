@@ -1,10 +1,9 @@
 from MyLists import db, app, bcrypt
 from MyLists.models import HomePage, User
 from flask_login import login_required, current_user
-from flask import Blueprint, flash, request, render_template, redirect, url_for
+from flask import Blueprint, flash, request, render_template, redirect, url_for, jsonify
 from MyLists.settings.functions import send_email_update_email, save_profile_picture
 from MyLists.settings.forms import UpdateAccountForm, ChangePasswordForm, UpdateAccountOauthForm
-
 
 bp = Blueprint('settings', __name__)
 
@@ -129,3 +128,34 @@ def email_update_token(token):
     flash('Email successfully updated!', 'success')
 
     return redirect(url_for('auth.home'))
+
+
+@bp.route('/import_list')
+@login_required
+def import_list():
+    if current_user.get_task_in_progress('import_list'):
+        flash('An export task is already in progress', 'warning')
+    else:
+        current_user.launch_task('import_list', 'Importing list...')
+        db.session.commit()
+    return redirect(url_for('users.account', user_name=current_user.username))
+
+
+# --- AJAX Methods ----------------------------------------------------------------------------------
+
+
+@bp.route('/progress_import', methods=['POST'])
+@login_required
+def progress_import():
+    try:
+        request.get_json()
+    except:
+        return '', 400
+
+    task = current_user.get_task_in_progress('import_list')
+    if task:
+        progress = {'progress': task.get_progress()}
+    else:
+        progress = {'progress': 100}
+
+    return jsonify(progress=progress), 200

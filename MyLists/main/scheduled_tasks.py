@@ -34,6 +34,7 @@ def remove_non_list_media():
         count += 1
 
         app.logger.info('Removed series with ID: [{}]'.format(deletion))
+        print('Removed series with ID: [{}]'.format(deletion))
     app.logger.info('Total series removed: {}'.format(count))
 
     # ANIME DELETIONS
@@ -552,7 +553,9 @@ def update_Mylists_stats():
 
 # ---------------------------------------------------------------------------------------------------------------
 
+@app.cli.command()
 def scheduled_task():
+    """Run the scheduled jobs."""
     remove_non_list_media()
     remove_old_covers()
     automatic_media_refresh()

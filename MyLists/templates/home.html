@@ -38,27 +38,27 @@
                                 {{ login_form.hidden_tag() }}
                                 <div class="md-form">
                                     {% if login_form.login_username.errors %}
-                                        {{ login_form.login_username(class="form-control is-invalid") }}
+                                        {{ login_form.login_username(class="form-control-home is-invalid") }}
                                         <div class="invalid-feedback">
                                             {% for error in login_form.login_username.errors %}
                                                 <span>{{ error }}</span>
                                             {% endfor %}
                                         </div>
                                     {% else %}
-                                        {{ login_form.login_username(class="form-control text-light",
+                                        {{ login_form.login_username(class="form-control-home text-light",
                                     placeholder="Username") }}
                                     {% endif %}
                                 </div>
                                 <div class="md-form">
                                     {% if login_form.login_password.errors %}
-                                        {{ login_form.login_password(class="form-control is-invalid") }}
+                                        {{ login_form.login_password(class="form-control-home is-invalid") }}
                                         <div class="invalid-feedback">
                                             {% for error in login_form.login_password.errors %}
                                                 <span>{{ error }}</span>
                                             {% endfor %}
                                         </div>
                                     {% else %}
-                                        {{ login_form.login_password(class="form-control text-light",
+                                        {{ login_form.login_password(class="form-control-home text-light",
                                     placeholder="Password") }}
                                     {% endif %}
                                 </div>
@@ -105,49 +105,49 @@
                             <fieldset>
                                 <div class="md-form m-l-10 m-r-10">
                                     {% if register_form.register_username.errors %}
-                                        {{ register_form.register_username(class="form-control is-invalid") }}
+                                        {{ register_form.register_username(class="form-control-home is-invalid") }}
                                         <div class="invalid-feedback">
                                             {% for error in register_form.register_username.errors %}
                                                 <span>{{ error }}</span>
                                             {% endfor %}
                                         </div>
                                     {% else %}
-                                        {{ register_form.register_username(class="form-control text-light",
+                                        {{ register_form.register_username(class="form-control-home text-light",
                                     placeholder="Username") }}
                                     {% endif %}
                                 </div>
 
                                 <div class="md-form m-l-10 m-r-10">
                                     {% if register_form.register_email.errors %}
-                                        {{ register_form.register_email(class="form-control is-invalid") }}
+                                        {{ register_form.register_email(class="form-control-home is-invalid") }}
                                         <div class="invalid-feedback">
                                             {% for error in register_form.register_email.errors %}
                                                 <span>{{ error }}</span>
                                             {% endfor %}
                                         </div>
                                     {% else %}
-                                        {{ register_form.register_email(class="form-control text-light",
+                                        {{ register_form.register_email(class="form-control-home text-light",
                                     placeholder="E-mail") }}
                                     {% endif %}
                                 </div>
 
                                 <div class="md-form m-l-10 m-r-10">
                                     {% if register_form.register_password.errors %}
-                                        {{ register_form.register_password(class="form-control is-invalid") }}
+                                        {{ register_form.register_password(class="form-control-home is-invalid") }}
                                         <div class="invalid-feedback">
                                             {% for error in register_form.register_password.errors %}
                                                 <span>{{ error }}</span>
                                             {% endfor %}
                                         </div>
                                     {% else %}
-                                        {{ register_form.register_password(class="form-control text-light",
+                                        {{ register_form.register_password(class="form-control-home text-light",
                                     placeholder="Password") }}
                                     {% endif %}
                                 </div>
 
                                 <div class="md-form m-l-10 m-r-10">
                                     {% if register_form.register_confirm_password.errors %}
-                                        {{ register_form.register_confirm_password(class="form-control is-invalid") }}
+                                        {{ register_form.register_confirm_password(class="form-control-home is-invalid") }}
                                         <div class="invalid-feedback">
                                             {% for error in register_form.register_confirm_password.errors %}
                                                 {% if error == "Field must be equal to new_password." %}
@@ -158,7 +158,7 @@
                                             {% endfor %}
                                         </div>
                                     {% else %}
-                                        {{ register_form.register_confirm_password(class="form-control text-light",
+                                        {{ register_form.register_confirm_password(class="form-control-home text-light",
                                     placeholder="Confirm Password") }}
                                     {% endif %}
                                 </div>

@@ -105,4 +105,4 @@ def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0,
 
 # --- Python Scheduler -----------------------------------------------------------------------------------------
 
-app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='refresh_all_data', hour=3, minute=00)
+# app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='refresh_all_data', hour=3, minute=00)

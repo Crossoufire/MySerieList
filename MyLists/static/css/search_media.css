@@ -1,5 +1,5 @@
 
-/* --- Card CSS ------------------------------------------------------------- */
+/* --- Card CSS ------------------------------------------------------------------------------- */
 .giveMeEllipsis {
    overflow: hidden;
    text-overflow: ellipsis;
@@ -24,27 +24,15 @@
    -webkit-line-clamp: 4;   /* number of lines to show */
 }
 
-.card-series {
-   background: #216c7d;
+.card {
    width: 700px;
-   border-radius: 0;
-}
-
-.card-anime {
-   background: #945141;
-   width: 700px;
-   border-radius: 0;
-}
-
-.card-movies {
-   background: #8c7821;
-   width: 700px;
+   background: #151418;
    border-radius: 0;
 }
 
 .img-min-height {
-   min-height: 225px;
-   width: 150px;
+   min-height: 300px;
+   width: 200px;
 }
 
 .card-hashtag {
