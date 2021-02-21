@@ -1,9 +1,11 @@
+import requests
+import pandas as pd
 from MyLists import db, app, bcrypt
-from MyLists.models import HomePage, User
+from MyLists.models import HomePage, User, ListType, Status
 from flask_login import login_required, current_user
+from MyLists.settings.functions import send_email_update_email, save_profile_picture, import_the_list
 from flask import Blueprint, flash, request, render_template, redirect, url_for, jsonify
-from MyLists.settings.functions import send_email_update_email, save_profile_picture
-from MyLists.settings.forms import UpdateAccountForm, ChangePasswordForm, UpdateAccountOauthForm
+from MyLists.settings.forms import UpdateAccountForm, ChangePasswordForm, UpdateAccountOauthForm, ImportListForm
 
 bp = Blueprint('settings', __name__)
 
@@ -11,6 +13,11 @@ bp = Blueprint('settings', __name__)
 @bp.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
+    import_form = ImportListForm()
+    if import_form.submit.data and import_form.validate():
+        if import_form.csv_list.data:
+            import_the_list(import_form)
+
     if current_user.oauth_id:
         settings_form = UpdateAccountOauthForm()
 
@@ -20,6 +27,12 @@ def settings():
                 current_user.image_file = save_profile_picture(settings_form.picture.data, old_picture_file)
                 app.logger.info('[{}] Settings updated: Old picture file = {}. New picture file = {}'
                                 .format(current_user.id, old_picture_file, current_user.image_file))
+            if settings_form.back_picture.data:
+                old_background_picture = current_user.background_image
+                current_user.background_image = save_profile_picture(settings_form.back_picture.data,
+                                                                     old_background_picture, profile=False)
+                app.logger.info('[{}] Settings updated: Old background picture = {}. New background picture = {}'
+                                .format(current_user.id, old_background_picture, current_user.background_image))
             if settings_form.username.data != current_user.username:
                 old_username = current_user.username
                 current_user.username = settings_form.username.data
@@ -55,6 +68,12 @@ def settings():
                 current_user.image_file = save_profile_picture(settings_form.picture.data, old_picture_file)
                 app.logger.info('[{}] Settings updated: Old picture file = {}. New picture file = {}'
                                 .format(current_user.id, old_picture_file, current_user.image_file))
+            if settings_form.back_picture.data:
+                old_background_picture = current_user.background_image
+                current_user.background_image = save_profile_picture(settings_form.back_picture.data,
+                                                                     old_background_picture, profile=False)
+                app.logger.info('[{}] Settings updated: Old background picture = {}. New background picture = {}'
+                                .format(current_user.id, old_background_picture, current_user.background_image))
             if settings_form.username.data != current_user.username:
                 old_username = current_user.username
                 current_user.username = settings_form.username.data
@@ -101,10 +120,8 @@ def settings():
             app.logger.info('[{}] Password updated'.format(current_user.id))
             flash('Your password has been successfully updated!', 'success')
 
-    return render_template('settings.html',
-                           title='Your settings',
-                           settings_form=settings_form,
-                           password_form=password_form)
+    return render_template('settings.html', title='Your settings', settings_form=settings_form,
+                           password_form=password_form, import_form=import_form)
 
 
 @bp.route("/email_update/<token>", methods=['GET'])

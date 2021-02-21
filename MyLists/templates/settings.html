@@ -7,7 +7,6 @@
             border-top: 1px solid rgba(44, 57, 70, 1);
             margin-top: 1px;
         }
-
         .vertical_line {
             width: 5px;
             border-left: 2px solid rgba(44, 57, 70, 1);
@@ -19,14 +18,25 @@
 
 {% block content %}
     {% if not current_user.get_task_in_progress('import_list') %}
-        <div class="m-t-30">Import your list as csv from IMDb or TMDb:
-            <a href="{{ url_for('settings.import_list') }}">Import list</a>
+        <div class="text-left m-t-30 m-b-60">
+            <h4>&nbsp;&nbsp;<i class="fas fa-file-import"></i>&nbsp;&nbsp; List import</h4>
+            <hr>
+            <form method="POST" action="" enctype="multipart/form-data">
+                <div class="m-l-20">
+                    {{ import_form.hidden_tag() }}
+                    Import your list as csv from TMDb:&nbsp;&nbsp; {{ import_form.csv_list() }}
+                    {{ import_form.submit(class="btn btn-outline-info p-2") }}
+                    {% for error in import_form.csv_list.errors %}
+                        <div style="color: red;">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </form>
         </div>
     {% endif %}
     {% if not current_user.oauth_id %}
         <div class="row text-center m-t-60 m-b-60">
             <div class="col">
-                <h4><i class="fas fa-sliders-h"></i>&nbsp&nbsp General settings</h4>
+                <h4><i class="fas fa-sliders-h"></i>&nbsp;&nbsp; General settings</h4>
                 <hr>
                 <form method="POST" action="" enctype="multipart/form-data">
                     {{ settings_form.hidden_tag() }}
@@ -34,33 +44,40 @@
                         {{ settings_form.username.label }}<br>
                         {{ settings_form.username(size=28) }}<br>
                         {% for error in settings_form.username.errors %}
-                            <span style="color: red;">[{{ error }}]</span>
+                            <span style="color: red;">{{ error }}</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
                         {{ settings_form.email.label }}<br>
                         {{ settings_form.email(size=28) }}<br>
                         {% for error in settings_form.email.errors %}
-                            <span style="color: red;">[{{ error }}]</span>
+                            <span style="color: red;">{{ error }}</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
                         {{ settings_form.homepage.label }}: &nbsp&nbsp&nbsp {{ settings_form.homepage }}<br>
                         {% for error in settings_form.homepage.errors %}
-                            <span style="color: red;">[{{ error }}]</span>
+                            <span style="color: red;">{{ error }}</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
                         {{ settings_form.isprivate.label }}: &nbsp&nbsp&nbsp {{ settings_form.isprivate() }}<br>
                         {% for error in settings_form.isprivate.errors %}
-                            <span style="color: red;">[{{ error }}]</span>
+                            <span style="color: red;">{{ error }}</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
                         {{ settings_form.picture.label }}<br>
                         {{ settings_form.picture() }}<br>
                         {% for error in settings_form.picture.errors %}
-                            <span style="color: red;">[{{ error }}]</span>
+                            <span style="color: red;">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="m-t-30">
+                        {{ settings_form.back_picture.label }}<br>
+                        {{ settings_form.back_picture() }}<br>
+                        {% for error in settings_form.back_picture.errors %}
+                            <span style="color: red;">{{ error }}</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
@@ -78,21 +95,21 @@
                         {{ password_form.current_password.label }}<br>
                         {{ password_form.current_password(size=28) }}<br>
                         {% for error in password_form.current_password.errors %}
-                            <span style="color: red;">[{{ error }}]</span>
+                            <span style="color: red;">{{ error }}</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
                         {{ password_form.new_password.label }}<br>
                         {{ password_form.new_password(size=28) }}<br>
                         {% for error in password_form.new_password.errors %}
-                            <span style="color: red;">[{{ error }}]</span>
+                            <span style="color: red;">{{ error }}</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
                         {{ password_form.confirm_new_password.label }}<br>
                         {{ password_form.confirm_new_password(size=28) }}<br>
                         {% for error in password_form.confirm_new_password.errors %}
-                            <span style="color: red;">[{{ error }}]</span>
+                            <span style="color: red;">{{ error }}</span>
                         {% endfor %}
                     </div>
                     <div class="m-t-30">
@@ -103,7 +120,7 @@
         </div>
     {% else %}
         <div class="text-center m-t-60 m-b-60">
-            <h4><i class="fas fa-sliders-h"></i>&nbsp&nbsp General settings</h4>
+            <h4><i class="fas fa-sliders-h"></i>&nbsp;&nbsp; General settings</h4>
             <hr>
             <form method="POST" action="" enctype="multipart/form-data">
                 {{ settings_form.hidden_tag() }}
@@ -111,26 +128,33 @@
                     {{ settings_form.username.label }}<br>
                     {{ settings_form.username(size=28) }}<br>
                     {% for error in settings_form.username.errors %}
-                        <span style="color: red;">[{{ error }}]</span>
+                        <span style="color: red;">{{ error }}</span>
                     {% endfor %}
                 </div>
                 <div class="m-t-30">
-                    {{ settings_form.homepage.label }}: &nbsp&nbsp&nbsp {{ settings_form.homepage }}<br>
+                    {{ settings_form.homepage.label }}: &nbsp;&nbsp;&nbsp; {{ settings_form.homepage }}<br>
                     {% for error in settings_form.homepage.errors %}
-                        <span style="color: red;">[{{ error }}]</span>
+                        <span style="color: red;">{{ error }}</span>
                     {% endfor %}
                 </div>
                 <div class="m-t-30">
-                    {{ settings_form.isprivate.label }}: &nbsp&nbsp&nbsp {{ settings_form.isprivate() }}<br>
+                    {{ settings_form.isprivate.label }}: &nbsp;&nbsp;&nbsp; {{ settings_form.isprivate() }}<br>
                     {% for error in settings_form.isprivate.errors %}
-                        <span style="color: red;">[{{ error }}]</span>
+                        <span style="color: red;">{{ error }}</span>
                     {% endfor %}
                 </div>
                 <div class="m-t-30">
                     {{ settings_form.picture.label }}<br>
                     {{ settings_form.picture() }}<br>
                     {% for error in settings_form.picture.errors %}
-                        <span style="color: red;">[{{ error }}]</span>
+                        <span style="color: red;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="m-t-30">
+                    {{ settings_form.back_picture.label }}<br>
+                    {{ settings_form.back_picture() }}<br>
+                    {% for error in settings_form.back_picture.errors %}
+                        <span style="color: red;">{{ error }}</span>
                     {% endfor %}
                 </div>
                 <div class="m-t-30">

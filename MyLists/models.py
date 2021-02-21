@@ -69,6 +69,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     homepage = db.Column(db.Enum(HomePage), nullable=False, default=HomePage.ACCOUNT)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
+    background_image = db.Column(db.String(50), nullable=False, default='default.jpg')
     time_spent_series = db.Column(db.Integer, nullable=False, default=0)
     time_spent_movies = db.Column(db.Integer, nullable=False, default=0)
     time_spent_anime = db.Column(db.Integer, nullable=False, default=0)
@@ -226,6 +227,9 @@ class Notifications(db.Model):
 
 
 class Series(db.Model):
+    def __repr__(self):
+        return f'<Series {self.id}-{self.name}>'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     original_name = db.Column(db.String(50), nullable=False)

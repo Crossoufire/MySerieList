@@ -231,6 +231,7 @@ def get_header_data(user):
     header_data = {"id": str(user.id),
                    "username": user.username,
                    "profile_picture": url_for('static', filename='profile_pics/{0}'.format(user.image_file)),
+                   "back_picture": url_for('static', filename='background_pics/{0}'.format(user.background_image)),
                    "register": user.registered_on.strftime("%d %b %Y"),
                    "followers": followers,
                    "isfollowing": isfollowing,

@@ -12,6 +12,7 @@ class UpdateAccountForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
+    back_picture = FileField('Background picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
     isprivate = BooleanField('Private mode')
     steamID = StringField('SteamID')
     homepage = SelectField('Default homepage', choices=[('serieslist', 'MySeriesList'), ('animelist', 'MyAnimeList'),
@@ -35,6 +36,7 @@ class UpdateAccountForm(FlaskForm):
 class UpdateAccountOauthForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
     picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
+    back_picture = FileField('Background picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
     isprivate = BooleanField('Private mode')
     steamID = StringField('SteamID')
     homepage = SelectField('Default homepage', choices=[('serieslist', 'MySeriesList'), ('animelist', 'MyAnimeList'),
@@ -59,3 +61,9 @@ class ChangePasswordForm(FlaskForm):
         user = User.query.filter_by(id=current_user.get_id()).first()
         if not bcrypt.check_password_hash(user.password, current_password.data):
             raise ValidationError("Incorrect current password")
+
+
+class ImportListForm(FlaskForm):
+    csv_list = FileField('file.csv', validators=[FileAllowed(['csv'])])
+    submit = SubmitField('Import')
+

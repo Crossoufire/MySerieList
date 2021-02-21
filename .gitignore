@@ -120,6 +120,9 @@ MyLists/static/profile_pics/*
 !MyLists/static/profile_pics/default.jpg
 !MyLists/static/profile_pics/anonymous.jpg
 
+MyLists/static/background_pics/*
+!MyLists/static/background_pics/default.jpg
+
 MyLists/static/covers/series_covers/*
 !MyLists/static/covers/series_covers/default.jpg
 

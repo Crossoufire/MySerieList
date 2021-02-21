@@ -32,13 +32,21 @@ a {
 /* --- Header ------------------------------------------- */
 .header-container {
     position: relative;
-    height: 240px;
-    background-image: url('/static/img/profile_background_2.jpg');
+    height: 280px;
     background-size: cover;
     border-bottom: 2px solid #808080;
     background-position: center;
     background-repeat: no-repeat;
 }
+
+/*.header-container-back {*/
+/*    position: absolute;*/
+/*    background: rgba(0, 0, 0, 0.8);*/
+/*    border-radius: 20px 20px 20px 0;*/
+/*    height: 190px;*/
+/*    width: 520px;*/
+/*    bottom: 0;*/
+/*}*/
 
 .header-profile-container {
     position: absolute;
