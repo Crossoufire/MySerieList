@@ -3,7 +3,7 @@ import pandas as pd
 from MyLists import db, app, bcrypt
 from MyLists.models import HomePage, User, ListType, Status
 from flask_login import login_required, current_user
-from MyLists.settings.functions import send_email_update_email, save_profile_picture, import_the_list
+from MyLists.settings.functions import send_email_update_email, save_account_picture, import_the_list
 from flask import Blueprint, flash, request, render_template, redirect, url_for, jsonify
 from MyLists.settings.forms import UpdateAccountForm, ChangePasswordForm, UpdateAccountOauthForm, ImportListForm
 
@@ -24,12 +24,12 @@ def settings():
         if settings_form.submit_account.data and settings_form.validate():
             if settings_form.picture.data:
                 old_picture_file = current_user.image_file
-                current_user.image_file = save_profile_picture(settings_form.picture.data, old_picture_file)
+                current_user.image_file = save_account_picture(settings_form.picture.data, old_picture_file)
                 app.logger.info('[{}] Settings updated: Old picture file = {}. New picture file = {}'
                                 .format(current_user.id, old_picture_file, current_user.image_file))
             if settings_form.back_picture.data:
                 old_background_picture = current_user.background_image
-                current_user.background_image = save_profile_picture(settings_form.back_picture.data,
+                current_user.background_image = save_account_picture(settings_form.back_picture.data,
                                                                      old_background_picture, profile=False)
                 app.logger.info('[{}] Settings updated: Old background picture = {}. New background picture = {}'
                                 .format(current_user.id, old_background_picture, current_user.background_image))
@@ -65,12 +65,12 @@ def settings():
         if settings_form.submit_account.data and settings_form.validate():
             if settings_form.picture.data:
                 old_picture_file = current_user.image_file
-                current_user.image_file = save_profile_picture(settings_form.picture.data, old_picture_file)
+                current_user.image_file = save_account_picture(settings_form.picture.data, old_picture_file)
                 app.logger.info('[{}] Settings updated: Old picture file = {}. New picture file = {}'
                                 .format(current_user.id, old_picture_file, current_user.image_file))
             if settings_form.back_picture.data:
                 old_background_picture = current_user.background_image
-                current_user.background_image = save_profile_picture(settings_form.back_picture.data,
+                current_user.background_image = save_account_picture(settings_form.back_picture.data,
                                                                      old_background_picture, profile=False)
                 app.logger.info('[{}] Settings updated: Old background picture = {}. New background picture = {}'
                                 .format(current_user.id, old_background_picture, current_user.background_image))
