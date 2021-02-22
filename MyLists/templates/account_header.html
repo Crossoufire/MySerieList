@@ -10,16 +10,15 @@
 
 {% block content %}
     <div class="header-container" style="background-image: url('{{ header_data['back_picture'] }}');">
-{#        <div class="header-container-back"></div>#}
         <div class="header-profile-container" {% if header_data['knowledge_info']['frame_level'] < 36 %}
-            style="left: -10px; {% endif %}">
+        style="left: -10px; {% endif %}">
             <img class="header-profile-img" src="{{ header_data['profile_picture'] }}" alt=""/>
             <img class="header-profile-frame" src="{{ header_data['knowledge_info']['frame_id'] }}.png" alt=""/>
             <div class="header-knowledge-level text-center">{{ header_data['knowledge_info']['level'] }}</div>
         </div>
         <div class="header-profile-data" {% if header_data['knowledge_info']['frame_level'] < 36 %}
-            style="left: 200px; {% endif %}">
-            <h2 class="profile-name"><b>{{ header_data['username'] }}</b>
+        style="left: 200px; {% endif %}">
+            <h2 class="profile-name add-shadow"><b>{{ header_data['username'] }}</b>
                 {% if header_data['id'] != current_user.get_id() %}
                     {% if header_data["isfollowing"] %}
                         <button id="follow_{{ header_data['id'] }}" class="btn btn-sm btn-dark follow-btn" value="1"
@@ -35,14 +34,14 @@
                     <i id="load_{{ header_data['id'] }}" class="fas fa-spinner fast-spin" style="display: none;"></i>
                 {% endif %}
             </h2>
-            <div>
+            <div class="add-shadow">
                 <b>Joined: {{ header_data['register'] }}</b><br>
                 <b>Followers: {{ header_data['followers'] }}</b>
             </div>
         </div>
         <div class="header-profile-data-mobile text-center">
-            <h4 class="p-0 m-0"><b>{{ header_data['username'] }}&nbsp;</b></h4>
-            <div class="header-join-follow">
+            <h4 class="p-0 m-0 add-shadow"><b>{{ header_data['username'] }}&nbsp;</b></h4>
+            <div class="header-join-follow add-shadow">
                 <b>Joined: {{ header_data['register'] }}</b><br>
                 <b>Followers: {{ header_data['followers'] }}</b>
             </div>

@@ -39,15 +39,6 @@ a {
     background-repeat: no-repeat;
 }
 
-/*.header-container-back {*/
-/*    position: absolute;*/
-/*    background: rgba(0, 0, 0, 0.8);*/
-/*    border-radius: 20px 20px 20px 0;*/
-/*    height: 190px;*/
-/*    width: 520px;*/
-/*    bottom: 0;*/
-/*}*/
-
 .header-profile-container {
     position: absolute;
     left: 15px;
@@ -105,6 +96,10 @@ a {
     display: none;
 }
 
+.add-shadow {
+    text-shadow: 1px 1px 2px black, 0 0 1em black, 0 0 0.2em black;
+}
+
 .follow-btn {
     display: inline-block;
 }
@@ -143,7 +138,7 @@ a {
         display: block;
         position: absolute;
         left: 50%;
-        bottom: -30px;
+        bottom: -20px;
         transform: translate(-50%, -50%);
         -ms-transform: translate(-50%, -50%);
     }

@@ -9,7 +9,7 @@ load_dotenv(dotenv_path=os.path.join(basedir, '.env'))
 class Config(object):
     SECRET_KEY = os.environ.get('FLASK_SECRET_KEY') or 'lets-go-guys'
     ENV = os.environ.get('FLASK_ENV')
-    SESSION_COOKIE_SECURE = bool(os.environ.get('FLASK_SESSION_COOKIE_SECURE'))
+    SESSION_COOKIE_SECURE = False   # bool(os.environ.get('FLASK_SESSION_COOKIE_SECURE'))
     SQLALCHEMY_DATABASE_URI = os.environ.get('FLASK_SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TESTING = bool(os.environ.get('FLASK_TESTING'))
