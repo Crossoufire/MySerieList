@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+    <link href="{{ url_for('static', filename='css/current_trends.css') }}" rel="stylesheet">
+{% endblock css %}
+
+
+{% block content %}
+    <h3 class="mb-0 m-t-50"><b>IMPORT</b></h3>
+    <hr class="mt-2 mb-0">
+    <div class="m-t-30 hof ml-auto mr-auto m-b-60">
+        <table id="imported" class="table table-responsive-sm text-light">
+            <thead>
+            <tr>
+                <th class="text-center">Cover</th>
+                <th class="text-center">Title</th>
+                <th class="text-center">Type</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for media in all_data %}
+                <tr class="text-center">
+                    <td style="min-width: 180px; max-width: 180px;"><img src="{{ media['cover'] }}"  height="150" width="100" alt=""></td>
+                    <td>{{ media['name'] }}</td>
+                    <td>{{ media['type'] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}
+
+
+{% block script %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/hall_of_fame.js') }}"></script>
+{% endblock script %}

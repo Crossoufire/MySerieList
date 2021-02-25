@@ -74,14 +74,6 @@
                         <div class="text-center">
                             <a href="{{ url_for('auth.reset_password') }}"><b>Forgot Password?</b></a>
                         </div>
-                        <hr>
-                        <div class="text-center">
-                            <a type="button" class="btn btn-primary" href="{{ url_for('auth.oauth_authorize',
-                            provider='twitter') }}">
-                                <i class="fab fa-2x fa-twitter"></i>&nbsp;
-                                <div style="display: inline-block;">Login with Twitter</div>
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -167,14 +159,6 @@
                                 {{ register_form.register_submit(class="btn btn-outline-info") }}
                             </div>
                         </form>
-                        <hr>
-                        <div class="text-center">
-                            <a type="button" class="btn btn-primary" href="{{ url_for('auth.oauth_authorize',
-                            provider='twitter') }}">
-                                <i class="fab fa-2x fa-twitter"></i>&nbsp;
-                                <div style="display: inline-block;">Register with Twitter</div>
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -183,10 +167,10 @@
 
     <section>
         <h1 class="title-section my-5 h3 text-center">
-            TRACK YOUR FAVORITE TV SHOWS / ANIME / MOVIES AND NEVER GET LOST
+            TRACK YOUR FAVORITE SERIES / ANIME / MOVIES AND NEVER GET LOST
         </h1>
         <h5 class="title-section my-5 text-center">
-            MyLists has a beautiful and clear interface which allows you to track all your TV shows / anime / movies
+            MyLists has a beautiful and clear interface which allows you to track all your series / anime / movies
             without remembering what was your last watched episode. It integrates all kind of statistics so you can
             see how much time you spent. Moreover, you can see your friends' list and compare it to yours.
         </h5>
@@ -202,8 +186,8 @@
         <h1 class="title-section my-5 h3 text-center">COMPARE YOUR LIST WITH OTHER USERS</h1>
         <h5 class="title-section my-5 text-center">
             MyLists includes a Hall of Fame of all registered users. By default, everyone can see everyone's list, last
-            updates, time spent, favorites and much more.
-            You can also set your profile to private, so only you and your friends can see it.
+            updates, time spent, favorites and much more. You can also set your profile to private, so only you and
+            your friends can see it.
         </h5>
         <div class="row wow fadeIn">
             <div class="col-md-12 flex-center">
@@ -223,9 +207,10 @@
                     </div>
                     <div class="col-10 mb-2">
                         <h5 class="feature-title font-bold mb-1">Responsive</h5>
-                        <p class="grey-text mt-2">Fully responsive created with <a
-                        href="https://mdbootstrap.com/">MDB</a>.
-                            Supports PC, tablets, mobile, TV.</p>
+                        <p class="grey-text mt-2">
+                            Fully responsive created with <a href="https://mdbootstrap.com/">MDB</a>.
+                            Supports PC, tablets, mobile, TV.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -236,9 +221,9 @@
                     </div>
                     <div class="col-10 mb-2">
                         <h5 class="feature-title font-bold mb-1">Open Source</h5>
-                        <p class="grey-text mt-2">Totally open source, made with <a href="http://flask.pocoo.org/">
-                            Flask</a>. You can find the source code on
-                            <a href="https://www.github.com/Crossoufire/MyLists">Github.</a>
+                        <p class="grey-text mt-2">
+                            Totally open source, made with <a href="http://flask.pocoo.org/">Flask</a>. You can find
+                            the source code on <a href="https://www.github.com/Crossoufire/MyLists">Github.</a>
                         </p>
                     </div>
                 </div>
@@ -250,9 +235,9 @@
                     </div>
                     <div class="col-10 mb-2">
                         <h5 class="feature-title font-bold mb-1">No ads & 100% free</h5>
-                        <p class="grey-text mt-2">You will not find any ads here, we don't do that here. You only need
-                            to
-                            create an account to access all the content.
+                        <p class="grey-text mt-2">
+                            You will not find any ads, we don't do that here. You only need to create an account to
+                            access all the content.
                         </p>
                     </div>
                 </div>
@@ -286,7 +271,7 @@
                         <i class="far fa-smile fa-2x mb-1 indigo-text" aria-hidden="true"></i>
                     </div>
                     <div class="col-10 mb-2">
-                        <h5 class="feature-title font-bold mb-1">Made by random people with ❤</h5>
+                        <h5 class="feature-title font-bold mb-1">Made by 2 random people with ❤</h5>
                         <p class="grey-text mt-2">Built and kept alive by only 2 people, on their spare time.</p>
                     </div>
                 </div>
@@ -308,9 +293,7 @@
 
 
 {% block script %}
-    <!------------------ Main JS ---------------------->
     <script>
-        // Animations initialization
         new WOW().init();
 
         $('#modalLoginForm').on('shown.bs.modal', function () {

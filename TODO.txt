@@ -8,24 +8,19 @@ Media sheet:
 
 Account:
     Add: New achievements system
-    Enhance: Possibility to change background image
 
 MyLists Stats:
     Enhance: Better CSS and presentation
 
-Personal More Stats:
+Personal more stats:
     Add: More stats
     Add: A Personal stats table (with automatic update at 3:00 AM)
     Enchance: Better python and CSS
 
 General:
-    Add: Use redis queue
-    Add: Finish the PWA
     Add: If API down, user can still add media but check in local database instead of API
     Enhance: Change the hamburger display to a vertical panel in mobile
-    Enhance: followed level up notification
-    Enhance: From APScheduler to CRON
+    Enhance: Followed level up notification
 
-On going:
-    Add: Show shared
-    Add: Search in medialist
+MediaLists:
+    Add: Show/hide shared

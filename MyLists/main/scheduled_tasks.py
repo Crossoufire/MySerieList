@@ -8,15 +8,15 @@ from datetime import datetime, timedelta
 from MyLists.main.media_object import MediaDetails
 from MyLists.general.functions import compute_media_time_spent
 from MyLists.models import Series, SeriesList, SeriesActors, SeriesGenre, SeriesNetwork, SeriesEpisodesPerSeason, \
-    UserLastUpdate, Notifications, ListType, Anime, AnimeList, AnimeActors, AnimeGenre, AnimeNetwork, \
-    AnimeEpisodesPerSeason, Movies, MoviesList, MoviesActors, MoviesGenre, GlobalStats, Status, MyListsStats
+    UserLastUpdate, Notifications, ListType, Anime, AnimeList, AnimeActors, AnimeGenre, AnimeNetwork, Status, Movies, \
+    AnimeEpisodesPerSeason, MoviesList, MoviesActors, MoviesGenre, GlobalStats, MyListsStats
 
 
 def remove_non_list_media():
     app.logger.info('###################################################################')
     app.logger.info('[SYSTEM] - Starting automatic media remover')
 
-    # SERIES DELETIONS
+    # Series remover
     series = db.session.query(Series, SeriesList).outerjoin(SeriesList, SeriesList.media_id == Series.id).all()
     count = 0
     to_delete = []
@@ -34,10 +34,9 @@ def remove_non_list_media():
         count += 1
 
         app.logger.info('Removed series with ID: [{}]'.format(deletion))
-        print('Removed series with ID: [{}]'.format(deletion))
     app.logger.info('Total series removed: {}'.format(count))
 
-    # ANIME DELETIONS
+    # Anime remover
     anime = db.session.query(Anime, AnimeList).outerjoin(AnimeList, AnimeList.media_id == Anime.id).all()
     count = 0
     to_delete = []
@@ -57,7 +56,7 @@ def remove_non_list_media():
         app.logger.info('Removed anime with ID: [{}]'.format(deletion))
     app.logger.info('Total anime removed: {}'.format(count))
 
-    # MOVIES DELETIONS
+    # Movies remover
     movies = db.session.query(Movies, MoviesList).outerjoin(MoviesList, MoviesList.media_id == Movies.id).all()
     count = 0
     to_delete = []
@@ -84,7 +83,7 @@ def remove_old_covers():
     app.logger.info('###################################################################')
     app.logger.info('[SYSTEM] - Starting automatic covers remover')
 
-    # SERIES OLD COVERS
+    # Series old cover remover
     series = Series.query.all()
     path_series_covers = Path(app.root_path, 'static/covers/series_covers/')
 
@@ -104,7 +103,7 @@ def remove_old_covers():
             count += 1
     app.logger.info('Total old series covers deleted: {}'.format(count))
 
-    # ANIME OLD COVERS
+    # Anime old cover remover
     anime = Anime.query.all()
     path_anime_covers = Path(app.root_path, 'static/covers/anime_covers/')
 
@@ -124,7 +123,7 @@ def remove_old_covers():
             count += 1
     app.logger.info('Total old anime covers deleted: {}'.format(count))
 
-    # MOVIES OLD COVERS
+    # Movies old cover remover
     movies = Movies.query.all()
     path_movies_covers = Path(app.root_path, 'static/covers/movies_covers/')
 
@@ -316,7 +315,7 @@ def automatic_media_refresh():
 
 def new_releasing_series():
     app.logger.info('###################################################################')
-    app.logger.info('[SYSTEM] - Starting new releasing series')
+    app.logger.info('[SYSTEM] - Start adding the new releasing series')
 
     all_series = Series.query.filter(Series.next_episode_to_air != None).all()
 
@@ -365,13 +364,13 @@ def new_releasing_series():
         db.session.add(data)
 
     db.session.commit()
-    app.logger.info('[SYSTEM] - Finished new releasing series')
+    app.logger.info('[SYSTEM] - Finish adding the new releasing series')
     app.logger.info('###################################################################')
 
 
 def new_releasing_anime():
     app.logger.info('###################################################################')
-    app.logger.info('[SYSTEM] - Starting new releasing anime')
+    app.logger.info('[SYSTEM] - Start adding the new releasing anime')
 
     all_anime = Anime.query.filter(Anime.next_episode_to_air != None).all()
 
@@ -418,13 +417,13 @@ def new_releasing_anime():
         db.session.add(data)
 
     db.session.commit()
-    app.logger.info('[SYSTEM] - Finished new releasing anime')
+    app.logger.info('[SYSTEM] - Finish adding the new releasing anime')
     app.logger.info('###################################################################')
 
 
 def new_releasing_movies():
     app.logger.info('###################################################################')
-    app.logger.info('[SYSTEM] - Starting new releasing movies')
+    app.logger.info('[SYSTEM] - Start adding the new releasing movies')
 
     all_movies = Movies.query.all()
 
@@ -457,7 +456,7 @@ def new_releasing_movies():
             db.session.add(data)
 
     db.session.commit()
-    app.logger.info('[SYSTEM] - Finished new releasing anime')
+    app.logger.info('[SYSTEM] - Finish adding the new releasing movies')
     app.logger.info('###################################################################')
 
 
@@ -468,7 +467,7 @@ def automatic_movies_locking():
 
     count_locked = 0
     count_not_locked = 0
-    now_date = (datetime.utcnow()-timedelta(minutes=225000))  # About 5 months
+    now_date = (datetime.utcnow() - timedelta(minutes=225000))  # About 5 months
     for movie in all_movies:
         try:
             release_date = datetime.strptime(movie.release_date, '%Y-%m-%d')
@@ -538,20 +537,19 @@ def update_Mylists_stats():
     total_movies = stats.get_total_movies()
     total_movies_dict = {"movies": total_movies}
 
-    stats_to_add = MyListsStats(total_time=json.dumps(total_time),
-                                top_media=json.dumps(most_present_media),
-                                top_genres=json.dumps(most_genres_media),
-                                top_actors=json.dumps(most_actors_media),
-                                top_directors=json.dumps(most_directors_media),
-                                top_dropped=json.dumps(top_dropped_media),
-                                total_episodes=json.dumps(total_episodes_media),
-                                total_seasons=json.dumps(total_seasons_media),
-                                total_movies=json.dumps(total_movies_dict))
+    stats_to_add = MyListsStats(
+        total_time=json.dumps(total_time), top_media=json.dumps(most_present_media),
+        top_genres=json.dumps(most_genres_media), top_actors=json.dumps(most_actors_media),
+        top_directors=json.dumps(most_directors_media), top_dropped=json.dumps(top_dropped_media),
+        total_episodes=json.dumps(total_episodes_media), total_seasons=json.dumps(total_seasons_media),
+        total_movies=json.dumps(total_movies_dict)
+    )
     db.session.add(stats_to_add)
     db.session.commit()
 
 
 # ---------------------------------------------------------------------------------------------------------------
+
 
 @app.cli.command()
 def scheduled_task():

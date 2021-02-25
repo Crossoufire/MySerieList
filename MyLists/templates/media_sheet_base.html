@@ -40,22 +40,22 @@
                 </div>
                 <div class="m-b-10 m-t-15">
                     <div id="your-medialist-data" class="m-t-5 p-2" {% if not data['in_user_list'] %}
-                     style="display: none;"{% endif %}>
+                         style="display: none;"{% endif %}>
                         <h4 id="fav-title" class="m-l-15 m-r-15">
                             <i class="fas fa-list"></i>&nbsp;&nbsp; <b>List Info</b>
                             <i id="favorite" class="fa-heart m-t-3 {% if data['favorite'] %} fas favorited {% else %}
                              far no-fav{% endif %}" data-toggle="tooltip" title="Favorite"
-                             onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></i>
+                               onclick="addFavorite('{{ data['id'] }}', '{{ media_list }}')"></i>
                         </h4>
                         <hr class="m-l-15 m-r-15 m-b-8">
                         {% block medialist_info scoped %}
                         {% endblock medialist_info %}
                         <h4 id="comment-title" class="m-l-15 m-r-15 m-t-15">
-        <i class="fas fa-pen-alt m-t-10"></i>&nbsp; <b>Comment</b>
-        <a class="far fa-edit m-t-10"
-        href="/comment/{{ data['media_type'] }}/{{ data['id'] }}?from=media" data-toggle="tooltip"
-        title="Add/Edit Comment"></a>
-    </h4>
+                            <i class="fas fa-pen-alt m-t-10"></i>&nbsp; <b>Comment</b>
+                            <a class="far fa-edit m-t-10"
+                               href="/comment/{{ data['media_type'] }}/{{ data['id'] }}?from=media" data-toggle="tooltip"
+                               title="Add/Edit Comment"></a>
+                        </h4>
                         <hr class="m-l-15 m-r-15 m-b-8">
                         <p class="comment-style m-l-20 m-r-20">
                             {% if data['comment'] %}
@@ -66,7 +66,7 @@
                         </p>
                         <div class="text-center m-t-15">
                             <button class="btn btn-smaller btn-danger" onclick="removeFromUser('{{ data['id'] }}',
-                            '{{ media_list }}')">
+                                    '{{ media_list }}')">
                                 <i class="fas fa-ban"></i>&nbsp; Remove from list
                             </button>
                             <i id="loading-remove-list" class="fas fa-spinner fast-spin" style="display: none;"></i>
@@ -74,7 +74,7 @@
                     </div>
                     <div class="text-center">
                         <button id="add-to-list" class="btn btn-smaller btn-info"{% if data['in_user_list'] %}
-                        style="display: none;" {% endif %} onclick="addToUser('{{ data['id'] }}', '{{ media_list }}')">
+                                style="display: none;" {% endif %} onclick="addToUser('{{ data['id'] }}', '{{ media_list }}')">
                             <i class="fas fa-plus"></i>&nbsp; Add to your list
                         </button>
                         <i id="loading-add-list" class="fas fa-spinner fast-spin" style="display: none;"></i>
@@ -110,7 +110,7 @@
                         {% for similar in data['same_genres'] %}
                             <a class="m-r-10" href="/media_sheet/{{ data['media_type'] }}/{{ similar[0].id }}">
                                 <img class="m-b-10" height="80" width="53" data-toggle="tooltip" title="{{ similar[0].name }}"
-                                src="/static/covers/{{ data['cover_path'] }}/{{ similar[0].image_cover }}" alt=""/>
+                                     src="/static/covers/{{ data['cover_path'] }}/{{ similar[0].image_cover }}" alt=""/>
                             </a>
                         {% endfor %}
                         {% if not data['same_genres'] %}
@@ -174,13 +174,13 @@
                 {% if data['lock_status'] %}
                     <div class="custom-control custom-switch">
                         <input id="lock-button" class="custom-control-input" type="checkbox" checked
-                        onchange="lock_media('{{ data['id'] }}', '{{ media_list }}')">
+                               onchange="lock_media('{{ data['id'] }}', '{{ media_list }}')">
                         <label id="lock-button-label" class="custom-control-label" for="lock-button">Media is Locked</label>
                     </div>
                 {% else %}
                     <div class="custom-control custom-switch">
                         <input id="lock-button" class="custom-control-input" type="checkbox"
-                        onchange="lock_media('{{ data['id'] }}', '{{ media_list }}')">
+                               onchange="lock_media('{{ data['id'] }}', '{{ media_list }}')">
                         <label id="lock-button-label" class="custom-control-label" for="lock-button">Media is Unlocked</label>
                     </div>
                 {% endif %}
@@ -189,8 +189,8 @@
                        href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}">Edit media</a>
                 {% else %}
                     <a id="edit-button" class="btn btn-sm btn-warning text-dark" style="display: none;"
-                    href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}">
-                       Edit media
+                       href="/media_sheet_form/{{ data['media_type'] }}/{{ data['id'] }}">
+                        Edit media
                     </a>
                 {% endif %}
             </div>
@@ -203,7 +203,7 @@
     <script>
         $(document).ready(function () {
             $("input[type='number']").each(function() {
-               $(this).attr("style", "width: "+$(this).val().length + 3+"px;");
+                $(this).attr("style", "width: "+$(this).val().length + 3+"px;");
             });
             $("input[type='number']").bind('keyup', function () {
                 $(this).attr("style", "width: "+$(this).val().length + 3+"px;");

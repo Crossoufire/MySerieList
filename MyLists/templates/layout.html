@@ -241,10 +241,10 @@
                         success: function(data) {
                             if (data.progress.progress === 100) {
                                 $('#'+'{{ task.id }}'+'-progress').text('{{ task.description }} Completed!');
-                                $('#'+'{{ task.id }}'+'-progress').parent().fadeOut();
+                                $('#'+'{{ task.id }}'+'-progress').parent().delay(2000).fadeOut();
                             } else {
                                 $('#'+'{{ task.id }}'+'-progress').text('{{ task.description }} '+data.progress.progress+'%');
-                                setTimeout(get_progress, 1000);
+                                setTimeout(get_progress, 2500);
                             }
                         }
                     });

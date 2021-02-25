@@ -83,6 +83,8 @@
                 <h5 class="mb-1 text-media"><i class="fas fa-flag"></i><b>&nbsp; Original language</b></h5>
                 {% if data['original_language'] == 'en' %}
                     <span class="flag-icon flag-icon-us"></span>&nbsp;
+                {% elif data['original_language'] == 'ja' %}
+                    <span class="flag-icon flag-icon-jp"></span>&nbsp;
                 {% else %}
                     <span class="flag-icon flag-icon-{{ data['original_language'] }}"></span>
                 {% endif %}

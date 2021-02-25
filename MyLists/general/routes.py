@@ -6,10 +6,9 @@ from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from MyLists.general.trending_data import TrendingData
 from flask import render_template, flash, request, abort
-from MyLists.main.scheduled_tasks import update_Mylists_stats
-from MyLists.models import ListType, User, RoleType, MyListsStats
+from MyLists.models import User, RoleType, MyListsStats
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
-    refresh_db_frames, refresh_db_badges, refresh_db_ranks, add_eps_watched
+    refresh_db_frames, refresh_db_badges, refresh_db_ranks
 
 bp = Blueprint('general', __name__)
 
@@ -25,23 +24,20 @@ def create_first_data():
                       private=True,
                       registered_on=datetime.utcnow(),
                       activated_on=datetime.utcnow(),
-                      role=RoleType.ADMIN,
-                      oauth_id="a")
+                      role=RoleType.ADMIN)
         manager1 = User(username='manager',
                         email='manager@manager.com',
                         password=bcrypt.generate_password_hash("password").decode('utf-8'),
                         active=True,
                         registered_on=datetime.utcnow(),
                         activated_on=datetime.utcnow(),
-                        role=RoleType.MANAGER,
-                        oauth_id="b")
+                        role=RoleType.MANAGER)
         user1 = User(username='user',
                      email='user@user.com',
                      password=bcrypt.generate_password_hash("password").decode('utf-8'),
                      active=True,
                      registered_on=datetime.utcnow(),
-                     activated_on=datetime.utcnow(),
-                     oauth_id="c")
+                     activated_on=datetime.utcnow())
         db.session.add(admin1)
         db.session.add(manager1)
         db.session.add(user1)
@@ -52,10 +48,7 @@ def create_first_data():
     refresh_db_badges()
     refresh_db_ranks()
 
-    # add_eps_watched()
     compute_media_time_spent()
-    # update_Mylists_stats()
-
     db.session.commit()
 
 
@@ -82,7 +75,7 @@ def mylists_stats():
     total_seasons = json.loads(all_stats.total_seasons)
     total_movies = json.loads(all_stats.total_movies)
 
-    return render_template("mylists_stats.html", title='MyLists Stats', total_time=total_time, top_media=top_media,
+    return render_template("mylists_stats.html", title='MyLists stats', total_time=total_time, top_media=top_media,
                            top_genres=top_genres, top_actors=top_actors, top_directors=top_directors,
                            top_dropped=top_dropped, total_episodes=total_episodes, total_movies=total_movies,
                            total_seasons=total_seasons)
@@ -121,17 +114,14 @@ def current_trends():
     if platform == "iphone" or platform == "android" or not platform or platform == 'None':
         template = 'current_trends_mobile.html'
 
-    return render_template(template,
-                           title="Current trends",
-                           series_trends=series_results,
-                           anime_trends=anime_results,
+    return render_template(template, title="Current trends", series_trends=series_results, anime_trends=anime_results,
                            movies_trends=movies_results)
 
 
 @bp.route("/privacy_policy", methods=['GET'])
 @login_required
 def privacy_policy():
-    return render_template('privacy_policy.html', title='Privacy Policy of MyLists')
+    return render_template('privacy_policy.html', title='Privacy policy')
 
 
 @bp.route("/about", methods=['GET'])

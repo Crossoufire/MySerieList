@@ -40,16 +40,18 @@ class MediaType(enum.Enum):
 
 class HomePage(enum.Enum):
     ACCOUNT = "account"
-    HALL_OF_FAME = "hall_of_fame"
     MYSERIESLIST = "serieslist"
     MYANIMELIST = "animelist"
     MYMOVIESLIST = "movieslist"
 
 
 class RoleType(enum.Enum):
-    ADMIN = "admin"         # Can access to the admin dashboard (/admin)
-    MANAGER = "manager"     # Can lock and edit media (/lock_media & /media_sheet_form)
-    USER = "user"           # Standard user
+    # Can access to the admin dashboard (/admin)
+    ADMIN = "admin"
+    # Can lock and edit media (/lock_media & /media_sheet_form)
+    MANAGER = "manager"
+    # Standard user
+    USER = "user"
 
 
 followers = db.Table('followers',
@@ -63,7 +65,6 @@ class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)
-    oauth_id = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
     password = db.Column(db.String(60), nullable=False)
@@ -157,7 +158,7 @@ class User(db.Model, UserMixin):
             db.session.commit()
 
     def launch_task(self, name, description, *args, **kwargs):
-        rq_job = app.q.enqueue('MyLists.settings.tasks.' + name, self.id, *args, **kwargs)
+        rq_job = app.q.enqueue('MyLists.rq_tasks.' + name, self.id, *args, **kwargs)
         task = RedisTasks(id=rq_job.get_id(), name=name, description=description, user=self)
         db.session.add(task)
         return task
@@ -223,7 +224,7 @@ class Notifications(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 
-# --- SERIES -------------------------------------------------------------------------------------------------------
+# --- SERIES ------------------------------------------------------------------------------------------------------
 
 
 class Series(db.Model):
@@ -325,6 +326,9 @@ class SeriesActors(db.Model):
 
 
 class Anime(db.Model):
+    def __repr__(self):
+        return f'<Anime {self.id}-{self.name}>'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     original_name = db.Column(db.String(50), nullable=False)
@@ -416,7 +420,7 @@ class AnimeActors(db.Model):
     name = db.Column(db.String(150))
 
 
-# --- MOVIES -------------------------------------------------------------------------------------------------------
+# --- MOVIES ------------------------------------------------------------------------------------------------------
 
 
 class Movies(db.Model):

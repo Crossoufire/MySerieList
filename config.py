@@ -22,9 +22,3 @@ class Config(object):
     MAIL_USERNAME = os.environ.get('FLASK_MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('FLASK_MAIL_PASSWORD')
     THEMOVIEDB_API_KEY = os.environ.get('FLASK_THEMOVIEDB_API_KEY')
-    OAUTH_CREDENTIALS = {
-        'twitter': {
-            'id': os.environ.get('FLASK_TWITTER_ID'),
-            'secret': os.environ.get('FLASK_TWITTER_SECRET')
-        }
-    }

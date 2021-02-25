@@ -1,6 +1,6 @@
 
 
-// --- On document load ------------------------------------
+// --- On document load ----------------------------------------------------------------------------------------
 $(document).ready(function() {
     let time_data = $('#time-spent-pie').attr('values').split(', ');
 

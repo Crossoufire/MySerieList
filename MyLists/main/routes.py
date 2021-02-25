@@ -44,7 +44,7 @@ _SORTING = {'title-A-Z': 'title A-Z',
           "/page/<int:page_val>", methods=['GET', 'POST'])
 @login_required
 def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', sorting='title-A-Z', page_val=1):
-    # Check if the <user> can see the <media_list>
+    # Check if <user> can see <media_list>
     user = current_user.check_autorization(user_name)
 
     # Check if <media_list> is valid
@@ -53,13 +53,11 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
     except ValueError:
         abort(400)
 
-    # Add views_count to the profile
+    # Add <views_count> to the profile
     current_user.add_view_count(user, list_type)
 
-    # Select <search> category if query is not none
+    # Recover the query if it exists
     q = request.args.get('q')
-    if q:
-        category = Status.SEARCH
 
     # Check the sorting value
     try:
@@ -86,16 +84,15 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
     items = query.items
     info_pages = {'actual_page': query.page, 'total_pages': query.pages, 'total_media': query.total}
 
-    # Get <common_media> and <total_media>
+    # Get <common_media>, <total_media> and the percentage of media in common
     common_media, total_media = get_media_count(user.id, list_type)
-
     try:
         percentage = int((len(common_media)/total_media)*100)
     except ZeroDivisionError:
         percentage = 0
     common_elements = [len(common_media), total_media, percentage]
 
-    # Recover the data to a dict
+    # Recover the media data into a dict
     items_data_list = []
     for item in items:
         add_data = MediaListDict(item, common_media, list_type).redirect_medialist()
@@ -165,9 +162,8 @@ def media_sheet(media_type, media_id):
     elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
 
-    # Check if <media_id> came from an API and if in local DB
+    # Check if <media_id> came from an API and if in local Db
     api_id = request.args.get('search')
-
     if api_id:
         search = {'themoviedb_id': media_id}
     else:
@@ -182,7 +178,7 @@ def media_sheet(media_type, media_id):
         media = Movies.query.filter_by(**search).first()
         html_template = 'media_sheet_movies.html'
 
-    # If <media> does not exist and <api_id> is provived: Add the <media> to DB, else abort.
+    # If <media> does not exist and <api_id> is provived: Add the <media> to Db, else abort.
     if not media:
         if api_id:
             try:
@@ -201,6 +197,7 @@ def media_sheet(media_type, media_id):
                 return redirect(request.referrer)
             try:
                 media = AddtoDB(media_details, list_type).add_media_to_db()
+                db.session.commit()
             except Exception as e:
                 app.logger.error('[ERROR] - Occured trying to add media ({}) ID [{}] to DB: {}'
                                  .format(media_type.value, media_id, e))
@@ -389,14 +386,9 @@ def your_next_airing():
     for movies in next_movies_airing:
         movies_dates.append(change_air_format(movies[0].release_date))
 
-    return render_template('your_next_airing.html',
-                           title='Your Next Airing',
-                           airing_series=next_series_airing,
-                           series_dates=series_dates,
-                           airing_anime=next_anime_airing,
-                           anime_dates=anime_dates,
-                           airing_movies=next_movies_airing,
-                           movies_dates=movies_dates)
+    return render_template('your_next_airing.html',title='Your next airing', airing_series=next_series_airing,
+                           series_dates=series_dates, airing_anime=next_anime_airing, anime_dates=anime_dates,
+                           airing_movies=next_movies_airing, movies_dates=movies_dates)
 
 
 @bp.route('/search_media', methods=['GET', 'POST'])
@@ -412,8 +404,8 @@ def search_media():
         data_search = ApiData().TMDb_search(search, page=page)
     except Exception as e:
         data_search = {}
-        app.logger.error('[SYSTEM] - Error requesting the TMDB API: {}'.format(e))
-        flash('Sorry, an error occured, the TMDB API is unreachable for now.', 'warning')
+        app.logger.error('[SYSTEM] - Error requesting the TMDb API: {}'.format(e))
+        flash('Sorry, an error occured, the TMDb API is unreachable for now.', 'warning')
 
     if data_search.get("total_results", 0) == 0:
         flash('Sorry, no results found for your query.', 'warning')
@@ -476,7 +468,7 @@ def search_media():
                            total_results=data_search['total_results'])
 
 
-# --- AJAX Methods ----------------------------------------------------------------------------------
+# --- AJAX Methods -----------------------------------------------------------------------------------------------
 
 
 @bp.route('/update_element_season', methods=['POST'])

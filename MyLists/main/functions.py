@@ -4,8 +4,7 @@ from PIL import Image
 from MyLists import db, app
 from datetime import datetime
 from flask_login import current_user
-from MyLists.main.scheduled_tasks import scheduled_task
-from MyLists.models import MediaType, ListType, Status, UserLastUpdate
+from MyLists.models import MediaType, ListType, Status, UserLastUpdate, User
 
 
 def check_cat_type(list_type, status):
@@ -53,16 +52,20 @@ def save_new_cover(cover_file, media_type):
 
 
 def set_last_update(media, media_type, old_status=None, new_status=None, old_season=None, new_season=None,
-                    old_episode=None, new_episode=None):
+                    old_episode=None, new_episode=None, user_id=None):
 
-    check = UserLastUpdate.query.filter_by(user_id=current_user.id, media_type=media_type, media_id=media.id) \
+    # Use for the list import function (redis and rq backgound process), can't import the current_user context
+    if current_user:
+        user_id = current_user.id
+
+    check = UserLastUpdate.query.filter_by(user_id=user_id, media_type=media_type, media_id=media.id) \
         .order_by(UserLastUpdate.date.desc()).first()
 
     diff = 10000
     if check:
         diff = (datetime.utcnow() - check.date).total_seconds()
 
-    update = UserLastUpdate(user_id=current_user.id, media_name=media.name, media_id=media.id, media_type=media_type,
+    update = UserLastUpdate(user_id=user_id, media_name=media.name, media_id=media.id, media_type=media_type,
                             old_status=old_status, new_status=new_status, old_season=old_season, new_season=new_season,
                             old_episode=old_episode, new_episode=new_episode, date=datetime.utcnow())
 
@@ -76,33 +79,34 @@ def set_last_update(media, media_type, old_status=None, new_status=None, old_sea
 
 
 def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0, movie_status=None, movie_delete=False,
-                       movie_add=False, new_rewatch=0, old_rewatch=0, movie_runtime=0):
+                       movie_add=False, new_rewatch=0, old_rewatch=0, movie_runtime=0, user_id=None):
+
+    # Use for the list import function (redis and rq backgound process), can't import the current_user context
+    if current_user:
+        user = current_user
+    else:
+        user = User.query.filter(User.id == user_id).first()
 
     if list_type == ListType.SERIES:
-        old_time = current_user.time_spent_series
-        current_user.time_spent_series = old_time + ((new_watched-old_watched) * media.episode_duration) + (
+        old_time = user.time_spent_series
+        user.time_spent_series = old_time + ((new_watched-old_watched) * media.episode_duration) + (
                 media.total_episodes * media.episode_duration * (new_rewatch - old_rewatch))
     elif list_type == ListType.ANIME:
-        old_time = current_user.time_spent_anime
-        current_user.time_spent_anime = old_time + ((new_watched-old_watched)*media.episode_duration) + (
+        old_time = user.time_spent_anime
+        user.time_spent_anime = old_time + ((new_watched-old_watched)*media.episode_duration) + (
                 media.total_episodes*media.episode_duration*(new_rewatch-old_rewatch))
     elif list_type == ListType.MOVIES:
-        old_time = current_user.time_spent_movies
+        old_time = user.time_spent_movies
         if movie_delete:
             if movie_status == Status.COMPLETED:
-                current_user.time_spent_movies = old_time - media.runtime + media.runtime*(new_rewatch-old_rewatch)
+                user.time_spent_movies = old_time - media.runtime + media.runtime*(new_rewatch-old_rewatch)
         elif movie_add:
             if movie_status == Status.COMPLETED:
-                current_user.time_spent_movies = old_time + media.runtime
+                user.time_spent_movies = old_time + media.runtime
         else:
             if movie_status == Status.COMPLETED:
-                current_user.time_spent_movies = old_time + movie_runtime + media.runtime*(new_rewatch-old_rewatch)
+                user.time_spent_movies = old_time + movie_runtime + media.runtime*(new_rewatch-old_rewatch)
             else:
-                current_user.time_spent_movies = old_time - movie_runtime + media.runtime*(new_rewatch-old_rewatch)
+                user.time_spent_movies = old_time - movie_runtime + media.runtime*(new_rewatch-old_rewatch)
 
     db.session.commit()
-
-
-# --- Python Scheduler -----------------------------------------------------------------------------------------
-
-# app.apscheduler.add_job(func=scheduled_task, trigger='cron', id='refresh_all_data', hour=3, minute=00)

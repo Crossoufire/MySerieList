@@ -1,4 +1,13 @@
 flask
+flask_wtf
+flask_mail
+flask_admin
+flask_login
+flask_bcrypt
+flask_compress
+flask_sqlalchemy
+email_validator
+python-dotenv
 itsdangerous
 sqlalchemy
 ratelimit
@@ -7,8 +16,8 @@ requests
 wtforms
 pathlib
 Pillow
+pandas
 rauth
 redis
 pytz
 rq
-python-dotenv
