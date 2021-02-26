@@ -629,10 +629,9 @@
             <div class="col-xl-3 col-lg col-md">
                 <ul class="list-unstyled">
                     <li class="m-b-20">
-                        <h4>
-                            <i class="fas fa-user-check"></i>&nbsp;&nbsp; Follows
+                        <h4><i class="fas fa-user-check"></i>&nbsp;&nbsp; Follows
                             <form id='all_follows' style="display: inline;" method="POST"
-                            action="/account/{{ header_data['username'] }}">
+                                  action={{ url_for('users.account', user_name=header_data['username']) }}>
                                 <input class="d-none" name="all_follows" value="True">
                                 <a onclick="$('#all_follows').submit()" class="more-link">
                                     <u><i>All ({{ follows_list|length }})</i></u>

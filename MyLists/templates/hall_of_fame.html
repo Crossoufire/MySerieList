@@ -45,7 +45,9 @@
                         {% if user['isprivate'] and not user["isfollowing"] and current_user.id != 1 %}
                             <b><a class="disabled">Anonymous</a></b>
                         {% else %}
-                            <b><a href="/account/{{ user['username'] }}">{{ user['username'] }}</a></b>
+                            <b><a href="{{ url_for('users.account', user_name=user['username']) }}">
+                                {{ user['username'] }}
+                            </a></b>
                         {% endif %}
                     </td>
                     <td>

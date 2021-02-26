@@ -1,5 +1,5 @@
 
-// --- Autocomplete ----------------------------------------------------------------
+// --- Autocomplete -------------------------------------------------------------------------------------
 $(function() {
     $('#autocomplete').catcomplete({
         delay: 250,
@@ -91,7 +91,7 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
     });
 
 
-// --- Follow status --------------------------------------------------------------
+// --- Follow status -----------------------------------------------------------------------------------------
 function follow_status(button, follow_id) {
     let status;
     let $follow_button = $(button);

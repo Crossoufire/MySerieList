@@ -18,7 +18,7 @@ def home():
     register_form = RegistrationForm()
 
     if login_form.validate_on_submit():
-        user = User.query.filter_by(username=login_form.login_username.data).first()
+        user = User.query.filter_by(username=login_form.login_username.data.strip()).first()
         if user and not user.active:
             app.logger.info('[INFO] - [{}] Connexion attempt while account not activated'.format(user.id))
             flash('Your Account is not activated. Please check your email address to activate your account.', 'danger')
@@ -35,14 +35,15 @@ def home():
             flash('Login Failed. Please check username and password.', 'warning')
     elif register_form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(register_form.register_password.data).decode('utf-8')
-        user = User(username=register_form.register_username.data,
+        user = User(username=register_form.register_username.data.strip(),
                     email=register_form.register_email.data,
                     password=hashed_password,
                     registered_on=datetime.utcnow())
         db.session.add(user)
         db.session.commit()
         app.logger.info('[INFO] - [{}] New account registration: Username: {}, email: {}'
-                        .format(user.id, register_form.register_username.data, register_form.register_email.data))
+                        .format(user.id, register_form.register_username.data.strip(),
+                                register_form.register_email.data))
         try:
             send_register_email(user)
             flash('Your account has been created. Check your e-mail address to activate your account.', 'info')
