@@ -459,7 +459,7 @@ def search_media():
     if platform == "iphone" or platform == "android" or platform == 'None' or not platform:
         mobile = True
 
-    return render_template('media_search.html',
+    return render_template('media_search_new.html',
                            title="Search",
                            mobile=mobile,
                            all_results=media_results,

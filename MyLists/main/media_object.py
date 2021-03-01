@@ -93,40 +93,32 @@ class MediaDict:
             self.add_movies_dict()
 
     def add_tv_dict(self):
-        self.media_info["created_by"] = self.data.created_by
-        self.media_info["total_seasons"] = self.data.total_seasons
-        self.media_info["total_episodes"] = self.data.total_episodes
-        self.media_info["prod_status"] = self.data.status
-        self.media_info["episode_duration"] = self.data.episode_duration
-        self.media_info["in_production"] = self.data.in_production
-        self.media_info["origin_country"] = self.data.origin_country
-        self.media_info["eps_per_season"] = [r.episodes for r in self.data.eps_per_season]
-        self.media_info["networks"] = ', '.join([r.network for r in self.data.networks])
-        self.media_info["first_air_date"] = self.data.first_air_date
-        self.media_info["last_air_date"] = self.data.last_air_date
-        self.media_info["status"] = Status.WATCHING.value
-        self.media_info["last_episode_watched"] = 1
-        self.media_info["current_season"] = 1
-
-        # Change <first_air_time> format
-        self.media_info['first_air_date'] = change_air_format(self.data.first_air_date, media_sheet=True)
-
-        # Change <last_air_time> format
-        self.media_info['last_air_date'] = change_air_format(self.data.last_air_date, media_sheet=True)
-
-        # Time to complete
-        self.media_info['time_to_complete'] = (self.data.total_episodes * self.data.episode_duration)
+        self.media_info.update({"created_by": self.data.created_by,
+                                "total_seasons": self.data.total_seasons,
+                                "total_episodes": self.data.total_episodes,
+                                "prod_status": self.data.status,
+                                "episode_duration": self.data.episode_duration,
+                                "in_production": self.data.in_production,
+                                "origin_country": self.data.origin_country,
+                                "eps_per_season": [r.episodes for r in self.data.eps_per_season],
+                                "networks": ', '.join([r.network for r in self.data.networks]),
+                                "first_air_date": change_air_format(self.data.first_air_date, media_sheet=True),
+                                "last_air_date": change_air_format(self.data.last_air_date, media_sheet=True),
+                                "time_to_complete": self.data.total_episodes * self.data.episode_duration,
+                                "status": Status.WATCHING.value,
+                                "last_episode_watched": 1,
+                                "current_season": 1})
 
         if self.list_type == ListType.SERIES:
-            self.media_info["media_type"] = 'Series'
-            self.media_info["cover"] = 'series_covers/{}'.format(self.data.image_cover)
-            self.media_info["cover_path"] = 'series_covers'
+            self.media_info.update({"media_type": "Series",
+                                    "cover": f"series_covers/{self.data.image_cover}",
+                                    "cover_path": "series_covers"})
         elif self.list_type == ListType.ANIME:
-            self.media_info['name'] = self.data.original_name
-            self.media_info['original_name'] = self.data.name
-            self.media_info["media_type"] = 'Anime'
-            self.media_info["cover"] = 'anime_covers/{}'.format(self.data.image_cover)
-            self.media_info["cover_path"] = 'anime_covers'
+            self.media_info.update({"name": self.data.original_name,
+                                    "original_name": self.data.name,
+                                    "media_type": "Anime",
+                                    "cover": f"anime_covers/{self.data.image_cover}",
+                                    "cover_path": "anime_covers"})
 
         in_user_list = self.add_user_list()
         if in_user_list:

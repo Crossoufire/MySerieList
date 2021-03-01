@@ -21,26 +21,30 @@
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 4;   /* number of lines to show */
+   -webkit-line-clamp: 3;   /* number of lines to show */
 }
 
 .card {
-   width: 700px;
+   width: 850px;
    background: #151418;
    border-radius: 0;
 }
 
 .img-min-height {
-   min-height: 300px;
-   width: 200px;
-}
-
-.card-hashtag {
-   position: absolute;
-   bottom: -8px;
-   right: 16px;
+   min-height: 180px;
+   width: 120px;
 }
 
 .btn-small {
    padding: 8px 15px 8px 15px;
+}
+
+.search-active {
+   background: #2f4b67;
+   cursor: pointer;
+}
+
+.search-not-active {
+   background: #2c3946;
+   cursor: pointer;
 }

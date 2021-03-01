@@ -29,7 +29,7 @@ a {
 }
 
 
-/* --- Header ------------------------------------------- */
+/* --- Header ------------------------------------------------------------------------------- */
 .header-container {
     position: relative;
     height: 280px;
@@ -37,6 +37,18 @@ a {
     border-bottom: 2px solid #808080;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+.header-back-pen {
+    position: absolute;
+    opacity: 0.4;
+    right: 15px;
+    top: 10px;
+}
+
+.header-back-pen:hover {
+    opacity: 0.8;
+    color: white;
 }
 
 .header-profile-container {
@@ -57,6 +69,11 @@ a {
     border-radius: 50%;
     height: 100px;
     width: 100px;
+}
+
+.on-hover:hover {
+    color: white;
+    filter: brightness(25%);
 }
 
 .header-profile-frame {

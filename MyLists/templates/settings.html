@@ -65,14 +65,14 @@
                         <span style="color: red;">{{ error }}</span>
                     {% endfor %}
                 </div>
-                <div class="m-t-30">
+                <div id="profile-pic" class="m-t-30">
                     {{ settings_form.picture.label }}<br>
                     {{ settings_form.picture() }}<br>
                     {% for error in settings_form.picture.errors %}
                         <span style="color: red;">{{ error }}</span>
                     {% endfor %}
                 </div>
-                <div class="m-t-30">
+                <div id="back-pic" class="m-t-30">
                     {{ settings_form.back_picture.label }}<br>
                     {{ settings_form.back_picture() }}<br>
                     {% for error in settings_form.back_picture.errors %}
@@ -121,4 +121,16 @@
 
 
 {% block script %}
+    <script>
+        let back_pic = $("#back-pic");
+        let profile_pic = $("#profile-pic");
+        {% if back_pic %}
+            back_pic.css('border', '2px brown solid');
+            back_pic.css('padding', '15px');
+        {% endif %}
+        {% if pic %}
+            profile_pic.css('border', '2px brown solid');
+            profile_pic.css('padding', '15px');
+        {% endif %}
+    </script>
 {% endblock script %}

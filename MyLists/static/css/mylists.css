@@ -770,6 +770,13 @@ hr {
 .top-anime {border-top: solid 1px #945141;}
 .top-movies {border-top: solid 1px #8c7821;}
 .top-global {border-top: solid 1px lightgray;}
+.right-series {border-right: solid 3px #216e7d;}
+.right-anime {border-right: solid 3px #945141;}
+.right-movies {border-right: solid 3px #8c7821;}
+.left-series {border-left: solid 3px #216e7d;}
+.left-anime {border-left: solid 3px #945141;}
+.left-movies {border-left: solid 3px #8c7821;}
+
 
 /* --- Shape -------------------------------------------- */
 .dis-inline {display: inline;}

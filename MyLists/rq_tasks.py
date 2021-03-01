@@ -199,3 +199,4 @@ def import_list(user_id, csv_data):
         app.logger.error('[RQ ERROR]', exc_info=sys.exc_info())
     finally:
         _set_task_progress(100)
+

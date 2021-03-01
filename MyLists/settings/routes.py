@@ -40,9 +40,9 @@ def settings():
                                                                  old_background_picture, profile=False)
             app.logger.info('[{}] Settings updated: Old background picture = {}. New background picture = {}'
                             .format(current_user.id, old_background_picture, current_user.background_image))
-        if settings_form.username.data != current_user.username:
+        if settings_form.username.data.strip() != current_user.username:
             old_username = current_user.username
-            current_user.username = settings_form.username.data
+            current_user.username = settings_form.username.data.strip()
             app.logger.info('[{}] Settings updated: Old username = {}. New username = {}'
                             .format(current_user.id, old_username, current_user.username))
         if settings_form.isprivate.data != current_user.private:
@@ -84,8 +84,15 @@ def settings():
     settings_form.isprivate.data = current_user.private
     settings_form.homepage.data = current_user.homepage.value
 
+    back_pic = False
+    pic = False
+    if request.args.get('from') == 'back_pic':
+        back_pic = True
+    elif request.args.get('from') == 'profile_pic':
+        pic = True
+
     return render_template('settings.html', title='Your settings', settings_form=settings_form,
-                           password_form=password_form, import_form=import_form)
+                           password_form=password_form, import_form=import_form, back_pic=back_pic, pic=pic)
 
 
 @bp.route("/email_update/<token>", methods=['GET'])
