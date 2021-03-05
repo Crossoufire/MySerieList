@@ -524,6 +524,8 @@ class Frames(db.Model):
 
 class MyListsStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    nb_users = db.Column(db.Integer)
+    nb_media = db.Column(db.Text)
     total_time = db.Column(db.Text)
     top_media = db.Column(db.Text)
     top_genres = db.Column(db.Text)

@@ -453,19 +453,8 @@ def search_media():
                 media_data['name'] = result['title']
             media_results.append(media_data)
 
-    # Get the plateform to display the appropriate template
-    mobile = False
-    platform = str(request.user_agent.platform)
-    if platform == "iphone" or platform == "android" or platform == 'None' or not platform:
-        mobile = True
-
-    return render_template('media_search_new.html',
-                           title="Search",
-                           mobile=mobile,
-                           all_results=media_results,
-                           search=search,
-                           page=int(page),
-                           total_results=data_search['total_results'])
+    return render_template("media_search.html", title="Search", all_results=media_results, search=search,
+                           page=int(page), total_results=data_search['total_results'])
 
 
 # --- AJAX Methods -----------------------------------------------------------------------------------------------

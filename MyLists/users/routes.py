@@ -73,12 +73,8 @@ def more_stats(user_name):
 @bp.route("/hall_of_fame", methods=['GET', 'POST'])
 @login_required
 def hall_of_fame():
-    users = User.query.filter(User.role != RoleType.ADMIN, User.active == True).order_by(User.username.asc()).all()
-
-    # Get the follows of the current account
-    follows_list = []
-    for follows in current_user.followed.all():
-        follows_list.append(follows.id)
+    users = current_user.followed.all()
+    users.append(current_user)
 
     all_users_data = []
     for user in users:
@@ -93,19 +89,11 @@ def hall_of_fame():
                      "series_data": series_level,
                      "anime_data": anime_level,
                      "movies_data": movies_level,
-                     'knowledge_frame': knowledge_frame}
-
-        if user.id in follows_list:
-            user_data["isfollowing"] = True
-        else:
-            user_data["isfollowing"] = False
+                     'knowledge_frame': knowledge_frame,
+                     'current_user': False}
 
         if user.id == current_user.id:
-            user_data["isprivate"] = False
-            user_data["iscurrentuser"] = True
-        else:
-            user_data["isprivate"] = user.private
-            user_data["iscurrentuser"] = False
+            user_data["current_user"] = True
 
         all_users_data.append(user_data)
 

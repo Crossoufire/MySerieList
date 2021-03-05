@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <!--- Global site tag (gtag.js)/Google Analytics ------------------------>
+    <!--- Global site tag (gtag.js)/Google Analytics --------------------------------------------------->
     <script async type="text/javascript" src="https://www.googletagmanager.com/gtag/js?id=UA-146580264-1"></script>
     <script type="text/javascript">
         window.dataLayer = window.dataLayer || [];
@@ -11,30 +11,31 @@
         gtag('config', 'UA-146580264-1');
     </script>
 
-    <!--- <meta> tag to defines metadata about our HTML document ------------>
+    <!--- <meta> tag to defines metadata about our HTML document --------------------------------------->
     <meta charset="UTF-8">
-    <meta name="author" content="Crossoufire">
+    <meta name="author" content="Cross">
     <meta http-equiv="x-ua-compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="keywords" content="Mylists, lists, series, tv shows, anime, movies, levels, hall of fame">
     <meta name="description" content="Create your TV shows/anime/movies list, see how much time you spent and gain
     levels and badges."/>
 
-    <!--- CDN CSS ---------------------------------------------------------->
+    <!--- CDN CSS -------------------------------------------------------------------------------------->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/css/mdb.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
 
-    <!--- Website Icon ----------------------------------------------------->
+    <!--- Website Icon --------------------------------------------------------------------------------->
     <link rel='icon' type='image/gif' href="{{ url_for('static', filename='img/favicon.ico') }}">
 
-    <!--- Custom CSS ------------------------------------------------------->
+    <!--- Custom CSS ----------------------------------------------------------------------------------->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mylists.css') }}">
     {% block css %}
     {% endblock css %}
 
+    <!--- Page Title ----------------------------------------------------------------------------------->
     {% if title %}
         <title>MyLists - {{ title }}</title>
     {% else %}
@@ -92,21 +93,21 @@
                     </form>
                     <ul class="navbar-nav mr-auto nav-ul-1">
                         <li class="nav-item nav-li-1">
-                            <a class="nav-link" href="{{ url_for('users.hall_of_fame') }}">
-                                <i class="fas fa-lg fa-trophy" style="color: goldenrod;"></i>
-                                <div class="info-nav fs-14 nav-text">Hall of Fame</div>
-                            </a>
-                        </li>
-                        <li class="nav-item nav-li-1">
                             <a class="nav-link" href="{{ url_for('general.mylists_stats') }}">
                                 <i class="far fa-lg fa-chart-bar" style="color: darkorange;"></i>
-                                <div class="info-nav fs-14 nav-text">MyLists Stats</div>
+                                <div class="info-nav fs-14 nav-text">Stats</div>
                             </a>
                         </li>
                         <li class="nav-item nav-li-1">
                             <a class="nav-link" href="{{ url_for('general.current_trends') }}">
                                 <i class="fas fa-lg fa-fire-alt" style="color: orangered;"></i>
-                                <div class="info-nav fs-14 nav-text">TMDb Trends</div>
+                                <div class="info-nav fs-14 nav-text">Trends</div>
+                            </a>
+                        </li>
+                        <li class="nav-item nav-li-1">
+                            <a class="nav-link" href="{{ url_for('users.hall_of_fame') }}">
+                                <i class="fas fa-lg fa-trophy" style="color: goldenrod;"></i>
+                                <div class="info-nav fs-14 nav-text">Follow HoF</div>
                             </a>
                         </li>
                     </ul>

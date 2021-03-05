@@ -1,13 +1,9 @@
 
 
-// --- Datatable ---------------------------------------------------
+// --- Datatable -----------------------------------------------------------------
 $(document).ready(function () {
     $('#hall_of_fame').DataTable({
         "order": [[ 0, "desc" ]],
-        columnDefs: [
-            {orderable: true, targets: 0},
-            {orderable: false, targets: 5}
-        ],
         "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
     });
 

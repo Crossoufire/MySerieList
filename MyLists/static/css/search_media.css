@@ -48,3 +48,9 @@
    background: #2c3946;
    cursor: pointer;
 }
+
+@media (max-width: 500px) {
+   .mobile-img {
+      text-align: center;
+   }
+}

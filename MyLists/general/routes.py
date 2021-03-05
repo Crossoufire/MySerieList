@@ -65,8 +65,10 @@ def admin():
 @bp.route("/mylists_stats", methods=['GET'])
 @login_required
 def mylists_stats():
-    all_stats = MyListsStats.query.first()
+    all_stats = MyListsStats.query.order_by(MyListsStats.timestamp.desc()).first()
 
+    nb_users = all_stats.nb_users
+    nb_media = json.loads(all_stats.nb_media)
     total_time = json.loads(all_stats.total_time)
     top_media = json.loads(all_stats.top_media)
     top_genres = json.loads(all_stats.top_genres)
@@ -77,10 +79,10 @@ def mylists_stats():
     total_seasons = json.loads(all_stats.total_seasons)
     total_movies = json.loads(all_stats.total_movies)
 
-    return render_template("mylists_stats.html", title='MyLists stats', total_time=total_time, top_media=top_media,
-                           top_genres=top_genres, top_actors=top_actors, top_directors=top_directors,
-                           top_dropped=top_dropped, total_episodes=total_episodes, total_movies=total_movies,
-                           total_seasons=total_seasons)
+    return render_template("mylists_stats.html", title='MyLists stats', nb_users=nb_users, total_time=total_time,
+                           nb_media=nb_media, top_media=top_media, top_genres=top_genres, top_actors=top_actors,
+                           top_directors=top_directors, top_dropped=top_dropped, total_episodes=total_episodes,
+                           total_movies=total_movies, total_seasons=total_seasons)
 
 
 @bp.route("/current_trends", methods=['GET'])

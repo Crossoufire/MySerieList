@@ -9,7 +9,7 @@ from MyLists.main.media_object import MediaDetails
 from MyLists.general.functions import compute_media_time_spent
 from MyLists.models import Series, SeriesList, SeriesActors, SeriesGenre, SeriesNetwork, SeriesEpisodesPerSeason, \
     UserLastUpdate, Notifications, ListType, Anime, AnimeList, AnimeActors, AnimeGenre, AnimeNetwork, Status, Movies, \
-    AnimeEpisodesPerSeason, MoviesList, MoviesActors, MoviesGenre, GlobalStats, MyListsStats
+    AnimeEpisodesPerSeason, MoviesList, MoviesActors, MoviesGenre, GlobalStats, MyListsStats, User, RoleType
 
 
 def remove_non_list_media():
@@ -537,7 +537,14 @@ def update_Mylists_stats():
     total_movies = stats.get_total_movies()
     total_movies_dict = {"movies": total_movies}
 
+    nb_users = User.query.filter(User.role != RoleType.ADMIN, User.active == True).all()
+    nb_series = Series.query.all()
+    nb_anime = Anime.query.all()
+    nb_movies = Movies.query.all()
+    nb_media = {"series": len(nb_series), "anime": len(nb_anime), "movies": len(nb_movies)}
+
     stats_to_add = MyListsStats(
+        nb_users=len(nb_users), nb_media=json.dumps(nb_media),
         total_time=json.dumps(total_time), top_media=json.dumps(most_present_media),
         top_genres=json.dumps(most_genres_media), top_actors=json.dumps(most_actors_media),
         top_directors=json.dumps(most_directors_media), top_dropped=json.dumps(top_dropped_media),
