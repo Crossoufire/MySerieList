@@ -130,7 +130,7 @@ a {
     .header-profile-container {
         position: absolute;
         left: 50% !important;
-        top: 80px;
+        top: 95px;
         transform: translate(-50%, -50%);
         -ms-transform: translate(-50%, -50%);
         height: 210px;

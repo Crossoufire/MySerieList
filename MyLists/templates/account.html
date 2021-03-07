@@ -163,14 +163,6 @@
                                     </a>
                                 </li>
                             {% endif %}
-                            {% if header_data['id'] == current_user.get_id() and current_user.role.value != 'user' %}
-                                <li class="m-b-10">
-                                    Refresh APScheduler
-                                    <a class="btn btn-sm btn-primary" href="{{ url_for('users.apscheduler_info') }}">
-                                        Refresh
-                                    </a>
-                                </li>
-                            {% endif %}
                         </ul>
                     </li>
                 </ul>

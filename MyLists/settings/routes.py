@@ -16,19 +16,19 @@ def settings():
     settings_form = UpdateAccountForm()
     password_form = ChangePasswordForm()
 
-    if import_form.submit.data and import_form.validate():
-        if import_form.csv_list.data:
-            if current_user.get_task_in_progress('import_list'):
-                flash('An import task is already in progress', 'warning')
-            else:
-                try:
-                    csv_data = pd.read_csv(import_form.csv_list.data, index_col='Type')
-                    current_user.launch_task('import_list', 'Importing List...', csv_data)
-                    db.session.commit()
-                except:
-                    flash("Your file couldn't be processed. Please check your file or contact an admin.", 'warning')
-            return redirect(url_for('users.account', user_name=current_user.username))
-    elif settings_form.submit_account.data and settings_form.validate():
+    # if import_form.submit.data and import_form.validate():
+    #     if import_form.csv_list.data:
+    #         if current_user.get_task_in_progress('import_list'):
+    #             flash('An import task is already in progress', 'warning')
+    #         else:
+    #             try:
+    #                 csv_data = pd.read_csv(import_form.csv_list.data, index_col='Type')
+    #                 current_user.launch_task('import_list', 'Importing List...', csv_data)
+    #                 db.session.commit()
+    #             except:
+    #                 flash("Your file couldn't be processed. Please check your file or contact an admin.", 'warning')
+    #         return redirect(url_for('users.account', user_name=current_user.username))
+    if settings_form.submit_account.data and settings_form.validate():
         if settings_form.picture.data:
             old_picture_file = current_user.image_file
             current_user.image_file = save_account_picture(settings_form.picture.data, old_picture_file)

@@ -123,18 +123,6 @@ def knowledge_frame_data():
     return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
 
 
-@bp.route("/apscheduler_info", methods=['GET', 'POST'])
-@login_required
-def apscheduler_info():
-    if current_user.role != RoleType.USER:
-        refresh = app.apscheduler.get_job('refresh_all_data')
-        refresh.modify(next_run_time=datetime.now())
-        flash('All the data have been refreshed!', 'success')
-
-        return redirect(request.referrer)
-    abort(403)
-
-
 # --- AJAX Methods ---------------------------------------------------------------------------------------------
 
 

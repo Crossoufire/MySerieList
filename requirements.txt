@@ -1,4 +1,5 @@
 flask
+flask_cli
 flask_wtf
 flask_mail
 flask_admin

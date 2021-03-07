@@ -17,22 +17,22 @@
 
 
 {% block content %}
-    {% if not current_user.get_task_in_progress('import_list') %}
-        <div class="text-left m-t-30 m-b-60">
-            <h4>&nbsp;&nbsp;<i class="fas fa-file-import"></i>&nbsp;&nbsp; List import</h4>
-            <hr>
-            <form method="POST" action="" enctype="multipart/form-data">
-                {{ import_form.hidden_tag() }}
-                <div class="m-l-20">
-                    Import your list as csv from TMDb:&nbsp;&nbsp; {{ import_form.csv_list() }}
-                    {{ import_form.submit(class="btn btn-outline-info p-2") }}
-                    {% for error in import_form.csv_list.errors %}
-                        <div style="color: red;">{{ error }}</div>
-                    {% endfor %}
-                </div>
-            </form>
-        </div>
-    {% endif %}
+{#    {% if not current_user.get_task_in_progress('import_list') %}#}
+{#        <div class="text-left m-t-30 m-b-60">#}
+{#            <h4>&nbsp;&nbsp;<i class="fas fa-file-import"></i>&nbsp;&nbsp; List import</h4>#}
+{#            <hr>#}
+{#            <form method="POST" action="" enctype="multipart/form-data">#}
+{#                {{ import_form.hidden_tag() }}#}
+{#                <div class="m-l-20">#}
+{#                    Import your list as csv from TMDb:&nbsp;&nbsp; {{ import_form.csv_list() }}#}
+{#                    {{ import_form.submit(class="btn btn-outline-info p-2") }}#}
+{#                    {% for error in import_form.csv_list.errors %}#}
+{#                        <div style="color: red;">{{ error }}</div>#}
+{#                    {% endfor %}#}
+{#                </div>#}
+{#            </form>#}
+{#        </div>#}
+{#    {% endif %}#}
     <div class="row text-center m-t-60 m-b-60">
         <div class="col">
             <h4><i class="fas fa-sliders-h"></i>&nbsp;&nbsp; General settings</h4>
