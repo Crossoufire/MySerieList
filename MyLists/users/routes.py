@@ -57,21 +57,24 @@ def more_stats(user_name):
     # Check if the user can see the <media_list>
     user = current_user.check_autorization(user_name)
 
+    # Recover the stats data
     stats = get_more_stats(user)
+
+    # Recover the account header data
+    header_data = get_header_data(user)
+
+    # Recover the user data
     user_data = get_user_data(user)
 
-    return render_template('more_stats.html', title='More stats', stats=stats, user_data=user_data)
+    return render_template('more_stats.html', title='More stats', stats=stats, user_data=user_data,
+                           header_data=header_data)
 
 
 @bp.route("/hall_of_fame", methods=['GET', 'POST'])
 @login_required
 def hall_of_fame():
-    users = User.query.filter(User.role != RoleType.ADMIN, User.active == True).order_by(User.username.asc()).all()
-
-    # Get the follows of the current account
-    follows_list = []
-    for follows in current_user.followed.all():
-        follows_list.append(follows.id)
+    users = current_user.followed.all()
+    users.append(current_user)
 
     all_users_data = []
     for user in users:
@@ -86,19 +89,11 @@ def hall_of_fame():
                      "series_data": series_level,
                      "anime_data": anime_level,
                      "movies_data": movies_level,
-                     'knowledge_frame': knowledge_frame}
-
-        if user.id in follows_list:
-            user_data["isfollowing"] = True
-        else:
-            user_data["isfollowing"] = False
+                     'knowledge_frame': knowledge_frame,
+                     'current_user': False}
 
         if user.id == current_user.id:
-            user_data["isprivate"] = False
-            user_data["iscurrentuser"] = True
-        else:
-            user_data["isprivate"] = user.private
-            user_data["iscurrentuser"] = False
+            user_data["current_user"] = True
 
         all_users_data.append(user_data)
 
@@ -126,18 +121,6 @@ def level_grade_data():
 def knowledge_frame_data():
     ranks = Frames.query.all()
     return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
-
-
-@bp.route("/apscheduler_info", methods=['GET', 'POST'])
-@login_required
-def apscheduler_info():
-    if current_user.role != RoleType.USER:
-        refresh = app.apscheduler.get_job('refresh_all_data')
-        refresh.modify(next_run_time=datetime.now())
-        flash('All the data have been refreshed!', 'success')
-
-        return redirect(request.referrer)
-    abort(403)
 
 
 # --- AJAX Methods ---------------------------------------------------------------------------------------------

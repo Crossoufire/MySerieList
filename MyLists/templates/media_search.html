@@ -8,96 +8,63 @@
 
 {% block content %}
     <h2 class="font-weight-light m-l-8 mt-1 mb-0 p-t-50">
-        Search <b>></b> Results for <i>"{{ search }}"</i>
+        <b>Search > Results for <i>"{{ search }}"</i></b>
         <div class="float-r fs-18 m-t-15 m-r-8"><b>Total:</b> {{ total_results }} results</div>
     </h2>
     <hr style="margin-top: 3px;">
-    <div class="text-center m-t-25 m-b-30">
-        {% if page > 1 %}
-            <a class="btn btn-small btn-primary" href="/search_media?search={{ search }}&page={{ page - 1 }}">
-                Previous page
-            </a>
-        {% endif %}
-        {% if total_results/20 > page %}
-            <a class="btn btn-small btn-danger" href="/search_media?search={{ search }}&page={{ page + 1 }}">
-                Next page
-            </a>
-        {% endif %}
-    </div>
-    {% if mobile %}
-        <div class="d-flex flex-wrap justify-content-center m-t-30">
-            {% for media in all_results %}
-                <a class="card mb-4 {% if media['media_type'] == 'serieslist' %}card-series
-                {% elif media['media_type'] == 'animelist' %}card-anime{% else %}card-movies{% endif %}"
-                href="/media_sheet/{{ media['media'] }}/{{ media['api_id'] }}?search=True">
-                    <div class="row no-gutters">
-                        <div class="col-3 p-2">
-                            <img width="70" src="{{ media['poster_path'] }}" alt="">
-                        </div>
-                        <div class="col-9">
-                            <div class="card-body p-2">
-                                <h5 class="card-title">
-                                    <div class="text-light fs-15 giveMeEllipsis2">{{ media['name'] }}</div>
-                                    <div class="fs-12 text-grey"><i>{{ media['first_air_date'] }}</i></div>
-                                </h5>
-                                {% if media['overview'] %}
-                                    <p class="fs-12 text-light giveMeEllipsis m-b-0">{{ media['overview'] }}</p>
-                                {% else %}
-                                    <p class="fs-12 text-light m-b-0"><i>No overview avalaible for this content.</i>
+
+    <div class="row">
+        <div class="col-lg-3 col-sm-12">
+            <div class="p-3 m-t-27">
+                <div class="fs-20 p-3" style="background: #0a262d;"><b>Search results</b></div>
+                <div id="all" class="fs-16 p-2 search-active" onclick="show_results('all')">All</div>
+                <div id="series" class="fs-16 p-2 search-not-active" onclick="show_results('series')">Series</div>
+                <div id="anime" class="fs-16 p-2 search-not-active" onclick="show_results('anime')">Anime</div>
+                <div id="movies" class="fs-16 p-2 search-not-active" onclick="show_results('movies')">Movies</div>
+            </div>
+        </div>
+        <div class="col-lg-9 col-sm-12">
+            <div class="d-flex flex-wrap justify-content-center m-t-40 m-b-40 add-text">
+                {% for media in all_results %}
+                    <a class="card mb-4 {% if media['media'] == 'Series' %}right-series
+                    {% elif media['media'] == 'Anime' %}right-anime{% else %}right-movies{% endif %}"
+                    href="/media_sheet/{{ media['media'] }}/{{ media['api_id'] }}?search=True" style="background: #2a2b2d;">
+                        <div class="row no-gutters">
+                            <div class="col-lg-2 col-sm-12 mobile-img">
+                                <img class="img-min-height" src="{{ media['poster_path'] }}" alt=""/>
+                            </div>
+                            <div class="col-lg-10 col-sm-12" style="margin-left: -20px;">
+                                <div class="card-body p-3">
+                                    <h5 class="card-title m-l-15">
+                                        <div class="text-light fs-23 giveMeEllipsis2">{{ media['name'] }}</div>
+                                        <div class="fs-16 m-t-5 text-grey"><i>{{ media['first_air_date'] }}</i></div>
+                                    </h5>
+                                    <p class="fs-15 text-light giveMeEllipsis-3 m-b-0 text-justify m-l-15">
+                                        {% if media['overview'] %}
+                                            {{ media['overview'] }}
+                                        {% else %}
+                                            <i>No overview accessible for this media.</i>
+                                        {% endif %}
                                     </p>
-                                {% endif %}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </a>
-            {% endfor %}
+                    </a>
+                {% endfor %}
+            </div>
+            <div class="text-center m-b-40">
+                {% if page > 1 %}
+                    <a class="btn btn-small btn-primary" href="/search_media?search={{ search }}&page={{ page - 1 }}">
+                        Previous page
+                    </a>
+                {% endif %}
+                {% if total_results/20 > page %}
+                    <a class="btn btn-small btn-danger" href="/search_media?search={{ search }}&page={{ page + 1 }}">
+                        Next page
+                    </a>
+                {% endif %}
+            </div>
         </div>
-    {% else %}
-        <div class="d-flex flex-wrap justify-content-center m-t-30">
-        {% for media in all_results %}
-            <a class="card mb-4 {% if media['media_type'] == 'serieslist' %}card-series
-            {% elif media['media_type'] == 'animelist' %}card-anime{% else %}card-movies{% endif %}"
-            href="/media_sheet/{{ media['media'] }}/{{ media['api_id'] }}?search=True">
-                <div class="row no-gutters">
-                    <div class="col-3 p-3">
-                        <img class="img-min-height" src="{{ media['poster_path'] }}" alt=""/>
-                    </div>
-                    <div class="col-9">
-                        <div class="card-body p-3">
-                            <h5 class="card-title">
-                                <div class="text-light fs-20 giveMeEllipsis2">
-                                    {{ media['name'] }}
-                                </div>
-                                <div class="fs-15 text-grey">
-                                    <i>{{ media['first_air_date'] }}</i>
-                                </div>
-                            </h5>
-                            <p class="fs-15 text-light giveMeEllipsis-3 m-b-0">
-                                {% if media['overview'] %}
-                                    {{ media['overview'] }}
-                                {% else %}
-                                    <i>No overview accessible for this content.</i>
-                                {% endif %}
-                            </p>
-                            <p class="card-hashtag text-light fs-20">#{{ media['media']|replace('s', '') }}</p>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        {% endfor %}
-    </div>
-    {% endif %}
-    <div class="text-center m-b-30">
-        {% if page > 1 %}
-            <a class="btn btn-small btn-primary" href="/search_media?search={{ search }}&page={{ page - 1 }}">
-                Previous page
-            </a>
-        {% endif %}
-        {% if total_results/20 > page %}
-            <a class="btn btn-small btn-danger" href="/search_media?search={{ search }}&page={{ page + 1 }}">
-                Next page
-            </a>
-        {% endif %}
     </div>
 {% endblock content %}
 

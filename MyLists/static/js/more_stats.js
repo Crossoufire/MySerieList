@@ -1,22 +1,17 @@
 
 
-// --- Series Canvas Data ----------------------------------
-let series_episodes_labels = $('#episodes-series-bar').attr('values-y').split(', ');
-let series_episodes_data = $('#episodes-series-bar').attr('values-x').split(', ');
-series_episodes_labels.pop();
-series_episodes_data.pop();
+// --- Series Canvas Data ----------------------------------------------------------------------------------------
+let series_eps_labels = $('#eps-series-bar').attr('values-y').split(', ');
+let series_eps_data = $('#eps-series-bar').attr('values-x').split(', ');
+series_eps_labels.pop();
+series_eps_data.pop();
 
-let series_episodes_rgb = [];
-for(let j = 0; j < (series_episodes_data.length); j++) {
-    series_episodes_rgb.push('#'+Math.floor(Math.random()*16777215).toString(16));
-}
-
-let series_episodes_config = {
-    type: 'horizontalBar',
+let series_eps_config = {
+    type: 'bar',
     data: {
-        labels: series_episodes_labels,
+        labels: series_eps_labels,
         datasets: [{
-            data: series_episodes_data,
+            data: series_eps_data,
             backgroundColor: '#216e7d',
         }],
     },
@@ -36,14 +31,14 @@ let series_episodes_config = {
             onComplete: function () {
                 let chartInstance = this.chart,
                 ctx = chartInstance.ctx;
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'top';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
 
                 this.data.datasets.forEach(function (dataset, i) {
                     let meta = chartInstance.controller.getDatasetMeta(i);
                     meta.data.forEach(function (bar, index) {
                         let data = dataset.data[index];
-                        ctx.fillText(data, bar._model.x + 10, bar._model.y - 7);
+                        ctx.fillText(data, bar._model.x, bar._model.y);
                     });
                 });
             }
@@ -64,7 +59,7 @@ let series_episodes_config = {
             }],
             xAxes: [{
                 display: true,
-                position: 'top',
+                position: 'bottom',
                 ticks: {
                     fontColor: '#e2e2e2',
                     fontSize: 18,
@@ -82,21 +77,15 @@ let series_episodes_config = {
         },
     }
 };
-let series_episodes_ctx = document.getElementById('episodes-series').getContext('2d');
-new Chart(series_episodes_ctx, series_episodes_config);
+new Chart(document.getElementById('eps-series').getContext('2d'), series_eps_config);
 
 let series_periods_labels = $('#periods-series-bar').attr('values-y').split(', ');
 let series_periods_data = $('#periods-series-bar').attr('values-x').split(', ');
 series_periods_labels.pop();
 series_periods_data.pop();
 
-let series_periods_rgb = [];
-for(let j = 0; j < (series_periods_data.length); j++) {
-    series_periods_rgb.push('#'+Math.floor(Math.random()*16777215).toString(16));
-}
-
 let series_periods_config = {
-    type: 'horizontalBar',
+    type: 'bar',
     data: {
         labels: series_periods_labels,
         datasets: [{
@@ -120,14 +109,14 @@ let series_periods_config = {
             onComplete: function () {
                 let chartInstance = this.chart,
                 ctx = chartInstance.ctx;
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'top';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
 
                 this.data.datasets.forEach(function (dataset, i) {
                     let meta = chartInstance.controller.getDatasetMeta(i);
                     meta.data.forEach(function (bar, index) {
                         let data = dataset.data[index];
-                        ctx.fillText(data, bar._model.x + 10, bar._model.y - 7);
+                        ctx.fillText(data, bar._model.x, bar._model.y);
                     });
                 });
             }
@@ -148,10 +137,10 @@ let series_periods_config = {
             }],
             xAxes: [{
                 display: true,
-                position: 'top',
+                position: 'bottom',
                 ticks: {
                     fontColor: '#e2e2e2',
-                    fontSize: 18,
+                    fontSize: 12,
                 },
                 gridLines: {
                     display: false,
@@ -166,21 +155,15 @@ let series_periods_config = {
         },
     }
 };
-let series_periods_ctx = document.getElementById('periods-series').getContext('2d');
-new Chart(series_periods_ctx, series_periods_config);
+new Chart(document.getElementById('periods-series').getContext('2d'), series_periods_config);
 
 let series_genres_labels = $('#genres-series-bar').attr('values-y').split(', ');
 let series_genres_data = $('#genres-series-bar').attr('values-x').split(', ');
 series_genres_labels.pop();
 series_genres_data.pop();
 
-let series_genres_rgb = [];
-for(let j = 0; j < (series_genres_data.length); j++) {
-    series_genres_rgb.push('#'+Math.floor(Math.random()*16777215).toString(16));
-}
-
 let series_genres_config = {
-    type: 'horizontalBar',
+    type: 'bar',
     data: {
         labels: series_genres_labels,
         datasets: [{
@@ -204,14 +187,14 @@ let series_genres_config = {
             onComplete: function () {
                 let chartInstance = this.chart,
                 ctx = chartInstance.ctx;
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'top';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
 
                 this.data.datasets.forEach(function (dataset, i) {
                     let meta = chartInstance.controller.getDatasetMeta(i);
                     meta.data.forEach(function (bar, index) {
                         let data = dataset.data[index];
-                        ctx.fillText(data + ' h', bar._model.x + 10, bar._model.y - 7);
+                        ctx.fillText(data + ' h', bar._model.x, bar._model.y);
                     });
                 });
             }
@@ -232,15 +215,11 @@ let series_genres_config = {
             }],
             xAxes: [{
                 display: true,
-                position: 'top',
+                position: 'bottom',
                 ticks: {
                     fontColor: '#e2e2e2',
-                    fontSize: 18,
-                },
-                gridLines: {
-                    display: false,
-                    color: 'rgba(127, 127, 127, 0.4)',
-                },
+                    fontSize: 16,
+                }
             }]
         },
         title: {
@@ -250,27 +229,21 @@ let series_genres_config = {
         },
     }
 };
-let series_genres_ctx = document.getElementById('genres-series').getContext('2d');
-new Chart(series_genres_ctx, series_genres_config);
+new Chart(document.getElementById('genres-series').getContext('2d'), series_genres_config);
 
 
-// --- Anime Canvas Data -----------------------------------
-let anime_episodes_labels = $('#episodes-anime-bar').attr('values-y').split(', ');
-let anime_episodes_data = $('#episodes-anime-bar').attr('values-x').split(', ');
-anime_episodes_labels.pop();
-anime_episodes_data.pop();
-
-let anime_episodes_rgb = [];
-for(let j = 0; j < (anime_episodes_data.length); j++) {
-    anime_episodes_rgb.push('#'+Math.floor(Math.random()*16777215).toString(16));
-}
+// --- Anime Canvas Data -----------------------------------------------------------------------------------------
+let anime_eps_labels = $('#eps-anime-bar').attr('values-y').split(', ');
+let anime_eps_data = $('#eps-anime-bar').attr('values-x').split(', ');
+anime_eps_labels.pop();
+anime_eps_data.pop();
 
 let anime_episodes_config = {
     type: 'horizontalBar',
     data: {
-        labels: anime_episodes_labels,
+        labels: anime_eps_labels,
         datasets: [{
-            data: anime_episodes_data,
+            data: anime_eps_data,
             backgroundColor: '#945141',
         }],
     },
@@ -336,18 +309,12 @@ let anime_episodes_config = {
         },
     }
 };
-let anime_episodes_ctx = document.getElementById('episodes-anime').getContext('2d');
-new Chart(anime_episodes_ctx, anime_episodes_config);
+new Chart(document.getElementById('eps-anime').getContext('2d'), anime_episodes_config);
 
 let anime_periods_labels = $('#periods-anime-bar').attr('values-y').split(', ');
 let anime_periods_data = $('#periods-anime-bar').attr('values-x').split(', ');
 anime_periods_labels.pop();
 anime_periods_data.pop();
-
-let anime_periods_rgb = [];
-for(let j = 0; j < (anime_periods_data.length); j++) {
-    anime_periods_rgb.push('#'+Math.floor(Math.random()*16777215).toString(16));
-}
 
 let anime_periods_config = {
     type: 'horizontalBar',
@@ -420,18 +387,12 @@ let anime_periods_config = {
         },
     }
 };
-let anime_periods_ctx = document.getElementById('periods-anime').getContext('2d');
-new Chart(anime_periods_ctx, anime_periods_config);
+new Chart(document.getElementById('periods-anime').getContext('2d'), anime_periods_config);
 
 let anime_genres_labels = $('#genres-anime-bar').attr('values-y').split(', ');
 let anime_genres_data = $('#genres-anime-bar').attr('values-x').split(', ');
 anime_genres_labels.pop();
 anime_genres_data.pop();
-
-let anime_genres_rgb = [];
-for(let j = 0; j < (anime_genres_data.length); j++) {
-    anime_genres_rgb.push('#'+Math.floor(Math.random()*16777215).toString(16));
-}
 
 let anime_genres_config = {
     type: 'horizontalBar',
@@ -504,20 +465,14 @@ let anime_genres_config = {
         },
     }
 };
-let anime_genres_ctx = document.getElementById('genres-anime').getContext('2d');
-new Chart(anime_genres_ctx, anime_genres_config);
+new Chart(document.getElementById('genres-anime').getContext('2d'), anime_genres_config);
 
 
-// --- Movies Canvas Data ----------------------------------
+// --- Movies Canvas Data ---------------------------------------------------------------------------------------
 let movies_lengths_labels = $('#lengths-movies-bar').attr('values-y').split(', ');
 let movies_lengths_data = $('#lengths-movies-bar').attr('values-x').split(', ');
 movies_lengths_labels.pop();
 movies_lengths_data.pop();
-
-let movies_lengths_rgb = [];
-for(let j = 0; j < (movies_lengths_data.length); j++) {
-    movies_lengths_rgb.push('#'+Math.floor(Math.random()*16777215).toString(16));
-}
 
 let movies_lengths_config = {
     type: 'horizontalBar',
@@ -590,18 +545,12 @@ let movies_lengths_config = {
         },
     }
 };
-let movies_lengths_ctx = document.getElementById('lengths-movies').getContext('2d');
-new Chart(movies_lengths_ctx, movies_lengths_config);
+new Chart(document.getElementById('lengths-movies').getContext('2d'), movies_lengths_config);
 
 let movies_periods_labels = $('#periods-movies-bar').attr('values-y').split(', ');
 let movies_periods_data = $('#periods-movies-bar').attr('values-x').split(', ');
 movies_periods_labels.pop();
 movies_periods_data.pop();
-
-let movies_periods_rgb = [];
-for(let j = 0; j < (movies_periods_data.length); j++) {
-    movies_periods_rgb.push('#'+Math.floor(Math.random()*16777215).toString(16));
-}
 
 let movies_periods_config = {
     type: 'horizontalBar',
@@ -674,18 +623,12 @@ let movies_periods_config = {
         },
     }
 };
-let movies_periods_ctx = document.getElementById('periods-movies').getContext('2d');
-new Chart(movies_periods_ctx, movies_periods_config);
+new Chart(document.getElementById('periods-movies').getContext('2d'), movies_periods_config);
 
 let movies_genres_labels = $('#genres-movies-bar').attr('values-y').split(', ');
 let movies_genres_data = $('#genres-movies-bar').attr('values-x').split(', ');
 movies_genres_labels.pop();
 movies_genres_data.pop();
-
-let movies_genres_rgb = [];
-for(let j = 0; j < (movies_genres_data.length); j++) {
-    movies_genres_rgb.push('#'+Math.floor(Math.random()*16777215).toString(16));
-}
 
 let movies_genres_config = {
     type: 'horizontalBar',
@@ -758,11 +701,10 @@ let movies_genres_config = {
         },
     }
 };
-let movies_genres_ctx = document.getElementById('genres-movies').getContext('2d');
-new Chart(movies_genres_ctx, movies_genres_config);
+new Chart(document.getElementById('genres-movies').getContext('2d'), movies_genres_config);
 
 
-// --- Media genres container size -------------------------
+// --- Media genres container size -------------------------------------------------------------------------------
 let series_height = 40*series_genres_data.length + 'px';
 let anime_height = 40*anime_genres_data.length + 'px';
 let movies_height = 40*movies_genres_data.length + 'px';

@@ -1,7 +1,7 @@
 from pathlib import Path
 from MyLists import db, app
-from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, get_total_time, SeriesList, \
-    AnimeList, Series, Anime, MoviesList
+from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, get_total_time, SeriesList, Anime, \
+    AnimeList, Series, MoviesList
 
 
 def compute_media_time_spent():
@@ -9,8 +9,8 @@ def compute_media_time_spent():
 
     for user in users:
         for list_type in ListType:
-            media_list = get_total_time(user.id, list_type)
             total_time = 0
+            media_list = get_total_time(user.id, list_type)
             if list_type == ListType.SERIES or list_type == ListType.ANIME:
                 for media in media_list:
                     try:
@@ -32,7 +32,7 @@ def compute_media_time_spent():
                 user.time_spent_movies = total_time
 
 
-# ---------------------------------------- DB add/refresh from CSV data ------------------------------------------- #
+# --- DB add/refresh from CSV data -----------------------------------------------------------------------------
 
 
 def add_ranks_to_db():

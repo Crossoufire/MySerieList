@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <!--- Global site tag (gtag.js)/Google Analytics ------------------------>
+    <!--- Global site tag (gtag.js)/Google Analytics --------------------------------------------------->
     <script async type="text/javascript" src="https://www.googletagmanager.com/gtag/js?id=UA-146580264-1"></script>
     <script type="text/javascript">
         window.dataLayer = window.dataLayer || [];
@@ -11,30 +11,31 @@
         gtag('config', 'UA-146580264-1');
     </script>
 
-    <!--- <meta> tag to defines metadata about our HTML document ------------>
+    <!--- <meta> tag to defines metadata about our HTML document --------------------------------------->
     <meta charset="UTF-8">
-    <meta name="author" content="Crossoufire">
+    <meta name="author" content="Cross">
     <meta http-equiv="x-ua-compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="keywords" content="Mylists, lists, series, tv shows, anime, movies, levels, hall of fame">
     <meta name="description" content="Create your TV shows/anime/movies list, see how much time you spent and gain
     levels and badges."/>
 
-    <!--- CDN CSS ---------------------------------------------------------->
+    <!--- CDN CSS -------------------------------------------------------------------------------------->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/css/mdb.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
 
-    <!--- Website Icon ----------------------------------------------------->
+    <!--- Website Icon --------------------------------------------------------------------------------->
     <link rel='icon' type='image/gif' href="{{ url_for('static', filename='img/favicon.ico') }}">
 
-    <!--- Custom CSS ------------------------------------------------------->
+    <!--- Custom CSS ----------------------------------------------------------------------------------->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mylists.css') }}">
     {% block css %}
     {% endblock css %}
 
+    <!--- Page Title ----------------------------------------------------------------------------------->
     {% if title %}
         <title>MyLists - {{ title }}</title>
     {% else %}
@@ -92,21 +93,21 @@
                     </form>
                     <ul class="navbar-nav mr-auto nav-ul-1">
                         <li class="nav-item nav-li-1">
-                            <a class="nav-link" href="{{ url_for('users.hall_of_fame') }}">
-                                <i class="fas fa-lg fa-trophy" style="color: goldenrod;"></i>
-                                <div class="info-nav fs-14 nav-text">Hall of Fame</div>
-                            </a>
-                        </li>
-                        <li class="nav-item nav-li-1">
                             <a class="nav-link" href="{{ url_for('general.mylists_stats') }}">
                                 <i class="far fa-lg fa-chart-bar" style="color: darkorange;"></i>
-                                <div class="info-nav fs-14 nav-text">MyLists Stats</div>
+                                <div class="info-nav fs-14 nav-text">Stats</div>
                             </a>
                         </li>
                         <li class="nav-item nav-li-1">
                             <a class="nav-link" href="{{ url_for('general.current_trends') }}">
                                 <i class="fas fa-lg fa-fire-alt" style="color: orangered;"></i>
                                 <div class="info-nav fs-14 nav-text">Trends</div>
+                            </a>
+                        </li>
+                        <li class="nav-item nav-li-1">
+                            <a class="nav-link" href="{{ url_for('users.hall_of_fame') }}">
+                                <i class="fas fa-lg fa-trophy" style="color: goldenrod;"></i>
+                                <div class="info-nav fs-14 nav-text">Follows HoF</div>
                             </a>
                         </li>
                     </ul>
@@ -143,13 +144,6 @@
                                 user_name=current_user.username) }}">
                                     <i class="fas fa-user"></i>&nbsp;&nbsp;&nbsp;&nbsp;Profile
                                 </a>
-{#                                <a class="dropdown-item text-light" href="{{ url_for('users.achievements',#}
-{#                                user_name=current_user.username) }}">#}
-{#                                    <i class="fas fa-trophy"></i>&nbsp;&nbsp;&nbsp;&nbsp;Achievements#}
-{#                                </a>#}
-{#                                <a class="dropdown-item text-light" href="{{ url_for('users.media_stats') }}">#}
-{#                                    <i class="fas fa-chart-pie"></i>&nbsp;&nbsp;&nbsp;&nbsp;Media Stats#}
-{#                                </a>#}
                                 {% if current_user.role.value == 'admin' %}
                                     <a class="dropdown-item text-light" href="{{ url_for('admin.index') }}">
                                         <i class="fas fa-database"></i>&nbsp;&nbsp;&nbsp;&nbsp;Dashboard
@@ -206,6 +200,17 @@
 
 <main role="main" class="container">
     <div class="content">
+
+        {% if current_user.is_authenticated %}
+            {% with task = current_user.get_task_in_progress('import_list') %}
+                {% if task %}
+                    <div class="m-t-16 alert alert-success" role="alert">
+                        <span id="{{ task.id }}-progress"></span>
+                    </div>
+                {% endif %}
+            {% endwith %}
+        {% endif %}
+
         {% block content %}
         {% endblock content %}
     </div>
@@ -223,7 +228,32 @@
 {% block script %}
 {% endblock %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/mylists.js') }}"></script>
-
+<script>
+    {% if current_user.is_authenticated %}
+        {% with task = current_user.get_task_in_progress('import_list') %}
+            {% if task %}
+                window.onload = function get_progress() {
+                    $.ajax ({
+                        type: "POST",
+                        url: "/progress_import",
+                        contentType: "application/json",
+                        data: JSON.stringify({task_id: '{{ task.id }}'}),
+                        dataType: "json",
+                        success: function(data) {
+                            if (data.progress.progress === 100) {
+                                $('#'+'{{ task.id }}'+'-progress').text('{{ task.description }} Completed!');
+                                $('#'+'{{ task.id }}'+'-progress').parent().delay(2000).fadeOut();
+                            } else {
+                                $('#'+'{{ task.id }}'+'-progress').text('{{ task.description }} '+data.progress.progress+'%');
+                                setTimeout(get_progress, 2500);
+                            }
+                        }
+                    });
+                }
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+</script>
 <footer class="text-center text-lg-left" style="background-color: #100e0e;">
     {% if current_user.is_authenticated %}
         <div class="container p-3" style="padding-bottom: 0px !important;">
@@ -232,7 +262,7 @@
                 <img class="m-b-5" src="{{ url_for('static', filename='img/favicon.ico') }}">&nbsp;
                 <h5 class="dis-inline text-uppercase" style="color: #3fd3da;"><b>MyLists.info</b></h5>
                 <p class="text-justify m-b-5">
-                    Create your series/anime and movies list, see how much time you spent, follow your friends.
+                    Create your series, anime and movies list, see how much time you spent, follow your friends.
                     Add your favorites, comments, rewatch and gain levels to get to the top of the Hall of Fame.
                 </p>
                 <a href="mailto:contact@mylists.info" class="text-light">

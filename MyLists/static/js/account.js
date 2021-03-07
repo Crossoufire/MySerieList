@@ -1,6 +1,6 @@
 
 
-// --- On document load ------------------------------------
+// --- On document load ----------------------------------------------------------------------------------------
 $(document).ready(function() {
     let time_data = $('#time-spent-pie').attr('values').split(', ');
 
@@ -32,18 +32,15 @@ $(document).ready(function() {
                         for (let i = 0; i < dataset.data.length; i++) {
                             let model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model,
                             total = dataset._meta[Object.keys(dataset._meta)[0]].total,
-                            mid_radius = model.innerRadius+(model.outerRadius-model.innerRadius)/2,
+                            mid_radius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2,
                             start_angle = model.startAngle,
                             end_angle = model.endAngle,
-                            mid_angle = start_angle + (end_angle - start_angle)/2;
+                            mid_angle = start_angle + (end_angle - start_angle) / 2;
 
                             let x = mid_radius * Math.cos(mid_angle);
                             let y = mid_radius * Math.sin(mid_angle);
 
-                            let percent = String(Math.round(dataset.data[i]/total*100)) + "%";
-                            // ctx.font = "16px 'Helvetica Neue', Helvetica, Arial, sans-serif";
-                            // ctx.fillStyle = 'lightgrey';
-                            // ctx.fillText(config_pie.data.labels[i], model.x + x, model.y + y);
+                            let percent = String(Math.round(dataset.data[i] / total * 100)) + "%";
 
                             ctx.font = "16px 'Helvetica Neue', Helvetica, Arial, sans-serif";
                             ctx.fillStyle = 'lightgrey';

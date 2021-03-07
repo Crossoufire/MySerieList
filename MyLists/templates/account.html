@@ -163,14 +163,6 @@
                                     </a>
                                 </li>
                             {% endif %}
-                            {% if header_data['id'] == current_user.get_id() and current_user.role.value != 'user' %}
-                                <li class="m-b-10">
-                                    Refresh APScheduler
-                                    <a class="btn btn-sm btn-primary" href="{{ url_for('users.apscheduler_info') }}">
-                                        Refresh
-                                    </a>
-                                </li>
-                            {% endif %}
                         </ul>
                     </li>
                 </ul>
@@ -178,7 +170,7 @@
             <div class="vertical-line"></div>
             <div class="col-xl col-lg col-md">
                 <ul class="list-unstyled">
-                    <li class="m-b-40">
+                    <li class="m-b-30">
                         <h4><i class="fas fa-chart-pie"></i>&nbsp;&nbsp; Statistics</h4>
                         <hr>
                         <div class="row no-gutters">
@@ -567,10 +559,6 @@
                                             <span id="{{ media_data['movies']['media_count']['Completed']
                                             ['percent'] }}%" class="value"></span>
                                         </span>
-                                        <span class="block-movie" data-toggle="tooltip" title="Completed Animation">
-                                            <span id="{{ media_data['movies']['media_count']['Completed Animation']
-                                            ['percent'] }}%" class="value"></span>
-                                        </span>
                                         <span class="block-movie" data-toggle="tooltip" title="Plan to Watch">
                                             <span id="{{ media_data['movies']['media_count']['Plan to Watch']
                                             ['percent'] }}%" class="value"></span>
@@ -595,24 +583,13 @@
                                         <span>{{ media_data['movies']['media_count']['Plan to Watch']['count'] }}</span>
                                     </div>
                                     <div class="col-4">
-                                        <a href="{{ url_for('main.mymedialist', media_list='movieslist',
-                                        user_name=header_data['username'], category='Completed Animation') }}">
-                                            Completed Anime:
-                                        </a>
-                                    </div>
-                                    <div class="col-2">
-                                        <span>
-                                            {{ media_data['movies']['media_count']['Completed Animation']['count'] }}
-                                        </span>
-                                    </div>
-                                    <div class="col-4">
                                         <span>Total movies:</span>
                                     </div>
                                     <div class="col-2">
                                         <span>{{ media_data['movies']['media_count']['total'] }}</span>
                                     </div>
                                      <div class="col-4">
-                                        <span>Total Seen:</span>
+                                        <span data-toggle="tooltip" title="Counting the rewatched">Total Seen:</span>
                                     </div>
                                     <div class="col-2">
                                         <span>{{ media_data['movies']['media_total_eps'] }}</span>
@@ -644,10 +621,9 @@
             <div class="col-xl-3 col-lg col-md">
                 <ul class="list-unstyled">
                     <li class="m-b-20">
-                        <h4>
-                            <i class="fas fa-user-check"></i>&nbsp;&nbsp; Follows
+                        <h4><i class="fas fa-user-check"></i>&nbsp;&nbsp; Follows
                             <form id='all_follows' style="display: inline;" method="POST"
-                            action="/account/{{ header_data['username'] }}">
+                                  action={{ url_for('users.account', user_name=header_data['username']) }}>
                                 <input class="d-none" name="all_follows" value="True">
                                 <a onclick="$('#all_follows').submit()" class="more-link">
                                     <u><i>All ({{ follows_list|length }})</i></u>

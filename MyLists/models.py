@@ -1,3 +1,4 @@
+import rq
 import enum
 from flask import abort
 from datetime import datetime
@@ -23,7 +24,6 @@ class Status(enum.Enum):
     ALL = 'All'
     WATCHING = 'Watching'
     COMPLETED = 'Completed'
-    COMPLETED_ANIMATION = 'Completed Animation'
     ON_HOLD = 'On Hold'
     RANDOM = 'Random'
     DROPPED = 'Dropped'
@@ -40,16 +40,18 @@ class MediaType(enum.Enum):
 
 class HomePage(enum.Enum):
     ACCOUNT = "account"
-    HALL_OF_FAME = "hall_of_fame"
     MYSERIESLIST = "serieslist"
     MYANIMELIST = "animelist"
     MYMOVIESLIST = "movieslist"
 
 
 class RoleType(enum.Enum):
-    ADMIN = "admin"         # Can access to the admin dashboard (/admin)
-    MANAGER = "manager"     # Can lock and edit media (/lock_media & /media_sheet_form)
-    USER = "user"           # Standard user
+    # Can access to the admin dashboard (/admin)
+    ADMIN = "admin"
+    # Can lock and edit media (/lock_media & /media_sheet_form)
+    MANAGER = "manager"
+    # Standard user
+    USER = "user"
 
 
 followers = db.Table('followers',
@@ -58,14 +60,17 @@ followers = db.Table('followers',
 
 
 class User(db.Model, UserMixin):
+    def __repr__(self):
+        return f'<User {self.id}-{self.username}>'
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)
-    oauth_id = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     homepage = db.Column(db.Enum(HomePage), nullable=False, default=HomePage.ACCOUNT)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
+    background_image = db.Column(db.String(50), nullable=False, default='default.jpg')
     time_spent_series = db.Column(db.Integer, nullable=False, default=0)
     time_spent_movies = db.Column(db.Integer, nullable=False, default=0)
     time_spent_anime = db.Column(db.Integer, nullable=False, default=0)
@@ -84,6 +89,7 @@ class User(db.Model, UserMixin):
     series_list = db.relationship('SeriesList', backref='user', lazy=True)
     anime_list = db.relationship('AnimeList', backref='user', lazy=True)
     movies_list = db.relationship('MoviesList', backref='user', lazy=True)
+    redis_tasks = db.relationship('RedisTasks', backref='user', lazy='dynamic')
     followed = db.relationship('User',
                                secondary=followers,
                                primaryjoin=(followers.c.follower_id == id),
@@ -151,6 +157,15 @@ class User(db.Model, UserMixin):
                 user.movies_views += 1
             db.session.commit()
 
+    def launch_task(self, name, description, *args, **kwargs):
+        rq_job = app.q.enqueue('MyLists.rq_tasks.' + name, self.id, *args, **kwargs)
+        task = RedisTasks(id=rq_job.get_id(), name=name, description=description, user=self)
+        db.session.add(task)
+        return task
+
+    def get_task_in_progress(self, name):
+        return RedisTasks.query.filter_by(name=name, user=self, complete=False).first()
+
     @staticmethod
     def verify_reset_token(token):
         s = Serializer(app.config['SECRET_KEY'])
@@ -180,6 +195,26 @@ class UserLastUpdate(db.Model):
     date = db.Column(db.DateTime, nullable=False)
 
 
+class RedisTasks(db.Model):
+    id = db.Column(db.String(50), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    name = db.Column(db.String(150), index=True)
+    description = db.Column(db.String(150))
+    complete = db.Column(db.Boolean, default=False)
+
+    def get_rq_job(self):
+        try:
+            rq_job = rq.job.Job.fetch(self.id, connection=app.r)
+        except Exception as e:
+            app.logger.info(f'[ERROR] - {e}')
+            return None
+        return rq_job
+
+    def get_progress(self):
+        job = self.get_rq_job()
+        return job.meta.get('progress', 0) if job is not None else 100
+
+
 class Notifications(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -189,10 +224,13 @@ class Notifications(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 
-# --- SERIES -------------------------------------------------------------------------------------------------------
+# --- SERIES ------------------------------------------------------------------------------------------------------
 
 
 class Series(db.Model):
+    def __repr__(self):
+        return f'<Series {self.id}-{self.name}>'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     original_name = db.Column(db.String(50), nullable=False)
@@ -288,6 +326,9 @@ class SeriesActors(db.Model):
 
 
 class Anime(db.Model):
+    def __repr__(self):
+        return f'<Anime {self.id}-{self.name}>'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     original_name = db.Column(db.String(50), nullable=False)
@@ -379,7 +420,7 @@ class AnimeActors(db.Model):
     name = db.Column(db.String(150))
 
 
-# --- MOVIES -------------------------------------------------------------------------------------------------------
+# --- MOVIES ------------------------------------------------------------------------------------------------------
 
 
 class Movies(db.Model):
@@ -483,6 +524,8 @@ class Frames(db.Model):
 
 class MyListsStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    nb_users = db.Column(db.Integer)
+    nb_media = db.Column(db.Text)
     total_time = db.Column(db.Text)
     top_media = db.Column(db.Text)
     top_genres = db.Column(db.Text)

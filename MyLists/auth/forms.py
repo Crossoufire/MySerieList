@@ -26,13 +26,13 @@ class RegistrationForm(FlaskForm):
 class LoginForm(FlaskForm):
     login_username = StringField('Username', validators=[DataRequired()])
     login_password = PasswordField('Password', validators=[DataRequired()])
-    login_remember = BooleanField('Remember Me')
+    login_remember = BooleanField('Remember me')
     login_submit = SubmitField('Login')
 
 
 class ResetPasswordRequestForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
-    submit = SubmitField('Request Password Reset')
+    submit = SubmitField('Request password reset')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
@@ -42,5 +42,5 @@ class ResetPasswordRequestForm(FlaskForm):
 
 class ResetPasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Reset Password')
+    confirm_password = PasswordField('Confirm password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Reset password')

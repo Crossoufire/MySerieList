@@ -12,11 +12,11 @@ class UpdateAccountForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
+    back_picture = FileField('Background picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
     isprivate = BooleanField('Private mode')
     steamID = StringField('SteamID')
-    homepage = SelectField('Default homepage', choices=[('serieslist', 'MySeriesList'), ('animelist', 'MyAnimeList'),
-                                                        ('movieslist', 'MyMoviesList'), ('account', 'Account'),
-                                                        ('hall_of_fame', 'Hall of Fame')])
+    homepage = SelectField('Default homepage', choices=[('serieslist', 'SeriesList'), ('animelist', 'AnimeList'),
+                                                        ('movieslist', 'MoviesList'), ('account', 'Account')])
     submit_account = SubmitField('Update account')
 
     def validate_username(self, username):
@@ -32,23 +32,6 @@ class UpdateAccountForm(FlaskForm):
                 raise ValidationError("This email already exist.")
 
 
-class UpdateAccountOauthForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
-    picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
-    isprivate = BooleanField('Private mode')
-    steamID = StringField('SteamID')
-    homepage = SelectField('Default homepage', choices=[('serieslist', 'MySeriesList'), ('animelist', 'MyAnimeList'),
-                                                        ('movieslist', 'MyMoviesList'), ('account', 'Account'),
-                                                        ('hall_of_fame', 'Hall of Fame')])
-    submit_account = SubmitField('Update account')
-
-    def validate_username(self, username):
-        if username.data != current_user.username:
-            user = User.query.filter_by(username=username.data).first()
-            if user:
-                raise ValidationError("This username is already taken. Please choose another one.")
-
-
 class ChangePasswordForm(FlaskForm):
     current_password = PasswordField('Current password', validators=[DataRequired()])
     new_password = PasswordField('Choose new password', validators=[DataRequired(), Length(min=6)])
@@ -59,3 +42,9 @@ class ChangePasswordForm(FlaskForm):
         user = User.query.filter_by(id=current_user.get_id()).first()
         if not bcrypt.check_password_hash(user.password, current_password.data):
             raise ValidationError("Incorrect current password")
+
+
+class ImportListForm(FlaskForm):
+    csv_list = FileField('file.csv', validators=[FileAllowed(['csv'])])
+    submit = SubmitField('Import')
+

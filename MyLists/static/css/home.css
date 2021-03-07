@@ -40,3 +40,11 @@
     margin-bottom: 2rem !important;
     margin-top: 2rem !important;
 }
+
+.form-control-home {
+    background: transparent;
+    border-radius: 8px;
+    border: 1px solid darkgray;
+    color: #fff;
+    width: 100%;
+}

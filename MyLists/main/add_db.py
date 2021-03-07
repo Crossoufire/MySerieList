@@ -59,7 +59,6 @@ class AddtoDB:
             self.media = Series(**self.media_details['tv_data'])
         elif self.list_type == ListType.ANIME:
             self.media = Anime(**self.media_details['tv_data'])
-
         db.session.add(self.media)
         db.session.commit()
 
@@ -68,8 +67,6 @@ class AddtoDB:
         self.add_networks_to_db()
         self.add_seasons_to_db()
 
-        db.session.commit()
-
     def add_movies_to_db(self):
         self.media = Movies(**self.media_details['movies_data'])
         db.session.add(self.media)
@@ -77,8 +74,6 @@ class AddtoDB:
 
         self.add_genres_to_db()
         self.add_actors_to_db()
-
-        db.session.commit()
 
     def add_media_to_db(self):
         if self.list_type == ListType.SERIES or self.list_type == ListType.ANIME:

@@ -1,52 +1,43 @@
 
-/* --- Table CSS ---------------------------------------- */
-table.table-sm td, table.table-sm th {
+/* --- General CSS --------------------------------------------------------------- */
+table.table-sm td {
     padding: 5px;
 }
 
-table.table th {
-    font-size: 12pt;
-}
-
-table.table a {
-    color: #359aff;
-    font-size: 11pt;
-}
-
-.table tr {
-    text-align: center;
-    vertical-align: middle;
-}
-
-.table td {
-    text-align: center;
-    vertical-align: middle;
-}
-
-div.col-sm-12 {
-    margin-top: 15px;
+.giveMeEllipsis {
+   overflow: hidden;
+   text-overflow: ellipsis;
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-line-clamp: 1;   /* number of lines to show */
 }
 
 
-/* --- General CSS -------------------------------------- */
+/* --- Statistics ---------------------------------------------------------------- */
+.statistics {
+	color: #e5e7eb;
+}
+
+.statistics .box {
+	background-color: #313348;
+}
+
+.statistics .box i {
+	width: 50px;
+	height: 50px;
+	line-height: 50px;
+}
+
+
+/* --- General CSS --------------------------------------------------------------- */
 .seasons-eps-container {
     position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    height: 450px;
-    width: 700px;
+    height: 400px;
 }
 
 .media-container {
     position: relative;
-    height: 449px;
-}
-
-.genres {
-    max-width: 167px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    height: 400px;
 }
 
 @media (max-width: 768px) {
@@ -59,3 +50,6 @@ div.col-sm-12 {
         height: 300px;
     }
 }
+
+
+

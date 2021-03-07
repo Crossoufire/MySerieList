@@ -9,39 +9,50 @@
 
 
 {% block content %}
-    <div class="header-container">
+    <div class="header-container" style="background-image: url('{{ header_data['back_picture'] }}');">
+        {% if current_user.get_id() == header_data['id'] %}
+            <a class="header-back-pen" href="/settings?from=back_pic" data-toggle="tooltip" data-placement="bottom"
+               title="Change your background"><i class="fas fa-lg fa-pen"></i></a>
+        {% endif %}
         <div class="header-profile-container" {% if header_data['knowledge_info']['frame_level'] < 36 %}
             style="left: -10px; {% endif %}">
-            <img class="header-profile-img" src="{{ header_data['profile_picture'] }}" alt=""/>
+            {% if current_user.get_id() == header_data['id'] %}
+                <a href="/settings?from=profile_pic">
+                    <img class="header-profile-img on-hover" data-toggle="tooltip" title="Change your picture"
+                         src="{{ header_data['profile_picture'] }}" alt=""/>
+                </a>
+            {% else %}
+                <img class="header-profile-img" src="{{ header_data['profile_picture'] }}" alt=""/>
+            {% endif %}
             <img class="header-profile-frame" src="{{ header_data['knowledge_info']['frame_id'] }}.png" alt=""/>
             <div class="header-knowledge-level text-center">{{ header_data['knowledge_info']['level'] }}</div>
         </div>
-        <div class="header-profile-data"  {% if header_data['knowledge_info']['frame_level'] < 36 %}
+        <div class="header-profile-data" {% if header_data['knowledge_info']['frame_level'] < 36 %}
             style="left: 200px; {% endif %}">
-            <h2 class="profile-name"><b>{{ header_data['username'] }}</b>
+            <h2 class="profile-name add-shadow"><b>{{ header_data['username'] }}</b>
                 {% if header_data['id'] != current_user.get_id() %}
                     {% if header_data["isfollowing"] %}
                         <button id="follow_{{ header_data['id'] }}" class="btn btn-sm btn-dark follow-btn" value="1"
-                         onclick="follow_status(this, '{{ header_data['id'] }}')">
+                                onclick="follow_status(this, '{{ header_data['id'] }}')">
                             Unfollow
                         </button>
                     {% else %}
                         <button id="follow_{{ header_data['id'] }}" class="btn btn-sm btn-primary follow-btn" value="0"
-                         onclick="follow_status(this, '{{ header_data['id'] }}')">
+                                onclick="follow_status(this, '{{ header_data['id'] }}')">
                             Follow
                         </button>
                     {% endif %}
                     <i id="load_{{ header_data['id'] }}" class="fas fa-spinner fast-spin" style="display: none;"></i>
                 {% endif %}
             </h2>
-            <div>
+            <div class="add-shadow">
                 <b>Joined: {{ header_data['register'] }}</b><br>
                 <b>Followers: {{ header_data['followers'] }}</b>
             </div>
         </div>
         <div class="header-profile-data-mobile text-center">
-            <h4 class="p-0 m-0"><b>{{ header_data['username'] }}&nbsp;</b></h4>
-            <div class="header-join-follow">
+            <h4 class="p-0 m-0 add-shadow"><b>{{ header_data['username'] }}&nbsp;</b></h4>
+            <div class="header-join-follow add-shadow">
                 <b>Joined: {{ header_data['register'] }}</b><br>
                 <b>Followers: {{ header_data['followers'] }}</b>
             </div>
