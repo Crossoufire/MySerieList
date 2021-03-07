@@ -110,6 +110,9 @@ venv.bak/
 *.DS_Store
 
 # MyLists
+start.sh
+.env
+.flaskenv
 config.ini
 site.db
 site.db-journal
@@ -134,5 +137,3 @@ MyLists/static/covers/movies_covers/*
 
 MyLists/static/background_pics/*
 !MyLists/static/background_pics/default.jpg
-
-start.sh
