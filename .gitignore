@@ -136,3 +136,5 @@ MyLists/static/covers/movies_covers/*
 
 MyLists/static/background_pics/*
 !MyLists/static/background_pics/default.jpg
+
+scheduled.log
