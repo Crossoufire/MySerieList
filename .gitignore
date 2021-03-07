@@ -112,7 +112,6 @@ venv.bak/
 # MyLists
 start.sh
 .env
-.flaskenv
 config.ini
 site.db
 site.db-journal
