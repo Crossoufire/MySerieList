@@ -21,18 +21,17 @@ def home():
         user = User.query.filter_by(username=login_form.login_username.data.strip()).first()
         if user and not user.active:
             app.logger.info('[INFO] - [{}] Connexion attempt while account not activated'.format(user.id))
-            flash('Your Account is not activated. Please check your email address to activate your account.', 'danger')
+            flash('Your account is not activated. Please check your email address to activate your account.', 'danger')
         elif user and bcrypt.check_password_hash(user.password, login_form.login_password.data):
             login_user(user, remember=login_form.login_remember.data)
             app.logger.info('[INFO] - [{}] Logged in.'.format(user.id))
-            flash("You're now logged in. Welcome {0}".format(user.username), "success")
 
             next_page = request.args.get('next')
             if next_page:
                 return redirect(next_page)
             return return_user_homepage(user.homepage, user.username)
         else:
-            flash('Login Failed. Please check username and password.', 'warning')
+            flash('Login failed. Please check username and password.', 'warning')
     elif register_form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(register_form.register_password.data).decode('utf-8')
         user = User(username=register_form.register_username.data.strip(),
@@ -48,7 +47,7 @@ def home():
             send_register_email(user)
             flash('Your account has been created. Check your e-mail address to activate your account.', 'info')
         except Exception as e:
-            app.logger.error('[ERROR] - Sending register email to account ID [{}]: {}.'.format(user.id, e))
+            app.logger.error('[ERROR] - Sending register email to account [{}]: {}.'.format(user.id, e))
             flash("An error occured while sending your register e-mail. Admin were advised. Please try again later.")
         return redirect(url_for('auth.home'))
 
@@ -77,7 +76,8 @@ def reset_password():
             flash('An email has been sent with the instructions to reset your password.', 'info')
         except Exception as e:
             app.logger.error('[ERROR] - Failed sending reset password email to [{}]: {}'.format(user.email, e))
-            flash("An error occured while sending the reset password email. Please try again later.")
+            flash("An error occured while sending the reset password email. Admin were advised. "
+                  "Please try again later.")
         return redirect(url_for('auth.home'))
 
     return render_template('reset_password.html', title='Reset password', form=form)
@@ -86,9 +86,9 @@ def reset_password():
 @bp.route("/reset_password/<token>", methods=['GET', 'POST'])
 @check_if_auth
 def reset_password_token(token):
-    user = User.verify_reset_token(token)
+    user = User.verify_token(token)
     if user is None:
-        flash('That is an invalid or an expired token.', 'warning')
+        flash('This is an invalid or an expired token.', 'warning')
         return redirect(url_for('auth.reset_password'))
 
     form = ResetPasswordForm()
@@ -106,9 +106,9 @@ def reset_password_token(token):
 @bp.route("/register_account/<token>", methods=['GET'])
 @check_if_auth
 def register_account_token(token):
-    user = User.verify_reset_token(token)
+    user = User.verify_token(token)
     if not user or user.active:
-        flash('That is an invalid or an expired token.', 'warning')
+        flash('This is an invalid or an expired token.', 'warning')
         return redirect(url_for('auth.reset_password'))
 
     user.active = True

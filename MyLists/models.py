@@ -129,14 +129,10 @@ class User(db.Model, UserMixin):
 
     def check_autorization(self, user_name):
         # retrieve the user
-        user = User.query.filter_by(username=user_name).first()
+        user = self.query.filter_by(username=user_name).first()
 
-        # No account with this username
-        if not user:
-            abort(404)
-
-        # Protection of the admin account
-        if self.role != RoleType.ADMIN and user.role == RoleType.ADMIN:
+        # No account with this username & Protection of the admin account
+        if user is None or (self.role != RoleType.ADMIN and user.role == RoleType.ADMIN):
             abort(404)
 
         # Check if the current account can see the target's account
@@ -167,7 +163,7 @@ class User(db.Model, UserMixin):
         return RedisTasks.query.filter_by(name=name, user=self, complete=False).first()
 
     @staticmethod
-    def verify_reset_token(token):
+    def verify_token(token):
         s = Serializer(app.config['SECRET_KEY'])
         try:
             user_id = s.loads(token)["user_id"]
@@ -669,7 +665,7 @@ def get_media_query(user_id, list_type, category, genre, sort_val, page, q):
         sort_option = {'release_date_asc': media.release_date.asc(),
                        'release_date_desc': media.release_date.desc()}
 
-    # Create a sorting dict and update the unique values
+    # Create a sorting dict and update the lists unique values
     sorting_dict = {'title-A-Z': media.name.asc(),
                     'title-Z-A': media.name.desc(),
                     'score_desc': media_list.score.desc(),
@@ -677,17 +673,13 @@ def get_media_query(user_id, list_type, category, genre, sort_val, page, q):
                     'comments': media_list.comment.desc(),
                     'rewatched': media_list.rewatched.desc()}
     sorting_dict.update(sort_option)
-
-    try:
-        sorting = sorting_dict[sort_val]
-    except KeyError:
-        abort(400)
+    sorting = sorting_dict[sort_val]
 
     # Check the category
     try:
         category = Status(category)
         cat_value = category.value
-    except:
+    except ValueError:
         abort(400)
 
     # Check the genre
@@ -708,15 +700,15 @@ def get_media_query(user_id, list_type, category, genre, sort_val, page, q):
     # Recover the <media_data> from the selected <category>
     if category != Status.FAVORITE and category != Status.SEARCH and category != Status.ALL:
         query = db.session.query(media, media_list, media_genre) \
-            .join(media, media.id == media_list.media_id) \
-            .join(media_genre, media_genre.media_id == media_list.media_id) \
+            .outerjoin(media, media.id == media_list.media_id) \
+            .outerjoin(media_genre, media_genre.media_id == media_list.media_id) \
             .filter(media_list.user_id == user_id, media_list.status == category, media_list.media_id.notin_(com_ids),
                     genre_filter) \
             .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
     elif category == Status.ALL:
         query = db.session.query(media, media_list, media_genre) \
-            .join(media, media.id == media_list.media_id) \
-            .join(media_genre, media_genre.media_id == media_list.media_id) \
+            .outerjoin(media, media.id == media_list.media_id) \
+            .outerjoin(media_genre, media_genre.media_id == media_list.media_id) \
             .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter) \
             .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
     elif category == Status.FAVORITE:
@@ -789,20 +781,28 @@ def get_next_airing(list_type):
     return query
 
 
-def get_total_time(user_id, list_type):
+# Recover the total time by medialist for all users
+def get_total_time(list_type):
     if list_type == ListType.SERIES:
         media = Series
         media_list = SeriesList
+        media_duration = Series.episode_duration
+        media_eps = SeriesList.eps_watched
     elif list_type == ListType.ANIME:
         media = Anime
         media_list = AnimeList
+        media_duration = Anime.episode_duration
+        media_eps = AnimeList.eps_watched
     elif list_type == ListType.MOVIES:
         media = Movies
         media_list = MoviesList
+        media_duration = Movies.runtime
+        media_eps = MoviesList.eps_watched
 
-    query = db.session.query(media, media_list) \
+    query = db.session.query(User, media_duration, media_eps, func.sum(media_duration * media_eps)) \
         .join(media, media.id == media_list.media_id) \
-        .filter(media_list.user_id == user_id)
+        .join(User, User.id == media_list.user_id) \
+        .group_by(media_list.user_id).all()
 
     return query
 

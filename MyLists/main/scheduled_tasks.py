@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 from pathlib import Path
 from MyLists import app, db
 from sqlalchemy import and_, desc
@@ -555,12 +556,20 @@ def update_Mylists_stats():
     db.session.commit()
 
 
+def correct_orphan_media():
+    query = db.session.query(Movies, MoviesGenre).outerjoin(MoviesGenre, MoviesGenre.media_id == Movies.id).all()
+    for q in query:
+        if q[1] is None:
+            print(q)
+
+
 # ---------------------------------------------------------------------------------------------------------------
 
 
 @app.cli.command()
 def scheduled_task():
     """Run the scheduled jobs."""
+    app.logger.setLevel(logging.INFO)
     remove_non_list_media()
     remove_old_covers()
     automatic_media_refresh()

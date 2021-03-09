@@ -11,7 +11,7 @@ from MyLists.main.functions import set_last_update, compute_time_spent, check_ca
 from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaListDict
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MediaType, get_next_airing, check_media, User, \
-    get_media_query, get_media_count
+    get_media_query, get_media_count, MoviesGenre
 
 bp = Blueprint('main', __name__)
 
