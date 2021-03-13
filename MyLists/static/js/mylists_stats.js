@@ -63,7 +63,7 @@ $(document).ready(function () {
             },
             title: {
                 display: true,
-                text: 'Time spent by media type',
+                text: 'TIME SPENT',
                 position: 'top',
                 fontColor: '#e2e2e2',
                 fontSize: 18,
@@ -177,12 +177,12 @@ $(document).ready(function () {
             },
             title: {
                 display: true,
-                text: 'Seasons and episodes by media',
+                text: 'SEASONS AND EPISODES',
                 position: 'top',
                 fontColor: '#e2e2e2',
                 fontSize: 18,
-                fontStyle: 'normal'
-            }
+                fontStyle: 'normal',
+            },
         }
     };
     let ctx_eps = document.getElementById('total-seasons').getContext('2d');

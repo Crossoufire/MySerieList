@@ -148,14 +148,14 @@ def remove_old_covers():
     app.logger.info('###################################################################')
 
 
-def refresh_element_data(api_id, list_type):
+def refresh_element_data(api_id, list_type, updating=True, for_orphan=False, media_id=None):
     media_data = ApiData().get_details_and_credits_data(api_id, list_type)
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        data = MediaDetails(media_data, list_type, updating=True).get_media_details()
+        data = MediaDetails(media_data, list_type, updating).get_media_details()
         if not data['tv_data']:
             return None
     elif list_type == ListType.MOVIES:
-        data = MediaDetails(media_data, list_type, updating=True).get_media_details()
+        data = MediaDetails(media_data, list_type, updating).get_media_details()
         if not data['movies_data']:
             return None
 
@@ -169,6 +169,37 @@ def refresh_element_data(api_id, list_type):
 
     # Commit the new changes
     db.session.commit()
+
+    if for_orphan:
+        if list_type == ListType.SERIES:
+            # for genre in data['genres_data']:
+            #     genre.update({'media_id': media_id})
+            #     db.session.add(SeriesGenre(**genre))
+            for actor in data['actors_data']:
+                actor.update({'media_id': media_id})
+                db.session.add(SeriesActors(**actor))
+        elif list_type == ListType.ANIME:
+            # if len(data['anime_genres_data']) > 0:
+            #     for genre in data['anime_genres_data']:
+            #         genre.update({'media_id': media_id})
+            #         db.session.add(AnimeGenre(**genre))
+            # else:
+                # for genre in data['genres_data']:
+                #     genre.update({'media_id': media_id})
+                #     db.session.add(AnimeGenre(**genre))
+            for actor in data['actors_data']:
+                actor.update({'media_id': media_id})
+                db.session.add(AnimeActors(**actor))
+        elif list_type == ListType.MOVIES:
+            # for genre in data['genres_data']:
+            #     genre.update({'media_id': media_id})
+            #     db.session.add(MoviesGenre(**genre))
+            for actor in data['actors_data']:
+                actor.update({'media_id': media_id})
+                db.session.add(MoviesActors(**actor))
+
+        # Commit the new changes
+        db.session.commit()
 
     # Check the episodes/seasons
     if list_type != ListType.MOVIES:
@@ -319,7 +350,6 @@ def new_releasing_series():
     app.logger.info('[SYSTEM] - Start adding the new releasing series')
 
     all_series = Series.query.filter(Series.next_episode_to_air != None).all()
-
     media_id = []
     for series in all_series:
         try:
@@ -374,7 +404,6 @@ def new_releasing_anime():
     app.logger.info('[SYSTEM] - Start adding the new releasing anime')
 
     all_anime = Anime.query.filter(Anime.next_episode_to_air != None).all()
-
     media_id = []
     for anime in all_anime:
         try:
@@ -427,7 +456,6 @@ def new_releasing_movies():
     app.logger.info('[SYSTEM] - Start adding the new releasing movies')
 
     all_movies = Movies.query.all()
-
     media_id = []
     for movie in all_movies:
         try:
@@ -464,8 +492,8 @@ def new_releasing_movies():
 def automatic_movies_locking():
     app.logger.info('###################################################################')
     app.logger.info('[SYSTEM] - Starting automatic movies locking')
-    all_movies = Movies.query.filter(Movies.lock_status != True).all()
 
+    all_movies = Movies.query.filter(Movies.lock_status != True).all()
     count_locked = 0
     count_not_locked = 0
     now_date = (datetime.utcnow() - timedelta(minutes=225000))  # About 5 months
@@ -557,10 +585,39 @@ def update_Mylists_stats():
 
 
 def correct_orphan_media():
-    query = db.session.query(Movies, MoviesGenre).outerjoin(MoviesGenre, MoviesGenre.media_id == Movies.id).all()
+    app.logger.info('###################################################################')
+    app.logger.info('[SYSTEM] - Starting correction of orphan media')
+
+    query = db.session.query(Series, SeriesActors).outerjoin(SeriesActors, SeriesActors.media_id == Series.id).all()
     for q in query:
         if q[1] is None:
-            print(q)
+            info = refresh_element_data(q[0].themoviedb_id, ListType.SERIES, for_orphan=True, media_id=q[0].id)
+            if info is True:
+                app.logger.info(f'Orphan series corrected with ID [{q[0].id}]: {q[0].name}')
+            else:
+                app.logger.info(f'Orphan series NOT corrected with ID [{q[0].id}]: {q[0].name}')
+
+    query = db.session.query(Anime, AnimeActors).outerjoin(AnimeActors, AnimeActors.media_id == Anime.id).all()
+    for q in query:
+        if q[1] is None:
+            info = refresh_element_data(q[0].themoviedb_id, ListType.ANIME, updating=False,
+                                        for_orphan=True, media_id=q[0].id)
+            if info is True:
+                app.logger.info(f'Orphan anime corrected with ID [{q[0].id}]: {q[0].name}')
+            else:
+                app.logger.info(f'Orphan anime NOT corrected with ID [{q[0].id}]: {q[0].name}')
+
+    query = db.session.query(Movies, MoviesActors).outerjoin(MoviesActors, MoviesActors.media_id == Movies.id).all()
+    for q in query:
+        if q[1] is None:
+            info = refresh_element_data(q[0].themoviedb_id, ListType.MOVIES, for_orphan=True, media_id=q[0].id)
+            if info is True:
+                app.logger.info(f'Orphan movie corrected with ID [{q[0].id}]: {q[0].name}')
+            else:
+                app.logger.info(f'Orphan movie NOT corrected with ID [{q[0].id}]: {q[0].name}')
+
+    app.logger.info('[SYSTEM] - Finished correction of orphan media')
+    app.logger.info('###################################################################')
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -570,12 +627,13 @@ def correct_orphan_media():
 def scheduled_task():
     """Run the scheduled jobs."""
     app.logger.setLevel(logging.INFO)
-    remove_non_list_media()
-    remove_old_covers()
-    automatic_media_refresh()
-    new_releasing_movies()
-    new_releasing_series()
-    new_releasing_anime()
-    automatic_movies_locking()
-    compute_media_time_spent()
-    update_Mylists_stats()
+    # remove_non_list_media()
+    # remove_old_covers()
+    # automatic_media_refresh()
+    # new_releasing_movies()
+    # new_releasing_series()
+    # new_releasing_anime()
+    # automatic_movies_locking()
+    # compute_media_time_spent()
+    # update_Mylists_stats()
+    correct_orphan_media()

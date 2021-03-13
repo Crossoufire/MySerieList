@@ -697,47 +697,28 @@ def get_media_query(user_id, list_type, category, genre, sort_val, page, q):
             .filter(v1.user_id == current_user.id).all()
         com_ids = [r[0].media_id for r in get_common]
 
-    # Recover the <media_data> from the selected <category>
+    query = db.session.query(media, media_list, media_genre, media_actors) \
+        .outerjoin(media, media.id == media_list.media_id) \
+        .outerjoin(media_genre, media_genre.media_id == media_list.media_id) \
+        .outerjoin(media_actors, media_actors.media_id == media_list.media_id) \
+        .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter)
+
     if category != Status.FAVORITE and category != Status.SEARCH and category != Status.ALL:
-        query = db.session.query(media, media_list, media_genre) \
-            .outerjoin(media, media.id == media_list.media_id) \
-            .outerjoin(media_genre, media_genre.media_id == media_list.media_id) \
-            .filter(media_list.user_id == user_id, media_list.status == category, media_list.media_id.notin_(com_ids),
-                    genre_filter) \
-            .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
-    elif category == Status.ALL:
-        query = db.session.query(media, media_list, media_genre) \
-            .outerjoin(media, media.id == media_list.media_id) \
-            .outerjoin(media_genre, media_genre.media_id == media_list.media_id) \
-            .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter) \
-            .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
+        query = query.filter(media_list.status == category)
     elif category == Status.FAVORITE:
-        query = db.session.query(media, media_list, media_genre) \
-            .join(media, media.id == media_list.media_id) \
-            .join(media_genre, media_genre.media_id == media_list.media_id) \
-            .filter(media_list.user_id == user_id, media_list.favorite, media_list.media_id.notin_(com_ids),
-                    genre_filter) \
-            .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
+        query = query.filter(media_list.favorite)
     elif category == Status.SEARCH:
         if list_type != ListType.MOVIES:
-            query = db.session.query(media, media_list, media_genre, media_actors) \
-                .join(media, media.id == media_list.media_id) \
-                .join(media_genre, media_genre.media_id == media_list.media_id) \
-                .join(media_actors, media_actors.media_id == media_list.media_id) \
-                .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter,
-                        or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'))) \
-                .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
+            query = query.filter(or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'),
+                                     media.original_name.like('%' + q + '%')))
         else:
-            query = db.session.query(media, media_list, media_genre, media_actors) \
-                .join(media, media.id == media_list.media_id) \
-                .join(media_genre, media_genre.media_id == media_list.media_id) \
-                .join(media_actors, media_actors.media_id == media_list.media_id) \
-                .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter,
-                        or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'),
-                        media.director_name.like('%' + q + '%'))) \
-                .group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
+            query = query.filter(or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'),
+                                     media.director_name.like('%' + q + '%'), media.original_name.like('%' + q + '%')))
 
-    return query, cat_value
+    # Run the query
+    results = query.group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
+
+    return results, cat_value
 
 
 def get_media_count(user_id, list_type):

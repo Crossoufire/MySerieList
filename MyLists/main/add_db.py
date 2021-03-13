@@ -1,6 +1,6 @@
 from MyLists import db
-from MyLists.models import ListType, Series, Anime, SeriesGenre, AnimeGenre, AnimeActors, SeriesActors, SeriesNetwork, \
-    AnimeNetwork, SeriesEpisodesPerSeason, AnimeEpisodesPerSeason, Movies, MoviesGenre, MoviesActors
+from MyLists.models import ListType, Series, Anime, SeriesGenre, AnimeGenre, AnimeActors, SeriesActors, Movies, \
+    SeriesNetwork, AnimeNetwork, SeriesEpisodesPerSeason, AnimeEpisodesPerSeason, MoviesGenre, MoviesActors
 
 
 class AddtoDB:

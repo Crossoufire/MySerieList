@@ -40,13 +40,8 @@ def account(user_name):
     # Recover the Favorites
     favorites = get_favorites(user.id)
 
-    return render_template('account.html',
-                           title=user.username+"'s account",
-                           header_data=header_data,
-                           user_data=user_data,
-                           favorites=favorites,
-                           media_data=media_data,
-                           follows_list=follows_list,
+    return render_template('account.html', title=user.username+"'s account", header_data=header_data,
+                           user_data=user_data, favorites=favorites, media_data=media_data, follows_list=follows_list,
                            follows_update_list=follows_update_list)
 
 

@@ -8,264 +8,262 @@
 
 
 {% block content %}
-    <section class="statistics m-t-30 p-2">
-        <div class="row">
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 7px;">
-                    <i class="fas fa-lg fa-tv fs-2 text-center bg-series rounded-circle"></i>
-                    <div class="d-flex align-items-center">
-                        <h3 class="mb-0">&nbsp; {{ nb_media["series"] }}</h3>
-                        <div>&nbsp; Series</div>
+    <div class="m-l-30 m-r-30 mobile-margin">
+        <section class="statistics m-t-20 p-2">
+            <div class="row">
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 2px;">
+                        <i class="fas fa-lg fa-tv fs-2 text-center bg-series rounded-circle"></i>
+                        <div class="d-flex align-items-center">
+                            <h3 class="mb-0">&nbsp; {{ nb_media["series"] }}</h3>
+                            <div>&nbsp; SERIES</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 2px;">
+                        <i class="fas fa-lg fa-torii-gate fs-2 text-center bg-anime rounded-circle"></i>
+                        <div class="d-flex align-items-center">
+                            <h3 class="mb-0">&nbsp; {{ nb_media["anime"] }}</h3>
+                            <div>&nbsp; ANIME</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 2px;">
+                        <i class="fas fa-lg fa-film fs-2 text-center bg-movies rounded-circle"></i>
+                        <div class="d-flex align-items-center">
+                            <h3 class="mb-0">&nbsp; {{ nb_media["movies"] }}</h3>
+                            <div>&nbsp; MOVIES</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 2px;">
+                        <i class="fas fa-lg fa-user fs-2 text-center bg-danger rounded-circle"></i>
+                        <div class="d-flex align-items-center">
+                            <h3 class="mb-0">&nbsp; {{ nb_users }}</h3>
+                            <div>&nbsp; USERS</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 2px;">
+                        <i class="fas fa-lg fa-clock fs-2 text-center bg-primary rounded-circle"></i>
+                        <div class="d-flex align-items-center">
+                            <h3 class="mb-0">&nbsp; {{ (total_time["total"]/60/24)|int }}</h3>
+                            <div>&nbsp; DAYS</div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 7px;">
-                    <i class="fas fa-lg fa-torii-gate fs-2 text-center bg-anime rounded-circle"></i>
-                    <div class="d-flex align-items-center">
-                        <h3 class="mb-0">&nbsp; {{ nb_media["anime"] }}</h3>
-                        <div>&nbsp; Anime</div>
+        </section>
+        <section class="general-graphs p-2">
+            <div class="row">
+                <div class="col-lg-5 col-sm-12 m-b-10">
+                    <div class="media-container" style="background: #313348; border-radius: 2px;">
+                        <canvas id="media-time"></canvas>
+                        <span id="time-spent-pie" values="{{ total_time['series'] }}, {{ total_time['anime'] }}, {{ total_time['movies'] }}"></span>
+                    </div>
+                </div>
+                <div class="col-lg-7 col-sm-12">
+                    <div class="seasons-eps-container" style="background: #313348; border-radius: 2px;">
+                        <canvas id="total-seasons"></canvas>
+                        <span id="seasons-graph-data" values="{{ total_seasons['series'] }}, {{ total_seasons['anime'] }}"></span>
+                        <span id="episodes-graph-data" values="{{ total_episodes['series'] }}, {{ total_episodes['anime'] }}"></span>
                     </div>
                 </div>
             </div>
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 7px;">
-                    <i class="fas fa-lg fa-film fs-2 text-center bg-movies rounded-circle"></i>
-                    <div class="d-flex align-items-center">
-                        <h3 class="mb-0">&nbsp; {{ nb_media["movies"] }}</h3>
-                        <div>&nbsp; Movies</div>
+        </section>
+        <section class="series p-2">
+            <div class="row">
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="p-2" style="background: #313348; border-radius: 2px;">
+                        <h5><b>TOP GENRES</b></h5>
+                        <hr class="mb-0 mt-0 top-series">
+                        <table class="table table-sm text-light">
+                            <tbody>
+                            {% for media in top_genres["series"] %}
+                                <tr>
+                                    <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
+                                    <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 7px;">
-                    <i class="fas fa-lg fa-user fs-2 text-center bg-danger rounded-circle"></i>
-                    <div class="d-flex align-items-center">
-                        <h3 class="mb-0">&nbsp; {{ nb_users }}</h3>
-                        <div>&nbsp; Users</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 7px;">
-                    <i class="fas fa-lg fa-clock fs-2 text-center bg-primary rounded-circle"></i>
-                    <div class="d-flex align-items-center">
-                        <h3 class="mb-0">&nbsp; {{ (total_time["total"]/60/24)|int }}</h3>
-                        <div>&nbsp; Days</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="general-graphs m-t-10 p-2">
-        <div class="row">
-            <div class="col-lg-5 col-sm-12 m-b-10">
-                <div class="media-container" style="background: #313348; border-radius: 7px;">
-                    <canvas id="media-time"></canvas>
-                    <span id="time-spent-pie" values="{{ total_time['series'] }}, {{ total_time['anime'] }}, {{ total_time['movies'] }}"></span>
-                </div>
-            </div>
-            <div class="col-lg-7 col-sm-12">
-                <div class="seasons-eps-container" style="background: #313348; border-radius: 7px;">
-                    <canvas id="total-seasons"></canvas>
-                    <span id="seasons-graph-data" values="{{ total_seasons['series'] }}, {{ total_seasons['anime'] }}"></span>
-                    <span id="episodes-graph-data" values="{{ total_episodes['series'] }}, {{ total_episodes['anime'] }}"></span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="series m-t-10 p-2">
-        <div class="row">
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="p-2" style="background: #313348; border-radius: 7px;">
-                    <h5><b>Top genres</b></h5>
-                    <hr class="mb-0 mt-0 top-series">
-                    <table class="table table-sm text-light">
-                    <tbody>
-                        {% for media in top_genres["series"] %}
-                            <tr>
-                                <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
-                                <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                </div>
-            </div>
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="p-2" style="background: #313348; border-radius: 7px;">
-                    <h5><b>Top actors</b></h5>
-                    <hr class="mb-0 mt-0 top-series">
-                    <table class="table table-sm text-light">
-                        <tbody>
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="p-2" style="background: #313348; border-radius: 2px;">
+                        <h5><b>TOP ACTORS</b></h5>
+                        <hr class="mb-0 mt-0 top-series">
+                        <table class="table table-sm text-light">
+                            <tbody>
                             {% for media in top_actors["series"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="p-2" style="background: #313348; border-radius: 7px;">
-                    <h5><b>Top series</b></h5>
-                    <hr class="mb-0 mt-0 top-series">
-                    <table class="table table-sm text-light">
-                        <tbody>
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="p-2" style="background: #313348; border-radius: 2px;">
+                        <h5><b>TOP SERIES</b></h5>
+                        <hr class="mb-0 mt-0 top-series">
+                        <table class="table table-sm text-light">
+                            <tbody>
                             {% for media in top_media["series"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="p-2" style="background: #313348; border-radius: 7px;">
-                    <h5><b>Top dropped</b></h5>
-                    <hr class="mb-0 mt-0 top-series">
-                    <table class="table table-sm text-light">
-                        <tbody>
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="p-2" style="background: #313348; border-radius: 2px;">
+                        <h5><b>TOP DROPPED</b></h5>
+                        <hr class="mb-0 mt-0 top-series">
+                        <table class="table table-sm text-light">
+                            <tbody>
                             {% for media in top_dropped["series"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section class="anime m-t-10 p-2">
-        <div class="row">
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="p-2" style="background: #313348; border-radius: 7px;">
-                    <h5><b>Top genres</b></h5>
-                    <hr class="mb-0 mt-0 top-anime">
-                    <table class="table table-sm text-light">
-                    <tbody>
-                        {% for media in top_genres["anime"] %}
-                            <tr>
-                                <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
-                                <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        </section>
+        <section class="anime p-2">
+            <div class="row">
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="p-2" style="background: #313348; border-radius: 2px;">
+                        <h5><b>TOP GENRES</b></h5>
+                        <hr class="mb-0 mt-0 top-anime">
+                        <table class="table table-sm text-light">
+                            <tbody>
+                            {% for media in top_genres["anime"] %}
+                                <tr>
+                                    <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
+                                    <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="p-2" style="background: #313348; border-radius: 7px;">
-                    <h5><b>Top actors</b></h5>
-                    <hr class="mb-0 mt-0 top-anime">
-                    <table class="table table-sm text-light">
-                        <tbody>
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="p-2" style="background: #313348; border-radius: 2px;">
+                        <h5><b>TOP ACTORS</b></h5>
+                        <hr class="mb-0 mt-0 top-anime">
+                        <table class="table table-sm text-light">
+                            <tbody>
                             {% for media in top_actors["anime"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="p-2" style="background: #313348; border-radius: 7px;">
-                    <h5><b>Top anime</b></h5>
-                    <hr class="mb-0 mt-0 top-anime">
-                    <table class="table table-sm text-light">
-                        <tbody>
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="p-2" style="background: #313348; border-radius: 2px;">
+                        <h5><b>TOP ANIME</b></h5>
+                        <hr class="mb-0 mt-0 top-anime">
+                        <table class="table table-sm text-light">
+                            <tbody>
                             {% for media in top_media["anime"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="p-2" style="background: #313348; border-radius: 7px;">
-                    <h5><b>Top dropped</b></h5>
-                    <hr class="mb-0 mt-0 top-anime">
-                    <table class="table table-sm text-light">
-                        <tbody>
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="p-2" style="background: #313348; border-radius: 2px;">
+                        <h5><b>TOP DROPPED</b></h5>
+                        <hr class="mb-0 mt-0 top-anime">
+                        <table class="table table-sm text-light">
+                            <tbody>
                             {% for media in top_dropped["anime"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section class="series m-t-10 p-2 m-b-50">
-        <div class="row">
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="p-2" style="background: #313348; border-radius: 7px;">
-                    <h5><b>Top genres</b></h5>
-                    <hr class="mb-0 mt-0 top-movies">
-                    <table class="table table-sm text-light">
-                    <tbody>
-                        {% for media in top_genres["movies"] %}
-                            <tr>
-                                <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
-                                <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        </section>
+        <section class="series p-2 m-b-50">
+            <div class="row">
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="p-2" style="background: #313348; border-radius: 2px;">
+                        <h5><b>TOP GENRES</b></h5>
+                        <hr class="mb-0 mt-0 top-movies">
+                        <table class="table table-sm text-light">
+                            <tbody>
+                            {% for media in top_genres["movies"] %}
+                                <tr>
+                                    <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
+                                    <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="p-2" style="background: #313348; border-radius: 7px;">
-                    <h5><b>Top actors</b></h5>
-                    <hr class="mb-0 mt-0 top-movies">
-                    <table class="table table-sm text-light">
-                        <tbody>
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="p-2" style="background: #313348; border-radius: 2px;">
+                        <h5><b>TOP ACTORS</b></h5>
+                        <hr class="mb-0 mt-0 top-movies">
+                        <table class="table table-sm text-light">
+                            <tbody>
                             {% for media in top_actors["movies"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg col-sm-12 col-md-6 m-b-10">
-                <div class="p-2" style="background: #313348; border-radius: 7px;">
-                    <h5><b>Top movies</b></h5>
-                    <hr class="mb-0 mt-0 top-movies">
-                    <table class="table table-sm text-light">
-                        <tbody>
+                <div class="col-lg col-sm-12 col-md-6 m-b-10">
+                    <div class="p-2" style="background: #313348; border-radius: 2px;">
+                        <h5><b>TOP MOVIES</b></h5>
+                        <hr class="mb-0 mt-0 top-movies">
+                        <table class="table table-sm text-light">
+                            <tbody>
                             {% for media in top_media["movies"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 {% endblock content %}
 
 

@@ -50,46 +50,19 @@
 {% endblock sorting_list %}
 
 
-{#{% block sorting_list %}#}
-{#    <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Title</option>#}
-{#    <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>#}
-{#    <option {% if sort_val == 'rewatch' %}selected="selected"{% endif %} value="rewatch">Rewatch</option>#}
-{#    <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>#}
-{#    <option {% if sort_val == 'first_air_date' %}selected="selected"{% endif %} value="first_air_date">Release date</option>#}
-{#{% endblock sorting_list %}#}
-
-
-{#{% block button %}#}
-{#    <a class="btn btn-sm {% if category == 'Watching' %}btn-selected{% else %} btn-header{% endif %}"#}
-{#    href="/{{ media_list }}/{{ username }}?category=Watching&sort={{ sort_val }}&filter={{ filter_val }}">WATCHING</a>#}
-{#    <a class="btn btn-sm {% if category == 'Completed' %}btn-selected {% else %} btn-header{% endif %}"#}
-{#    href="/{{ media_list }}/{{ username }}?category=Completed&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED</a>#}
-{#    <a class="btn btn-sm {% if category == 'On Hold' %}btn-selected {% else %} btn-header{% endif %}"#}
-{#    href="/{{ media_list }}/{{ username }}?category=On Hold&sort={{ sort_val }}&filter={{ filter_val }}">ON HOLD</a>#}
-{#    <a class="btn btn-sm {% if category == 'Random' %}btn-selected {% else %} btn-header{% endif %}"#}
-{#    href="/{{ media_list }}/{{ username }}?category=Random&sort={{ sort_val }}&filter={{ filter_val }}">RANDOM</a>#}
-{#    <a class="btn btn-sm {% if category == 'Dropped' %}btn-selected {% else %} btn-header{% endif %}"#}
-{#    href="/{{ media_list }}/{{ username }}?category=Dropped&sort={{ sort_val }}&filter={{ filter_val }}">DROPPED</a>#}
-{#    <a class="btn btn-sm {% if category == 'Plan to Watch' %}btn-selected {% else %} btn-header {% endif %}"#}
-{#    href="/{{ media_list }}/{{ username }}?category=Plan to Watch&sort={{ sort_val }}&filter={{ filter_val }}">PLAN TO WATCH</a>#}
-{#    <a class="btn btn-sm {% if category == 'Favorite' %}btn-selected-fav {% else %} btn-header-fav{% endif %}"#}
-{#    href="/{{ media_list }}/{{ username }}?category=Favorite&sort={{ sort_val }}&filter={{ filter_val }}">FAVORITES</a>#}
-{#{% endblock button %}#}
-
-
 {% block data %}
-    {{ data['eps_per_season'] }}-{{ media_list }}-{{ data['id'] }}
+    {{ item.eps_per_season }}-{{ media_list }}-{{ item.id }}
 {% endblock data %}
 
 
 {% block seas_eps_drop %}
     <div class="seas-eps-drop-container" {% if category == 'Plan to Watch'
     or category == 'Random' %} style="display: none;"{% endif %}>
-        <select id="S_{{ data['id'] }}" class="seas-eps-drop
+        <select id="S_{{ item.id }}" class="seas-eps-drop
          {% if user_id != current_user.get_id() %} disabled{% endif %}"
-                onchange="updateSeason('{{ data['id'] }}', this)">
-            {% for i in range(data['eps_per_season']|length) %}
-                <option class="seas-eps-drop-options" {% if i + 1 == data['current_season'] %}
+                onchange="updateSeason('{{ item.id }}', this)">
+            {% for i in range(item.eps_per_season|length) %}
+                <option class="seas-eps-drop-options" {% if i + 1 == item.current_season %}
                         selected="selected"{% endif %}>
                     {{ "S{:02}".format(i + 1) }}
                 </option>
@@ -98,19 +71,19 @@
 
         <span style="border-right: 2px solid gray;"></span>
 
-        <select id="E_{{ data['id'] }}" class="text-light text-center p-0 seas-eps-drop
+        <select id="E_{{ item.id }}" class="text-light text-center p-0 seas-eps-drop
          {% if user_id != current_user.get_id() %} disabled{% endif %}"
-                onchange="updateEpisode('{{ data['id'] }}', this, '{{ media_list }}')">
+                onchange="updateEpisode('{{ item.id }}', this, '{{ media_list }}')">
             {% if category == 'Plan to Watch' or category == 'Random' %}
-                {% for i in range(0, data['eps_per_season'][data['current_season'] - 1]) %}
+                {% for i in range(0, item.eps_per_season[item.current_season - 1]) %}
                     <option class="seas-eps-drop-options" {% if i + 1 == 1 %} selected="selected" {% endif %}>
                         {{ "E{:02}".format(i + 1) }}
                     </option>
                 {% endfor %}
             {% else %}
-                {% for i in range(data['eps_per_season'][data['current_season'] - 1]) %}
+                {% for i in range(item.eps_per_season[item.current_season - 1]) %}
                     <option class="seas-eps-drop-options"
-                    {% if i + 1 == data['last_episode_watched'] %} selected="selected" {% endif %}>
+                    {% if i + 1 == item.last_episode_watched %} selected="selected" {% endif %}>
                         {{ "E{:02}".format(i + 1) }}
                     </option>
                 {% endfor %}

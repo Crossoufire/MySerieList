@@ -1,6 +1,7 @@
 import pytz
 import random
 import operator
+import collections
 from MyLists import db
 from flask import url_for
 from sqlalchemy import func
@@ -35,6 +36,37 @@ def get_media_count_by_status(user_id, list_type):
                                  "percent": 0}
 
     return data
+
+
+def get_media_count_by_score(user_id, list_type):
+    if list_type == ListType.SERIES:
+        score = SeriesList.score
+    elif list_type == ListType.ANIME:
+        score = AnimeList.score
+    elif list_type == ListType.MOVIES:
+        score = MoviesList.score
+
+    media_count = db.session.query(score, func.count(score)).filter_by(user_id=user_id)\
+        .group_by(score).order_by(score.asc()).all()
+
+    data = {}
+    for media in media_count:
+        data[media[0]] = media[1]
+
+    scores = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+    for sc in scores:
+        if sc not in data.keys():
+            data[sc] = 0
+
+    data.pop(None, None)
+    data.pop(-1, None)
+    data = OrderedDict(sorted(data.items()))
+
+    data_list = []
+    for key, value in data.items():
+        data_list.append(value)
+
+    return data_list
 
 
 def get_media_total_eps(user_id, list_type):
@@ -271,6 +303,7 @@ def get_media_data(user):
     media_dict = {}
     for list_type in all_lists:
         media_count = get_media_count_by_status(user.id, list_type[1])
+        media_count_score = get_media_count_by_score(user.id, list_type[1])
         media_levels = get_media_levels(user, list_type[1])
         media_score = get_media_score(user.id, list_type[1])
         media_time = list_type[2]
@@ -280,6 +313,7 @@ def get_media_data(user):
         media_data = {'time_spent_hour': round(media_time/60),
                       'time_spent_day': round(media_time/1440, 2),
                       'media_count': media_count,
+                      'media_count_score': media_count_score,
                       'media_total_eps': media_total_eps,
                       'media_levels': media_levels,
                       'media_score': media_score}
