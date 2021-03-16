@@ -49,6 +49,10 @@ table.table-sm td {
         position: relative;
         height: 300px;
     }
+    .mobile-margin {
+        margin-left: 0;
+        margin-right: 0;
+    }
 }
 
 

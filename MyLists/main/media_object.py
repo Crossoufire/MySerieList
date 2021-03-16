@@ -174,77 +174,63 @@ class MediaDict:
 
 
 # Parsing the DB data to the <MediaList> route
-class MediaListDict:
+class MediaListObj:
     def __init__(self, media_data, common_media, list_type):
-        self.data = media_data
-        self.list_type = list_type
-        self.common_media = common_media
-        self.media_info = {}
+        if list_type == ListType.SERIES:
+            cover_path = url_for('static', filename='covers/series_covers/')
+            self.media = "Series"
+        elif list_type == ListType.ANIME:
+            cover_path = url_for('static', filename='covers/anime_covers/')
+            self.media = "Anime"
+        elif list_type == ListType.MOVIES:
+            cover_path = url_for('static', filename='covers/movies_covers/')
+            self.media = "Movies"
 
-        if self.list_type == ListType.SERIES:
-            self.cover_path = url_for('static', filename='covers/series_covers/')
-        elif self.list_type == ListType.ANIME:
-            self.cover_path = url_for('static', filename='covers/anime_covers/')
-        elif self.list_type == ListType.MOVIES:
-            self.cover_path = url_for('static', filename='covers/movies_covers/')
+        self.id = media_data[0].id
+        self.tmdb_id = media_data[0].themoviedb_id
+        self.cover = "{}{}".format(cover_path, media_data[0].image_cover)
+        self.favorite = media_data[1].favorite
+        self.rewatched = media_data[1].rewatched
+        self.comment = media_data[1].comment
+        self.category = media_data[1].status.value
 
-    def redirect_medialist(self):
-        self.create_medialist_dict()
-        return self.media_info
+        self.score = media_data[1].score
+        if not media_data[1].score or media_data[1].score == -1:
+            self.score = '---'
 
-    def create_medialist_dict(self):
-        self.media_info = {"id": self.data[0].id,
-                           "tmdb_id": self.data[0].themoviedb_id,
-                           "cover": "{}{}".format(self.cover_path, self.data[0].image_cover),
-                           "score": self.data[1].score,
-                           "favorite": self.data[1].favorite,
-                           "rewatched": self.data[1].rewatched,
-                           "comment": self.data[1].comment,
-                           "category": self.data[1].status.value,
-                           "common": False,
-                           "media": "Movies"}
-
-        if not self.media_info['score'] or self.media_info['score'] == -1:
-            self.media_info['score'] = '---'
-
-        return_latin = latin_alphabet(self.data[0].original_name)
+        return_latin = latin_alphabet(media_data[0].original_name)
         if return_latin is True:
-            self.media_info["display_name"] = self.data[0].original_name
-            self.media_info["other_name"] = self.data[0].name
+            self.display_name = media_data[0].original_name
+            self.other_name = media_data[0].name
         elif return_latin is False:
-            self.media_info["display_name"] = self.data[0].name
-            self.media_info["other_name"] = self.data[0].original_name
+            self.display_name = media_data[0].name
+            self.other_name = media_data[0].original_name
         else:
-            self.media_info["display_name"] = self.data[0].name
-            self.media_info["other_name"] = return_latin
+            self.display_name = media_data[0].name
+            self.other_name = return_latin
 
-        if self.data[0].id in self.common_media:
-            self.media_info['common'] = True
+        self.common = False
+        if media_data[0].id in common_media:
+            self.common = True
 
-        if self.list_type != ListType.MOVIES:
-            self.add_tv_dict()
-
-    def add_tv_dict(self):
-        self.media_info['media'] = 'Series'
-        if self.list_type == ListType.ANIME:
-            self.media_info['media'] = 'Anime'
-
-        self.media_info['last_episode_watched'] = self.data[1].last_episode_watched
-        self.media_info['eps_per_season'] = [eps.episodes for eps in self.data[0].eps_per_season]
-        self.media_info['current_season'] = self.data[1].current_season
-        try:
-            self.media_info['eps_per_season'][self.media_info['current_season'] - 1]
-        except:
-            self.media_info['current_season'] = 1
-            self.media_info['last_episode_watched'] = 1
+        if list_type != ListType.MOVIES:
+            self.last_episode_watched = media_data[1].last_episode_watched
+            self.eps_per_season = [eps.episodes for eps in media_data[0].eps_per_season]
+            self.current_season = media_data[1].current_season
+           
+            try:
+                self.eps_per_season[self.current_season - 1]
+            except:
+                self.current_season = 1
+                self.last_episode_watched = 1
 
 
 # Parsing the <API_data> to dict
 class MediaDetails:
     def __init__(self, media_data, list_type, updating=False):
         self.media_data = media_data
-        self.list_type = list_type
         self.updating = updating
+        self.list_type = list_type
         self.media_details = {}
         self.all_data = {}
 
@@ -316,13 +302,11 @@ class MediaDetails:
         genres_list = []
         if genres:
             for i in range(0, len(genres)):
-                genres_dict = {'genre': genres[i]['name'],
-                               'genre_id': int(genres[i]['id'])}
-                genres_list.append(genres_dict)
+                genres_list.append({'genre': genres[i]['name'],
+                                    'genre_id': int(genres[i]['id'])})
         else:
-            genres_dict = {'genre': 'No genres found',
-                           'genre_id': 0}
-            genres_list.append(genres_dict)
+            genres_list.append({'genre': 'Unknown',
+                                'genre_id': 0})
 
         return genres_list
 
@@ -400,18 +384,13 @@ class MediaDetails:
         self.get_episode_duration()
         self.get_origin_country()
         self.get_created_by()
-        seasons_list = self.get_seasons()
 
-        a_genres_list = []
-        genres_list = []
-        actors_list = []
-        networks_list = []
-        if not self.updating:
-            genres_list = self.get_genres()
-            actors_list = self.get_actors()
-            networks_list = self.get_networks()
-            if self.list_type == ListType.ANIME:
-                a_genres_list = self.get_anime_genres()
+        seasons_list = self.get_seasons()
+        genres_list = self.get_genres()
+        actors_list = self.get_actors()
+        networks_list = self.get_networks()
+        if self.list_type == ListType.ANIME and self.updating is False:
+            a_genres_list = self.get_anime_genres()
 
         self.all_data = {'tv_data': self.media_details,
                          'seasons_data': seasons_list,
@@ -439,12 +418,8 @@ class MediaDetails:
                               'image_cover': self.get_media_cover()}
 
         self.get_director_name()
-
-        genres_list = []
-        actors_list = []
-        if not self.updating:
-            genres_list = self.get_genres()
-            actors_list = self.get_actors()
+        genres_list = self.get_genres()
+        actors_list = self.get_actors()
 
         self.all_data = {'movies_data': self.media_details,
                          'genres_data': genres_list,

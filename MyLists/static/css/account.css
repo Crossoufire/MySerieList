@@ -1,5 +1,5 @@
 
-/* --- Main CSS ----------------------------------------- */
+/* --- Main CSS ----------------------------------------------------------------------------- */
 .vertical-line {
     width: 5px;
     border-left: 2px solid rgba(44, 57, 70, 1);
@@ -169,7 +169,7 @@ a {
 }
 
 
-/* --- Levels ------------------------------------------- */
+/* --- Levels ------------------------------------------------------------------------------ */
 #series-level {
     margin-left: 20px;
 }
@@ -224,7 +224,7 @@ a {
 }
 
 
-/* --- Updates ------------------------------------------ */
+/* --- Updates ------------------------------------------------------------------------------- */
 .more-link {
     float: right;
     color: grey !important;
@@ -258,7 +258,7 @@ a {
 }
 
 
-/* --- Central Statistics ------------------------------- */
+/* --- Central statistics ------------------------------------------------------------------- */
 .media-container {
     position: relative;
     height: 200px;
@@ -315,14 +315,55 @@ a {
 	opacity: 0.75;
 }
 
+.media-stats-title {
+    background: #403d3a;
+}
+
 .stat-text {
     font-size: 12pt;
     color: lightgray;
 }
 
 .favorite-img {
-    height: 89px;
+    height: 88px;
     width: auto;
+}
+
+.histogram-wrapper {
+    display: flex;
+    align-items: left;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#series-score, #anime-score, #movies-score {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    grid-column-gap: 3px;
+    align-items: end;
+}
+
+.added-styles {
+    list-style: none;
+    height: 50px;
+    width: 100%;
+    padding-left: 0;
+}
+
+.histogram-item-series {
+    width: 100%;
+    background: #216e7d;
+}
+
+.histogram-item-anime {
+    width: 100%;
+    background: #945141;
+}
+
+.histogram-item-movies {
+    width: 100%;
+    background: #8c7821;
 }
 
 @media (max-width: 768px) {
@@ -338,7 +379,7 @@ a {
 }
 
 
-/* --- Follows ------------------------------------------ */
+/* --- Follows ------------------------------------------------------------------------------ */
 .follow-img {
     border-radius: 50%;
     height: 60px;

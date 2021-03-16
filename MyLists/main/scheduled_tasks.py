@@ -315,7 +315,6 @@ def new_releasing_series():
     app.logger.info('[SYSTEM] - Start adding the new releasing series')
 
     all_series = Series.query.filter(Series.next_episode_to_air != None).all()
-
     media_id = []
     for series in all_series:
         try:
@@ -370,7 +369,6 @@ def new_releasing_anime():
     app.logger.info('[SYSTEM] - Start adding the new releasing anime')
 
     all_anime = Anime.query.filter(Anime.next_episode_to_air != None).all()
-
     media_id = []
     for anime in all_anime:
         try:
@@ -423,7 +421,6 @@ def new_releasing_movies():
     app.logger.info('[SYSTEM] - Start adding the new releasing movies')
 
     all_movies = Movies.query.all()
-
     media_id = []
     for movie in all_movies:
         try:
@@ -460,8 +457,8 @@ def new_releasing_movies():
 def automatic_movies_locking():
     app.logger.info('###################################################################')
     app.logger.info('[SYSTEM] - Starting automatic movies locking')
-    all_movies = Movies.query.filter(Movies.lock_status != True).all()
 
+    all_movies = Movies.query.filter(Movies.lock_status != True).all()
     count_locked = 0
     count_not_locked = 0
     now_date = (datetime.utcnow() - timedelta(minutes=225000))  # About 5 months

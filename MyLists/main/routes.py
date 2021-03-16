@@ -8,7 +8,7 @@ from flask_login import login_required, current_user
 from MyLists.main.forms import EditMediaData, MediaComment
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
-from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaListDict
+from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaListObj
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MediaType, get_next_airing, check_media, User, \
     get_media_query, get_media_count
@@ -95,10 +95,11 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
     # Recover the media data into a dict
     items_data_list = []
     for item in items:
-        add_data = MediaListDict(item, common_media, list_type).redirect_medialist()
+        # add_data = MediaListDict(item, common_media, list_type).redirect_medialist()
+        add_data = MediaListObj(item, common_media, list_type)
         items_data_list.append(add_data)
 
-    return render_template(html_template, title="{}'s {}".format(user_name, media_list), media_data=items_data_list,
+    return render_template(html_template, title="{}'s {}".format(user_name, media_list), media_items=items_data_list,
                            common_elements=common_elements, media_list=media_list, username=user_name, genre=genre,
                            user_id=str(user.id), info_pages=info_pages, category=category, sorting=sorting,
                            page=page_val, all_genres=all_genres, sorting_bis=sorting_bis, search_query=q)

@@ -37,6 +37,37 @@ def get_media_count_by_status(user_id, list_type):
     return data
 
 
+def get_media_count_by_score(user_id, list_type):
+    if list_type == ListType.SERIES:
+        score = SeriesList.score
+    elif list_type == ListType.ANIME:
+        score = AnimeList.score
+    elif list_type == ListType.MOVIES:
+        score = MoviesList.score
+
+    media_count = db.session.query(score, func.count(score)).filter_by(user_id=user_id)\
+        .group_by(score).order_by(score.asc()).all()
+
+    data = {}
+    for media in media_count:
+        data[media[0]] = media[1]
+
+    scores = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+    for sc in scores:
+        if sc not in data.keys():
+            data[sc] = 0
+
+    data.pop(None, None)
+    data.pop(-1, None)
+    data = OrderedDict(sorted(data.items()))
+
+    data_list = []
+    for key, value in data.items():
+        data_list.append(value)
+
+    return data_list
+
+
 def get_media_total_eps(user_id, list_type):
     if list_type == ListType.SERIES:
         media = SeriesList
@@ -84,19 +115,16 @@ def get_media_score(user_id, list_type):
 
 
 def get_favorites(user_id):
-    series_favorites = db.session.query(Series, SeriesList) \
-        .join(Series, Series.id == SeriesList.media_id) \
-        .filter(SeriesList.user_id == user_id, SeriesList.favorite == True).group_by(SeriesList.media_id).all()
+    s_fav = SeriesList.query.filter_by(favorite=True, user_id=user_id).all()
+    series_favorites = db.session.query(Series).filter(Series.id.in_([m.media_id for m in s_fav])).all()
     random.shuffle(series_favorites)
 
-    anime_favorites = db.session.query(Anime, AnimeList) \
-        .join(Anime, Anime.id == AnimeList.media_id) \
-        .filter(AnimeList.user_id == user_id, AnimeList.favorite == True).group_by(AnimeList.media_id).all()
+    a_fav = AnimeList.query.filter_by(favorite=True, user_id=user_id).all()
+    anime_favorites = db.session.query(Anime).filter(Anime.id.in_([m.media_id for m in a_fav])).all()
     random.shuffle(anime_favorites)
 
-    movies_favorites = db.session.query(Movies, MoviesList) \
-        .join(Movies, Movies.id == MoviesList.media_id) \
-        .filter(MoviesList.user_id == user_id, MoviesList.favorite == True).group_by(MoviesList.media_id).all()
+    m_fav = MoviesList.query.filter_by(favorite=True, user_id=user_id).all()
+    movies_favorites = db.session.query(Movies).filter(Movies.id.in_([m.media_id for m in m_fav])).all()
     random.shuffle(movies_favorites)
 
     favorites = [series_favorites, anime_favorites, movies_favorites]
@@ -154,8 +182,8 @@ def get_knowledge_grade(user):
 
 def get_knowledge_frame(user):
     # Compute the corresponding level and percentage from the media time
-    knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
-                      int((((400+80*user.time_spent_anime)**(1/2))-20)/40) +\
+    knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) + \
+                      int((((400+80*user.time_spent_anime)**(1/2))-20)/40) + \
                       int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
 
     frame_level = round(knowledge_level/8, 0) + 1
@@ -246,15 +274,15 @@ def get_user_data(user):
     if current_user.role != RoleType.ADMIN and user.id != current_user.id:
         user.profile_views += 1
         profile_view_count = user.profile_views
-        db.session.commit()
+
     view_count = {"profile": profile_view_count,
                   "series": user.series_views,
                   "anime": user.anime_views,
                   "movies": user.movies_views}
 
-    # Recover the overview user's last update
-    last_update = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).limit(7)
-    media_update = get_updates(last_update)
+    # Recover the user's last updates
+    last_updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).limit(7)
+    media_update = get_updates(last_updates)
 
     user_data = {"media_update": media_update,
                  "view_count": view_count}
@@ -263,14 +291,14 @@ def get_user_data(user):
 
 
 def get_media_data(user):
-    all_lists = [['series', ListType.SERIES, user.time_spent_series],
-                 ['anime', ListType.ANIME, user.time_spent_anime],
+    all_lists = [['series', ListType.SERIES, user.time_spent_series], ['anime', ListType.ANIME, user.time_spent_anime],
                  ['movies', ListType.MOVIES, user.time_spent_movies]]
 
     # Create dict with media as key. Dict values are dict or list of dict
     media_dict = {}
     for list_type in all_lists:
         media_count = get_media_count_by_status(user.id, list_type[1])
+        media_count_score = get_media_count_by_score(user.id, list_type[1])
         media_levels = get_media_levels(user, list_type[1])
         media_score = get_media_score(user.id, list_type[1])
         media_time = list_type[2]
@@ -280,6 +308,7 @@ def get_media_data(user):
         media_data = {'time_spent_hour': round(media_time/60),
                       'time_spent_day': round(media_time/1440, 2),
                       'media_count': media_count,
+                      'media_count_score': media_count_score,
                       'media_total_eps': media_total_eps,
                       'media_levels': media_levels,
                       'media_score': media_score}
@@ -308,24 +337,19 @@ def get_follows_data(user):
         for follow in follows_list:
             follows_to_update.append(follow.id)
 
-        follows_update = db.session.query(User, followers, UserLastUpdate)\
-            .join(followers, followers.c.followed_id == User.id)\
-            .join(UserLastUpdate, UserLastUpdate.user_id == User.id)\
-            .filter(followers.c.followed_id.in_(follows_to_update), followers.c.follower_id == user.id)\
-            .order_by(UserLastUpdate.date.desc()).all()
+        follows_update = db.session.query(UserLastUpdate) \
+            .filter(UserLastUpdate.user_id.in_([u.id for u in user.followed.all()])) \
+            .order_by(UserLastUpdate.date.desc()).limit(11)
     else:
-        follows_update = db.session.query(User, followers, UserLastUpdate)\
-            .join(followers, followers.c.followed_id == User.id)\
-            .join(UserLastUpdate, UserLastUpdate.user_id == User.id)\
-            .filter(followers.c.follower_id == user.id)\
-            .order_by(UserLastUpdate.date.desc()).all()
-
         follows_list = user.followed.all()
+        follows_update = db.session.query(UserLastUpdate) \
+            .filter(UserLastUpdate.user_id.in_([u.id for u in user.followed.all()])) \
+            .order_by(UserLastUpdate.date.desc()).limit(11)
 
     follows_update_list = []
-    for follow in follows_update[:11]:
-        follows = {'username': follow[0].username}
-        follows.update(get_updates([follow[3]])[0])
+    for follow in follows_update:
+        follows = {'username': follow.user.username}
+        follows.update(get_updates([follow])[0])
         follows_update_list.append(follows)
 
     return follows_list, follows_update_list

@@ -98,7 +98,7 @@ def settings():
 @bp.route("/email_update/<token>", methods=['GET'])
 @login_required
 def email_update_token(token):
-    user = User.verify_reset_token(token)
+    user = User.verify_token(token)
 
     if user is None:
         flash('That is an invalid or expired token', 'warning')

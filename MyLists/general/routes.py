@@ -9,7 +9,7 @@ from MyLists.models import User, RoleType, MyListsStats
 from flask import render_template, flash, request, abort
 from MyLists.main.scheduled_tasks import update_Mylists_stats
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
-    refresh_db_frames, refresh_db_badges, refresh_db_ranks
+    refresh_db_frames, refresh_db_badges, refresh_db_ranks, correct_orphan_media
 
 bp = Blueprint('general', __name__)
 
@@ -51,6 +51,7 @@ def create_first_data():
 
     compute_media_time_spent()
     # update_Mylists_stats()
+    # correct_orphan_media()
     db.session.commit()
 
 
@@ -93,7 +94,7 @@ def current_trends():
     except Exception as e:
         series_info = {'results': []}
         app.logger.error('[ERROR] - Getting the Series trending info: {}.'.format(e))
-        flash('The current TV trends from TMDB are not available right now.', 'warning')
+        flash('The current TV trends from TMDb are not available right now.', 'warning')
 
     try:
         anime_info = ApiData().get_trending_anime()
@@ -107,7 +108,7 @@ def current_trends():
     except Exception as e:
         movies_info = {'results': []}
         app.logger.error('[ERROR] - Getting the movies trending info: {}.'.format(e))
-        flash('The current movies trends from TMDB are not available right now.', 'warning')
+        flash('The current movies trends from TMDb are not available right now.', 'warning')
 
     series_results = TrendingData(series_info).get_trending_series()
     anime_results = TrendingData(anime_info).get_trending_anime()
@@ -131,4 +132,4 @@ def privacy_policy():
 @bp.route("/about", methods=['GET'])
 @login_required
 def about():
-    return render_template('about.html', title='About MyLists')
+    return render_template('about.html', title='About')

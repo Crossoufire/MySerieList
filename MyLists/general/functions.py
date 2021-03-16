@@ -1,35 +1,23 @@
 from pathlib import Path
 from MyLists import db, app
-from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, get_total_time, SeriesList, Anime, \
-    AnimeList, Series, MoviesList
+from MyLists.API_data import ApiData
+from MyLists.main.media_object import MediaDetails
+from MyLists.models import ListType, Status, Movies, Badges, Ranks, Frames, SeriesGenre, SeriesList, Anime, Series, \
+    AnimeList, MoviesList, AnimeGenre, MoviesGenre, get_total_time, SeriesActors, AnimeActors, MoviesActors
 
 
 def compute_media_time_spent():
-    users = User.query.all()
-
-    for user in users:
-        for list_type in ListType:
-            total_time = 0
-            media_list = get_total_time(user.id, list_type)
-            if list_type == ListType.SERIES or list_type == ListType.ANIME:
-                for media in media_list:
-                    try:
-                        total_time += media[0].episode_duration * media[1].eps_watched
-                    except Exception as e:
-                        app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
-            elif list_type == ListType.MOVIES:
-                for media in media_list:
-                    try:
-                        total_time += media[0].runtime * media[1].eps_watched
-                    except Exception as e:
-                        app.logger.info('[ERROR] - {}. [MEDIA]: {}'.format(e, media[0].name))
-
-            if list_type == ListType.SERIES:
-                user.time_spent_series = total_time
-            elif list_type == ListType.ANIME:
-                user.time_spent_anime = total_time
-            elif list_type == ListType.MOVIES:
-                user.time_spent_movies = total_time
+    for list_type in ListType:
+        query = get_total_time(list_type)
+        if list_type == ListType.SERIES:
+            for q in query:
+                q[0].time_spent_series = q[3]
+        elif list_type == ListType.ANIME:
+            for q in query:
+                q[0].time_spent_anime = q[3]
+        elif list_type == ListType.MOVIES:
+            for q in query:
+                q[0].time_spent_movies = q[3]
 
 
 # --- DB add/refresh from CSV data -----------------------------------------------------------------------------
@@ -166,3 +154,75 @@ def add_eps_watched():
         else:
             movie[1].eps_watched = 1 + movie[1].rewatched
     db.session.commit()
+
+
+def correct_orphan_media():
+    def get_orphan_genres_and_actors(api_id, list_type, media_id):
+        media_data = ApiData().get_details_and_credits_data(api_id, list_type)
+        if list_type == ListType.SERIES or list_type == ListType.ANIME:
+            data = MediaDetails(media_data, list_type).get_media_details()
+            if not data['tv_data']:
+                return None
+        elif list_type == ListType.MOVIES:
+            data = MediaDetails(media_data, list_type).get_media_details()
+            if not data['movies_data']:
+                return None
+
+        if list_type == ListType.SERIES:
+            for genre in data['genres_data']:
+                genre.update({'media_id': media_id})
+                db.session.add(SeriesGenre(**genre))
+            for actor in data['actors_data']:
+                actor.update({'media_id': media_id})
+                db.session.add(SeriesActors(**actor))
+        elif list_type == ListType.ANIME:
+            if len(data['anime_genres_data']) > 0:
+                for genre in data['anime_genres_data']:
+                    genre.update({'media_id': media_id})
+                    db.session.add(AnimeGenre(**genre))
+            else:
+                for genre in data['genres_data']:
+                    genre.update({'media_id': media_id})
+                    db.session.add(AnimeGenre(**genre))
+            for actor in data['actors_data']:
+                actor.update({'media_id': media_id})
+                db.session.add(AnimeActors(**actor))
+        elif list_type == ListType.MOVIES:
+            for genre in data['genres_data']:
+                genre.update({'media_id': media_id})
+                db.session.add(MoviesGenre(**genre))
+            for actor in data['actors_data']:
+                actor.update({'media_id': media_id})
+                db.session.add(MoviesActors(**actor))
+
+        # Commit the new changes
+        db.session.commit()
+
+        return True
+
+    query = db.session.query(Series, SeriesGenre).outerjoin(SeriesGenre, SeriesGenre.media_id == Series.id).all()
+    for q in query:
+        if q[1] is None:
+            info = get_orphan_genres_and_actors(q[0].themoviedb_id, ListType.SERIES, media_id=q[0].id)
+            if info is True:
+                app.logger.info(f'Orphan series corrected with ID [{q[0].id}]: {q[0].name}')
+            else:
+                app.logger.info(f'Orphan series NOT corrected with ID [{q[0].id}]: {q[0].name}')
+
+    query = db.session.query(Anime, AnimeGenre).outerjoin(AnimeGenre, AnimeGenre.media_id == Anime.id).all()
+    for q in query:
+        if q[1] is None:
+            info = get_orphan_genres_and_actors(q[0].themoviedb_id, ListType.ANIME, media_id=q[0].id)
+            if info is True:
+                app.logger.info(f'Orphan anime corrected with ID [{q[0].id}]: {q[0].name}')
+            else:
+                app.logger.info(f'Orphan anime NOT corrected with ID [{q[0].id}]: {q[0].name}')
+
+    query = db.session.query(Movies, MoviesGenre).outerjoin(MoviesGenre, MoviesGenre.media_id == Movies.id).all()
+    for q in query:
+        if q[1] is None:
+            info = get_orphan_genres_and_actors(q[0].themoviedb_id, ListType.MOVIES, media_id=q[0].id)
+            if info is True:
+                app.logger.info(f'Orphan movie corrected with ID [{q[0].id}]: {q[0].name}')
+            else:
+                app.logger.info(f'Orphan movie NOT corrected with ID [{q[0].id}]: {q[0].name}')
