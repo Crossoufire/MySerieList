@@ -190,6 +190,8 @@ class UserLastUpdate(db.Model):
     new_episode = db.Column(db.Integer)
     date = db.Column(db.DateTime, nullable=False)
 
+    user = db.relationship('User', backref='UserLastUpdate', lazy=False)
+
 
 class RedisTasks(db.Model):
     id = db.Column(db.String(50), primary_key=True)
@@ -642,6 +644,7 @@ class GlobalStats:
         return t_movies
 
 
+# Query for <mymedialist> route
 def get_media_query(user_id, list_type, category, genre, sort_val, page, q):
     if list_type == ListType.SERIES:
         media = Series
@@ -721,6 +724,7 @@ def get_media_query(user_id, list_type, category, genre, sort_val, page, q):
     return results, cat_value
 
 
+# Count the number of media in a list type for a user
 def get_media_count(user_id, list_type):
     if list_type == ListType.SERIES:
         media_list = SeriesList
@@ -739,6 +743,7 @@ def get_media_count(user_id, list_type):
     return common_ids, int(count_total)
 
 
+# Recover the next airing media for the user
 def get_next_airing(list_type):
     if list_type == ListType.SERIES:
         media = Series
@@ -788,6 +793,7 @@ def get_total_time(list_type):
     return query
 
 
+# Check if media exists
 def check_media(media_id, list_type, add=False):
     if list_type == ListType.SERIES:
         media = Series

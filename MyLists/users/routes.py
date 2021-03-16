@@ -1,3 +1,4 @@
+import time
 import json
 from MyLists import app, db
 from flask_login import login_required, current_user
@@ -37,8 +38,14 @@ def account(user_name):
     # Recover follows data and last updates
     follows_list, follows_update_list = get_follows_data(user)
 
+    start = time.time()
     # Recover the Favorites
     favorites = get_favorites(user.id)
+    end = time.time()
+    print(end - start)
+
+    # Commit the changes
+    db.session.commit()
 
     return render_template('account.html', title=user.username+"'s account", header_data=header_data,
                            user_data=user_data, favorites=favorites, media_data=media_data, follows_list=follows_list,

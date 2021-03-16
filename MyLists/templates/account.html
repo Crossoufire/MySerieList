@@ -175,20 +175,20 @@
                                       , {{ media_data['movies']['time_spent_hour'] }}"></span>
                             </div>
                             <div class="col-xl-7 col-lg-12 col-sm-12 m-t-10">
-                                <div class="row m-t-10 fs-18 text-center">
+                                <div class="row m-t-15 fs-18 text-center">
                                     <div class="col-6 m-b-10">
-                                        <div class="p-2" style="background: #262424; border-radius: 2px;">
+                                        <div class="p-2">
                                             <i class="fas fa-clock"></i><b> TIME</b><br>
                                             <b>{{ media_data['series']['time_spent_hour']+
                                                media_data['anime']['time_spent_hour']+
                                                media_data['movies']['time_spent_hour'] }} h
-                                                - {{ ((media_data['series']['time_spent_hour'] +
+                                                &nbsp;|&nbsp; {{ ((media_data['series']['time_spent_hour'] +
                                                 media_data['anime']['time_spent_hour'] +
                                                 media_data['movies']['time_spent_hour'])/24)|int }} d</b>
                                         </div>
                                     </div>
                                     <div class="col-6 m-b-10" style="margin-left: -10px;">
-                                        <div class="p-2" style="background: #262424; border-radius: 2px;">
+                                        <div class="p-2">
                                             <i class="fas fa-play"></i><b class="m-l-3"> MEDIA</b><br>
                                             <b>{{ media_data['series']['media_total_eps']+
                                             media_data['anime']['media_total_eps'] +
@@ -196,7 +196,7 @@
                                         </div>
                                     </div>
                                     <div class="col-6 m-b-10">
-                                        <div class="p-2" style="background: #262424; border-radius: 2px;">
+                                        <div class="p-2">
                                             <i class="fas fa-align-justify"></i><b class="m-l-4"> SCORED</b><br>
                                             <b>{{ media_data['series']['media_score']['scored_media']+
                                             media_data['anime']['media_score']['scored_media']+
@@ -206,7 +206,7 @@
                                         </div>
                                     </div>
                                     <div class="col-6 m-b-10" style="margin-left: -10px;">
-                                        <div class="p-2" style="background: #262424; border-radius: 2px;">
+                                        <div class="p-2">
                                             <i class="fas fa-star"></i><b> SCORE</b><br>
                                             {% set a = media_data['series']['media_score']['mean_score'] %}
                                             {% set b = media_data['anime']['media_score']['mean_score'] %}
@@ -357,10 +357,10 @@
                                     {% for favorite in favorites[0] %}
                                         {% if loop.index < 11 %}
                                             <a href="{{ url_for('main.media_sheet', media_type='Series',
-                                            media_id=favorite[0].id) }}">
-                                                <img class="favorite-img" title="{{ favorite[0].name }}"
+                                            media_id=favorite.id) }}">
+                                                <img class="favorite-img" title="{{ favorite.name }}"
                                                      data-toggle="tooltip"
-                                                     src="/static/covers/series_covers/{{ favorite[0].image_cover }}"/>
+                                                     src="/static/covers/series_covers/{{ favorite.image_cover }}"/>
                                             </a>
                                         {% endif %}
                                     {% endfor %}
@@ -511,10 +511,10 @@
                                     {% for favorite in favorites[1] %}
                                         {% if loop.index < 11 %}
                                             <a href="{{ url_for('main.media_sheet', media_type='Anime',
-                                            media_id=favorite[0].id) }}">
+                                            media_id=favorite.id) }}">
                                                 <img class="favorite-img" data-toggle="tooltip"
-                                                     title="{{ favorite[0].name }}"
-                                                     src="/static/covers/anime_covers/{{ favorite[0].image_cover }}"/>
+                                                     title="{{ favorite.name }}"
+                                                     src="/static/covers/anime_covers/{{ favorite.image_cover }}"/>
                                             </a>
                                         {% endif %}
                                     {% endfor %}
@@ -599,10 +599,10 @@
                                     {% for favorite in favorites[2] %}
                                         {% if loop.index < 11 %}
                                             <a href="{{ url_for('main.media_sheet', media_type='Movies',
-                                            media_id=favorite[0].id) }}">
+                                            media_id=favorite.id) }}">
                                                 <img class="favorite-img" data-toggle="tooltip"
-                                                     title="{{ favorite[0].name }}"
-                                                     src="/static/covers/movies_covers/{{ favorite[0].image_cover }}"/>
+                                                     title="{{ favorite.name }}"
+                                                     src="/static/covers/movies_covers/{{ favorite.image_cover }}"/>
                                             </a>
                                         {% endif %}
                                     {% endfor %}
@@ -725,7 +725,7 @@
             const height = number/maxValue_series*100;
             i = i + 0.5;
             // adding 1px so there's an indication of 0
-            return acc + `<li class="histogramItem" data-toggle="tooltip" title="`+number+` series at `+i+`" style="height: calc(${height}% + 1px)" />`
+            return acc + `<li class="histogram-item-series" data-toggle="tooltip" title="`+i+`/10: `+number+` series" style="height: calc(${height}% + 1px)" />`
         }, ``)
         // inject into dom
         const series_chart = document.getElementById('series-score')
@@ -741,7 +741,7 @@
             const height = number/maxValue_anime*100;
             i = i + 0.5;
             // adding 1px so there's an indication of 0
-            return acc + `<li class="histogramItem" data-toggle="tooltip" title="`+number+` anime at `+i+`" style="height: calc(${height}% + 1px)" />`
+            return acc + `<li class="histogram-item-anime" data-toggle="tooltip" title="`+i+`/10: `+number+` anime" style="height: calc(${height}% + 1px)" />`
         }, ``)
         // inject into dom
         const anime_chart = document.getElementById('anime-score')
@@ -757,7 +757,7 @@
         const height = number/maxValue_movies*100;
         i = i + 0.5;
         // adding 1px so there's an indication of 0
-        return acc + `<li class="histogramItem" data-toggle="tooltip" title="`+number+` movies at `+i+`" style="height: calc(${height}% + 1px)" />`
+        return acc + `<li class="histogram-item-movies" data-toggle="tooltip" title="`+i+`/10: `+number+` movies" style="height: calc(${height}% + 1px)" />`
         }, ``)
         // inject into dom
         const movies_chart = document.getElementById('movies-score')

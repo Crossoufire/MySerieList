@@ -351,9 +351,19 @@ a {
     padding-left: 0;
 }
 
-.histogramItem {
+.histogram-item-series {
     width: 100%;
-    background: grey;
+    background: #216e7d;
+}
+
+.histogram-item-anime {
+    width: 100%;
+    background: #945141;
+}
+
+.histogram-item-movies {
+    width: 100%;
+    background: #8c7821;
 }
 
 @media (max-width: 768px) {
