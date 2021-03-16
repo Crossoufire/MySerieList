@@ -168,46 +168,46 @@
                     <li class="m-b-30">
                         <h4><i class="fas fa-chart-pie"></i>&nbsp;&nbsp; Statistics</h4><hr>
                         <div class="row no-gutters">
-                            <div class="col-xl-5 col-lg-12 col-sm-12 media-container">
+                            <div class="col-xl-6 col-lg-12 col-sm-12 media-container">
                                 <canvas id="media-time"></canvas>
                                 <span id="time-spent-pie" values="{{ media_data['series']['time_spent_hour'] }}
                                       , {{ media_data['anime']['time_spent_hour'] }}
                                       , {{ media_data['movies']['time_spent_hour'] }}"></span>
                             </div>
-                            <div class="col-xl-7 col-lg-12 col-sm-12 m-t-10">
-                                <div class="row m-t-15 fs-18 text-center">
+                            <div class="col-xl-6 col-lg-12 col-sm-12 m-t-10">
+                                <div class="row m-t-15 fs-18">
                                     <div class="col-6 m-b-10">
-                                        <div class="p-2">
-                                            <i class="fas fa-clock"></i><b> TIME</b><br>
-                                            <b>{{ media_data['series']['time_spent_hour']+
+                                        <div class="p-2" title="{{ ((media_data['series']['time_spent_hour'] +
+                                                media_data['anime']['time_spent_hour'] +
+                                                media_data['movies']['time_spent_hour'])/24)|int }} days"
+                                             data-toggle="tooltip">
+                                            <i class="fas fa-clock"></i><b> Time</b><br>
+                                            {{ media_data['series']['time_spent_hour']+
                                                media_data['anime']['time_spent_hour']+
                                                media_data['movies']['time_spent_hour'] }} h
-                                                &nbsp;|&nbsp; {{ ((media_data['series']['time_spent_hour'] +
-                                                media_data['anime']['time_spent_hour'] +
-                                                media_data['movies']['time_spent_hour'])/24)|int }} d</b>
                                         </div>
                                     </div>
                                     <div class="col-6 m-b-10" style="margin-left: -10px;">
                                         <div class="p-2">
-                                            <i class="fas fa-play"></i><b class="m-l-3"> MEDIA</b><br>
-                                            <b>{{ media_data['series']['media_total_eps']+
+                                            <i class="fas fa-play"></i><b class="m-l-3"> Media</b><br>
+                                            {{ media_data['series']['media_total_eps']+
                                             media_data['anime']['media_total_eps'] +
-                                            media_data['movies']['media_total_eps'] }}</b>
+                                            media_data['movies']['media_total_eps'] }}
                                         </div>
                                     </div>
                                     <div class="col-6 m-b-10">
                                         <div class="p-2">
-                                            <i class="fas fa-align-justify"></i><b class="m-l-4"> SCORED</b><br>
-                                            <b>{{ media_data['series']['media_score']['scored_media']+
+                                            <i class="fas fa-align-justify"></i><b class="m-l-4"> Scored</b><br>
+                                            {{ media_data['series']['media_score']['scored_media']+
                                             media_data['anime']['media_score']['scored_media']+
                                             media_data['movies']['media_score']['scored_media'] }}/{{ media_data['series']
                                             ['media_score']['total_media']+media_data['anime']['media_score']
-                                            ['total_media']+media_data['movies']['media_score']['total_media'] }}</b>
+                                            ['total_media']+media_data['movies']['media_score']['total_media'] }}
                                         </div>
                                     </div>
                                     <div class="col-6 m-b-10" style="margin-left: -10px;">
                                         <div class="p-2">
-                                            <i class="fas fa-star"></i><b> SCORE</b><br>
+                                            <i class="fas fa-star"></i><b> Score</b><br>
                                             {% set a = media_data['series']['media_score']['mean_score'] %}
                                             {% set b = media_data['anime']['media_score']['mean_score'] %}
                                             {% set c = media_data['movies']['media_score']['mean_score'] %}
@@ -225,9 +225,9 @@
                                                 {% set d = d - 1 %}
                                             {% endif %}
                                             {%  if d != 0 %}
-                                                <b>{{ ((a + b + c)/d)|round(2) }}/10</b>
+                                                {{ ((a + b + c)/d)|round(2) }}/10
                                             {% else %}
-                                                <b>-/10</b>
+                                                -/10
                                             {% endif %}
                                         </div>
                                     </div>
