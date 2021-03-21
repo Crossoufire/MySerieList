@@ -94,7 +94,7 @@ class AnimeAdminView(ModelView):
     column_exclude_list = ('homepage', 'synopsis', 'image_cover', 'themoviedb_id')
     column_searchable_list = ['name']
     column_sortable_list = ('id', 'name', 'original_name', 'in_production', 'created_by', 'origin_country', 'status',
-                            'episode_duration', 'total_seasons', 'total_episodes', 'vote_average', 'vote_count',
+                            'duration', 'total_seasons', 'total_episodes', 'vote_average', 'vote_count',
                             'popularity', 'first_air_date', 'last_air_date', 'last_update')
 
 
@@ -152,7 +152,7 @@ class MoviesAdminView(ModelView):
     column_display_pk = True
     column_exclude_list = ('homepage', 'released', 'synopsis', 'tagline', 'image_cover', 'themoviedb_id')
     column_searchable_list = ['name']
-    column_sortable_list = ('id', 'name', 'original_name', 'release_date', 'runtime', 'original_language',
+    column_sortable_list = ('id', 'name', 'original_name', 'release_date', 'duration', 'original_language',
                             'vote_average', 'vote_count', 'popularity', 'budget', 'revenue')
 
 

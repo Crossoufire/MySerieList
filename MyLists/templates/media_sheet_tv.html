@@ -153,7 +153,7 @@
             </li>
             <li>
                 <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Episode duration</b></h5>
-                <div>{{ data['episode_duration'] }} min</div>
+                <div>{{ data['duration'] }} min</div>
             </li>
         </ul>
     </div>
@@ -293,10 +293,10 @@
 {#                                <div class="row">#}
 {#                                    {% if media_list != 'movieslist' %}#}
 {#                                        <div class="col-5"><b>Episode duration:</b></div>#}
-{#                                        <div class="col-7">{{ data['episode_duration'] }} min</div>#}
+{#                                        <div class="col-7">{{ data['duration'] }} min</div>#}
 {#                                    {% else %}#}
-{#                                        <div class="col-5"><b>Movie Runtime</b></div>#}
-{#                                        <div class="col-7">{{ data['runtime'] }} min</div>#}
+{#                                        <div class="col-5"><b>Movie duration</b></div>#}
+{#                                        <div class="col-7">{{ data['duration'] }} min</div>#}
 {#                                    {% endif %}#}
 {#                                </div>#}
 {#                            </li>#}
@@ -305,7 +305,7 @@
 {#                                    <div class="row">#}
 {#                                        <div class="col-5"><b>Time to watch:</b></div>#}
 {#                                        <div#}
-{#                                        class="col-7">{{ ((data['total_episodes'] * data['episode_duration'])/60)|round(1) }}#}
+{#                                        class="col-7">{{ ((data['total_episodes'] * data['duration'])/60)|round(1) }}#}
 {#                                            hours#}
 {#                                        </div>#}
 {#                                    </div>#}

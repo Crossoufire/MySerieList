@@ -256,13 +256,13 @@ def media_sheet_form(media_type, media_id):
             form.first_air_date.data = media.first_air_date
             form.last_air_date.data = media.last_air_date
             form.production_status.data = media.status
-            form.duration.data = media.episode_duration
+            form.duration.data = media.duration
             form.origin_country.data = media.origin_country
             form.networks.data = ', '.join([r.network for r in media.networks])
         elif list_type == ListType.MOVIES:
             form.directed_by.data = media.director_name
             form.release_date.data = media.release_date
-            form.duration.data = media.runtime
+            form.duration.data = media.duration
             form.original_language.data = media.original_language
             form.tagline.data = media.tagline
             form.budget.data = media.budget
@@ -279,12 +279,12 @@ def media_sheet_form(media_type, media_id):
             media.first_air_date = form.first_air_date.data
             media.last_air_date = form.last_air_date.data
             media.status = form.production_status.data
-            media.episode_duration = form.duration.data
+            media.duration = form.duration.data
             media.origin_country = form.origin_country.data
         elif list_type == ListType.MOVIES:
             media.director_name = form.directed_by.data
             media.release_date = form.release_date.data
-            media.runtime = form.duration.data
+            media.duration = form.duration.data
             media.original_language = form.original_language.data
             media.tagline = form.tagline.data
             media.budget = form.budget.data
@@ -638,7 +638,7 @@ def change_element_category():
                            old_rewatch=old_rewatch)
     elif list_type == ListType.MOVIES:
         compute_time_spent(media=media[0], list_type=list_type, movie_status=media[1].status, old_rewatch=old_rewatch,
-                           movie_runtime=media[0].runtime)
+                           movie_duration=media[0].duration)
 
     db.session.commit()
     app.logger.info("[User {}] {}'s category [ID {}] changed from {} to {}."

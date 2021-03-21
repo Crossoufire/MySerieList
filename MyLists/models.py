@@ -59,7 +59,7 @@ followers = db.Table('followers',
                      db.Column('followed_id', db.Integer, db.ForeignKey('user.id')))
 
 
-class User(db.Model, UserMixin):
+class User(UserMixin, db.Model):
     def __repr__(self):
         return f'<User {self.id}-{self.username}>'
 
@@ -96,37 +96,6 @@ class User(db.Model, UserMixin):
                                secondaryjoin=(followers.c.followed_id == id),
                                backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
-    def add_follow(self, user):
-        if not self.is_following(user):
-            self.followed.append(user)
-
-    def remove_follow(self, user):
-        if self.is_following(user):
-            self.followed.remove(user)
-
-    def is_following(self, user):
-        return self.followed.filter(followers.c.followed_id == user.id).count() > 0
-
-    def get_reset_token(self, expires_sec=1800):
-        s = Serializer(app.config['SECRET_KEY'], expires_sec)
-        return s.dumps({'user_id': self.id}).decode('utf-8')
-
-    def get_register_token(self):
-        s = Serializer(app.config['SECRET_KEY'])
-        return s.dumps({'user_id': self.id}).decode('utf-8')
-
-    def get_email_update_token(self):
-        s = Serializer(app.config['SECRET_KEY'])
-        return s.dumps({'user_id': self.id}).decode('utf-8')
-
-    def count_notifications(self):
-        last_notif_time = self.last_notif_read_time or datetime(1900, 1, 1)
-        return Notifications.query.filter_by(user_id=self.id) \
-            .filter(Notifications.timestamp > last_notif_time).count()
-
-    def get_notifications(self):
-        return Notifications.query.filter_by(user_id=self.id).order_by(desc(Notifications.timestamp)).limit(8).all()
-
     def check_autorization(self, user_name):
         # retrieve the user
         user = self.query.filter_by(username=user_name).first()
@@ -153,6 +122,25 @@ class User(db.Model, UserMixin):
                 user.movies_views += 1
             db.session.commit()
 
+    def add_follow(self, user):
+        if not self.is_following(user):
+            self.followed.append(user)
+
+    def remove_follow(self, user):
+        if self.is_following(user):
+            self.followed.remove(user)
+
+    def is_following(self, user):
+        return self.followed.filter(followers.c.followed_id == user.id).count() > 0
+
+    def count_notifications(self):
+        last_notif_time = self.last_notif_read_time or datetime(1900, 1, 1)
+        return Notifications.query.filter_by(user_id=self.id) \
+            .filter(Notifications.timestamp > last_notif_time).count()
+
+    def get_notifications(self):
+        return Notifications.query.filter_by(user_id=self.id).order_by(desc(Notifications.timestamp)).limit(8).all()
+
     def launch_task(self, name, description, *args, **kwargs):
         rq_job = app.q.enqueue('MyLists.rq_tasks.' + name, self.id, *args, **kwargs)
         task = RedisTasks(id=rq_job.get_id(), name=name, description=description, user=self)
@@ -161,6 +149,10 @@ class User(db.Model, UserMixin):
 
     def get_task_in_progress(self, name):
         return RedisTasks.query.filter_by(name=name, user=self, complete=False).first()
+
+    def get_token(self):
+        s = Serializer(app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id}).decode('utf-8')
 
     @staticmethod
     def verify_token(token):
@@ -240,7 +232,7 @@ class Series(db.Model):
     homepage = db.Column(db.String(200))
     in_production = db.Column(db.Boolean)
     created_by = db.Column(db.String(100))
-    episode_duration = db.Column(db.Integer)
+    duration = db.Column(db.Integer)
     total_seasons = db.Column(db.Integer, nullable=False)
     total_episodes = db.Column(db.Integer)
     origin_country = db.Column(db.String(20))
@@ -338,7 +330,7 @@ class Anime(db.Model):
     homepage = db.Column(db.String(200))
     in_production = db.Column(db.Boolean)
     created_by = db.Column(db.String(100))
-    episode_duration = db.Column(db.Integer)
+    duration = db.Column(db.Integer)
     total_seasons = db.Column(db.Integer, nullable=False)
     total_episodes = db.Column(db.Integer)
     origin_country = db.Column(db.String(20))
@@ -429,7 +421,7 @@ class Movies(db.Model):
     release_date = db.Column(db.String(30))
     homepage = db.Column(db.String(200))
     released = db.Column(db.String(30))
-    runtime = db.Column(db.Integer)
+    duration = db.Column(db.Integer)
     original_language = db.Column(db.String(20))
     synopsis = db.Column(db.Text)
     vote_average = db.Column(db.Float)
@@ -772,17 +764,17 @@ def get_total_time(list_type):
     if list_type == ListType.SERIES:
         media = Series
         media_list = SeriesList
-        media_duration = Series.episode_duration
+        media_duration = Series.duration
         media_eps = SeriesList.eps_watched
     elif list_type == ListType.ANIME:
         media = Anime
         media_list = AnimeList
-        media_duration = Anime.episode_duration
+        media_duration = Anime.duration
         media_eps = AnimeList.eps_watched
     elif list_type == ListType.MOVIES:
         media = Movies
         media_list = MoviesList
-        media_duration = Movies.runtime
+        media_duration = Movies.duration
         media_eps = MoviesList.eps_watched
 
     query = db.session.query(User, media_duration, media_eps, func.sum(media_duration * media_eps)) \

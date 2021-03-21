@@ -79,7 +79,7 @@ def set_last_update(media, media_type, old_status=None, new_status=None, old_sea
 
 
 def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0, movie_status=None, movie_delete=False,
-                       movie_add=False, new_rewatch=0, old_rewatch=0, movie_runtime=0, user_id=None):
+                       movie_add=False, new_rewatch=0, old_rewatch=0, movie_duration=0, user_id=None):
 
     # Use for the list import function (redis and rq backgound process), can't import the current_user context
     if current_user:
@@ -89,24 +89,24 @@ def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0,
 
     if list_type == ListType.SERIES:
         old_time = user.time_spent_series
-        user.time_spent_series = old_time + ((new_watched-old_watched) * media.episode_duration) + (
-                media.total_episodes * media.episode_duration * (new_rewatch - old_rewatch))
+        user.time_spent_series = old_time + ((new_watched-old_watched) * media.duration) + (
+                media.total_episodes * media.duration * (new_rewatch - old_rewatch))
     elif list_type == ListType.ANIME:
         old_time = user.time_spent_anime
-        user.time_spent_anime = old_time + ((new_watched-old_watched)*media.episode_duration) + (
-                media.total_episodes*media.episode_duration*(new_rewatch-old_rewatch))
+        user.time_spent_anime = old_time + ((new_watched-old_watched)*media.duration) + (
+                media.total_episodes*media.duration*(new_rewatch-old_rewatch))
     elif list_type == ListType.MOVIES:
         old_time = user.time_spent_movies
         if movie_delete:
             if movie_status == Status.COMPLETED:
-                user.time_spent_movies = old_time - media.runtime + media.runtime*(new_rewatch-old_rewatch)
+                user.time_spent_movies = old_time - media.duration + media.duration*(new_rewatch-old_rewatch)
         elif movie_add:
             if movie_status == Status.COMPLETED:
-                user.time_spent_movies = old_time + media.runtime
+                user.time_spent_movies = old_time + media.duration
         else:
             if movie_status == Status.COMPLETED:
-                user.time_spent_movies = old_time + movie_runtime + media.runtime*(new_rewatch-old_rewatch)
+                user.time_spent_movies = old_time + movie_duration + media.duration*(new_rewatch-old_rewatch)
             else:
-                user.time_spent_movies = old_time - movie_runtime + media.runtime*(new_rewatch-old_rewatch)
+                user.time_spent_movies = old_time - movie_duration + media.duration*(new_rewatch-old_rewatch)
 
     db.session.commit()

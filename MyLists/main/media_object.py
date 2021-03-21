@@ -97,14 +97,14 @@ class MediaDict:
                                 "total_seasons": self.data.total_seasons,
                                 "total_episodes": self.data.total_episodes,
                                 "prod_status": self.data.status,
-                                "episode_duration": self.data.episode_duration,
+                                "duration": self.data.duration,
                                 "in_production": self.data.in_production,
                                 "origin_country": self.data.origin_country,
                                 "eps_per_season": [r.episodes for r in self.data.eps_per_season],
                                 "networks": ', '.join([r.network for r in self.data.networks]),
                                 "first_air_date": change_air_format(self.data.first_air_date, media_sheet=True),
                                 "last_air_date": change_air_format(self.data.last_air_date, media_sheet=True),
-                                "time_to_complete": self.data.total_episodes * self.data.episode_duration,
+                                "time_to_complete": self.data.total_episodes * self.data.duration,
                                 "status": Status.WATCHING.value,
                                 "last_episode_watched": 1,
                                 "current_season": 1})
@@ -137,7 +137,7 @@ class MediaDict:
         self.media_info["cover"] = 'movies_covers/{}'.format(self.data.image_cover)
         self.media_info["original_language"] = self.data.original_language
         self.media_info["director"] = self.data.director_name
-        self.media_info["runtime"] = self.data.runtime
+        self.media_info["duration"] = self.data.duration
         self.media_info["budget"] = self.data.budget
         self.media_info["revenue"] = self.data.revenue
         self.media_info["tagline"] = self.data.tagline
@@ -252,15 +252,15 @@ class MediaDetails:
             self.media_details['season_to_air'] = next_episode_to_air['season_number']
             self.media_details['episode_to_air'] = next_episode_to_air['episode_number']
 
-    def get_episode_duration(self):
-        episode_duration = self.media_data.get("episode_run_time") or None
-        if episode_duration:
-            self.media_details['episode_duration'] = episode_duration[0]
+    def get_duration(self):
+        duration = self.media_data.get("episode_run_time") or None
+        if duration:
+            self.media_details['duration'] = duration[0]
         else:
             if self.list_type == ListType.ANIME:
-                self.media_details['episode_duration'] = 24
+                self.media_details['duration'] = 24
             elif self.list_type == ListType.SERIES:
-                self.media_details['episode_duration'] = 45
+                self.media_details['duration'] = 45
 
     def get_origin_country(self):
         origin_country = self.media_data.get("origin_country") or None
@@ -375,7 +375,7 @@ class MediaDetails:
                               'last_update': datetime.utcnow()}
 
         self.get_next_eps_seas()
-        self.get_episode_duration()
+        self.get_duration()
         self.get_origin_country()
         self.get_created_by()
 
@@ -406,7 +406,7 @@ class MediaDetails:
                               'budget': self.media_data.get('budget', 0) or 0,
                               'revenue': self.media_data.get('revenue', 0) or 0,
                               'tagline': self.media_data.get('tagline', '-') or '-',
-                              'runtime': self.media_data.get('runtime', 0) or 0,
+                              'duration': self.media_data.get('runtime', 0) or 0,
                               'original_language': self.media_data.get('original_language', 'Unknown') or 'Unknown',
                               'themoviedb_id': self.media_data.get('id'),
                               'image_cover': self.get_media_cover()}

@@ -322,6 +322,7 @@ a {
 .stat-text {
     font-size: 12pt;
     color: lightgray;
+    clear: both;
 }
 
 .favorite-img {

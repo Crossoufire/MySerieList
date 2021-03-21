@@ -360,13 +360,13 @@ def get_more_stats(user):
     def get_episodes_and_time(element):
         if element[1].status == Status.COMPLETED:
             try:
-                return [1, element[0].runtime]
+                return [1, element[0].duration]
             except:
-                return [element[0].total_episodes, int(element[0].episode_duration)*element[0].total_episodes]
+                return [element[0].total_episodes, int(element[0].duration)*element[0].total_episodes]
         elif element[1].status != Status.PLAN_TO_WATCH and element[1].status != Status.RANDOM:
             nb_episodes = [m.episodes for m in element[0].eps_per_season]
             
-            ep_duration = int(element[0].episode_duration)
+            ep_duration = int(element[0].duration)
             ep_counter = 0
             for i in range(0, element[1].current_season - 1):
                 ep_counter += int(nb_episodes[i])

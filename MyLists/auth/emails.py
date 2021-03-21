@@ -5,7 +5,7 @@ from flask_mail import Message
 
 
 def send_reset_email(user):
-    token = user.get_reset_token()
+    token = user.get_token()
     msg = Message(subject='MyLists - Password reset request',
                   sender=app.config['MAIL_USERNAME'],
                   recipients=[user.email],
@@ -21,7 +21,7 @@ def send_reset_email(user):
 
 
 def send_register_email(user):
-    token = user.get_register_token()
+    token = user.get_token()
     msg = Message(subject='MyLists - Register request',
                   sender=app.config['MAIL_USERNAME'],
                   recipients=[user.email],
