@@ -7,7 +7,7 @@
         <div class="col-8">
             <label for="category-dropdown"></label>
             <select id="category-dropdown" class="text-light text-center cat-drop"
-             onchange="changeCategoryMovies('{{ data['id'] }}', this, '{{ data['genres'] }}')">
+             onchange="changeCategoryMovies('{{ data['id'] }}', this)">
                 <option {% if data['status'] == 'Completed' %}selected="selected"{% endif %}>Completed</option>
                 <option {% if data['status'] == 'Plan to Watch' %}selected="selected"{% endif %}>Plan to Watch</option>
             </select>

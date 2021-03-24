@@ -708,61 +708,62 @@
 
 {% block added_js %}
     <script>
-        // change these around
-        const histogramValues_series = {{ media_data['series']['media_count_score'] }}
-        const histogramValues_anime = {{ media_data['anime']['media_count_score'] }}
-        const histogramValues_movies = {{ media_data['movies']['media_count_score'] }}
+        // Recover the histograms values
+        const histogramValues_series = {{ media_data['series']['media_count_score'] }};
+        const histogramValues_anime = {{ media_data['anime']['media_count_score'] }};
+        const histogramValues_movies = {{ media_data['movies']['media_count_score'] }};
 
-        // wmax value of the histogram array
-        const maxValue_series = Math.max(...histogramValues_series)
-        const maxValue_anime = Math.max(...histogramValues_anime)
-        const maxValue_movies = Math.max(...histogramValues_movies)
+        // Max value of each histogram array
+        const maxValue_series = Math.max(...histogramValues_series);
+        const maxValue_anime = Math.max(...histogramValues_anime);
+        const maxValue_movies = Math.max(...histogramValues_movies);
 
-        // turn histogram numbers into histogram li items
-        var i = -0.5;
+        // Turn histogram numbers into histogram li items
+        let i = -0.5;
         const histogram_series = histogramValues_series.reduce((acc, number) => {
-            // getting a percentage of the max
+            // Getting a percentage of the max
             const height = number/maxValue_series*100;
-            i = i + 0.5;
-            // adding 1px so there's an indication of 0
+            i += 0.5;
+            // Adding 1px so there's an indication of 0
             return acc + `<li class="histogram-item-series" data-toggle="tooltip" title="`+i+`/10: `+number+` series" style="height: calc(${height}% + 1px)" />`
-        }, ``)
-        // inject into dom
-        const series_chart = document.getElementById('series-score')
+        }, ``);
+
+        // Inject into dom
+        const series_chart = document.getElementById('series-score');
         try {
             series_chart.innerHTML = histogram_series
-        } catch (error) {}
+        } catch {}
 
 
-        // turn histogram numbers into histogram li items
-        var i = -0.5;
+        // Turn histogram numbers into histogram li items
+        i = -0.5;
         const histogram_anime = histogramValues_anime.reduce((acc, number) => {
-            // getting a percentage of the max
+            // Getting a percentage of the max
             const height = number/maxValue_anime*100;
-            i = i + 0.5;
-            // adding 1px so there's an indication of 0
+            i += 0.5;
+            // Adding 1px so there's an indication of 0
             return acc + `<li class="histogram-item-anime" data-toggle="tooltip" title="`+i+`/10: `+number+` anime" style="height: calc(${height}% + 1px)" />`
-        }, ``)
-        // inject into dom
-        const anime_chart = document.getElementById('anime-score')
+        }, ``);
+        // Inject into dom
+        const anime_chart = document.getElementById('anime-score');
         try {
             anime_chart.innerHTML = histogram_anime
-        } catch (error) {}
+        } catch {}
 
 
-        // turn histogram numbers into histogram li items
-        var i = -0.5;
+        // Turn histogram numbers into histogram li items
+        i = -0.5;
         const histogram_movies = histogramValues_movies.reduce((acc, number) => {
-        // getting a percentage of the max
+        // Getting a percentage of the max
         const height = number/maxValue_movies*100;
-        i = i + 0.5;
-        // adding 1px so there's an indication of 0
+        i += 0.5;
+        // Adding 1px so there's an indication of 0
         return acc + `<li class="histogram-item-movies" data-toggle="tooltip" title="`+i+`/10: `+number+` movies" style="height: calc(${height}% + 1px)" />`
-        }, ``)
-        // inject into dom
-        const movies_chart = document.getElementById('movies-score')
+        }, ``);
+        // Inject into dom
+        const movies_chart = document.getElementById('movies-score');
                 try {
             movies_chart.innerHTML = histogram_movies
-        } catch (error) {}
+        } catch {}
     </script>
 {% endblock added_js %}

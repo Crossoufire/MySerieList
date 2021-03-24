@@ -1,5 +1,5 @@
 
-/* --- Icon/Search/Shared Header CSS ------------------------------- */
+/* --- Return icons/Search/Shared Header CSS ------------------------------- */
 .return-icon {
     background: rgba(0, 0, 0, 0.8);
     padding: 13px 13px 13px 13px;
@@ -84,7 +84,7 @@
 }
 
 
-/* --- Categories Header CSS --------------------------------------- */
+/* --- Categories Header CSS -------------------------------------------- */
 .cat-btn {
     display: inline-block;
     padding: 5px 0 5px 0;
@@ -107,6 +107,12 @@
     color: lightseagreen;
 }
 
+.categories-css {
+    text-align: text-center;
+    margin: 30px 0 20px 0;
+    background: #34383c;
+}
+
 @media (max-width: 500px) {
     .cat-btn {
         display: inline-block;
@@ -117,7 +123,7 @@
 }
 
 
-/* --- Filtering/Sorting Header CSS -------------------------------- */
+/* --- Filtering/Sorting Header CSS ------------------------------------ */
 .li-genre-sort {
     list-style-type: none;
     display: inline-block;

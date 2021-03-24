@@ -5,7 +5,7 @@ from datetime import datetime
 from MyLists.API_data import ApiData
 from MyLists.main.add_db import AddtoDB
 from flask_login import login_required, current_user
-from MyLists.main.forms import EditMediaData, MediaComment
+from MyLists.main.forms import EditMediaData, MediaComment, SearchForm
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
 from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaListObj
@@ -16,47 +16,59 @@ from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwo
 bp = Blueprint('main', __name__)
 
 
-_MOVIES_GENRES = ["All", "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", "Family",
-                  "Fantasy", "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "TV Movie",
-                  "Thriller", "War", "Western"]
-_SERIES_GENRES = ["All", "Action & Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", "Family", "Kids",
-                  "Mystery", "News", "Reality", "Sci-Fi & Fantasy", "Soap", "Talk", "War & Politics", "Western"]
-_ANIME_GENRES = ['All', 'Action', 'Adventure', 'Cars', 'Comedy', 'Dementia', 'Demons', 'Mystery', 'Drama', 'Ecchi',
-                 'Fantasy', 'Game', 'Hentai', 'Historical', 'Horror', 'Magic', 'Martial Arts', 'Mecha', 'Music',
-                 'Samurai', 'Romance', 'School', 'Sci-Fi', "Shoujo", 'Shounen', 'Space', 'Sports', 'Super Power',
-                 'Vampire', 'Harem', 'Slice Of Life', 'Supernatural', 'Military', 'Police', 'Psychological',
-                 'Thriller', 'Seinen', 'Josei']
 _SORTING = {'title-A-Z': 'Title A-Z',
             'title-Z-A': 'Title Z-A',
             'score_desc': 'Score 🠗',
             'score_asc': 'Score 🠕',
+            'score_TMDb_asc': 'Score TMDb 🠕',
             'score_TMDb_desc': 'Score TMDb 🠗',
             'comments': 'Comments',
             'rewatched': 'Rewatch',
             'release_date_desc': 'Release date 🠗',
-            'release_date_asc': 'Release date 🠕',
-            'first_air_date_desc': 'First air date 🠗',
-            'first_air_date_asc': 'First air date 🠕'}
-_SORTING_TV = ['Title A-Z', 'Title Z-A', 'Score 🠗', 'Score 🠕', 'Score TMDb 🠗', 'Comments', 'Rewatch',
-               'First air date 🠗', 'First air date 🠕']
-_SORTING_MOVIES = ['Title A-Z', 'Title Z-A', 'Score 🠗', 'Score 🠕', 'Score TMDb 🠗', 'Comments', 'Rewatch',
-                   'Release date 🠗', 'Release date 🠕']
+            'release_date_asc': 'Release date 🠕'}
+_TV_CATEGORIES = {'all': 'All', 'watching': 'Watching', 'completed': 'Completed', 'on-hold': 'On Hold',
+                  'random': 'Random', 'dropped': 'Dropped', 'plan-to-watch': 'Plan to Watch', 'search': 'Search',
+                  'favorite': 'Favorite'}
+_MOVIES_CATEGORIES = {'all': 'All', 'completed': 'Completed', 'plan-to-watch': 'Plan to Watch', 'search': 'Search',
+                      'favorite': 'Favorite'}
+_SERIES_GENRES = {'all': 'All', 'action-and-adventure': 'Action & Adventure', 'animation': 'Animation',
+                  'comedy': 'Comedy', 'crime': 'Crime', 'documentary': 'Documentary', 'drama': 'Drama',
+                  'family': 'Family', 'kids': 'Kids', 'mystery': 'Mystery', 'news': 'News', 'reality': 'Reality',
+                  'sci-fi-and-fantasy': 'Sci-Fi & Fantasy', 'soap': 'Soap', 'talk': 'Talk',
+                  'war-and-politics': 'War & Politics', 'western': 'Western'}
+_ANIME_GENRES = {'all': 'All', 'action': 'Action', 'adventure': 'Adventure', 'comedy': 'Comedy', 'drama': 'Drama',
+                 'fantasy': 'Fantasy', 'horror': 'Horror', 'music': 'Music', 'mystery': 'Mystery', 'romance': 'Romance',
+                 'thriller': 'Thriller', 'Cars': 'cars', 'dementia': 'Dementia', 'demons': 'Demons', 'ecchi': 'Ecchi',
+                 'game': 'Game', 'hentai': 'Hentai', 'historical': 'Historical', 'magic': 'Magic',
+                 'martial-arts': 'Martial Arts', 'mecha': 'Mecha', 'samurai': 'Samurai', 'school': 'School',
+                 'sci-fi': 'Sci-Fi', 'shoujo': 'Shoujo', 'shounen': 'Shounen', 'space': 'Space', 'sports': 'Sports',
+                 'super-power': 'Super Power', 'vampire': 'Vampire', 'harem': 'Harem', 'slice-of-life': 'Slice Of Life',
+                 'supernatural': 'Supernatural', 'military': 'Military', 'police': 'Police',
+                 'psychological': 'Psychological', 'seinen': 'Seinen', 'josei': 'Josei'}
+_MOVIES_GENRES = {'all': 'All', 'action': 'Action', 'adventure': 'Adventure', 'animation': 'Animation',
+                  'comedy': 'Comedy', 'crime': 'Crime', 'documentary': 'Documentary', 'drama': 'Drama',
+                  'family': 'Family', 'fantasy': 'Fantasy', 'history': 'History', 'horror': 'Horror', 'music': 'Music',
+                  'mystery': 'Mystery', 'romance': 'Romance', 'science-fiction': 'Science Fiction',
+                  'tv-movie': 'TV Movie', 'thriller': 'Thriller', 'war': 'War', 'western': 'Western'}
 
 
-@bp.route("/<string:media_list>/<string:user_name>/", methods=['GET', 'POST'])
-@bp.route("/<string:media_list>/<string:user_name>/<string:category>/", methods=['GET', 'POST'])
-@bp.route("/<string:media_list>/<string:user_name>/<string:category>/genre/<string:genre>/by/<string:sorting>"
-          "/page/<int:page_val>", methods=['GET', 'POST'])
+@bp.route("/<media_list>/<user_name>/", methods=['GET', 'POST'])
+@bp.route("/<media_list>/<user_name>/<category>/", methods=['GET', 'POST'])
+@bp.route("/<media_list>/<user_name>/<category>/genre/<genre>/by/<sorting>/page/<page_val>", methods=['GET', 'POST'])
 @login_required
-def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', sorting='title-A-Z', page_val=1):
-    # Check if <user> can see <media_list>
-    user = current_user.check_autorization(user_name)
-
+def mymedialist(media_list, user_name, category='watching', genre='all', sorting='title-A-Z', page_val=1):
     # Check if <media_list> is valid
     try:
         list_type = ListType(media_list)
-    except ValueError:
-        abort(400)
+        _SORTING[sorting]
+    except (ValueError, KeyError):
+        return abort(400)
+
+    # Check if <user> can see <media_list>
+    user = current_user.check_autorization(user_name)
+
+    # Initialize the search form
+    search_form = SearchForm()
 
     # Add <views_count> to the profile
     current_user.add_view_count(user, list_type)
@@ -64,29 +76,42 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
     # Recover the query if it exists
     q = request.args.get('q')
 
-    # Check the sorting value
-    try:
-        sort_name = _SORTING[sorting]
-    except KeyError:
-        abort(400)
-
     # Recover the template
     html_template = 'medialist_tv.html'
     if list_type == ListType.SERIES:
+        all_categories = _TV_CATEGORIES
         all_genres = _SERIES_GENRES
-        all_sorting = _SORTING_TV
+        try:
+            nice_cat = Status(_TV_CATEGORIES[category])
+            nice_genre = _SERIES_GENRES[genre]
+        except KeyError:
+            return abort(400)
     elif list_type == ListType.ANIME:
+        all_categories = _TV_CATEGORIES
         all_genres = _ANIME_GENRES
-        all_sorting = _SORTING_TV
+        try:
+            nice_cat = Status(_TV_CATEGORIES[category])
+            nice_genre = _ANIME_GENRES[genre]
+        except KeyError:
+            return abort(400)
     elif list_type == ListType.MOVIES:
+        all_categories = _MOVIES_CATEGORIES
         all_genres = _MOVIES_GENRES
-        all_sorting = _SORTING_MOVIES
-        if category == Status.WATCHING:
-            category = Status.COMPLETED
+        try:
+            nice_genre = _MOVIES_GENRES[genre]
+        except KeyError:
+            return abort(400)
+        if category == 'watching':
+            nice_cat = Status.COMPLETED
+        else:
+            try:
+                nice_cat = Status(_MOVIES_CATEGORIES[category])
+            except KeyError:
+                return abort(400)
         html_template = 'medialist_movies.html'
 
     # Retrieve the corresponding media_data
-    query, category = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
+    query = get_media_query(user.id, list_type, nice_cat, nice_genre, sorting, page_val, q)
 
     # Get the actual page, total number of pages and the total number of media from the query
     items = query.items
@@ -107,9 +132,10 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
         items_data_list.append(add_data)
 
     return render_template(html_template, title="{}'s {}".format(user_name, media_list), username=user_name,
-                           media_items=items_data_list, common_elements=common_elements, media_list=media_list,
-                           info_pages=info_pages, category=category, page=page_val, search_query=q, genre=genre,
-                           sorting=sort_name, all_sorting=all_sorting, all_genres=all_genres, user_id=str(user.id))
+                           user_id=str(user.id), media_list=media_list, search_form=search_form, search_q=q,
+                           common_elements=common_elements, media_items=items_data_list, category=category, genre=genre,
+                           sorting=sorting, page=page_val, all_categories=all_categories, info_pages=info_pages,
+                           all_genres=all_genres, all_sorting=_SORTING)
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
@@ -809,7 +835,7 @@ def add_element():
     if not new_status:
         return '', 400
 
-    # Check if the <media>
+    # Check if the <media> exists
     media = check_media(media_id, list_type, add=True)
     if not media:
         return '', 400

@@ -1,13 +1,13 @@
 
 
 $(document).ready(function () {
-    // --- Canvas Data -------------------------------------------------
+    // --- Canvas Data ---------------------------------------------------------------------------------
     let time_data = $('#time-spent-pie').attr('values').split(', ');
     let seasons_data = $('#seasons-graph-data').attr('values').split(', ');
     let episodes_data = $('#episodes-graph-data').attr('values').split(', ');
 
 
-    // --- Time sent pie graph -----------------------------------------
+    // --- Time sent pie graph -------------------------------------------------------------------------
     let config_pie = {
         type: 'pie',
         data: {
@@ -75,7 +75,7 @@ $(document).ready(function () {
     new Chart(ctx_pie, config_pie);
 
 
-    // --- Total eps/seasons watched -----------------------------------
+    // --- Total eps/seasons watched -------------------------------------------------------------------
     let config_eps = {
         type: 'bar',
         data: {

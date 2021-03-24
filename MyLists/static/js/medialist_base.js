@@ -1,6 +1,6 @@
 
 
-// --- Delete element --------------------------------------
+// --- Delete element --------------------------------------------------------------------------------------
 function deleteElement(card, media_list) {
     let element_id = $(card)[0].id.split('_')[1];
     let $load_img = $(card).find('.view.overlay');
@@ -30,7 +30,7 @@ function deleteElement(card, media_list) {
 }
 
 
-// --- Remove the category buttons -------------------------
+// --- Remove the category buttons -------------------------------------------------------------------------
 function removeCat() {
     $('.card-cat-buttons').remove();
     $('.card-btn-top-right').remove();
@@ -44,7 +44,7 @@ function removeCat() {
 }
 
 
-// --- Add media to favorite -------------------------------
+// --- Add media to favorite -------------------------------------------------------------------------------
 function addFavorite(fav_div, element_id, media_type) {
     let favorite = !!$(fav_div).hasClass('far');
 
@@ -68,7 +68,7 @@ function addFavorite(fav_div, element_id, media_type) {
 }
 
 
-// --- Add the category to the user (from other list) ------
+// --- Add the category to the user (from other list) ------------------------------------------------------
 function AddCatUser(category, card_id) {
     let $card = $('#'+card_id);
     let media_list = $card.attr('values').split('-')[1];
@@ -97,7 +97,7 @@ function AddCatUser(category, card_id) {
 }
 
 
-// --- Show comments ---------------------------------------
+// --- Show comments ---------------------------------------------------------------------------------------
 function showComment(card, media_type, media_id, current_user) {
     let media_name = $(card).find('.font-mask').text();
     let comment = $("#com_"+media_id).text();
@@ -138,14 +138,14 @@ function showComment(card, media_type, media_id, current_user) {
 }
 
 
-// --- Remove comments modal -------------------------------
+// --- Remove comments modal -------------------------------------------------------------------------------
 function removeModal() {
     $('#commentModal').remove();
     $('.modal-backdrop.show').remove();
 }
 
 
-// --- Create the loading image on media -------------------
+// --- Create the loading image on media -------------------------------------------------------------------
 function Loading() {
     return ('<div class="load-medialist">' +
                 '<div class="central-loading fas fa-3x fa-spinner fast-spin"></div>' +
@@ -153,7 +153,7 @@ function Loading() {
 }
 
 
-// --- Create the score dropdown ---------------------------
+// --- Create the score dropdown ---------------------------------------------------------------------------
 function scoreDrop(score, data_id, media_list) {
     let score_value = $(score).text();
     let drop = document.createElement("select");
@@ -189,7 +189,7 @@ function scoreDrop(score, data_id, media_list) {
 }
 
 
-// --- Change/delete the score dropdown --------------------
+// --- Change/delete the score dropdown --------------------------------------------------------------------
 $(document).on('change focusout','.score-drop',function(event) {
     let value = parseFloat(this.value).toFixed(1);
     let media_id = $(this).attr('values').split(',')[0];
@@ -224,7 +224,7 @@ $(document).on('change focusout','.score-drop',function(event) {
 });
 
 
-// --- Create the rewatch dropdown -------------------------
+// --- Create the rewatch dropdown -------------------------------------------------------------------------
 function rewatchDrop(rewatch, data_id, media_list) {
     let rewatch_value = $(rewatch).text();
     let drop = document.createElement("select");
@@ -253,7 +253,7 @@ function rewatchDrop(rewatch, data_id, media_list) {
 }
 
 
-// --- Change/delete the rewatch dropdown ------------------
+// --- Change/delete the rewatch dropdown ------------------------------------------------------------------
 $(document).on('change focusout', '.rewatch-drop', function(event) {
     let value = parseInt(this.value);
     let media_id = $(this).attr('values').split(',')[0];
@@ -282,7 +282,7 @@ $(document).on('change focusout', '.rewatch-drop', function(event) {
 });
 
 
-// --- Create Row gutters ----------------------------------
+// --- Create Row gutters ----------------------------------------------------------------------------------
 $(document).ready(function() {
     let $row = $('.row');
 

@@ -1,5 +1,5 @@
 
-// --- Autocomplete -------------------------------------------------------------------------------------
+// --- Autocomplete ----------------------------------------------------------------------------------
 $(function() {
     $('#autocomplete').catcomplete({
         delay: 250,
@@ -91,7 +91,7 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
     });
 
 
-// --- Follow status -----------------------------------------------------------------------------------------
+// --- Follow status ---------------------------------------------------------------------------------
 function follow_status(button, follow_id) {
     let status;
     let $follow_button = $(button);
@@ -129,7 +129,7 @@ function follow_status(button, follow_id) {
 }
 
 
-// --- Notification ----------------------------------------------------------------
+// --- Notification ----------------------------------------------------------------------------------
 function display_notifications(data) {
     let add_hr;
     let resp = data.results;
@@ -234,7 +234,7 @@ function display_notifications(data) {
 }
 
 
-// --- AJAX Notification --------------------------------------------------------------
+// --- AJAX Notification -----------------------------------------------------------------------------
 function notifications() {
     $('.notif-items').remove();
     $('#loading-image').show();
@@ -258,7 +258,7 @@ function notifications() {
 }
 
 
-// --- Ajax error handling ---------------------------------------------------------
+// --- Ajax error handling ---------------------------------------------------------------------------
 function error_ajax_message(message) {
     $('.content-message').prepend(
         '<div class="alert alert-danger alert-dismissible m-t-15">' +
@@ -270,13 +270,13 @@ function error_ajax_message(message) {
 }
 
 
-// --- Tooltip initialization ------------------------------------------------------
+// --- Tooltip initialization ------------------------------------------------------------------------
 $(function () {
     $('[data-toggle="tooltip"]').tooltip()
 });
 
 
-// --- Left dropdown for notifictaions on mobile  ----------------------------------
+// --- Left dropdown for notifictaions on mobile  ----------------------------------------------------
 $(document).ready(function() {
     function a() {
         if ($(window).width() < 991) {

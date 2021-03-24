@@ -1,53 +1,17 @@
 {% extends 'medialist_base.html' %}
 
 
-{% block categories %}
-    <a class="cat-btn{% if category == 'All' %} btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/All/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>ALL</b>
-    </a>
-    <a class="cat-btn{% if category == 'Watching' %} btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/Watching/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>WATCHING</b>
-    </a>
-    <a class="cat-btn{% if category == 'Completed' %} btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>COMPLETED</b>
-    </a>
-    <a class="cat-btn{% if category == 'On Hold' %} btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/On Hold/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>ON HOLD</b>
-    </a>
-    <a class="cat-btn{% if category == 'Random' %} btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/Random/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>RANDOM</b>
-    </a>
-    <a class="cat-btn{% if category == 'Dropped' %} btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/Dropped/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>DROPPED</b>
-    </a>
-    <a class="cat-btn{% if category == 'Plan to Watch' %} btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/Plan to Watch/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>PLAN TO WATCH</b>
-    </a>
-    <a class="cat-btn{% if media_list == 'serieslist' %} text-series {% elif media_list == 'animelist' %}
-     text-anime{% endif %} {% if category == 'Favorite' %} btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/Favorite/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>FAVORITES</b>
-    </a>
-{% endblock categories %}
-
-
-{% block sorting_list %}
-    <a class="dropdown-item text-light"
-       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/first_air_date_desc/page/1{% if category == 'search' %}?q={{ search_query }}{% endif %}">
-        <div>First Air Date 🠗</div>
-    </a>
-    <a class="dropdown-item text-light"
-       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/first_air_date_asc/page/1{% if category == 'search' %}?q={{ search_query }}{% endif %}">
-        <div>First Air Date 🠕</div>
-    </a>
-{% endblock sorting_list %}
+{% block return_icon %}
+    {% if media_list == 'serieslist' %}
+        <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip" title="Animelist"
+           href="{{ url_for('main.mymedialist', media_list='animelist', user_name=username) }}"></a>
+    {% elif media_list == 'animelist' %}
+        <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip" title="Serieslist"
+           href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=username) }}"></a>
+    {% endif %}
+    <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip" title="Movieslist"
+       href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=username) }}"></a>
+{% endblock return_icon %}
 
 
 {% block data %}
@@ -56,8 +20,8 @@
 
 
 {% block seas_eps_drop %}
-    <div class="seas-eps-drop-container" {% if category == 'Plan to Watch'
-    or category == 'Random' %} style="display: none;"{% endif %}>
+    <div class="seas-eps-drop-container" {% if category == 'plan-to-watch'
+    or category == 'random' %} style="display: none;"{% endif %}>
         <select id="S_{{ item.id }}" class="seas-eps-drop
          {% if user_id != current_user.get_id() %} disabled{% endif %}"
                 onchange="updateSeason('{{ item.id }}', this)">
@@ -74,7 +38,7 @@
         <select id="E_{{ item.id }}" class="text-light text-center p-0 seas-eps-drop
          {% if user_id != current_user.get_id() %} disabled{% endif %}"
                 onchange="updateEpisode('{{ item.id }}', this, '{{ media_list }}')">
-            {% if category == 'Plan to Watch' or category == 'Random' %}
+            {% if category == 'plan-to-watch' or category == 'random' %}
                 {% for i in range(0, item.eps_per_season[item.current_season - 1]) %}
                     <option class="seas-eps-drop-options" {% if i + 1 == 1 %} selected="selected" {% endif %}>
                         {{ "E{:02}".format(i + 1) }}

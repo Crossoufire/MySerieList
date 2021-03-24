@@ -1,36 +1,12 @@
 {% extends 'medialist_base.html' %}
 
 
-{% block categories %}
-    <a class="cat-btn {% if category == 'All' %}btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/All/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>ALL</b>
-    </a>
-    <a class="cat-btn {% if category == 'Completed' %}btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>COMPLETED</b>
-    </a>
-    <a class="cat-btn {% if category == 'Plan to Watch' %}btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/Plan to Watch/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>PLAN TO WATCH</b>
-    </a>
-    <a class="cat-btn {% if category == 'Favorite' %}btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/Favorite/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>FAVORITES</b>
-    </a>
-{% endblock categories %}
-
-
-{% block sorting_list %}
-    <a class="dropdown-item text-light"
-       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/release_date_desc/page/1{% if category == 'search' %}?q={{ search_query }}{% endif %}">
-        <div>Release dates 🠗</div>
-    </a>
-    <a class="dropdown-item text-light"
-       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/release_date_asc/page/1{% if category == 'search' %}?q={{ search_query }}{% endif %}">
-        <div>Release dates 🠕</div>
-    </a>
-{% endblock sorting_list %}
+{% block return_icon %}
+    <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip" title="Serieslist"
+       href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=username) }}"></a>
+    <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip" title="Animelist"
+       href="{{ url_for('main.mymedialist', media_list='animelist', user_name=username) }}"></a>
+{% endblock return_icon %}
 
 
 {% block data %}

@@ -1,5 +1,5 @@
 import rq
-import enum
+from enum import Enum
 from flask import abort
 from datetime import datetime
 from sqlalchemy.orm import aliased
@@ -14,13 +14,13 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-class ListType(enum.Enum):
+class ListType(Enum):
     SERIES = 'serieslist'
     ANIME = 'animelist'
     MOVIES = 'movieslist'
 
 
-class Status(enum.Enum):
+class Status(Enum):
     ALL = 'All'
     WATCHING = 'Watching'
     COMPLETED = 'Completed'
@@ -32,20 +32,26 @@ class Status(enum.Enum):
     FAVORITE = 'Favorite'
 
 
-class MediaType(enum.Enum):
+class MediaType(Enum):
     SERIES = "Series"
     ANIME = "Anime"
     MOVIES = 'Movies'
 
+    @classmethod
+    def _missing_name_(cls, name):
+        for member in cls:
+            if member.name.lower() == name.lower():
+                return member
 
-class HomePage(enum.Enum):
+
+class HomePage(Enum):
     ACCOUNT = "account"
     MYSERIESLIST = "serieslist"
     MYANIMELIST = "animelist"
     MYMOVIESLIST = "movieslist"
 
 
-class RoleType(enum.Enum):
+class RoleType(Enum):
     # Can access to the admin dashboard (/admin)
     ADMIN = "admin"
     # Can lock and edit media (/lock_media & /media_sheet_form)
@@ -647,50 +653,39 @@ class GlobalStats:
 
 
 # Query for <mymedialist> route
-def get_media_query(user_id, list_type, category, genre, sort_val, page, q):
+def get_media_query(user_id, list_type, nice_cat, nice_genre, sorting, page, q):
     if list_type == ListType.SERIES:
         media = Series
         media_list = SeriesList
         media_actors = SeriesActors
         media_genre = SeriesGenre
-        sort_option = {'first_air_date_desc': media.first_air_date.desc(),
-                       'first_air_date_asc': media.first_air_date.asc()}
     elif list_type == ListType.ANIME:
         media = Anime
         media_list = AnimeList
         media_actors = AnimeActors
         media_genre = AnimeGenre
-        sort_option = {'first_air_date_desc': media.first_air_date.desc(),
-                       'first_air_date_asc': media.first_air_date.asc()}
     elif list_type == ListType.MOVIES:
         media = Movies
         media_list = MoviesList
         media_genre = MoviesGenre
         media_actors = MoviesActors
-        sort_option = {'release_date_asc': media.release_date.asc(),
-                       'release_date_desc': media.release_date.desc()}
 
-    # Create a sorting dict and update the lists unique values
+    # Create a sorting dict
     sorting_dict = {'title-A-Z': media.name.asc(),
                     'title-Z-A': media.name.desc(),
-                    'score_desc': media_list.score.desc(),
-                    'score_asc': media_list.score.asc(),
+                    'score_TMDb_asc': media.vote_average.asc(),
                     'score_TMDb_desc': media.vote_average.desc(),
+                    'score_asc': media_list.score.asc(),
+                    'score_desc': media_list.score.desc(),
                     'comments': media_list.comment.desc(),
-                    'rewatched': media_list.rewatched.desc(),}
-    sorting_dict.update(sort_option)
-    sorting = sorting_dict[sort_val]
-
-    # Check the category
-    try:
-        category = Status(category)
-        cat_value = category.value
-    except ValueError:
-        abort(400)
+                    'rewatched': media_list.rewatched.desc(),
+                    'release_date_asc': media.release_date.asc(),
+                    'release_date_desc': media.release_date.desc()}
+    sorting = sorting_dict[sorting]
 
     # Check the genre
-    genre_filter = media_genre.genre.like(genre)
-    if genre == 'All':
+    genre_filter = media_genre.genre.like(nice_genre)
+    if nice_genre == 'All':
         genre_filter = text('')
 
     # Check the <filter_val> value - NOT USED FOR NOW
@@ -709,11 +704,11 @@ def get_media_query(user_id, list_type, category, genre, sort_val, page, q):
         .outerjoin(media_actors, media_actors.media_id == media_list.media_id) \
         .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter)
 
-    if category != Status.FAVORITE and category != Status.SEARCH and category != Status.ALL:
-        query = query.filter(media_list.status == category)
-    elif category == Status.FAVORITE:
+    if nice_cat != Status.FAVORITE and nice_cat != Status.SEARCH and nice_cat != Status.ALL:
+        query = query.filter(media_list.status == nice_cat)
+    elif nice_cat == Status.FAVORITE:
         query = query.filter(media_list.favorite)
-    elif category == Status.SEARCH:
+    elif nice_cat == Status.SEARCH:
         if list_type != ListType.MOVIES:
             query = query.filter(or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'),
                                      media.original_name.like('%' + q + '%')))
@@ -724,7 +719,7 @@ def get_media_query(user_id, list_type, category, genre, sort_val, page, q):
     # Run the query
     results = query.group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
 
-    return results, cat_value
+    return results
 
 
 # Count the number of media in a list type for a user
@@ -805,6 +800,11 @@ def check_media(media_id, list_type, add=False):
 
     if add:
         query = db.session.query(media).filter(media.id == media_id).first()
+        if query:
+            test = db.session.query(media_list)\
+                .filter(media_list.media_id == media_id, media_list.user_id == current_user.id).first()
+            if test:
+                query = None
     else:
         query = db.session.query(media, media_list) \
             .join(media, media.id == media_list.media_id) \

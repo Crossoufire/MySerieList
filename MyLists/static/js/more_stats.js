@@ -1,6 +1,6 @@
 
 
-// --- Series Canvas Data ----------------------------------------------------------------------------------------
+// --- Series Canvas Data -----------------------------------------------------------------------------------
 let series_eps_labels = $('#eps-series-bar').attr('values-y').split(', ');
 let series_eps_data = $('#eps-series-bar').attr('values-x').split(', ');
 series_eps_labels.pop();
@@ -232,7 +232,7 @@ let series_genres_config = {
 new Chart(document.getElementById('genres-series').getContext('2d'), series_genres_config);
 
 
-// --- Anime Canvas Data -----------------------------------------------------------------------------------------
+// --- Anime Canvas Data ----------------------------------------------------------------------------------
 let anime_eps_labels = $('#eps-anime-bar').attr('values-y').split(', ');
 let anime_eps_data = $('#eps-anime-bar').attr('values-x').split(', ');
 anime_eps_labels.pop();
@@ -468,7 +468,7 @@ let anime_genres_config = {
 new Chart(document.getElementById('genres-anime').getContext('2d'), anime_genres_config);
 
 
-// --- Movies Canvas Data ---------------------------------------------------------------------------------------
+// --- Movies Canvas Data ---------------------------------------------------------------------------------
 let movies_lengths_labels = $('#lengths-movies-bar').attr('values-y').split(', ');
 let movies_lengths_data = $('#lengths-movies-bar').attr('values-x').split(', ');
 movies_lengths_labels.pop();
@@ -704,7 +704,7 @@ let movies_genres_config = {
 new Chart(document.getElementById('genres-movies').getContext('2d'), movies_genres_config);
 
 
-// --- Media genres container size -------------------------------------------------------------------------------
+// --- Media genres container size ------------------------------------------------------------------------
 let series_height = 40*series_genres_data.length + 'px';
 let anime_height = 40*anime_genres_data.length + 'px';
 let movies_height = 40*movies_genres_data.length + 'px';

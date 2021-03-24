@@ -1,6 +1,6 @@
 
 
-// --- Create the cat buttons list -------------------------
+// --- Create the cat buttons list ----------------------------------------------------------------------
 function chargeButtons(card) {
     removeCat();
 
@@ -35,7 +35,7 @@ function chargeButtons(card) {
 }
 
 
-// --- Change the category ---------------------------------
+// --- Change the category ------------------------------------------------------------------------------
 function changeCategory(new_category, card_id) {
     let $card = $('#'+card_id);
     let media_list = $card.attr('values').split('-')[1];
@@ -63,7 +63,7 @@ function changeCategory(new_category, card_id) {
 }
 
 
-// --- Charge the categories buttons from other lists ------
+// --- Charge the categories buttons from other lists ---------------------------------------------------
 function ChargeButtonsOther(card) {
     removeCat();
     let $card = $('#'+card.id)
