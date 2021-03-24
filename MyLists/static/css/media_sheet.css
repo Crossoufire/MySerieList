@@ -34,9 +34,6 @@ ul {
     .media-title-pc {
         display: none !important;
     }
-    .mobile-follow {
-        margin-bottom: 20px;
-    }
 }
 @media (max-width: 490px) {
     .wrapper {
@@ -44,11 +41,8 @@ ul {
         padding-right: 10px;
     }
     .media-cover {
-        width: 200px;
-        height: 300px;
-    }
-    .follow-margin-mobile {
-        margin-left: 2px;
+        width: 250px;
+        height: 375px;
     }
 }
 
@@ -120,7 +114,7 @@ ul {
 
 
 /* --- Follows ------------------------------------------ */
-.follow-margin-mobile {
+.follow-margin {
     margin-left: 21px;
 }
 
@@ -146,6 +140,12 @@ ul {
 
 .commentary {
     margin-bottom: 0;
+}
+
+@media (max-width: 490px) {
+    .follow-margin {
+        margin-left: 2px;
+    }
 }
 
 

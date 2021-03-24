@@ -120,7 +120,7 @@ class MediaDict:
                                     "cover": f"anime_covers/{self.data.image_cover}",
                                     "cover_path": "anime_covers"})
 
-        in_user_list = self.add_user_list()
+        in_user_list = self.data.in_user_list()
         if in_user_list:
             self.media_info["in_user_list"] = True
             self.media_info["last_episode_watched"] = in_user_list.last_episode_watched
@@ -148,7 +148,7 @@ class MediaDict:
         # Change <release_date> format
         self.media_info['release_date'] = change_air_format(self.data.release_date)
 
-        in_user_list = self.add_user_list()
+        in_user_list = self.data.in_user_list()
         if in_user_list:
             self.media_info["in_user_list"] = True
             self.media_info["score"] = in_user_list.score
@@ -159,18 +159,13 @@ class MediaDict:
 
     def add_genres(self):
         genres_list = [r.genre for r in self.data.genres]
-        genre_str = ','.join([g for g in genres_list])
         if len(genres_list) > 2:
             genres_list = genres_list[:2]
-            genre_str = ','.join([g for g in genres_list[:2]])
 
-        self.media_info['same_genres'] = self.data.get_same_genres(genres_list, genre_str)
+        self.media_info['same_genres'] = self.data.get_same_genres(genres_list)
 
     def add_follow_list(self):
-        self.media_info['in_follows_lists'] = self.data.in_follows_lists(current_user.id)
-
-    def add_user_list(self):
-        return self.data.in_user_list(current_user.id)
+        self.media_info['in_follows_lists'] = self.data.in_follows_lists()
 
 
 # Parsing the DB data to the <MediaList> route

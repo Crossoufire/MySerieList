@@ -80,28 +80,37 @@
             </div>
         </li>
         <li class="nav-item dropdown li-genre-sort text-grey">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Sort {{ sorting_bis|upper }}</b></a>
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Sort {{ sorting|upper }}</b></a>
             <div class="dropdown-menu sort-drop">
-                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-A-Z/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    <div>Title A-Z</div>
-                </a>
-                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-Z-A/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    <div>Title Z-A</div>
-                </a>
-                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_desc/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    <div>Score 🠗</div>
-                </a>
-                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_asc/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    <div>Score 🠕</div>
-                </a>
-                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/rewatched/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    <div>Rewatched</div>
-                </a>
-                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/comments/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    <div>Comments</div>
-                </a>
-                {% block sorting_list %}
-                {% endblock sorting_list %}
+                {% for sort in all_sorting %}
+                    <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sort }}/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
+                        <div>{{ sort }}</div>
+                    </a>
+                {% endfor %}
+
+{#                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-A-Z/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">#}
+{#                    <div>Title A-Z</div>#}
+{#                </a>#}
+{#                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-Z-A/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">#}
+{#                    <div>Title Z-A</div>#}
+{#                </a>#}
+{#                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_desc/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">#}
+{#                    <div>Score 🠗</div>#}
+{#                </a>#}
+{#                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_asc/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">#}
+{#                    <div>Score 🠕</div>#}
+{#                </a>#}
+{#                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_TMDb_desc/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">#}
+{#                    <div>Score TMDb 🠕</div>#}
+{#                </a>#}
+{#                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/rewatched/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">#}
+{#                    <div>Rewatched</div>#}
+{#                </a>#}
+{#                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/comments/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">#}
+{#                    <div>Comments</div>#}
+{#                </a>#}
+{#                {% block sorting_list %}#}
+{#                {% endblock sorting_list %}#}
             </div>
         </li>
     </div>

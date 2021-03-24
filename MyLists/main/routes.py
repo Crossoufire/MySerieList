@@ -26,16 +26,21 @@ _ANIME_GENRES = ['All', 'Action', 'Adventure', 'Cars', 'Comedy', 'Dementia', 'De
                  'Samurai', 'Romance', 'School', 'Sci-Fi', "Shoujo", 'Shounen', 'Space', 'Sports', 'Super Power',
                  'Vampire', 'Harem', 'Slice Of Life', 'Supernatural', 'Military', 'Police', 'Psychological',
                  'Thriller', 'Seinen', 'Josei']
-_SORTING = {'title-A-Z': 'title A-Z',
-            'title-Z-A': 'title Z-A',
-            'score_desc': 'score 🠗',
-            'score_asc': 'score 🠕',
-            'comments': 'comments',
-            'rewatched': 'rewatch',
-            'release_date_desc': 'release date 🠗',
-            'release_date_asc': 'release date 🠕',
-            'first_air_date_desc': 'first air date 🠗',
-            'first_air_date_asc': 'first air date 🠕'}
+_SORTING = {'title-A-Z': 'Title A-Z',
+            'title-Z-A': 'Title Z-A',
+            'score_desc': 'Score 🠗',
+            'score_asc': 'Score 🠕',
+            'score_TMDb_desc': 'Score TMDb 🠗',
+            'comments': 'Comments',
+            'rewatched': 'Rewatch',
+            'release_date_desc': 'Release date 🠗',
+            'release_date_asc': 'Release date 🠕',
+            'first_air_date_desc': 'First air date 🠗',
+            'first_air_date_asc': 'First air date 🠕'}
+_SORTING_TV = ['Title A-Z', 'Title Z-A', 'Score 🠗', 'Score 🠕', 'Score TMDb 🠗', 'Comments', 'Rewatch',
+               'First air date 🠗', 'First air date 🠕']
+_SORTING_MOVIES = ['Title A-Z', 'Title Z-A', 'Score 🠗', 'Score 🠕', 'Score TMDb 🠗', 'Comments', 'Rewatch',
+                   'Release date 🠗', 'Release date 🠕']
 
 
 @bp.route("/<string:media_list>/<string:user_name>/", methods=['GET', 'POST'])
@@ -61,7 +66,7 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
 
     # Check the sorting value
     try:
-        sorting_bis = _SORTING[sorting]
+        sort_name = _SORTING[sorting]
     except KeyError:
         abort(400)
 
@@ -69,10 +74,13 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
     html_template = 'medialist_tv.html'
     if list_type == ListType.SERIES:
         all_genres = _SERIES_GENRES
+        all_sorting = _SORTING_TV
     elif list_type == ListType.ANIME:
         all_genres = _ANIME_GENRES
+        all_sorting = _SORTING_TV
     elif list_type == ListType.MOVIES:
         all_genres = _MOVIES_GENRES
+        all_sorting = _SORTING_MOVIES
         if category == Status.WATCHING:
             category = Status.COMPLETED
         html_template = 'medialist_movies.html'
@@ -95,14 +103,13 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
     # Recover the media data into a dict
     items_data_list = []
     for item in items:
-        # add_data = MediaListDict(item, common_media, list_type).redirect_medialist()
         add_data = MediaListObj(item, common_media, list_type)
         items_data_list.append(add_data)
 
-    return render_template(html_template, title="{}'s {}".format(user_name, media_list), media_items=items_data_list,
-                           common_elements=common_elements, media_list=media_list, username=user_name, genre=genre,
-                           user_id=str(user.id), info_pages=info_pages, category=category, sorting=sorting,
-                           page=page_val, all_genres=all_genres, sorting_bis=sorting_bis, search_query=q)
+    return render_template(html_template, title="{}'s {}".format(user_name, media_list), username=user_name,
+                           media_items=items_data_list, common_elements=common_elements, media_list=media_list,
+                           info_pages=info_pages, category=category, page=page_val, search_query=q, genre=genre,
+                           sorting=sort_name, all_sorting=all_sorting, all_genres=all_genres, user_id=str(user.id))
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])

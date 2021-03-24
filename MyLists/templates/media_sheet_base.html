@@ -5,20 +5,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/media_sheet.css') }}">
     <style rel="stylesheet">
         {% if media_list == 'serieslist' %}
-            hr {
-                margin-top: 5px;
-                border-top: 1px solid #216e7d;
-            }
+            hr {margin-top: 5px; border-top: 1px solid #216e7d;}
         {% elif media_list == 'animelist' %}
-            hr {
-                margin-top: 5px;
-                border-top: 1px solid #945141;
-            }
+            hr {margin-top: 5px; border-top: 1px solid #945141;}
         {% elif media_list == 'movieslist' %}
-            hr {
-                margin-top: 5px;
-                border-top: 1px solid #8c7821;
-            }
+            hr {margin-top: 5px; border-top: 1px solid #8c7821;}
         {% endif %}
     </style>
 {% endblock css %}
@@ -52,17 +43,12 @@
                         {% endblock medialist_info %}
                         <h4 id="comment-title" class="m-l-15 m-r-15 m-t-15">
                             <i class="fas fa-pen-alt m-t-10"></i>&nbsp; <b>Comment</b>
-                            <a class="far fa-edit m-t-10"
-                               href="/comment/{{ data['media_type'] }}/{{ data['id'] }}?from=media" data-toggle="tooltip"
-                               title="Add/Edit Comment"></a>
+                            <a class="far fa-edit m-t-10" data-toggle="tooltip" title="Add/Edit Comment"
+                               href="/comment/{{ data['media_type'] }}/{{ data['id'] }}?from=media"></a>
                         </h4>
                         <hr class="m-l-15 m-r-15 m-b-8">
                         <p class="comment-style m-l-20 m-r-20">
-                            {% if data['comment'] %}
-                                {{ data['comment'] }}
-                            {% else %}
-                                <i>No comment added.</i>
-                            {% endif %}
+                            {% if data['comment'] %}{{ data['comment'] }}{% else %}<i>No comment added.</i>{% endif %}
                         </p>
                         <div class="text-center m-t-15">
                             <button class="btn btn-smaller btn-danger" onclick="removeFromUser('{{ data['id'] }}',
@@ -124,7 +110,7 @@
                 <hr>
             </div>
         </div>
-        <div class="follow-margin-mobile m-t-40 m-b-30">
+        <div class="follow-margin m-t-40 m-b-30">
             <h4><i class="fas fa-user-check"></i>&nbsp;&nbsp;<b>In follow's list</b></h4>
             <hr>
             <div class="row" style="margin-top: -5px;">

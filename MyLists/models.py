@@ -142,7 +142,7 @@ class User(UserMixin, db.Model):
         return Notifications.query.filter_by(user_id=self.id).order_by(desc(Notifications.timestamp)).limit(8).all()
 
     def launch_task(self, name, description, *args, **kwargs):
-        rq_job = app.q.enqueue('MyLists.rq_tasks.' + name, self.id, *args, **kwargs)
+        rq_job = app.q.enqueue('MyLists.main.rq_tasks.' + name, self.id, *args, **kwargs)
         task = RedisTasks(id=rq_job.get_id(), name=name, description=description, user=self)
         db.session.add(task)
         return task
@@ -214,10 +214,53 @@ class Notifications(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 
+class MediaMixin(object):
+    models = None
+
+    def __init__(self, model_name):
+        self.model_name = model_name
+
+    def get_same_genres(self, genres_list):
+        media = eval(self.__class__.__name__)
+        media_genre = eval(self.__class__.__name__+'Genre')
+
+        same_genres = db.session.query(media, media_genre) \
+            .join(media, media.id == media_genre.media_id) \
+            .filter(media_genre.genre.in_(genres_list), media_genre.media_id != self.id) \
+            .group_by(media_genre.media_id) \
+            .having(func.group_concat(media_genre.genre.distinct()) == ','.join(genres_list)).limit(8).all()
+        return same_genres
+
+    def in_follows_lists(self):
+        media_list = eval(self.__class__.__name__+'List')
+
+        in_follows_lists = db.session.query(User, media_list, followers) \
+            .join(User, User.id == followers.c.followed_id) \
+            .join(media_list, media_list.user_id == followers.c.followed_id) \
+            .filter(followers.c.follower_id == current_user.id, media_list.media_id == self.id).all()
+        return in_follows_lists
+
+    def in_user_list(self):
+        in_user_list = self.list_info.filter_by(user_id=current_user.id).first()
+        return in_user_list
+
+    @classmethod
+    def get_model(cls, model_name):
+        if cls.models is None:
+            cls.models = {}
+            for model in cls.__subclasses__():
+                tmp = model()
+                cls.models[tmp.model_name] = tmp
+        return cls.models[model_name]
+
+
 # --- SERIES ------------------------------------------------------------------------------------------------------
 
 
-class Series(db.Model):
+class Series(MediaMixin, db.Model):
+    def __init__(self):
+        super(Series, self).__init__('Series')
+
     def __repr__(self):
         return f'<Series {self.id}-{self.name}>'
 
@@ -252,27 +295,11 @@ class Series(db.Model):
     networks = db.relationship('SeriesNetwork', backref='series', lazy=True)
     list_info = db.relationship('SeriesList', backref='series', lazy="dynamic")
 
-    def get_same_genres(self, genres_list, genre_str):
-        same_genres = db.session.query(Series, SeriesGenre) \
-            .join(Series, Series.id == SeriesGenre.media_id) \
-            .filter(SeriesGenre.genre.in_(genres_list), SeriesGenre.media_id != self.id) \
-            .group_by(SeriesGenre.media_id) \
-            .having(func.group_concat(SeriesGenre.genre.distinct()) == genre_str).limit(8).all()
-        return same_genres
 
-    def in_follows_lists(self, user_id):
-        in_follows_lists = db.session.query(User, SeriesList, followers) \
-            .join(User, User.id == followers.c.followed_id) \
-            .join(SeriesList, SeriesList.user_id == followers.c.followed_id) \
-            .filter(followers.c.follower_id == user_id, SeriesList.media_id == self.id).all()
-        return in_follows_lists
+class SeriesList(MediaMixin, db.Model):
+    def __init__(self):
+        super(SeriesList, self).__init__('serieslist')
 
-    def in_user_list(self, user_id):
-        in_user_list = self.list_info.filter_by(user_id=user_id).first()
-        return in_user_list
-
-
-class SeriesList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -286,7 +313,10 @@ class SeriesList(db.Model):
     comment = db.Column(db.Text)
 
 
-class SeriesGenre(db.Model):
+class SeriesGenre(MediaMixin, db.Model):
+    def __init__(self):
+        super(SeriesGenre, self).__init__('seriesgenre')
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
@@ -315,7 +345,10 @@ class SeriesActors(db.Model):
 # --- ANIME -------------------------------------------------------------------------------------------------------
 
 
-class Anime(db.Model):
+class Anime(MediaMixin, db.Model):
+    def __init__(self):
+        super(Anime, self).__init__('Anime')
+
     def __repr__(self):
         return f'<Anime {self.id}-{self.name}>'
 
@@ -350,27 +383,11 @@ class Anime(db.Model):
     list_info = db.relationship('AnimeList', backref='anime', lazy='dynamic')
     networks = db.relationship('AnimeNetwork', backref='anime', lazy=True)
 
-    def get_same_genres(self, genres_list, genre_str):
-        same_genres = db.session.query(Anime, AnimeGenre) \
-            .join(Anime, Anime.id == AnimeGenre.media_id) \
-            .filter(AnimeGenre.genre.in_(genres_list), AnimeGenre.media_id != self.id) \
-            .group_by(AnimeGenre.media_id) \
-            .having(func.group_concat(AnimeGenre.genre.distinct()) == genre_str).limit(8).all()
-        return same_genres
 
-    def in_follows_lists(self, user_id):
-        in_follows_lists = db.session.query(User, AnimeList, followers) \
-            .join(User, User.id == followers.c.followed_id) \
-            .join(AnimeList, AnimeList.user_id == followers.c.followed_id) \
-            .filter(followers.c.follower_id == user_id, AnimeList.media_id == self.id).all()
-        return in_follows_lists
+class AnimeList(MediaMixin, db.Model):
+    def __init__(self):
+        super(AnimeList, self).__init__('animelist')
 
-    def in_user_list(self, user_id):
-        in_user_list = self.list_info.filter_by(user_id=user_id).first()
-        return in_user_list
-
-
-class AnimeList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
@@ -384,18 +401,21 @@ class AnimeList(db.Model):
     comment = db.Column(db.Text)
 
 
+class AnimeGenre(MediaMixin, db.Model):
+    def __init__(self):
+        super(AnimeGenre, self).__init__('animegenre')
+
+    id = db.Column(db.Integer, primary_key=True)
+    media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
+    genre = db.Column(db.String(100), nullable=False)
+    genre_id = db.Column(db.Integer, nullable=False)
+
+
 class AnimeEpisodesPerSeason(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     season = db.Column(db.Integer, nullable=False)
     episodes = db.Column(db.Integer, nullable=False)
-
-
-class AnimeGenre(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
-    genre = db.Column(db.String(100), nullable=False)
-    genre_id = db.Column(db.Integer, nullable=False)
 
 
 class AnimeNetwork(db.Model):
@@ -413,7 +433,10 @@ class AnimeActors(db.Model):
 # --- MOVIES ------------------------------------------------------------------------------------------------------
 
 
-class Movies(db.Model):
+class Movies(MediaMixin, db.Model):
+    def __init__(self):
+        super(Movies, self).__init__('Movies')
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     original_name = db.Column(db.String(50), nullable=False)
@@ -438,27 +461,11 @@ class Movies(db.Model):
     actors = db.relationship('MoviesActors', backref='movies', lazy=True)
     list_info = db.relationship('MoviesList', backref='movies', lazy='dynamic')
 
-    def get_same_genres(self, genres_list, genre_str):
-        same_genres = db.session.query(Movies, MoviesGenre) \
-            .join(Movies, Movies.id == MoviesGenre.media_id) \
-            .filter(MoviesGenre.genre.in_(genres_list), MoviesGenre.media_id != self.id) \
-            .group_by(MoviesGenre.media_id) \
-            .having(func.group_concat(MoviesGenre.genre.distinct()) == genre_str).limit(8).all()
-        return same_genres
 
-    def in_follows_lists(self, user_id):
-        in_follows_lists = db.session.query(User, MoviesList, followers) \
-            .join(User, User.id == followers.c.followed_id) \
-            .join(MoviesList, MoviesList.user_id == followers.c.followed_id) \
-            .filter(followers.c.follower_id == user_id, MoviesList.media_id == self.id).all()
-        return in_follows_lists
+class MoviesList(MediaMixin, db.Model):
+    def __init__(self):
+        super(MoviesList, self).__init__('movieslist')
 
-    def in_user_list(self, user_id):
-        in_user_list = self.list_info.filter_by(user_id=user_id).first()
-        return in_user_list
-
-
-class MoviesList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
@@ -470,7 +477,10 @@ class MoviesList(db.Model):
     comment = db.Column(db.Text)
 
 
-class MoviesGenre(db.Model):
+class MoviesGenre(MediaMixin, db.Model):
+    def __init__(self):
+        super(MoviesGenre, self).__init__('moviesgenre')
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
@@ -665,8 +675,9 @@ def get_media_query(user_id, list_type, category, genre, sort_val, page, q):
                     'title-Z-A': media.name.desc(),
                     'score_desc': media_list.score.desc(),
                     'score_asc': media_list.score.asc(),
+                    'score_TMDb_desc': media.vote_average.desc(),
                     'comments': media_list.comment.desc(),
-                    'rewatched': media_list.rewatched.desc()}
+                    'rewatched': media_list.rewatched.desc(),}
     sorting_dict.update(sort_option)
     sorting = sorting_dict[sort_val]
 
@@ -764,20 +775,15 @@ def get_total_time(list_type):
     if list_type == ListType.SERIES:
         media = Series
         media_list = SeriesList
-        media_duration = Series.duration
-        media_eps = SeriesList.eps_watched
     elif list_type == ListType.ANIME:
         media = Anime
         media_list = AnimeList
-        media_duration = Anime.duration
-        media_eps = AnimeList.eps_watched
     elif list_type == ListType.MOVIES:
         media = Movies
         media_list = MoviesList
-        media_duration = Movies.duration
-        media_eps = MoviesList.eps_watched
 
-    query = db.session.query(User, media_duration, media_eps, func.sum(media_duration * media_eps)) \
+    query = db.session.query(User, media.duration, media_list.eps_watched,
+                             func.sum(media.duration * media_list.eps_watched)) \
         .join(media, media.id == media_list.media_id) \
         .join(User, User.id == media_list.user_id) \
         .group_by(media_list.user_id).all()

@@ -367,7 +367,7 @@ $(document).ready(function () {
         }
     });
 
-    // --- Fill the media icon score -----------------------
+    // --- Fill the media icon score -------------------------------------------------------
     let $media_ticket = $('.media-ticket');
     let gradient = $media_ticket.attr('value');
     $media_ticket.attr('style', add_gradient(gradient));

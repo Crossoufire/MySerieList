@@ -152,7 +152,7 @@
                 <div>{{ data['total_episodes'] }} Episodes</div>
             </li>
             <li>
-                <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Episode duration</b></h5>
+                <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Eps. duration</b></h5>
                 <div>{{ data['duration'] }} min</div>
             </li>
         </ul>
@@ -164,7 +164,7 @@
                 <div>{{ data['genres'] }}</div>
             </li>
             <li class="m-b-15">
-                <h5 class="mb-1 text-media"><i class="fas fa-user"></i><b>&nbsp; Actors</b></h5>
+                <h5 class="mb-1 text-media"><i class="fas fa-user"></i><b>&nbsp; Main Actors</b></h5>
                 {% if data['actors'] == 'Unknown' %}
                     <div><i>No actors found</i></div>
                 {% else %}
@@ -176,7 +176,7 @@
                 <div>{{ data['networks'] }}</div>
             </li>
             <li class="m-b-15">
-                <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Completion Time</b></h5>
+                <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Completion</b></h5>
                 <div>{{ data['time_to_complete']//60 }} h {{ '%02d'|format(data['time_to_complete']%60) }} min</div>
             </li>
             <li class="m-b-15">
