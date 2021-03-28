@@ -378,6 +378,7 @@ class MediaDetails:
         genres_list = self.get_genres()
         actors_list = self.get_actors()
         networks_list = self.get_networks()
+        a_genres_list = []
         if self.list_type == ListType.ANIME and self.updating is False:
             a_genres_list = self.get_anime_genres()
 

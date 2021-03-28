@@ -9,6 +9,31 @@
 {% endblock return_icon %}
 
 
+{% block categories %}
+    {% set categories = ['All', 'Completed', 'Plan to Watch', 'Favorite'] %}
+    {% for cat in categories %}
+        <a class="cat-btn{% if cat == category %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
+         media_list=media_list, user_name=username, category=cat, genre=genre, sorting=sorting, page_val=1) }}">
+            <b>{{ cat|upper }}</b>
+        </a>
+    {% endfor %}
+{% endblock categories %}
+
+
+{% block add_genres %}
+    {% set all_genres = ["All", "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama",
+    "Family", "Fantasy", "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "TV Movie", "Thriller",
+    "War", "Western"] %}
+    {% for ge in all_genres %}
+        <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
+         user_name=username, category=cat, genre=genre, sorting=sorting,
+         page_val=1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
+            <div>{{ ge }}</div>
+        </a>
+    {% endfor %}
+{% endblock add_genres %}
+
+
 {% block data %}
     {{ item.genres }}-{{ media_list }}-{{ item.id }}
 {% endblock data %}

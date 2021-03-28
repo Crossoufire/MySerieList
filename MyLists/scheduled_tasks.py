@@ -541,15 +541,13 @@ def update_Mylists_stats():
     nb_movies = Movies.query.all()
     nb_media = {"series": len(nb_series), "anime": len(nb_anime), "movies": len(nb_movies)}
 
-    stats_to_add = MyListsStats(
-        nb_users=len(nb_users), nb_media=json.dumps(nb_media),
-        total_time=json.dumps(total_time), top_media=json.dumps(most_present_media),
-        top_genres=json.dumps(most_genres_media), top_actors=json.dumps(most_actors_media),
-        top_directors=json.dumps(most_directors_media), top_dropped=json.dumps(top_dropped_media),
-        total_episodes=json.dumps(total_episodes_media), total_seasons=json.dumps(total_seasons_media),
-        total_movies=json.dumps(total_movies_dict)
-    )
-    db.session.add(stats_to_add)
+    stats = MyListsStats(nb_users=len(nb_users), nb_media=json.dumps(nb_media),
+                         total_time=json.dumps(total_time), top_media=json.dumps(most_present_media),
+                         top_genres=json.dumps(most_genres_media), top_actors=json.dumps(most_actors_media),
+                         top_directors=json.dumps(most_directors_media), top_dropped=json.dumps(top_dropped_media),
+                         total_episodes=json.dumps(total_episodes_media), total_seasons=json.dumps(total_seasons_media),
+                         total_movies=json.dumps(total_movies_dict))
+    db.session.add(stats)
     db.session.commit()
 
 

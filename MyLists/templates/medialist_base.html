@@ -32,32 +32,25 @@
             </div>
             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 input-container mobile-margin">
                 <form method="GET" action="{{ url_for('main.mymedialist', media_list=media_list, user_name=username,
-                category='search', genre=genre, sorting=sorting, page_val=1) }}">
-                    {{ search_form.q(size=20, class='modded-input', placeholder=search_form.q.label.text,
-                       onfocus="this.placeholder = '';", onblur="this.placeholder = search_form.q.label.text") }}
+                category='Search', genre=genre, sorting=sorting, page_val=1) }}">
+                    {{ search_form.q(class='modded-input', placeholder=search_form.q.label.text,
+                       onfocus="this.placeholder = '';",
+                       onblur="this.placeholder = "+"'"+search_form.q.label.text+"'"+";") }}
                 </form>
-{#                <form method="GET" action="/{{ media_list }}/{{ username }}/search/genre/{{ genre }}/by/{{ sorting }}/page/1">#}
-{#                    <input class="modded-input" name="q" placeholder="&#128269; Search titles, actors..."#}
-{#                     onfocus="this.placeholder = '';" onblur="this.placeholder = '&#128269; Search titles, actors...';">#}
-{#                </form>#}
             </div>
         </div>
     </section>
 
     <section class="media-list-categories">
         <div class="categories-css p-1">
-            {% for key, value in all_categories.items() %}
-                <a class="cat-btn{% if key == category %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
-                 media_list=media_list, username=user_name, category=key, genre=genre, sorting=sorting, page_val=1) }}">
-                    <b>{{ value|upper }}</b>
-                </a>
-            {% endfor %}
+            {% block categories scoped %}
+            {% endblock categories %}
         </div>
     </section>
 
     <section class="title-sorting-filtering-genres">
         <h4 class="cat-title">
-            {{ all_categories[category]|upper }}{% if category == 'search' %} RESULTS FOR "{{ search_q }}" {% endif %}
+            {{ category|upper }}{% if category == "Search" %} RESULTS FOR "{{ search_q }}" {% endif %}
             ({{ info_pages['total_media'] }})
         </h4>
         <div class="sort-container">
@@ -71,25 +64,22 @@
     {#            </a>#}
     {#        {% endif %}#}
             <li class="nav-item dropdown li-genre-sort text-grey">
-                <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Genre {{ all_genres[genre]|upper }}</b></a>
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Genre {{ genre|upper }}</b></a>
                 <div class="dropdown-menu genre-drop">
-                    {% for key, value in all_genres.items() %}
-                        <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
-                        user_name=username, category=category, genre=key, sorting=sorting,
-                        page_val=1) }}{% if category == 'search' %}?q={{ search_q }}{% endif %}">
-                            <div>{{ value }}</div>
-                        </a>
-                    {% endfor %}
+                    {% block add_genres scoped %}
+                    {% endblock add_genres %}
                 </div>
             </li>
             <li class="nav-item dropdown li-genre-sort text-grey">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Sort {{ sorting|upper }}</b></a>
                 <div class="dropdown-menu sort-drop">
-                    {% for key, value in all_sorting.items() %}
+                    {% set all_sort = ['Title A-Z','Title Z-A','Score +','Score -','Score TMDb +','Score TMDb -',
+                    'Comments','Rewatch','Release date +','Release date -'] %}
+                    {% for so in all_sort %}
                         <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
-                        user_name=username, category=category, genre=genre, sorting=key,
-                        page_val=1) }}{% if category == 'search' %}?q={{ search_q }}{% endif %}">
-                            <div>{{ value }}</div>
+                         user_name=username, category=category, genre=genre, sorting=so,
+                         page_val=1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
+                            <div>{{ so }}</div>
                         </a>
                     {% endfor %}
                 </div>
@@ -111,7 +101,7 @@
                             media_type=item.media, media_id=item.id) }}">
                                 <span class="font-mask text-center text-light">{{ item.display_name }}</span>
                             </a>
-                            {% if category == 'search' or category == 'all' %}
+                            {% if category == 'Search' or category == 'All' %}
                                 <div class="bottom-card-cat{% if media_list =='movieslist' %}-movie {% endif %}">
                                     {{ item.category }}</div>
                             {% endif %}
@@ -183,9 +173,9 @@
         <ul class="pagination flex-wrap m-b-50 pagination-css">
             {% for i in range(info_pages['total_pages']) %}
                 <li class="page-item {% if i + 1 == info_pages['actual_page'] %}active {% endif %}">
-                    <a class="page-link text-light"
-                     href="{{ url_for('main.mymedialist', media_list=media_list, user_name=username, category=category,
-                     genre=genre, sorting=sorting, page_val=i+ 1) }}{% if category == 'search' %}?q={{ search_q }}{% endif %}">
+                    <a class="page-link text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
+                     user_name=username, category=category, genre=genre, sorting=sorting,
+                     page_val=i + 1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
                         {{ '{:02d}'.format(i + 1) }}
                     </a>
                 </li>

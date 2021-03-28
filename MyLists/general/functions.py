@@ -9,15 +9,8 @@ from MyLists.models import ListType, Status, Movies, Badges, Ranks, Frames, Seri
 def compute_media_time_spent():
     for list_type in ListType:
         query = get_total_time(list_type)
-        if list_type == ListType.SERIES:
-            for q in query:
-                q[0].time_spent_series = q[3]
-        elif list_type == ListType.ANIME:
-            for q in query:
-                q[0].time_spent_anime = q[3]
-        elif list_type == ListType.MOVIES:
-            for q in query:
-                q[0].time_spent_movies = q[3]
+        for q in query:
+            setattr(q[0], f"time_spent_{list_type.value.replace('list', '')}", q[3])
 
 
 # --- DB add/refresh from CSV data -----------------------------------------------------------------------------

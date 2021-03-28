@@ -37,12 +37,6 @@ class MediaType(Enum):
     ANIME = "Anime"
     MOVIES = 'Movies'
 
-    @classmethod
-    def _missing_name_(cls, name):
-        for member in cls:
-            if member.name.lower() == name.lower():
-                return member
-
 
 class HomePage(Enum):
     ACCOUNT = "account"
@@ -221,11 +215,6 @@ class Notifications(db.Model):
 
 
 class MediaMixin(object):
-    models = None
-
-    def __init__(self, model_name):
-        self.model_name = model_name
-
     def get_same_genres(self, genres_list):
         media = eval(self.__class__.__name__)
         media_genre = eval(self.__class__.__name__+'Genre')
@@ -250,23 +239,11 @@ class MediaMixin(object):
         in_user_list = self.list_info.filter_by(user_id=current_user.id).first()
         return in_user_list
 
-    @classmethod
-    def get_model(cls, model_name):
-        if cls.models is None:
-            cls.models = {}
-            for model in cls.__subclasses__():
-                tmp = model()
-                cls.models[tmp.model_name] = tmp
-        return cls.models[model_name]
-
 
 # --- SERIES ------------------------------------------------------------------------------------------------------
 
 
 class Series(MediaMixin, db.Model):
-    def __init__(self):
-        super(Series, self).__init__('Series')
-
     def __repr__(self):
         return f'<Series {self.id}-{self.name}>'
 
@@ -302,10 +279,7 @@ class Series(MediaMixin, db.Model):
     list_info = db.relationship('SeriesList', backref='series', lazy="dynamic")
 
 
-class SeriesList(MediaMixin, db.Model):
-    def __init__(self):
-        super(SeriesList, self).__init__('serieslist')
-
+class SeriesList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -319,10 +293,7 @@ class SeriesList(MediaMixin, db.Model):
     comment = db.Column(db.Text)
 
 
-class SeriesGenre(MediaMixin, db.Model):
-    def __init__(self):
-        super(SeriesGenre, self).__init__('seriesgenre')
-
+class SeriesGenre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
@@ -352,9 +323,6 @@ class SeriesActors(db.Model):
 
 
 class Anime(MediaMixin, db.Model):
-    def __init__(self):
-        super(Anime, self).__init__('Anime')
-
     def __repr__(self):
         return f'<Anime {self.id}-{self.name}>'
 
@@ -390,10 +358,7 @@ class Anime(MediaMixin, db.Model):
     networks = db.relationship('AnimeNetwork', backref='anime', lazy=True)
 
 
-class AnimeList(MediaMixin, db.Model):
-    def __init__(self):
-        super(AnimeList, self).__init__('animelist')
-
+class AnimeList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
@@ -407,10 +372,7 @@ class AnimeList(MediaMixin, db.Model):
     comment = db.Column(db.Text)
 
 
-class AnimeGenre(MediaMixin, db.Model):
-    def __init__(self):
-        super(AnimeGenre, self).__init__('animegenre')
-
+class AnimeGenre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
@@ -440,8 +402,8 @@ class AnimeActors(db.Model):
 
 
 class Movies(MediaMixin, db.Model):
-    def __init__(self):
-        super(Movies, self).__init__('Movies')
+    def __repr__(self):
+        return f'<Movies {self.id}-{self.name}>'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -469,9 +431,6 @@ class Movies(MediaMixin, db.Model):
 
 
 class MoviesList(MediaMixin, db.Model):
-    def __init__(self):
-        super(MoviesList, self).__init__('movieslist')
-
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
@@ -484,9 +443,6 @@ class MoviesList(MediaMixin, db.Model):
 
 
 class MoviesGenre(MediaMixin, db.Model):
-    def __init__(self):
-        super(MoviesGenre, self).__init__('moviesgenre')
-
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
@@ -565,23 +521,12 @@ class GlobalStats:
         return times_spent
 
     def get_query_data(self, list_type):
-        if list_type == ListType.SERIES:
-            self.media = Series
-            self.media_genre = SeriesGenre
-            self.media_actors = SeriesActors
-            self.media_eps = SeriesEpisodesPerSeason
-            self.media_list = SeriesList
-        elif list_type == ListType.ANIME:
-            self.media = Anime
-            self.media_genre = AnimeGenre
-            self.media_actors = AnimeActors
-            self.media_eps = AnimeEpisodesPerSeason
-            self.media_list = AnimeList
-        elif list_type == ListType.MOVIES:
-            self.media = Movies
-            self.media_genre = MoviesGenre
-            self.media_actors = MoviesActors
-            self.media_list = MoviesList
+        self.media = eval(list_type.value.capitalize().replace('list', ''))
+        self.media_list = eval(list_type.value.capitalize().replace('l', 'L'))
+        self.media_genre = eval(list_type.value.capitalize().replace('list', 'Genre'))
+        self.media_actors = eval(list_type.value.capitalize().replace('list', 'Actors'))
+        if list_type != ListType.MOVIES:
+            self.media_eps = eval(list_type.value.capitalize().replace('list', 'EpisodesPerSeason'))
 
     def get_top_media(self):
         queries = []
@@ -653,39 +598,41 @@ class GlobalStats:
 
 
 # Query for <mymedialist> route
-def get_media_query(user_id, list_type, nice_cat, nice_genre, sorting, page, q):
-    if list_type == ListType.SERIES:
-        media = Series
-        media_list = SeriesList
-        media_actors = SeriesActors
-        media_genre = SeriesGenre
-    elif list_type == ListType.ANIME:
-        media = Anime
-        media_list = AnimeList
-        media_actors = AnimeActors
-        media_genre = AnimeGenre
-    elif list_type == ListType.MOVIES:
-        media = Movies
-        media_list = MoviesList
-        media_genre = MoviesGenre
-        media_actors = MoviesActors
+def get_media_query(user_id, list_type, category, genre, sorting, page, q):
+    media = eval(list_type.value.capitalize().replace('list', ''))
+    media_list = eval(list_type.value.capitalize().replace('l', 'L'))
+    media_actors = eval(list_type.value.capitalize().replace('list', 'Actors'))
+    media_genre = eval(list_type.value.capitalize().replace('list', 'Genre'))
+
+    if list_type != ListType.MOVIES:
+        add_sort = {'Release date +': media.first_air_date.desc(),
+                    'Release date -': media.first_air_date.asc()}
+    else:
+        add_sort = {'Release date +': media.release_date.desc(),
+                    'Release date -': media.release_date.asc()}
 
     # Create a sorting dict
-    sorting_dict = {'title-A-Z': media.name.asc(),
-                    'title-Z-A': media.name.desc(),
-                    'score_TMDb_asc': media.vote_average.asc(),
-                    'score_TMDb_desc': media.vote_average.desc(),
-                    'score_asc': media_list.score.asc(),
-                    'score_desc': media_list.score.desc(),
-                    'comments': media_list.comment.desc(),
-                    'rewatched': media_list.rewatched.desc(),
-                    'release_date_asc': media.release_date.asc(),
-                    'release_date_desc': media.release_date.desc()}
+    sorting_dict = {'Title A-Z': media.name.asc(),
+                    'Title Z-A': media.name.desc(),
+                    'Score TMDb +': media.vote_average.desc(),
+                    'Score TMDb -': media.vote_average.asc(),
+                    'Score +': media_list.score.desc(),
+                    'Score -': media_list.score.asc(),
+                    'Comments': media_list.comment.desc(),
+                    'Rewatch': media_list.rewatched.desc()}
+    sorting_dict.update(add_sort)
     sorting = sorting_dict[sorting]
 
+    # Check the category
+    try:
+        category = Status(category)
+        cat_value = category.value
+    except ValueError:
+        return abort(400)
+
     # Check the genre
-    genre_filter = media_genre.genre.like(nice_genre)
-    if nice_genre == 'All':
+    genre_filter = media_genre.genre.like(genre)
+    if genre == 'All':
         genre_filter = text('')
 
     # Check the <filter_val> value - NOT USED FOR NOW
@@ -704,11 +651,11 @@ def get_media_query(user_id, list_type, nice_cat, nice_genre, sorting, page, q):
         .outerjoin(media_actors, media_actors.media_id == media_list.media_id) \
         .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter)
 
-    if nice_cat != Status.FAVORITE and nice_cat != Status.SEARCH and nice_cat != Status.ALL:
-        query = query.filter(media_list.status == nice_cat)
-    elif nice_cat == Status.FAVORITE:
+    if category != Status.FAVORITE and category != Status.SEARCH and category != Status.ALL:
+        query = query.filter(media_list.status == category)
+    elif category == Status.FAVORITE:
         query = query.filter(media_list.favorite)
-    elif nice_cat == Status.SEARCH:
+    elif category == Status.SEARCH:
         if list_type != ListType.MOVIES:
             query = query.filter(or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'),
                                      media.original_name.like('%' + q + '%')))
@@ -717,19 +664,19 @@ def get_media_query(user_id, list_type, nice_cat, nice_genre, sorting, page, q):
                                      media.director_name.like('%' + q + '%'), media.original_name.like('%' + q + '%')))
 
     # Run the query
-    results = query.group_by(media.id).order_by(sorting).paginate(page, 48, error_out=True)
+    results = query.group_by(media.id).order_by(sorting).paginate(int(page), 48, error_out=True)
 
-    return results
+    return results, cat_value
 
 
-# Count the number of media in a list type for a user
+# # Count the number of media in a list type for a user
 def get_media_count(user_id, list_type):
-    if list_type == ListType.SERIES:
-        media_list = SeriesList
-    elif list_type == ListType.ANIME:
-        media_list = AnimeList
-    elif list_type == ListType.MOVIES:
-        media_list = MoviesList
+    # If user_id == current_user.id the common media does not need to be calculated.
+    if user_id == current_user.id:
+        common_media, common_elements = [], []
+        return common_media, common_elements
+
+    media_list = eval(list_type.value.capitalize().replace('l', 'L'))
 
     v1, v2 = aliased(media_list), aliased(media_list)
     count_total = media_list.query.filter_by(user_id=user_id).count()
@@ -738,23 +685,24 @@ def get_media_count(user_id, list_type):
         .filter(v1.user_id == current_user.id).all()
     common_ids = [r[0].media_id for r in count_versus]
 
-    return common_ids, int(count_total)
+    try:
+        percentage = int((len(common_ids) / count_total) * 100)
+    except ZeroDivisionError:
+        percentage = 0
+    common_elements = [len(common_ids), count_total, percentage]
+
+    return common_ids, common_elements
 
 
 # Recover the next airing media for the user
 def get_next_airing(list_type):
-    if list_type == ListType.SERIES:
-        media = Series
-        media_data = Series.next_episode_to_air
-        media_list = SeriesList
-    elif list_type == ListType.ANIME:
-        media = Anime
-        media_data = Anime.next_episode_to_air
-        media_list = AnimeList
-    elif list_type == ListType.MOVIES:
-        media = Movies
+    media = eval(list_type.value.capitalize().replace('list', ''))
+    media_list = eval(list_type.value.capitalize().replace('l', 'L'))
+
+    if list_type != ListType.MOVIES:
+        media_data = media.next_episode_to_air
+    else:
         media_data = Movies.release_date
-        media_list = MoviesList
 
     query = db.session.query(media, media_list) \
         .join(media, media.id == media_list.media_id) \
@@ -767,15 +715,8 @@ def get_next_airing(list_type):
 
 # Recover the total time by medialist for all users
 def get_total_time(list_type):
-    if list_type == ListType.SERIES:
-        media = Series
-        media_list = SeriesList
-    elif list_type == ListType.ANIME:
-        media = Anime
-        media_list = AnimeList
-    elif list_type == ListType.MOVIES:
-        media = Movies
-        media_list = MoviesList
+    media = eval(list_type.value.capitalize().replace('list', ''))
+    media_list = eval(list_type.value.capitalize().replace('l', 'L'))
 
     query = db.session.query(User, media.duration, media_list.eps_watched,
                              func.sum(media.duration * media_list.eps_watched)) \
@@ -788,15 +729,8 @@ def get_total_time(list_type):
 
 # Check if media exists
 def check_media(media_id, list_type, add=False):
-    if list_type == ListType.SERIES:
-        media = Series
-        media_list = SeriesList
-    elif list_type == ListType.ANIME:
-        media = Anime
-        media_list = AnimeList
-    elif list_type == ListType.MOVIES:
-        media = Movies
-        media_list = MoviesList
+    media = eval(list_type.value.capitalize().replace('list', ''))
+    media_list = eval(list_type.value.capitalize().replace('l', 'L'))
 
     if add:
         query = db.session.query(media).filter(media.id == media_id).first()

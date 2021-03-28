@@ -34,7 +34,7 @@ class MediaComment(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    q = StringField('&#128269; Search titles, actors...', validators=[DataRequired()])
+    q = StringField('Search titles, actors...', validators=[DataRequired()])
 
     def __init__(self, *args, **kwargs):
         if 'formdata' not in kwargs:
