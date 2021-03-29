@@ -8,7 +8,8 @@ from flask_login import login_required, current_user
 from MyLists.main.forms import EditMediaData, MediaComment, SearchForm
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
-from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaListObj
+from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaListObj, \
+    SeriesClass, MediaClass
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MediaType, get_next_airing, check_media, User, \
     get_media_query, get_media_count
@@ -16,56 +17,99 @@ from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwo
 bp = Blueprint('main', __name__)
 
 
+# @bp.route("/<media_list>/<user_name>/", methods=['GET', 'POST'])
+# @bp.route("/<media_list>/<user_name>/<category>/", methods=['GET', 'POST'])
+# @bp.route("/<media_list>/<user_name>/<category>/genre/<genre>/by/<sorting>/page/<page_val>", methods=['GET', 'POST'])
+# @login_required
+# def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', sorting='Title A-Z', page_val=1):
+#     # Check if <media_list> is valid
+#     try:
+#         list_type = ListType(media_list)
+#     except (ValueError, KeyError):
+#         return abort(400)
+#
+#     # Check if <user> can see <media_list>
+#     user = current_user.check_autorization(user_name)
+#
+#     # Initialize the search form
+#     search_form = SearchForm()
+#
+#     # Add <views_count> to the profile
+#     current_user.add_view_count(user, list_type)
+#
+#     # Recover the query if it exists
+#     q = request.args.get('q')
+#
+#     # Recover the template
+#     html_template = 'medialist_tv.html'
+#     if list_type == ListType.MOVIES:
+#         html_template = 'medialist_movies.html'
+#         if category == Status.WATCHING:
+#             category = Status.COMPLETED
+#
+#     # Retrieve the corresponding media_data
+#     query, category = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
+#
+#     # Get the actual page, total number of pages and the total number of media from the query
+#     items = query.items
+#     info_pages = {'actual_page': query.page, 'total_pages': query.pages, 'total_media': query.total}
+#
+#     # Get <common_media> and <common_elements> between the users
+#     common_media, common_elements = get_media_count(user.id, list_type)
+#
+#     # Recover the media data into a dict
+#     items_data_list = []
+#     for item in items:
+#         add_data = MediaListObj(item, common_media, list_type)
+#         items_data_list.append(add_data)
+#
+#     return render_template(html_template, title="{}'s {}".format(user_name, media_list), username=user_name,
+#                            user_id=str(user.id), media_list=media_list, search_form=search_form, search_q=q,
+#                            common_elements=common_elements, media_items=items_data_list, category=category,
+#                            genre=genre, sorting=sorting, page=page_val, info_pages=info_pages)
+
+
 @bp.route("/<media_list>/<user_name>/", methods=['GET', 'POST'])
 @bp.route("/<media_list>/<user_name>/<category>/", methods=['GET', 'POST'])
 @bp.route("/<media_list>/<user_name>/<category>/genre/<genre>/by/<sorting>/page/<page_val>", methods=['GET', 'POST'])
 @login_required
 def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', sorting='Title A-Z', page_val=1):
-    # Check if <media_list> is valid
-    try:
-        list_type = ListType(media_list)
-    except (ValueError, KeyError):
-        return abort(400)
-
     # Check if <user> can see <media_list>
     user = current_user.check_autorization(user_name)
+
+    # Check if <media_list> is valid and instantiate the appropriate media
+    try:
+        list_type = ListType(media_list)
+        media_class = MediaClass(user).get_media_class(list_type)
+    except ValueError:
+        return abort(400)
 
     # Initialize the search form
     search_form = SearchForm()
 
     # Add <views_count> to the profile
-    current_user.add_view_count(user, list_type)
+    media_class.add_view_count()
+
+    # Recover the template
+    template = media_class.get_template()
 
     # Recover the query if it exists
     q = request.args.get('q')
 
-    # Recover the template
-    html_template = 'medialist_tv.html'
-    if list_type == ListType.MOVIES:
-        html_template = 'medialist_movies.html'
-        if category == Status.WATCHING:
-            category = Status.COMPLETED
+    # Recover the query for the media data
+    query = media_class.query_data(list_type, category, genre, sorting, page_val, q)
 
-    # Retrieve the corresponding media_data
-    query, category = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
-
-    # Get the actual page, total number of pages and the total number of media from the query
+    # Get the actual page, total pages and total media
     items = query.items
     info_pages = {'actual_page': query.page, 'total_pages': query.pages, 'total_media': query.total}
 
-    # Get <common_media> and <common_elements> between the users
-    common_media, common_elements = get_media_count(user.id, list_type)
+    # Recover the media_data as a list of dict
+    query = media_class.query_data(list_type, category, genre, sorting, page_val, q)
 
-    # Recover the media data into a dict
-    items_data_list = []
-    for item in items:
-        add_data = MediaListObj(item, common_media, list_type)
-        items_data_list.append(add_data)
-
-    return render_template(html_template, title="{}'s {}".format(user_name, media_list), username=user_name,
+    return render_template(template, title="{}'s {}".format(user_name, media_list), username=user_name,
                            user_id=str(user.id), media_list=media_list, search_form=search_form, search_q=q,
-                           common_elements=common_elements, media_items=items_data_list, category=category,
-                           genre=genre, sorting=sorting, page=page_val, info_pages=info_pages)
+                           media_items=media_items_list, category=category, genre=genre, sorting=sorting, page=page_val,
+                           info_pages=info_pages)
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
