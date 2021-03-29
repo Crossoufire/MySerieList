@@ -1,0 +1,111 @@
+{% extends 'media_sheet_base.html' %}
+
+
+{% block medialist_cat_drop %}
+    <select id="category-dropdown" class="text-light text-center cat-drop"
+    onchange="changeCategoryGames('{{ data['id'] }}', this)">
+        <option {% if data['status'] == 'Playing' %} selected="selected" {% endif %}>Playing</option>
+        <option {% if data['status'] == 'Completed' %} selected="selected" {% endif %}>Completed</option>
+        <option {% if data['status'] == 'Endless' %} selected="selected" {% endif %}>Endless</option>
+        <option {% if data['status'] == 'Multiplayer' %} selected="selected" {% endif %}>Multiplayer</option>
+        <option {% if data['status'] == 'On Hold' %} selected="selected" {% endif %}>On Hold</option>
+        <option {% if data['status'] == 'Dropped' %} selected="selected" {% endif %}>Dropped</option>
+        <option {% if data['status'] == 'Owned' %} selected="selected" {% endif %}>Owned</option>
+        <option {% if data['status'] == 'Plan to Play' %} selected="selected"{% endif %}>Plan to Play</option>
+    </select>
+{% endblock medialist_cat_drop %}
+
+
+{% block medialist_eps_seas_drop %}
+    <div class="row m-l-20 m-r-25"{% if data['status'] == 'Plan to Play' %} style="display: none;"{% endif %}>
+        <div class="col-5">
+            <b>Played:</b>
+        </div>
+        <div class="col-7">
+            <input id="time_h" type="number" name="time_h" class="time-played-input" max="9999" maxlength="4"
+                   placeholder="00" pattern="[0-9]*" value="{{ data['t_played_h'] }}">h
+            <input  id="time_m" type="number" name="time_m" class="time-played-input" max="59" maxlength="2"
+                    placeholder="00" pattern="[0-9]*" value="{{ data['t_played_m'] }}">m
+        </div>
+    </div>
+    <div class="text-center">
+        <div class="btn btn-smaller btn-warning text-dark" onclick="updatePlaytime({{ data['id'] }})">Update time</div>
+        <i id="time-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+        &nbsp;<i id="time-check" class="fas fa-check" style="display: none;"></i>
+    </div>
+{% endblock medialist_eps_seas_drop %}
+
+
+{% block information %}
+    <div class="col-6">
+        <ul class="list-unstyled">
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-star"></i><b>&nbsp; IGDB Score</b></h5>
+                <i class="fas fa-scroll fa-3x media-ticket" value="{{ data['vote_average']|int }}"></i>
+                <div class="game-vote-average">{{ data['vote_average']|int }}</div>
+                <div class="movie-vote-count">({{ data['vote_count']|int }} votes)</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-code"></i><b>&nbsp; Developer</b></h5>
+                <div>{{ ', '.join(data['developer']) }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-money-bill-wave-alt"></i><b>&nbsp; Publisher</b></h5>
+                <div>{{ ', '.join(data['publisher']) }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-calendar-check"></i><b>&nbsp; Release date</b></h5>
+                <div>{{ data['first_release_date'] }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-layer-group"></i><b>&nbsp; Collection Name</b></h5>
+                <div>{{ data['collection_name'] }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-layer-group"></i><b>&nbsp; Platforms</b></h5>
+                <div>{{ data['platforms'] }}</div>
+            </li>
+        </ul>
+    </div>
+    <div class="col-6">
+        <ul class="list-unstyled">
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fab fa-unity"></i><b>&nbsp; Game Engine</b></h5>
+                    <div>{{ data['game_engine'] }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-theater-masks"></i><b>&nbsp; Genres</b></h5>
+                <div>{{ data['genres'] }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-user"></i><b>&nbsp; Game Modes</b></h5>
+                <div>{{ data['game_modes']|replace(',', ', ') }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-cube"></i><b>&nbsp; Perspective</b></h5>
+                <div>{{ data['player_perspective'] }}</div>
+            </li>
+            <li>
+                <h5 class="mb-1 text-media"><i class="fas fa-link"></i><b>&nbsp; IGDB link</b></h5>
+                <a style="word-break: break-all;" href="{{ data['IGDB_url'] }}">{{ data['IGDB_url'] }}</a>
+            </li>
+        </ul>
+    </div>
+{% endblock information %}
+
+
+{% block more_info %}
+    <h4><i class="fas fa-hourglass"></i>&nbsp;&nbsp; <b>HLTB data</b></h4><hr>
+    <ul class="text-left p-0">
+        <li class="m-b-10">
+            <div class="row">
+                <div class="col-5"><b>Main game</b></div>
+                <div class="col-7"><i>No info.</i></div>
+                <div class="col-5"><b>Main + Extra</b></div>
+                <div class="col-7"><i>No info.</i></div>
+                <div class="col-5"><b>100%</b></div>
+                <div class="col-7"><i>No info.</i></div>
+            </div>
+        </li>
+    </ul>
+{% endblock more_info %}

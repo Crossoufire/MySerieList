@@ -1,10 +1,14 @@
 
+<<<<<<< HEAD
 /* --- Main CSS ----------------------------------------------------------------------------- */
 .vertical-line {
     width: 5px;
     border-left: 2px solid rgba(44, 57, 70, 1);
     height: 100wh;
 }
+=======
+/* --- Main CSS ----------------------------------------- */
+>>>>>>> parent of 21634e6 (testing games)
 
 hr {
     border-top: 1px solid rgba(44, 57, 70, 1);
@@ -15,6 +19,7 @@ a {
     color: lightgray;
 }
 
+<<<<<<< HEAD
 @media (max-width: 650px) {
     .account-wrapper {
         padding-left: 0;
@@ -30,11 +35,14 @@ a {
 
 
 /* --- Header ------------------------------------------------------------------------------- */
+=======
+/* --- Header ------------------------------------------- */
+>>>>>>> parent of 21634e6 (testing games)
 .header-container {
     position: relative;
     height: 280px;
     background-size: cover;
-    border-bottom: 2px solid #808080;
+    border-bottom: 2px solid grey;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -291,12 +299,6 @@ a {
 .block:nth-of-type(6) {
 	background-color: #962D3E;
 }
-.block:nth-of-type(7) {
-	background-color: #48792c;
-}
-.block:nth-of-type(8) {
-	background-color: #32345d;
-}
 
 .block-movie {
     height: 30px;
@@ -357,6 +359,7 @@ a {
     background: #216e7d;
 }
 
+<<<<<<< HEAD
 .histogram-item-anime {
     width: 100%;
     background: #945141;
@@ -367,6 +370,8 @@ a {
     background: #8c7821;
 }
 
+=======
+>>>>>>> parent of 21634e6 (testing games)
 @media (max-width: 768px) {
     .media-container {
         position: relative;
@@ -377,6 +382,57 @@ a {
     .stat-text {
         font-size: 10pt;
     }
+<<<<<<< HEAD
+=======
+    .account-wrapper {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .mobile-time {
+        font-size: 15px;
+    }
+}
+
+/*!* --- Levels ------------------------------------------- *!*/
+.account-bar-wrapper {
+    width: 100%;
+}
+
+.account-bar {
+    height: 100%;
+    margin: 0 auto;
+}
+
+.account-bar-name {
+    font-size: 12pt;
+    margin: 0 0 0 5px;
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.account-bar-level {
+    font-size: 12pt;
+    margin: 0 0 0;
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+#series-level {
+    margin-left: 20px;
+}
+
+#movies-level {
+    margin-left: 13px;
+}
+
+#anime-level {
+    margin-left: 18px;
+}
+
+.account-bar-next-level {
+    display: inline-block;
+    font-size: 12pt;
+>>>>>>> parent of 21634e6 (testing games)
 }
 
 
@@ -386,4 +442,85 @@ a {
     height: 60px;
     width: 60px;
     background-color: grey;
+}
+
+.truncate {
+    width: 100%;
+    margin-bottom: -8px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
+
+.badges {
+	width: 3.5em;
+	height: 3.5em;
+	border-radius: 20%;
+    box-shadow: 6px 8px 10px 1px rgba(0, 0, 0, 0.43);
+}
+
+.dada {
+    color: white;
+    font-weight: 500;
+    text-align: center;
+    padding-top: 15px;
+}
+
+.blue {
+    background: dodgerblue;
+    color: deepskyblue;
+}
+
+.orange {
+  background: darkorange;
+  color: orange;
+}
+
+.gold {
+  background: gold;
+  color: gold;
+}
+
+.red {
+  background: red;
+  color: red;
+}
+
+.purple {
+  background: mediumpurple;
+  color: slategray;
+}
+
+.green {
+  background: yellowgreen;
+  color: darkslategray;
+}
+
+.crimson {
+  background: crimson;
+  color: firebrick;
+}
+
+.steel {
+  background: steelblue;
+  color: gold;
+}
+
+.pink {
+  background: hotpink;
+  color: palevioletred;
+}
+
+.rebecca {
+  background: rebeccapurple;
+  color: rebeccapurple;
+}
+
+.gainsboro {
+  background: gainsboro;
+  color: orangered;
 }

@@ -8,6 +8,7 @@
 
 
 {% block content %}
+<<<<<<< HEAD
     <div class="m-l-30 m-r-30 mobile-margin">
         <section class="statistics m-t-20 p-2">
             <div class="row">
@@ -19,6 +20,45 @@
                             <div>&nbsp; Series</div>
                         </div>
                     </div>
+=======
+    <h2 class="font-weight-light text-center mt-1 mb-0 p-t-50 p-l-10 p-r-10">MYLISTS STATISTICS</h2>
+    <hr class="mt-2 mb-0">
+
+    <h4 class="text-center m-t-10 p-l-10 p-r-10">
+        <b>Total watched time: {{ total_time["total"] }} hours</b> -
+        <b>{{ (total_time["total"]/24)|int }} days</b> -
+        <b>{{ (total_time["total"]/24/365)|round(2) }} years</b>
+    </h4>
+
+    <div class="row m-t-30 p-l-10 p-r-10">
+        <div class="col col-lg-5 col-md-4">
+            <div class="media-container">
+                <canvas id="media-time"></canvas>
+                <span id="time-spent-pie"
+                      values="{{ total_time['series'] }}, {{ total_time['anime'] }}, {{ total_time['movies'] }}"></span>
+            </div>
+            <div class="text-center m-b-5 m-t-37 fs-20"><b>Most popular genres</b></div>
+            <div class="row d-flex flex-wrap">
+                <div class="col col-xl-4">
+                    <table class="table table-sm bg-series text-light">
+                        <thead>
+                        <tr>
+                            <th class="text-center">N°</th>
+                            <th class="text-center">Series</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for series in most_genres_media["series"] %}
+                            <tr>
+                                <td class="text-center">{{ series['quantity'] }}</td>
+                                <td class="text-center genres" data-toggle="tooltip" title="{{ series['info'] }}">
+                                    {{ series['info'] }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+>>>>>>> parent of 21634e6 (testing games)
                 </div>
                 <div class="col-lg col-sm-12 col-md-6 m-b-10">
                     <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 2px;">

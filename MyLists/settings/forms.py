@@ -14,9 +14,15 @@ class UpdateAccountForm(FlaskForm):
     picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
     back_picture = FileField('Background picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
     isprivate = BooleanField('Private mode')
+<<<<<<< HEAD
     steamID = StringField('SteamID')
     homepage = SelectField('Default homepage', choices=[('serieslist', 'SeriesList'), ('animelist', 'AnimeList'),
                                                         ('movieslist', 'MoviesList'), ('account', 'Account')])
+=======
+    homepage = SelectField('Default homepage', choices=[('serieslist', 'MySeriesList'), ('animelist', 'MyAnimeList'),
+                                                        ('movieslist', 'MyMoviesList'), ('account', 'Account'),
+                                                        ('hall_of_fame', 'Hall of Fame')])
+>>>>>>> parent of 21634e6 (testing games)
     submit_account = SubmitField('Update account')
 
     def validate_username(self, username):
@@ -32,6 +38,25 @@ class UpdateAccountForm(FlaskForm):
                 raise ValidationError("This email already exist.")
 
 
+<<<<<<< HEAD
+=======
+class UpdateAccountOauthForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
+    picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
+    isprivate = BooleanField('Private mode')
+    homepage = SelectField('Default homepage', choices=[('serieslist', 'MySeriesList'), ('animelist', 'MyAnimeList'),
+                                                        ('movieslist', 'MyMoviesList'), ('account', 'Account'),
+                                                        ('hall_of_fame', 'Hall of Fame')])
+    submit_account = SubmitField('Update account')
+
+    def validate_username(self, username):
+        if username.data != current_user.username:
+            user = User.query.filter_by(username=username.data).first()
+            if user:
+                raise ValidationError("This username is already taken. Please choose another one.")
+
+
+>>>>>>> parent of 21634e6 (testing games)
 class ChangePasswordForm(FlaskForm):
     current_password = PasswordField('Current password', validators=[DataRequired()])
     new_password = PasswordField('Choose new password', validators=[DataRequired(), Length(min=6)])

@@ -1,10 +1,20 @@
 import json
+
 from MyLists import app, db
+<<<<<<< HEAD
 from flask_login import login_required, current_user
 from flask import Blueprint, request, render_template
 from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_updates,\
     get_user_data, get_knowledge_frame, get_favorites, get_all_follows_data, get_header_data
+=======
+from datetime import datetime
+from flask_login import login_required, current_user
+from flask import Blueprint, flash, redirect, request, render_template, abort
+from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications, RoleType
+from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
+    get_knowledge_frame, get_updates, get_favorites, get_all_follows_data, get_header_data
+>>>>>>> parent of 21634e6 (testing games)
 
 bp = Blueprint('users', __name__)
 
@@ -20,6 +30,7 @@ def account(user_name):
 
     if request.form.get('all_follows'):
         all_follows = get_all_follows_data(user)
+<<<<<<< HEAD
         return render_template('account_all_follows.html', title='Follows', all_follows=all_follows,
                                header_data=header_data)
     elif request.form.get('all_history'):
@@ -27,6 +38,13 @@ def account(user_name):
         media_update = get_updates(updates)
         return render_template('account_all_history.html', title='History', media_updates=media_update,
                                header_data=header_data)
+=======
+        return render_template('all_follows.html', title='Follows', all_follows=all_follows, header_data=header_data)
+    elif request.form.get('all_history'):
+        updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
+        media_update = get_updates(updates)
+        return render_template('all_history.html', title='History', media_updates=media_update, header_data=header_data)
+>>>>>>> parent of 21634e6 (testing games)
 
     # Recover user data
     user_data = get_user_data(user)
@@ -70,8 +88,17 @@ def more_stats(user_name):
 @bp.route("/hall_of_fame", methods=['GET', 'POST'])
 @login_required
 def hall_of_fame():
+<<<<<<< HEAD
     users = current_user.followed.all()
     users.append(current_user)
+=======
+    users = User.query.filter(User.id >= "2", User.active == True).order_by(User.username.asc()).all()
+
+    # Get the follows of the current account
+    follows_list = []
+    for follows in current_user.followed.all():
+        follows_list.append(follows.id)
+>>>>>>> parent of 21634e6 (testing games)
 
     all_users_data = []
     for user in users:
@@ -86,8 +113,17 @@ def hall_of_fame():
                      "series_data": series_level,
                      "anime_data": anime_level,
                      "movies_data": movies_level,
+<<<<<<< HEAD
                      'knowledge_frame': knowledge_frame,
                      'current_user': False}
+=======
+                     'knowledge_frame': knowledge_frame}
+
+        if user.id in follows_list:
+            user_data["isfollowing"] = True
+        else:
+            user_data["isfollowing"] = False
+>>>>>>> parent of 21634e6 (testing games)
 
         if user.id == current_user.id:
             user_data["current_user"] = True
@@ -120,6 +156,21 @@ def knowledge_frame_data():
     return render_template('knowledge_grade_data.html', title='Knowledge frame data', data=ranks)
 
 
+<<<<<<< HEAD
+=======
+@bp.route("/apscheduler_info", methods=['GET', 'POST'])
+@login_required
+def apscheduler_info():
+    if current_user.role != RoleType.USER:
+        refresh = app.apscheduler.get_job('refresh_all_data')
+        refresh.modify(next_run_time=datetime.now())
+        flash('All the data have been refreshed!', 'success')
+
+        return redirect(request.referrer)
+    abort(403)
+
+
+>>>>>>> parent of 21634e6 (testing games)
 # --- AJAX Methods ---------------------------------------------------------------------------------------------
 
 

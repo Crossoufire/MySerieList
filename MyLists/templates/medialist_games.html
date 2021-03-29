@@ -1,0 +1,48 @@
+{% extends 'medialist_base.html' %}
+
+
+{% block button %}
+    <a class="btn btn-sm {% if category == 'Playing' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Playing&sort={{ sort_val }}&filter={{ filter_val }}">PLAYING</a>
+    <a class="btn btn-sm {% if category == 'Completed' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Completed&sort={{ sort_val }}&filter={{ filter_val }}">COMPLETED</a>
+    <a class="btn btn-sm {% if category == 'On Hold' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=On Hold&sort={{ sort_val }}&filter={{ filter_val }}">ON HOLD</a>
+    <a class="btn btn-sm {% if category == 'Endless' %}btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Endless&sort={{ sort_val }}&filter={{ filter_val }}">ENDLESS</a>
+    <a class="btn btn-sm {% if category == 'Multiplayer' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Multiplayer&sort={{ sort_val }}&filter={{ filter_val }}">MULTIPLAYER</a>
+    <a class="btn btn-sm {% if category == 'Dropped' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Dropped&sort={{ sort_val }}&filter={{ filter_val }}">DROPPED</a>
+    <a class="btn btn-sm {% if category == 'Owned' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Owned&sort={{ sort_val }}&filter={{ filter_val }}">OWNED</a>
+    <a class="btn btn-sm {% if category == 'Plan to Play' %} btn-selected {% else %} btn-header {% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Plan to Play&sort={{ sort_val }}&filter={{ filter_val }}">PLAN TO PLAY</a>
+    <a class="btn btn-sm {% if category == 'Favorite' %}btn-selected-fav {% else %} btn-header-fav{% endif %}"
+    href="/{{ media_list }}/{{ username }}?category=Favorite&sort={{ sort_val }}&filter={{ filter_val }}">FAVORITES</a>
+{% endblock button %}
+
+
+{% block seas_eps_drop scoped %}
+    <div class="seas-eps-drop-container" {% if category == 'Plan to Play' %} style="display: none;"{% endif %}>
+        <input id="{{ data['id'] }}-time_h" class="time-played-input" type="number" name="time_h" max="9999"
+               maxlength="4" placeholder="00" pattern="[0-9]*" value="{{ data['t_played_h'] }}">h
+        <input id="{{ data['id'] }}-time_m" class="time-played-input-m" type="number" name="time_m" max="59"
+               maxlength="2" placeholder="00" pattern="[0-9]*" value="{{ data['t_played_m'] }}">min
+        <span class="m-l-8 m-r-8">|</span>
+        <a class="fas fa-upload" onclick="updatePlaytime({{ data['id'] }})" data-toggle="tooltip"
+           title="Update playtime"></a>
+        <i id="{{ data['id'] }}-time-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+        &nbsp;<i id="{{ data['id'] }}-time-check" class="fas fa-check" style="display: none;"></i>
+    </div>
+{% endblock seas_eps_drop %}
+
+
+{% block data %}
+    {{ data['genres'] }}-{{ media_list }}-{{ data['id'] }}
+{% endblock data %}
+
+
+{% block javascript %}
+    <script src="{{ url_for('static', filename='js/medialist_games.js') }}"></script>
+{% endblock javascript %}

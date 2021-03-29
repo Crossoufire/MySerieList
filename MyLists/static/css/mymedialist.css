@@ -133,6 +133,7 @@
     background-color: black;
 }
 
+<<<<<<< HEAD
 .genre-drop {
     background-color: #0f0f0f;
     overflow: auto;
@@ -141,6 +142,11 @@
 
 .sort-drop {
     background-color: #0f0f0f;
+=======
+.return-icon-tv {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 13px 10px 13px 10px;
+>>>>>>> parent of 21634e6 (testing games)
 }
 
 .sort-container {

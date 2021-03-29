@@ -1,9 +1,19 @@
 from pathlib import Path
 from MyLists import db, app
+<<<<<<< HEAD
 from MyLists.API_data import ApiData
 from MyLists.main.media_object import MediaDetails
 from MyLists.models import ListType, Status, Movies, Badges, Ranks, Frames, SeriesGenre, SeriesList, Anime, Series, \
     AnimeList, MoviesList, AnimeGenre, MoviesGenre, get_total_time, SeriesActors, AnimeActors, MoviesActors
+=======
+from datetime import datetime
+from MyLists.models import ListType, Status, User, Movies, Badges, Ranks, Frames, MoviesCollections, get_total_time, \
+    SeriesList, AnimeList, Series, Anime
+
+
+def compute_media_time_spent(list_type):
+    users = User.query.all()
+>>>>>>> parent of 21634e6 (testing games)
 
 
 def compute_media_time_spent():
@@ -147,6 +157,7 @@ def add_eps_watched():
         else:
             movie[1].eps_watched = 1 + movie[1].rewatched
     db.session.commit()
+<<<<<<< HEAD
 
 
 def correct_orphan_media():
@@ -219,3 +230,5 @@ def correct_orphan_media():
                 app.logger.info(f'Orphan movie corrected with ID [{q[0].id}]: {q[0].name}')
             else:
                 app.logger.info(f'Orphan movie NOT corrected with ID [{q[0].id}]: {q[0].name}')
+=======
+>>>>>>> parent of 21634e6 (testing games)

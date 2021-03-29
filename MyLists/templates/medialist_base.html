@@ -16,6 +16,7 @@
 
 
 {% block content %}
+<<<<<<< HEAD
     <section class="return-icons-and-search-bar">
         <div class="row no-gutters m-t-30">
             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mobile-margin mobile-center">
@@ -45,6 +46,91 @@
         <div class="categories-css p-1">
             {% block categories scoped %}
             {% endblock categories %}
+=======
+    <div class="back-image p-b-15">
+        <div class="d-flex flex-wrap center-mobile">
+            <div class="m-l-30 m-t-20 icons-mobile">
+                <a class="fas fa-lg fa-user m-r-8 return-icon" href="/account/{{ username }}"
+                   data-toggle="tooltip" title="{{ username }}" style="color: grey;"></a>
+                {% if media_list == 'serieslist' %}
+                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon text-anime" data-toggle="tooltip"
+                       href="/animelist/{{ username }}" title="Anime list"></a>
+                    <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
+                       href="/movieslist/{{ username }}" title="Movies list"></a>
+                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon text-dark" data-toggle="tooltip"
+                       href="/gameslist/{{ username }}" title="Games list"></a>
+                {% elif media_list == 'animelist' %}
+                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
+                       href="/serieslist/{{ username }}" title="Series list"></a>
+                    <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
+                       href="/movieslist/{{ username }}" title="Movies list"></a>
+                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon text-dark" data-toggle="tooltip"
+                       href="/gameslist/{{ username }}" title="Games list"></a>
+                {% elif media_list == 'movieslist' %}
+                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
+                       href="/serieslist/{{ username }}" title="Series list"></a>
+                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon text-anime" data-toggle="tooltip"
+                       href="/animelist/{{ username }}" title="Anime list"></a>
+                    <a class="fas fa-lg fa-gamepad m-r-8 return-icon text-dark" data-toggle="tooltip"
+                       href="/gameslist/{{ username }}" title="Games list"></a>
+                {% elif media_list == 'gameslist' %}
+                    <a class="fas fa-lg fa-tv m-r-8 return-icon-tv text-series" data-toggle="tooltip"
+                       href="/serieslist/{{ username }}" title="Series list"></a>
+                    <a class="fas fa-lg fa-torii-gate m-r-8 return-icon text-anime" data-toggle="tooltip"
+                       href="/animelist/{{ username }}" title="Anime list"></a>
+                    <a class="fas fa-lg fa-film m-r-8 return-icon text-movies" data-toggle="tooltip"
+                       href="/movieslist/{{ username }}" title="Movies list"></a>
+                {% endif %}
+            </div>
+            {% if user_id != current_user.get_id() %}
+                <div class="ml-auto m-r-30 m-t-20">
+                    <div class="text-center common-media">
+                        You share {{ common_elements[0] }}/{{ common_elements[1] }} media ({{ common_elements[2] }}%)
+                    </div>
+                    <div class="common-media-meter">
+                        <span class="common-media-meter-bar" style="width: {{ common_elements[2] }}%;"></span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <hr class="header-bar">
+        <div class="center-mobile d-flex flex-wrap m-t-20">
+            <div class="ml-auto mr-auto">
+                <input id="search-input" class="modded-input" placeholder="&#128269; Search..."
+                onfocus="this.placeholder = '';" onblur="this.placeholder = '&#128269; Search...';">
+                <select id="select-option" class="search-select">
+                    <option {% if option == 'title' %}selected="selected"{% endif %} value="title">Title</option>
+                    {% if media_list == 'movieslist' %}
+                        <option {% if option == 'director' %}selected="selected"{% endif %} value="director">Director</option>
+                    {% endif %}
+                    <option {% if option == 'actor' %}selected="selected"{% endif %} value="actor">Actor</option>
+                    <option {% if option == 'genre' %}selected="selected"{% endif %} value="genre">Genre</option>
+                </select>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap" style="justify-content: center;">
+            {% block button scoped %}
+            {% endblock button %}
+        </div>
+    </div>
+    <div class="{% if media_list == 'serieslist' %}bg-series-opa {% elif media_list == 'animelist' %}bg-anime-opa
+    {% else %}bg-movies-opa {% endif %} p-t-4 p-b-4">
+        <div class="mobile-sorting">
+            <label class="m-l-10 mb-0"><b>Sort by:</b></label>
+            <select class="m-l-8" onchange="sort_medialist(this)">
+                <option {% if sort_val == 'title' %}selected="selected"{% endif %} value="title">Title</option>
+                <option {% if sort_val == 'score' %}selected="selected"{% endif %} value="score">Score</option>
+                <option {% if sort_val == 'rewatch' %}selected="selected"{% endif %} value="rewatch">Rewatch</option>
+                <option {% if sort_val == 'comment' %}selected="selected"{% endif %} value="comment">Comment</option>
+                <option {% if sort_val == 'playtime' %}selected="selected"{% endif %} value="playtime">Playtime</option>
+            </select>
+            {% if user_id != current_user.get_id() %}
+                <input id="shared-check" class="m-l-15" type="checkbox" value="{{ filter_val }}" onclick="filter_medialist()"
+                {% if filter_val == 'check' %}checked {% endif %}>
+                <b> Show Shared</b>
+            {% endif %}
+            <div class="t-pages float-r m-r-10"><b>Total pages: {{ info_pages['total_pages'] }}</b></div>
+>>>>>>> parent of 21634e6 (testing games)
         </div>
     </section>
 

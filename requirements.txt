@@ -19,6 +19,11 @@ pathlib
 Pillow
 pandas
 rauth
+<<<<<<< HEAD
 redis
 pytz
 rq
+=======
+configparser
+ratelimit
+>>>>>>> parent of 21634e6 (testing games)

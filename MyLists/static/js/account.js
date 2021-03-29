@@ -10,7 +10,11 @@ $(document).ready(function() {
             datasets: [{
                 data: time_data,
                 backgroundColor: ['#216e7d', '#945141', '#8c7821'],
+<<<<<<< HEAD
                 borderColor: '#212529',
+=======
+                borderColor: 'black',
+>>>>>>> parent of 21634e6 (testing games)
                 borderWidth: 1,
                 label: 'by_media'
             }],
@@ -40,18 +44,41 @@ $(document).ready(function() {
                             let x = mid_radius * Math.cos(mid_angle);
                             let y = mid_radius * Math.sin(mid_angle);
 
+<<<<<<< HEAD
                             let percent = String(Math.round(dataset.data[i] / total * 100)) + "%";
 
                             ctx.font = "16px 'Helvetica Neue', Helvetica, Arial, sans-serif";
                             ctx.fillStyle = 'lightgrey';
                             ctx.fillText(percent, model.x + x, model.y + y + 10);
+=======
+                            ctx.fillStyle = '#fff';
+                            if (i === 3){ // Darker text color for lighter background
+                                ctx.fillStyle = '#444';
+                            }
+                            let percent = String(Math.round(dataset.data[i]/total*100)) + "%";
+                            //Don't Display If Legend is hide or value is 0
+                            if(dataset.data[i] !== 0 && dataset._meta[0].data[i].hidden !== true) {
+                                // ctx.fillText(dataset.data[i]+ " h", model.x + x, model.y + y);
+                                // Display percent in another line, line break doesn't work for fillText
+                                ctx.fillText(percent, model.x + x + 5, model.y + y + 10);
+                            }
+>>>>>>> parent of 21634e6 (testing games)
                         }
                     });
                 }
             },
             legend: {
+<<<<<<< HEAD
                 display: false,
             }
+=======
+                position: 'bottom',
+                labels: {
+                    fontColor: '#e2e2e2',
+                    fontSize: 14,
+                }
+            },
+>>>>>>> parent of 21634e6 (testing games)
         }
     };
     let ctx = document.getElementById('media-time').getContext('2d');

@@ -13,11 +13,56 @@ from email.message import EmailMessage
 from flask_sqlalchemy import SQLAlchemy
 from logging.handlers import SMTPHandler, RotatingFileHandler
 
+<<<<<<< HEAD
+=======
+config = configparser.ConfigParser()
+config.read('config.ini')
+try:
+    flask_secret = config['Flask']['secret']
+    email = config['Mail']['email']
+    password = config['Mail']['password']
+    server = config['Mail']['server']
+    port = int(config['Mail']['port'])
+    themoviedb_key = config['TheMovieDB']['api_key']
+    twitter_oauth = [config['OAuth']['twitter_id'], config['OAuth']['twitter_secret']]
+except Exception as e:
+    print("Config file error: {}. Please read the README to configure the config.ini file properly.\nExit.".format(e))
+    sys.exit()
+
+>>>>>>> parent of 21634e6 (testing games)
 
 # Recover the Flask app name (in .flaskenv) and check the config from the .env file
 app = Flask(__name__)
+<<<<<<< HEAD
 app.config.from_object(Config)
 
+=======
+Compress(app)
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+
+app.config['SECRET_KEY'] = flask_secret
+app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['TESTING'] = True
+app.config['MAX_CONTENT_LENGTH'] = 8*1024*1024
+app.config['FLASK_ADMIN_SWATCH'] = 'cyborg'
+
+app.config['MAIL_SERVER'] = server
+app.config['MAIL_PORT'] = port
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = email
+app.config['MAIL_PASSWORD'] = password
+
+app.config['THEMOVIEDB_API_KEY'] = themoviedb_key
+app.config['OAUTH_CREDENTIALS'] = {
+    'twitter': {
+        'id': twitter_oauth[0],
+        'secret': twitter_oauth[1]
+    }
+}
+>>>>>>> parent of 21634e6 (testing games)
 
 # Initialization of the different Flask modules
 mail = Mail(app)
@@ -30,12 +75,15 @@ login_manager.login_message_category = 'info'
 app.url_map.strict_slashes = False
 
 
+<<<<<<< HEAD
 # Add the redis server and the queue
 app.r = redis.Redis()
 app.q = Queue(connection=app.r)
 
 
 # Recover and register all the blueprints of the app
+=======
+>>>>>>> parent of 21634e6 (testing games)
 from MyLists.auth.routes import bp as auth_bp
 app.register_blueprint(auth_bp)
 

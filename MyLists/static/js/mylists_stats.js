@@ -14,7 +14,11 @@ $(document).ready(function () {
             datasets: [{
                 data: time_data,
                 backgroundColor: ['#216e7d', '#945141', '#8c7821'],
+<<<<<<< HEAD
                 borderColor: '#212529',
+=======
+                borderColor: 'black',
+>>>>>>> parent of 21634e6 (testing games)
                 borderWidth: 1,
                 label: 'by_media'
             }],
@@ -44,6 +48,13 @@ $(document).ready(function () {
                             let x = mid_radius * Math.cos(mid_angle);
                             let y = mid_radius * Math.sin(mid_angle);
 
+<<<<<<< HEAD
+=======
+                            ctx.fillStyle = '#fff';
+                            if (i === 3) { // Darker text color for lighter background
+                                ctx.fillStyle = '#444';
+                            }
+>>>>>>> parent of 21634e6 (testing games)
                             let percent = String(Math.round(dataset.data[i] / total * 100)) + "%";
 
                             ctx.font = "20px 'Helvetica Neue', Helvetica, Arial, sans-serif";

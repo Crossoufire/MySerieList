@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 
 /* --- Main CSS ------------------------------------------------------------------------- */
+=======
+>>>>>>> parent of 21634e6 (testing games)
 body > li {
     font-weight: 400;
 }
@@ -72,7 +75,7 @@ ul {
     background: #131418;
     border: transparent;
     cursor: pointer;
-    width: 130px;
+    width: 125px;
 }
 
 .loading-img {
@@ -185,3 +188,59 @@ ul {
     top: 37px;
     left: 74px;
 }
+<<<<<<< HEAD
+=======
+
+.time-played-input {
+    width: 43px;
+    background-color: #131418;
+    border: none;
+    color: lightgray;
+    text-align: center;
+}
+
+.time-played-input:focus{
+    outline: none;
+}
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+}
+
+@media (max-width: 1100px) {
+    .wrapper {
+        width: auto;
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+@media (max-width: 767px) {
+    .media-title-mobile {
+        display: block !important;
+    }
+    .media-title-pc {
+        display: none !important;
+    }
+    .mobile-follow {
+        margin-bottom: 20px;
+    }
+}
+@media (max-width: 490px) {
+    .wrapper {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .media-cover {
+        width: 200px;
+        height: 300px;
+    }
+    .follow-margin-mobile {
+        margin-left: 2px;
+    }
+}
+>>>>>>> parent of 21634e6 (testing games)

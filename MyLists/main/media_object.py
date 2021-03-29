@@ -54,6 +54,64 @@ class MediaDict:
         self.media_dict()
         return self.media_info
 
+<<<<<<< HEAD
+=======
+    def games_dict(self):
+        self.media_info = {"id": self.data.id,
+                           "cover": 'games_covers/{}'.format(self.data.image_cover),
+                           "display_name": self.data.name,
+                           "IGDB_url": self.data.IGDB_url,
+                           "vote_average": self.data.vote_average,
+                           "vote_count": self.data.vote_count,
+                           "synopsis": self.data.summary,
+                           "lock_status": self.data.lock_status,
+                           "collection_name": self.data.collection_name,
+                           "game_engine": self.data.game_engine,
+                           "game_modes": self.data.game_modes,
+                           "player_perspective": self.data.player_perspective,
+                           "storyline": self.data.storyline,
+                           "genres": ', '.join([r.genre for r in self.data.genres]),
+                           "media_type": 'Games',
+                           "publisher": [],
+                           "developer": [],
+                           "in_user_list": False,
+                           "score": "---",
+                           "favorite": False,
+                           "status": Status.OWNED.value,
+                           "comment": None,
+                           "time_played": 0.,
+                           "completion": False}
+
+        for company in self.data.companies:
+            if company.publisher is True:
+                self.media_info['publisher'].append(company.name)
+            if company.developer is True:
+                self.media_info['developer'].append(company.name)
+
+        self.media_info["first_release_date"] = datetime.utcfromtimestamp(int(self.data.first_release_date))\
+            .strftime('%d %b %Y')
+
+        self.add_genres()
+        self.add_follow_list()
+
+        in_user_list = self.add_user_list()
+        if in_user_list:
+            self.media_info["in_user_list"] = True
+            self.media_info["score"] = in_user_list.score
+            self.media_info["favorite"] = in_user_list.favorite
+            self.media_info["status"] = in_user_list.status.value
+            self.media_info["comment"] = in_user_list.comment
+            self.media_info["completion"] = in_user_list.completion
+
+            total_time = str(in_user_list.time_played)
+            total_time = total_time.split('.')
+            hours = total_time[0]
+            minutes = int((float(total_time[1])/100)*60)
+
+            self.media_info["t_played_h"] = hours
+            self.media_info["t_played_m"] = minutes
+
+>>>>>>> parent of 21634e6 (testing games)
     def media_dict(self):
         self.media_info = {"id": self.data.id,
                            "homepage": self.data.homepage,
@@ -351,6 +409,73 @@ class MediaDetails:
                     self.media_details['director_name'] = element['name']
                     break
 
+<<<<<<< HEAD
+=======
+    def get_games_platforms(self):
+        platforms = self.media_data.get('platforms') or None
+        platforms_list = []
+        if platforms:
+            for platform in platforms:
+                platform_dict = {'name': platform["name"]}
+                platforms_list.append(platform_dict)
+        else:
+            platform_dict = {'name': 'Unknown'}
+            platforms_list.append(platform_dict)
+
+        return platforms_list
+
+    def get_games_companies(self):
+        companies = self.media_data.get('involved_companies') or None
+        companies_list = []
+        if companies:
+            for company in companies:
+                companies_dict = {'name': company["company"]["name"],
+                                  'publisher': company["publisher"],
+                                  'developer': company["developer"]}
+                companies_list.append(companies_dict)
+        else:
+            companies_dict = {'name': 'Unknown',
+                              'publisher': False,
+                              'developper': False}
+            companies_list.append(companies_dict)
+
+        return companies_list
+
+    def get_collection_info(self):
+
+        def get_collection_data(co_id):
+            collection_data = ApiData().get_collection_data(co_id)
+
+            collection_cover_path = collection_data.get('poster_path') or None
+            collection_cover_name = 'default.jpg'
+            if collection_cover_path:
+                collection_cover_name = '{}.jpg'.format(secrets.token_hex(8))
+                try:
+                    ApiData().save_api_cover(collection_cover_path, collection_cover_name, ListType.MOVIES,
+                                             collection=True)
+                except Exception as e:
+                    app.logger.error('[ERROR] - Trying to recover the poster for collection: {}'.format(e))
+                    collection_cover_name = 'default.jpg'
+
+            collection_info = {'collection_id': co_id,
+                               'parts': len(collection_data.get('parts')),
+                               'name': collection_data.get('name', 'Unknown') or 'Unknown',
+                               'poster': collection_cover_name,
+                               'overview': collection_data.get('overview')}
+
+            return collection_info
+
+        collection_id = self.media_data.get("belongs_to_collection") or None
+
+        self.media_details['collection_id'] = None
+        collection_info = None
+        if collection_id:
+            self.media_details['collection_id'] = collection_id['id']
+            collection_info = get_collection_data(collection_id['id'])
+
+        return collection_info
+
+>>>>>>> parent of 21634e6 (testing games)
     def get_tv_details(self):
         self.media_details = {'name': self.media_data.get('name', 'Unknown') or 'Unknown',
                               'original_name': self.media_data.get('original_name', 'Unknown') or 'Unknown',
@@ -415,6 +540,34 @@ class MediaDetails:
                          'genres_data': genres_list,
                          'actors_data': actors_list}
 
+<<<<<<< HEAD
+=======
+    def get_games_details(self):
+        self.media_data = self.media_data[0]
+        self.media_details = {'name': self.media_data.get('name', 'Unknown') or 'Unknown',
+                              'first_release_date': self.media_data.get('first_release_date', 'Unknown') or 'Unknown',
+                              'IGDB_url': self.media_data.get('url', 'Unknown') or 'Unknown',
+                              'vote_average': self.media_data.get('total_rating', 0) or 0,
+                              'vote_count': self.media_data.get('total_rating_count', 0) or 0,
+                              'summary': self.media_data.get('summary', 'No summary found.') or 'No summary found.',
+                              'storyline': self.media_data.get('storyline', 'No storyline found.') or 'No storyline found.',
+                              'collection_name': self.media_data.get('collection', {'name': 'Unknown'})['name'] or 'Unknown',
+                              'game_engine': self.media_data.get('game_engines', [{'name': 'Unknown'}])[0]['name'] or 'Unknown',
+                              'player_perspective': self.media_data.get('player_perspectives', [{'name': 'Unknown'}])[0]['name'] or 'Unknown',
+                              'game_modes': ','.join([x['name'] for x in self.media_data.get('game_modes', [{'name': 'Unknown'}])]),
+                              'igdb_id': self.media_data.get('id'),
+                              'image_cover': self.get_media_cover()}
+
+        companies_list = self.get_games_companies()
+        genres_list = self.get_games_genres()
+        platforms_list = self.get_games_platforms()
+
+        self.all_data = {'games_data': self.media_details,
+                         'companies_data': companies_list,
+                         'genres_data': genres_list,
+                         'platforms_data': platforms_list}
+
+>>>>>>> parent of 21634e6 (testing games)
     def get_media_details(self):
         if self.list_type == ListType.SERIES or self.list_type == ListType.ANIME:
             self.get_tv_details()
@@ -445,6 +598,23 @@ class Autocomplete:
 
         return self.info
 
+<<<<<<< HEAD
+=======
+    def get_games_autocomplete_dict(self):
+        self.info['igdb_id'] = self.result.get('id')
+        self.info['display_name'] = self.result.get('name')
+        self.info['category'] = 'Games'
+        self.info['type'] = 'Game'
+
+        self.info['image_cover'] = url_for('static', filename="covers/series_covers/default.jpg")
+        if self.result.get('cover'):
+            self.info['image_cover'] = "{}{}.jpg".format(self.igdb_cover_link, self.result['cover']['image_id'])
+
+        self.info['platforms'] = self.result.get('platforms', 'Unknown') or 'Unknown'
+
+        return self.info
+
+>>>>>>> parent of 21634e6 (testing games)
     def get_user_dict(self):
         self.info = {'display_name': self.result.username,
                      'image_cover': '/static/profile_pics/' + self.result.image_file,

@@ -36,15 +36,32 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
     # Add <views_count> to the profile
     current_user.add_view_count(user, list_type)
 
+<<<<<<< HEAD
     # Recover the query if it exists
     q = request.args.get('q')
 
     # Recover the template
     html_template = 'medialist_tv.html'
+=======
+    # Check the <category>, the <page>, the <media_list> and the <html_template>.
+    page = request.args.get('page', 1, int)
+    sort_val = request.args.get('sort', 'title')
+    search = request.args.get('query')
+    filter_val = request.args.get('filter', 'check')
+    option = request.args.get('option', None)
+    html_template = 'medialist_tv.html'
+    category = request.args.get('category', 'Watching')
+>>>>>>> parent of 21634e6 (testing games)
     if list_type == ListType.MOVIES:
         html_template = 'medialist_movies.html'
+<<<<<<< HEAD
         if category == Status.WATCHING:
             category = Status.COMPLETED
+=======
+    elif list_type == ListType.GAMES:
+        category = request.args.get('category', 'Playing')
+        html_template = 'medialist_games.html'
+>>>>>>> parent of 21634e6 (testing games)
 
     # Retrieve the corresponding media_data
     query, category = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
@@ -593,7 +610,7 @@ def change_element_category():
             media[1].eps_watched = 0
 
     # Set the last updates
-    set_last_update(media=media[0], media_type=list_type, old_status=old_status, new_status=new_status)
+    # set_last_update(media=media[0], media_type=list_type, old_status=old_status, new_status=new_status)
 
     # Compute the new time spent
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
@@ -804,8 +821,18 @@ def add_element():
     elif list_type == ListType.MOVIES:
         user_list = MoviesList(user_id=current_user.id,
                                media_id=media.id,
+<<<<<<< HEAD
                                status=new_status,
                                eps_watched=new_watched)
+=======
+                               status=new_status)
+    elif list_type == ListType.GAMES:
+        user_list = GamesList(user_id=current_user.id,
+                              media_id=media.id,
+                              status=new_status,
+                              completion=False,
+                              time_played=0.)
+>>>>>>> parent of 21634e6 (testing games)
 
     # Commit the changes
     db.session.add(user_list)
@@ -814,7 +841,7 @@ def add_element():
                     .format(current_user.id, list_type.value.replace('list', ''), media_id, new_status.value))
 
     # Set the last update
-    set_last_update(media=media, media_type=list_type, new_status=new_status)
+    # set_last_update(media=media, media_type=list_type, new_status=new_status)
 
     # Compute the new time spent
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
@@ -849,7 +876,7 @@ def delete_element():
     old_rewatch = media[1].rewatched
 
     # Compute the new time spent
-    if list_type == ListType.SERIES or list_type == ListType.ANIME:
+    if list_type != ListType.MOVIES:
         old_watched = media[1].eps_watched
         compute_time_spent(media=media[0], old_watched=old_watched, list_type=list_type, old_rewatch=old_rewatch)
     elif list_type == ListType.MOVIES:
@@ -933,6 +960,21 @@ def autocomplete():
                 continue
             media_results.append(Autocomplete(result).get_autocomplete_dict())
 
+<<<<<<< HEAD
+=======
+    # Get the games results
+    try:
+        games_data = ApiData().IGDB_search(search)
+    except Exception as e:
+        games_data = {}
+        app.logger.error('[ERROR] - Requesting the IGDB API: {}'.format(e))
+
+    games_results = []
+    if len(games_data) > 0:
+        for result in games_data:
+            games_results.append(Autocomplete(result).get_games_autocomplete_dict())
+
+>>>>>>> parent of 21634e6 (testing games)
     # Create the <total_results> list
     total_results = media_results + users_results
     if len(total_results) == 0:

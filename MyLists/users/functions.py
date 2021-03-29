@@ -1,9 +1,14 @@
 import pytz
 import random
 import operator
+
 from MyLists import db
 from flask import url_for
+<<<<<<< HEAD
 from sqlalchemy import func
+=======
+from sqlalchemy import func, text
+>>>>>>> parent of 21634e6 (testing games)
 from flask_login import current_user
 from _collections import OrderedDict
 from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
@@ -234,6 +239,13 @@ def get_updates(last_update):
             element_data["category"] = "Movies"
             element_data["icon-color"] = "fas fa-film text-movies"
             element_data["border"] = "#8c7821"
+<<<<<<< HEAD
+=======
+        elif element.media_type == ListType.GAMES:
+            element_data["category"] = "Games"
+            element_data["icon-color"] = "fas fa-gamepad text-dark"
+            element_data["border"] = "#255255"
+>>>>>>> parent of 21634e6 (testing games)
 
         update.append(element_data)
 
