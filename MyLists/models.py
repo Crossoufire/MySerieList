@@ -1,11 +1,11 @@
-# import rq
+import rq
 from enum import Enum
 from flask import abort
 from datetime import datetime
 from sqlalchemy.orm import aliased
 from MyLists import app, db, login_manager
 from flask_login import UserMixin, current_user
-from sqlalchemy import func, desc, text, and_, or_, inspect
+from sqlalchemy import func, desc, text, and_, or_
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 
@@ -54,49 +54,12 @@ class RoleType(Enum):
     USER = "user"
 
 
-# --- MIXIN CLASS -------------------------------------------------------------------------------------------------
-
-
-class MediaMixin(object):
-    def get_same_genres(self, genres_list):
-        media = eval(self.__class__.__name__)
-        media_genre = eval(self.__class__.__name__+'Genre')
-
-        same_genres = db.session.query(media, media_genre) \
-            .join(media, media.id == media_genre.media_id) \
-            .filter(media_genre.genre.in_(genres_list), media_genre.media_id != self.id) \
-            .group_by(media_genre.media_id) \
-            .having(func.group_concat(media_genre.genre.distinct()) == ','.join(genres_list)).limit(8).all()
-        return same_genres
-
-    def in_follows_lists(self):
-        media_list = eval(self.__class__.__name__+'List')
-
-        in_follows_lists = db.session.query(User, media_list, followers) \
-            .join(User, User.id == followers.c.followed_id) \
-            .join(media_list, media_list.user_id == followers.c.followed_id) \
-            .filter(followers.c.follower_id == current_user.id, media_list.media_id == self.id).all()
-        return in_follows_lists
-
-    def in_user_list(self):
-        in_user_list = self.list_info.filter_by(user_id=current_user.id).first()
-        return in_user_list
-
-
-class Dictizer(object):
-    def as_dict(self):
-        return {c: getattr(self, c) for c in inspect(self).attrs.keys()}
-
-
-# --- USERS and NOTIFICATIONS -------------------------------------------------------------------------------------
-
-
 followers = db.Table('followers',
                      db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
                      db.Column('followed_id', db.Integer, db.ForeignKey('user.id')))
 
 
-class User(UserMixin, Dictizer, db.Model):
+class User(UserMixin, db.Model):
     def __repr__(self):
         return f'<User {self.id}-{self.username}>'
 
@@ -205,7 +168,7 @@ class User(UserMixin, Dictizer, db.Model):
             return user
 
 
-class UserLastUpdate(Dictizer, db.Model):
+class UserLastUpdate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_name = db.Column(db.String(50), nullable=False)
@@ -222,7 +185,7 @@ class UserLastUpdate(Dictizer, db.Model):
     user = db.relationship('User', backref='UserLastUpdate', lazy=False)
 
 
-class RedisTasks(Dictizer, db.Model):
+class RedisTasks(db.Model):
     id = db.Column(db.String(50), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String(150), index=True)
@@ -242,7 +205,7 @@ class RedisTasks(Dictizer, db.Model):
         return job.meta.get('progress', 0) if job is not None else 100
 
 
-class Notifications(Dictizer, db.Model):
+class Notifications(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     media_type = db.Column(db.String(50))
@@ -251,10 +214,36 @@ class Notifications(Dictizer, db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 
+class MediaMixin(object):
+    def get_same_genres(self, genres_list):
+        media = eval(self.__class__.__name__)
+        media_genre = eval(self.__class__.__name__+'Genre')
+
+        same_genres = db.session.query(media, media_genre) \
+            .join(media, media.id == media_genre.media_id) \
+            .filter(media_genre.genre.in_(genres_list), media_genre.media_id != self.id) \
+            .group_by(media_genre.media_id) \
+            .having(func.group_concat(media_genre.genre.distinct()) == ','.join(genres_list)).limit(8).all()
+        return same_genres
+
+    def in_follows_lists(self):
+        media_list = eval(self.__class__.__name__+'List')
+
+        in_follows_lists = db.session.query(User, media_list, followers) \
+            .join(User, User.id == followers.c.followed_id) \
+            .join(media_list, media_list.user_id == followers.c.followed_id) \
+            .filter(followers.c.follower_id == current_user.id, media_list.media_id == self.id).all()
+        return in_follows_lists
+
+    def in_user_list(self):
+        in_user_list = self.list_info.filter_by(user_id=current_user.id).first()
+        return in_user_list
+
+
 # --- SERIES ------------------------------------------------------------------------------------------------------
 
 
-class Series(MediaMixin, Dictizer, db.Model):
+class Series(MediaMixin, db.Model):
     def __repr__(self):
         return f'<Series {self.id}-{self.name}>'
 
@@ -290,7 +279,7 @@ class Series(MediaMixin, Dictizer, db.Model):
     list_info = db.relationship('SeriesList', backref='series', lazy="dynamic")
 
 
-class SeriesList(Dictizer, db.Model):
+class SeriesList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -304,27 +293,27 @@ class SeriesList(Dictizer, db.Model):
     comment = db.Column(db.Text)
 
 
-class SeriesGenre(Dictizer, db.Model):
+class SeriesGenre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
     genre_id = db.Column(db.Integer, nullable=False)
 
 
-class SeriesEpisodesPerSeason(Dictizer, db.Model):
+class SeriesEpisodesPerSeason(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     season = db.Column(db.Integer, nullable=False)
     episodes = db.Column(db.Integer, nullable=False)
 
 
-class SeriesNetwork(Dictizer, db.Model):
+class SeriesNetwork(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     network = db.Column(db.String(150), nullable=False)
 
 
-class SeriesActors(Dictizer, db.Model):
+class SeriesActors(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     name = db.Column(db.String(150))
@@ -333,7 +322,7 @@ class SeriesActors(Dictizer, db.Model):
 # --- ANIME -------------------------------------------------------------------------------------------------------
 
 
-class Anime(MediaMixin, Dictizer, db.Model):
+class Anime(MediaMixin, db.Model):
     def __repr__(self):
         return f'<Anime {self.id}-{self.name}>'
 
@@ -369,7 +358,7 @@ class Anime(MediaMixin, Dictizer, db.Model):
     networks = db.relationship('AnimeNetwork', backref='anime', lazy=True)
 
 
-class AnimeList(Dictizer, db.Model):
+class AnimeList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
@@ -383,27 +372,27 @@ class AnimeList(Dictizer, db.Model):
     comment = db.Column(db.Text)
 
 
-class AnimeGenre(Dictizer, db.Model):
+class AnimeGenre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
     genre_id = db.Column(db.Integer, nullable=False)
 
 
-class AnimeEpisodesPerSeason(Dictizer, db.Model):
+class AnimeEpisodesPerSeason(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     season = db.Column(db.Integer, nullable=False)
     episodes = db.Column(db.Integer, nullable=False)
 
 
-class AnimeNetwork(Dictizer, db.Model):
+class AnimeNetwork(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     network = db.Column(db.String(150), nullable=False)
 
 
-class AnimeActors(Dictizer, db.Model):
+class AnimeActors(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     name = db.Column(db.String(150))
@@ -412,7 +401,7 @@ class AnimeActors(Dictizer, db.Model):
 # --- MOVIES ------------------------------------------------------------------------------------------------------
 
 
-class Movies(MediaMixin, Dictizer, db.Model):
+class Movies(MediaMixin, db.Model):
     def __repr__(self):
         return f'<Movies {self.id}-{self.name}>'
 
@@ -441,7 +430,7 @@ class Movies(MediaMixin, Dictizer, db.Model):
     list_info = db.relationship('MoviesList', backref='movies', lazy='dynamic')
 
 
-class MoviesList(MediaMixin, Dictizer, db.Model):
+class MoviesList(MediaMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
@@ -453,14 +442,14 @@ class MoviesList(MediaMixin, Dictizer, db.Model):
     comment = db.Column(db.Text)
 
 
-class MoviesGenre(MediaMixin, Dictizer, db.Model):
+class MoviesGenre(MediaMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
     genre_id = db.Column(db.Integer, nullable=False)
 
 
-class MoviesActors(Dictizer, db.Model):
+class MoviesActors(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     name = db.Column(db.String(150))
@@ -469,7 +458,7 @@ class MoviesActors(Dictizer, db.Model):
 # --- BADGES & RANKS ----------------------------------------------------------------------------------------------
 
 
-class Badges(Dictizer, db.Model):
+class Badges(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     threshold = db.Column(db.Integer, nullable=False)
     image_id = db.Column(db.String(100), nullable=False)
@@ -478,7 +467,7 @@ class Badges(Dictizer, db.Model):
     genres_id = db.Column(db.String(100))
 
 
-class Ranks(Dictizer, db.Model):
+class Ranks(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     level = db.Column(db.Integer, nullable=False)
     image_id = db.Column(db.String(50), nullable=False)
@@ -486,7 +475,7 @@ class Ranks(Dictizer, db.Model):
     type = db.Column(db.String(50), nullable=False)
 
 
-class Frames(Dictizer, db.Model):
+class Frames(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     level = db.Column(db.Integer, nullable=False)
     image_id = db.Column(db.String(50), nullable=False)
@@ -495,7 +484,7 @@ class Frames(Dictizer, db.Model):
 # --- STATS and TRENDS --------------------------------------------------------------------------------------------
 
 
-class MyListsStats(Dictizer, db.Model):
+class MyListsStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nb_users = db.Column(db.Integer)
     nb_media = db.Column(db.Text)

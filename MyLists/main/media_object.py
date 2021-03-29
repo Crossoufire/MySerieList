@@ -1,14 +1,11 @@
 import secrets
 import pykakasi
-from sqlalchemy import and_
-from sqlalchemy.orm import aliased
-
-from MyLists import app, db
+from MyLists import app
 from flask import url_for
 from datetime import datetime
 from flask_login import current_user
 from MyLists.API_data import ApiData
-from MyLists.models import ListType, Status, SeriesList, RoleType, get_media_query, get_media_count
+from MyLists.models import ListType, Status
 
 
 def latin_alphabet(original_name):
@@ -44,32 +41,6 @@ def change_air_format(date, media_sheet=False):
             return datetime.strptime(date, '%Y-%m-%d').strftime("%d %b %Y")
         except:
             return 'Unknown'
-
-
-class MediaClass(object):
-    providers = None
-
-    def __init__(self, user):
-        self.results = None
-        self.cat_value = None
-        self.media_data = None
-        self.media_dict = None
-        self.user = user
-
-    def add_view_count(self):
-        pass
-
-    def get_template(self):
-        pass
-
-    @classmethod
-    def get_media_class(cls, list_type):
-        if cls.providers is None:
-            cls.providers = {}
-            for provider_class in cls.__subclasses__():
-                provider = provider_class()
-                cls.providers[provider.provider_name] = provider
-        return cls.providers[list_type]
 
 
 # Parsing the DB data to the <MediaSheet> route
@@ -507,37 +478,3 @@ class Autocomplete:
 
         self.info['date'] = change_air_format(self.result.get('release_date'))
         self.info['type'] = 'Movie'
-
-
-class SeriesClass(MediaClass):
-    def __init__(self):
-        super(SeriesClass, self).__init__('serieslist')
-
-        #     # Retrieve the corresponding media_data
-        #     query, category = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
-        #
-        #     # Get the actual page, total number of pages and the total number of media from the query
-        #     items = query.items
-        #     info_pages = {'actual_page': query.page, 'total_pages': query.pages, 'total_media': query.total}
-        #
-        #     # Get <common_media> and <common_elements> between the users
-        #     common_media, common_elements = get_media_count(user.id, list_type)
-        #
-        #     # Recover the media data into a dict
-        #     items_data_list = []
-        #     for item in items:
-        #         add_data = MediaListObj(item, common_media, list_type)
-        #         items_data_list.append(add_data)
-
-    def add_view_count(self):
-        if current_user.role != RoleType.ADMIN and self.user.id != current_user.id:
-            self.user.series_views += 1
-
-    def get_template(self):
-        return "medialist_tv.html"
-
-    def query_data(self, list_type, category, genre, sorting, page_val, q):
-        media_data = get_media_query(self.user.id, list_type, category, genre, sorting, page_val, q)
-
-    def create_dict_from_query(self, media_data):
-        pass
