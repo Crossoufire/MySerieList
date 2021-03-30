@@ -52,6 +52,8 @@ def create_first_data():
     compute_media_time_spent()
     # update_Mylists_stats()
     # correct_orphan_media()
+    # add_hltb_time()
+    # add_manual_games()
     db.session.commit()
 
 

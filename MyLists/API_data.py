@@ -13,6 +13,7 @@ class ApiData:
     def __init__(self):
         self.tmdb_api_key = app.config['THEMOVIEDB_API_KEY']
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
+        self.igdb_base_url = 'https://images.igdb.com/igdb/image/upload/t_1080p/'
 
     @staticmethod
     def status_code(status_code):
@@ -27,6 +28,16 @@ class ApiData:
 
         return json.loads(response.text)
 
+    def IGDB_search(self, game_name):
+        headers = {'Client-ID': '5i5pi21s0ninkmp6jj09ix4l6fw5bd',
+                   'Authorization': 'Bearer ' + '3chy3hiswzh9qf97qhbe3xacue7i41'}
+        body = 'fields id, name, cover.image_id, first_release_date; search "{}";'.format(game_name)
+        response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers)
+
+        self.status_code(response.status_code)
+
+        return json.loads(response.text)
+
     def get_details_and_credits_data(self, api_id, list_type):
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
             response = requests.get("https://api.themoviedb.org/3/tv/{}?api_key={}&append_to_response=credits"
@@ -34,6 +45,16 @@ class ApiData:
         elif list_type == ListType.MOVIES:
             response = requests.get("https://api.themoviedb.org/3/movie/{}?api_key={}&append_to_response=credits"
                                     .format(api_id, self.tmdb_api_key), timeout=15)
+        elif list_type == ListType.GAMES:
+            headers = {'Client-ID': '5i5pi21s0ninkmp6jj09ix4l6fw5bd',
+                       'Authorization': 'Bearer ' + '3chy3hiswzh9qf97qhbe3xacue7i41'}
+            body = 'fields name, cover.image_id, collection.name, game_engines.name, game_modes.name, ' \
+                   'platforms.name, genres.name, player_perspectives.name, total_rating, total_rating_count, ' \
+                   'first_release_date, involved_companies.company.name, involved_companies.developer, ' \
+                   'involved_companies.publisher, storyline, summary, themes.name, url, external_games.uid, ' \
+                   'external_games.category; where id={};'\
+                .format(api_id)
+            response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers)
 
         self.status_code(response.status_code)
 
@@ -81,9 +102,26 @@ class ApiData:
             local_covers_path = Path(app.root_path, "static/covers/anime_covers/")
         elif list_type == ListType.MOVIES:
             local_covers_path = Path(app.root_path, "static/covers/movies_covers")
+        elif list_type == ListType.GAMES:
+            local_covers_path = Path(app.root_path, "static/covers/games_covers/")
 
-        urllib.request.urlretrieve(f"{self.tmdb_poster_base_url}{media_cover_path}",
-                                   f"{local_covers_path}/{media_cover_name}")
+        if list_type != ListType.GAMES:
+            urllib.request.urlretrieve(f"{self.tmdb_poster_base_url}{media_cover_path}",
+                                       f"{local_covers_path}/{media_cover_name}")
+        else:
+            url_address = f"{self.igdb_base_url}{media_cover_path}.jpg"
+            headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) '
+                                     'Chrome/23.0.1271.64 Safari/537.11',
+                       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                       'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+                       'Accept-Encoding': 'none',
+                       'Accept-Language': 'en-US,en;q=0.8',
+                       'Connection': 'keep-alive'}
+            request_ = urllib.request.Request(url_address, None, headers)
+            response = urllib.request.urlopen(request_)
+            f = open(f"{local_covers_path}/{media_cover_name}", 'wb')
+            f.write(response.read())
+            f.close()
 
         img = Image.open(f"{local_covers_path}/{media_cover_name}")
         img = img.resize((300, 450), Image.ANTIALIAS)

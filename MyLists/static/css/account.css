@@ -337,7 +337,7 @@ a {
     flex-direction: column;
 }
 
-#series-score, #anime-score, #movies-score {
+#series-score, #anime-score, #movies-score, #games-score {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
@@ -365,6 +365,11 @@ a {
 .histogram-item-movies {
     width: 100%;
     background: #8c7821;
+}
+
+.histogram-item-games {
+    width: 100%;
+    background: #196219;
 }
 
 @media (max-width: 768px) {

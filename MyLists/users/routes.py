@@ -78,6 +78,7 @@ def hall_of_fame():
         series_level = get_media_levels(user, ListType.SERIES)
         anime_level = get_media_levels(user, ListType.ANIME)
         movies_level = get_media_levels(user, ListType.MOVIES)
+        games_level = get_media_levels(user, ListType.GAMES)
         knowledge_frame = get_knowledge_frame(user)
 
         user_data = {"id": user.id,
@@ -86,6 +87,7 @@ def hall_of_fame():
                      "series_data": series_level,
                      "anime_data": anime_level,
                      "movies_data": movies_level,
+                     "games_data": games_level,
                      'knowledge_frame': knowledge_frame,
                      'current_user': False}
 

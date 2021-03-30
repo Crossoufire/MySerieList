@@ -22,6 +22,8 @@ $(function() {
                 form.action = '/media_sheet/Anime/' + ui.item.tmdb_id + '?search=True';
             } else if (ui.item.type === 'Movie') {
                 form.action = '/media_sheet/Movies/' + ui.item.tmdb_id + '?search=True';
+            } else if (ui.item.type === 'Game') {
+                form.action = '/media_sheet/Games/' + ui.item.igdb_id + '?search=True';
             } else if (ui.item.type === 'User') {
                 form.action = '/account/' + ui.item.display_name;
             }

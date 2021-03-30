@@ -185,3 +185,14 @@ ul {
     top: 37px;
     left: 74px;
 }
+
+.game-vote-average {
+    color: black;
+    font-weight: 1000;
+    position: absolute;
+    top: 49px;
+    left: 46px;
+    font-size: 14pt;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+}

@@ -1,6 +1,7 @@
 from MyLists import db
 from MyLists.models import ListType, Series, Anime, SeriesGenre, AnimeGenre, AnimeActors, SeriesActors, Movies, \
-    SeriesNetwork, AnimeNetwork, SeriesEpisodesPerSeason, AnimeEpisodesPerSeason, MoviesGenre, MoviesActors
+    SeriesNetwork, AnimeNetwork, SeriesEpisodesPerSeason, AnimeEpisodesPerSeason, MoviesGenre, MoviesActors, \
+    GamesCompanies, GamesPlatforms, Games
 
 
 class AddtoDB:
@@ -54,6 +55,16 @@ class AddtoDB:
             elif self.list_type == ListType.ANIME:
                 db.session.add(AnimeEpisodesPerSeason(**season))
 
+    def add_games_companies_to_db(self):
+        for company in self.media_details['companies_data']:
+            company.update({'media_id': self.media.id})
+            db.session.add(GamesCompanies(**company))
+
+    def add_games_platforms_to_db(self):
+        for platform in self.media_details['platforms_data']:
+            platform.update({'media_id': self.media.id})
+            db.session.add(GamesPlatforms(**platform))
+
     def add_tv_to_db(self):
         if self.list_type == ListType.SERIES:
             self.media = Series(**self.media_details['tv_data'])
@@ -75,10 +86,24 @@ class AddtoDB:
         self.add_genres_to_db()
         self.add_actors_to_db()
 
+    def add_games_to_db(self):
+        self.media = Games(**self.media_details['games_data'])
+
+        db.session.add(self.media)
+        db.session.commit()
+
+        self.add_games_companies_to_db()
+        self.add_genres_to_db()
+        self.add_games_platforms_to_db()
+
+        db.session.commit()
+
     def add_media_to_db(self):
         if self.list_type == ListType.SERIES or self.list_type == ListType.ANIME:
             self.add_tv_to_db()
         elif self.list_type == ListType.MOVIES:
             self.add_movies_to_db()
+        elif self.list_type == ListType.GAMES:
+            self.add_games_to_db()
 
         return self.media

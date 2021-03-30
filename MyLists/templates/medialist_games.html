@@ -6,13 +6,13 @@
        href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=username) }}"></a>
     <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip" title="Animelist"
        href="{{ url_for('main.mymedialist', media_list='animelist', user_name=username) }}"></a>
-    <a class="fas fa-lg fa-gamepad m-r-10 return-icon text-games" data-toggle="tooltip" title="Gameslist"
-       href="{{ url_for('main.mymedialist', media_list='gameslist', user_name=username) }}"></a>
+    <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip" title="Movieslist"
+       href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=username) }}"></a>
 {% endblock return_icon %}
 
 
 {% block categories %}
-    {% set categories = ['All', 'Completed', 'Plan to Watch', 'Favorite'] %}
+    {% set categories = ['All', 'Completed', 'Endless', 'Multiplayer', 'Favorite'] %}
     {% for cat in categories %}
         <a class="cat-btn{% if cat == category %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
          media_list=media_list, user_name=username, category=cat, genre=genre, sorting=sorting, page_val=1) }}">
@@ -42,5 +42,5 @@
 
 
 {% block javascript %}
-    <script src="{{ url_for('static', filename='js/medialist_movies.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/medialist_games.js') }}"></script>
 {% endblock javascript %}

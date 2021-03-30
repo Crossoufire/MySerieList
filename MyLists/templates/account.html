@@ -74,6 +74,24 @@
                                 &nbsp;{{ '%02d' |format(media_data['movies']['media_levels']['level']|int + 1) }}
                             </div>
                         </div>
+                        <div class="account-bar">
+                            <img class="float-left m-r-10 m-t-4" height='40' width='40' data-toggle="tooltip"
+                                 title="{{ media_data['games']['media_levels']['grade_title'] }}"
+                                 src="{{ media_data['games']['media_levels']['grade_id'] }}.png"/>
+                            <a class="account-bar-name text-light" href="{{ url_for('main.mymedialist',
+                                    media_list='gameslist', user_name=header_data['username']) }}">Games</a>
+                            <div id="movies-level" class='account-bar-level'>
+                                Level {{ '%02d' |format(media_data['games']['media_levels']['level']) }}
+                            </div>
+                            <div class="xp-bar" data-toggle="tooltip" title="{{ media_data['games']
+                            ['media_levels']['level_percent'] }}%">
+                                <div class="xp-bar-fill bg-games" style="width: {{ media_data['games']
+                                ['media_levels']['level_percent'] }}%;">
+                                </div>
+                            </div>
+                            <div class="account-bar-next-level">&nbsp;{{ '%02d' |
+                            format(media_data['games']['media_levels']['level']|int + 1) }}</div>
+                        </div>
                     </li>
                     <li class="m-b-20">
                         <h4><i class="fas fa-highlighter text-light"></i>&nbsp;&nbsp; Updates
@@ -521,17 +539,15 @@
                                 </div>
                             </div>
                         </section>
-                        <section class="movies-stats">
+                        <section class="movies-stats m-b-40">
                             {% if media_data['movies']['media_count_score']|sum != 0 %}
                                 <div class="histogram-wrapper m-b-2">
-                                <ul id="movies-score" class="added-styles"></ul>
-                            </div>
+                                    <ul id="movies-score" class="added-styles"></ul>
+                                </div>
                             {% endif %}
                             <h5 class="media-stats-title mb-2 p-1">
                                 <a class="text-light" href="{{ url_for('main.mymedialist', media_list='movieslist',
-                                 user_name=header_data['username']) }}">
-                                    <b>MOVIES</b>
-                                </a>
+                                 user_name=header_data['username']) }}"><b>MOVIES</b></a>
                             </h5>
                             <div id="MOVIES" class="stat-text m-b-8">
                                 <span><b>Days: {{ media_data['movies']['time_spent_day'] }}</b></span>
@@ -582,7 +598,7 @@
                                     <div class="col-2">
                                         <span>{{ media_data['movies']['media_count']['total'] }}</span>
                                     </div>
-                                     <div class="col-4">
+                                    <div class="col-4">
                                         <span data-toggle="tooltip" title="Counting the rewatched">Total Seen:</span>
                                     </div>
                                     <div class="col-2">
@@ -603,6 +619,100 @@
                                                 <img class="favorite-img" data-toggle="tooltip"
                                                      title="{{ favorite.name }}"
                                                      src="/static/covers/movies_covers/{{ favorite.image_cover }}"/>
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </section>
+                        <section class="games-stats">
+                            {% if media_data['games']['media_count_score']|sum != 0 %}
+                                <div class="histogram-wrapper m-b-2">
+                                    <ul id="games-score" class="added-styles"></ul>
+                                </div>
+                            {% endif %}
+                            <h5 class="media-stats-title mb-2 p-1">
+                                <a class="text-light" href="{{ url_for('main.mymedialist', media_list='gameslist',
+                                 user_name=header_data['username']) }}"><b>GAMES</b></a>
+                            </h5>
+                            <div id="GAMES" class="stat-text m-b-8">
+                                <span><b>Days: {{ media_data['games']['time_spent_day'] }}</b></span>
+                                <span class="float-r">
+                                    <b>Score: {{ media_data['games']['media_score']['mean_score'] }}/10</b>
+                                </span><br>
+                                <span><b>Hours: {{ media_data['games']['time_spent_hour'] }}</b></span>
+                                <span class="float-r" data-toggle="tooltip" title="Media scored">
+                                    <b>Scored: {{ media_data['games']['media_score']['scored_media'] }}
+                                        /{{ media_data['games']['media_score']['total_media'] }}</b>
+                                </span>
+                                <figure>
+                                    {% if media_data['games']['media_count']['nodata'] %}
+                                        <span class="block-no-data" data-toggle="tooltip" title="No data">
+                                            <span id="100%" class="value"></span>
+                                        </span>
+                                    {% else %}
+                                        <span class="block" data-toggle="tooltip" title="Completed">
+                                            <span id="{{ media_data['games']['media_count']['Completed']
+                                            ['percent'] }}%" class="value"></span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="Endless">
+                                            <span id="{{ media_data['games']['media_count']['Endless']
+                                            ['percent'] }}%" class="value"></span>
+                                        </span>
+                                        <span class="block" data-toggle="tooltip" title="Multiplayer">
+                                            <span id="{{ media_data['games']['media_count']['Multiplayer']['percent'] }}%"
+                                                  class="value"></span>
+                                        </span>
+                                    {% endif %}
+                                </figure>
+                                <div class="row stat-text p-t-5">
+                                    <div class="col-4">
+                                        <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=Completed">
+                                            Completed:
+                                        </a>
+                                    </div>
+                                    <div class="col-2">
+                                        <span class="stat-text">{{ media_data['games']['media_count']['Completed']['count'] }}</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=Multiplayer">
+                                            Multiplayer:
+                                        </a>
+                                    </div>
+                                    <div class="col-2">
+                                        <span class="stat-text">{{ media_data['games']['media_count']['Multiplayer']['count'] }}</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <a class="stat-text" href="/gameslist/{{ header_data['username'] }}?category=Endless">
+                                            Endless:
+                                        </a>
+                                    </div>
+                                    <div class="col-2">
+                                        <span class="stat-text">{{ media_data['games']['media_count']['Endless']['count'] }}</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <span class="stat-text" data-toggle="tooltip" title="Without plan to play">
+                                            Total Games:
+                                        </span>
+                                    </div>
+                                    <div class="col-2">
+                                        <span class="stat-text" data-toggle="tooltip" title="Without plan to play">
+                                            {{ media_data['games']['media_count']['total'] }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="{{ url_for('main.mymedialist', media_list='gameslist',
+                            user_name=header_data['username'], category='Favorite') }}">
+                                <b>Favorites ({{ favorites[3]|length }}):</b>
+                            </a>
+                            <div class="row m-b-16">
+                                <div class="col">
+                                    {% for favorite in favorites[3] %}
+                                        {% if loop.index < 11 %}
+                                            <a href="{{ url_for('main.media_sheet', media_type='Games',
+                                             media_id=favorite.id) }}">
+                                                <img class="favorite-img" data-toggle="tooltip" title="{{ favorite.name }}"
+                                                src="/static/covers/games_covers/{{ favorite.image_cover }}"/>
                                             </a>
                                         {% endif %}
                                     {% endfor %}
@@ -712,11 +822,13 @@
         const histogramValues_series = {{ media_data['series']['media_count_score'] }};
         const histogramValues_anime = {{ media_data['anime']['media_count_score'] }};
         const histogramValues_movies = {{ media_data['movies']['media_count_score'] }};
+        const histogramValues_games = {{ media_data['games']['media_count_score'] }};
 
         // Max value of each histogram array
         const maxValue_series = Math.max(...histogramValues_series);
         const maxValue_anime = Math.max(...histogramValues_anime);
         const maxValue_movies = Math.max(...histogramValues_movies);
+        const maxValue_games = Math.max(...histogramValues_games);
 
         // Turn histogram numbers into histogram li items
         let i = -0.5;
@@ -755,7 +867,7 @@
         i = -0.5;
         const histogram_movies = histogramValues_movies.reduce((acc, number) => {
         // Getting a percentage of the max
-        const height = number/maxValue_movies*100;
+        const height = number/maxValue_movies * 100;
         i += 0.5;
         // Adding 1px so there's an indication of 0
         return acc + `<li class="histogram-item-movies" data-toggle="tooltip" title="`+i+`/10: `+number+` movies" style="height: calc(${height}% + 1px)" />`
@@ -764,6 +876,22 @@
         const movies_chart = document.getElementById('movies-score');
                 try {
             movies_chart.innerHTML = histogram_movies
+        } catch {}
+
+
+        // Turn histogram numbers into histogram li items
+        i = -0.5;
+        const histogram_games = histogramValues_games.reduce((acc, number) => {
+        // Getting a percentage of the max
+        const height = number/maxValue_games * 100;
+        i += 0.5;
+        // Adding 1px so there's an indication of 0
+        return acc + `<li class="histogram-item-games" data-toggle="tooltip" title="`+i+`/10: `+number+` games" style="height: calc(${height}% + 1px)" />`
+        }, ``);
+        // Inject into dom
+        const games_chart = document.getElementById('games-score');
+        try {
+            games_chart.innerHTML = histogram_games
         } catch {}
     </script>
 {% endblock added_js %}

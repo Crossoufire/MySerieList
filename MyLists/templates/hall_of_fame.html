@@ -19,6 +19,7 @@
                 <th class="text-center">Series</th>
                 <th class="text-center">Anime</th>
                 <th class="text-center">Movies</th>
+                <th class="text-center">Games</th>
             </tr>
             </thead>
             <tbody>
@@ -59,6 +60,14 @@
                                 <img class="grade_picture" src="{{ user['movies_data']['grade_id'] }}.png" alt="">
                                 <br>
                                 {{ user['movies_data']['level'] }}
+                            </a>
+                        </td>
+                        <td>
+                            <a class="text-light" href="{{ url_for('main.mymedialist', media_list='gameslist',
+                            user_name=user['username']) }}">
+                                <img class="grade_picture" src="{{ user['games_data']['grade_id'] }}.png" alt="">
+                                <br>
+                                {{ user['games_data']['level'] }}
                             </a>
                         </td>
                     </tr>

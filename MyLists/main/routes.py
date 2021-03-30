@@ -11,7 +11,7 @@ from MyLists.main.functions import set_last_update, compute_time_spent, check_ca
 from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaListObj
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MediaType, get_next_airing, check_media, User, \
-    get_media_query, get_media_count
+    get_media_query, get_media_count, Games, GamesList
 
 bp = Blueprint('main', __name__)
 
@@ -24,7 +24,7 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
     # Check if <media_list> is valid
     try:
         list_type = ListType(media_list)
-    except (ValueError, KeyError):
+    except ValueError:
         return abort(400)
 
     # Check if <user> can see <media_list>
@@ -45,6 +45,11 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
         html_template = 'medialist_movies.html'
         if category == Status.WATCHING:
             category = Status.COMPLETED
+    elif list_type == ListType.GAMES:
+        html_template = 'medialist_games.html'
+        if category == Status.WATCHING:
+            category = Status.COMPLETED
+        sorting = 'Playtime +'
 
     # Retrieve the corresponding media_data
     query, category = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
@@ -83,6 +88,8 @@ def write_comment(media_type, media_id):
         list_type = ListType.ANIME
     elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
+    elif media_type == MediaType.GAMES:
+        list_type = ListType.GAMES
 
     media = check_media(media_id, list_type)
     if not media:
@@ -125,10 +132,14 @@ def media_sheet(media_type, media_id):
         list_type = ListType.ANIME
     elif media_type == MediaType.MOVIES:
         list_type = ListType.MOVIES
+    elif media_type == MediaType.GAMES:
+        list_type = ListType.GAMES
 
     # Check if <media_id> came from an API and if in local Db
     api_id = request.args.get('search')
-    if api_id:
+    if api_id and list_type == ListType.GAMES:
+        search = {'igdb_id': media_id}
+    elif api_id and list_type != ListType.GAMES:
         search = {'themoviedb_id': media_id}
     else:
         search = {'id': media_id}
@@ -141,6 +152,9 @@ def media_sheet(media_type, media_id):
     elif list_type == ListType.MOVIES:
         media = Movies.query.filter_by(**search).first()
         html_template = 'media_sheet_movies.html'
+    elif list_type == ListType.GAMES:
+        media = Games.query.filter_by(**search).first()
+        html_template = 'media_sheet_games.html'
 
     # If <media> does not exist and <api_id> is provived: Add the <media> to Db, else abort.
     if not media:
@@ -653,6 +667,73 @@ def update_score():
     return '', 204
 
 
+@bp.route('/update_playtime', methods=['POST'])
+@login_required
+def update_playtime():
+    try:
+        json_data = request.get_json()
+        new_playtime = int(json_data['playtime'])*60
+        media_id = int(json_data['media_id'])
+        media_list = json_data['media_type']
+    except:
+        return '', 400
+
+    # Check if <media_list> exist and valid
+    try:
+        list_type = ListType(media_list)
+    except ValueError:
+        return '', 400
+
+    media = check_media(media_id, list_type)
+    if not media:
+        return '', 400
+
+    # Get the old data
+    old_playtime = media[1].playtime
+
+    # Set the new data
+    media[1].playtime = new_playtime
+    app.logger.info('[{}] Games ID {} playtime updated from {} to {}'
+                    .format(current_user.id, media_id, old_playtime, new_playtime))
+
+    compute_time_spent(media=media[0], list_type=list_type, old_gametime=old_playtime, new_gametime=new_playtime)
+
+    # Commit the changes
+    db.session.commit()
+
+    return '', 204
+
+
+@bp.route('/update_completion', methods=['POST'])
+@login_required
+def update_completion():
+    try:
+        json_data = request.get_json()
+        media_id = int(json_data['element_id'])
+        media_list = json_data['media_list']
+        completion = bool(json_data['data'])
+    except:
+        return '', 400
+
+    # Check if the <media_list> exist and is valid
+    try:
+        list_type = ListType(media_list)
+    except ValueError:
+        return '', 400
+
+    # Check if the <media_id> is in the current user's list
+    media = GamesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
+
+    if not media:
+        return '', 400
+
+    # Add <completion> and commit the changes
+    media.completion = completion
+    db.session.commit()
+
+    return '', 204
+
+
 @bp.route('/update_rewatch', methods=['POST'])
 @login_required
 def update_rewatch():
@@ -732,6 +813,8 @@ def add_favorite():
         media = AnimeList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
     elif list_type == ListType.MOVIES:
         media = MoviesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
+    elif list_type == ListType.GAMES:
+        media = GamesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
 
     if not media:
         return '', 400
@@ -806,6 +889,12 @@ def add_element():
                                media_id=media.id,
                                status=new_status,
                                eps_watched=new_watched)
+    elif list_type == ListType.GAMES:
+        user_list = GamesList(user_id=current_user.id,
+                              media_id=media.id,
+                              status=new_status,
+                              completion=False,
+                              playtime=0)
 
     # Commit the changes
     db.session.add(user_list)
@@ -815,12 +904,15 @@ def add_element():
 
     # Set the last update
     set_last_update(media=media, media_type=list_type, new_status=new_status)
+    db.session.commit()
 
     # Compute the new time spent
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
         compute_time_spent(media=media, new_watched=new_watched, list_type=list_type)
     elif list_type == ListType.MOVIES:
         compute_time_spent(media=media, list_type=list_type, movie_status=new_status, movie_add=True)
+    elif list_type == ListType.GAMES:
+        compute_time_spent(media=media, list_type=list_type)
 
     return '', 204
 
@@ -846,7 +938,8 @@ def delete_element():
         return '', 400
 
     # Get the old data
-    old_rewatch = media[1].rewatched
+    if list_type != ListType.GAMES:
+        old_rewatch = media[1].rewatched
 
     # Compute the new time spent
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
@@ -855,6 +948,8 @@ def delete_element():
     elif list_type == ListType.MOVIES:
         compute_time_spent(media=media[0], list_type=list_type, movie_status=media[1].status, movie_delete=True,
                            old_rewatch=old_rewatch)
+    elif list_type == ListType.GAMES:
+        compute_time_spent(media=media[0], list_type=list_type, old_gametime=media[1].playtime)
 
     # Delete the media from the user's list
     db.session.delete(media[1])
@@ -896,6 +991,8 @@ def lock_media():
         media = Anime.query.filter_by(id=media_id).first()
     elif list_type == ListType.MOVIES:
         media = Movies.query.filter_by(id=media_id).first()
+    elif list_type == ListType.GAMES:
+        media = Games.query.filter_by(id=media_id).first()
 
     if not media:
         return '', 400
@@ -933,8 +1030,22 @@ def autocomplete():
                 continue
             media_results.append(Autocomplete(result).get_autocomplete_dict())
 
+    # Get the games results
+    try:
+        games_data = ApiData().IGDB_search(search)
+    except Exception as e:
+        games_data = {}
+        app.logger.error('[ERROR] - Requesting the IGDB API: {}'.format(e))
+
+    games_results = []
+    if len(games_data) > 0:
+        for result in games_data:
+            if len(games_results) >= 5:
+                break
+            games_results.append(Autocomplete(result).get_games_autocomplete_dict())
+
     # Create the <total_results> list
-    total_results = media_results + users_results
+    total_results = media_results + users_results + games_results
     if len(total_results) == 0:
         return jsonify(search_results=[{'nb_results': 0, 'category': None}]), 200
 

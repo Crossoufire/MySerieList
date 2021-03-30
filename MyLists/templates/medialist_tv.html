@@ -11,6 +11,8 @@
     {% endif %}
     <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip" title="Movieslist"
        href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=username) }}"></a>
+    <a class="fas fa-lg fa-gamepad m-r-10 return-icon text-games" data-toggle="tooltip" title="Gameslist"
+       href="{{ url_for('main.mymedialist', media_list='gameslist', user_name=username) }}"></a>
 {% endblock return_icon %}
 
 
