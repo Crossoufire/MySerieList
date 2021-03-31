@@ -282,6 +282,64 @@ $(document).on('change focusout', '.rewatch-drop', function(event) {
 });
 
 
+// --- Create the playtime dropdown -------------------------------------------------------------------------
+function playtimeDrop(playtime, data_id) {
+    let playtime_value = $(playtime).text();
+    let drop = document.createElement("select");
+    let option = document.createElement("option");
+    let i;
+
+    $(playtime).hide();
+
+    drop.className = "playtime-drop";
+    drop.setAttribute('values', ''+data_id);
+    option.className = "seas-eps-drop-options";
+
+    for (i = 0; i < 11; i++) {
+        let option = document.createElement("option");
+        option.className = "seas-eps-drop-options";
+        option.value = "" + i;
+        if (i === parseInt(playtime_value)) {
+            option.selected = true;
+        }
+        option.text = "" + i;
+        drop.appendChild(option);
+    }
+
+    $(playtime).parent().prepend(drop);
+    drop.focus();
+}
+
+
+// --- Change/delete the playtime dropdown ------------------------------------------------------------------
+$(document).on('change focusout', '.playtime-drop', function(event) {
+    let value = parseInt(this.value);
+    let media_id = $(this).attr('values').split(',')[0];
+    let $play_div = $('#play_'+media_id);
+
+    if (event.type === 'change') {
+        $.ajax ({
+            type: "POST",
+            url: "/update_playtime",
+            contentType: "application/json",
+            data: JSON.stringify({playtime: value, element_id: media_id, element_type: 'gameslist'}),
+            dataType: "json",
+            success: function() {
+                $play_div.text(value).show();
+                $(this).remove();
+            },
+            error: function () {
+                error_ajax_message('Error trying to change the game playtime value. Please try again later.')
+            }
+        });
+    }
+
+    $rew_div.text(value).show();
+    this.remove();
+});
+
+
+
 // --- Create Row gutters ----------------------------------------------------------------------------------
 $(document).ready(function() {
     let $row = $('.row');

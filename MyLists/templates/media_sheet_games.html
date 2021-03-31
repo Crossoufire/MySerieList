@@ -22,10 +22,8 @@
             <label for="time-dropdown"></label>
             <select id="time-dropdown" class="text-light text-center cat-drop"
              onchange="updatePlaytime('{{ data['id'] }}', this)">
-                <option {% if data['playtime'] == None or data['playtime'] == 0 %} selected="selected"
-                {% endif %}value="0">
-                    &nbsp;0&nbsp;
-                </option>
+                <option {% if data['playtime'] == None or data['playtime'] == 0 %}selected="selected" {% endif %}
+                 value="0">&nbsp;0&nbsp;</option>
                 {% for i in range(0, 31) %}
                     <option {% if i == data['playtime'] %} selected="selected" {% endif %}
                     value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
@@ -35,17 +33,12 @@
             &nbsp;<i id="time-check" class="fas fa-check" style="display: none;"></i>
         </div>
     </div>
-    <div class="text-center">
-        <div class="btn btn-smaller btn-warning text-dark" onclick="updatePlaytime({{ data['id'] }})">Update time</div>
-        <i id="time-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
-        &nbsp;<i id="time-check" class="fas fa-check" style="display: none;"></i>
-    </div>
     <div class="m-l-25 m-r-35 m-t-8 m-b-8" style="border: 1px solid grey;"></div>
     <div id="comp-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="100% completion?">
         <div class="col-4"><b>100%</b></div>
         <div class="col-8">
-            <input type="checkbox" name="comp-check" onchange="updateCompletion('{{ data['id'] }}')"
-            {% if data['completion'] == True %}checked{% endif %} class="m-l-12"/>
+            <input type="checkbox" name="comp-check" class="m-l-12" onchange="updateCompletion('{{ data['id'] }}')"
+            {% if data['completion'] == True %}checked{% endif %}/>
             <i id="comp-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
             &nbsp;<i id="comp-check" class="fas fa-check" style="display: none;"></i>
         </div>
@@ -56,14 +49,10 @@
             <select id="score-dropdown" class="text-light text-center cat-drop"
             onchange="updateScore('{{ data['id'] }}', this, '{{ media_list }}')">
                 <option {% if data['score'] == None or data['score'] == -1 %} selected="selected"
-                {% endif %}value="---">
-                    &nbsp;---&nbsp;
-                </option>
+                {% endif %}value="---">&nbsp;---&nbsp;</option>
                 {% for i in range(0, 21) %}
                     <option {% if (i-(i/2)) == data['score'] %} selected="selected" {% endif %}
-                    value="{{ (i-(i/2)) }}">
-                        &nbsp;{{ (i-(i/2)) }}&nbsp;
-                    </option>
+                    value="{{ (i-(i/2)) }}">&nbsp;{{ (i-(i/2)) }}&nbsp;</option>
                 {% endfor %}
             </select>
             <i id="score-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>

@@ -490,6 +490,9 @@ def update_element_season():
     # Compute the new time spent
     compute_time_spent(media=media[0], list_type=list_type, old_watched=old_watched, new_watched=new_watched)
 
+    # Commit the changes
+    db.session.commit()
+
     return '', 204
 
 
@@ -543,6 +546,9 @@ def update_element_episode():
 
     # Compute the new time spent
     compute_time_spent(media=media[0], old_watched=old_watched, new_watched=new_watched, list_type=list_type)
+
+    # Commit the changes
+    db.session.commit()
 
     return '', 204
 
@@ -672,7 +678,7 @@ def update_score():
 def update_playtime():
     try:
         json_data = request.get_json()
-        new_playtime = int(json_data['playtime'])*60
+        new_playtime = int(json_data['playtime'])*60        # To get minutes
         media_id = int(json_data['media_id'])
         media_list = json_data['media_type']
     except:
@@ -904,7 +910,6 @@ def add_element():
 
     # Set the last update
     set_last_update(media=media, media_type=list_type, new_status=new_status)
-    db.session.commit()
 
     # Compute the new time spent
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
@@ -913,6 +918,9 @@ def add_element():
         compute_time_spent(media=media, list_type=list_type, movie_status=new_status, movie_add=True)
     elif list_type == ListType.GAMES:
         compute_time_spent(media=media, list_type=list_type)
+
+    # Commit the last updates and the new time spent changes
+    db.session.commit()
 
     return '', 204
 

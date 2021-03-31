@@ -5,15 +5,7 @@ function addToUser(element_id, media_type) {
     let category;
     let $medialist = $('#your-medialist-data');
 
-    if (media_type === 'serieslist' || media_type === 'animelist') {
-        category = 'Watching'
-    }
-    else if (media_type === 'movieslist') {
-        category = 'Completed'
-    }
-    else if (media_type === 'gameslist') {
-        category = 'Completed'
-    }
+    category = media_type === 'serieslist' || media_type === 'animelist' ? 'Watching' : 'Completed';
 
     $medialist.addClass('disabled');
     $('#loading-add-list').hide();
@@ -61,6 +53,7 @@ function removeFromUser(element_id, media_type) {
                 $('#category-dropdown').val("Watching");
                 $('#season-dropdown').val("0");
                 $('#episode-dropdown').val("0");
+                $('#time-dropdown').val("0");
                 $('#rewatched-dropdown').val("0");
             }, 300);
         },
@@ -88,7 +81,6 @@ function addFavorite(element_id, media_type) {
         dataType: "json",
         success: function() {
             $('#fav-title').removeClass('disabled');
-
             if (favorite === true) {
                 $('#favorite').addClass('fas favorited').removeClass('far no-fav');
                 $('#add-fav').show('slow').delay(2000).fadeOut();
@@ -341,30 +333,6 @@ function updateCompletion(element_id) {
 }
 
 
-// --- Update score data --------------------------------------------------------------------------------
-function updateScore(element_id, score, media_list) {
-    $('#score-loading').show();
-    let value = score.options[score.selectedIndex].value;
-
-    $.ajax ({
-        type: "POST",
-        url: "/update_score",
-        contentType: "application/json",
-        data: JSON.stringify({score: value, element_id: element_id, element_type: media_list }),
-        dataType: "json",
-        success: function() {
-            $('#score-check').show().delay(1500).fadeOut();
-        },
-        error: function() {
-            error_ajax_message('Error updating the media score. Please try again later.');
-        },
-        complete: function () {
-            $('#score-loading').hide();
-        }
-    });
-}
-
-
 // --- Update time played -------------------------------------------------------------------------------
 function updatePlaytime(media_id, playtime) {
     $('#time-loading').show();
@@ -384,6 +352,30 @@ function updatePlaytime(media_id, playtime) {
         },
         complete: function () {
             $('#time-loading').hide();
+        }
+    });
+}
+
+
+// --- Update score data --------------------------------------------------------------------------------
+function updateScore(element_id, score, media_list) {
+    $('#score-loading').show();
+    let value = score.options[score.selectedIndex].value;
+
+    $.ajax ({
+        type: "POST",
+        url: "/update_score",
+        contentType: "application/json",
+        data: JSON.stringify({score: value, element_id: element_id, element_type: media_list }),
+        dataType: "json",
+        success: function() {
+            $('#score-check').show().delay(1500).fadeOut();
+        },
+        error: function() {
+            error_ajax_message('Error updating the media score. Please try again later.');
+        },
+        complete: function () {
+            $('#score-loading').hide();
         }
     });
 }
