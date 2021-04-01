@@ -10,7 +10,8 @@ from MyLists.main.media_object import MediaDetails
 from MyLists.general.functions import compute_media_time_spent
 from MyLists.models import Series, SeriesList, SeriesActors, SeriesGenre, SeriesNetwork, SeriesEpisodesPerSeason, \
     UserLastUpdate, Notifications, ListType, Anime, AnimeList, AnimeActors, AnimeGenre, AnimeNetwork, Status, Movies, \
-    AnimeEpisodesPerSeason, MoviesList, MoviesActors, MoviesGenre, GlobalStats, MyListsStats, User, RoleType
+    AnimeEpisodesPerSeason, MoviesList, MoviesActors, MoviesGenre, GlobalStats, MyListsStats, User, RoleType, Games, \
+    GamesList, GamesGenre, GamesPlatforms, GamesCompanies
 
 
 def remove_non_list_media():
@@ -74,6 +75,25 @@ def remove_non_list_media():
 
         app.logger.info('Removed movie with ID: [{}]'.format(deletion))
     app.logger.info('Total movies removed: {}'.format(count))
+
+    # Games remover
+    games = db.session.query(Games, GamesList).outerjoin(GamesList, GamesList.media_id == Games.id).all()
+    count = 0
+    to_delete = []
+    for game in games:
+        if not game[1]:
+            to_delete.append(game[0].id)
+    for deletion in to_delete:
+        Games.query.filter_by(id=deletion).delete()
+        GamesPlatforms.query.filter_by(media_id=deletion).delete()
+        GamesCompanies.query.filter_by(media_id=deletion).delete()
+        GamesGenre.query.filter_by(media_id=deletion).delete()
+        UserLastUpdate.query.filter_by(media_type=ListType.GAMES, media_id=deletion).delete()
+        Notifications.query.filter_by(media_type='gameslist', media_id=deletion).delete()
+        count += 1
+
+        app.logger.info('Removed game with ID: [{}]'.format(deletion))
+    app.logger.info('Total games removed: {}'.format(count))
 
     db.session.commit()
     app.logger.info('[SYSTEM] - Finished Automatic media remover')
@@ -143,6 +163,26 @@ def remove_old_covers():
             app.logger.info('Removed old movie cover with name: {}'.format(image))
             count += 1
     app.logger.info('Total old movies covers deleted: {}'.format(count))
+
+    # Games old cover remover
+    games = Games.query.all()
+    path_games_covers = Path(app.root_path, 'static/covers/games_covers/')
+
+    images_in_db = []
+    for game in games:
+        images_in_db.append(game.image_cover)
+
+    images_saved = []
+    for file in os.listdir(path_games_covers):
+        images_saved.append(file)
+
+    count = 0
+    for image in images_saved:
+        if image not in images_in_db and image != 'default.jpg':
+            os.remove('{0}/{1}'.format(path_games_covers, image))
+            app.logger.info('Removed old game cover with name: {}'.format(image))
+            count += 1
+    app.logger.info('Total old game covers deleted: {}'.format(count))
 
     app.logger.info('[SYSTEM] - Finished automatic covers remover')
     app.logger.info('###################################################################')

@@ -4,17 +4,13 @@
 function chargeButtons(card) {
     removeCat();
 
-    let dis_playing = "block;";
     let dis_completed = "block;";
     let dis_endless = "block;";
     let dis_multiplayer = "block;";
     let $card = $('#'+card.id);
     let category = $card.attr('cat');
 
-    if (category === 'Playing') {
-        dis_playing = "none;";
-    }
-    else if (category === 'Completed') {
+    if (category === 'Completed') {
         dis_completed = "none;";
     }
     else if (category === 'Endless') {
@@ -27,10 +23,6 @@ function chargeButtons(card) {
     $card.find('.view.overlay').prepend(
         '<a class="card-btn-top-right fas fa-times" onclick="removeCat()"></a>' +
         '<ul class="card-cat-buttons">' +
-            '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_playing+'" ' +
-            'onclick="changeCategory(\'Playing\', \''+card.id+'\')">' +
-                'Playing' +
-            '</li>' +
             '<li class="btn btn-light p-1 m-1 card-btn-mobile" style="display: '+dis_completed+'" ' +
             'onclick="changeCategory(\'Completed\', \''+card.id+'\')">' +
                 'Completed' +
@@ -90,10 +82,6 @@ function ChargeButtonsOther(card) {
         '<a class="card-btn-top-right fas fa-times" onclick="removeCat()"></a>' +
         '<ul class="card-cat-buttons">' +
             '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
-            'onclick="AddCatUser(\'Playing\', \''+card.id+'\')">' +
-                'Playing' +
-            '</li>' +
-            '<li class="btn btn-light p-1 m-1 card-btn-mobile\" style="display: block;" ' +
             'onclick="AddCatUser(\'Completed\', \''+card.id+'\')">' +
                 'Completed' +
             '</li>' +
@@ -116,16 +104,15 @@ function ChargeButtonsOther(card) {
 
 
 // --- Update time played --------------------------------------------------
-function updatePlaytime(media_id) {
+function updatePlaytime(media_id, playtime) {
     $('#'+media_id+'-time-loading').show();
-    let hours = $('#'+media_id+'-time_h').val();
-    let minutes = $('#'+media_id+'-time_m').val();
+    let value = playtime.options[playtime.selectedIndex].value;
 
     $.ajax ({
         type: "POST",
         url: "/update_playtime",
         contentType: "application/json",
-        data: JSON.stringify({hours: hours, min: minutes, media_id: media_id, media_type: 'gameslist' }),
+        data: JSON.stringify({playtime: value, media_id: media_id, media_type: 'gameslist' }),
         dataType: "json",
         success: function() {
             $('#'+media_id+'-time-check').show().delay(1500).fadeOut();
@@ -138,6 +125,7 @@ function updatePlaytime(media_id) {
         }
     });
 }
+
 
 
 // --- Update completion --------------------------------------------------

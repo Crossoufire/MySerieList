@@ -1,7 +1,7 @@
 from MyLists import db
 from MyLists.models import ListType, Series, Anime, SeriesGenre, AnimeGenre, AnimeActors, SeriesActors, Movies, \
     SeriesNetwork, AnimeNetwork, SeriesEpisodesPerSeason, AnimeEpisodesPerSeason, MoviesGenre, MoviesActors, \
-    GamesCompanies, GamesPlatforms, Games
+    GamesCompanies, GamesPlatforms, Games, GamesGenre
 
 
 class AddtoDB:
@@ -28,6 +28,10 @@ class AddtoDB:
             for genre in self.media_details['genres_data']:
                 genre.update({'media_id': self.media.id})
                 db.session.add(MoviesGenre(**genre))
+        elif self.list_type == ListType.GAMES:
+            for genre in self.media_details['genres_data']:
+                genre.update({'media_id': self.media.id})
+                db.session.add(GamesGenre(**genre))
 
     def add_actors_to_db(self):
         for actor in self.media_details['actors_data']:

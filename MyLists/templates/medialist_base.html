@@ -102,7 +102,8 @@
                                 <span class="font-mask text-center text-light">{{ item.display_name }}</span>
                             </a>
                             {% if category == 'Search' or category == 'All' %}
-                                <div class="bottom-card-cat{% if media_list =='movieslist' %}-movie {% endif %}">
+                                <div class="bottom-card-cat{% if media_list =='movieslist'
+                                 or media_list =='gameslist' %}-movie {% endif %}">
                                     {{ item.category }}</div>
                             {% endif %}
                             {% if user_id == current_user.get_id() %}
@@ -119,7 +120,8 @@
                                 {% endif %}
                             {% endif %}
                         </div>
-                        <div class="bottom-card-info{% if media_list =='movieslist' %}-movie {% endif %}">
+                        <div class="bottom-card-info{% if media_list =='movieslist'
+                         or media_list =='gameslist' %}-movie {% endif %}">
                             <div class="row no-gutters" style="opacity: 0.7;">
                                 <div class="col p-0">
                                     <a class="fa-heart {% if item.favorite %} fas favorited {% else %}
@@ -150,15 +152,25 @@
                                         '{{ item.id }}', false)"{% endif %}></a>
                                     {% endif %}
                                 </div>
-                                <div class="col" {% if item.category == 'Completed' %}style="display: block;"
-                                {% else %} style="display: none;"{% endif %}>
-                                    <a id="rew_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
-                                     disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this
-                                     media. Do not count the inital completion." onclick="rewatchDrop(this,
-                                     {{ item.id }}, '{{ media_list }}')">
-                                        {{ item.rewatched }}
+                                {% if media_list != 'gameslist' %}
+                                    <div class="col" {% if item.category == 'Completed' %}style="display: block;"
+                                    {% else %} style="display: none;"{% endif %}>
+                                        <a id="rew_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
+                                         disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this
+                                         media. Do not count the inital completion." onclick="rewatchDrop(this,
+                                         {{ item.id }}, '{{ media_list }}')">
+                                            {{ item.rewatched }}
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    <div class="col p-0">
+                                        <a id="play_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
+                                       disabled {% endif %}" data-toggle="tooltip" title="Playtime"
+                                       onclick="playtimeDrop(this, {{ item.id }})">
+                                        {{ item.playtime }}
                                     </a>
-                                </div>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         {% block seas_eps_drop scoped %}

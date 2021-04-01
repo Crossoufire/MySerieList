@@ -23,9 +23,7 @@
 
 
 {% block add_genres %}
-    {% set all_genres = ["All", "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama",
-    "Family", "Fantasy", "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "TV Movie", "Thriller",
-    "War", "Western"] %}
+    {% set all_genres = ["All", "Action", "Adventure", "Family", "Horror", "Music"] %}
     {% for ge in all_genres %}
         <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
          user_name=username, category=cat, genre=genre, sorting=sorting,
