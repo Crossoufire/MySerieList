@@ -279,6 +279,8 @@ class MediaListObj:
             self.last_episode_watched = media_data[1].last_episode_watched
             self.eps_per_season = [eps.episodes for eps in media_data[0].eps_per_season]
             self.current_season = media_data[1].current_season
+        elif list_type == ListType.GAMES:
+            self.playtime = media_data[1].playtime
 
 
 # Parsing the <API_data> to dict
@@ -376,9 +378,6 @@ class MediaDetails:
             for i in range(0, len(genres)):
                 genres_dict = {'genre': genres[i]['name']}
                 genres_list.append(genres_dict)
-        else:
-            genres_dict = {'genre': 'No genres found.'}
-            genres_list.append(genres_dict)
 
         themes = self.media_data.get('themes') or None
         themes_list = []
@@ -386,11 +385,12 @@ class MediaDetails:
             for i in range(0, len(themes)):
                 themes_dict = {'genre': themes[i]['name']}
                 themes_list.append(themes_dict)
-        else:
-            themes_dict = {'genre': 'No genres found.'}
-            themes_list.append(themes_dict)
 
         fusion_list = genres_list + themes_list
+
+        if len(fusion_list) == 0:
+            fusion_list.append({'genre': 'Unknown',
+                                'genre_id': 0})
 
         return fusion_list
 
@@ -543,7 +543,7 @@ class MediaDetails:
     def get_games_details(self):
         self.media_data = self.media_data[0]
         self.media_details = {'name': self.media_data.get('name', 'Unknown') or 'Unknown',
-                              'release_date': self.media_data.get('release_date', 'Unknown') or 'Unknown',
+                              'release_date': self.media_data.get('first_release_date', 'Unknown') or 'Unknown',
                               'IGDB_url': self.media_data.get('url', 'Unknown') or 'Unknown',
                               'vote_average': self.media_data.get('total_rating', 0) or 0,
                               'vote_count': self.media_data.get('total_rating_count', 0) or 0,
@@ -560,10 +560,17 @@ class MediaDetails:
         genres_list = self.get_games_genres()
         platforms_list = self.get_games_platforms()
 
+        # Get HLTB time
+        hltb_time = ApiData().HLTB_time(self.media_details['name'])
+        self.media_details['hltb_main_time'] = hltb_time['main']
+        self.media_details['hltb_main_and_extra_time'] = hltb_time['extra']
+        self.media_details['hltb_total_complete_time'] = hltb_time['completionist']
+
         self.all_data = {'games_data': self.media_details,
                          'companies_data': companies_list,
                          'genres_data': genres_list,
-                         'platforms_data': platforms_list}
+                         'platforms_data': platforms_list,
+                         'hltb_time': hltb_time}
 
     def get_media_details(self):
         if self.list_type == ListType.SERIES or self.list_type == ListType.ANIME:

@@ -23,15 +23,33 @@
 
 
 {% block add_genres %}
-    {% set all_genres = ["All", "Action", "Adventure", "Family", "Horror", "Music"] %}
+    {% set all_genres = ["All", "4X", "Action",  "Adventure", "Arcade", "Business", "Card Game", "Comedy", "Drama",
+    "Educational", "Erotic", "Fantasy", "Fighting","Hack and Slash", "Historical", "Horror", "Indie", "Kids", "MOBA",
+    "Music", "Mystery", "Non-fiction", "Open world", "Party", "Pinball", "Platform", "Point-and-click", "Puzzle",
+    "Quiz", "Racing", "Real Time Strategy (RTS)", "Role-playing (RPG)", "Romance", "Sandbox", "Science fiction",
+    "Shooter", "Simulator", "Sport", "Stealth", "Strategy", "Survival", "Tactical", "Thriller",
+    "Turn-based strategy (TBS)", "Visual Novel", "Warfare"] %}
     {% for ge in all_genres %}
         <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
-         user_name=username, category=cat, genre=genre, sorting=sorting,
+         user_name=username, category=category, genre=ge, sorting=sorting,
          page_val=1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
             <div>{{ ge }}</div>
         </a>
     {% endfor %}
 {% endblock add_genres %}
+
+
+{% block add_sort scoped %}
+    {% set all_sort = ['Playtime +', 'Playtime -', 'Title A-Z', 'Title Z-A', 'Score +', 'Score -', 'Score IGDB +',
+    'Score IGDB -', 'Comments','Release date +','Release date -'] %}
+    {% for so in all_sort %}
+        <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
+         user_name=username, category=category, genre=genre, sorting=so,
+         page_val=1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
+            <div>{{ so }}</div>
+        </a>
+    {% endfor %}
+{% endblock add_sort %}
 
 
 {% block data %}

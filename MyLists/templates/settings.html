@@ -35,8 +35,7 @@
 {#    {% endif %}#}
     <div class="row text-center m-t-60 m-b-60">
         <div class="col">
-            <h4><i class="fas fa-sliders-h"></i>&nbsp;&nbsp; General settings</h4>
-            <hr>
+            <h4><i class="fas fa-sliders-h"></i>&nbsp;&nbsp; General Settings</h4><hr>
             <form method="POST" action="" enctype="multipart/form-data">
                 {{ settings_form.hidden_tag() }}
                 <div class="m-t-30">
@@ -54,14 +53,14 @@
                     {% endfor %}
                 </div>
                 <div class="m-t-30">
-                    {{ settings_form.homepage.label }}: &nbsp&nbsp&nbsp {{ settings_form.homepage }}<br>
-                    {% for error in settings_form.homepage.errors %}
+                    {{ settings_form.isprivate.label }}: &nbsp;&nbsp;&nbsp; {{ settings_form.isprivate() }}<br>
+                    {% for error in settings_form.isprivate.errors %}
                         <span style="color: red;">{{ error }}</span>
                     {% endfor %}
                 </div>
                 <div class="m-t-30">
-                    {{ settings_form.isprivate.label }}: &nbsp&nbsp&nbsp {{ settings_form.isprivate() }}<br>
-                    {% for error in settings_form.isprivate.errors %}
+                    {{ settings_form.add_games.label }}: &nbsp;&nbsp;&nbsp; {{ settings_form.add_games() }}<br>
+                    {% for error in settings_form.add_games.errors %}
                         <span style="color: red;">{{ error }}</span>
                     {% endfor %}
                 </div>
@@ -86,7 +85,7 @@
         </div>
         <div class="vertical_line"></div>
         <div class="col">
-            <h4><i class="fas fa-unlock-alt"></i>&nbsp&nbsp Change your password</h4>
+            <h4><i class="fas fa-unlock-alt"></i>&nbsp;&nbsp; Change your password</h4>
             <hr>
             <form method="POST" action="" enctype="multipart/form-data">
                 {{ password_form.hidden_tag() }}

@@ -392,3 +392,14 @@ a {
     width: 60px;
     background-color: grey;
 }
+
+.hof-button {
+    background-color: #3b3434;
+    width: 100%;
+    margin: 0;
+    padding: 5px 0 5px 0;
+}
+
+.hof-button:hover {
+    color: wheat;
+}

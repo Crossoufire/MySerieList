@@ -5,7 +5,7 @@ from datetime import datetime
 from MyLists.API_data import ApiData
 from MyLists.main.add_db import AddtoDB
 from flask_login import login_required, current_user
-from MyLists.main.forms import EditMediaData, MediaComment, SearchForm
+from MyLists.main.forms import EditMediaData, MediaComment, SearchForm, SearchGameForm
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
 from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails, MediaListObj
@@ -20,7 +20,7 @@ bp = Blueprint('main', __name__)
 @bp.route("/<media_list>/<user_name>/<category>/", methods=['GET', 'POST'])
 @bp.route("/<media_list>/<user_name>/<category>/genre/<genre>/by/<sorting>/page/<page_val>", methods=['GET', 'POST'])
 @login_required
-def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', sorting='Title A-Z', page_val=1):
+def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', sorting=None, page_val=1):
     # Check if <media_list> is valid
     try:
         list_type = ListType(media_list)
@@ -39,6 +39,13 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
     # Recover the query if it exists
     q = request.args.get('q')
 
+    # Recover the sorting
+    if not sorting:
+        if list_type == ListType.GAMES:
+            sorting = 'Playtime +'
+        else:
+            sorting = 'Title A-Z'
+
     # Recover the template
     html_template = 'medialist_tv.html'
     if list_type == ListType.MOVIES:
@@ -46,10 +53,10 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
         if category == Status.WATCHING:
             category = Status.COMPLETED
     elif list_type == ListType.GAMES:
+        search_form = SearchGameForm()
         html_template = 'medialist_games.html'
         if category == Status.WATCHING:
             category = Status.COMPLETED
-        sorting = 'Playtime +'
 
     # Retrieve the corresponding media_data
     query, category = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
@@ -70,7 +77,7 @@ def mymedialist(media_list, user_name, category=Status.WATCHING, genre='All', so
     return render_template(html_template, title="{}'s {}".format(user_name, media_list), username=user_name,
                            user_id=str(user.id), media_list=media_list, search_form=search_form, search_q=q,
                            common_elements=common_elements, media_items=items_data_list, category=category,
-                           genre=genre, sorting=sorting, page=page_val, info_pages=info_pages)
+                           genre=genre, sorting=sorting, page=page_val, info_pages=info_pages, user=user)
 
 
 @bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
@@ -80,7 +87,7 @@ def write_comment(media_type, media_id):
     try:
         media_type = MediaType(media_type)
     except ValueError:
-        abort(404)
+        abort(400)
 
     if media_type == MediaType.SERIES:
         list_type = ListType.SERIES
@@ -124,7 +131,7 @@ def media_sheet(media_type, media_id):
     try:
         media_type = MediaType(media_type)
     except ValueError:
-        abort(404)
+        abort(400)
 
     if media_type == MediaType.SERIES:
         list_type = ListType.SERIES
@@ -378,6 +385,7 @@ def search_media():
     if not search or len(search) == 0:
         return redirect(request.referrer)
 
+    # Get the series, anime and movies results
     try:
         data_search = ApiData().TMDb_search(search, page=page)
     except Exception as e:
@@ -389,7 +397,7 @@ def search_media():
         flash('Sorry, no results found for your query.', 'warning')
         return redirect(request.referrer)
 
-    # Recover 1 page of results (20 max) without peoples
+    # Recover 1 page of results (20 max, series, anime, movies) without peoples
     media_results = []
     for result in data_search["results"]:
         if result.get('known_for_department'):
@@ -430,6 +438,38 @@ def search_media():
             if result['original_language'] == 'ja' and 16 in result['genre_ids']:
                 media_data['name'] = result['title']
             media_results.append(media_data)
+
+    games_results = []
+    if current_user.add_games:
+        # Get the games results
+        try:
+            games_data = ApiData().IGDB_search(search)
+        except Exception as e:
+            games_data = {}
+            app.logger.error('[ERROR] - Requesting the IGDB API: {}'.format(e))
+            flash('Sorry, an error occured, the IGDB API is unreachable for now.', 'warning')
+
+        # Recover the games results
+        if len(games_data) > 0:
+            for result in games_data:
+                media_data = {'name': result.get('name'),
+                              'overview': result.get('storyline'),
+                              'first_air_date': change_air_format(result.get('first_release_date'), games=True),
+                              'api_id': result.get('id'),
+                              'poster_path': url_for('static', filename="covers/games_covers/default.jpg")}
+
+                # Recover the poster_path or take a default image
+                if result.get('cover'):
+                    igdb_cover_link = "https://images.igdb.com/igdb/image/upload/t_1080p/"
+                    media_data['poster_path'] = "{}{}.jpg".format(igdb_cover_link, result['cover']['image_id'])
+
+                # Put data in different lists in function of media type
+                media_data['media'] = 'Games'
+                media_data['media_type'] = ListType.GAMES.value
+
+                games_results.append(media_data)
+
+    media_results += games_results
 
     return render_template("media_search.html", title="Search", all_results=media_results, search=search,
                            page=int(page), total_results=data_search['total_results'])
@@ -586,10 +626,11 @@ def change_element_category():
     # Set the new status
     media[1].status = new_status
 
-    # Get the old rewatched
-    old_rewatch = media[1].rewatched
-    # Reset the rewatched time multiplier
-    media[1].rewatched = 0
+    if list_type != ListType.GAMES:
+        # Get the old rewatched
+        old_rewatch = media[1].rewatched
+        # Reset the rewatched time multiplier
+        media[1].rewatched = 0
 
     # Set and change accordingly <last_episode_watched>, <current_season> and <eps_watched> for anime and series
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
@@ -705,36 +746,6 @@ def update_playtime():
     compute_time_spent(media=media[0], list_type=list_type, old_gametime=old_playtime, new_gametime=new_playtime)
 
     # Commit the changes
-    db.session.commit()
-
-    return '', 204
-
-
-@bp.route('/update_completion', methods=['POST'])
-@login_required
-def update_completion():
-    try:
-        json_data = request.get_json()
-        media_id = int(json_data['element_id'])
-        media_list = json_data['media_list']
-        completion = bool(json_data['data'])
-    except:
-        return '', 400
-
-    # Check if the <media_list> exist and is valid
-    try:
-        list_type = ListType(media_list)
-    except ValueError:
-        return '', 400
-
-    # Check if the <media_id> is in the current user's list
-    media = GamesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
-
-    if not media:
-        return '', 400
-
-    # Add <completion> and commit the changes
-    media.completion = completion
     db.session.commit()
 
     return '', 204
@@ -1038,19 +1049,20 @@ def autocomplete():
                 continue
             media_results.append(Autocomplete(result).get_autocomplete_dict())
 
-    # Get the games results
-    try:
-        games_data = ApiData().IGDB_search(search)
-    except Exception as e:
-        games_data = {}
-        app.logger.error('[ERROR] - Requesting the IGDB API: {}'.format(e))
-
     games_results = []
-    if len(games_data) > 0:
-        for result in games_data:
-            if len(games_results) >= 5:
-                break
-            games_results.append(Autocomplete(result).get_games_autocomplete_dict())
+    if current_user.add_games:
+        # Get the games results
+        try:
+            games_data = ApiData().IGDB_search(search)
+        except Exception as e:
+            games_data = {}
+            app.logger.error('[ERROR] - Requesting the IGDB API: {}'.format(e))
+
+        if len(games_data) > 0:
+            for result in games_data:
+                if len(games_results) >= 5:
+                    break
+                games_results.append(Autocomplete(result).get_games_autocomplete_dict())
 
     # Create the <total_results> list
     total_results = media_results + users_results + games_results

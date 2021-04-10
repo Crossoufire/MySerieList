@@ -35,15 +35,15 @@ hr {
 
 .form-control {
     background: transparent;
-    border-radius: 8px;
+    border-radius: 3px;
     border: 1px solid darkgray;
     color: #fff;
-    width: 25vmin !important;
+    width: 30vmin !important;
 }
 
 .form-control:focus {
     background: transparent;
-    border-radius: 8px;
+    border-radius: 3px;
     border: 1px solid darkgray;
     color: #fff;
 }
@@ -201,6 +201,13 @@ hr {
 .ui-menu-item .ui-menu-item-wrapper.ui-state-active {
     background: #131418 !important;
     border: solid grey 1px;
+}
+
+.ui-autocomplete {
+    max-height: 600px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 999;
 }
 
 .ui-autocomplete-category {
@@ -778,11 +785,11 @@ hr {
 .right-series {border-right: solid 3px #216e7d;}
 .right-anime {border-right: solid 3px #945141;}
 .right-movies {border-right: solid 3px #8c7821;}
-.right-games {border-right: solid 1px #196219;}
+.right-games {border-right: solid 3px #196219;}
 .left-series {border-left: solid 3px #216e7d;}
 .left-anime {border-left: solid 3px #945141;}
 .left-movies {border-left: solid 3px #8c7821;}
-.left-games {border-left: solid 1px #196219;}
+.left-games {border-left: solid 3px #196219;}
 
 /* --- Shape -------------------------------------------- */
 .dis-inline {display: inline;}

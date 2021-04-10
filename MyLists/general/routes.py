@@ -9,7 +9,6 @@ from MyLists.models import User, RoleType, MyListsStats
 from flask import render_template, flash, request, abort
 from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
     refresh_db_frames, refresh_db_badges, refresh_db_ranks
-from MyLists.scheduled_tasks import update_Mylists_stats
 
 bp = Blueprint('general', __name__)
 
@@ -50,10 +49,7 @@ def create_first_data():
     refresh_db_ranks()
 
     compute_media_time_spent()
-    # update_Mylists_stats()
     # correct_orphan_media()
-    # add_hltb_time()
-    # add_manual_games()
     db.session.commit()
 
 

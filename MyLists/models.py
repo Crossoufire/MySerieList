@@ -88,6 +88,7 @@ class User(UserMixin, db.Model):
     anime_views = db.Column(db.Integer, nullable=False, default=0)
     movies_views = db.Column(db.Integer, nullable=False, default=0)
     games_views = db.Column(db.Integer, nullable=False, default=0)
+    add_games = db.Column(db.Boolean, nullable=False, default=False)
     biography = db.Column(db.Text)
     transition_email = db.Column(db.String(120))
     activated_on = db.Column(db.DateTime)
@@ -481,9 +482,9 @@ class Games(MediaMixin, db.Model):
     storyline = db.Column(db.Text)
     summary = db.Column(db.Text)
     IGDB_url = db.Column(db.String(200))
-    hltb_main_time = db.Column(db.Float)
-    hltb_main_and_extra_time = db.Column(db.Float)
-    hltb_total_complete_time = db.Column(db.Float)
+    hltb_main_time = db.Column(db.String(20))
+    hltb_main_and_extra_time = db.Column(db.String(20))
+    hltb_total_complete_time = db.Column(db.String(20))
     steam_id = db.Column(db.Integer)
     igdb_id = db.Column(db.Integer, nullable=False)
     lock_status = db.Column(db.Boolean, default=1)
@@ -677,32 +678,41 @@ def get_media_query(user_id, list_type, category, genre, sorting, page, q):
     if list_type != ListType.GAMES:
         media_actors = eval(list_type.value.capitalize().replace('list', 'Actors'))
     else:
-        media_actors = eval(list_type.value.capitalize().replace('list', 'Platforms'))
+        media_actors = eval(list_type.value.capitalize().replace('list', 'Companies'))
 
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
         add_sort = {'Release date +': media.first_air_date.desc(),
                     'Release date -': media.first_air_date.asc(),
-                    'Rewatch': media_list.rewatched.desc()}
+                    'Rewatch': media_list.rewatched.desc(),
+                    'Score TMDB +': media.vote_average.desc(),
+                    'Score TMDB -': media.vote_average.asc()}
     elif list_type == ListType.MOVIES:
         add_sort = {'Release date +': media.release_date.desc(),
                     'Release date -': media.release_date.asc(),
-                    'Rewatch': media_list.rewatched.desc()}
+                    'Rewatch': media_list.rewatched.desc(),
+                    'Score TMDB +': media.vote_average.desc(),
+                    'Score TMDB -': media.vote_average.asc()}
     elif list_type == ListType.GAMES:
         add_sort = {'Release date +': media.release_date.desc(),
                     'Release date -': media.release_date.asc(),
                     'Playtime +': media_list.playtime.desc(),
-                    'Playtime -': media_list.playtime.asc()}
+                    'Playtime -': media_list.playtime.asc(),
+                    'Score IGDB +': media.vote_average.desc(),
+                    'Score IGDB -': media.vote_average.asc()}
 
     # Create a sorting dict
     sorting_dict = {'Title A-Z': media.name.asc(),
                     'Title Z-A': media.name.desc(),
-                    'Score TMDb +': media.vote_average.desc(),
-                    'Score TMDb -': media.vote_average.asc(),
                     'Score +': media_list.score.desc(),
                     'Score -': media_list.score.asc(),
-                    'Comments': media_list.comment.desc(),}
+                    'Comments': media_list.comment.desc()}
     sorting_dict.update(add_sort)
-    sorting = sorting_dict[sorting]
+
+    # Check the sorting value
+    try:
+        sorting = sorting_dict[sorting]
+    except KeyError:
+        abort(400)
 
     # Check the category
     try:
@@ -737,12 +747,15 @@ def get_media_query(user_id, list_type, category, genre, sorting, page, q):
     elif category == Status.FAVORITE:
         query = query.filter(media_list.favorite)
     elif category == Status.SEARCH:
-        if list_type != ListType.MOVIES:
+        if list_type == ListType.SERIES or list_type == ListType.ANIME:
             query = query.filter(or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'),
                                      media.original_name.like('%' + q + '%')))
-        else:
+        elif list_type == ListType.MOVIES:
             query = query.filter(or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'),
                                      media.director_name.like('%' + q + '%'), media.original_name.like('%' + q + '%')))
+        elif list_type == ListType.GAMES:
+            query = query.filter(or_(media.name.like('%' + q + '%'),
+                                     media_actors.name.like('%' + q + '%')))
 
     # Run the query
     results = query.group_by(media.id).order_by(sorting).paginate(int(page), 48, error_out=True)
@@ -832,3 +845,5 @@ def check_media(media_id, list_type, add=False):
             .filter(media.id == media_id, media_list.user_id == current_user.id).first()
 
     return query
+
+

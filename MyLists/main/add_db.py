@@ -30,6 +30,14 @@ class AddtoDB:
                 db.session.add(MoviesGenre(**genre))
         elif self.list_type == ListType.GAMES:
             for genre in self.media_details['genres_data']:
+                if genre['genre'] == '4X (explore, expand, exploit, and exterminate)':
+                    genre['genre'] = '4X'
+                elif genre['genre'] == "Hack and slash/Beat 'em up":
+                    genre['genre'] = 'Hack and Slash'
+                elif genre['genre'] == "Card & Board Game":
+                    genre['genre'] = 'Card Game'
+                elif genre['genre'] == "Quiz/Trivia":
+                    genre['genre'] = 'Quiz'
                 genre.update({'media_id': self.media.id})
                 db.session.add(GamesGenre(**genre))
 

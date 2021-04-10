@@ -3,20 +3,17 @@ from flask_wtf import FlaskForm
 from MyLists.models import User
 from flask_login import current_user
 from flask_wtf.file import FileField, FileAllowed
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField
 
 
 class UpdateAccountForm(FlaskForm):
-    biography = TextAreaField('Biography', validators=[Length(max=200)])
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=15)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     picture = FileField('Profile picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
     back_picture = FileField('Background picture', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
     isprivate = BooleanField('Private mode')
-    steamID = StringField('SteamID')
-    homepage = SelectField('Default homepage', choices=[('serieslist', 'SeriesList'), ('animelist', 'AnimeList'),
-                                                        ('movieslist', 'MoviesList'), ('account', 'Account')])
+    add_games = BooleanField('Activate the GamesList')
     submit_account = SubmitField('Update account')
 
     def validate_username(self, username):

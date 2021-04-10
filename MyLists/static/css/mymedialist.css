@@ -490,3 +490,16 @@ input[type=number] {
     bottom: -24px;
     right: 0;
 }
+
+
+/* --- Games dropdown ---------------------------------------------- */
+.playtime-drop {
+	cursor: pointer;
+    background: transparent;
+    border: none;
+    color: lightgrey;
+}
+
+.playtime-drop:focus {
+    outline: none;
+}

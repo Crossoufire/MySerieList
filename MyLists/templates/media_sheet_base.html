@@ -96,7 +96,7 @@
                     <div class="col-lg-5 col-md-12 col-sm-12">
                         {% block more_info scoped %}
                         {% endblock more_info %}
-                        <h4><i class="fas fa-thumbs-up m-t-30"></i>&nbsp;&nbsp; <b>Similar genres</b></h4><hr>
+                        <h4><i class="fas fa-thumbs-up m-t-30"></i>&nbsp;&nbsp; <b>Similar Genres</b></h4><hr>
                         {% for sim_genre in data['same_genres'] %}
                             <a class="m-r-10" href="{{ url_for('main.media_sheet', media_type=data['media_type'],
                             media_id=sim_genre[0].id) }}">
@@ -148,9 +148,10 @@
                                 {% if follow[1].status.value == 'Completed' and media_list != 'gameslist' %}
                                     <i class="fas fas-sm fa-redo"></i>
                                     <b>&nbsp;Re-watched:&nbsp; {{ follow[1].rewatched }}</b>
-                                {% elif follow[1].status.value == 'Completed' and media_list == 'gameslist' %}
-                                    <i class="fas fas-sm fa-medal"></i>
-                                    <b>&nbsp;Completion:&nbsp; {{ follow[1].completion }}</b>
+                                {% endif %}
+                                {% if media_list == 'gameslist' %}
+                                    <i class="fas fas-sm fa-hourglass"></i>
+                                    <b>&nbsp;Playtime:&nbsp; {{ (follow[1].playtime/60)|int }} hours</b>
                                 {% endif %}
                                 {% if follow[1].comment %}
                                     <div class="m-t-10"><b>Comment:</b></div>

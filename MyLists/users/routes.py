@@ -45,7 +45,7 @@ def account(user_name):
 
     return render_template('account.html', title=user.username+"'s account", header_data=header_data,
                            user_data=user_data, favorites=favorites, media_data=media_data, follows_list=follows_list,
-                           follows_update_list=follows_update_list)
+                           follows_update_list=follows_update_list, user=user)
 
 
 @bp.route("/account/more_stats/<user_name>", methods=['GET', 'POST'])
@@ -89,7 +89,8 @@ def hall_of_fame():
                      "movies_data": movies_level,
                      "games_data": games_level,
                      'knowledge_frame': knowledge_frame,
-                     'current_user': False}
+                     'current_user': False,
+                     'add_games': user.add_games}
 
         if user.id == current_user.id:
             user_data["current_user"] = True

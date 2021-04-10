@@ -11,10 +11,10 @@ const games_active = $('#games');
 let somme = series.length + anime.length + movies.length + games.length;
 
 all.html('All &nbsp; (' + somme + ')');
-series_active.html('Series &nbsp; (' + series.length + ')');
-anime_active.html('Anime &nbsp; (' + anime.length + ')');
-movies_active.html('Movies &nbsp; (' + movies.length + ')');
-games_active.html('Games &nbsp; (' + games.length + ')');
+series_active.html('Series &nbsp; ('+ series.length +')');
+anime_active.html('Anime &nbsp; ('+ anime.length +')');
+movies_active.html('Movies &nbsp; ('+ movies.length +')');
+games_active.html('Games &nbsp; ('+ games.length +')');
 
 function show_results(media) {
     if (media === 'series') {
@@ -77,7 +77,7 @@ function show_results(media) {
         movies.hide();
         games.show();
 
-        if (movies.length === 0) {
+        if (games.length === 0) {
             remove_and_add('games')
         } else {
             $("#texti").remove();

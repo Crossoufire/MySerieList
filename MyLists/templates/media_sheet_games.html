@@ -22,11 +22,14 @@
             <label for="time-dropdown"></label>
             <select id="time-dropdown" class="text-light text-center cat-drop"
              onchange="updatePlaytime('{{ data['id'] }}', this)">
+                {% set play_drop = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 125, 150, 175,
+                200, 225, 250, 275, 300, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000, 1500, 2000, 2500, 3000,
+                4000, 5000, 6000, 7000, 8000, 9000, 10000] %}
                 <option {% if data['playtime'] == None or data['playtime'] == 0 %}selected="selected" {% endif %}
-                 value="0">&nbsp;0&nbsp;</option>
-                {% for i in range(0, 31) %}
-                    <option {% if i == data['playtime'] %} selected="selected" {% endif %}
-                    value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
+                 value="0">&nbsp;0&nbsp;h</option>
+                {% for val in play_drop %}
+                    <option {% if val == data['playtime']/60|int %} selected="selected" {% endif %}
+                    value="{{ val }}">&nbsp;{{ val }}&nbsp;h</option>
                 {% endfor %}
             </select>
             <i id="time-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
@@ -34,20 +37,12 @@
         </div>
     </div>
     <div class="m-l-25 m-r-35 m-t-8 m-b-8" style="border: 1px solid grey;"></div>
-    <div id="comp-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="100% completion?">
-        <div class="col-4"><b>100%</b></div>
-        <div class="col-8">
-            <input type="checkbox" name="comp-check" class="m-l-12" onchange="updateCompletion('{{ data['id'] }}')"
-            {% if data['completion'] == True %}checked{% endif %}/>
-            <i id="comp-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
-            &nbsp;<i id="comp-check" class="fas fa-check" style="display: none;"></i>
-        </div>
-    </div>
     <div id="score-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="Score /10">
         <div class="col-4"><b>Score:</b></div>
         <div class="col-8">
+            <label for="score-dropdown"></label>
             <select id="score-dropdown" class="text-light text-center cat-drop"
-            onchange="updateScore('{{ data['id'] }}', this, '{{ media_list }}')">
+             onchange="updateScore('{{ data['id'] }}', this, '{{ media_list }}')">
                 <option {% if data['score'] == None or data['score'] == -1 %} selected="selected"
                 {% endif %}value="---">&nbsp;---&nbsp;</option>
                 {% for i in range(0, 21) %}
@@ -67,7 +62,7 @@
         <ul class="list-unstyled">
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-star"></i><b>&nbsp; IGDB Score</b></h5>
-                <i class="fas fa-scroll fa-3x media-ticket" value="{{ data['vote_average']|int }}"></i>
+                <i class="fas fa-scroll fa-3x media-ticket" value="{{ data['vote_average']/10|int }}"></i>
                 <div class="game-vote-average">{{ data['vote_average']|int }}</div>
                 <div class="movie-vote-count">({{ data['vote_count']|int }} votes)</div>
             </li>
@@ -121,35 +116,33 @@
 
 
 {% block more_info %}
-    <h4><i class="fas fa-hourglass"></i>&nbsp;&nbsp; <b>HLTB data</b></h4><hr>
-    <ul class="text-left p-0">
-        <li class="m-b-10">
-            <div class="row">
-                <div class="col-5"><b>Main game</b></div>
-                <div class="col-7">
-                    {% if not data['hltb_main'] %}
-                        <i>No data.</i>
-                    {% else %}
-                        {{ (data['hltb_main']/60)|int }} h
-                    {% endif %}
-                </div>
-                <div class="col-5"><b>Main + Extra</b></div>
-                <div class="col-7">
-                     {% if not data['hltb_main'] %}
-                        <i>No data.</i>
-                    {% else %}
-                        {{ (data['hltb_main_extra']/60)|int }} h
-                    {% endif %}
-                </div>
-                <div class="col-5"><b>100%</b></div>
-                <div class="col-7">
-                    {% if not data['hltb_main'] %}
-                        <i>No data.</i>
-                    {% else %}
-                        {{ (data['hltb_complete']/60)|int }} h
-                    {% endif %}
-                </div>
-            </div>
-        </li>
-    </ul>
+    <h4 data-toggle="tooltip" title="HowLongToBeat Time in hours">
+        <i class="fas fa-hourglass"></i>&nbsp;&nbsp; <b>HLTB Time [h]</b>
+    </h4><hr>
+    <div class="d-flex flex-wrap" style="justify-content: space-evenly;">
+        <div class="game-box text-center" style="background-color: slategrey;">
+            <div class="p-t-5"><b>MAIN</b></div>
+            {% if not data['hltb_main'] %}
+                <div class="fs-17"><b>-</b></div>
+            {% else %}
+                <div class="fs-17"><b>{{ data['hltb_main'] }}</b></div>
+            {% endif %}
+        </div>
+        <div class="game-box text-center" style="background-color: dimgrey;">
+            <div class="p-t-5"><b>EXTRA</b></div>
+            {% if not data['hltb_main_extra'] %}
+                <div class="fs-17"><b>-</b></div>
+            {% else %}
+                <div class="fs-17"><b>{{ data['hltb_main_extra'] }}</b></div>
+            {% endif %}
+        </div>
+        <div class="game-box text-center" style="background-color: darkslategrey;">
+            <div class="p-t-5"><b>TOTAL</b></div>
+            {% if not data['hltb_complete'] %}
+                <div class="fs-17"><b>-</b></div>
+            {% else %}
+                <div class="fs-17"><b>{{ data['hltb_complete'] }}</b></div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock more_info %}

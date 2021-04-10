@@ -10,6 +10,8 @@
             hr {border-top: 1px solid #945141;}
         {% elif media_list == 'movieslist' %}
             hr {border-top: 1px solid #8c7821;}
+        {% elif media_list == 'gameslist' %}
+            hr {border-top: 1px solid #196219;}
         {% endif %}
     </style>
 {% endblock css %}
@@ -73,15 +75,8 @@
             <li class="nav-item dropdown li-genre-sort text-grey">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Sort {{ sorting|upper }}</b></a>
                 <div class="dropdown-menu sort-drop">
-                    {% set all_sort = ['Title A-Z','Title Z-A','Score +','Score -','Score TMDb +','Score TMDb -',
-                    'Comments','Rewatch','Release date +','Release date -'] %}
-                    {% for so in all_sort %}
-                        <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
-                         user_name=username, category=category, genre=genre, sorting=so,
-                         page_val=1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
-                            <div>{{ so }}</div>
-                        </a>
-                    {% endfor %}
+                    {% block add_sort scoped %}
+                    {% endblock add_sort %}
                 </div>
             </li>
         </div>
@@ -102,8 +97,7 @@
                                 <span class="font-mask text-center text-light">{{ item.display_name }}</span>
                             </a>
                             {% if category == 'Search' or category == 'All' %}
-                                <div class="bottom-card-cat{% if media_list =='movieslist'
-                                 or media_list =='gameslist' %}-movie {% endif %}">
+                                <div class="bottom-card-cat{% if media_list =='movieslist' %}-movie {% endif %}">
                                     {{ item.category }}</div>
                             {% endif %}
                             {% if user_id == current_user.get_id() %}
@@ -120,8 +114,7 @@
                                 {% endif %}
                             {% endif %}
                         </div>
-                        <div class="bottom-card-info{% if media_list =='movieslist'
-                         or media_list =='gameslist' %}-movie {% endif %}">
+                        <div class="bottom-card-info{% if media_list =='movieslist' %}-movie {% endif %}">
                             <div class="row no-gutters" style="opacity: 0.7;">
                                 <div class="col p-0">
                                     <a class="fa-heart {% if item.favorite %} fas favorited {% else %}
@@ -154,7 +147,7 @@
                                 </div>
                                 {% if media_list != 'gameslist' %}
                                     <div class="col" {% if item.category == 'Completed' %}style="display: block;"
-                                    {% else %} style="display: none;"{% endif %}>
+                                     {% else %} style="display: none;"{% endif %}>
                                         <a id="rew_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
                                          disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this
                                          media. Do not count the inital completion." onclick="rewatchDrop(this,
@@ -162,19 +155,21 @@
                                             {{ item.rewatched }}
                                         </a>
                                     </div>
-                                {% else %}
-                                    <div class="col p-0">
-                                        <a id="play_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
-                                       disabled {% endif %}" data-toggle="tooltip" title="Playtime"
-                                       onclick="playtimeDrop(this, {{ item.id }})">
-                                        {{ item.playtime }}
-                                    </a>
-                                    </div>
                                 {% endif %}
                             </div>
                         </div>
                         {% block seas_eps_drop scoped %}
                         {% endblock seas_eps_drop %}
+                        {% if media_list == 'gameslist' %}
+                            <div class="seas-eps-drop-container {% if user_id != current_user.get_id() %}
+                             disabled {% endif %}">
+                                <a id="play_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
+                                 disabled {% endif %}" data-toggle="tooltip" title="Update playtime"
+                                 onclick="playtimeDrop(this, {{ item.id }})">
+                                    {{ (item.playtime/60)|int }} hours
+                                </a>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}

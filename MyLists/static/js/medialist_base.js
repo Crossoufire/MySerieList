@@ -287,22 +287,25 @@ function playtimeDrop(playtime, data_id) {
     let playtime_value = $(playtime).text();
     let drop = document.createElement("select");
     let option = document.createElement("option");
-    let i;
 
     $(playtime).hide();
+
+    const play_drop = [0, 2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 125, 150, 175,
+    200, 225, 250, 275, 300, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000, 1500, 2000, 2500, 3000,
+    4000, 5000, 6000, 7000, 8000, 9000, 10000];
 
     drop.className = "playtime-drop";
     drop.setAttribute('values', ''+data_id);
     option.className = "seas-eps-drop-options";
 
-    for (i = 0; i < 11; i++) {
+    for (let val of play_drop) {
         let option = document.createElement("option");
         option.className = "seas-eps-drop-options";
-        option.value = "" + i;
-        if (i === parseInt(playtime_value)) {
+        option.value = "" + val;
+        if (val === parseInt(playtime_value)) {
             option.selected = true;
         }
-        option.text = "" + i;
+        option.text = "" + val + " hours";
         drop.appendChild(option);
     }
 
@@ -316,17 +319,24 @@ $(document).on('change focusout', '.playtime-drop', function(event) {
     let value = parseInt(this.value);
     let media_id = $(this).attr('values').split(',')[0];
     let $play_div = $('#play_'+media_id);
+    let check_img = $('<div style="position: absolute; z-index: 200; top: 65%; width: 100%;' +
+                    'background-color: black; opacity: 0.60;">' +
+                    '<div class="central-loading fas fa-2x fa-check" style="color: green;"></div>' +
+                    '</div>');
 
     if (event.type === 'change') {
         $.ajax ({
             type: "POST",
             url: "/update_playtime",
             contentType: "application/json",
-            data: JSON.stringify({playtime: value, element_id: media_id, element_type: 'gameslist'}),
+            data: JSON.stringify({playtime: value, media_id: media_id, media_type: 'gameslist'}),
             dataType: "json",
             success: function() {
-                $play_div.text(value).show();
+                $play_div.text(value + ' hours').show();
                 $(this).remove();
+                check_img.prependTo($('#card_'+media_id).find('.view.overlay'));
+                check_img.delay(800).fadeOut(300, function() { this.remove(); });
+
             },
             error: function () {
                 error_ajax_message('Error trying to change the game playtime value. Please try again later.')
@@ -334,7 +344,7 @@ $(document).on('change focusout', '.playtime-drop', function(event) {
         });
     }
 
-    $rew_div.text(value).show();
+    $play_div.text(value + ' hours').show();
     this.remove();
 });
 

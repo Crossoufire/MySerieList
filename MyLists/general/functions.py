@@ -1,4 +1,6 @@
 import json
+import time
+
 import requests
 from pathlib import Path
 from MyLists import db, app
@@ -239,58 +241,72 @@ def add_hltb_time():
             if game.name == htlb_game[1]:
                 print(game.name)
                 try:
-                    game.hltb_main_time = float(htlb_game[2])*60
+                    first = htlb_game[2].split('.')[0]
+                    virgule = htlb_game[2].split('.')[1]
+                    if virgule == '5':
+                        game.hltb_main_time = first+'½'
+                    else:
+                        game.hltb_main_time = first
                 except:
                     pass
                 try:
-                    game.hltb_main_and_extra_time = float(htlb_game[3])*60
+                    first = htlb_game[3].split('.')[0]
+                    virgule = htlb_game[3].split('.')[1]
+                    if virgule == '5':
+                        game.hltb_main_and_extra_time = first + '½'
+                    else:
+                        game.hltb_main_and_extra_time = first
                 except:
                     pass
                 try:
-                    game.hltb_total_complete_time = float(htlb_game[4])*60
+                    first = htlb_game[4].split('.')[0]
+                    virgule = htlb_game[4].split('.')[1]
+                    if virgule == '5':
+                        game.hltb_total_complete_time = first + '½'
+                    else:
+                        game.hltb_total_complete_time = first
                 except:
                     pass
-                db.session.commit()
+
+    db.session.commit()
 
 
 def add_manual_games():
     headers = {'Client-ID': '5i5pi21s0ninkmp6jj09ix4l6fw5bd',
-               'Authorization': 'Bearer ' + '46gsxkz0svtqzujd4znmjqilhq0xa5'}
+               'Authorization': 'Bearer ' + '3chy3hiswzh9qf97qhbe3xacue7i41'}
 
     list_all_manual_games = []
-    path = Path(app.root_path, 'static/csv_data/amazon_games.csv')
-    with open(path, encoding='utf-8') as fp:
+    path = Path(app.root_path, 'static/csv_data/OUI.csv')
+    with open(path) as fp:
         for line in fp:
-            list_all_manual_games.append(line.strip())
+            list_all_manual_games.append(line.split(';'))
 
-    all_games = Games.query.all()
-    all_games_name = [x.name for x in all_games]
     for game in list_all_manual_games:
-        if game in all_games_name:
-            continue
-        else:
-            try:
-                body = 'fields name, cover.image_id, collection.name, game_engines.name, game_modes.name, ' \
-                       'platforms.name, genres.name, player_perspectives.name, total_rating, total_rating_count, ' \
-                       'first_release_date, involved_companies.company.name, involved_companies.developer, ' \
-                       'involved_companies.publisher, storyline, summary, themes.name, url, external_games.uid,' \
-                       ' external_games.category; where name="{}";'.format(game)
+        try:
+            time.sleep(0.3)
+            body = 'fields name, cover.image_id, collection.name, game_engines.name, game_modes.name, ' \
+                   'platforms.name, genres.name, player_perspectives.name, total_rating, total_rating_count, ' \
+                   'first_release_date, involved_companies.company.name, involved_companies.developer, ' \
+                   'involved_companies.publisher, storyline, summary, themes.name, url, external_games.uid,' \
+                   ' external_games.category; where name="{}";'.format(game[0])
 
-                response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers)
-                data = json.loads(response.text)
+            response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers)
+            data = json.loads(response.text)
 
-                media_details = MediaDetails(data, ListType.GAMES).get_media_details()
-                media = AddtoDB(media_details, ListType.GAMES).add_media_to_db()
+            media_details = MediaDetails(data, ListType.GAMES).get_media_details()
+            media = AddtoDB(media_details, ListType.GAMES).add_media_to_db()
 
-                in_user_list = GamesList.query.filter_by(user_id=current_user.id, media_id=media.id).first()
-                if not in_user_list:
-                    user_list = GamesList(user_id=current_user.id,
-                                          media_id=media.id,
-                                          status=Status.OWNED,
-                                          completion=False,
-                                          playtime=0)
-                    db.session.add(user_list)
-                    db.session.commit()
-            except:
-                continue
+            db.session.commit()
 
+            user_list = GamesList(user_id=current_user.id,
+                                  media_id=media.id,
+                                  status=Status(game[1]),
+                                  playtime=int(game[2])*60)
+            db.session.add(user_list)
+
+            print("Added " + game[0])
+
+        except Exception as e:
+            print("Exception:", game[0], e)
+
+    db.session.commit()

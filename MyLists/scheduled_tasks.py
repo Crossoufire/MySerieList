@@ -591,12 +591,46 @@ def update_Mylists_stats():
     db.session.commit()
 
 
+def update_IGDB_API():
+    import dotenv
+    import requests
+
+    app.logger.info('###################################################################')
+    app.logger.info('[SYSTEM] - Recovering new IGDB API key')
+
+    try:
+        r = requests.post(f"https://id.twitch.tv/oauth2/token?client_id={app.config['CLIENT_IGDB']}&"
+                          f"client_secret={app.config['SECRET_IGDB']}&grant_type=client_credentials")
+        response = json.loads(r.text)
+
+        # Recover the new IGDB API KEY/TOKEN
+        new_IGDB_token = response['access_token']
+
+        # Get the .env file and load it
+        dotenv_file = dotenv.find_dotenv()
+        dotenv.load_dotenv(dotenv_file)
+
+        # Set the new IGDB API KEY to the actual environment
+        os.environ['IGDB_API_KEY'] = f'{new_IGDB_token}'
+
+        # Set the new IGDB API KEY to the actual app config
+        app.config['IGDB_API_KEY'] = f'{new_IGDB_token}'
+
+        # Write the new IGDB API KEY to the .env file
+        dotenv.set_key(dotenv_file, 'IGDB_API_KEY', f'{new_IGDB_token}')
+    except Exception as e:
+        app.logger.error(e)
+
+    app.logger.info('[SYSTEM] - Finished getting new IGDB API key')
+    app.logger.info('###################################################################')
+
+
 # ---------------------------------------------------------------------------------------------------------------
 
 
 @app.cli.command()
 def scheduled_task():
-    """Run the scheduled jobs."""
+    """ Run the scheduled jobs. """
     app.logger.setLevel(logging.INFO)
     remove_non_list_media()
     remove_old_covers()
@@ -607,3 +641,11 @@ def scheduled_task():
     automatic_movies_locking()
     compute_media_time_spent()
     update_Mylists_stats()
+
+
+@app.cli.command()
+def update_igdb_key():
+    """ Update IGDB API key. """
+    app.logger.setLevel(logging.INFO)
+    update_IGDB_API()
+

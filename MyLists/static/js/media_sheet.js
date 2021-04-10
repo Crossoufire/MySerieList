@@ -305,34 +305,6 @@ function updateRewatched(element_id, rewatch, media_list) {
 }
 
 
-// --- Update completion --------------------------------------------------------------------------------
-function updateCompletion(element_id) {
-    $('#comp-loading').show();
-    $('#your-medialist-data').addClass('disabled');
-
-    let comp_value = $("input[type=checkbox][name=comp-check]:checked").val();
-    comp_value = comp_value === 'on';
-
-    $.ajax ({
-        type: "POST",
-        url: "/update_completion",
-        contentType: "application/json",
-        data: JSON.stringify({data: comp_value, element_id: element_id, media_list: 'gameslist' }),
-        dataType: "json",
-        success: function() {
-            $('#comp-check').show().delay(1500).fadeOut();
-            $('#your-medialist-data').removeClass('disabled');
-        },
-        error: function() {
-            error_ajax_message('Error updating the completion of the game. Please try again later.');
-        },
-        complete: function () {
-            $('#comp-loading').hide();
-        }
-    });
-}
-
-
 // --- Update time played -------------------------------------------------------------------------------
 function updatePlaytime(media_id, playtime) {
     $('#time-loading').show();
@@ -448,6 +420,7 @@ $(document).ready(function () {
     function add_gradient(gradient) {
         let val = parseFloat(gradient);
         let value = 100-(val*10);
+        console.log(value);
         return ('background:' +
             '-webkit-linear-gradient(180deg, grey '+ value+'%, darkgoldenrod 0%);' +
             '-webkit-background-clip: text;' +

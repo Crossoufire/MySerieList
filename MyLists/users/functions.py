@@ -181,32 +181,11 @@ def get_media_levels(user, list_type):
     return level_info
 
 
-def get_knowledge_grade(user):
-    # Compute the corresponding level and percentage from the media time
-    knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
-                      int((((400+80*user.time_spent_anime)**(1/2))-20)/40) + \
-                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40) + \
-                      int((((400+80*user.time_spent_games)**(1/2))-20)/40)
-
-    query_rank = Ranks.query.filter_by(level=knowledge_level, type='knowledge_rank\n').first()
-    if query_rank:
-        grade_id = url_for('static', filename='img/knowledge_ranks/{}'.format(query_rank.image_id))
-        grade_title = query_rank.name
-    else:
-        grade_id = url_for('static', filename='img/knowledge_ranks/Knowledge_Emperor_Grade_4')
-        grade_title = "Knowledge Emperor Grade 4"
-
-    return {"level": knowledge_level,
-            "grade_id": grade_id,
-            "grade_title": grade_title}
-
-
 def get_knowledge_frame(user):
     # Compute the corresponding level and percentage from the media time
     knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
                       int((((400+80*user.time_spent_anime)**(1/2))-20)/40) + \
-                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40) + \
-                      int((((400+80*user.time_spent_games)**(1/2))-20)/40)
+                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
 
     frame_level = round(knowledge_level/8, 0) + 1
     query_frame = Frames.query.filter_by(level=frame_level).first()

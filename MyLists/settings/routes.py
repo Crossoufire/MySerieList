@@ -1,6 +1,6 @@
 import pandas as pd
+from MyLists.models import User
 from MyLists import db, app, bcrypt
-from MyLists.models import HomePage, User
 from flask_login import login_required, current_user
 from MyLists.settings.functions import send_email_update_email, save_account_picture
 from MyLists.settings.forms import UpdateAccountForm, ChangePasswordForm, ImportListForm
@@ -50,12 +50,11 @@ def settings():
             current_user.private = settings_form.isprivate.data
             app.logger.info('[{}] Settings updated: Old private mode = {}. New private mode = {}'
                             .format(current_user.id, old_value, settings_form.isprivate.data))
-
-        old_homepage = current_user.homepage
-        current_user.homepage = HomePage(settings_form.homepage.data)
-        app.logger.info('[{}] Settings updated: Old homepage = {}. New homepage = {}'
-                        .format(current_user.id, old_homepage, HomePage(settings_form.homepage.data)))
-
+        if settings_form.add_games.data != current_user.add_games:
+            old_value = current_user.add_games
+            current_user.add_games = settings_form.add_games.data
+            app.logger.info('[{}] Settings updated: Old games value = {}. New games mode = {}'
+                            .format(current_user.id, old_value, settings_form.add_games.data))
         if settings_form.email.data != current_user.email:
             old_email = current_user.email
             current_user.transition_email = settings_form.email.data
@@ -82,7 +81,7 @@ def settings():
     settings_form.username.data = current_user.username
     settings_form.email.data = current_user.email
     settings_form.isprivate.data = current_user.private
-    settings_form.homepage.data = current_user.homepage.value
+    settings_form.add_games.data = current_user.add_games
 
     back_pic = False
     pic = False

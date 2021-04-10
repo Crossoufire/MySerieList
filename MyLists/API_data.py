@@ -6,11 +6,13 @@ from flask import abort
 from MyLists import app
 from pathlib import Path
 from MyLists.models import ListType
+from howlongtobeatpy import HowLongToBeat
 from ratelimit import sleep_and_retry, limits
 
 
 class ApiData:
     def __init__(self):
+        self.igdb_api_key = app.config['IGDB_API_KEY']
         self.tmdb_api_key = app.config['THEMOVIEDB_API_KEY']
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
         self.igdb_base_url = 'https://images.igdb.com/igdb/image/upload/t_1080p/'
@@ -20,6 +22,18 @@ class ApiData:
         if status_code != 200:
             abort(status_code)
 
+    @staticmethod
+    def HLTB_time(game_name):
+        games_list = HowLongToBeat().search(game_name)
+        if games_list and len(games_list) > 0:
+            game = max(games_list, key=lambda x: x.similarity)
+            hltb_time = {'main': game.gameplay_main,
+                         'extra': game.gameplay_main_extra,
+                         'completionist': game.gameplay_completionist}
+            return hltb_time
+        else:
+            return {'main': None, 'extra': None, 'completionist': None}
+
     def TMDb_search(self, media_name, page=1):
         response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}&page={2}"
                                 .format(self.tmdb_api_key, media_name, page), timeout=15)
@@ -28,11 +42,13 @@ class ApiData:
 
         return json.loads(response.text)
 
+    @sleep_and_retry
+    @limits(calls=4, period=1)
     def IGDB_search(self, game_name):
-        headers = {'Client-ID': '5i5pi21s0ninkmp6jj09ix4l6fw5bd',
-                   'Authorization': 'Bearer ' + '3chy3hiswzh9qf97qhbe3xacue7i41'}
-        body = 'fields id, name, cover.image_id, first_release_date; search "{}";'.format(game_name)
-        response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers)
+        headers = {'Client-ID': f"{app.config['CLIENT_IGDB']}",
+                   'Authorization': 'Bearer ' + self.igdb_api_key}
+        body = 'fields id, name, cover.image_id, first_release_date, storyline; search "{}";'.format(game_name)
+        response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers, timeout=15)
 
         self.status_code(response.status_code)
 
@@ -46,15 +62,15 @@ class ApiData:
             response = requests.get("https://api.themoviedb.org/3/movie/{}?api_key={}&append_to_response=credits"
                                     .format(api_id, self.tmdb_api_key), timeout=15)
         elif list_type == ListType.GAMES:
-            headers = {'Client-ID': '5i5pi21s0ninkmp6jj09ix4l6fw5bd',
-                       'Authorization': 'Bearer ' + '3chy3hiswzh9qf97qhbe3xacue7i41'}
+            headers = {'Client-ID': f"{app.config['CLIENT_IGDB']}",
+                       'Authorization': 'Bearer ' + self.igdb_api_key}
             body = 'fields name, cover.image_id, collection.name, game_engines.name, game_modes.name, ' \
                    'platforms.name, genres.name, player_perspectives.name, total_rating, total_rating_count, ' \
                    'first_release_date, involved_companies.company.name, involved_companies.developer, ' \
                    'involved_companies.publisher, storyline, summary, themes.name, url, external_games.uid, ' \
                    'external_games.category; where id={};'\
                 .format(api_id)
-            response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers)
+            response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers, timeout=15)
 
         self.status_code(response.status_code)
 
