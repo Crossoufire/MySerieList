@@ -1,26 +1,19 @@
 
 Trends:
-    Add: A trending table (with automatic update at 3:00 AM)
+    Enhance: A trending table (with automatic update at 3:00 AM)
     Enhance: Better CSS and presentation
-
-Media sheet:
-    Enhance: Add genres modif to the metadata edit
 
 Account:
-    Add: New achievements system
+    Add: New achievements/badges system
+    Fix: Anonymous users
 
-MyLists Stats:
-    Enhance: Better CSS and presentation
-
-Personal more stats:
-    Add: More stats
-    Add: A Personal stats table (with automatic update at 3:00 AM)
-    Enchance: Better python and CSS
+More stats:
+    Enchance: Better python, CSS and HTML
 
 General:
     Add: If API down, user can still add media but check in local database instead of API
     Enhance: Change the hamburger display to a vertical panel in mobile
-    Enhance: Followed level up notification
 
 MediaLists:
-    Add: Show/hide shared
+    Enhance: Show/hide shared
+

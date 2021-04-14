@@ -485,7 +485,6 @@ class Games(MediaMixin, db.Model):
     hltb_main_time = db.Column(db.String(20))
     hltb_main_and_extra_time = db.Column(db.String(20))
     hltb_total_complete_time = db.Column(db.String(20))
-    steam_id = db.Column(db.Integer)
     igdb_id = db.Column(db.Integer, nullable=False)
     lock_status = db.Column(db.Boolean, default=1)
 
@@ -808,23 +807,25 @@ def get_next_airing(list_type):
 
 
 # Recover the total time by medialist for all users
-def get_total_time(list_type):
-    media = eval(list_type.value.capitalize().replace('list', ''))
-    media_list = eval(list_type.value.capitalize().replace('l', 'L'))
+def compute_media_time_spent():
+    for list_type in ListType:
+        media = eval(list_type.value.capitalize().replace('list', ''))
+        media_list = eval(list_type.value.capitalize().replace('l', 'L'))
 
-    if media_list != GamesList:
-        query = db.session.query(User, media.duration, media_list.eps_watched,
-                                 func.sum(media.duration * media_list.eps_watched)) \
-            .join(media, media.id == media_list.media_id) \
-            .join(User, User.id == media_list.user_id) \
-            .group_by(media_list.user_id).all()
-    else:
-        query = db.session.query(User, media_list.playtime, media_list.score, func.sum(media_list.playtime)) \
-            .join(media, media.id == media_list.media_id) \
-            .join(User, User.id == media_list.user_id) \
-            .group_by(media_list.user_id).all()
+        if media_list != GamesList:
+            query = db.session.query(User, media.duration, media_list.eps_watched,
+                                     func.sum(media.duration * media_list.eps_watched)) \
+                .join(media, media.id == media_list.media_id) \
+                .join(User, User.id == media_list.user_id) \
+                .group_by(media_list.user_id).all()
+        else:
+            query = db.session.query(User, media_list.playtime, media_list.score, func.sum(media_list.playtime)) \
+                .join(media, media.id == media_list.media_id) \
+                .join(User, User.id == media_list.user_id) \
+                .group_by(media_list.user_id).all()
 
-    return query
+        for q in query:
+            setattr(q[0], f"time_spent_{list_type.value.replace('list', '')}", q[3])
 
 
 # Check if media exists

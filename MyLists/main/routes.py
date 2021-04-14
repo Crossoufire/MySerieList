@@ -927,8 +927,6 @@ def add_element():
         compute_time_spent(media=media, new_watched=new_watched, list_type=list_type)
     elif list_type == ListType.MOVIES:
         compute_time_spent(media=media, list_type=list_type, movie_status=new_status, movie_add=True)
-    elif list_type == ListType.GAMES:
-        compute_time_spent(media=media, list_type=list_type)
 
     # Commit the last updates and the new time spent changes
     db.session.commit()

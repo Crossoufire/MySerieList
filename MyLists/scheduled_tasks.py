@@ -7,11 +7,10 @@ from sqlalchemy import and_, desc
 from MyLists.API_data import ApiData
 from datetime import datetime, timedelta
 from MyLists.main.media_object import MediaDetails
-from MyLists.general.functions import compute_media_time_spent
 from MyLists.models import Series, SeriesList, SeriesActors, SeriesGenre, SeriesNetwork, SeriesEpisodesPerSeason, \
     UserLastUpdate, Notifications, ListType, Anime, AnimeList, AnimeActors, AnimeGenre, AnimeNetwork, Status, Movies, \
     AnimeEpisodesPerSeason, MoviesList, MoviesActors, MoviesGenre, GlobalStats, MyListsStats, User, RoleType, Games, \
-    GamesList, GamesGenre, GamesPlatforms, GamesCompanies
+    GamesList, GamesGenre, GamesPlatforms, GamesCompanies, compute_media_time_spent
 
 
 def remove_non_list_media():

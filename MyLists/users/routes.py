@@ -100,15 +100,6 @@ def hall_of_fame():
     return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
 
 
-@bp.route("/achievements/<user_name>", methods=['GET', 'POST'])
-@login_required
-def achievements(user_name):
-    # Check if the user can see the <media_list>
-    user = current_user.check_autorization(user_name)
-
-    return render_template('achievements.html', title="{}'s achievements".format(user_name))
-
-
 @bp.route("/level_grade_data", methods=['GET'])
 @login_required
 def level_grade_data():

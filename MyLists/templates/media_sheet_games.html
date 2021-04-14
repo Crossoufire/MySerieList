@@ -122,7 +122,7 @@
     <div class="d-flex flex-wrap" style="justify-content: space-evenly;">
         <div class="game-box text-center" style="background-color: slategrey;">
             <div class="p-t-5"><b>MAIN</b></div>
-            {% if not data['hltb_main'] %}
+            {% if not data['hltb_main'] or data['hltb_main'] == -1 %}
                 <div class="fs-17"><b>-</b></div>
             {% else %}
                 <div class="fs-17"><b>{{ data['hltb_main'] }}</b></div>
@@ -130,7 +130,7 @@
         </div>
         <div class="game-box text-center" style="background-color: dimgrey;">
             <div class="p-t-5"><b>EXTRA</b></div>
-            {% if not data['hltb_main_extra'] %}
+           {% if not data['hltb_main_extra'] or data['hltb_main_extra'] == -1 %}
                 <div class="fs-17"><b>-</b></div>
             {% else %}
                 <div class="fs-17"><b>{{ data['hltb_main_extra'] }}</b></div>
@@ -138,7 +138,7 @@
         </div>
         <div class="game-box text-center" style="background-color: darkslategrey;">
             <div class="p-t-5"><b>TOTAL</b></div>
-            {% if not data['hltb_complete'] %}
+            {% if not data['hltb_complete'] or data['hltb_complete'] == -1 %}
                 <div class="fs-17"><b>-</b></div>
             {% else %}
                 <div class="fs-17"><b>{{ data['hltb_complete'] }}</b></div>
