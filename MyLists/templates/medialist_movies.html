@@ -16,11 +16,15 @@
 {% block categories %}
     {% set categories = ['All', 'Completed', 'Plan to Watch', 'Favorite'] %}
     {% for cat in categories %}
-        <a class="cat-btn{% if cat == category %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
+        <a class="cat-btn{% if category == cat %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
          media_list=media_list, user_name=username, category=cat, genre=genre, sorting=sorting, page_val=1) }}">
             <b>{{ cat|upper }}</b>
         </a>
     {% endfor %}
+    <a class="cat-btn{% if category == 'Stats' %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
+     media_list=media_list, user_name=username, category='Stats') }}">
+        <b>STATS</b>
+    </a>
 {% endblock categories %}
 
 
@@ -54,6 +58,61 @@
 {% block data %}
     {{ item.genres }}-{{ media_list }}-{{ item.id }}
 {% endblock data %}
+
+
+{% block stats_block %}
+    <section class="stats-for-movies">
+            <div class="row">
+                <div class="col">
+                    <h4><i class="fas fa-caret-square-right"></i>&nbsp;&nbsp; Runtimes</h4>
+                    <div class="movies-container">
+                        <canvas id="lengths-movies"></canvas>
+                        <span id="lengths-movies-bar"
+                          values-y="{% for key in data['movies_times'].keys() %} {{ key }}, {% endfor %}"
+                          values-x="{% for value in data['movies_times'].values() %}{{ value }}, {% endfor %}">
+                        </span>
+                    </div>
+                </div>
+                <div class="col">
+                    <h4><i class="fas fa-calendar-times"></i>&nbsp;&nbsp; Release Dates</h4>
+                    <div class="movies-container">
+                        <canvas id="periods-movies"></canvas>
+                        <span id="periods-movies-bar"
+                          values-y="{% for key in data['periods'].keys() %} {{ key }}, {% endfor %}"
+                          values-x="{% for value in data['periods'].values() %}{{ value }}, {% endfor %}">
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row m-t-40 m-b-50">
+                <div class="col">
+                    <h4><i class="fas fa-theater-masks"></i>&nbsp;&nbsp; Top 10 Genres</h4>
+                    <div class="movies-container">
+                        <canvas id="genres-movies"></canvas>
+                        <span id="genres-movies-bar"
+                          values-y="{% for d in data['genres'] %}{{ d[0] }}, {% endfor %}"
+                          values-x="{% for d in data['genres'] %}{{ d[2] }}, {% endfor %}">
+                        </span>
+                    </div>
+                </div>
+                <div class="col">
+                    <h4><i class="fas fa-user-alt"></i>&nbsp;&nbsp; Top 10 Actors</h4>
+                    <div class="movies-container">
+                        <canvas id="actors-movies"></canvas>
+                        <span id="actors-movies-bar"
+                          values-y="{% for d in data['actors'] %}{{ d[0] }}, {% endfor %}"
+                          values-x="{% for d in data['actors'] %}{{ d[2] }}, {% endfor %}">
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock stats_block %}
+
+
+{% block stats_js %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/more_stats.js') }}"></script>
+{% endblock stats_js %}
 
 
 {% block javascript %}

@@ -3,6 +3,8 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, DataRequired
 from wtforms import StringField, SubmitField, TextAreaField, IntegerField
 
+from MyLists.models import ListType
+
 
 class EditMediaData(FlaskForm):
     cover = FileField('Media cover', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
@@ -34,7 +36,7 @@ class MediaComment(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    q = StringField('Search titles, actors...', validators=[DataRequired()])
+    q = StringField('Search...', validators=[DataRequired()])
 
     def __init__(self, *args, **kwargs):
         if 'formdata' not in kwargs:
@@ -42,14 +44,3 @@ class SearchForm(FlaskForm):
         if 'csrf_enabled' not in kwargs:
             kwargs['csrf_enabled'] = False
         super(SearchForm, self).__init__(*args, **kwargs)
-
-
-class SearchGameForm(FlaskForm):
-    q = StringField('Search names, developers...', validators=[DataRequired()])
-
-    def __init__(self, *args, **kwargs):
-        if 'formdata' not in kwargs:
-            kwargs['formdata'] = request.args
-        if 'csrf_enabled' not in kwargs:
-            kwargs['csrf_enabled'] = False
-        super(SearchGameForm, self).__init__(*args, **kwargs)

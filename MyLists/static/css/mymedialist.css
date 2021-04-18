@@ -1,5 +1,5 @@
 
-/* --- Return icons/Search/Shared Header CSS ------------------------------- */
+/* --- Return icons/Search/Shared Header CSS ---------------------------------------------------------------- */
 .return-icon {
     background: rgba(0, 0, 0, 0.8);
     padding: 13px 13px 13px 13px;
@@ -84,7 +84,7 @@
 }
 
 
-/* --- Categories Header CSS -------------------------------------------- */
+/* --- Categories Header CSS ------------------------------------------------------------------------------- */
 .cat-btn {
     display: inline-block;
     padding: 5px 0 5px 0;
@@ -123,7 +123,7 @@
 }
 
 
-/* --- Filtering/Sorting Header CSS ------------------------------------ */
+/* --- Filtering/Sorting Header CSS ------------------------------------------------------------------------ */
 .li-genre-sort {
     list-style-type: none;
     display: inline-block;
@@ -145,7 +145,7 @@
 
 .sort-container {
     float: right;
-    margin-top: 45px;
+    margin-top: 30px;
 }
 
 @media (max-width: 500px) {
@@ -160,13 +160,13 @@
 }
 
 
-/* --- Media Header CSS -------------------------------------------- */
+/* --- Media Header CSS ------------------------------------------------------------------------------------ */
 .cat-title {
     font-weight: 400;
     color: lightgrey;
     display: inline-block;
     text-align: left;
-    margin: 45px 0 0 0;
+    margin: 30px 0 0 0;
 }
 
 @media (max-width: 500px) {
@@ -178,7 +178,7 @@
 }
 
 
-/* --- Card CSS ---------------------------------------------------- */
+/* --- Card CSS -------------------------------------------------------------------------------------------- */
 .card {
     border-radius: 0 !important;
     margin-bottom: 50px;
@@ -446,7 +446,7 @@ input[type=number] {
 }
 
 
-/* --- Pagination Header CSS --------------------------------------- */
+/* --- Pagination Header CSS ------------------------------------------------------------------------------- */
 .pagination-css {
     justify-content: center;
     font-weight: 400;
@@ -465,7 +465,7 @@ input[type=number] {
 }
 
 
-/* --- Next airing CSS --------------------------------------------- */
+/* --- Next airing CSS ------------------------------------------------------------------------------------- */
 .absolute-data {
     background-color: #21263b;
     border-top: solid 1px black;
@@ -492,7 +492,7 @@ input[type=number] {
 }
 
 
-/* --- Games dropdown ---------------------------------------------- */
+/* --- Games dropdown -------------------------------------------------------------------------------------- */
 .playtime-drop {
 	cursor: pointer;
     background: transparent;
@@ -502,4 +502,30 @@ input[type=number] {
 
 .playtime-drop:focus {
     outline: none;
+}
+
+
+/* --- More Stats CSS -------------------------------------------------------------------------------------- */
+.vertical_line {
+    width: 5px;
+    border-left: 2px solid rgba(44, 57, 70, 1);
+    height: 100wh;
+}
+
+.series-container {
+    position: relative;
+    height: 400px;
+    margin-top: -15px;
+}
+
+.anime-container {
+    position: relative;
+    height: 400px;
+    margin-top: -15px;
+}
+
+.movies-container {
+    position: relative;
+    height: 400px;
+    margin-top: 15px;
 }

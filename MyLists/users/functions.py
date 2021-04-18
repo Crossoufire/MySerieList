@@ -1,13 +1,12 @@
 import pytz
 import random
-import operator
 from MyLists import db
 from flask import url_for
 from sqlalchemy import func
 from flask_login import current_user
 from _collections import OrderedDict
-from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
-    Movies, Ranks, followers, Frames, RoleType, GamesList, Games
+from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, Series, Anime, Movies, \
+    Ranks, Frames, RoleType, GamesList, Games
 
 
 def get_media_count_by_status(user_id, list_type):
@@ -360,152 +359,6 @@ def get_follows_data(user):
         follows_update_list.append(follows)
 
     return follows_list, follows_update_list
-
-
-def get_more_stats(user):
-
-    def get_episodes_and_time(element):
-        if element[1].status == Status.COMPLETED:
-            try:
-                return [1, element[0].duration]
-            except:
-                return [element[0].total_episodes, int(element[0].duration)*element[0].total_episodes]
-        elif element[1].status != Status.PLAN_TO_WATCH and element[1].status != Status.RANDOM:
-            nb_episodes = [m.episodes for m in element[0].eps_per_season]
-            
-            ep_duration = int(element[0].duration)
-            ep_counter = 0
-            for i in range(0, element[1].current_season - 1):
-                ep_counter += int(nb_episodes[i])
-            episodes_watched = ep_counter + element[1].last_episode_watched
-            time_watched = (ep_duration * episodes_watched)
-            return [episodes_watched, time_watched]
-        else:
-            return [0, 0]
-
-    series_data = db.session.query(Series, SeriesList) \
-        .join(SeriesList, SeriesList.media_id == Series.id) \
-        .filter(SeriesList.user_id == user.id)
-
-    anime_data = db.session.query(Anime, AnimeList) \
-        .join(AnimeList, AnimeList.media_id == Anime.id) \
-        .filter(AnimeList.user_id == user.id)
-
-    movies_data = db.session.query(Movies, MoviesList) \
-        .join(MoviesList, MoviesList.media_id == Movies.id) \
-        .filter(MoviesList.user_id == user.id)
-
-    media_data = [series_data, anime_data, movies_data]
-
-    data = {}
-    for index, media in enumerate(media_data):
-        genres_time = {}
-        periods_time = OrderedDict({'1960-1969': 0, '1970-1979': 0, '1980-1989': 0, '1990-1999': 0, '2000-2009': 0,
-                                    '2010-2019': 0, '2020+': 0})
-        episodes_time = OrderedDict({'1-19': 0, '20-49': 0, '50-99': 0, '100-149': 0, '150-199': 0, '200-299': 0,
-                                     '300-399': 0, '400-499': 0, '500+': 0})
-        movies_time = OrderedDict({'<1h': 0, '1h-1h29': 0, '1h30-1h59': 0, '2h00-2h29': 0, '2h30-2h59': 0, '3h+': 0})
-        for element in media:
-            # Number of episodes and the time watched by element
-            episodes_watched, time_watched = get_episodes_and_time(element)
-
-            # Genres stats
-            for genre in [m.genre for m in element[0].genres]:
-                if genre not in genres_time:
-                    genres_time[genre] = time_watched
-                else:
-                    genres_time[genre] += time_watched
-
-            # Period stats
-            try:
-                airing_year = int(element[0].first_air_date.split('-')[0])
-            except:
-                try:
-                    airing_year = int(element[0].release_date.split('-')[0])
-                except:
-                    airing_year = 0
-
-            if 1960 <= airing_year < 1970:
-                periods_time['1960-1969'] += 1
-            elif 1970 <= airing_year < 1980:
-                periods_time['1970-1979'] += 1
-            elif 1980 <= airing_year < 1990:
-                periods_time['1980-1989'] += 1
-            elif 1990 <= airing_year < 2000:
-                periods_time['1990-1999'] += 1
-            elif 2000 <= airing_year < 2010:
-                periods_time['2000-2009'] += 1
-            elif 2010 <= airing_year < 2020:
-                periods_time['2010-2019'] += 1
-            elif airing_year >= 2020:
-                periods_time['2020+'] += 1
-
-            # Episodes / time stats
-            if index != 2:
-                if 1 <= episodes_watched < 19:
-                    episodes_time['1-19'] += 1
-                elif 20 <= episodes_watched < 49:
-                    episodes_time['20-49'] += 1
-                elif 50 <= episodes_watched < 99:
-                    episodes_time['50-99'] += 1
-                elif 100 <= episodes_watched < 149:
-                    episodes_time['100-149'] += 1
-                elif 150 <= episodes_watched < 199:
-                    episodes_time['150-199'] += 1
-                elif 200 <= episodes_watched < 299:
-                    episodes_time['200-299'] += 1
-                elif 300 <= episodes_watched < 399:
-                    episodes_time['300-399'] += 1
-                elif 400 <= episodes_watched < 499:
-                    episodes_time['400-499'] += 1
-                elif episodes_watched >= 500:
-                    episodes_time['500+'] += 1
-            else:
-                if time_watched < 60:
-                    movies_time['<1h'] += 1
-                elif 60 <= time_watched < 90:
-                    movies_time['1h-1h29'] += 1
-                elif 90 <= time_watched < 120:
-                    movies_time['1h30-1h59'] += 1
-                elif 120 <= time_watched < 150:
-                    movies_time['2h00-2h29'] += 1
-                elif 150 <= time_watched < 180:
-                    movies_time['2h30-2h59'] += 1
-                elif time_watched >= 180:
-                    movies_time['3h+'] += 1
-
-        # Rename
-        if index == 0:
-            genres_time['Action/Adventure'] = genres_time.pop('Action & Adventure', 0)
-            genres_time['War/Politics'] = genres_time.pop('War & Politics', 0)
-            genres_time['Sci-Fi/Fantasy'] = genres_time.pop('Sci-Fi & Fantasy', 0)
-            genres_time.pop('Unknown', 0)
-
-        if all(x == 0 for x in genres_time.values()):
-            genres_time = {}
-        else:
-            genres_time = sorted(genres_time.items(), key=operator.itemgetter(1), reverse=True)
-        if all(x == 0 for x in periods_time.values()):
-            periods_time = {}
-        if all(x == 0 for x in episodes_time.values()):
-            episodes_time = {}
-        if all(x == 0 for x in movies_time.values()):
-            movies_time = {}
-
-        if index == 0:
-            data.update({'Series_genres': genres_time,
-                         'Series_periods': periods_time,
-                         'Series_eps': episodes_time})
-        elif index == 1:
-            data.update({'Anime_genres': genres_time,
-                         'Anime_periods': periods_time,
-                         'Anime_eps': episodes_time})
-        else:
-            data.update({'Movies_genres': genres_time,
-                         'Movies_periods': periods_time,
-                         'Movies_times': movies_time})
-
-    return data
 
 
 def get_all_follows_data(user):

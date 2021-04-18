@@ -1,10 +1,12 @@
 import rq
+import operator
 from enum import Enum
-from flask import abort
 from datetime import datetime
 from sqlalchemy.orm import aliased
+from collections import OrderedDict
 from MyLists import app, db, login_manager
 from flask_login import UserMixin, current_user
+from flask import abort, flash, redirect, request, url_for
 from sqlalchemy import func, desc, text, and_, or_
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
@@ -34,6 +36,7 @@ class Status(Enum):
     PLAN_TO_WATCH = 'Plan to Watch'
     SEARCH = 'Search'
     FAVORITE = 'Favorite'
+    STATS = 'Stats'
 
 
 class MediaType(Enum):
@@ -675,9 +678,9 @@ def get_media_query(user_id, list_type, category, genre, sorting, page, q):
     media_genre = eval(list_type.value.capitalize().replace('list', 'Genre'))
 
     if list_type != ListType.GAMES:
-        media_actors = eval(list_type.value.capitalize().replace('list', 'Actors'))
-    else:
-        media_actors = eval(list_type.value.capitalize().replace('list', 'Companies'))
+        media_more = eval(list_type.value.capitalize().replace('list', 'Actors'))
+    elif list_type == ListType.GAMES:
+        media_more = eval(list_type.value.capitalize().replace('list', 'Companies'))
 
     if list_type == ListType.SERIES or list_type == ListType.ANIME:
         add_sort = {'Release date +': media.first_air_date.desc(),
@@ -735,10 +738,10 @@ def get_media_query(user_id, list_type, category, genre, sorting, page, q):
             .filter(v1.user_id == current_user.id).all()
         com_ids = [r[0].media_id for r in get_common]
 
-    query = db.session.query(media, media_list, media_genre, media_actors) \
+    query = db.session.query(media, media_list, media_genre, media_more) \
         .outerjoin(media, media.id == media_list.media_id) \
         .outerjoin(media_genre, media_genre.media_id == media_list.media_id) \
-        .outerjoin(media_actors, media_actors.media_id == media_list.media_id) \
+        .outerjoin(media_more, media_more.media_id == media_list.media_id) \
         .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter)
 
     if category != Status.FAVORITE and category != Status.SEARCH and category != Status.ALL:
@@ -747,22 +750,38 @@ def get_media_query(user_id, list_type, category, genre, sorting, page, q):
         query = query.filter(media_list.favorite)
     elif category == Status.SEARCH:
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            query = query.filter(or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'),
+            query = query.filter(or_(media.name.like('%' + q + '%'), media_more.name.like('%' + q + '%'),
                                      media.original_name.like('%' + q + '%')))
         elif list_type == ListType.MOVIES:
-            query = query.filter(or_(media.name.like('%' + q + '%'), media_actors.name.like('%' + q + '%'),
+            query = query.filter(or_(media.name.like('%' + q + '%'), media_more.name.like('%' + q + '%'),
                                      media.director_name.like('%' + q + '%'), media.original_name.like('%' + q + '%')))
         elif list_type == ListType.GAMES:
             query = query.filter(or_(media.name.like('%' + q + '%'),
-                                     media_actors.name.like('%' + q + '%')))
+                                     media_more.name.like('%' + q + '%')))
 
     # Run the query
     results = query.group_by(media.id).order_by(sorting).paginate(int(page), 48, error_out=True)
 
-    return results, cat_value
+    # Get <common_media> and <common_elements> between the users
+    common_media, common_elements = get_media_count(user_id, list_type)
+
+    # Recover the media data into a dict
+    items_data_list = []
+    for item in results.items:
+        from MyLists.main.media_object import MediaListObj
+        add_data = MediaListObj(item, common_media, list_type)
+        items_data_list.append(add_data)
+
+    data = {'actual_page': results.page,
+            'total_pages': results.pages,
+            'total_media': results.total,
+            'common_elements': common_elements,
+            'items_list': items_data_list}
+
+    return cat_value, data
 
 
-# # Count the number of media in a list type for a user
+# Count the number of media in a list type for a user
 def get_media_count(user_id, list_type):
     # If user_id == current_user.id the common media does not need to be calculated.
     if user_id == current_user.id:
@@ -848,3 +867,96 @@ def check_media(media_id, list_type, add=False):
     return query
 
 
+# Get additional stats on the <list_type> and the <user>
+def get_more_stats(user, list_type):
+    if list_type == ListType.GAMES:
+        return flash('Not available for now ;)', 'warning')
+
+    media = eval(list_type.value.capitalize().replace('list', ''))
+    media_list = eval(list_type.value.capitalize().replace('l', 'L'))
+    media_actors = eval(list_type.value.capitalize().replace('list', 'Actors'))
+    media_genres = eval(list_type.value.capitalize().replace('list', 'Genre'))
+
+    media_data = db.session.query(media, media_list) \
+        .join(media_list, media_list.media_id == media.id) \
+        .filter(media_list.user_id == user.id)
+
+    top_actors = db.session.query(media_actors.name, media_list, func.count(media_actors.name).label('count')) \
+        .join(media_actors, media_actors.media_id == media_list.media_id) \
+        .filter(media_list.user_id == user.id, media_actors.name != 'Unknown') \
+        .group_by(media_actors.name).order_by(text('count desc')).limit(10).all()
+
+    top_genres = db.session.query(media_genres.genre, media_list, func.count(media_genres.genre).label('count')) \
+        .join(media_genres, media_genres.media_id == media_list.media_id) \
+        .filter(media_list.user_id == user.id, media_genres.genre != 'Unknown') \
+        .group_by(media_genres.genre).order_by(text('count desc')).limit(10).all()
+
+    media_periods = OrderedDict({"'60s-": 0, "'70s": 0, "'80s": 0, "'90s": 0, "'00s": 0, "'10s": 0, "'20s+": 0})
+    media_eps = OrderedDict({'1-25': 0, '26-49': 0, '50-99': 0, '100-149': 0, '150-199': 0, '200+': 0})
+    movies_runtime = OrderedDict({'<1h': 0, '1h-1h29': 0, '1h30-1h59': 0, '2h00-2h29': 0, '2h30-2h59': 0, '3h+': 0})
+    for element in media_data:
+        if element[1].status == Status.PLAN_TO_WATCH:
+            continue
+
+        # --- Period stats ----------------------------------------------------------------------------
+        try:
+            airing_year = int(element[0].first_air_date.split('-')[0])
+        except:
+            try:
+                airing_year = int(element[0].release_date.split('-')[0])
+            except:
+                airing_year = 0
+
+        if airing_year < 1970:
+            media_periods["'60s-"] += 1
+        elif 1970 <= airing_year < 1980:
+            media_periods["'70s"] += 1
+        elif 1980 <= airing_year < 1990:
+            media_periods["'80s"] += 1
+        elif 1990 <= airing_year < 2000:
+            media_periods["'90s"] += 1
+        elif 2000 <= airing_year < 2010:
+            media_periods["'00s"] += 1
+        elif 2010 <= airing_year < 2020:
+            media_periods["'10s"] += 1
+        elif airing_year >= 2020:
+            media_periods["'20s+"] += 1
+
+        # --- Eps / runtime stats ---------------------------------------------------------------------
+        if list_type == ListType.SERIES or list_type == ListType.ANIME:
+            nb_watched = element[1].eps_watched
+            if element[1].rewatched > 0:
+                nb_watched = element[0].total_episodes
+
+            if 1 <= nb_watched < 26:
+                media_eps['1-25'] += 1
+            elif 26 <= nb_watched < 50:
+                media_eps['26-49'] += 1
+            elif 50 <= nb_watched < 100:
+                media_eps['50-99'] += 1
+            elif 100 <= nb_watched < 150:
+                media_eps['100-149'] += 1
+            elif 150 <= nb_watched < 200:
+                media_eps['150-199'] += 1
+            elif nb_watched >= 200:
+                media_eps['200+'] += 1
+        elif list_type == ListType.MOVIES:
+            time_watched = element[0].duration
+
+            if time_watched < 60:
+                movies_runtime['<1h'] += 1
+            elif 60 <= time_watched < 90:
+                movies_runtime['1h-1h29'] += 1
+            elif 90 <= time_watched < 120:
+                movies_runtime['1h30-1h59'] += 1
+            elif 120 <= time_watched < 150:
+                movies_runtime['2h00-2h29'] += 1
+            elif 150 <= time_watched < 180:
+                movies_runtime['2h30-2h59'] += 1
+            elif time_watched >= 180:
+                movies_runtime['3h+'] += 1
+
+    data = {'genres': top_genres, 'actors': top_actors, 'periods': media_periods, 'eps_time': media_eps,
+            'movies_times': movies_runtime}
+
+    return data
