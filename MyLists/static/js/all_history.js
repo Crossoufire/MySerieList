@@ -1,6 +1,6 @@
 
 
-// --- Datatable functions ---------------------------------
+// --- Datatable functions -----------------------------------------------------------------------------
 $(document).ready(function () {
     $('#all-history').DataTable({
         "bPaginate": true,
@@ -18,8 +18,3 @@ $(document).ready(function () {
     });
     $('.dataTables_length').addClass('bs-select');
 });
-
-
-function removeRow(app_id) {
-    $('#'+app_id).remove();
-}

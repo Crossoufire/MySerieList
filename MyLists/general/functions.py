@@ -1,23 +1,14 @@
+import json
+import time
+import requests
 from pathlib import Path
 from MyLists import db, app
+from flask_login import current_user
 from MyLists.API_data import ApiData
+from MyLists.main.add_db import AddtoDB
 from MyLists.main.media_object import MediaDetails
 from MyLists.models import ListType, Status, Movies, Badges, Ranks, Frames, SeriesGenre, SeriesList, Anime, Series, \
-    AnimeList, MoviesList, AnimeGenre, MoviesGenre, get_total_time, SeriesActors, AnimeActors, MoviesActors
-
-
-def compute_media_time_spent():
-    for list_type in ListType:
-        query = get_total_time(list_type)
-        if list_type == ListType.SERIES:
-            for q in query:
-                q[0].time_spent_series = q[3]
-        elif list_type == ListType.ANIME:
-            for q in query:
-                q[0].time_spent_anime = q[3]
-        elif list_type == ListType.MOVIES:
-            for q in query:
-                q[0].time_spent_movies = q[3]
+    AnimeList, MoviesList, AnimeGenre, MoviesGenre, SeriesActors, AnimeActors, MoviesActors, Games, GamesList
 
 
 # --- DB add/refresh from CSV data -----------------------------------------------------------------------------

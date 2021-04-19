@@ -28,8 +28,8 @@
             <li><a class='text-light' href="{{ url_for('series.index_view') }}">Series</a></li>
             <li><a class='text-light' href="{{ url_for('serieslist.index_view') }}">Series list</a></li>
             <li><a class='text-light' href="{{ url_for('seriesepisodesperseason.index_view') }}">Series episodes per season</a></li>
-            <li><a class='text-light' href="{{ url_for('seriesgenre.index_view') }}">Series genre</a></li>
-            <li><a class='text-light' href="{{ url_for('seriesnetwork.index_view') }}">Series network</a></li>
+            <li><a class='text-light' href="{{ url_for('seriesgenre.index_view') }}">Series genres</a></li>
+            <li><a class='text-light' href="{{ url_for('seriesnetwork.index_view') }}">Series networks</a></li>
             <li><a class='text-light' href="{{ url_for('seriesactors.index_view') }}">Series actors</a></li>
         </ul>
      </div>
@@ -40,8 +40,8 @@
             <li><a class='text-light' href="{{ url_for('anime.index_view') }}">Anime</a></li>
             <li><a class='text-light' href="{{ url_for('animelist.index_view') }}">Anime list</a></li>
             <li><a class='text-light' href="{{ url_for('animeepisodesperseason.index_view') }}">Anime episodes per season</a></li>
-            <li><a class='text-light' href="{{ url_for('animegenre.index_view') }}">Anime genre</a></li>
-            <li><a class='text-light' href="{{ url_for('animenetwork.index_view') }}">Anime network</a></li>
+            <li><a class='text-light' href="{{ url_for('animegenre.index_view') }}">Anime genres</a></li>
+            <li><a class='text-light' href="{{ url_for('animenetwork.index_view') }}">Anime networks</a></li>
             <li><a class='text-light' href="{{ url_for('animeactors.index_view') }}">Anime actors</a></li>
         </ul>
      </div>
@@ -51,9 +51,20 @@
         <ul>
             <li><a class='text-light' href="{{ url_for('movies.index_view') }}">Movies</a></li>
             <li><a class='text-light' href="{{ url_for('movieslist.index_view') }}">Movies list</a></li>
-            <li><a class='text-light' href="{{ url_for('moviesgenre.index_view') }}">Movies genre</a></li>
+            <li><a class='text-light' href="{{ url_for('moviesgenre.index_view') }}">Movies genres</a></li>
             <li><a class='text-light' href="{{ url_for('moviesactors.index_view') }}">Movies actors</a></li>
         </ul>
- </div>
+    </div>
+        <div class="vertical_line"></div>
+    <div class="col">
+        <h2>Games</h2>
+        <ul>
+            <li><a class='text-light' href="{{ url_for('games.index_view') }}">Games</a></li>
+            <li><a class='text-light' href="{{ url_for('gameslist.index_view') }}">Games list</a></li>
+            <li><a class='text-light' href="{{ url_for('gamesgenres.index_view') }}">Games genres</a></li>
+            <li><a class='text-light' href="{{ url_for('gamescompanies.index_view') }}">Games companies</a></li>
+            <li><a class='text-light' href="{{ url_for('gamesplatforms.index_view') }}">Games platforms</a></li>
+        </ul>
+    </div>
 </div>
 {% endblock %}

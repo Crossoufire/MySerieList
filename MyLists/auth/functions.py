@@ -1,22 +1,12 @@
 import functools
-from MyLists.models import HomePage
+from flask import url_for, redirect
 from flask_login import current_user
-from flask import url_for, abort, redirect
-
-
-def return_user_homepage(homepage, username):
-    if homepage != HomePage.ACCOUNT:
-        return redirect(url_for('main.mymedialist', media_list=homepage.value, user_name=username))
-    elif homepage == HomePage.ACCOUNT:
-        return redirect(url_for('users.account', user_name=username))
-    else:
-        abort(404)
 
 
 def check_if_auth(func):
     @functools.wraps(func)
     def wrapper_auth(*args, **kwargs):
         if current_user.is_authenticated:
-            return return_user_homepage(current_user.homepage, current_user.username)
+            return redirect(url_for('users.account', user_name=current_user.username))
         return func(*args, **kwargs)
     return wrapper_auth

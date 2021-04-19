@@ -21,14 +21,16 @@
                 <div id="series" class="fs-16 p-2 search-not-active" onclick="show_results('series')">Series</div>
                 <div id="anime" class="fs-16 p-2 search-not-active" onclick="show_results('anime')">Anime</div>
                 <div id="movies" class="fs-16 p-2 search-not-active" onclick="show_results('movies')">Movies</div>
+                <div id="games" class="fs-16 p-2 search-not-active" onclick="show_results('games')">Games</div>
             </div>
         </div>
         <div class="col-lg-9 col-sm-12">
             <div class="d-flex flex-wrap justify-content-center m-t-40 m-b-40 add-text">
                 {% for media in all_results %}
                     <a class="card mb-4 {% if media['media'] == 'Series' %}right-series
-                    {% elif media['media'] == 'Anime' %}right-anime{% else %}right-movies{% endif %}"
-                    href="/media_sheet/{{ media['media'] }}/{{ media['api_id'] }}?search=True" style="background: #2a2b2d;">
+                     {% elif media['media'] == 'Anime' %}right-anime{% elif media['media'] == 'Movies' %}right-movies
+                     {% else %}right-games{% endif %}" href="{{ url_for('main.media_sheet', media_type=media['media'],
+                     media_id=media['api_id']) }}?search=True" style="background: #2a2b2d;">
                         <div class="row no-gutters">
                             <div class="col-lg-2 col-sm-12 mobile-img">
                                 <img class="img-min-height" src="{{ media['poster_path'] }}" alt=""/>
@@ -40,10 +42,8 @@
                                         <div class="fs-16 m-t-5 text-grey"><i>{{ media['first_air_date'] }}</i></div>
                                     </h5>
                                     <p class="fs-15 text-light giveMeEllipsis-3 m-b-0 text-justify m-l-15">
-                                        {% if media['overview'] %}
-                                            {{ media['overview'] }}
-                                        {% else %}
-                                            <i>No overview accessible for this media.</i>
+                                        {% if media['overview'] %}{{ media['overview'] }}
+                                        {% else %}<i>No overview accessible for this media.</i>
                                         {% endif %}
                                     </p>
                                 </div>

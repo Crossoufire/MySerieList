@@ -1,0 +1,148 @@
+{% extends 'media_sheet_base.html' %}
+
+
+{% block medialist_info %}
+    <div class="row m-l-15 m-r-15">
+        <div class="col-4"><b>Status:</b></div>
+        <div class="col-8">
+            <label for="category-dropdown"></label>
+            <select id="category-dropdown" class="text-light text-center cat-drop"
+              onchange="changeCategoryGames('{{ data['id'] }}', this)">
+                <option {% if data['status'] == 'Completed' %} selected="selected" {% endif %}>Completed</option>
+                <option {% if data['status'] == 'Endless' %} selected="selected" {% endif %}>Endless</option>
+                <option {% if data['status'] == 'Multiplayer' %} selected="selected" {% endif %}>Multiplayer</option>
+            </select>
+            <i id="cat-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+            &nbsp;<i id="cat-check" class="fas fa-check" style="display: none;"></i>
+        </div>
+    </div>
+    <div class="row m-l-15 m-r-15">
+        <div class="col-4"><b>Played:</b></div>
+        <div class="col-8">
+            <label for="time-dropdown"></label>
+            <select id="time-dropdown" class="text-light text-center cat-drop"
+             onchange="updatePlaytime('{{ data['id'] }}', this)">
+                {% set play_drop = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 125, 150, 175,
+                200, 225, 250, 275, 300, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000, 1500, 2000, 2500, 3000,
+                4000, 5000, 6000, 7000, 8000, 9000, 10000] %}
+                <option {% if data['playtime'] == None or data['playtime'] == 0 %}selected="selected" {% endif %}
+                 value="0">&nbsp;0&nbsp;h</option>
+                {% for val in play_drop %}
+                    <option {% if val == data['playtime']/60|int %} selected="selected" {% endif %}
+                    value="{{ val }}">&nbsp;{{ val }}&nbsp;h</option>
+                {% endfor %}
+            </select>
+            <i id="time-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+            &nbsp;<i id="time-check" class="fas fa-check" style="display: none;"></i>
+        </div>
+    </div>
+    <div class="m-l-25 m-r-35 m-t-8 m-b-8" style="border: 1px solid grey;"></div>
+    <div id="score-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="Score /10">
+        <div class="col-4"><b>Score:</b></div>
+        <div class="col-8">
+            <label for="score-dropdown"></label>
+            <select id="score-dropdown" class="text-light text-center cat-drop"
+             onchange="updateScore('{{ data['id'] }}', this, '{{ media_list }}')">
+                <option {% if data['score'] == None or data['score'] == -1 %} selected="selected"
+                {% endif %}value="---">&nbsp;---&nbsp;</option>
+                {% for i in range(0, 21) %}
+                    <option {% if (i-(i/2)) == data['score'] %} selected="selected" {% endif %}
+                    value="{{ (i-(i/2)) }}">&nbsp;{{ (i-(i/2)) }}&nbsp;</option>
+                {% endfor %}
+            </select>
+            <i id="score-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+            &nbsp;<i id="score-check" class="fas fa-check" style="display: none;"></i>
+        </div>
+    </div>
+{% endblock medialist_info %}
+
+
+{% block information %}
+    <div class="col-6">
+        <ul class="list-unstyled">
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-star"></i><b>&nbsp; IGDB Score</b></h5>
+                <i class="fas fa-scroll fa-3x media-ticket" value="{{ data['vote_average']/10|int }}"></i>
+                <div class="game-vote-average">{{ data['vote_average']|int }}</div>
+                <div class="movie-vote-count">({{ data['vote_count']|int }} votes)</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-code"></i><b>&nbsp; Developer</b></h5>
+                <div>{{ ', '.join(data['developer']) }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-money-bill-wave-alt"></i><b>&nbsp; Publisher</b></h5>
+                <div>{{ ', '.join(data['publisher']) }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-calendar-check"></i><b>&nbsp; Release date</b></h5>
+                <div>{{ data['release_date'] }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-layer-group"></i><b>&nbsp; Collection Name</b></h5>
+                <div>{{ data['collection_name'] }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-layer-group"></i><b>&nbsp; Platforms</b></h5>
+                <div>{{ data['platforms'] }}</div>
+            </li>
+        </ul>
+    </div>
+    <div class="col-6">
+        <ul class="list-unstyled">
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fab fa-unity"></i><b>&nbsp; Game Engine</b></h5>
+                    <div>{{ data['game_engine'] }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-theater-masks"></i><b>&nbsp; Genres</b></h5>
+                <div>{{ data['genres'] }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-user"></i><b>&nbsp; Game Modes</b></h5>
+                <div>{{ data['game_modes']|replace(',', ', ') }}</div>
+            </li>
+            <li class="m-b-15">
+                <h5 class="mb-1 text-media"><i class="fas fa-cube"></i><b>&nbsp; Perspective</b></h5>
+                <div>{{ data['player_perspective'] }}</div>
+            </li>
+            <li>
+                <h5 class="mb-1 text-media"><i class="fas fa-link"></i><b>&nbsp; IGDB link</b></h5>
+                <a style="word-break: break-all;" href="{{ data['IGDB_url'] }}">{{ data['IGDB_url'] }}</a>
+            </li>
+        </ul>
+    </div>
+{% endblock information %}
+
+
+{% block more_info %}
+    <h4 data-toggle="tooltip" title="HowLongToBeat Time in hours">
+        <i class="fas fa-hourglass"></i>&nbsp;&nbsp; <b>HLTB Time [h]</b>
+    </h4><hr>
+    <div class="d-flex flex-wrap" style="justify-content: space-evenly;">
+        <div class="game-box text-center" style="background-color: slategrey;">
+            <div class="p-t-5"><b>MAIN</b></div>
+            {% if not data['hltb_main'] or data['hltb_main'] == -1 %}
+                <div class="fs-17"><b>-</b></div>
+            {% else %}
+                <div class="fs-17"><b>{{ data['hltb_main'] }}</b></div>
+            {% endif %}
+        </div>
+        <div class="game-box text-center" style="background-color: dimgrey;">
+            <div class="p-t-5"><b>EXTRA</b></div>
+           {% if not data['hltb_main_extra'] or data['hltb_main_extra'] == -1 %}
+                <div class="fs-17"><b>-</b></div>
+            {% else %}
+                <div class="fs-17"><b>{{ data['hltb_main_extra'] }}</b></div>
+            {% endif %}
+        </div>
+        <div class="game-box text-center" style="background-color: darkslategrey;">
+            <div class="p-t-5"><b>TOTAL</b></div>
+            {% if not data['hltb_complete'] or data['hltb_complete'] == -1 %}
+                <div class="fs-17"><b>-</b></div>
+            {% else %}
+                <div class="fs-17"><b>{{ data['hltb_complete'] }}</b></div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock more_info %}

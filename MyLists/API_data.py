@@ -6,22 +6,49 @@ from flask import abort
 from MyLists import app
 from pathlib import Path
 from MyLists.models import ListType
+from howlongtobeatpy import HowLongToBeat
 from ratelimit import sleep_and_retry, limits
 
 
 class ApiData:
     def __init__(self):
+        self.igdb_api_key = app.config['IGDB_API_KEY']
         self.tmdb_api_key = app.config['THEMOVIEDB_API_KEY']
         self.tmdb_poster_base_url = 'https://image.tmdb.org/t/p/w300'
+        self.igdb_base_url = 'https://images.igdb.com/igdb/image/upload/t_1080p/'
 
     @staticmethod
     def status_code(status_code):
         if status_code != 200:
             abort(status_code)
 
+    @staticmethod
+    def HLTB_time(game_name):
+        games_list = HowLongToBeat().search(game_name)
+        if games_list and len(games_list) > 0:
+            game = max(games_list, key=lambda x: x.similarity)
+            hltb_time = {'main': game.gameplay_main,
+                         'extra': game.gameplay_main_extra,
+                         'completionist': game.gameplay_completionist}
+            return hltb_time
+        else:
+            return {'main': None, 'extra': None, 'completionist': None}
+
     def TMDb_search(self, media_name, page=1):
         response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}&page={2}"
                                 .format(self.tmdb_api_key, media_name, page), timeout=15)
+
+        self.status_code(response.status_code)
+
+        return json.loads(response.text)
+
+    @sleep_and_retry
+    @limits(calls=4, period=1)
+    def IGDB_search(self, game_name):
+        headers = {'Client-ID': f"{app.config['CLIENT_IGDB']}",
+                   'Authorization': 'Bearer ' + self.igdb_api_key}
+        body = 'fields id, name, cover.image_id, first_release_date, storyline; search "{}";'.format(game_name)
+        response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers, timeout=15)
 
         self.status_code(response.status_code)
 
@@ -34,6 +61,16 @@ class ApiData:
         elif list_type == ListType.MOVIES:
             response = requests.get("https://api.themoviedb.org/3/movie/{}?api_key={}&append_to_response=credits"
                                     .format(api_id, self.tmdb_api_key), timeout=15)
+        elif list_type == ListType.GAMES:
+            headers = {'Client-ID': f"{app.config['CLIENT_IGDB']}",
+                       'Authorization': 'Bearer ' + self.igdb_api_key}
+            body = 'fields name, cover.image_id, collection.name, game_engines.name, game_modes.name, ' \
+                   'platforms.name, genres.name, player_perspectives.name, total_rating, total_rating_count, ' \
+                   'first_release_date, involved_companies.company.name, involved_companies.developer, ' \
+                   'involved_companies.publisher, storyline, summary, themes.name, url, external_games.uid, ' \
+                   'external_games.category; where id={};'\
+                .format(api_id)
+            response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers, timeout=15)
 
         self.status_code(response.status_code)
 
@@ -81,9 +118,26 @@ class ApiData:
             local_covers_path = Path(app.root_path, "static/covers/anime_covers/")
         elif list_type == ListType.MOVIES:
             local_covers_path = Path(app.root_path, "static/covers/movies_covers")
+        elif list_type == ListType.GAMES:
+            local_covers_path = Path(app.root_path, "static/covers/games_covers/")
 
-        urllib.request.urlretrieve(f"{self.tmdb_poster_base_url}{media_cover_path}",
-                                   f"{local_covers_path}/{media_cover_name}")
+        if list_type != ListType.GAMES:
+            urllib.request.urlretrieve(f"{self.tmdb_poster_base_url}{media_cover_path}",
+                                       f"{local_covers_path}/{media_cover_name}")
+        else:
+            url_address = f"{self.igdb_base_url}{media_cover_path}.jpg"
+            headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) '
+                                     'Chrome/23.0.1271.64 Safari/537.11',
+                       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                       'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+                       'Accept-Encoding': 'none',
+                       'Accept-Language': 'en-US,en;q=0.8',
+                       'Connection': 'keep-alive'}
+            request_ = urllib.request.Request(url_address, None, headers)
+            response = urllib.request.urlopen(request_)
+            f = open(f"{local_covers_path}/{media_cover_name}", 'wb')
+            f.write(response.read())
+            f.close()
 
         img = Image.open(f"{local_covers_path}/{media_cover_name}")
         img = img.resize((300, 450), Image.ANTIALIAS)

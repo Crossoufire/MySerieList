@@ -4,7 +4,7 @@ MyLists is a website with a nice and clear interface which allows you to track a
 It integrates statistics, so you can see how much time you spent. Moreover, you can follow people, see their lists  
 and compare it to yours. You can see a live version here: [https://mylists.info](https://mylists.info).
 
-![MyLists](https://raw.githubusercontent.com/Crossoufire/MyLists/master/MyLists/static/img/home222.jpg)
+![MyLists](https://raw.githubusercontent.com/Crossoufire/MyLists/master/MyLists/static/img/home2.jpg)
 
 MyLists uses [Flask](http://flask.pocoo.org/) and [Material Design for Bootstrap 4](https://mdbootstrap.com/)
 

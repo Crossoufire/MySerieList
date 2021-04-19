@@ -99,11 +99,11 @@ def add_id_to_user(user_id, ids_to_add, list_type):
                                user_id=user_id)
 
         if list_type == ListType.SERIES:
-            covers_path = "static/covers/series_covers"
+            covers_path = "../static/covers/series_covers"
         elif list_type == ListType.ANIME:
-            covers_path = "static/covers/anime_covers"
+            covers_path = "../static/covers/anime_covers"
         elif list_type == ListType.MOVIES:
-            covers_path = "static/covers/movies_covers"
+            covers_path = "../static/covers/movies_covers"
 
         data.append({'name': media.name,
                      'cover': f'{covers_path}/{media.image_cover}',

@@ -4,7 +4,8 @@ from flask_admin.contrib.sqla import ModelView
 from flask_admin import Admin, expose, AdminIndexView
 from MyLists.models import User, UserLastUpdate, Series, SeriesList, SeriesEpisodesPerSeason, SeriesGenre, \
     SeriesNetwork, SeriesActors, Anime, AnimeEpisodesPerSeason, AnimeGenre, AnimeList, AnimeNetwork, AnimeActors, \
-    Movies, MoviesGenre, MoviesList, MoviesActors, RoleType
+    Movies, MoviesGenre, MoviesList, MoviesActors, RoleType, Games, GamesList, GamesGenre, GamesCompanies, \
+    GamesPlatforms
 
 
 # --- USER ----------------------------------------------------------------------------------------------------- #
@@ -94,7 +95,7 @@ class AnimeAdminView(ModelView):
     column_exclude_list = ('homepage', 'synopsis', 'image_cover', 'themoviedb_id')
     column_searchable_list = ['name']
     column_sortable_list = ('id', 'name', 'original_name', 'in_production', 'created_by', 'origin_country', 'status',
-                            'episode_duration', 'total_seasons', 'total_episodes', 'vote_average', 'vote_count',
+                            'duration', 'total_seasons', 'total_episodes', 'vote_average', 'vote_count',
                             'popularity', 'first_air_date', 'last_air_date', 'last_update')
 
 
@@ -152,7 +153,7 @@ class MoviesAdminView(ModelView):
     column_display_pk = True
     column_exclude_list = ('homepage', 'released', 'synopsis', 'tagline', 'image_cover', 'themoviedb_id')
     column_searchable_list = ['name']
-    column_sortable_list = ('id', 'name', 'original_name', 'release_date', 'runtime', 'original_language',
+    column_sortable_list = ('id', 'name', 'original_name', 'release_date', 'duration', 'original_language',
                             'vote_average', 'vote_count', 'popularity', 'budget', 'revenue')
 
 
@@ -175,6 +176,56 @@ class MoviesListAdminView(ModelView):
 
 
 class MoviesActorsAdminView(ModelView):
+    def is_accessible(self):
+        return current_user.role == RoleType.ADMIN
+
+    column_list = ('media_id', 'name')
+    column_searchable_list = ('media_id', 'name')
+    column_sortable_list = ('id', 'media_id', 'name')
+
+
+# --- GAMES --------------------------------------------------------------------------------------------------- #
+
+class GamesAdminView(ModelView):
+    def is_accessible(self):
+        return current_user.role == RoleType.ADMIN
+
+    column_display_pk = True
+    column_exclude_list = ('storyline', 'summary', 'tagline', 'image_cover', 'themoviedb_id', 'IGDB_url', 'igdb_id')
+    column_searchable_list = ['name']
+    column_sortable_list = ('id', 'name', 'release_date', 'hltb_main_time', 'hltb_main_and_extra_time',
+                            'hltb_total_complete_time', 'vote_average', 'vote_count', 'game_modes', 'game_engine',
+                            'lock_status')
+
+
+class GamesGenreAdminView(ModelView):
+    def is_accessible(self):
+        return current_user.role == RoleType.ADMIN
+
+    column_list = ('media_id', 'genre')
+    column_searchable_list = ['media_id']
+    column_sortable_list = ('media_id', 'genre')
+
+
+class GamesListAdminView(ModelView):
+    def is_accessible(self):
+        return current_user.role == RoleType.ADMIN
+
+    column_list = ('user_id', 'media_id', 'status', 'score')
+    column_searchable_list = ('user_id', 'media_id', 'status')
+    column_sortable_list = ('id', 'user_id', 'media_id', 'status')
+
+
+class GamesCompaniesAdminView(ModelView):
+    def is_accessible(self):
+        return current_user.role == RoleType.ADMIN
+
+    column_list = ('media_id', 'name')
+    column_searchable_list = ('media_id', 'name')
+    column_sortable_list = ('id', 'media_id', 'name')
+
+
+class GamesPlatformsAdminView(ModelView):
     def is_accessible(self):
         return current_user.role == RoleType.ADMIN
 
@@ -220,3 +271,10 @@ admin.add_view(MoviesAdminView(Movies, db.session))
 admin.add_view(MoviesListAdminView(MoviesList, db.session))
 admin.add_view(MoviesGenreAdminView(MoviesGenre, db.session))
 admin.add_view(MoviesActorsAdminView(MoviesActors, db.session))
+
+admin.add_view(GamesAdminView(Games, db.session))
+admin.add_view(GamesListAdminView(GamesList, db.session))
+admin.add_view(GamesGenreAdminView(GamesGenre, db.session))
+admin.add_view(GamesCompaniesAdminView(GamesCompanies, db.session))
+admin.add_view(GamesPlatformsAdminView(GamesPlatforms, db.session))
+

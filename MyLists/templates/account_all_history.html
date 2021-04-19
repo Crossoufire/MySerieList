@@ -11,7 +11,7 @@
     <h4><i class="fas fa-highlighter m-t-15"></i>&nbsp; All Updates</h4>
     <hr>
     <div class="m-b-30">
-         <a class="text-light" href="/account/{{ header_data['username'] }}">
+         <a class="text-light" href="{{ url_for('users.account', user_name=header_data['username']) }}">
             <i class="fas fa-caret-left"></i>&nbsp&nbsp <b>Return to account</b>
         </a>
     </div>
@@ -29,12 +29,14 @@
             {% for update in media_updates %}
                 <tr>
                     <td>
-                        {% if update['category'] == 'Movies' %}
-                            <i class="fas fa-2x fa-film" style="color: #8c7821;"></i>
+                        {% if update['category'] == 'Series' %}
+                            <i class="fas fa-2x fa-tv" style="color: #216e7d;"></i>
                         {% elif update['category'] == 'Anime' %}
                             <i class="fas fa-2x fa-torii-gate" style="color: #945141;"></i>
-                        {% else %}
-                            <i class="fas fa-2x fa-tv" style="color: #216e7d;"></i>
+                        {% elif update['category'] == 'Movies' %}
+                            <i class="fas fa-2x fa-film" style="color: #8c7821;"></i>
+                        {% elif update['category'] == 'Games' %}
+                            <i class="fas fa-2x fa-gamepad" style="color: #196219;"></i>
                         {% endif %}
                     </td>
                     <td>{{ update['media_name'] }}</td>

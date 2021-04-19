@@ -1,6 +1,6 @@
 
 
-// --- Delete element --------------------------------------
+// --- Delete element --------------------------------------------------------------------------------------
 function deleteElement(card, media_list) {
     let element_id = $(card)[0].id.split('_')[1];
     let $load_img = $(card).find('.view.overlay');
@@ -30,7 +30,7 @@ function deleteElement(card, media_list) {
 }
 
 
-// --- Remove the category buttons -------------------------
+// --- Remove the category buttons -------------------------------------------------------------------------
 function removeCat() {
     $('.card-cat-buttons').remove();
     $('.card-btn-top-right').remove();
@@ -44,7 +44,7 @@ function removeCat() {
 }
 
 
-// --- Add media to favorite -------------------------------
+// --- Add media to favorite -------------------------------------------------------------------------------
 function addFavorite(fav_div, element_id, media_type) {
     let favorite = !!$(fav_div).hasClass('far');
 
@@ -68,7 +68,7 @@ function addFavorite(fav_div, element_id, media_type) {
 }
 
 
-// --- Add the category to the user (from other list) ------
+// --- Add the category to the user (from other list) ------------------------------------------------------
 function AddCatUser(category, card_id) {
     let $card = $('#'+card_id);
     let media_list = $card.attr('values').split('-')[1];
@@ -97,7 +97,7 @@ function AddCatUser(category, card_id) {
 }
 
 
-// --- Show comments ---------------------------------------
+// --- Show comments ---------------------------------------------------------------------------------------
 function showComment(card, media_type, media_id, current_user) {
     let media_name = $(card).find('.font-mask').text();
     let comment = $("#com_"+media_id).text();
@@ -138,14 +138,14 @@ function showComment(card, media_type, media_id, current_user) {
 }
 
 
-// --- Remove comments modal -------------------------------
+// --- Remove comments modal -------------------------------------------------------------------------------
 function removeModal() {
     $('#commentModal').remove();
     $('.modal-backdrop.show').remove();
 }
 
 
-// --- Create the loading image on media -------------------
+// --- Create the loading image on media -------------------------------------------------------------------
 function Loading() {
     return ('<div class="load-medialist">' +
                 '<div class="central-loading fas fa-3x fa-spinner fast-spin"></div>' +
@@ -153,7 +153,7 @@ function Loading() {
 }
 
 
-// --- Create the score dropdown ---------------------------
+// --- Create the score dropdown ---------------------------------------------------------------------------
 function scoreDrop(score, data_id, media_list) {
     let score_value = $(score).text();
     let drop = document.createElement("select");
@@ -189,7 +189,7 @@ function scoreDrop(score, data_id, media_list) {
 }
 
 
-// --- Change/delete the score dropdown --------------------
+// --- Change/delete the score dropdown --------------------------------------------------------------------
 $(document).on('change focusout','.score-drop',function(event) {
     let value = parseFloat(this.value).toFixed(1);
     let media_id = $(this).attr('values').split(',')[0];
@@ -224,7 +224,7 @@ $(document).on('change focusout','.score-drop',function(event) {
 });
 
 
-// --- Create the rewatch dropdown -------------------------
+// --- Create the rewatch dropdown -------------------------------------------------------------------------
 function rewatchDrop(rewatch, data_id, media_list) {
     let rewatch_value = $(rewatch).text();
     let drop = document.createElement("select");
@@ -253,7 +253,7 @@ function rewatchDrop(rewatch, data_id, media_list) {
 }
 
 
-// --- Change/delete the rewatch dropdown ------------------
+// --- Change/delete the rewatch dropdown ------------------------------------------------------------------
 $(document).on('change focusout', '.rewatch-drop', function(event) {
     let value = parseInt(this.value);
     let media_id = $(this).attr('values').split(',')[0];
@@ -282,7 +282,75 @@ $(document).on('change focusout', '.rewatch-drop', function(event) {
 });
 
 
-// --- Create Row gutters ----------------------------------
+// --- Create the playtime dropdown -------------------------------------------------------------------------
+function playtimeDrop(playtime, data_id) {
+    let playtime_value = $(playtime).text();
+    let drop = document.createElement("select");
+    let option = document.createElement("option");
+
+    $(playtime).hide();
+
+    const play_drop = [0, 2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 125, 150, 175,
+    200, 225, 250, 275, 300, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000, 1500, 2000, 2500, 3000,
+    4000, 5000, 6000, 7000, 8000, 9000, 10000];
+
+    drop.className = "playtime-drop";
+    drop.setAttribute('values', ''+data_id);
+    option.className = "seas-eps-drop-options";
+
+    for (let val of play_drop) {
+        let option = document.createElement("option");
+        option.className = "seas-eps-drop-options";
+        option.value = "" + val;
+        if (val === parseInt(playtime_value)) {
+            option.selected = true;
+        }
+        option.text = "" + val + " hours";
+        drop.appendChild(option);
+    }
+
+    $(playtime).parent().prepend(drop);
+    drop.focus();
+}
+
+
+// --- Change/delete the playtime dropdown ------------------------------------------------------------------
+$(document).on('change focusout', '.playtime-drop', function(event) {
+    let value = parseInt(this.value);
+    let media_id = $(this).attr('values').split(',')[0];
+    let $play_div = $('#play_'+media_id);
+    let check_img = $('<div style="position: absolute; z-index: 200; top: 65%; width: 100%;' +
+                    'background-color: black; opacity: 0.60;">' +
+                    '<div class="central-loading fas fa-2x fa-check" style="color: green;"></div>' +
+                    '</div>');
+
+    if (event.type === 'change') {
+        $.ajax ({
+            type: "POST",
+            url: "/update_playtime",
+            contentType: "application/json",
+            data: JSON.stringify({playtime: value, media_id: media_id, media_type: 'gameslist'}),
+            dataType: "json",
+            success: function() {
+                $play_div.text(value + ' hours').show();
+                $(this).remove();
+                check_img.prependTo($('#card_'+media_id).find('.view.overlay'));
+                check_img.delay(800).fadeOut(300, function() { this.remove(); });
+
+            },
+            error: function () {
+                error_ajax_message('Error trying to change the game playtime value. Please try again later.')
+            }
+        });
+    }
+
+    $play_div.text(value + ' hours').show();
+    this.remove();
+});
+
+
+
+// --- Create Row gutters ----------------------------------------------------------------------------------
 $(document).ready(function() {
     let $row = $('.row');
 

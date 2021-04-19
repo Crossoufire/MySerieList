@@ -6,8 +6,8 @@
         <div class="col-4"><b>Status:</b></div>
         <div class="col-8">
             <label for="category-dropdown"></label>
-            <select id="category-dropdown" class="text-light text-center cat-drop"
-             onchange="changeCategoryMovies('{{ data['id'] }}', this, '{{ data['genres'] }}')">
+            <select id="category-dropdown" class="text-light text-center cat-drop" onchange="changeCategoryMovies(
+             '{{ data['id'] }}', this)">
                 <option {% if data['status'] == 'Completed' %}selected="selected"{% endif %}>Completed</option>
                 <option {% if data['status'] == 'Plan to Watch' %}selected="selected"{% endif %}>Plan to Watch</option>
             </select>
@@ -19,19 +19,17 @@
     <div id="score-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="Score /10">
         <div class="col-4"><b>Score:</b></div>
         <div class="col-8">
-            &nbsp;<select id="score-dropdown" class="text-light text-center cat-drop"
-                          onchange="updateScore('{{ data['id'] }}', this, '{{ media_list }}')">
-            <option {% if data['score'] == None or data['score'] == -1 %} selected="selected"
-            {% endif %}value="---">
-                &nbsp;---&nbsp;
-            </option>
-            {% for i in range(0, 21) %}
-                <option {% if (i-(i/2)) == data['score'] %} selected="selected" {% endif %}
-                                                            value="{{ (i-(i/2)) }}">
-                    &nbsp;{{ (i-(i/2)) }}&nbsp;
-                </option>
-            {% endfor %}
-        </select>
+            <label for="score-dropdown"></label>
+            <select id="score-dropdown" class="text-light text-center cat-drop" onchange="updateScore(
+             '{{ data['id'] }}', this, '{{ media_list }}')">
+                <option {% if data['score'] == None or data['score'] == -1 %} selected="selected"
+                {% endif %}value="---">&nbsp;---&nbsp;</option>
+                {% for i in range(0, 21) %}
+                    <option {% if (i-(i/2)) == data['score'] %} selected="selected" {% endif %} value="{{ (i-(i/2)) }}">
+                        &nbsp;{{ (i-(i/2)) }}&nbsp;
+                    </option>
+                {% endfor %}
+            </select>
             <i id="score-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
             &nbsp;<i id="score-check" class="fas fa-check" style="display: none;"></i>
         </div>
@@ -41,14 +39,12 @@
         <div class="col-4"><b>Rewatched:</b></div>
         <div class="col-8">
             <label for="rewatched-dropdown"></label>
-            <select id="rewatched-dropdown" class="text-light text-center cat-drop"
-                    onchange="updateRewatched('{{ data['id'] }}', this, '{{ media_list }}')">
+            <select id="rewatched-dropdown" class="text-light text-center cat-drop" onchange="updateRewatched(
+             '{{ data['id'] }}', this, '{{ media_list }}')">
                 {% for i in range(0, 11) %}
-                    {% if i == data['rewatched'] %}
-                        <option selected="selected" value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
-                    {% else %}
-                        <option value="{{ i }}">&nbsp;{{ i }}&nbsp;</option>
-                    {% endif %}
+                    <option {% if i == data['rewatched'] %}selected="selected"{% endif %} value="{{ i }}">
+                        &nbsp;{{ i }}&nbsp;
+                    </option>
                 {% endfor %}
             </select>
             <i id="rewatched-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
@@ -77,7 +73,7 @@
             </li>
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Runtime</b></h5>
-                <div>{{ data['runtime']//60 }} h {{ '%02d'|format(data['runtime']%60) }} min</div>
+                <div>{{ data['duration']//60 }} h {{ '%02d'|format(data['duration']%60) }} min</div>
             </li>
             <li>
                 <h5 class="mb-1 text-media"><i class="fas fa-flag"></i><b>&nbsp; Original language</b></h5>

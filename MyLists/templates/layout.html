@@ -52,8 +52,8 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle fs-22" data-toggle="dropdown">MyLists</a>
                         <div class="dropdown-menu medialist-dropdown">
-                            <a class="dropdown-item text-light"
-                               href="/serieslist/{{ current_user.username }}/Watching/genre/All/by/title-A-Z/page/1">
+                            <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
+                             media_list='serieslist', user_name=current_user.username) }}">
                                 <div class="row">
                                     <div class="col-3" style="margin-right: -5px;">
                                         <i class="fas fa-tv text-series"></i>
@@ -61,8 +61,8 @@
                                     <div class="col-9">SeriesList</div>
                                 </div>
                             </a>
-                            <a class="dropdown-item text-light"
-                               href="/animelist/{{ current_user.username }}/Watching/genre/All/by/title-A-Z/page/1">
+                            <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
+                             media_list='animelist', user_name=current_user.username) }}">
                                 <div class="row">
                                     <div class="col-3" style="margin-right: -5px;">
                                         <i class="fas fa-torii-gate text-anime"></i>
@@ -70,8 +70,8 @@
                                     <div class="col-9">AnimeList</div>
                                 </div>
                             </a>
-                            <a class="dropdown-item text-light"
-                               href="/movieslist/{{ current_user.username }}/Completed/genre/All/by/title-A-Z/page/1">
+                            <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
+                             media_list='movieslist', user_name=current_user.username) }}">
                                 <div class="row">
                                     <div class="col-3" style="margin-right: -5px;">
                                         <i class="fas fa-film text-movies"></i>
@@ -79,17 +79,29 @@
                                     <div class="col-9">MoviesList</div>
                                 </div>
                             </a>
+                            {% if current_user.add_games %}
+                                <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist',
+                                 media_list='gameslist', user_name=current_user.username) }}">
+                                    <div class="row">
+                                        <div class="col-3" style="margin-right: -5px;">
+                                            <i class="fas fa-gamepad text-games"></i>
+                                        </div>
+                                        <div class="col-9">GamesList</div>
+                                    </div>
+                                </a>
+                            {% endif %}
                         </div>
                     </li>
                 </ul>
-                <button class="navbar-toggler third-button" type="button" data-toggle="collapse" data-target="#nav-collapse">
+                <button class="navbar-toggler third-button" data-toggle="collapse" data-target="#nav-collapse"
+                 type="button">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="nav-collapse">
                     <form class="form-inline nav-form" action="{{ url_for('main.search_media') }}">
                         <label for="autocomplete"></label>
                         <input id="autocomplete" class="form-control search-ipad-mobile" name="search"
-                               placeholder="Search media, users...">
+                               placeholder="Search media or users...">
                     </form>
                     <ul class="navbar-nav mr-auto nav-ul-1">
                         <li class="nav-item nav-li-1">
@@ -102,12 +114,6 @@
                             <a class="nav-link" href="{{ url_for('general.current_trends') }}">
                                 <i class="fas fa-lg fa-fire-alt" style="color: orangered;"></i>
                                 <div class="info-nav fs-14 nav-text">Trends</div>
-                            </a>
-                        </li>
-                        <li class="nav-item nav-li-1">
-                            <a class="nav-link" href="{{ url_for('users.hall_of_fame') }}">
-                                <i class="fas fa-lg fa-trophy" style="color: goldenrod;"></i>
-                                <div class="info-nav fs-14 nav-text">Follows HoF</div>
                             </a>
                         </li>
                     </ul>

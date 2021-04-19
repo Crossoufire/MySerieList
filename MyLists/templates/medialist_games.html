@@ -1,0 +1,62 @@
+{% extends 'medialist_base.html' %}
+
+
+{% block return_icon %}
+    <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip" title="Serieslist"
+       href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=username) }}"></a>
+    <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip" title="Animelist"
+       href="{{ url_for('main.mymedialist', media_list='animelist', user_name=username) }}"></a>
+    <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip" title="Movieslist"
+       href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=username) }}"></a>
+{% endblock return_icon %}
+
+
+{% block categories %}
+    {% set categories = ['All', 'Completed', 'Endless', 'Multiplayer', 'Favorite'] %}
+    {% for cat in categories %}
+        <a class="cat-btn{% if cat == category %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
+         media_list=media_list, user_name=username, category=cat, genre=genre, sorting=sorting, page_val=1) }}">
+            <b>{{ cat|upper }}</b>
+        </a>
+    {% endfor %}
+{% endblock categories %}
+
+
+{% block add_genres %}
+    {% set all_genres = ["All", "4X", "Action",  "Adventure", "Arcade", "Business", "Card Game", "Comedy", "Drama",
+    "Educational", "Erotic", "Fantasy", "Fighting","Hack and Slash", "Historical", "Horror", "Indie", "Kids", "MOBA",
+    "Music", "Mystery", "Non-fiction", "Open world", "Party", "Pinball", "Platform", "Point-and-click", "Puzzle",
+    "Quiz", "Racing", "Real Time Strategy (RTS)", "Role-playing (RPG)", "Romance", "Sandbox", "Science fiction",
+    "Shooter", "Simulator", "Sport", "Stealth", "Strategy", "Survival", "Tactical", "Thriller",
+    "Turn-based strategy (TBS)", "Visual Novel", "Warfare"] %}
+    {% for ge in all_genres %}
+        <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
+         user_name=username, category=category, genre=ge, sorting=sorting,
+         page_val=1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
+            <div>{{ ge }}</div>
+        </a>
+    {% endfor %}
+{% endblock add_genres %}
+
+
+{% block add_sort scoped %}
+    {% set all_sort = ['Playtime +', 'Playtime -', 'Title A-Z', 'Title Z-A', 'Score +', 'Score -', 'Score IGDB +',
+    'Score IGDB -', 'Comments','Release date +','Release date -'] %}
+    {% for so in all_sort %}
+        <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
+         user_name=username, category=category, genre=genre, sorting=so,
+         page_val=1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
+            <div>{{ so }}</div>
+        </a>
+    {% endfor %}
+{% endblock add_sort %}
+
+
+{% block data %}
+    {{ item.genres }}-{{ media_list }}-{{ item.id }}
+{% endblock data %}
+
+
+{% block javascript %}
+    <script src="{{ url_for('static', filename='js/medialist_games.js') }}"></script>
+{% endblock javascript %}

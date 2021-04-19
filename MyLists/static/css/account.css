@@ -337,7 +337,7 @@ a {
     flex-direction: column;
 }
 
-#series-score, #anime-score, #movies-score {
+#series-score, #anime-score, #movies-score, #games-score {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
@@ -367,6 +367,11 @@ a {
     background: #8c7821;
 }
 
+.histogram-item-games {
+    width: 100%;
+    background: #196219;
+}
+
 @media (max-width: 768px) {
     .media-container {
         position: relative;
@@ -386,4 +391,15 @@ a {
     height: 60px;
     width: 60px;
     background-color: grey;
+}
+
+.hof-button {
+    background-color: #3b3434;
+    width: 100%;
+    margin: 0;
+    padding: 5px 0 5px 0;
+}
+
+.hof-button:hover {
+    color: wheat;
 }

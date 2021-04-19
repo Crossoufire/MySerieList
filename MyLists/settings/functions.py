@@ -8,7 +8,7 @@ from flask_mail import Message
 
 
 def send_email_update_email(user):
-    token = user.get_email_update_token()
+    token = user.get_token()
     msg = Message(subject='MyList - Email update request',
                   sender=app.config['MAIL_USERNAME'],
                   recipients=[user.transition_email],

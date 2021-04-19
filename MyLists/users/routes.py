@@ -1,11 +1,10 @@
-import time
 import json
 from MyLists import app, db
 from flask_login import login_required, current_user
 from flask import Blueprint, request, render_template
 from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications
-from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_more_stats, get_user_data, \
-    get_knowledge_frame, get_updates, get_favorites, get_all_follows_data, get_header_data
+from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_updates,\
+    get_user_data, get_knowledge_frame, get_favorites, get_all_follows_data, get_header_data
 
 bp = Blueprint('users', __name__)
 
@@ -46,26 +45,7 @@ def account(user_name):
 
     return render_template('account.html', title=user.username+"'s account", header_data=header_data,
                            user_data=user_data, favorites=favorites, media_data=media_data, follows_list=follows_list,
-                           follows_update_list=follows_update_list)
-
-
-@bp.route("/account/more_stats/<user_name>", methods=['GET', 'POST'])
-@login_required
-def more_stats(user_name):
-    # Check if the user can see the <media_list>
-    user = current_user.check_autorization(user_name)
-
-    # Recover the stats data
-    stats = get_more_stats(user)
-
-    # Recover the account header data
-    header_data = get_header_data(user)
-
-    # Recover the user data
-    user_data = get_user_data(user)
-
-    return render_template('more_stats.html', title='More stats', stats=stats, user_data=user_data,
-                           header_data=header_data)
+                           follows_update_list=follows_update_list, user=user)
 
 
 @bp.route("/hall_of_fame", methods=['GET', 'POST'])
@@ -79,6 +59,7 @@ def hall_of_fame():
         series_level = get_media_levels(user, ListType.SERIES)
         anime_level = get_media_levels(user, ListType.ANIME)
         movies_level = get_media_levels(user, ListType.MOVIES)
+        games_level = get_media_levels(user, ListType.GAMES)
         knowledge_frame = get_knowledge_frame(user)
 
         user_data = {"id": user.id,
@@ -87,8 +68,10 @@ def hall_of_fame():
                      "series_data": series_level,
                      "anime_data": anime_level,
                      "movies_data": movies_level,
+                     "games_data": games_level,
                      'knowledge_frame': knowledge_frame,
-                     'current_user': False}
+                     'current_user': False,
+                     'add_games': user.add_games}
 
         if user.id == current_user.id:
             user_data["current_user"] = True
@@ -96,15 +79,6 @@ def hall_of_fame():
         all_users_data.append(user_data)
 
     return render_template("hall_of_fame.html", title='Hall of Fame', all_data=all_users_data)
-
-
-@bp.route("/achievements/<user_name>", methods=['GET', 'POST'])
-@login_required
-def achievements(user_name):
-    # Check if the user can see the <media_list>
-    user = current_user.check_autorization(user_name)
-
-    return render_template('achievements.html', title="{}'s achievements".format(user_name))
 
 
 @bp.route("/level_grade_data", methods=['GET'])

@@ -1,41 +1,118 @@
 {% extends 'medialist_base.html' %}
 
 
+{% block return_icon %}
+    <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip" title="Serieslist"
+       href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=username) }}"></a>
+    <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip" title="Animelist"
+       href="{{ url_for('main.mymedialist', media_list='animelist', user_name=username) }}"></a>
+    {% if user.add_games %}
+        <a class="fas fa-lg fa-gamepad m-r-10 return-icon text-games" data-toggle="tooltip" title="Gameslist"
+        href="{{ url_for('main.mymedialist', media_list='gameslist', user_name=username) }}"></a>
+    {% endif %}
+{% endblock return_icon %}
+
+
 {% block categories %}
-    <a class="cat-btn {% if category == 'All' %}btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/All/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>ALL</b>
-    </a>
-    <a class="cat-btn {% if category == 'Completed' %}btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/Completed/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>COMPLETED</b>
-    </a>
-    <a class="cat-btn {% if category == 'Plan to Watch' %}btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/Plan to Watch/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>PLAN TO WATCH</b>
-    </a>
-    <a class="cat-btn {% if category == 'Favorite' %}btn-selected{% endif %}"
-       href="/{{ media_list }}/{{ username }}/Favorite/genre/{{ genre }}/by/{{ sorting }}/page/1">
-        <b>FAVORITES</b>
+    {% set categories = ['All', 'Completed', 'Plan to Watch', 'Favorite'] %}
+    {% for cat in categories %}
+        <a class="cat-btn{% if category == cat %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
+         media_list=media_list, user_name=username, category=cat, genre=genre, sorting=sorting, page_val=1) }}">
+            <b>{{ cat|upper }}</b>
+        </a>
+    {% endfor %}
+    <a class="cat-btn{% if category == 'Stats' %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
+     media_list=media_list, user_name=username, category='Stats') }}">
+        <b>STATS</b>
     </a>
 {% endblock categories %}
 
 
-{% block sorting_list %}
-    <a class="dropdown-item text-light"
-       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/release_date_desc/page/1{% if category == 'search' %}?q={{ search_query }}{% endif %}">
-        <div>Release dates 🠗</div>
-    </a>
-    <a class="dropdown-item text-light"
-       href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/release_date_asc/page/1{% if category == 'search' %}?q={{ search_query }}{% endif %}">
-        <div>Release dates 🠕</div>
-    </a>
-{% endblock sorting_list %}
+{% block add_genres %}
+    {% set all_genres = ["All", "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama",
+    "Family", "Fantasy", "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "TV Movie", "Thriller",
+    "War", "Western"] %}
+    {% for ge in all_genres %}
+        <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
+         user_name=username, category=cat, genre=genre, sorting=sorting,
+         page_val=1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
+            <div>{{ ge }}</div>
+        </a>
+    {% endfor %}
+{% endblock add_genres %}
+
+
+{% block add_sort scoped %}
+    {% set all_sort = ['Title A-Z', 'Title Z-A', 'Score +', 'Score -', 'Score TMDB +',
+    'Score TMDB -', 'Rewatch', 'Comments', 'Release date +','Release date -'] %}
+    {% for so in all_sort %}
+        <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
+         user_name=username, category=category, genre=genre, sorting=so,
+         page_val=1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
+            <div>{{ so }}</div>
+        </a>
+    {% endfor %}
+{% endblock add_sort %}
 
 
 {% block data %}
     {{ item.genres }}-{{ media_list }}-{{ item.id }}
 {% endblock data %}
+
+
+{% block stats_block %}
+    <section class="stats-for-movies">
+            <div class="row">
+                <div class="col">
+                    <h4><i class="fas fa-caret-square-right"></i>&nbsp;&nbsp; Runtimes</h4>
+                    <div class="movies-container">
+                        <canvas id="lengths-movies"></canvas>
+                        <span id="lengths-movies-bar"
+                          values-y="{% for key in data['movies_times'].keys() %} {{ key }}, {% endfor %}"
+                          values-x="{% for value in data['movies_times'].values() %}{{ value }}, {% endfor %}">
+                        </span>
+                    </div>
+                </div>
+                <div class="col">
+                    <h4><i class="fas fa-calendar-times"></i>&nbsp;&nbsp; Release Dates</h4>
+                    <div class="movies-container">
+                        <canvas id="periods-movies"></canvas>
+                        <span id="periods-movies-bar"
+                          values-y="{% for key in data['periods'].keys() %} {{ key }}, {% endfor %}"
+                          values-x="{% for value in data['periods'].values() %}{{ value }}, {% endfor %}">
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row m-t-40 m-b-50">
+                <div class="col">
+                    <h4><i class="fas fa-theater-masks"></i>&nbsp;&nbsp; Top 10 Genres</h4>
+                    <div class="movies-container">
+                        <canvas id="genres-movies"></canvas>
+                        <span id="genres-movies-bar"
+                          values-y="{% for d in data['genres'] %}{{ d[0] }}, {% endfor %}"
+                          values-x="{% for d in data['genres'] %}{{ d[2] }}, {% endfor %}">
+                        </span>
+                    </div>
+                </div>
+                <div class="col">
+                    <h4><i class="fas fa-user-alt"></i>&nbsp;&nbsp; Top 10 Actors</h4>
+                    <div class="movies-container">
+                        <canvas id="actors-movies"></canvas>
+                        <span id="actors-movies-bar"
+                          values-y="{% for d in data['actors'] %}{{ d[0] }}, {% endfor %}"
+                          values-x="{% for d in data['actors'] %}{{ d[2] }}, {% endfor %}">
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock stats_block %}
+
+
+{% block stats_js %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/more_stats.js') }}"></script>
+{% endblock stats_js %}
 
 
 {% block javascript %}

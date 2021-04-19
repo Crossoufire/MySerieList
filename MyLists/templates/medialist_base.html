@@ -10,201 +10,206 @@
             hr {border-top: 1px solid #945141;}
         {% elif media_list == 'movieslist' %}
             hr {border-top: 1px solid #8c7821;}
+        {% elif media_list == 'gameslist' %}
+            hr {border-top: 1px solid #196219;}
         {% endif %}
     </style>
 {% endblock css %}
 
 
 {% block content %}
-    <div class="row no-gutters m-t-30">
-        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mobile-margin mobile-center">
-            <a class="fas fa-lg fa-user m-r-10 return-icon text-grey" href="/account/{{ username }}"
-               data-toggle="tooltip" title="{{ username }}"></a>
-            {% if media_list == 'serieslist' %}
-                <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip"
-                   href="/animelist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Anime list"></a>
-                <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip"
-                   href="/movieslist/{{ username }}/Completed/genre/All/by/title-A-Z/page/1" title="Movies list"></a>
-            {% elif media_list == 'animelist' %}
-                <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip"
-                   href="/serieslist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Series list"></a>
-                <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip"
-                   href="/movieslist/{{ username }}/Completed/genre/All/by/title-A-Z/page/1" title="Movies list"></a>
-            {% elif media_list == 'movieslist' %}
-                <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip"
-                   href="/serieslist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Series list"></a>
-                <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip"
-                   href="/animelist/{{ username }}/Watching/genre/All/by/title-A-Z/page/1" title="Anime list"></a>
-            {% endif %}
-            {% if user_id != current_user.get_id() %}
-                <div class="shared-pie" data-toggle="tooltip"
-                     title="{{ common_elements[0] }}/{{ common_elements[1] }} shared ({{ common_elements[2] }}%)"
-                     style="background: conic-gradient(#8a7a6c {{ common_elements[2] }}%, #040404 0);"></div>
-            {% endif %}
-        </div>
-        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 input-container mobile-margin">
-            <form method="GET" action="/{{ media_list }}/{{ username }}/Search/genre/{{ genre }}/by/{{ sorting }}/page/1">
-                <input class="modded-input" name="q" placeholder="&#128269; Search..."
-                 onfocus="this.placeholder = '';" onblur="this.placeholder = '&#128269; Search...';">
-            </form>
-        </div>
-    </div>
-
-    <div class="text-center m-t-30 m-b-20 p-1" style="background: #34383c;">
-        {% block categories scoped %}
-        {% endblock categories %}
-    </div>
-
-    <h4 class="cat-title">
-        {{ category|upper }} {% if category == 'Search' %} RESULTS FOR "{{ search_query }}" {% endif %}
-        ({{ info_pages['total_media'] }})
-    </h4>
-    <div class="sort-container">
-{#        {% if user_id != current_user.get_id() %}#}
-{#            <a class="m-r-15" style="display: inline-block;"#}
-{#               href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/#}
-{#                {{ sorting }}/page/1?filter={{ filter_val }}">#}
-{#                <b class="text-grey"> Shared#}
-{#                    <i class="fas fa-{% if filter_val == True %}check{% else %}times{% endif %}"></i>#}
-{#                </b>#}
-{#            </a>#}
-{#        {% endif %}#}
-        <li class="nav-item dropdown li-genre-sort text-grey">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Genre {{ genre|upper }}</b></a>
-            <div class="dropdown-menu genre-drop">
-                {% for genre in all_genres %}
-                    <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                        <div>{{ genre }}</div>
-                    </a>
-                {% endfor %}
-            </div>
-        </li>
-        <li class="nav-item dropdown li-genre-sort text-grey">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Sort {{ sorting_bis|upper }}</b></a>
-            <div class="dropdown-menu sort-drop">
-                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-A-Z/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    <div>Title A-Z</div>
-                </a>
-                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/title-Z-A/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    <div>Title Z-A</div>
-                </a>
-                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_desc/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    <div>Score 🠗</div>
-                </a>
-                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/score_asc/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    <div>Score 🠕</div>
-                </a>
-                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/rewatched/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    <div>Rewatched</div>
-                </a>
-                <a class="dropdown-item text-light" href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/comments/page/1{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    <div>Comments</div>
-                </a>
-                {% block sorting_list %}
-                {% endblock sorting_list %}
-            </div>
-        </li>
-    </div>
-    <hr class="mt-2 pb-3 mb-0">
-
-    <div class="row m-b-40">
-        {% for item in media_items  %}
-            <div id="card_{{ item.id }}" values="{% block data scoped %}{% endblock data %}"
-                 cat="{{ item.category }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
-                <div class="card bg-transparent">
-                    <div class="view overlay">
-                        <img class="card-img-top" height="300" width="200" src="{{ item.cover }}" style="height: auto;" alt=""/>
-                        <a class="mask flex-center rgba-black-strong" href="/media_sheet/{{ item.media }}/{{ item.id }}">
-                            <span class="font-mask text-center text-light">{{ item.display_name }}</span>
-                        </a>
-                        {% if category == 'Search' or category == 'All' %}
-                            <div class="bottom-card-cat{% if media_list =='movieslist' %}-movie {% endif %}">
-                                {{ item.category }}
-                            </div>
-                        {% endif %}
-                        {% if user_id == current_user.get_id() %}
-                            <a class="card-btn-top-left fas fa-bars text-light"
-                               onclick="chargeButtons(card_{{ item.id }})">
-                            </a>
-                            <a class="card-btn-toop-right fas fa-trash text-light"
-                               onclick="deleteElement(card_{{ item.id }}, '{{ media_list }}')">
-                            </a>
-                        {% else %}
-                            {% if item.common %}
-                                <div class="card-ribbon"></div>
-                            {% else %}
-                                <a class="card-btn-top-left fas fa-plus text-light"
-                                   onclick="ChargeButtonsOther(card_{{ item.id }})">
-                                </a>
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                    <div class="bottom-card-info{% if media_list =='movieslist' %}-movie {% endif %}">
-                        <div class="row no-gutters" style="opacity: 0.7;">
-                            <div class="col" style="padding: 0;">
-                                <a class="fa-heart {% if item.favorite %} fas favorited {% else %}
-                                far {% endif %} {% if user_id != current_user.get_id() %}
-                                disabled {% endif %}" data-toggle='tooltip' title="Favorite"
-                                   onclick="addFavorite(this,'{{ item.id }}','{{ media_list }}')">
-                                </a>
-                            </div>
-                            <div class="col" style="padding: 0;">
-                                <a id="score_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
-                                disabled {% endif %}" data-toggle="tooltip" title="Score /10"
-                                   onclick="scoreDrop(this, {{ item.id }}, '{{ media_list }}')">
-                                    {{ item.score }}
-                                </a>
-                            </div>
-                            <div class="col" style="padding: 0;">
-                                <span id="com_{{ item.id }}" style="display: none;">{{ item.comment }}</span>
-                                {% if user_id == current_user.get_id() %}
-                                    <a class="fa-comment-alt text-light {% if item.comment %} fas commented {% else %}
-                                    far {% endif %}" data-toggle='tooltip' title="Comments"
-                                    {% if item.comment %} onclick="showComment(card_{{ item.id }},
-                                    '{{ item.media }}', '{{ item.id }}', true)"
-                                    {% else %} href="/comment/{{ item.media }}/{{ item.id }}"{% endif %}>
-                                    </a>
-                                {% else %}
-                                    <a class="fa-comment-alt text-light {% if item.comment %} fas commented {% else %}
-                                    far disabled{% endif %}" data-toggle='tooltip' title="Comments"
-                                    {% if item.comment %} onclick="showComment(card_{{ item.id }},
-                                    '{{ item.media }}', '{{ item.id }}', false)"{% endif %}>
-                                    </a>
-                                {% endif %}
-                            </div>
-                            <div class="col" {% if item.category == 'Completed' %}style="display: block;"
-                            {% else %} style="display: none;"{% endif %}>
-                                <a id="rew_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
-                                 disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this
-                                 media. Do not count the inital completion." onclick="rewatchDrop(this,
-                                 {{ item.id }}, '{{ media_list }}')">
-                                    {{ item.rewatched }}
-                                </a>
-                            </div>
+    <section class="header-mymedialist">
+        <section class="return-icons-and-search-bar">
+            <div class="row no-gutters m-t-30">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mobile-margin mobile-center">
+                    <a class="fas fa-lg fa-user m-r-10 return-icon text-grey" data-toggle="tooltip" title="{{ username }}"
+                       href="{{ url_for('users.account', user_name=username) }}"></a>
+                    {% block return_icon scoped %}
+                    {% endblock return_icon %}
+                    {% if user_id != current_user.get_id() and category != 'Stats' %}
+                        <div class="shared-pie" data-toggle="tooltip"
+                         title="{{ data['common_elements'][0] }}/{{ data['common_elements'][1] }} shared
+                         ({{ data['common_elements'][2] }}%)" style="background: conic-gradient(#8a7a6c
+                         {{ data['common_elements'][2] }}%, #040404 0);">
                         </div>
-                    </div>
-                    {% block seas_eps_drop scoped %}
-                    {% endblock seas_eps_drop %}
+                    {% endif %}
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 input-container mobile-margin">
+                    <form method="GET" action="{{ url_for('main.mymedialist', media_list=media_list, user_name=username,
+                    category='Search', genre=genre, sorting=sorting, page_val=1) }}">
+                        {{ search_form.q(class='modded-input', placeholder=search_form.q.label.text,
+                           onfocus="this.placeholder = '';",
+                           onblur="this.placeholder = "+"'"+search_form.q.label.text+"'"+";") }}
+                    </form>
                 </div>
             </div>
-        {% endfor %}
-    </div>
-
-    <ul class="pagination flex-wrap m-b-50 pagination-css">
-        {% for i in range(info_pages['total_pages']) %}
-            <li class="page-item {% if i + 1 == info_pages['actual_page'] %}active {% endif %}">
-                <a class="page-link text-light"
-                   href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/{{ sorting }}/page/{{ i + 1 }}{% if category == 'Search' %}?q={{ search_query }}{% endif %}">
-                    {{ '{:02d}'.format(i + 1) }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+        </section>
+        <section class="media-list-categories">
+            <div class="categories-css p-1">
+                {% block categories scoped %}
+                {% endblock categories %}
+            </div>
+        </section>
+        <section class="title-sorting-filtering-genres">
+            <h4 class="cat-title">
+                {{ category|upper }}{% if category == "Search" %} RESULTS FOR "{{ search_q }}" {% endif %}
+                {% if category != 'Stats' %}
+                    ({{ data['total_media'] }})
+                {% endif %}
+            </h4>
+            {% if category != 'Stats' %}
+                <div class="sort-container">
+        {#        {% if user_id != current_user.get_id() %}#}
+        {#            <a class="m-r-15" style="display: inline-block;"#}
+        {#               href="/{{ media_list }}/{{ username }}/{{ category }}/genre/{{ genre }}/by/#}
+        {#                {{ sorting }}/page/1?filter={{ filter_val }}">#}
+        {#                <b class="text-grey"> Shared#}
+        {#                    <i class="fas fa-{% if filter_val == True %}check{% else %}times{% endif %}"></i>#}
+        {#                </b>#}
+        {#            </a>#}
+        {#        {% endif %}#}
+                <li class="nav-item dropdown li-genre-sort text-grey">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Genre {{ genre|upper }}</b></a>
+                    <div class="dropdown-menu genre-drop">
+                        {% block add_genres scoped %}
+                        {% endblock add_genres %}
+                    </div>
+                </li>
+                <li class="nav-item dropdown li-genre-sort text-grey">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Sort {{ sorting|upper }}</b></a>
+                    <div class="dropdown-menu sort-drop">
+                        {% block add_sort scoped %}
+                        {% endblock add_sort %}
+                    </div>
+                </li>
+            </div>
+            {% endif %}
+            <hr class="mt-2 pb-3 mb-0">
+        </section>
+    </section>
+    <section class="media-display">
+        {% if category == 'Stats' %}
+            {% block stats_block scoped %}
+            {% endblock stats_block %}
+        {% else %}
+            <div class="row m-b-40">
+                {% for item in data['items_list'] %}
+                    <div id="card_{{ item.id }}" values="{% block data scoped %}{% endblock data %}"
+                    cat="{{ item.category }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+                        <div class="card bg-transparent">
+                            <div class="view overlay">
+                                <img class="card-img-top" height="300" width="200" src="{{ item.cover }}" alt=""
+                                style="height: auto;"/>
+                                <a class="mask flex-center rgba-black-strong" href="{{ url_for('main.media_sheet',
+                                media_type=item.media, media_id=item.id) }}">
+                                    <span class="font-mask text-center text-light">{{ item.display_name }}</span>
+                                </a>
+                                {% if category == 'Search' or category == 'All' %}
+                                    <div class="bottom-card-cat{% if media_list =='movieslist' %}-movie {% endif %}">
+                                        {{ item.category }}</div>
+                                {% endif %}
+                                {% if user_id == current_user.get_id() %}
+                                    <a class="card-btn-top-left fas fa-bars text-light"
+                                       onclick="chargeButtons(card_{{ item.id }})"></a>
+                                    <a class="card-btn-toop-right fas fa-trash text-light"
+                                       onclick="deleteElement(card_{{ item.id }}, '{{ media_list }}')"></a>
+                                {% else %}
+                                    {% if item.common %}
+                                        <div class="card-ribbon"></div>
+                                    {% else %}
+                                        <a class="card-btn-top-left fas fa-plus text-light"
+                                           onclick="ChargeButtonsOther(card_{{ item.id }})"></a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="bottom-card-info{% if media_list =='movieslist' %}-movie {% endif %}">
+                                <div class="row no-gutters" style="opacity: 0.7;">
+                                    <div class="col p-0">
+                                        <a class="fa-heart {% if item.favorite %} fas favorited {% else %}
+                                        far {% endif %} {% if user_id != current_user.get_id() %}
+                                        disabled {% endif %}" data-toggle='tooltip' title="Favorite"
+                                           onclick="addFavorite(this,'{{ item.id }}','{{ media_list }}')">
+                                        </a>
+                                    </div>
+                                    <div class="col p-0">
+                                        <a id="score_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
+                                           disabled {% endif %}" data-toggle="tooltip" title="Score /10"
+                                           onclick="scoreDrop(this, {{ item.id }}, '{{ media_list }}')">
+                                            {{ item.score }}
+                                        </a>
+                                    </div>
+                                    <div class="col p-0">
+                                        <span id="com_{{ item.id }}" style="display: none;">{{ item.comment }}</span>
+                                        {% if user_id == current_user.get_id() %}
+                                            <a class="fa-comment-alt text-light{% if item.comment %} fas commented{% else %}
+                                            far{% endif %}" data-toggle='tooltip' title="Comments" {% if item.comment %}
+                                            onclick="showComment(card_{{ item.id }}, '{{ item.media }}', '{{ item.id }}',
+                                            true)" href="{{ url_for('main.write_comment', media_type=item.media,
+                                            media_id=item.id) }}"{% endif %}></a>
+                                        {% else %}
+                                            <a class="fa-comment-alt text-light {% if item.comment %}fas commented {% else %}
+                                            far disabled{% endif %}" data-toggle="tooltip" title="Comments"
+                                            {% if item.comment %} onclick="showComment(card_{{ item.id }}, '{{ item.media }}',
+                                            '{{ item.id }}', false)"{% endif %}></a>
+                                        {% endif %}
+                                    </div>
+                                    {% if media_list != 'gameslist' %}
+                                        <div class="col" {% if item.category == 'Completed' %}style="display: block;"
+                                         {% else %} style="display: none;"{% endif %}>
+                                            <a id="rew_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
+                                             disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this
+                                             media. Do not count the inital completion." onclick="rewatchDrop(this,
+                                             {{ item.id }}, '{{ media_list }}')">
+                                                {{ item.rewatched }}
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% block seas_eps_drop scoped %}
+                            {% endblock seas_eps_drop %}
+                            {% if media_list == 'gameslist' %}
+                                <div class="seas-eps-drop-container {% if user_id != current_user.get_id() %}
+                                 disabled {% endif %}">
+                                    <a id="play_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
+                                     disabled {% endif %}" data-toggle="tooltip" title="Update playtime"
+                                     onclick="playtimeDrop(this, {{ item.id }})">
+                                        {{ (item.playtime/60)|int }} hours
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+    {% if category != 'Stats' %}
+        <section class="the-pagination">
+            <ul class="pagination flex-wrap m-b-50 pagination-css">
+                {% for i in range(data['total_pages']) %}
+                    <li class="page-item {% if i + 1 == data['actual_page'] %}active {% endif %}">
+                        <a class="page-link text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
+                         user_name=username, category=category, genre=genre, sorting=sorting,
+                         page_val=i + 1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
+                            {{ '{:02d}'.format(i + 1) }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
 {% endblock content %}
 
 
 {% block script %}
     <script src="{{ url_for('static', filename='js/medialist_base.js') }}"></script>
-    {% block javascript scoped %}
-    {% endblock javascript %}
+    {% if category == 'Stats' %}
+        {% block stats_js scoped %}
+        {% endblock stats_js %}
+    {% else %}
+        {% block javascript %}
+        {% endblock javascript %}
+    {% endif %}
 {% endblock script %}
+

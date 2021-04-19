@@ -1,13 +1,12 @@
 import pytz
 import random
-import operator
 from MyLists import db
 from flask import url_for
 from sqlalchemy import func
 from flask_login import current_user
 from _collections import OrderedDict
-from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, User, Series, Anime, \
-    Movies, Ranks, followers, Frames, RoleType
+from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, Series, Anime, Movies, \
+    Ranks, Frames, RoleType, GamesList, Games
 
 
 def get_media_count_by_status(user_id, list_type):
@@ -17,6 +16,8 @@ def get_media_count_by_status(user_id, list_type):
         status = AnimeList.status
     elif list_type == ListType.MOVIES:
         status = MoviesList.status
+    elif list_type == ListType.GAMES:
+        status = GamesList.status
 
     media_count = db.session.query(status, func.count(status)).filter_by(user_id=user_id).group_by(status).all()
 
@@ -44,6 +45,8 @@ def get_media_count_by_score(user_id, list_type):
         score = AnimeList.score
     elif list_type == ListType.MOVIES:
         score = MoviesList.score
+    elif list_type == ListType.GAMES:
+        score = GamesList.score
 
     media_count = db.session.query(score, func.count(score)).filter_by(user_id=user_id)\
         .group_by(score).order_by(score.asc()).all()
@@ -70,14 +73,21 @@ def get_media_count_by_score(user_id, list_type):
 
 def get_media_total_eps(user_id, list_type):
     if list_type == ListType.SERIES:
-        media = SeriesList
+        media_list = SeriesList
     elif list_type == ListType.ANIME:
-        media = AnimeList
+        media_list = AnimeList
     elif list_type == ListType.MOVIES:
-        media = MoviesList
+        media_list = MoviesList
+    elif list_type == ListType.GAMES:
+        media_list = GamesList
 
-    query = db.session.query(func.sum(media.eps_watched)).filter(media.user_id == user_id).all()
-    eps_watched = query[0][0]
+    if list_type != ListType.GAMES:
+        query = db.session.query(func.sum(media_list.eps_watched)).filter(media_list.user_id == user_id).all()
+        eps_watched = query[0][0]
+    else:
+        query = db.session.query(func.count(media_list.media_id)).filter(media_list.user_id == user_id).all()
+        eps_watched = query[0][0]
+
     if eps_watched is None:
         eps_watched = 0
 
@@ -94,6 +104,9 @@ def get_media_score(user_id, list_type):
     elif list_type == ListType.MOVIES:
         media = MoviesList
         status = Status.PLAN_TO_WATCH
+    elif list_type == ListType.GAMES:
+        media = GamesList
+        status = Status.PLAYING
 
     media_score = db.session.query(func.count(media.score), func.count(media.media_id), func.sum(media.score)) \
         .filter(media.user_id == user_id, media.status != status).all()
@@ -127,7 +140,11 @@ def get_favorites(user_id):
     movies_favorites = db.session.query(Movies).filter(Movies.id.in_([m.media_id for m in m_fav])).all()
     random.shuffle(movies_favorites)
 
-    favorites = [series_favorites, anime_favorites, movies_favorites]
+    m_fav = GamesList.query.filter_by(favorite=True, user_id=user_id).all()
+    games_favorites = db.session.query(Games).filter(Games.id.in_([m.media_id for m in m_fav])).all()
+    random.shuffle(games_favorites)
+
+    favorites = [series_favorites, anime_favorites, movies_favorites, games_favorites]
 
     return favorites
 
@@ -139,6 +156,8 @@ def get_media_levels(user, list_type):
         total_time_min = user.time_spent_anime
     elif list_type == ListType.MOVIES:
         total_time_min = user.time_spent_movies
+    elif list_type == ListType.GAMES:
+        total_time_min = user.time_spent_games
 
     # Compute the corresponding level and percentage from the media time
     element_level_tmp = "{:.2f}".format(round((((400+80*total_time_min)**(1/2))-20)/40, 2))
@@ -161,28 +180,9 @@ def get_media_levels(user, list_type):
     return level_info
 
 
-def get_knowledge_grade(user):
-    # Compute the corresponding level and percentage from the media time
-    knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
-                      int((((400+80*user.time_spent_anime)**(1/2))-20)/40) + \
-                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
-
-    query_rank = Ranks.query.filter_by(level=knowledge_level, type='knowledge_rank\n').first()
-    if query_rank:
-        grade_id = url_for('static', filename='img/knowledge_ranks/{}'.format(query_rank.image_id))
-        grade_title = query_rank.name
-    else:
-        grade_id = url_for('static', filename='img/knowledge_ranks/Knowledge_Emperor_Grade_4')
-        grade_title = "Knowledge Emperor Grade 4"
-
-    return {"level": knowledge_level,
-            "grade_id": grade_id,
-            "grade_title": grade_title}
-
-
 def get_knowledge_frame(user):
     # Compute the corresponding level and percentage from the media time
-    knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) + \
+    knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
                       int((((400+80*user.time_spent_anime)**(1/2))-20)/40) + \
                       int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
 
@@ -234,6 +234,10 @@ def get_updates(last_update):
             element_data["category"] = "Movies"
             element_data["icon-color"] = "fas fa-film text-movies"
             element_data["border"] = "#8c7821"
+        elif element.media_type == ListType.GAMES:
+            element_data["category"] = "Games"
+            element_data["icon-color"] = "fas fa-gamepad text-games"
+            element_data["border"] = "#196219"
 
         update.append(element_data)
 
@@ -278,7 +282,8 @@ def get_user_data(user):
     view_count = {"profile": profile_view_count,
                   "series": user.series_views,
                   "anime": user.anime_views,
-                  "movies": user.movies_views}
+                  "movies": user.movies_views,
+                  "games": user.games_views}
 
     # Recover the user's last updates
     last_updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).limit(7)
@@ -291,17 +296,22 @@ def get_user_data(user):
 
 
 def get_media_data(user):
-    all_lists = [['series', ListType.SERIES, user.time_spent_series], ['anime', ListType.ANIME, user.time_spent_anime],
+    all_lists = [['series', ListType.SERIES, user.time_spent_series],
+                 ['anime', ListType.ANIME, user.time_spent_anime],
                  ['movies', ListType.MOVIES, user.time_spent_movies]]
+    if user.add_games:
+        all_lists.append(["games", ListType.GAMES, user.time_spent_games])
 
     # Create dict with media as key. Dict values are dict or list of dict
-    media_dict = {}
+    media_dict, total_time, total_media, total_score, total_mean_score, total_media_and_eps = {}, 0, 0, 0, 0, 0
+    qte_media_type = len(all_lists)
     for list_type in all_lists:
         media_count = get_media_count_by_status(user.id, list_type[1])
         media_count_score = get_media_count_by_score(user.id, list_type[1])
         media_levels = get_media_levels(user, list_type[1])
         media_score = get_media_score(user.id, list_type[1])
         media_time = list_type[2]
+
         media_total_eps = get_media_total_eps(user.id, list_type[1])
 
         # Each media_data dict contains all the data for one type of media
@@ -313,8 +323,36 @@ def get_media_data(user):
                       'media_levels': media_levels,
                       'media_score': media_score}
 
+        # Recover the total time for all media in hours
+        total_time += media_data['time_spent_hour']
+
+        # Recover total number of media
+        total_media += media_data['media_count']['total']
+
+        # Recover total number of media
+        total_media_and_eps += media_data['media_total_eps']
+
+        # Recover the total score of all media
+        total_score += media_data['media_score']['scored_media']
+
+        # Recover the total mean score of all media
+        try:
+            total_mean_score += media_data['media_score']['mean_score']
+        except:
+            qte_media_type -= 1
+
         # return a media_dict with 3 keys (anime, series, movies) with media_data as values
         media_dict[f'{list_type[0]}'] = media_data
+
+    # Add global data on all media
+    media_dict['total_spent_hour'] = total_time
+    media_dict['total_media'] = total_media
+    media_dict['total_media_and_eps'] = total_media_and_eps
+    media_dict['total_score'] = total_score
+    try:
+        media_dict['total_mean_score'] = round(total_mean_score/qte_media_type, 2)
+    except:
+        media_dict['total_mean_score'] = '-'
 
     return media_dict
 
@@ -353,152 +391,6 @@ def get_follows_data(user):
         follows_update_list.append(follows)
 
     return follows_list, follows_update_list
-
-
-def get_more_stats(user):
-
-    def get_episodes_and_time(element):
-        if element[1].status == Status.COMPLETED:
-            try:
-                return [1, element[0].runtime]
-            except:
-                return [element[0].total_episodes, int(element[0].episode_duration)*element[0].total_episodes]
-        elif element[1].status != Status.PLAN_TO_WATCH and element[1].status != Status.RANDOM:
-            nb_episodes = [m.episodes for m in element[0].eps_per_season]
-            
-            ep_duration = int(element[0].episode_duration)
-            ep_counter = 0
-            for i in range(0, element[1].current_season - 1):
-                ep_counter += int(nb_episodes[i])
-            episodes_watched = ep_counter + element[1].last_episode_watched
-            time_watched = (ep_duration * episodes_watched)
-            return [episodes_watched, time_watched]
-        else:
-            return [0, 0]
-
-    series_data = db.session.query(Series, SeriesList) \
-        .join(SeriesList, SeriesList.media_id == Series.id) \
-        .filter(SeriesList.user_id == user.id)
-
-    anime_data = db.session.query(Anime, AnimeList) \
-        .join(AnimeList, AnimeList.media_id == Anime.id) \
-        .filter(AnimeList.user_id == user.id)
-
-    movies_data = db.session.query(Movies, MoviesList) \
-        .join(MoviesList, MoviesList.media_id == Movies.id) \
-        .filter(MoviesList.user_id == user.id)
-
-    media_data = [series_data, anime_data, movies_data]
-
-    data = {}
-    for index, media in enumerate(media_data):
-        genres_time = {}
-        periods_time = OrderedDict({'1960-1969': 0, '1970-1979': 0, '1980-1989': 0, '1990-1999': 0, '2000-2009': 0,
-                                    '2010-2019': 0, '2020+': 0})
-        episodes_time = OrderedDict({'1-19': 0, '20-49': 0, '50-99': 0, '100-149': 0, '150-199': 0, '200-299': 0,
-                                     '300-399': 0, '400-499': 0, '500+': 0})
-        movies_time = OrderedDict({'<1h': 0, '1h-1h29': 0, '1h30-1h59': 0, '2h00-2h29': 0, '2h30-2h59': 0, '3h+': 0})
-        for element in media:
-            # Number of episodes and the time watched by element
-            episodes_watched, time_watched = get_episodes_and_time(element)
-
-            # Genres stats
-            for genre in [m.genre for m in element[0].genres]:
-                if genre not in genres_time:
-                    genres_time[genre] = time_watched
-                else:
-                    genres_time[genre] += time_watched
-
-            # Period stats
-            try:
-                airing_year = int(element[0].first_air_date.split('-')[0])
-            except:
-                try:
-                    airing_year = int(element[0].release_date.split('-')[0])
-                except:
-                    airing_year = 0
-
-            if 1960 <= airing_year < 1970:
-                periods_time['1960-1969'] += 1
-            elif 1970 <= airing_year < 1980:
-                periods_time['1970-1979'] += 1
-            elif 1980 <= airing_year < 1990:
-                periods_time['1980-1989'] += 1
-            elif 1990 <= airing_year < 2000:
-                periods_time['1990-1999'] += 1
-            elif 2000 <= airing_year < 2010:
-                periods_time['2000-2009'] += 1
-            elif 2010 <= airing_year < 2020:
-                periods_time['2010-2019'] += 1
-            elif airing_year >= 2020:
-                periods_time['2020+'] += 1
-
-            # Episodes / time stats
-            if index != 2:
-                if 1 <= episodes_watched < 19:
-                    episodes_time['1-19'] += 1
-                elif 20 <= episodes_watched < 49:
-                    episodes_time['20-49'] += 1
-                elif 50 <= episodes_watched < 99:
-                    episodes_time['50-99'] += 1
-                elif 100 <= episodes_watched < 149:
-                    episodes_time['100-149'] += 1
-                elif 150 <= episodes_watched < 199:
-                    episodes_time['150-199'] += 1
-                elif 200 <= episodes_watched < 299:
-                    episodes_time['200-299'] += 1
-                elif 300 <= episodes_watched < 399:
-                    episodes_time['300-399'] += 1
-                elif 400 <= episodes_watched < 499:
-                    episodes_time['400-499'] += 1
-                elif episodes_watched >= 500:
-                    episodes_time['500+'] += 1
-            else:
-                if time_watched < 60:
-                    movies_time['<1h'] += 1
-                elif 60 <= time_watched < 90:
-                    movies_time['1h-1h29'] += 1
-                elif 90 <= time_watched < 120:
-                    movies_time['1h30-1h59'] += 1
-                elif 120 <= time_watched < 150:
-                    movies_time['2h00-2h29'] += 1
-                elif 150 <= time_watched < 180:
-                    movies_time['2h30-2h59'] += 1
-                elif time_watched >= 180:
-                    movies_time['3h+'] += 1
-
-        # Rename
-        if index == 0:
-            genres_time['Action/Adventure'] = genres_time.pop('Action & Adventure', 0)
-            genres_time['War/Politics'] = genres_time.pop('War & Politics', 0)
-            genres_time['Sci-Fi/Fantasy'] = genres_time.pop('Sci-Fi & Fantasy', 0)
-            genres_time.pop('Unknown', 0)
-
-        if all(x == 0 for x in genres_time.values()):
-            genres_time = {}
-        else:
-            genres_time = sorted(genres_time.items(), key=operator.itemgetter(1), reverse=True)
-        if all(x == 0 for x in periods_time.values()):
-            periods_time = {}
-        if all(x == 0 for x in episodes_time.values()):
-            episodes_time = {}
-        if all(x == 0 for x in movies_time.values()):
-            movies_time = {}
-
-        if index == 0:
-            data.update({'Series_genres': genres_time,
-                         'Series_periods': periods_time,
-                         'Series_eps': episodes_time})
-        elif index == 1:
-            data.update({'Anime_genres': genres_time,
-                         'Anime_periods': periods_time,
-                         'Anime_eps': episodes_time})
-        else:
-            data.update({'Movies_genres': genres_time,
-                         'Movies_periods': periods_time,
-                         'Movies_times': movies_time})
-
-    return data
 
 
 def get_all_follows_data(user):

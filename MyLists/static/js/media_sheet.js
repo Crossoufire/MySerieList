@@ -1,16 +1,11 @@
 
 
-// --- Add the media to the user ---------------------------
+// --- Add the media to the user ------------------------------------------------------------------------
 function addToUser(element_id, media_type) {
     let category;
     let $medialist = $('#your-medialist-data');
 
-    if (media_type === 'serieslist' || media_type === 'animelist') {
-        category = 'Watching'
-    }
-    else if (media_type === 'movieslist') {
-        category = 'Completed'
-    }
+    category = media_type === 'serieslist' || media_type === 'animelist' ? 'Watching' : 'Completed';
 
     $medialist.addClass('disabled');
     $('#loading-add-list').hide();
@@ -37,7 +32,7 @@ function addToUser(element_id, media_type) {
 }
 
 
-// --- Remove the media to the user ------------------------
+// --- Remove the media to the user ---------------------------------------------------------------------
 function removeFromUser(element_id, media_type) {
     $('#your-medialist-data').addClass('disabled');
     $('#loading-remove-list').show();
@@ -58,6 +53,7 @@ function removeFromUser(element_id, media_type) {
                 $('#category-dropdown').val("Watching");
                 $('#season-dropdown').val("0");
                 $('#episode-dropdown').val("0");
+                $('#time-dropdown').val("0");
                 $('#rewatched-dropdown').val("0");
             }, 300);
         },
@@ -71,7 +67,7 @@ function removeFromUser(element_id, media_type) {
 }
 
 
-// --- Set media to favorite -------------------------------
+// --- Set media to favorite ----------------------------------------------------------------------------
 function addFavorite(element_id, media_type) {
     let favorite;
     favorite = !!$('#favorite').hasClass('far');
@@ -85,7 +81,6 @@ function addFavorite(element_id, media_type) {
         dataType: "json",
         success: function() {
             $('#fav-title').removeClass('disabled');
-
             if (favorite === true) {
                 $('#favorite').addClass('fas favorited').removeClass('far no-fav');
                 $('#add-fav').show('slow').delay(2000).fadeOut();
@@ -101,7 +96,7 @@ function addFavorite(element_id, media_type) {
 }
 
 
-// --- Change the TV category ------------------------------
+// --- Change the TV category ---------------------------------------------------------------------------
 function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
     let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
     $('#cat-loading').show();
@@ -161,8 +156,8 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
 }
 
 
-// --- Change the Movie category ---------------------------
-function changeCategoryMovies(element_id, cat_selector, genres) {
+// --- Change the Movie category ------------------------------------------------------------------------
+function changeCategoryMovies(element_id, cat_selector) {
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
     let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
@@ -195,7 +190,34 @@ function changeCategoryMovies(element_id, cat_selector, genres) {
 }
 
 
-// --- Update season ---------------------------------------
+// --- Change the Game category -------------------------------------------------------------------------
+function changeCategoryGames(element_id, cat_selector) {
+    $('#cat-loading').show();
+    $('#your-medialist-data').addClass('disabled');
+
+    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
+
+    $.ajax ({
+        type: "POST",
+        url: "/change_element_category",
+        contentType: "application/json",
+        data: JSON.stringify({status: new_cat, element_id: element_id, element_type: 'gameslist' }),
+        dataType: "json",
+        success: function() {
+            $('#cat-check').show().delay(1500).fadeOut();
+            $('#your-medialist-data').removeClass('disabled');
+        },
+        error: function() {
+            error_ajax_message('Error changing your game status. Please try again later.');
+        },
+        complete: function () {
+            $('#cat-loading').hide();
+        }
+    });
+}
+
+
+// --- Update season ------------------------------------------------------------------------------------
 function updateSeason(element_id, value, seas_data, media_list) {
     $('#season-loading').show();
     $('#your-medialist-data').addClass('disabled');
@@ -235,7 +257,7 @@ function updateSeason(element_id, value, seas_data, media_list) {
 }
 
 
-// --- Update episode --------------------------------------
+// --- Update episode -----------------------------------------------------------------------------------
 function updateEpisode(element_id, episode, media_list) {
     $('#eps-loading').show();
     $('#your-medialist-data').addClass('disabled');
@@ -260,7 +282,7 @@ function updateEpisode(element_id, episode, media_list) {
 }
 
 
-// --- Update rewatched data -------------------------------
+// --- Update rewatched data ----------------------------------------------------------------------------
 function updateRewatched(element_id, rewatch, media_list) {
     $('#rewatched-loading').show();
 
@@ -283,7 +305,31 @@ function updateRewatched(element_id, rewatch, media_list) {
 }
 
 
-// --- Update score data -----------------------------------
+// --- Update time played -------------------------------------------------------------------------------
+function updatePlaytime(media_id, playtime) {
+    $('#time-loading').show();
+    let value = playtime.options[playtime.selectedIndex].value;
+
+    $.ajax ({
+        type: "POST",
+        url: "/update_playtime",
+        contentType: "application/json",
+        data: JSON.stringify({playtime: value, media_id: media_id, media_type: 'gameslist' }),
+        dataType: "json",
+        success: function() {
+            $('#time-check').show().delay(1500).fadeOut();
+        },
+        error: function() {
+            error_ajax_message('Error updating the time played. Please try again later.');
+        },
+        complete: function () {
+            $('#time-loading').hide();
+        }
+    });
+}
+
+
+// --- Update score data --------------------------------------------------------------------------------
 function updateScore(element_id, score, media_list) {
     $('#score-loading').show();
     let value = score.options[score.selectedIndex].value;
@@ -307,7 +353,7 @@ function updateScore(element_id, score, media_list) {
 }
 
 
-// --- Lock the media --------------------------------------
+// --- Lock the media -----------------------------------------------------------------------------------
 function lock_media(element_id, element_type) {
     let lock_status;
 
@@ -336,7 +382,7 @@ function lock_media(element_id, element_type) {
 
 
 $(document).ready(function () {
-    // --- Random box color ---------------------------------------------------------
+    // --- Random box color ---------------------------------------------------------------------
     let colors, boxes, i;
     colors = ['#5d6566', '#536872', '#708090', '#5d7282', '#36454f'];
     boxes = document.querySelectorAll(".box");
@@ -345,7 +391,7 @@ $(document).ready(function () {
         boxes[i].style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
     }
 
-    // --- Get the color of the status ----------------------------------------------
+    // --- Get the color of the status ----------------------------------------------------------
     $('.follow-div').each(function () {
         if ($(this).find('.follow-status').attr('value') === 'Watching') {
             $(this).find('.fa-list').attr('style', 'color: #334D5C;');
@@ -367,13 +413,14 @@ $(document).ready(function () {
         }
     });
 
-    // --- Fill the media icon score -----------------------
+    // --- Fill the media icon score ------------------------------------------------------------
     let $media_ticket = $('.media-ticket');
     let gradient = $media_ticket.attr('value');
     $media_ticket.attr('style', add_gradient(gradient));
     function add_gradient(gradient) {
         let val = parseFloat(gradient);
         let value = 100-(val*10);
+        console.log(value);
         return ('background:' +
             '-webkit-linear-gradient(180deg, grey '+ value+'%, darkgoldenrod 0%);' +
             '-webkit-background-clip: text;' +

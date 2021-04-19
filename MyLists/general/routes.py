@@ -5,11 +5,10 @@ from MyLists import db, bcrypt, app
 from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from MyLists.general.trending_data import TrendingData
-from MyLists.models import User, RoleType, MyListsStats
 from flask import render_template, flash, request, abort
-from MyLists.main.scheduled_tasks import update_Mylists_stats
-from MyLists.general.functions import compute_media_time_spent, add_badges_to_db, add_ranks_to_db, add_frames_to_db, \
-    refresh_db_frames, refresh_db_badges, refresh_db_ranks, correct_orphan_media
+from MyLists.models import User, RoleType, MyListsStats, compute_media_time_spent
+from MyLists.general.functions import add_badges_to_db, add_ranks_to_db, add_frames_to_db, refresh_db_frames, \
+    refresh_db_badges, refresh_db_ranks, correct_orphan_media
 
 bp = Blueprint('general', __name__)
 
@@ -50,8 +49,7 @@ def create_first_data():
     refresh_db_ranks()
 
     compute_media_time_spent()
-    # update_Mylists_stats()
-    # correct_orphan_media()
+    correct_orphan_media()
     db.session.commit()
 
 

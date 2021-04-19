@@ -14,11 +14,12 @@
         <table id="hall_of_fame" class="table table-responsive-sm text-light">
             <thead>
             <tr>
-                <th class="text-center">Global grade</th>
+                <th class="text-center" data-toggle="tooltip" title="Games not included">Global grade</th>
                 <th class="text-center">Username</th>
                 <th class="text-center">Series</th>
                 <th class="text-center">Anime</th>
                 <th class="text-center">Movies</th>
+                <th class="text-center" data-toggle="tooltip" title="Not included in Global grade">Games</th>
             </tr>
             </thead>
             <tbody>
@@ -60,6 +61,18 @@
                                 <br>
                                 {{ user['movies_data']['level'] }}
                             </a>
+                        </td>
+                        <td>
+                            {% if user['add_games'] %}
+                                <a class="text-light" href="{{ url_for('main.mymedialist', media_list='gameslist',
+                                user_name=user['username']) }}">
+                                    <img class="grade_picture" src="{{ user['games_data']['grade_id'] }}.png" alt="">
+                                    <br>
+                                    {{ user['games_data']['level'] }}
+                                </a>
+                            {% else %}
+                                <span>Not<br>Activated</span>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
