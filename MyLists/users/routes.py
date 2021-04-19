@@ -1,11 +1,8 @@
 import json
-
-from sqlalchemy import func, text
-
 from MyLists import app, db
 from flask_login import login_required, current_user
 from flask import Blueprint, request, render_template
-from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications, MoviesList, MoviesActors
+from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications
 from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_updates,\
     get_user_data, get_knowledge_frame, get_favorites, get_all_follows_data, get_header_data
 
@@ -49,31 +46,6 @@ def account(user_name):
     return render_template('account.html', title=user.username+"'s account", header_data=header_data,
                            user_data=user_data, favorites=favorites, media_data=media_data, follows_list=follows_list,
                            follows_update_list=follows_update_list, user=user)
-
-
-# @bp.route("/account/more_stats/<user_name>", methods=['GET', 'POST'])
-# @login_required
-# def more_stats(user_name):
-#     # Check if the user can see the <media_list>
-#     user = current_user.check_autorization(user_name)
-#
-#     # Recover the stats data
-#     stats = get_more_stats(user)
-#
-#     # Nb films by actors
-#     query = db.session.query(MoviesActors.name, MoviesList, func.count(MoviesActors.name).label('count'))\
-#         .join(MoviesActors, MoviesActors.media_id == MoviesList.media_id)\
-#         .filter(MoviesList.user_id == user.id, MoviesActors.name != 'Unknown')\
-#         .group_by(MoviesActors.name).order_by(text('count desc')).limit(10).all()
-#
-#     # Recover the account header data
-#     header_data = get_header_data(user)
-#
-#     # Recover the user data
-#     user_data = get_user_data(user)
-#
-#     return render_template('more_stats.html', title='More stats', stats=stats, user_data=user_data,
-#                            header_data=header_data, tata=query)
 
 
 @bp.route("/hall_of_fame", methods=['GET', 'POST'])

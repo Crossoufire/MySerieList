@@ -59,6 +59,7 @@
                     {% endfor %}
                 </div>
                 <div class="m-t-30">
+                    <i>The GamesList level is not included in the global level.</i><br>
                     {{ settings_form.add_games.label }}: &nbsp;&nbsp;&nbsp; {{ settings_form.add_games() }}<br>
                     {% for error in settings_form.add_games.errors %}
                         <span style="color: red;">{{ error }}</span>

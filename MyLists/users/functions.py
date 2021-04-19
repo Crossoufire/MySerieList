@@ -85,7 +85,7 @@ def get_media_total_eps(user_id, list_type):
         query = db.session.query(func.sum(media_list.eps_watched)).filter(media_list.user_id == user_id).all()
         eps_watched = query[0][0]
     else:
-        query = db.session.query(func.sum(media_list.media_id)).filter(media_list.user_id == user_id).all()
+        query = db.session.query(func.count(media_list.media_id)).filter(media_list.user_id == user_id).all()
         eps_watched = query[0][0]
 
     if eps_watched is None:
@@ -296,11 +296,15 @@ def get_user_data(user):
 
 
 def get_media_data(user):
-    all_lists = [['series', ListType.SERIES, user.time_spent_series], ['anime', ListType.ANIME, user.time_spent_anime],
-                 ['movies', ListType.MOVIES, user.time_spent_movies], ["games", ListType.GAMES, user.time_spent_games]]
+    all_lists = [['series', ListType.SERIES, user.time_spent_series],
+                 ['anime', ListType.ANIME, user.time_spent_anime],
+                 ['movies', ListType.MOVIES, user.time_spent_movies]]
+    if user.add_games:
+        all_lists.append(["games", ListType.GAMES, user.time_spent_games])
 
     # Create dict with media as key. Dict values are dict or list of dict
-    media_dict = {}
+    media_dict, total_time, total_media, total_score, total_mean_score, total_media_and_eps = {}, 0, 0, 0, 0, 0
+    qte_media_type = len(all_lists)
     for list_type in all_lists:
         media_count = get_media_count_by_status(user.id, list_type[1])
         media_count_score = get_media_count_by_score(user.id, list_type[1])
@@ -319,8 +323,36 @@ def get_media_data(user):
                       'media_levels': media_levels,
                       'media_score': media_score}
 
+        # Recover the total time for all media in hours
+        total_time += media_data['time_spent_hour']
+
+        # Recover total number of media
+        total_media += media_data['media_count']['total']
+
+        # Recover total number of media
+        total_media_and_eps += media_data['media_total_eps']
+
+        # Recover the total score of all media
+        total_score += media_data['media_score']['scored_media']
+
+        # Recover the total mean score of all media
+        try:
+            total_mean_score += media_data['media_score']['mean_score']
+        except:
+            qte_media_type -= 1
+
         # return a media_dict with 3 keys (anime, series, movies) with media_data as values
         media_dict[f'{list_type[0]}'] = media_data
+
+    # Add global data on all media
+    media_dict['total_spent_hour'] = total_time
+    media_dict['total_media'] = total_media
+    media_dict['total_media_and_eps'] = total_media_and_eps
+    media_dict['total_score'] = total_score
+    try:
+        media_dict['total_mean_score'] = round(total_mean_score/qte_media_type, 2)
+    except:
+        media_dict['total_mean_score'] = '-'
 
     return media_dict
 

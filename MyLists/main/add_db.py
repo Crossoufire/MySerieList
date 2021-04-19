@@ -100,15 +100,12 @@ class AddtoDB:
 
     def add_games_to_db(self):
         self.media = Games(**self.media_details['games_data'])
-
         db.session.add(self.media)
         db.session.commit()
 
         self.add_games_companies_to_db()
         self.add_genres_to_db()
         self.add_games_platforms_to_db()
-
-        db.session.commit()
 
     def add_media_to_db(self):
         if self.list_type == ListType.SERIES or self.list_type == ListType.ANIME:
