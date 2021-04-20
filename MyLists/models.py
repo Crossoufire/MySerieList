@@ -581,6 +581,7 @@ class MyListsStats(db.Model):
 class GlobalStats:
     def __init__(self):
         self.truncated_list_type = [ListType.SERIES, ListType.ANIME]
+        self.no_games_list_type = [ListType.SERIES, ListType.ANIME, ListType.MOVIES]
         self.media = None
         self.media_genre = None
         self.media_actors = None
@@ -605,7 +606,7 @@ class GlobalStats:
 
     def get_top_media(self):
         queries = []
-        for list_type in ListType:
+        for list_type in self.no_games_list_type:
             self.get_query_data(list_type)
             queries.append(db.session.query(self.media.name, self.media_list,
                                             func.count(self.media_list.media_id == self.media.id).label("count"))
@@ -615,7 +616,7 @@ class GlobalStats:
 
     def get_top_genres(self):
         queries = []
-        for list_type in ListType:
+        for list_type in self.no_games_list_type:
             self.get_query_data(list_type)
             queries.append(db.session.query(self.media_genre.genre, self.media_list,
                                             func.count(self.media_genre.genre).label('count'))
@@ -625,7 +626,7 @@ class GlobalStats:
 
     def get_top_actors(self):
         queries = []
-        for list_type in ListType:
+        for list_type in self.no_games_list_type:
             self.get_query_data(list_type)
             queries.append(db.session.query(self.media_actors.name, self.media_list,
                                             func.count(self.media_actors.name).label('count'))
