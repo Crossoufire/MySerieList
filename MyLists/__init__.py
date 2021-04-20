@@ -99,3 +99,8 @@ if not app.debug and not app.testing:
 
 # Import the admin view at the end to avoid loop import
 from MyLists import admin_views
+
+
+# Import the command
+from MyLists.scheduled_tasks import register
+register(app)

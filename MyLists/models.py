@@ -1,12 +1,13 @@
 import rq
-import operator
+import iso639
 from enum import Enum
 from datetime import datetime
+from flask import abort, flash
 from sqlalchemy.orm import aliased
 from collections import OrderedDict
 from MyLists import app, db, login_manager
 from flask_login import UserMixin, current_user
-from flask import abort, flash, redirect, request, url_for
+
 from sqlalchemy import func, desc, text, and_, or_
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
@@ -891,6 +892,29 @@ def get_more_stats(user, list_type):
         .filter(media_list.user_id == user.id, media_genres.genre != 'Unknown') \
         .group_by(media_genres.genre).order_by(text('count desc')).limit(10).all()
 
+    top_langages, top_directors = [], []
+    if list_type == ListType.MOVIES:
+        langages = db.session.query(media.original_language, media_list,
+                                    func.count(media.original_language).label('count')) \
+            .join(media, media.id == media_list.media_id).filter(media_list.user_id == user.id) \
+            .group_by(media.original_language).order_by(text('count desc')).limit(5).all()
+
+        top_langages = []
+        for langage in langages:
+            try:
+                name_iso = iso639.to_name(langage[0])
+            except:
+                if langage[0] == 'cn':
+                    name_iso = 'Chinese'
+                else:
+                    name_iso = langage[0]
+            top_langages.append([name_iso, langage[1], langage[2]])
+
+        top_directors = db.session.query(media.director_name, media_list,
+                                         func.count(media.director_name).label('count')) \
+            .join(media, media.id == media_list.media_id).filter(media_list.user_id == user.id) \
+            .group_by(media.director_name).order_by(text('count desc')).limit(10).all()
+
     media_periods = OrderedDict({"'60s-": 0, "'70s": 0, "'80s": 0, "'90s": 0, "'00s": 0, "'10s": 0, "'20s+": 0})
     media_eps = OrderedDict({'1-25': 0, '26-49': 0, '50-99': 0, '100-149': 0, '150-199': 0, '200+': 0})
     movies_runtime = OrderedDict({'<1h': 0, '1h-1h29': 0, '1h30-1h59': 0, '2h00-2h29': 0, '2h30-2h59': 0, '3h+': 0})
@@ -957,6 +981,6 @@ def get_more_stats(user, list_type):
                 movies_runtime['3h+'] += 1
 
     data = {'genres': top_genres, 'actors': top_actors, 'periods': media_periods, 'eps_time': media_eps,
-            'movies_times': movies_runtime}
+            'movies_times': movies_runtime, 'top_langage': top_langages, 'top_directors': top_directors}
 
     return data
