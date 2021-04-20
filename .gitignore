@@ -112,7 +112,7 @@ venv.bak/
 # MyLists
 start.sh
 config.ini
-site.db
+MyLists/site.db
 site.db-journal
 site2.db
 site2.db-journal

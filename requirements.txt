@@ -1,11 +1,4 @@
 flask
-flask-mail
-flask-login
-flask-admin
-flask-bcrypt
-flask-caching
-flask-compress
-flask-sqlalchemy
 howlongtobeatpy
 python-dotenv
 itsdangerous
@@ -17,6 +10,7 @@ wtforms
 pathlib
 Pillow
 pandas
+iso639
 redis
 pytz
 rq

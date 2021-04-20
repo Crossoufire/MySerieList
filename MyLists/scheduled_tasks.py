@@ -623,24 +623,23 @@ def update_IGDB_API():
 # ---------------------------------------------------------------------------------------------------------------
 
 
-@app.cli.command()
-def scheduled_task():
-    """ Run the scheduled jobs. """
-    app.logger.setLevel(logging.INFO)
-    remove_non_list_media()
-    remove_old_covers()
-    automatic_media_refresh()
-    new_releasing_movies()
-    new_releasing_series()
-    new_releasing_anime()
-    automatic_movies_locking()
-    compute_media_time_spent()
-    update_Mylists_stats()
+def register(app):
+    @app.cli.command()
+    def scheduled_task():
+        """ Run the scheduled jobs. """
+        app.logger.setLevel(logging.INFO)
+        remove_non_list_media()
+        remove_old_covers()
+        automatic_media_refresh()
+        new_releasing_movies()
+        new_releasing_series()
+        new_releasing_anime()
+        automatic_movies_locking()
+        compute_media_time_spent()
+        update_Mylists_stats()
 
-
-@app.cli.command()
-def update_igdb_key():
-    """ Update IGDB API key. """
-    app.logger.setLevel(logging.INFO)
-    update_IGDB_API()
-
+    @app.cli.command()
+    def update_igdb_key():
+        """ Update IGDB API key. """
+        app.logger.setLevel(logging.INFO)
+        update_IGDB_API()
