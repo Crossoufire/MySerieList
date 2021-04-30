@@ -38,7 +38,7 @@ hr {
     border-radius: 3px;
     border: 1px solid darkgray;
     color: #fff;
-    width: 30vmin !important;
+    width: 300px !important;
 }
 
 .form-control:focus {
@@ -70,8 +70,8 @@ hr {
 }
 @media (max-width: 490px) {
     .container {
-        padding-left: 0;
-        padding-right: 0;
+        padding-left: 7px;
+        padding-right: 7px;
     }
 }
 

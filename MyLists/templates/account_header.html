@@ -47,7 +47,11 @@
             </h2>
             <div class="add-shadow">
                 <b>Joined: {{ header_data['register'] }}</b><br>
-                <b>Followers: {{ header_data['followers'] }}</b>
+                <form id='who_follows_you' style="display: inline;" method="POST" action={{ url_for('users.account',
+                user_name=header_data['username']) }}>
+                    <input class="d-none" name="who_follows_you" value="True">
+                    <a onclick="$('#who_follows_you').submit()"><b>Followers: {{ header_data['followers'] }}</b></a>
+                </form>
             </div>
         </div>
         <div class="header-profile-data-mobile text-center">
