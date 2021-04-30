@@ -134,6 +134,8 @@ class User(UserMixin, db.Model):
                 user.anime_views += 1
             elif list_type == ListType.MOVIES:
                 user.movies_views += 1
+            elif list_type == ListType.GAMES:
+                user.games_views += 1
             db.session.commit()
 
     def add_follow(self, user):
