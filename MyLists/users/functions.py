@@ -393,20 +393,35 @@ def get_follows_data(user):
     return follows_list, follows_update_list
 
 
-def get_all_follows_data(user):
+def get_all_follows_data(user, followers=False):
     # If not <current_user>, check <follows> to show (remove the private ones if <current_user> does not follow them)
-    if current_user.id != user.id:
-        followed_by_user = user.followed.all()
-        current_user_follows = current_user.followed.all()
+    if followers:
+        if current_user.id != user.id:
+            user_followers = user.followers.all()
+            current_user_followers = current_user.followers.all()
 
-        follows_to_display = []
-        for follow in followed_by_user:
-            if follow.private:
-                if follow in current_user_follows or current_user.id == follow.id:
+            follows_to_display = []
+            for follow in user_followers:
+                if follow.private:
+                    if follow in current_user_followers or current_user.id == follow.id:
+                        follows_to_display.append(follow)
+                else:
                     follows_to_display.append(follow)
-            else:
-                follows_to_display.append(follow)
+        else:
+            follows_to_display = current_user.followers.all()
     else:
-        follows_to_display = current_user.followed.all()
+        if current_user.id != user.id:
+            followed_by_user = user.followed.all()
+            current_user_follows = current_user.followed.all()
+
+            follows_to_display = []
+            for follow in followed_by_user:
+                if follow.private:
+                    if follow in current_user_follows or current_user.id == follow.id:
+                        follows_to_display.append(follow)
+                else:
+                    follows_to_display.append(follow)
+        else:
+            follows_to_display = current_user.followed.all()
 
     return follows_to_display

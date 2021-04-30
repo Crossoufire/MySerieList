@@ -27,6 +27,10 @@ def account(user_name):
         media_update = get_updates(updates)
         return render_template('account_all_history.html', title='History', media_updates=media_update,
                                header_data=header_data)
+    elif request.form.get('who_follows_you'):
+        all_follows = get_all_follows_data(user, followers=True)
+        return render_template('account_all_follows.html', title='Followers', all_follows=all_follows,
+                               header_data=header_data, followers=True)
 
     # Recover user data
     user_data = get_user_data(user)

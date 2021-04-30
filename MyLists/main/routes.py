@@ -48,7 +48,7 @@ def mymedialist(media_list, user_name, category=None, genre='All', sorting=None,
     # Recover the category
     if category is None:
         category = Status.WATCHING
-        if list_type == ListType.MOVIES or ListType.GAMES:
+        if list_type == ListType.MOVIES or list_type == ListType.GAMES:
             category = Status.COMPLETED
 
     # Recover the template

@@ -3,16 +3,20 @@
 
 {% block data %}
     <div class="account-wrapper m-b-30">
-        <h4 class="m-t-15"><i class="fas fa-user-check"></i>&nbsp&nbsp All Follows</h4>
+        {% if followers %}
+            <h4 class="m-t-15"><i class="fas fa-user-check"></i>&nbsp;&nbsp; Your Followers</h4>
+        {% else %}
+            <h4 class="m-t-15"><i class="fas fa-user-check"></i>&nbsp;&nbsp; Your Follows</h4>
+        {% endif %}
         <hr>
         <a class="text-light" href="/account/{{ header_data['username'] }}">
-            <i class="fas fa-caret-left"></i>&nbsp&nbsp <b>Return to account</b>
+            <i class="fas fa-caret-left"></i>&nbsp;&nbsp; <b>Return to account</b>
         </a>
         <div class="d-flex flex-wrap m-t-10">
             {% for follow in all_follows %}
                 <a class="m-4 text-center text-light" href="/account/{{ follow.username }}">
                     <img class="follows-img" src="/static/profile_pics/{{ follow.image_file }}"
-                         style="height: 80px; width: 80px; border-radius: 50%;">
+                    style="height: 80px; width: 80px; border-radius: 50%;">
                     <h5 class="m-t-5">{{ follow.username }}</h5>
                 </a>
             {% endfor %}
