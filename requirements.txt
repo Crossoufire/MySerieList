@@ -14,3 +14,11 @@ iso639
 redis
 pytz
 rq
+flask_sqlalchemy
+flask_login
+flask_bcrypt
+flask_mail
+flask_compress
+flask_wtf
+email_validator
+flask_admin
