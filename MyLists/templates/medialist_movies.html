@@ -34,7 +34,7 @@
     "War", "Western"] %}
     {% for ge in all_genres %}
         <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
-         user_name=username, category=cat, genre=genre, sorting=sorting,
+         user_name=username, category=category, genre=ge, sorting=sorting,
          page_val=1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
             <div>{{ ge }}</div>
         </a>
