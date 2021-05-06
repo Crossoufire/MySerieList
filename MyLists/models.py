@@ -2,6 +2,8 @@ import rq
 import iso639
 from enum import Enum
 from datetime import datetime
+
+from IPython.utils.tz import utcfromtimestamp
 from flask import abort, flash
 from sqlalchemy.orm import aliased
 from collections import OrderedDict
@@ -873,9 +875,6 @@ def check_media(media_id, list_type, add=False):
 
 # Get additional stats on the <list_type> and the <user>
 def get_more_stats(user, list_type):
-    if list_type == ListType.GAMES:
-        return flash('Not available for now ;)', 'warning')
-
     media = eval(list_type.value.capitalize().replace('list', ''))
     media_list = eval(list_type.value.capitalize().replace('l', 'L'))
     media_actors = eval(list_type.value.capitalize().replace('list', 'Actors'))
@@ -987,3 +986,77 @@ def get_more_stats(user, list_type):
             'movies_times': movies_runtime, 'top_langage': top_langages, 'top_directors': top_directors}
 
     return data
+
+
+# Get user's games stats
+def get_games_stats(user):
+    media = Games
+    media_list = GamesList
+    media_genres = GamesGenre
+    media_comp = GamesCompanies
+    media_plat = GamesPlatforms
+
+    media_data = db.session.query(media, media_list) \
+        .join(media_list, media_list.media_id == media.id) \
+        .filter(media_list.user_id == user.id)
+
+    top_companies = db.session.query(media_comp.name, media_list, func.count(media_comp.name).label('count')) \
+        .join(media_comp, media_comp.media_id == media_list.media_id) \
+        .filter(media_list.user_id == user.id, media_comp.name != 'Unknown') \
+        .group_by(media_comp.name).order_by(text('count desc')).limit(10).all()
+
+    top_platforms = db.session.query(media_plat.name, media_list, func.count(media_plat.name).label('count')) \
+        .join(media_plat, media_plat.media_id == media_list.media_id) \
+        .filter(media_list.user_id == user.id, media_plat.name != 'Unknown') \
+        .group_by(media_plat.name).order_by(text('count desc')).limit(10).all()
+
+    top_genres = db.session.query(media_genres.genre, media_list, func.count(media_genres.genre).label('count')) \
+        .join(media_genres, media_genres.media_id == media_list.media_id) \
+        .filter(media_list.user_id == user.id, media_genres.genre != 'Unknown') \
+        .group_by(media_genres.genre).order_by(text('count desc')).limit(10).all()
+
+    media_periods = OrderedDict({"'60s-": 0, "'70s": 0, "'80s": 0, "'90s": 0, "'00s": 0, "'10s": 0, "'20s+": 0})
+    media_hltb_main = OrderedDict({'<1h': 0, '1h-1h29': 0, '1h30-1h59': 0, '2h00-2h29': 0, '2h30-2h59': 0, '3h+': 0})
+    for element in media_data:
+        # --- Period stats ----------------------------------------------------------------------------
+        try:
+            airing_year = utcfromtimestamp(int(element[0].release_date)).strftime('%d-%b-%Y').split('-')[2]
+        except:
+            airing_year = 0
+
+        if airing_year < 1970:
+            media_periods["'60s-"] += 1
+        elif 1970 <= airing_year < 1980:
+            media_periods["'70s"] += 1
+        elif 1980 <= airing_year < 1990:
+            media_periods["'80s"] += 1
+        elif 1990 <= airing_year < 2000:
+            media_periods["'90s"] += 1
+        elif 2000 <= airing_year < 2010:
+            media_periods["'00s"] += 1
+        elif 2010 <= airing_year < 2020:
+            media_periods["'10s"] += 1
+        elif airing_year >= 2020:
+            media_periods["'20s+"] += 1
+
+        # --- Eps / runtime stats ---------------------------------------------------------------------
+        hltb_main = element[0].hltb_main_time
+
+        if hltb_main < 60:
+            media_hltb_main['<1h'] += 1
+        elif 60 <= hltb_main < 90:
+            media_hltb_main['1h-1h29'] += 1
+        elif 90 <= hltb_main < 120:
+            media_hltb_main['1h30-1h59'] += 1
+        elif 120 <= hltb_main < 150:
+            media_hltb_main['2h00-2h29'] += 1
+        elif 150 <= hltb_main < 180:
+            media_hltb_main['2h30-2h59'] += 1
+        elif hltb_main >= 180:
+            media_hltb_main['3h+'] += 1
+
+    data = {'genres': top_genres, 'platforms': top_platforms, 'companies': top_companies, 'periods': media_periods,
+            'hltb_main': media_hltb_main}
+
+    return data
+
