@@ -438,3 +438,147 @@ let movies_langage_config = {
     }
 };
 new Chart(document.getElementById('langage-movies').getContext('2d'), movies_langage_config);
+
+
+
+let movies_platforms_labels = $('#platforms-movies-bar').attr('values-y').split(', ');
+let movies_platforms_data = $('#platforms-movies-bar').attr('values-x').split(', ');
+movies_platforms_labels.pop();
+movies_platforms_data.pop();
+
+let movies_platforms_config = {
+    type: 'pie',
+    data: {
+        datasets: [{
+            data: movies_platforms_data,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(255, 159, 64, 0.8)',
+                'rgba(255, 205, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(153, 102, 255, 0.8)',
+                'rgba(201, 203, 207, 0.8)',
+                'rgba(75, 99, 148, 0.8)',
+                'rgb(73, 110, 54, 0.8)',
+                'rgb(74, 32, 46, 0.8)'
+            ],
+            borderColor: '#212529',
+            borderWidth: 1,
+            label: 'by_media'
+        }],
+        labels: movies_platforms_labels
+    },
+    options: {
+        events: false,
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+            duration: 1,
+            onComplete: function () {
+                let ctx = this.chart.ctx;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+
+                this.data.datasets.forEach(function (dataset) {
+                    for (let i = 0; i < dataset.data.length; i++) {
+                        let model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model,
+                        // total = dataset._meta[Object.keys(dataset._meta)[0]].total,
+                        mid_radius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2,
+                        start_angle = model.startAngle,
+                        end_angle = model.endAngle,
+                        mid_angle = start_angle + (end_angle - start_angle) / 2;
+
+                        if ((Math.abs(end_angle) - Math.abs(start_angle)) > 0.2 ) {
+                            let x = mid_radius * Math.cos(mid_angle);
+                            let y = mid_radius * Math.sin(mid_angle);
+
+                            let percent = String(Math.round(dataset.data[i]));
+                            ctx.font = "16px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+                            ctx.fillStyle = 'lightgrey';
+                            ctx.fillText(percent, model.x + x, model.y + y + 10);
+                        }
+                    }
+                });
+            }
+        },
+        legend: {
+            display: true,
+            position: 'right',
+            color: 'white',
+        }
+    }
+};
+new Chart(document.getElementById('platforms-movies').getContext('2d'), movies_platforms_config);
+
+
+
+let movies_companies_labels = $('#companies-movies-bar').attr('values-y').split(', ');
+let movies_companies_data = $('#companies-movies-bar').attr('values-x').split(', ');
+movies_companies_labels.pop();
+movies_companies_data.pop();
+
+let movies_companies_config = {
+    type: 'pie',
+    data: {
+        datasets: [{
+            data: movies_companies_data,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(255, 159, 64, 0.8)',
+                'rgba(255, 205, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(153, 102, 255, 0.8)',
+                'rgba(201, 203, 207, 0.8)',
+                'rgba(75, 99, 148, 0.8)',
+                'rgb(73, 110, 54, 0.8)',
+                'rgb(74, 32, 46, 0.8)'
+            ],
+            borderColor: '#212529',
+            borderWidth: 1,
+            label: 'by_media'
+        }],
+        labels: movies_companies_labels
+    },
+    options: {
+        events: false,
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+            duration: 1,
+            onComplete: function () {
+                let ctx = this.chart.ctx;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+
+                this.data.datasets.forEach(function (dataset) {
+                    for (let i = 0; i < dataset.data.length; i++) {
+                        let model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model,
+                        // total = dataset._meta[Object.keys(dataset._meta)[0]].total,
+                        mid_radius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2,
+                        start_angle = model.startAngle,
+                        end_angle = model.endAngle,
+                        mid_angle = start_angle + (end_angle - start_angle) / 2;
+
+                        if ((Math.abs(end_angle) - Math.abs(start_angle)) > 0.2 ) {
+                            let x = mid_radius * Math.cos(mid_angle);
+                            let y = mid_radius * Math.sin(mid_angle);
+
+                            let percent = String(Math.round(dataset.data[i]));
+                            ctx.font = "16px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+                            ctx.fillStyle = 'lightgrey';
+                            ctx.fillText(percent, model.x + x, model.y + y + 10);
+                        }
+                    }
+                });
+            }
+        },
+        legend: {
+            display: true,
+            position: 'right',
+            color: 'white',
+        }
+    }
+};
+new Chart(document.getElementById('companies-movies').getContext('2d'), movies_companies_config);

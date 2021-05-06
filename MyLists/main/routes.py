@@ -11,7 +11,7 @@ from flask import Blueprint, url_for, request, abort, render_template, flash, js
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MediaType, get_next_airing, check_media, User, \
-    get_media_query, Games, GamesList, get_more_stats
+    get_media_query, Games, GamesList, get_more_stats, get_games_stats
 
 bp = Blueprint('main', __name__)
 
@@ -62,7 +62,10 @@ def mymedialist(media_list, user_name, category=None, genre='All', sorting=None,
     if category != 'Stats':
         category, media_data = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
     else:
-        media_data = get_more_stats(user, list_type)
+        if list_type == ListType.GAMES:
+            media_data = get_games_stats(user)
+        else:
+            media_data = get_more_stats(user, list_type)
 
     return render_template(html_template, title="{}'s {}".format(user_name, media_list), user=user, username=user_name,
                            user_id=str(user.id), media_list=media_list, search_form=search_form, search_q=q,
