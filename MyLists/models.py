@@ -185,6 +185,9 @@ class User(UserMixin, db.Model):
 
 
 class UserLastUpdate(db.Model):
+    def __repr__(self):
+        return f'<UserLastUpdate {self.id}-{self.media_name}>'
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_name = db.Column(db.String(50), nullable=False)
@@ -202,6 +205,9 @@ class UserLastUpdate(db.Model):
 
 
 class RedisTasks(db.Model):
+    def __repr__(self):
+        return f'<RedisTasks {self.id}-{self.name}>'
+
     id = db.Column(db.String(50), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String(150), index=True)
@@ -310,6 +316,9 @@ class SeriesList(db.Model):
 
 
 class SeriesGenre(db.Model):
+    def __repr__(self):
+        return f'<SeriesGenre {self.id}-{self.genre}>'
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
@@ -324,12 +333,18 @@ class SeriesEpisodesPerSeason(db.Model):
 
 
 class SeriesNetwork(db.Model):
+    def __repr__(self):
+        return f'<SeriesNetwork {self.id}-{self.network}>'
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     network = db.Column(db.String(150), nullable=False)
 
 
 class SeriesActors(db.Model):
+    def __repr__(self):
+        return f'<SeriesActors {self.id}-{self.name}>'
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     name = db.Column(db.String(150))
@@ -389,6 +404,9 @@ class AnimeList(db.Model):
 
 
 class AnimeGenre(db.Model):
+    def __repr__(self):
+        return f'<AnimeGenre {self.id}-{self.genre}>'
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
@@ -403,12 +421,18 @@ class AnimeEpisodesPerSeason(db.Model):
 
 
 class AnimeNetwork(db.Model):
+    def __repr__(self):
+        return f'<AnimeNetwork {self.id}-{self.network}>'
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     network = db.Column(db.String(150), nullable=False)
 
 
 class AnimeActors(db.Model):
+    def __repr__(self):
+        return f'<AnimeActors {self.id}-{self.name}>'
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     name = db.Column(db.String(150))
@@ -459,6 +483,9 @@ class MoviesList(MediaMixin, db.Model):
 
 
 class MoviesGenre(MediaMixin, db.Model):
+    def __repr__(self):
+        return f'<MoviesGenre {self.id}-{self.genre}>'
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
@@ -466,6 +493,9 @@ class MoviesGenre(MediaMixin, db.Model):
 
 
 class MoviesActors(db.Model):
+    def __repr__(self):
+        return f'<MoviesActors {self.id}-{self.name}>'
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     name = db.Column(db.String(150))
@@ -475,6 +505,9 @@ class MoviesActors(db.Model):
 
 
 class Games(MediaMixin, db.Model):
+    def __repr__(self):
+        return f'<Games {self.id}-{self.name}>'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     image_cover = db.Column(db.String(100), nullable=False)
@@ -513,18 +546,27 @@ class GamesList(db.Model):
 
 
 class GamesGenre(db.Model):
+    def __repr__(self):
+        return f'<GamesGenre {self.id}-{self.genre}>'
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
     genre = db.Column(db.String(100), nullable=False)
 
 
 class GamesPlatforms(db.Model):
+    def __repr__(self):
+        return f'<GamesPlatforms {self.id}-{self.name}>'
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
     name = db.Column(db.String(150))
 
 
 class GamesCompanies(db.Model):
+    def __repr__(self):
+        return f'<GamesCompanies {self.id}-{self.name}>'
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
     name = db.Column(db.String(100))
