@@ -1,15 +1,12 @@
 import rq
 import iso639
 from enum import Enum
+from flask import abort
 from datetime import datetime
-
-from IPython.utils.tz import utcfromtimestamp
-from flask import abort, flash
 from sqlalchemy.orm import aliased
 from collections import OrderedDict
 from MyLists import app, db, login_manager
 from flask_login import UserMixin, current_user
-
 from sqlalchemy import func, desc, text, and_, or_
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
@@ -1057,45 +1054,55 @@ def get_games_stats(user):
         .filter(media_list.user_id == user.id, media_genres.genre != 'Unknown') \
         .group_by(media_genres.genre).order_by(text('count desc')).limit(10).all()
 
-    media_periods = OrderedDict({"'60s-": 0, "'70s": 0, "'80s": 0, "'90s": 0, "'00s": 0, "'10s": 0, "'20s+": 0})
-    media_hltb_main = OrderedDict({'<1h': 0, '1h-1h29': 0, '1h30-1h59': 0, '2h00-2h29': 0, '2h30-2h59': 0, '3h+': 0})
+    media_periods = OrderedDict({"'90s-": 0, "'91-95s": 0, "'96-00s": 0, "'01-05s": 0, "'06-10s": 0, "'11-15s": 0,
+                                 "'16-20s+": 0})
+    media_hltb_main = OrderedDict({'<10h': 0, '10h-19h': 0, '20h-29h': 0, '30h-49h': 0, '50h-79h': 0, '80h+': 0})
     for element in media_data:
         # --- Period stats ----------------------------------------------------------------------------
         try:
-            airing_year = utcfromtimestamp(int(element[0].release_date)).strftime('%d-%b-%Y').split('-')[2]
+            airing_year = datetime.utcfromtimestamp(int(element[0].release_date)).strftime('%d-%b-%Y')
+            airing_year = int(airing_year.split('-')[2])
         except:
             airing_year = 0
 
-        if airing_year < 1970:
-            media_periods["'60s-"] += 1
-        elif 1970 <= airing_year < 1980:
-            media_periods["'70s"] += 1
-        elif 1980 <= airing_year < 1990:
-            media_periods["'80s"] += 1
-        elif 1990 <= airing_year < 2000:
-            media_periods["'90s"] += 1
-        elif 2000 <= airing_year < 2010:
-            media_periods["'00s"] += 1
-        elif 2010 <= airing_year < 2020:
-            media_periods["'10s"] += 1
-        elif airing_year >= 2020:
-            media_periods["'20s+"] += 1
+        if airing_year <= 1990:
+            media_periods["'90s-"] += 1
+        elif 1990 < airing_year < 1996:
+            media_periods["'91-95s"] += 1
+        elif 1995 < airing_year < 2001:
+            media_periods["'96-00s"] += 1
+        elif 2000 < airing_year < 2006:
+            media_periods["'01-05s"] += 1
+        elif 2005 < airing_year < 2011:
+            media_periods["'06-10s"] += 1
+        elif 2010 < airing_year < 2016:
+            media_periods["'11-15s"] += 1
+        elif airing_year >= 2016:
+            media_periods["'16-20s+"] += 1
 
         # --- Eps / runtime stats ---------------------------------------------------------------------
-        hltb_main = element[0].hltb_main_time
+        try:
+            hltb_main = element[0].hltb_main_time
+            if '½' in hltb_main:
+                hltb_main = hltb_main.replace('½', '')
+                hltb_main = float(hltb_main)*60 + 30
+            else:
+                hltb_main = float(hltb_main)*60
+        except:
+            hltb_main = 0
 
-        if hltb_main < 60:
-            media_hltb_main['<1h'] += 1
-        elif 60 <= hltb_main < 90:
-            media_hltb_main['1h-1h29'] += 1
-        elif 90 <= hltb_main < 120:
-            media_hltb_main['1h30-1h59'] += 1
-        elif 120 <= hltb_main < 150:
-            media_hltb_main['2h00-2h29'] += 1
-        elif 150 <= hltb_main < 180:
-            media_hltb_main['2h30-2h59'] += 1
-        elif hltb_main >= 180:
-            media_hltb_main['3h+'] += 1
+        if hltb_main < 600:
+            media_hltb_main['<10h'] += 1
+        elif 600 <= hltb_main < 1200:
+            media_hltb_main['10h-19h'] += 1
+        elif 1200 <= hltb_main < 1800:
+            media_hltb_main['20h-29h'] += 1
+        elif 1800 <= hltb_main < 3000:
+            media_hltb_main['30h-49h'] += 1
+        elif 3000 <= hltb_main < 4800:
+            media_hltb_main['50h-79h'] += 1
+        elif hltb_main >= 4800:
+            media_hltb_main['80h+'] += 1
 
     data = {'genres': top_genres, 'platforms': top_platforms, 'companies': top_companies, 'periods': media_periods,
             'hltb_main': media_hltb_main}
