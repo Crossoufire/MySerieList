@@ -12,7 +12,7 @@
 
 
 {% block categories %}
-    {% set categories = ['All', 'Completed', 'Endless', 'Multiplayer', 'Favorite'] %}
+    {% set categories = ['All', 'Completed', 'Endless', 'Multiplayer', 'Favorite', 'Stats'] %}
     {% for cat in categories %}
         <a class="cat-btn{% if cat == category %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
          media_list=media_list, user_name=username, category=cat, genre=genre, sorting=sorting, page_val=1) }}">
@@ -95,8 +95,8 @@
             <div class="col">
                 <h4><i class="fas fa-user-alt"></i>&nbsp;&nbsp; Top 10 Platforms</h4>
                 <div class="movies-container">
-                    <canvas id="platforms-movies"></canvas>
-                    <span id="platforms-movies-bar"
+                    <canvas id="actors-movies"></canvas>
+                    <span id="actors-movies-bar"
                       values-y="{% for d in data['platforms'] %}{{ d[0] }}, {% endfor %}"
                       values-x="{% for d in data['platforms'] %}{{ d[2] }}, {% endfor %}">
                     </span>
@@ -107,8 +107,8 @@
             <div class="col">
                 <h4><i class="fas fa-theater-masks"></i>&nbsp;&nbsp; Top 10 Companies</h4>
                 <div class="movies-container">
-                    <canvas id="companies-movies"></canvas>
-                    <span id="companies-movies-bar"
+                    <canvas id="directors-movies"></canvas>
+                    <span id="directors-movies-bar"
                       values-y="{% for d in data['companies'] %}{{ d[0] }}, {% endfor %}"
                       values-x="{% for d in data['companies'] %}{{ d[2] }}, {% endfor %}">
                     </span>

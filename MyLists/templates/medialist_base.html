@@ -144,7 +144,7 @@
                                             <a class="fa-comment-alt text-light{% if item.comment %} fas commented{% else %}
                                             far{% endif %}" data-toggle='tooltip' title="Comments" {% if item.comment %}
                                             onclick="showComment(card_{{ item.id }}, '{{ item.media }}', '{{ item.id }}',
-                                            true)" href="{{ url_for('main.write_comment', media_type=item.media,
+                                            true)"{% else %} href="{{ url_for('main.write_comment', media_type=item.media,
                                             media_id=item.id) }}"{% endif %}></a>
                                         {% else %}
                                             <a class="fa-comment-alt text-light {% if item.comment %}fas commented {% else %}
