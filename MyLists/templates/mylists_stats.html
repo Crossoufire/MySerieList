@@ -15,7 +15,7 @@
                     <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 2px;">
                         <i class="fas fa-lg fa-tv fs-2 text-center bg-series rounded-circle"></i>
                         <div class="d-flex align-items-center">
-                            <h3 class="mb-0">&nbsp; {{ nb_media["series"] }}</h3>
+                            <h3 class="mb-0">&nbsp; {{ all_stats['nb_media']["series"] }}</h3>
                             <div>&nbsp; Series</div>
                         </div>
                     </div>
@@ -24,7 +24,7 @@
                     <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 2px;">
                         <i class="fas fa-lg fa-torii-gate fs-2 text-center bg-anime rounded-circle"></i>
                         <div class="d-flex align-items-center">
-                            <h3 class="mb-0">&nbsp; {{ nb_media["anime"] }}</h3>
+                            <h3 class="mb-0">&nbsp; {{ all_stats['nb_media']["anime"] }}</h3>
                             <div>&nbsp; Anime</div>
                         </div>
                     </div>
@@ -33,7 +33,7 @@
                     <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 2px;">
                         <i class="fas fa-lg fa-film fs-2 text-center bg-movies rounded-circle"></i>
                         <div class="d-flex align-items-center">
-                            <h3 class="mb-0">&nbsp; {{ nb_media["movies"] }}</h3>
+                            <h3 class="mb-0">&nbsp; {{ all_stats['nb_media']["movies"] }}</h3>
                             <div>&nbsp; Movies</div>
                         </div>
                     </div>
@@ -42,7 +42,7 @@
                     <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 2px;">
                         <i class="fas fa-lg fa-user fs-2 text-center bg-danger rounded-circle"></i>
                         <div class="d-flex align-items-center">
-                            <h3 class="mb-0">&nbsp; {{ nb_users }}</h3>
+                            <h3 class="mb-0">&nbsp; {{ all_stats['nb_users'] }}</h3>
                             <div>&nbsp; Users</div>
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                     <div class="d-flex box align-items-center mb-0 p-3" style="border-radius: 2px;">
                         <i class="fas fa-lg fa-clock fs-2 text-center bg-primary rounded-circle"></i>
                         <div class="d-flex align-items-center">
-                            <h3 class="mb-0">&nbsp; {{ (total_time["total"]/60/24)|int }}</h3>
+                            <h3 class="mb-0">&nbsp; {{ (all_stats['total_time']["total"]/60/24)|int }}</h3>
                             <div>&nbsp; Days</div>
                         </div>
                     </div>
@@ -63,14 +63,15 @@
                 <div class="col-lg-5 col-sm-12 m-b-10">
                     <div class="media-container" style="background: #2a2b30; border-radius: 2px;">
                         <canvas id="media-time"></canvas>
-                        <span id="time-spent-pie" values="{{ total_time['series'] }}, {{ total_time['anime'] }}, {{ total_time['movies'] }}"></span>
+                        <span id="time-spent-pie"
+                        values="{{ all_stats['total_time']['series'] }}, {{ all_stats['total_time']['anime'] }}, {{ all_stats['total_time']['movies'] }}"></span>
                     </div>
                 </div>
                 <div class="col-lg-7 col-sm-12">
                     <div class="seasons-eps-container" style="background: #2a2b30; border-radius: 2px;">
                         <canvas id="total-seasons"></canvas>
-                        <span id="seasons-graph-data" values="{{ total_seasons['series'] }}, {{ total_seasons['anime'] }}"></span>
-                        <span id="episodes-graph-data" values="{{ total_episodes['series'] }}, {{ total_episodes['anime'] }}"></span>
+                        <span id="seasons-graph-data" values="{{ all_stats['total_seasons']['series'] }}, {{ all_stats['total_seasons']['anime'] }}"></span>
+                        <span id="episodes-graph-data" values="{{ all_stats['total_seasons']['series'] }}, {{ all_stats['total_seasons']['anime'] }}"></span>
                     </div>
                 </div>
             </div>
@@ -83,7 +84,7 @@
                         <hr class="mb-0 mt-0 top-series">
                         <table class="table table-sm text-light">
                             <tbody>
-                            {% for media in top_genres["series"] %}
+                            {% for media in all_stats['top_genres']["series"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
@@ -99,7 +100,7 @@
                         <hr class="mb-0 mt-0 top-series">
                         <table class="table table-sm text-light">
                             <tbody>
-                            {% for media in top_actors["series"] %}
+                            {% for media in all_stats['top_actors']["series"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
@@ -115,7 +116,7 @@
                         <hr class="mb-0 mt-0 top-series">
                         <table class="table table-sm text-light">
                             <tbody>
-                            {% for media in top_media["series"] %}
+                            {% for media in all_stats['top_media']["series"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
@@ -131,7 +132,7 @@
                         <hr class="mb-0 mt-0 top-series">
                         <table class="table table-sm text-light">
                             <tbody>
-                            {% for media in top_dropped["series"] %}
+                            {% for media in all_stats['top_dropped']["series"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
@@ -151,7 +152,7 @@
                         <hr class="mb-0 mt-0 top-anime">
                         <table class="table table-sm text-light">
                             <tbody>
-                            {% for media in top_genres["anime"] %}
+                            {% for media in all_stats['top_genres']["anime"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
@@ -167,7 +168,7 @@
                         <hr class="mb-0 mt-0 top-anime">
                         <table class="table table-sm text-light">
                             <tbody>
-                            {% for media in top_actors["anime"] %}
+                            {% for media in all_stats['top_actors']["anime"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
@@ -183,7 +184,7 @@
                         <hr class="mb-0 mt-0 top-anime">
                         <table class="table table-sm text-light">
                             <tbody>
-                            {% for media in top_media["anime"] %}
+                            {% for media in all_stats['top_media']["anime"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
@@ -199,7 +200,7 @@
                         <hr class="mb-0 mt-0 top-anime">
                         <table class="table table-sm text-light">
                             <tbody>
-                            {% for media in top_dropped["anime"] %}
+                            {% for media in all_stats['top_dropped']["anime"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
@@ -219,7 +220,7 @@
                         <hr class="mb-0 mt-0 top-movies">
                         <table class="table table-sm text-light">
                             <tbody>
-                            {% for media in top_genres["movies"] %}
+                            {% for media in all_stats['top_genres']["movies"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
@@ -235,7 +236,7 @@
                         <hr class="mb-0 mt-0 top-movies">
                         <table class="table table-sm text-light">
                             <tbody>
-                            {% for media in top_actors["movies"] %}
+                            {% for media in all_stats['top_actors']["movies"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>
@@ -251,7 +252,7 @@
                         <hr class="mb-0 mt-0 top-movies">
                         <table class="table table-sm text-light">
                             <tbody>
-                            {% for media in top_media["movies"] %}
+                            {% for media in all_stats['top_media']["movies"] %}
                                 <tr>
                                     <td class="text-center" style="border: none;">{{ media['quantity'] }}</td>
                                     <td class="giveMeEllipsis" style="border: none;">{{ media['info'] }}</td>

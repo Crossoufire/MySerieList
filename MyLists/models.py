@@ -1,7 +1,10 @@
+import json
+
 import rq
 import iso639
 from enum import Enum
 from flask import abort
+from pathlib import Path
 from datetime import datetime
 from sqlalchemy.orm import aliased
 from collections import OrderedDict
@@ -584,6 +587,47 @@ class Badges(db.Model):
     type = db.Column(db.String(100), nullable=False)
     genres_id = db.Column(db.String(100))
 
+    @classmethod
+    def add_badges_to_db(cls):
+        list_all_badges = []
+        path = Path(app.root_path, 'static/csv_data/badges.csv')
+        with open(path) as fp:
+            for line in fp:
+                list_all_badges.append(line.split(";"))
+
+        for i in range(1, len(list_all_badges)):
+            try:
+                genre_id = str(list_all_badges[i][4])
+            except:
+                genre_id = None
+            badge = cls(threshold=int(list_all_badges[i][0]),
+                        image_id=list_all_badges[i][1],
+                        title=list_all_badges[i][2],
+                        type=list_all_badges[i][3],
+                        genres_id=genre_id)
+            db.session.add(badge)
+        db.session.commit()
+
+    @classmethod
+    def refresh_db_badges(cls):
+        list_all_badges = []
+        path = Path(app.root_path, 'static/csv_data/badges.csv')
+        with open(path) as fp:
+            for line in fp:
+                list_all_badges.append(line.split(";"))
+
+        badges = cls.query.order_by(cls.id).all()
+        for i in range(1, len(list_all_badges)):
+            try:
+                genre_id = str(list_all_badges[i][4])
+            except:
+                genre_id = None
+            badges[i - 1].threshold = int(list_all_badges[i][0])
+            badges[i - 1].image_id = list_all_badges[i][1]
+            badges[i - 1].title = list_all_badges[i][2]
+            badges[i - 1].type = list_all_badges[i][3]
+            badges[i - 1].genres_id = genre_id
+
 
 class Ranks(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -592,11 +636,69 @@ class Ranks(db.Model):
     name = db.Column(db.String(50), nullable=False)
     type = db.Column(db.String(50), nullable=False)
 
+    @classmethod
+    def add_ranks_to_db(cls):
+        list_all_ranks = []
+        path = Path(app.root_path, 'static/csv_data/ranks.csv')
+        with open(path) as fp:
+            for line in fp:
+                list_all_ranks.append(line.split(";"))
+
+        for i in range(1, len(list_all_ranks)):
+            rank = cls(level=int(list_all_ranks[i][0]),
+                         image_id=list_all_ranks[i][1],
+                         name=list_all_ranks[i][2],
+                         type=list_all_ranks[i][3])
+            db.session.add(rank)
+        db.session.commit()
+
+    @classmethod
+    def refresh_db_ranks(cls):
+        list_all_ranks = []
+        path = Path(app.root_path, 'static/csv_data/ranks.csv')
+        with open(path) as fp:
+            for line in fp:
+                list_all_ranks.append(line.split(";"))
+
+        ranks = cls.query.order_by(cls.id).all()
+        for i in range(1, len(list_all_ranks)):
+            ranks[i - 1].level = int(list_all_ranks[i][0])
+            ranks[i - 1].image_id = list_all_ranks[i][1]
+            ranks[i - 1].name = list_all_ranks[i][2]
+            ranks[i - 1].type = list_all_ranks[i][3]
+
 
 class Frames(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     level = db.Column(db.Integer, nullable=False)
     image_id = db.Column(db.String(50), nullable=False)
+
+    @classmethod
+    def add_frames_to_db(cls):
+        list_all_frames = []
+        path = Path(app.root_path, 'static/csv_data/icon_frames.csv')
+        with open(path) as fp:
+            for line in fp:
+                list_all_frames.append(line.split(";"))
+
+        for i in range(1, len(list_all_frames)):
+            frame = cls(level=int(list_all_frames[i][0]),
+                           image_id=list_all_frames[i][1])
+            db.session.add(frame)
+        db.session.commit()
+
+    @classmethod
+    def refresh_db_frames(cls):
+        list_all_frames = []
+        path = Path(app.root_path, 'static/csv_data/icon_frames.csv')
+        with open(path) as fp:
+            for line in fp:
+                list_all_frames.append(line.split(";"))
+
+        frames = cls.query.order_by(cls.id).all()
+        for i in range(1, len(list_all_frames)):
+            frames[i - 1].level = int(list_all_frames[i][0])
+            frames[i - 1].image_id = list_all_frames[i][1]
 
 
 # --- STATS and TRENDS --------------------------------------------------------------------------------------------
@@ -616,6 +718,21 @@ class MyListsStats(db.Model):
     total_seasons = db.Column(db.Text)
     total_movies = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @classmethod
+    def get_all_stats(cls):
+        all_stats = cls.query.order_by(cls.timestamp.desc()).first()
+
+        return {'nb_users': all_stats.nb_users, 'nb_media': json.loads(all_stats.nb_media),
+                'total_time': json.loads(all_stats.total_time),
+                'top_media': json.loads(all_stats.top_media),
+                'top_genres': json.loads(all_stats.top_genres),
+                'top_actors': json.loads(all_stats.top_actors),
+                'top_directors': json.loads(all_stats.top_directors),
+                'top_dropped': json.loads(all_stats.top_dropped),
+                'total_episodes': json.loads(all_stats.total_episodes),
+                'total_seasons': json.loads(all_stats.total_seasons),
+                'total_movies': json.loads(all_stats.total_movies)}
 
 
 # --- OTHERS ------------------------------------------------------------------------------------------------------
@@ -1109,3 +1226,74 @@ def get_games_stats(user):
 
     return data
 
+
+# def correct_orphan_media():
+#     def get_orphan_genres_and_actors(api_id, list_type, media_id):
+#         media_data = ApiData().get_details_and_credits_data(api_id, list_type)
+#         if list_type == ListType.SERIES or list_type == ListType.ANIME:
+#             data = MediaDetails(media_data, list_type).get_media_details()
+#             if not data['tv_data']:
+#                 return None
+#         elif list_type == ListType.MOVIES:
+#             data = MediaDetails(media_data, list_type).get_media_details()
+#             if not data['movies_data']:
+#                 return None
+#
+#         if list_type == ListType.SERIES:
+#             for genre in data['genres_data']:
+#                 genre.update({'media_id': media_id})
+#                 db.session.add(SeriesGenre(**genre))
+#             for actor in data['actors_data']:
+#                 actor.update({'media_id': media_id})
+#                 db.session.add(SeriesActors(**actor))
+#         elif list_type == ListType.ANIME:
+#             if len(data['anime_genres_data']) > 0:
+#                 for genre in data['anime_genres_data']:
+#                     genre.update({'media_id': media_id})
+#                     db.session.add(AnimeGenre(**genre))
+#             else:
+#                 for genre in data['genres_data']:
+#                     genre.update({'media_id': media_id})
+#                     db.session.add(AnimeGenre(**genre))
+#             for actor in data['actors_data']:
+#                 actor.update({'media_id': media_id})
+#                 db.session.add(AnimeActors(**actor))
+#         elif list_type == ListType.MOVIES:
+#             for genre in data['genres_data']:
+#                 genre.update({'media_id': media_id})
+#                 db.session.add(MoviesGenre(**genre))
+#             for actor in data['actors_data']:
+#                 actor.update({'media_id': media_id})
+#                 db.session.add(MoviesActors(**actor))
+#
+#         # Commit the new changes
+#         db.session.commit()
+#
+#         return True
+#
+#     query = db.session.query(Series, SeriesGenre).outerjoin(SeriesGenre, SeriesGenre.media_id == Series.id).all()
+#     for q in query:
+#         if q[1] is None:
+#             info = get_orphan_genres_and_actors(q[0].themoviedb_id, ListType.SERIES, media_id=q[0].id)
+#             if info is True:
+#                 app.logger.info(f'Orphan series corrected with ID [{q[0].id}]: {q[0].name}')
+#             else:
+#                 app.logger.info(f'Orphan series NOT corrected with ID [{q[0].id}]: {q[0].name}')
+#
+#     query = db.session.query(Anime, AnimeGenre).outerjoin(AnimeGenre, AnimeGenre.media_id == Anime.id).all()
+#     for q in query:
+#         if q[1] is None:
+#             info = get_orphan_genres_and_actors(q[0].themoviedb_id, ListType.ANIME, media_id=q[0].id)
+#             if info is True:
+#                 app.logger.info(f'Orphan anime corrected with ID [{q[0].id}]: {q[0].name}')
+#             else:
+#                 app.logger.info(f'Orphan anime NOT corrected with ID [{q[0].id}]: {q[0].name}')
+#
+#     query = db.session.query(Movies, MoviesGenre).outerjoin(MoviesGenre, MoviesGenre.media_id == Movies.id).all()
+#     for q in query:
+#         if q[1] is None:
+#             info = get_orphan_genres_and_actors(q[0].themoviedb_id, ListType.MOVIES, media_id=q[0].id)
+#             if info is True:
+#                 app.logger.info(f'Orphan movie corrected with ID [{q[0].id}]: {q[0].name}')
+#             else:
+#                 app.logger.info(f'Orphan movie NOT corrected with ID [{q[0].id}]: {q[0].name}')
