@@ -34,7 +34,7 @@ Before starting the program, you *MUST* create a `.env` file respecting the foll
 ```
 FLASK_SECRET_KEY="the-super-secret-key"
 FLASK_SESSION_COOKIE_SECURE=True
-FLASK_SQLALCHEMY_DATABASE_URI="db info"
+FLASK_SQLALCHEMY_DATABASE_URI="sqlite:///site.db"
 FLASK_ENV="Production"
 FLASK_DEBUG=False
 FLASK_TESTING=False
@@ -51,7 +51,7 @@ If you need more settings, feel free to adapt it as you want.
 
 If you want to first test the project locally, you should put in your `.env` file these values:
 ```
-FLASK_SESSION_COOKIE_SECURE=True,  
+FLASK_SESSION_COOKIE_SECURE=False,  
 FLASK_DEBUG=True,
 FLASK_TESTING=True,
 FLASK_ENV="Development",
