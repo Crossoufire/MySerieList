@@ -1,5 +1,8 @@
 import json
 import pytz
+import sqlalchemy
+from sqlalchemy import func, and_, extract
+
 from MyLists import db, app
 from datetime import datetime
 from MyLists.API_data import ApiData
@@ -11,7 +14,7 @@ from flask import Blueprint, url_for, request, abort, render_template, flash, js
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MediaType, get_next_airing, check_media, User, \
-    get_media_query, Games, GamesList, get_more_stats, get_games_stats
+    get_media_query, Games, GamesList, get_more_stats, get_games_stats, UserLastUpdate
 
 bp = Blueprint('main', __name__)
 
@@ -465,6 +468,30 @@ def search_media():
 
     return render_template("media_search.html", title="Search", all_results=media_results, search=search,
                            page=int(page), total_results=data_search['total_results'])
+
+
+@bp.route('/graph_test', methods=['GET', 'POST'])
+@login_required
+def test_graph_date():
+    data = UserLastUpdate.query.filter_by(user_id=3, media_type=ListType.SERIES)\
+        .group_by(UserLastUpdate.date).all()
+
+    all_dates = {}
+    for d in data:
+        try:
+            date = d.date.strftime('%b-%Y')
+            if d.new_status == Status.COMPLETED or (d.old_status == Status.COMPLETED and d.new_status is None):
+                if all_dates.get('{}'.format(date)) is not None:
+                    all_dates['{}'.format(date)] += 1
+                else:
+                    all_dates['{}'.format(date)] = 1
+        except:
+            pass
+
+    labels = [k for k in all_dates.keys()]
+    data = [k for k in all_dates.values()]
+
+    return render_template('graph_test.html', title='Graph_test', labels=labels, data=data)
 
 
 # --- AJAX Methods -----------------------------------------------------------------------------------------------

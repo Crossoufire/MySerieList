@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+
+
+{% block css %}
+{% endblock css %}
+
+
+{% block content %}
+    <section class="test-graph p-2">
+        <canvas id="graphic"></canvas>
+        <span id="labels-graph" values={{ labels|tojson }}></span>
+        <span id="data-graph" values={{ data|tojson }}></span>
+    </section>
+{% endblock content %}
+
+
+{% block script %}
+    <script>
+        $(document).ready(function () {
+            let labels = JSON.parse($('#labels-graph').attr('values'));
+            let data =  JSON.parse($('#data-graph').attr('values'));
+
+            let config = {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: 'grey',
+                    }],
+                },
+                options: {
+                    events: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        enabled: false
+                    },
+                    hover: {
+                        animation: false,
+                        animationDuration: 0
+                    },
+                    animation: {
+                        duration: 1,
+                        onComplete: function () {
+                            let chartInstance = this.chart,
+                            ctx = chartInstance.ctx;
+
+                            this.data.datasets.forEach(function (dataset, i) {
+                                let meta = chartInstance.controller.getDatasetMeta(i);
+                                meta.data.forEach(function (bar, index) {
+                                    let data = dataset.data[index];
+                                    ctx.fillText(data, bar._model.x - 8, bar._model.y - 5);
+                                });
+                            });
+                        }
+                    },
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        fontColor: '#e2e2e2'
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                fontColor: '#e2e2e2'
+                            },
+                            gridLines: {
+                                display: false
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                fontColor: '#e2e2e2'
+                            },
+                            gridLines: {
+                                display: false
+                            },
+                        }]
+                    },
+                }
+            };
+            let ctx = document.getElementById('graphic').getContext('2d');
+            new Chart(ctx, config);
+        });
+    </script>
+{% endblock %}
