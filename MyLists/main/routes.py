@@ -473,14 +473,14 @@ def search_media():
 @bp.route('/graph_test', methods=['GET', 'POST'])
 @login_required
 def test_graph_date():
-    data = UserLastUpdate.query.filter_by(user_id=3, media_type=ListType.SERIES)\
+    series_data = UserLastUpdate.query.filter_by(user_id=3, media_type=ListType.SERIES)\
         .group_by(UserLastUpdate.date).all()
 
     all_dates = {}
-    for d in data:
+    for d in series_data:
         try:
             date = d.date.strftime('%b-%Y')
-            if d.new_status == Status.COMPLETED or (d.old_status == Status.COMPLETED and d.new_status is None):
+            if d.new_status == Status.COMPLETED:
                 if all_dates.get('{}'.format(date)) is not None:
                     all_dates['{}'.format(date)] += 1
                 else:
@@ -488,10 +488,66 @@ def test_graph_date():
         except:
             pass
 
-    labels = [k for k in all_dates.keys()]
-    data = [k for k in all_dates.values()]
+    series_labels = ", ".join([k for k in all_dates.keys()])
+    series_data = ", ".join([str(k) for k in all_dates.values()])
 
-    return render_template('graph_test.html', title='Graph_test', labels=labels, data=data)
+    anime_data = UserLastUpdate.query.filter_by(user_id=3, media_type=ListType.ANIME)\
+        .group_by(UserLastUpdate.date).all()
+
+    all_dates = {}
+    for d in anime_data:
+        try:
+            date = d.date.strftime('%b-%Y')
+            if d.new_status == Status.COMPLETED:
+                if all_dates.get('{}'.format(date)) is not None:
+                    all_dates['{}'.format(date)] += 1
+                else:
+                    all_dates['{}'.format(date)] = 1
+        except:
+            pass
+
+    anime_labels = ", ".join([k for k in all_dates.keys()])
+    anime_data = ", ".join([str(k) for k in all_dates.values()])
+
+    movies_data = UserLastUpdate.query.filter_by(user_id=3, media_type=ListType.MOVIES)\
+        .group_by(UserLastUpdate.date).all()
+
+    all_dates = {}
+    for d in movies_data:
+        try:
+            date = d.date.strftime('%b-%Y')
+            if d.new_status == Status.COMPLETED:
+                if all_dates.get('{}'.format(date)) is not None:
+                    all_dates['{}'.format(date)] += 1
+                else:
+                    all_dates['{}'.format(date)] = 1
+        except:
+            pass
+
+    movies_labels = ", ".join([k for k in all_dates.keys()])
+    movies_data = ", ".join([str(k) for k in all_dates.values()])
+
+    games_data = UserLastUpdate.query.filter_by(user_id=3, media_type=ListType.GAMES)\
+        .group_by(UserLastUpdate.date).all()
+
+    all_dates = {}
+    for d in games_data:
+        try:
+            date = d.date.strftime('%b-%Y')
+            if d.new_status == Status.COMPLETED:
+                if all_dates.get('{}'.format(date)) is not None:
+                    all_dates['{}'.format(date)] += 1
+                else:
+                    all_dates['{}'.format(date)] = 1
+        except:
+            pass
+
+    games_labels = ", ".join([k for k in all_dates.keys()])
+    games_data = ", ".join([str(k) for k in all_dates.values()])
+
+    return render_template('graph_test.html', title='Graph_test', series_labels=series_labels, series_data=series_data,
+                           games_labels=games_labels, games_data=games_data, movies_labels=movies_labels,
+                           movies_data=movies_data, anime_labels=anime_labels, anime_data=anime_data)
 
 
 # --- AJAX Methods -----------------------------------------------------------------------------------------------

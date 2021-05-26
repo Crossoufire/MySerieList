@@ -3,8 +3,8 @@ from MyLists import app, db
 from flask_login import login_required, current_user
 from flask import Blueprint, request, render_template
 from MyLists.models import User, ListType, Ranks, Frames, UserLastUpdate, Notifications
-from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_updates,\
-    get_user_data, get_knowledge_frame, get_favorites, get_all_follows_data, get_header_data
+from MyLists.users.functions import get_media_data, get_media_levels, get_follows_data, get_updates, \
+    get_user_data, get_favorites, get_all_follows_data, get_all_followers_data, get_header_data
 
 bp = Blueprint('users', __name__)
 
@@ -28,7 +28,7 @@ def account(user_name):
         return render_template('account_all_history.html', title='History', media_updates=media_update,
                                header_data=header_data)
     elif request.form.get('who_follows_you'):
-        all_follows = get_all_follows_data(user, followers=True)
+        all_follows = get_all_followers_data(user)
         return render_template('account_all_follows.html', title='Followers', all_follows=all_follows,
                                header_data=header_data, followers=True)
 
@@ -64,7 +64,7 @@ def hall_of_fame():
         anime_level = get_media_levels(user, ListType.ANIME)
         movies_level = get_media_levels(user, ListType.MOVIES)
         games_level = get_media_levels(user, ListType.GAMES)
-        knowledge_frame = get_knowledge_frame(user)
+        knowledge_frame = Frames.get_knowledge_frame(user)
 
         user_data = {"id": user.id,
                      "username": user.username,
@@ -88,7 +88,7 @@ def hall_of_fame():
 @bp.route("/level_grade_data", methods=['GET'])
 @login_required
 def level_grade_data():
-    ranks = Ranks.query.filter_by(type='media_rank\n').order_by(Ranks.level.asc()).all()
+    ranks = Ranks.get_levels()
     return render_template('level_grade_data.html', title='Level grade data', data=ranks)
 
 
@@ -112,24 +112,18 @@ def follow_status():
     except:
         return '', 400
 
-    # Check follow ID exist in User table and status is bool
+    # Check if <follow> exist in <User> table and status is <bool>
     user = User.query.filter_by(id=follow_id).first()
     if not user or type(follow_condition) is not bool:
         return '', 400
 
-    # Check the status of the follow
+    # Check the follow's status
     if follow_condition:
-        # Add the follow
         current_user.add_follow(user)
 
         # Notify the followed user
         payload = {'username': current_user.username,
                    'message': '{} is following you.'.format(current_user.username)}
-        notif = Notifications(user_id=user.id,
-                              payload_json=json.dumps(payload))
-        db.session.add(notif)
-
-        db.session.commit()
         app.logger.info('[{}] Follow the account with ID {}'.format(current_user.id, follow_id))
     else:
         # Remove the follow
@@ -138,11 +132,10 @@ def follow_status():
         # Notify the followed user
         payload = {'username': current_user.username,
                    'message': '{} stopped following you.'.format(current_user.username)}
-        notif = Notifications(user_id=user.id,
-                              payload_json=json.dumps(payload))
-        db.session.add(notif)
-
-        db.session.commit()
         app.logger.info('[{}] Unfollowed the account with ID {} '.format(current_user.id, follow_id))
+
+    notif = Notifications(user_id=user.id, payload_json=json.dumps(payload))
+    db.session.add(notif)
+    db.session.commit()
 
     return '', 204

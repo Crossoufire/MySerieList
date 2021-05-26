@@ -6,7 +6,7 @@ from sqlalchemy import func
 from flask_login import current_user
 from _collections import OrderedDict
 from MyLists.models import ListType, UserLastUpdate, SeriesList, AnimeList, MoviesList, Status, Series, Anime, Movies, \
-    Ranks, Frames, RoleType, GamesList, Games
+    Ranks, RoleType, GamesList, Games, Frames, User
 
 
 def get_media_count_by_status(user_id, list_type):
@@ -180,25 +180,6 @@ def get_media_levels(user, list_type):
     return level_info
 
 
-def get_knowledge_frame(user):
-    # Compute the corresponding level and percentage from the media time
-    knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) +\
-                      int((((400+80*user.time_spent_anime)**(1/2))-20)/40) + \
-                      int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
-
-    frame_level = round(knowledge_level/8, 0) + 1
-    query_frame = Frames.query.filter_by(level=frame_level).first()
-
-    if query_frame:
-        frame_id = url_for('static', filename='img/icon_frames/new/{}'.format(query_frame.image_id))
-    else:
-        frame_id = url_for('static', filename='img/icon_frames/new/border_40')
-
-    return {"level": knowledge_level,
-            "frame_id": frame_id,
-            "frame_level": frame_level}
-
-
 def get_updates(last_update):
     update = []
     for element in last_update:
@@ -257,7 +238,7 @@ def get_header_data(user):
     followers = user.followers.count()
 
     # Recover the knowledge frame and level of the user
-    knowledge_info = get_knowledge_frame(user)
+    knowledge_info = Frames.get_knowledge_frame(user)
 
     # Header info
     header_data = {"id": str(user.id),
@@ -302,7 +283,7 @@ def get_media_data(user):
     if user.add_games:
         all_lists.append(["games", ListType.GAMES, user.time_spent_games])
 
-    # Create dict with media as key. Dict values are dict or list of dict
+    # Create dict with media as key. Values are dict or list of dict
     media_dict, total_time, total_media, total_score, total_mean_score, total_media_and_eps = {}, 0, 0, 0, 0, 0
     qte_media_type = len(all_lists)
     for list_type in all_lists:
@@ -393,35 +374,39 @@ def get_follows_data(user):
     return follows_list, follows_update_list
 
 
-def get_all_follows_data(user, followers=False):
+def get_all_follows_data(user):
     # If not <current_user>, check <follows> to show (remove the private ones if <current_user> does not follow them)
-    if followers:
-        if current_user.id != user.id:
-            user_followers = user.followers.all()
-            current_user_followers = current_user.followers.all()
+    if current_user.id != user.id:
+        followed_by_user = user.followed.all()
+        current_user_follows = current_user.followed.all()
 
-            follows_to_display = []
-            for follow in user_followers:
-                if follow.private:
-                    if follow in current_user_followers or current_user.id == follow.id:
-                        follows_to_display.append(follow)
-                else:
+        follows_to_display = []
+        for follow in followed_by_user:
+            if follow.private:
+                if follow in current_user_follows or current_user.id == follow.id:
                     follows_to_display.append(follow)
-        else:
-            follows_to_display = current_user.followers.all()
+            else:
+                follows_to_display.append(follow)
     else:
-        if current_user.id != user.id:
-            followed_by_user = user.followed.all()
-            current_user_follows = current_user.followed.all()
-
-            follows_to_display = []
-            for follow in followed_by_user:
-                if follow.private:
-                    if follow in current_user_follows or current_user.id == follow.id:
-                        follows_to_display.append(follow)
-                else:
-                    follows_to_display.append(follow)
-        else:
-            follows_to_display = current_user.followed.all()
+        follows_to_display = current_user.followed.all()
 
     return follows_to_display
+
+
+def get_all_followers_data(user):
+    if current_user.id != user.id:
+        user_followers = user.followers.all()
+        current_user_followers = current_user.followers.all()
+
+        followers_to_display = []
+        for follower in user_followers:
+            if follower.private:
+                if follower in current_user_followers or current_user.id == follower.id:
+                    followers_to_display.append(follower)
+            else:
+                followers_to_display.append(follower)
+    else:
+        followers_to_display = current_user.followers.all()
+
+    return followers_to_display
+

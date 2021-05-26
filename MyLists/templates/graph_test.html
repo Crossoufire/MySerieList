@@ -6,10 +6,25 @@
 
 
 {% block content %}
-    <section class="test-graph p-2">
-        <canvas id="graphic"></canvas>
-        <span id="labels-graph" values={{ labels|tojson }}></span>
-        <span id="data-graph" values={{ data|tojson }}></span>
+    <section class="series-graph p-2 m-b-40">
+        <canvas id="series-graphic"></canvas>
+        <span id="series-labels-graph" values="{{ series_labels }}"></span>
+        <span id="series-data-graph" values="{{ series_data }}"></span>
+    </section>
+    <section class="anime-graph p-2 m-b-40">
+        <canvas id="anime-graphic"></canvas>
+        <span id="anime-labels-graph" values="{{ anime_labels }}"></span>
+        <span id="anime-data-graph" values="{{ anime_data }}"></span>
+    </section>
+    <section class="movies-graph p-2 m-b-40">
+        <canvas id="movies-graphic"></canvas>
+        <span id="movies-labels-graph" values="{{ movies_labels }}"></span>
+        <span id="movies-data-graph" values="{{ movies_data }}"></span>
+    </section>
+    <section class="games-graph p-2 m-b-40">
+        <canvas id="games-graphic"></canvas>
+        <span id="games-labels-graph" values="{{ games_labels }}"></span>
+        <span id="games-data-graph" values="{{ games_data }}"></span>
     </section>
 {% endblock content %}
 
@@ -17,15 +32,15 @@
 {% block script %}
     <script>
         $(document).ready(function () {
-            let labels = JSON.parse($('#labels-graph').attr('values'));
-            let data =  JSON.parse($('#data-graph').attr('values'));
+            let series_labels = $('#series-labels-graph').attr('values').split(', ');
+            let series_data =  $('#series-data-graph').attr('values').split(', ');
 
-            let config = {
+            let series_config = {
                 type: 'bar',
                 data: {
-                    labels: labels,
+                    labels: series_labels,
                     datasets: [{
-                        data: data,
+                        data: series_data,
                         backgroundColor: 'grey',
                     }],
                 },
@@ -82,8 +97,213 @@
                     },
                 }
             };
-            let ctx = document.getElementById('graphic').getContext('2d');
-            new Chart(ctx, config);
+            let series_ctx = document.getElementById('series-graphic').getContext('2d');
+            new Chart(series_ctx, series_config);
+
+            let anime_labels = $('#anime-labels-graph').attr('values').split(', ');
+            let anime_data =  $('#anime-data-graph').attr('values').split(', ');
+
+            let anime_config = {
+                type: 'bar',
+                data: {
+                    labels: anime_labels,
+                    datasets: [{
+                        data: anime_data,
+                        backgroundColor: 'grey',
+                    }],
+                },
+                options: {
+                    events: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        enabled: false
+                    },
+                    hover: {
+                        animation: false,
+                        animationDuration: 0
+                    },
+                    animation: {
+                        duration: 1,
+                        onComplete: function () {
+                            let chartInstance = this.chart,
+                            ctx = chartInstance.ctx;
+
+                            this.data.datasets.forEach(function (dataset, i) {
+                                let meta = chartInstance.controller.getDatasetMeta(i);
+                                meta.data.forEach(function (bar, index) {
+                                    let data = dataset.data[index];
+                                    ctx.fillText(data, bar._model.x - 8, bar._model.y - 5);
+                                });
+                            });
+                        }
+                    },
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        fontColor: '#e2e2e2'
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                fontColor: '#e2e2e2'
+                            },
+                            gridLines: {
+                                display: false
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                fontColor: '#e2e2e2'
+                            },
+                            gridLines: {
+                                display: false
+                            },
+                        }]
+                    },
+                }
+            };
+            let anime_ctx = document.getElementById('anime-graphic').getContext('2d');
+            new Chart(anime_ctx, anime_config);
+
+            let movies_labels = $('#movies-labels-graph').attr('values').split(', ');
+            let movies_data =  $('#movies-data-graph').attr('values').split(', ');
+
+            let movies_config = {
+                type: 'bar',
+                data: {
+                    labels: movies_labels,
+                    datasets: [{
+                        data: movies_data,
+                        backgroundColor: 'grey',
+                    }],
+                },
+                options: {
+                    events: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        enabled: false
+                    },
+                    hover: {
+                        animation: false,
+                        animationDuration: 0
+                    },
+                    animation: {
+                        duration: 1,
+                        onComplete: function () {
+                            let chartInstance = this.chart,
+                            ctx = chartInstance.ctx;
+
+                            this.data.datasets.forEach(function (dataset, i) {
+                                let meta = chartInstance.controller.getDatasetMeta(i);
+                                meta.data.forEach(function (bar, index) {
+                                    let data = dataset.data[index];
+                                    ctx.fillText(data, bar._model.x - 8, bar._model.y - 5);
+                                });
+                            });
+                        }
+                    },
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        fontColor: '#e2e2e2'
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                fontColor: '#e2e2e2'
+                            },
+                            gridLines: {
+                                display: false
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                fontColor: '#e2e2e2'
+                            },
+                            gridLines: {
+                                display: false
+                            },
+                        }]
+                    },
+                }
+            };
+            let movies_ctx = document.getElementById('movies-graphic').getContext('2d');
+            new Chart(movies_ctx, movies_config);
+
+            let games_labels = $('#games-labels-graph').attr('values').split(', ');
+            let games_data =  $('#games-data-graph').attr('values').split(', ');
+
+            let games_config = {
+                type: 'bar',
+                data: {
+                    labels: games_labels,
+                    datasets: [{
+                        data: games_data,
+                        backgroundColor: 'grey',
+                    }],
+                },
+                options: {
+                    events: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        enabled: false
+                    },
+                    hover: {
+                        animation: false,
+                        animationDuration: 0
+                    },
+                    animation: {
+                        duration: 1,
+                        onComplete: function () {
+                            let chartInstance = this.chart,
+                            ctx = chartInstance.ctx;
+
+                            this.data.datasets.forEach(function (dataset, i) {
+                                let meta = chartInstance.controller.getDatasetMeta(i);
+                                meta.data.forEach(function (bar, index) {
+                                    let data = dataset.data[index];
+                                    ctx.fillText(data, bar._model.x - 8, bar._model.y - 5);
+                                });
+                            });
+                        }
+                    },
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        fontColor: '#e2e2e2'
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                fontColor: '#e2e2e2'
+                            },
+                            gridLines: {
+                                display: false
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                fontColor: '#e2e2e2'
+                            },
+                            gridLines: {
+                                display: false
+                            },
+                        }]
+                    },
+                }
+            };
+            let games_ctx = document.getElementById('games-graphic').getContext('2d');
+            new Chart(games_ctx, games_config);
+
         });
     </script>
 {% endblock %}

@@ -6,7 +6,7 @@ from flask import abort
 from MyLists import app
 from pathlib import Path
 from MyLists.models import ListType
-# from howlongtobeatpy import HowLongToBeat
+from howlongtobeatpy import HowLongToBeat
 from ratelimit import sleep_and_retry, limits
 
 

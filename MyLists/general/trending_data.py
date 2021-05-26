@@ -4,9 +4,9 @@ from datetime import datetime
 
 class TrendingData:
     def __init__(self, trending_data):
+        self.movie_tmdb_link = "https://www.themoviedb.org/movie"
         self.tmdb_cover_path = "http://image.tmdb.org/t/p/w300"
         self.tv_tmdb_link = "https://www.themoviedb.org/tv"
-        self.movie_tmdb_link = "https://www.themoviedb.org/movie"
         self.trending_data = trending_data
         self.media_data = None
         self.result = None

@@ -1,10 +1,10 @@
-# import rq
+import rq
 import json
-# import iso639
+import iso639
 from enum import Enum
-from flask import abort
 from pathlib import Path
 from datetime import datetime
+from flask import abort, url_for
 from sqlalchemy.orm import aliased
 from collections import OrderedDict
 from MyLists import app, db, login_manager
@@ -70,6 +70,9 @@ followers = db.Table('followers',
                      db.Column('followed_id', db.Integer, db.ForeignKey('user.id')))
 
 
+# --- USERS -------------------------------------------------------------------------------------------------------
+
+
 class User(UserMixin, db.Model):
     def __repr__(self):
         return f'<User {self.id}-{self.username}>'
@@ -105,9 +108,7 @@ class User(UserMixin, db.Model):
     movies_list = db.relationship('MoviesList', backref='user', lazy=True)
     games_list = db.relationship('GamesList', backref='user', lazy=True)
     redis_tasks = db.relationship('RedisTasks', backref='user', lazy='dynamic')
-    followed = db.relationship('User',
-                               secondary=followers,
-                               primaryjoin=(followers.c.follower_id == id),
+    followed = db.relationship('User', secondary=followers, primaryjoin=(followers.c.follower_id == id),
                                secondaryjoin=(followers.c.followed_id == id),
                                backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
@@ -171,6 +172,36 @@ class User(UserMixin, db.Model):
         s = Serializer(app.config['SECRET_KEY'])
         return s.dumps({'user_id': self.id}).decode('utf-8')
 
+    def get_media_levels(self, list_type):
+        if list_type == ListType.SERIES:
+            total_time_min = self.time_spent_series
+        elif list_type == ListType.ANIME:
+            total_time_min = self.time_spent_anime
+        elif list_type == ListType.MOVIES:
+            total_time_min = self.time_spent_movies
+        elif list_type == ListType.GAMES:
+            total_time_min = self.time_spent_games
+
+        # Compute the corresponding level and percentage from the media time
+        element_level_tmp = "{:.2f}".format(round((((400+80*total_time_min)**(1/2))-20)/40, 2))
+        element_level = int(element_level_tmp.split('.')[0])
+        element_percentage = int(element_level_tmp.split('.')[1])
+
+        query_rank = Ranks.query.filter_by(level=element_level, type='media_rank\n').first()
+        if query_rank:
+            grade_id = url_for('static', filename='img/levels_ranks/{}'.format(query_rank.image_id))
+            grade_title = query_rank.name
+        else:
+            grade_id = url_for('static', filename='img/levels_ranks/ReachRank49')
+            grade_title = "Inheritor"
+
+        level_info = {"level": element_level,
+                      "level_percent": element_percentage,
+                      "grade_id": grade_id,
+                      "grade_title": grade_title}
+
+        return level_info
+
     @staticmethod
     def verify_token(token):
         s = Serializer(app.config['SECRET_KEY'])
@@ -203,6 +234,9 @@ class UserLastUpdate(db.Model):
     date = db.Column(db.DateTime, nullable=False)
 
     user = db.relationship('User', backref='UserLastUpdate', lazy=False)
+
+
+# --- OTHER -------------------------------------------------------------------------------------------------------
 
 
 class RedisTasks(db.Model):
@@ -263,6 +297,74 @@ class MediaMixin(object):
         return in_user_list
 
 
+class MediaListMixin(object):
+    @classmethod
+    def get_media_count_by_status(cls, user_id):
+        media_count = db.session.query(cls.status, func.count(cls.status))\
+            .filter_by(user_id=user_id).group_by(cls.status).all()
+
+        total = sum(x[1] for x in media_count)
+        data = {'total': total,
+                'nodata': False}
+        if total == 0:
+            data['nodata'] = True
+
+        for media in media_count:
+            data[media[0].value] = {"count": media[1],
+                                    "percent": (media[1] / total) * 100}
+        for media in Status:
+            if media.value not in data.keys():
+                data[media.value] = {"count": 0,
+                                     "percent": 0}
+
+        return data
+
+    @classmethod
+    def get_media_count_by_score(cls, user_id):
+        media_count = db.session.query(cls.score, func.count(cls.score)).filter_by(user_id=user_id) \
+            .group_by(cls.score).order_by(cls.score.asc()).all()
+
+        data = {}
+        for media in media_count:
+            data[media[0]] = media[1]
+
+        scores = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0,
+                  5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+        for sc in scores:
+            if sc not in data.keys():
+                data[sc] = 0
+
+        data.pop(None, None)
+        data.pop(-1, None)
+        data = OrderedDict(sorted(data.items()))
+
+        data_list = []
+        for key, value in data.items():
+            data_list.append(value)
+
+        return data_list
+
+    @classmethod
+    def get_media_score(cls, user_id, status):
+        media_score = db.session.query(func.count(cls.score), func.count(cls.media_id), func.sum(cls.score)) \
+            .filter(cls.user_id == user_id, cls.status != status).all()
+
+        try:
+            percentage = int(float(media_score[0][0]) / float(media_score[0][1]) * 100)
+        except (ZeroDivisionError, TypeError):
+            percentage = '-'
+
+        try:
+            mean_score = round(float(media_score[0][2]) / float(media_score[0][0]), 2)
+        except (ZeroDivisionError, TypeError):
+            mean_score = '-'
+
+        return {'scored_media': media_score[0][0],
+                'total_media': media_score[0][1],
+                'percentage': percentage,
+                'mean_score': mean_score}
+
+
 # --- SERIES ------------------------------------------------------------------------------------------------------
 
 
@@ -302,7 +404,7 @@ class Series(MediaMixin, db.Model):
     list_info = db.relationship('SeriesList', backref='series', lazy="dynamic")
 
 
-class SeriesList(db.Model):
+class SeriesList(MediaListMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -390,7 +492,7 @@ class Anime(MediaMixin, db.Model):
     networks = db.relationship('AnimeNetwork', backref='anime', lazy=True)
 
 
-class AnimeList(db.Model):
+class AnimeList(MediaListMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
@@ -471,7 +573,7 @@ class Movies(MediaMixin, db.Model):
     list_info = db.relationship('MoviesList', backref='movies', lazy='dynamic')
 
 
-class MoviesList(MediaMixin, db.Model):
+class MoviesList(MediaListMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
@@ -483,7 +585,7 @@ class MoviesList(MediaMixin, db.Model):
     comment = db.Column(db.Text)
 
 
-class MoviesGenre(MediaMixin, db.Model):
+class MoviesGenre(db.Model):
     def __repr__(self):
         return f'<MoviesGenre {self.id}-{self.genre}>'
 
@@ -666,6 +768,10 @@ class Ranks(db.Model):
             ranks[i - 1].name = list_all_ranks[i][2]
             ranks[i - 1].type = list_all_ranks[i][3]
 
+    @classmethod
+    def get_levels(cls):
+        return cls.query.filter_by(type='media_rank\n').order_by(cls.level.asc()).all()
+
 
 class Frames(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -699,8 +805,27 @@ class Frames(db.Model):
             frames[i - 1].level = int(list_all_frames[i][0])
             frames[i - 1].image_id = list_all_frames[i][1]
 
+    @classmethod
+    def get_knowledge_frame(cls, user):
+        # Compute the corresponding level and percentage from the media time
+        knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) + \
+                          int((((400+80*user.time_spent_anime)**(1/2))-20)/40) + \
+                          int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
 
-# --- STATS and TRENDS --------------------------------------------------------------------------------------------
+        frame_level = round(knowledge_level/8, 0)+1
+        query_frame = Frames.query.filter_by(level=frame_level).first()
+
+        if query_frame:
+            frame_id = url_for('static', filename='img/icon_frames/new/{}'.format(query_frame.image_id))
+        else:
+            frame_id = url_for('static', filename='img/icon_frames/new/border_40')
+
+        return {"level": knowledge_level,
+                "frame_id": frame_id,
+                "frame_level": frame_level}
+
+
+# --- STATS -------------------------------------------------------------------------------------------------------
 
 
 class MyListsStats(db.Model):

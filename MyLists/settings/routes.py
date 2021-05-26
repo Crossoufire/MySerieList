@@ -2,7 +2,8 @@ import pandas as pd
 from MyLists.models import User
 from MyLists import db, app, bcrypt
 from flask_login import login_required, current_user
-from MyLists.settings.functions import send_email_update_email, save_account_picture
+from MyLists.settings.emails import send_email_update_email
+from MyLists.settings.functions import save_account_picture
 from MyLists.settings.forms import UpdateAccountForm, ChangePasswordForm, ImportListForm
 from flask import Blueprint, flash, request, render_template, redirect, url_for, jsonify
 
@@ -83,8 +84,7 @@ def settings():
     settings_form.isprivate.data = current_user.private
     settings_form.add_games.data = current_user.add_games
 
-    back_pic = False
-    pic = False
+    back_pic, pic = False, False
     if request.args.get('from') == 'back_pic':
         back_pic = True
     elif request.args.get('from') == 'profile_pic':
