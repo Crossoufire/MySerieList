@@ -3,16 +3,16 @@
 
 {% block data %}
     <div class="account-wrapper m-b-60">
-        {% if header_data['id'] != current_user.get_id() %}
+        {% if user.id != current_user.get_id() %}
             <div class="follow-btn-mobile">
                 {% if header_data["isfollowing"] %}
-                    <button id="follow_{{ header_data['id'] }}" class="btn btn-sm btn-dark follow-btn" value="1"
-                     onclick="follow_status(this, '{{ header_data['id'] }}')">Unfollow</button>
+                    <button id="follow_{{ user.id }}" class="btn btn-sm btn-dark follow-btn" value="1"
+                     onclick="follow_status(this, '{{ user.id }}')">Unfollow</button>
                 {% else %}
-                    <button id="follow_{{ header_data['id'] }}" class="btn btn-sm btn-primary follow-btn" value="0"
-                     onclick="follow_status(this, '{{ header_data['id'] }}')">Follow</button>
+                    <button id="follow_{{ user.id }}" class="btn btn-sm btn-primary follow-btn" value="0"
+                     onclick="follow_status(this, '{{ user.id }}')">Follow</button>
                 {% endif %}
-                <i id="load_{{ header_data['id'] }}" class="fas fa-spinner fast-spin" style="display: none;"></i>
+                <i id="load_{{ user.id }}" class="fas fa-spinner fast-spin" style="display: none;"></i>
             </div>
         {% endif %}
 

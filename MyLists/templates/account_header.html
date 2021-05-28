@@ -9,56 +9,56 @@
 
 
 {% block content %}
-    <div class="header-container" style="background-image: url('{{ header_data['back_picture'] }}');">
-        {% if current_user.get_id() == header_data['id'] %}
+    <div class="header-container" style="background-image: url('{{ url_for("static",
+    filename="background_pics/" + user.background_image) }}');">
+        {% if current_user.get_id() == user.id %}
             <a class="header-back-pen" href="/settings?from=back_pic" data-toggle="tooltip" data-placement="bottom"
                title="Change your background"><i class="fas fa-lg fa-pen"></i></a>
         {% endif %}
-        <div class="header-profile-container" {% if header_data['knowledge_info']['frame_level'] < 36 %}
-            style="left: -10px; {% endif %}">
-            {% if current_user.get_id() == header_data['id'] %}
+        <div class="header-profile-container" {% if frame['frame_level'] < 36 %} style="left: -10px; {% endif %}">
+            {% if current_user.get_id() == user.id %}
                 <a href="/settings?from=profile_pic">
                     <img class="header-profile-img on-hover" data-toggle="tooltip" title="Change your picture"
-                         src="{{ header_data['profile_picture'] }}" alt=""/>
+                    src="{{ url_for("static", filename="profile_pics/" + user.image_file) }}" alt=""/>
                 </a>
             {% else %}
-                <img class="header-profile-img" src="{{ header_data['profile_picture'] }}" alt=""/>
+                <img class="header-profile-img" src="{{ url_for("static",
+                filename="profile_pics/" + user.image_file) }}" alt=""/>
             {% endif %}
-            <img class="header-profile-frame" src="{{ header_data['knowledge_info']['frame_id'] }}.png" alt=""/>
-            <div class="header-knowledge-level text-center">{{ header_data['knowledge_info']['level'] }}</div>
+            <img class="header-profile-frame" src="{{ frame['frame_id'] }}.png" alt=""/>
+            <div class="header-knowledge-level text-center">{{ frame['level'] }}</div>
         </div>
-        <div class="header-profile-data" {% if header_data['knowledge_info']['frame_level'] < 36 %}
-            style="left: 200px; {% endif %}">
-            <h2 class="profile-name add-shadow"><b>{{ header_data['username'] }}</b>
-                {% if header_data['id'] != current_user.get_id() %}
-                    {% if header_data["isfollowing"] %}
-                        <button id="follow_{{ header_data['id'] }}" class="btn btn-sm btn-dark follow-btn" value="1"
-                                onclick="follow_status(this, '{{ header_data['id'] }}')">
+        <div class="header-profile-data" {% if frame['frame_level'] < 36 %} style="left: 200px; {% endif %}">
+            <h2 class="profile-name add-shadow"><b>{{ user.username }}</b>
+                {% if current_user.get_id() != user.id  %}
+                    {% if current_user.is_following(user) %}
+                        <button id="follow_{{ user.id }}" class="btn btn-sm btn-dark follow-btn" value="1"
+                                onclick="follow_status(this, '{{ user.id }}')">
                             Unfollow
                         </button>
                     {% else %}
-                        <button id="follow_{{ header_data['id'] }}" class="btn btn-sm btn-primary follow-btn" value="0"
-                                onclick="follow_status(this, '{{ header_data['id'] }}')">
+                        <button id="follow_{{ user.id }}" class="btn btn-sm btn-primary follow-btn" value="0"
+                                onclick="follow_status(this, '{{ user.id }}')">
                             Follow
                         </button>
                     {% endif %}
-                    <i id="load_{{ header_data['id'] }}" class="fas fa-spinner fast-spin" style="display: none;"></i>
+                    <i id="load_{{ user.id }}" class="fas fa-spinner fast-spin" style="display: none;"></i>
                 {% endif %}
             </h2>
             <div class="add-shadow">
-                <b>Joined: {{ header_data['register'] }}</b><br>
-                <form id='who_follows_you' style="display: inline;" method="POST" action={{ url_for('users.account',
-                user_name=header_data['username']) }}>
-                    <input class="d-none" name="who_follows_you" value="True">
-                    <a onclick="$('#who_follows_you').submit()"><b>Followers: {{ header_data['followers'] }}</b></a>
+                <b>Joined: {{ user.registered_on }}</b><br>
+                <form id='all_followers' style="display: inline;" method="POST" action={{ url_for('users.account',
+                user_name=user.username) }}>
+                    <input class="d-none" name="all_followers" value="True">
+                    <a onclick="$('#all_followers').submit()"><b>Followers: {{ user.followers.count() }}</b></a>
                 </form>
             </div>
         </div>
         <div class="header-profile-data-mobile text-center">
-            <h4 class="p-0 m-0 add-shadow"><b>{{ header_data['username'] }}&nbsp;</b></h4>
+            <h4 class="p-0 m-0 add-shadow"><b>{{ user.username }}&nbsp;</b></h4>
             <div class="header-join-follow add-shadow">
-                <b>Joined: {{ header_data['register'] }}</b><br>
-                <b>Followers: {{ header_data['followers'] }}</b>
+                <b>Joined: {{ user.registered_on }}</b><br>
+                <b>Followers: {{ user.followers.count() }}</b>
             </div>
         </div>
     </div>

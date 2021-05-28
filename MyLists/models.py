@@ -74,8 +74,7 @@ followers = db.Table('followers',
 
 
 class User(UserMixin, db.Model):
-    def __repr__(self):
-        return f'<User {self.id}-{self.username}>'
+    _group = 'User'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)
@@ -113,18 +112,16 @@ class User(UserMixin, db.Model):
                                backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
     def check_autorization(self, user_name):
-        # retrieve the user
+        # Retrieve the user
         user = self.query.filter_by(username=user_name).first()
 
-        # No account with this username & Protection of the admin account
-        if user is None or (self.role != RoleType.ADMIN and user.role == RoleType.ADMIN):
+        # Check if account exist
+        if not user:
             abort(404)
 
-        # Check if the current account can see the target's account
-        if self.id == user.id or self.role == RoleType.ADMIN:
-            pass
-        elif user.private and not self.is_following(user):
-            abort(404)
+        # Protection of the admin account
+        if self.role != RoleType.ADMIN and user.role == RoleType.ADMIN:
+            abort(403)
 
         return user
 
@@ -138,7 +135,6 @@ class User(UserMixin, db.Model):
                 user.movies_views += 1
             elif list_type == ListType.GAMES:
                 user.games_views += 1
-            db.session.commit()
 
     def add_follow(self, user):
         if not self.is_following(user):
@@ -150,6 +146,22 @@ class User(UserMixin, db.Model):
 
     def is_following(self, user):
         return self.followed.filter(followers.c.followed_id == user.id).count() > 0
+
+    def get_all_follows(self):
+        if current_user.id != self.id:
+            follows = self.followed.all()
+        else:
+            follows = current_user.followed.all()
+
+        return follows
+
+    def get_all_followers(self):
+        if current_user.id != self.id:
+            followers = self.followers.all()
+        else:
+            followers = current_user.followers.all()
+
+        return followers
 
     def count_notifications(self):
         last_notif_time = self.last_notif_read_time or datetime(1900, 1, 1)
@@ -182,7 +194,6 @@ class User(UserMixin, db.Model):
         elif list_type == ListType.GAMES:
             total_time_min = self.time_spent_games
 
-        # Compute the corresponding level and percentage from the media time
         element_level_tmp = "{:.2f}".format(round((((400+80*total_time_min)**(1/2))-20)/40, 2))
         element_level = int(element_level_tmp.split('.')[0])
         element_percentage = int(element_level_tmp.split('.')[1])
@@ -202,6 +213,84 @@ class User(UserMixin, db.Model):
 
         return level_info
 
+    def get_user_frame(self):
+        knowledge_level = int((((400+80*self.time_spent_series)**(1/2))-20)/40) + \
+                          int((((400+80*self.time_spent_anime)**(1/2))-20)/40) + \
+                          int((((400+80*self.time_spent_movies)**(1/2))-20)/40)
+
+        frame_level = round(knowledge_level/8, 0)+1
+        query_frame = Frames.query.filter_by(level=frame_level).first()
+
+        frame_id = url_for('static', filename='img/icon_frames/new/border_40')
+        if query_frame:
+            frame_id = url_for('static', filename='img/icon_frames/new/{}'.format(query_frame.image_id))
+
+        return {"level": knowledge_level,
+                "frame_id": frame_id,
+                "frame_level": frame_level}
+
+    def get_follows_data(self):
+        # If not <current_user>, check <follows> to show (remove the private ones if <current_user> doesn't follow them)
+        if current_user.id != self.id:
+            followed_by_user = self.followed.all()
+            current_user_follows = current_user.followed.all()
+
+            follows_list = []
+            for follow in followed_by_user:
+                if follow.private:
+                    if follow in current_user_follows or current_user.id == follow.id:
+                        follows_list.append(follow)
+                else:
+                    follows_list.append(follow)
+
+            follows_to_update = []
+            for follow in follows_list:
+                follows_to_update.append(follow.id)
+
+            follows_update = db.session.query(UserLastUpdate) \
+                .filter(UserLastUpdate.user_id.in_([u.id for u in self.followed.all()])) \
+                .order_by(UserLastUpdate.date.desc()).limit(11)
+        else:
+            follows_list = self.followed.all()
+            follows_update = db.session.query(UserLastUpdate) \
+                .filter(UserLastUpdate.user_id.in_([u.id for u in self.followed.all()])) \
+                .order_by(UserLastUpdate.date.desc()).limit(11)
+
+        follows_update_list = []
+        for follow in follows_update:
+            follows = {'username': follow.user.username}
+            follows.update(get_updates([follow])[0])
+            follows_update_list.append(follows)
+
+        return follows_list, follows_update_list
+
+    def get_user_data(self):
+        # Recover the view count of the account and the media lists
+        profile_view_count = self.profile_views
+        if current_user.role != RoleType.ADMIN and self.id != current_user.id:
+            self.profile_views += 1
+            profile_view_count = self.profile_views
+
+        view_count = {"profile": profile_view_count,
+                      "series": self.series_views,
+                      "anime": self.anime_views,
+                      "movies": self.movies_views,
+                      "games": self.games_views}
+
+        # Recover the user's last updates
+        last_updates = UserLastUpdate.query.filter_by(user_id=self.id).order_by(UserLastUpdate.date.desc()).limit(7)
+        media_update = get_updates(last_updates)
+
+        user_data = {"media_update": media_update,
+                     "view_count": view_count}
+
+        return user_data
+
+    def get_media_updates(self, all=False):
+        if all:
+            updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
+        return get_updates(updates)
+
     @staticmethod
     def verify_token(token):
         s = Serializer(app.config['SECRET_KEY'])
@@ -217,8 +306,7 @@ class User(UserMixin, db.Model):
 
 
 class UserLastUpdate(db.Model):
-    def __repr__(self):
-        return f'<UserLastUpdate {self.id}-{self.media_name}>'
+    _group = 'User'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -240,8 +328,7 @@ class UserLastUpdate(db.Model):
 
 
 class RedisTasks(db.Model):
-    def __repr__(self):
-        return f'<RedisTasks {self.id}-{self.name}>'
+    _group = 'User'
 
     id = db.Column(db.String(50), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -263,6 +350,8 @@ class RedisTasks(db.Model):
 
 
 class Notifications(db.Model):
+    _group = 'User'
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     media_type = db.Column(db.String(50))
@@ -272,6 +361,8 @@ class Notifications(db.Model):
 
 
 class MediaMixin(object):
+    _group = None
+
     def get_same_genres(self, genres_list):
         media = eval(self.__class__.__name__)
         media_genre = eval(self.__class__.__name__+'Genre')
@@ -298,6 +389,8 @@ class MediaMixin(object):
 
 
 class MediaListMixin(object):
+    _group = None
+
     @classmethod
     def get_media_count_by_status(cls, user_id):
         media_count = db.session.query(cls.status, func.count(cls.status))\
@@ -364,15 +457,33 @@ class MediaListMixin(object):
                 'percentage': percentage,
                 'mean_score': mean_score}
 
+    @classmethod
+    def get_media_total_eps(cls, user_id):
+        if list_type == ListType.SERIES:
+            media_list = SeriesList
+        elif list_type == ListType.ANIME:
+            media_list = AnimeList
+        elif list_type == ListType.MOVIES:
+            media_list = MoviesList
+        elif list_type == ListType.GAMES:
+            media_list = GamesList
 
-# --- SERIES ------------------------------------------------------------------------------------------------------
+        if list_type != ListType.GAMES:
+            query = db.session.query(func.sum(media_list.eps_watched)).filter(media_list.user_id == user_id).all()
+            eps_watched = query[0][0]
+        else:
+            query = db.session.query(func.count(media_list.media_id)).filter(media_list.user_id == user_id).all()
+            eps_watched = query[0][0]
+
+        if eps_watched is None:
+            eps_watched = 0
+
+        return eps_watched
 
 
-class Series(MediaMixin, db.Model):
-    def __repr__(self):
-        return f'<Series {self.id}-{self.name}>'
+class TVBase(db.Model):
+    _group = None
 
-    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     original_name = db.Column(db.String(50), nullable=False)
     first_air_date = db.Column(db.String(30))
@@ -397,6 +508,15 @@ class Series(MediaMixin, db.Model):
     last_update = db.Column(db.DateTime, nullable=False)
     lock_status = db.Column(db.Boolean, default=0)
 
+
+# --- SERIES ------------------------------------------------------------------------------------------------------
+
+
+class Series(MediaMixin, TVBase):
+    _group = ListType.SERIES or MediaType.SERIES
+
+    id = db.Column(db.Integer, primary_key=True)
+
     genres = db.relationship('SeriesGenre', backref='series', lazy=True)
     actors = db.relationship('SeriesActors', backref='series', lazy=True)
     eps_per_season = db.relationship('SeriesEpisodesPerSeason', backref='series', lazy=False)
@@ -405,6 +525,8 @@ class Series(MediaMixin, db.Model):
 
 
 class SeriesList(MediaListMixin, db.Model):
+    _group = ListType.SERIES or MediaType.SERIES
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -419,8 +541,7 @@ class SeriesList(MediaListMixin, db.Model):
 
 
 class SeriesGenre(db.Model):
-    def __repr__(self):
-        return f'<SeriesGenre {self.id}-{self.genre}>'
+    _group = ListType.SERIES or MediaType.SERIES
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -429,6 +550,8 @@ class SeriesGenre(db.Model):
 
 
 class SeriesEpisodesPerSeason(db.Model):
+    _group = ListType.SERIES or MediaType.SERIES
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
     season = db.Column(db.Integer, nullable=False)
@@ -436,8 +559,7 @@ class SeriesEpisodesPerSeason(db.Model):
 
 
 class SeriesNetwork(db.Model):
-    def __repr__(self):
-        return f'<SeriesNetwork {self.id}-{self.network}>'
+    _group = ListType.SERIES or MediaType.SERIES
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -445,8 +567,7 @@ class SeriesNetwork(db.Model):
 
 
 class SeriesActors(db.Model):
-    def __repr__(self):
-        return f'<SeriesActors {self.id}-{self.name}>'
+    _group = ListType.SERIES or MediaType.SERIES
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -456,34 +577,10 @@ class SeriesActors(db.Model):
 # --- ANIME -------------------------------------------------------------------------------------------------------
 
 
-class Anime(MediaMixin, db.Model):
-    def __repr__(self):
-        return f'<Anime {self.id}-{self.name}>'
+class Anime(MediaMixin, TVBase):
+    _group = ListType.ANIME or MediaType.ANIME
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    original_name = db.Column(db.String(50), nullable=False)
-    first_air_date = db.Column(db.String(30))
-    last_air_date = db.Column(db.String(30))
-    next_episode_to_air = db.Column(db.String(30))
-    season_to_air = db.Column(db.Integer)
-    episode_to_air = db.Column(db.Integer)
-    homepage = db.Column(db.String(200))
-    in_production = db.Column(db.Boolean)
-    created_by = db.Column(db.String(100))
-    duration = db.Column(db.Integer)
-    total_seasons = db.Column(db.Integer, nullable=False)
-    total_episodes = db.Column(db.Integer)
-    origin_country = db.Column(db.String(20))
-    status = db.Column(db.String(50))
-    vote_average = db.Column(db.Float)
-    vote_count = db.Column(db.Float)
-    synopsis = db.Column(db.Text)
-    popularity = db.Column(db.Float)
-    image_cover = db.Column(db.String(100), nullable=False)
-    themoviedb_id = db.Column(db.Integer, nullable=False)
-    last_update = db.Column(db.DateTime, nullable=False)
-    lock_status = db.Column(db.Boolean, default=0)
 
     genres = db.relationship('AnimeGenre', backref='anime', lazy=True)
     actors = db.relationship('AnimeActors', backref='anime', lazy=True)
@@ -493,6 +590,8 @@ class Anime(MediaMixin, db.Model):
 
 
 class AnimeList(MediaListMixin, db.Model):
+    _group = ListType.ANIME or MediaType.ANIME
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
@@ -507,8 +606,7 @@ class AnimeList(MediaListMixin, db.Model):
 
 
 class AnimeGenre(db.Model):
-    def __repr__(self):
-        return f'<AnimeGenre {self.id}-{self.genre}>'
+    _group = ListType.ANIME or MediaType.ANIME
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
@@ -517,6 +615,8 @@ class AnimeGenre(db.Model):
 
 
 class AnimeEpisodesPerSeason(db.Model):
+    _group = ListType.ANIME or MediaType.ANIME
+
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
     season = db.Column(db.Integer, nullable=False)
@@ -524,8 +624,7 @@ class AnimeEpisodesPerSeason(db.Model):
 
 
 class AnimeNetwork(db.Model):
-    def __repr__(self):
-        return f'<AnimeNetwork {self.id}-{self.network}>'
+    _group = ListType.ANIME or MediaType.ANIME
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
@@ -533,8 +632,7 @@ class AnimeNetwork(db.Model):
 
 
 class AnimeActors(db.Model):
-    def __repr__(self):
-        return f'<AnimeActors {self.id}-{self.name}>'
+    _group = ListType.ANIME or MediaType.ANIME
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
@@ -545,8 +643,7 @@ class AnimeActors(db.Model):
 
 
 class Movies(MediaMixin, db.Model):
-    def __repr__(self):
-        return f'<Movies {self.id}-{self.name}>'
+    _group = ListType.MOVIES or MediaType.MOVIES
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -574,6 +671,8 @@ class Movies(MediaMixin, db.Model):
 
 
 class MoviesList(MediaListMixin, db.Model):
+    _group = ListType.MOVIES or MediaType.MOVIES
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
@@ -586,8 +685,7 @@ class MoviesList(MediaListMixin, db.Model):
 
 
 class MoviesGenre(db.Model):
-    def __repr__(self):
-        return f'<MoviesGenre {self.id}-{self.genre}>'
+    _group = ListType.MOVIES or MediaType.MOVIES
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
@@ -596,8 +694,7 @@ class MoviesGenre(db.Model):
 
 
 class MoviesActors(db.Model):
-    def __repr__(self):
-        return f'<MoviesActors {self.id}-{self.name}>'
+    _group = ListType.MOVIES or MediaType.MOVIES
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
@@ -608,8 +705,7 @@ class MoviesActors(db.Model):
 
 
 class Games(MediaMixin, db.Model):
-    def __repr__(self):
-        return f'<Games {self.id}-{self.name}>'
+    _group = ListType.GAMES or MediaType.GAMES
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -637,6 +733,8 @@ class Games(MediaMixin, db.Model):
 
 
 class GamesList(db.Model):
+    _group = ListType.GAMES or MediaType.GAMES
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
@@ -649,8 +747,7 @@ class GamesList(db.Model):
 
 
 class GamesGenre(db.Model):
-    def __repr__(self):
-        return f'<GamesGenre {self.id}-{self.genre}>'
+    _group = ListType.GAMES or MediaType.GAMES
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
@@ -658,8 +755,7 @@ class GamesGenre(db.Model):
 
 
 class GamesPlatforms(db.Model):
-    def __repr__(self):
-        return f'<GamesPlatforms {self.id}-{self.name}>'
+    _group = ListType.GAMES or MediaType.GAMES
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
@@ -667,8 +763,7 @@ class GamesPlatforms(db.Model):
 
 
 class GamesCompanies(db.Model):
-    def __repr__(self):
-        return f'<GamesCompanies {self.id}-{self.name}>'
+    _group = ListType.GAMES or MediaType.GAMES>'
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
@@ -681,6 +776,8 @@ class GamesCompanies(db.Model):
 
 
 class Badges(db.Model):
+    _group = None
+
     id = db.Column(db.Integer, primary_key=True)
     threshold = db.Column(db.Integer, nullable=False)
     image_id = db.Column(db.String(100), nullable=False)
@@ -731,6 +828,8 @@ class Badges(db.Model):
 
 
 class Ranks(db.Model):
+    _group = None
+
     id = db.Column(db.Integer, primary_key=True)
     level = db.Column(db.Integer, nullable=False)
     image_id = db.Column(db.String(50), nullable=False)
@@ -774,6 +873,8 @@ class Ranks(db.Model):
 
 
 class Frames(db.Model):
+    _group = None
+
     id = db.Column(db.Integer, primary_key=True)
     level = db.Column(db.Integer, nullable=False)
     image_id = db.Column(db.String(50), nullable=False)
@@ -805,30 +906,13 @@ class Frames(db.Model):
             frames[i - 1].level = int(list_all_frames[i][0])
             frames[i - 1].image_id = list_all_frames[i][1]
 
-    @classmethod
-    def get_knowledge_frame(cls, user):
-        # Compute the corresponding level and percentage from the media time
-        knowledge_level = int((((400+80*user.time_spent_series)**(1/2))-20)/40) + \
-                          int((((400+80*user.time_spent_anime)**(1/2))-20)/40) + \
-                          int((((400+80*user.time_spent_movies)**(1/2))-20)/40)
-
-        frame_level = round(knowledge_level/8, 0)+1
-        query_frame = Frames.query.filter_by(level=frame_level).first()
-
-        if query_frame:
-            frame_id = url_for('static', filename='img/icon_frames/new/{}'.format(query_frame.image_id))
-        else:
-            frame_id = url_for('static', filename='img/icon_frames/new/border_40')
-
-        return {"level": knowledge_level,
-                "frame_id": frame_id,
-                "frame_level": frame_level}
-
 
 # --- STATS -------------------------------------------------------------------------------------------------------
 
 
 class MyListsStats(db.Model):
+    _group = 'Stats'
+
     id = db.Column(db.Integer, primary_key=True)
     nb_users = db.Column(db.Integer)
     nb_media = db.Column(db.Text)
