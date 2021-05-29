@@ -46,7 +46,7 @@
                 {% endif %}
             </h2>
             <div class="add-shadow">
-                <b>Joined: {{ user.registered_on }}</b><br>
+                <b>Joined: {{ user.registered_on.strftime('%d %b %Y') }}</b><br>
                 <form id='all_followers' style="display: inline;" method="POST" action={{ url_for('users.account',
                 user_name=user.username) }}>
                     <input class="d-none" name="all_followers" value="True">
@@ -57,7 +57,7 @@
         <div class="header-profile-data-mobile text-center">
             <h4 class="p-0 m-0 add-shadow"><b>{{ user.username }}&nbsp;</b></h4>
             <div class="header-join-follow add-shadow">
-                <b>Joined: {{ user.registered_on }}</b><br>
+                <b>Joined: {{ user.registered_on.strftime('%d %b %Y') }}</b><br>
                 <b>Followers: {{ user.followers.count() }}</b>
             </div>
         </div>

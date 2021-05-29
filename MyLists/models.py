@@ -1,21 +1,42 @@
-import rq
-import json
-import iso639
+from collections import OrderedDict
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from datetime import datetime
+
+import iso639
+import json
+import pytz
+import random
+import rq
 from flask import abort, url_for
-from sqlalchemy.orm import aliased
-from collections import OrderedDict
-from MyLists import app, db, login_manager
 from flask_login import UserMixin, current_user
-from sqlalchemy import func, desc, text, and_, or_
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from sqlalchemy import func, desc, text, and_, or_
+from sqlalchemy.orm import aliased
+
+from MyLists import app, db, login_manager
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+def get_models_group(list_type):
+    return [cls for cls in db.Model._decl_class_registry.values() if isinstance(cls, type)
+            and issubclass(cls, db.Model) and cls._group == list_type]
+
+
+def get_models_type(model_type):
+    _ = []
+    for cls in db.Model._decl_class_registry.values():
+        if isinstance(cls, type) and issubclass(cls, db.Model):
+            try:
+                if cls._type == model_type:
+                    _.append(cls)
+            except:
+                pass
+    return _
 
 
 class ListType(Enum):
@@ -184,36 +205,7 @@ class User(UserMixin, db.Model):
         s = Serializer(app.config['SECRET_KEY'])
         return s.dumps({'user_id': self.id}).decode('utf-8')
 
-    def get_media_levels(self, list_type):
-        if list_type == ListType.SERIES:
-            total_time_min = self.time_spent_series
-        elif list_type == ListType.ANIME:
-            total_time_min = self.time_spent_anime
-        elif list_type == ListType.MOVIES:
-            total_time_min = self.time_spent_movies
-        elif list_type == ListType.GAMES:
-            total_time_min = self.time_spent_games
-
-        element_level_tmp = "{:.2f}".format(round((((400+80*total_time_min)**(1/2))-20)/40, 2))
-        element_level = int(element_level_tmp.split('.')[0])
-        element_percentage = int(element_level_tmp.split('.')[1])
-
-        query_rank = Ranks.query.filter_by(level=element_level, type='media_rank\n').first()
-        if query_rank:
-            grade_id = url_for('static', filename='img/levels_ranks/{}'.format(query_rank.image_id))
-            grade_title = query_rank.name
-        else:
-            grade_id = url_for('static', filename='img/levels_ranks/ReachRank49')
-            grade_title = "Inheritor"
-
-        level_info = {"level": element_level,
-                      "level_percent": element_percentage,
-                      "grade_id": grade_id,
-                      "grade_title": grade_title}
-
-        return level_info
-
-    def get_user_frame(self):
+    def get_frame_info(self):
         knowledge_level = int((((400+80*self.time_spent_series)**(1/2))-20)/40) + \
                           int((((400+80*self.time_spent_anime)**(1/2))-20)/40) + \
                           int((((400+80*self.time_spent_movies)**(1/2))-20)/40)
@@ -228,68 +220,6 @@ class User(UserMixin, db.Model):
         return {"level": knowledge_level,
                 "frame_id": frame_id,
                 "frame_level": frame_level}
-
-    def get_follows_data(self):
-        # If not <current_user>, check <follows> to show (remove the private ones if <current_user> doesn't follow them)
-        if current_user.id != self.id:
-            followed_by_user = self.followed.all()
-            current_user_follows = current_user.followed.all()
-
-            follows_list = []
-            for follow in followed_by_user:
-                if follow.private:
-                    if follow in current_user_follows or current_user.id == follow.id:
-                        follows_list.append(follow)
-                else:
-                    follows_list.append(follow)
-
-            follows_to_update = []
-            for follow in follows_list:
-                follows_to_update.append(follow.id)
-
-            follows_update = db.session.query(UserLastUpdate) \
-                .filter(UserLastUpdate.user_id.in_([u.id for u in self.followed.all()])) \
-                .order_by(UserLastUpdate.date.desc()).limit(11)
-        else:
-            follows_list = self.followed.all()
-            follows_update = db.session.query(UserLastUpdate) \
-                .filter(UserLastUpdate.user_id.in_([u.id for u in self.followed.all()])) \
-                .order_by(UserLastUpdate.date.desc()).limit(11)
-
-        follows_update_list = []
-        for follow in follows_update:
-            follows = {'username': follow.user.username}
-            follows.update(get_updates([follow])[0])
-            follows_update_list.append(follows)
-
-        return follows_list, follows_update_list
-
-    def get_user_data(self):
-        # Recover the view count of the account and the media lists
-        profile_view_count = self.profile_views
-        if current_user.role != RoleType.ADMIN and self.id != current_user.id:
-            self.profile_views += 1
-            profile_view_count = self.profile_views
-
-        view_count = {"profile": profile_view_count,
-                      "series": self.series_views,
-                      "anime": self.anime_views,
-                      "movies": self.movies_views,
-                      "games": self.games_views}
-
-        # Recover the user's last updates
-        last_updates = UserLastUpdate.query.filter_by(user_id=self.id).order_by(UserLastUpdate.date.desc()).limit(7)
-        media_update = get_updates(last_updates)
-
-        user_data = {"media_update": media_update,
-                     "view_count": view_count}
-
-        return user_data
-
-    def get_media_updates(self, all=False):
-        if all:
-            updates = UserLastUpdate.query.filter_by(user_id=user.id).order_by(UserLastUpdate.date.desc()).all()
-        return get_updates(updates)
 
     @staticmethod
     def verify_token(token):
@@ -322,6 +252,74 @@ class UserLastUpdate(db.Model):
     date = db.Column(db.DateTime, nullable=False)
 
     user = db.relationship('User', backref='UserLastUpdate', lazy=False)
+
+    @staticmethod
+    def _shape_to_dict_updates(last_update):
+        update = []
+        for element in last_update:
+            element_data = {}
+            # Season or episode update
+            if not element.old_status and not element.new_status:
+                element_data["update"] = ["S{:02d}.E{:02d}".format(element.old_season, element.old_episode),
+                                          "S{:02d}.E{:02d}".format(element.new_season, element.new_episode)]
+
+            # Category update
+            elif element.old_status and element.new_status:
+                element_data["update"] = ["{}".format(element.old_status.value).replace("Animation", "Anime"),
+                                          "{}".format(element.new_status.value).replace("Animation", "Anime")]
+
+            # Newly added media
+            elif not element.old_status and element.new_status:
+                element_data["update"] = ["{}".format(element.new_status.value)]
+
+            # Update date and add media name
+            element_data["date"] = element.date.replace(tzinfo=pytz.UTC).isoformat()
+            element_data["media_name"] = element.media_name
+            element_data["media_id"] = element.media_id
+
+            if element.media_type == ListType.SERIES:
+                element_data["category"] = "Series"
+                element_data["icon-color"] = "fas fa-tv text-series"
+                element_data["border"] = "#216e7d"
+            elif element.media_type == ListType.ANIME:
+                element_data["category"] = "Anime"
+                element_data["icon-color"] = "fas fa-torii-gate text-anime"
+                element_data["border"] = "#945141"
+            elif element.media_type == ListType.MOVIES:
+                element_data["category"] = "Movies"
+                element_data["icon-color"] = "fas fa-film text-movies"
+                element_data["border"] = "#8c7821"
+            elif element.media_type == ListType.GAMES:
+                element_data["category"] = "Games"
+                element_data["icon-color"] = "fas fa-gamepad text-games"
+                element_data["border"] = "#196219"
+
+            update.append(element_data)
+
+        return update
+
+    @classmethod
+    def get_follows_updates(cls, follows):
+        follows_update = db.session.query(cls).filter(cls.user_id.in_([u.id for u in follows]))\
+            .order_by(cls.date.desc()).limit(11)
+
+        follows_update_list = []
+        for follow in follows_update:
+            follows = {'username': follow.user.username}
+            follows.update(cls._shape_to_dict_updates([follow])[0])
+            follows_update_list.append(follows)
+
+        return follows_update_list
+
+    @classmethod
+    def get_user_updates(cls, user_id, all_=False):
+        if all_:
+            last_updates = cls.query.filter_by(user_id=user_id).order_by(cls.date.desc()).all()
+        else:
+            last_updates = cls.query.filter_by(user_id=user_id).order_by(cls.date.desc()).limit(7)
+        user_updates = cls._shape_to_dict_updates(last_updates)
+
+        return user_updates
 
 
 # --- OTHER -------------------------------------------------------------------------------------------------------
@@ -403,12 +401,10 @@ class MediaListMixin(object):
             data['nodata'] = True
 
         for media in media_count:
-            data[media[0].value] = {"count": media[1],
-                                    "percent": (media[1] / total) * 100}
+            data[media[0].value] = {"count": media[1], "percent": (media[1]/total)*100}
         for media in Status:
             if media.value not in data.keys():
-                data[media.value] = {"count": 0,
-                                     "percent": 0}
+                data[media.value] = {"count": 0, "percent": 0}
 
         return data
 
@@ -421,8 +417,8 @@ class MediaListMixin(object):
         for media in media_count:
             data[media[0]] = media[1]
 
-        scores = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0,
-                  5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+        scores = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5,
+                  10.0]
         for sc in scores:
             if sc not in data.keys():
                 data[sc] = 0
@@ -438,50 +434,66 @@ class MediaListMixin(object):
         return data_list
 
     @classmethod
-    def get_media_score(cls, user_id, status):
+    def get_media_levels(cls, user):
+        # Get user.time_spent_<media> from the User table
+        total_time_min = getattr(user, f"time_spent_{cls.__name__.replace('List', '').lower()}")
+
+        element_level_tmp = "{:.2f}".format(round((((400+80*total_time_min)**(1/2))-20)/40, 2))
+        element_level = int(element_level_tmp.split('.')[0])
+        element_percentage = int(element_level_tmp.split('.')[1])
+
+        query_rank = Ranks.query.filter_by(level=element_level, type='media_rank\n').first()
+        grade_id = url_for('static', filename='img/levels_ranks/ReachRank49')
+        grade_title = "Inheritor"
+        if query_rank:
+            grade_id = url_for('static', filename='img/levels_ranks/{}'.format(query_rank.image_id))
+            grade_title = query_rank.name
+
+        return {"level": element_level, "level_percent": element_percentage, "grade_id": grade_id,
+                "grade_title": grade_title}
+
+    @classmethod
+    def get_media_score(cls, user_id):
         media_score = db.session.query(func.count(cls.score), func.count(cls.media_id), func.sum(cls.score)) \
-            .filter(cls.user_id == user_id, cls.status != status).all()
+            .filter(cls.user_id == user_id).all()
 
         try:
-            percentage = int(float(media_score[0][0]) / float(media_score[0][1]) * 100)
+            percentage = int(float(media_score[0][0])/float(media_score[0][1]) * 100)
         except (ZeroDivisionError, TypeError):
             percentage = '-'
 
         try:
-            mean_score = round(float(media_score[0][2]) / float(media_score[0][0]), 2)
+            mean_score = round(float(media_score[0][2])/float(media_score[0][0]), 2)
         except (ZeroDivisionError, TypeError):
             mean_score = '-'
 
-        return {'scored_media': media_score[0][0],
-                'total_media': media_score[0][1],
-                'percentage': percentage,
+        return {'scored_media': media_score[0][0], 'total_media': media_score[0][1], 'percentage': percentage,
                 'mean_score': mean_score}
 
     @classmethod
     def get_media_total_eps(cls, user_id):
-        if list_type == ListType.SERIES:
-            media_list = SeriesList
-        elif list_type == ListType.ANIME:
-            media_list = AnimeList
-        elif list_type == ListType.MOVIES:
-            media_list = MoviesList
-        elif list_type == ListType.GAMES:
-            media_list = GamesList
-
-        if list_type != ListType.GAMES:
-            query = db.session.query(func.sum(media_list.eps_watched)).filter(media_list.user_id == user_id).all()
-            eps_watched = query[0][0]
-        else:
-            query = db.session.query(func.count(media_list.media_id)).filter(media_list.user_id == user_id).all()
-            eps_watched = query[0][0]
+        query = db.session.query(func.sum(cls.eps_watched)).filter(cls.user_id == user_id).all()
+        eps_watched = query[0][0]
 
         if eps_watched is None:
             eps_watched = 0
 
         return eps_watched
 
+    @classmethod
+    def get_favorites(cls, user_id):
+        media = eval(cls.__name__.replace('List', ''))
+        fav_media = cls.query.filter_by(favorite=True, user_id=user_id).all()
+        favorites = db.session.query(media).filter(media.id.in_([m.media_id for m in fav_media])).all()
+
+        # Randomize the favorites displayed
+        random.shuffle(favorites)
+
+        return favorites
+
 
 class TVBase(db.Model):
+    __abstract__ = True
     _group = None
 
     name = db.Column(db.String(50), nullable=False)
@@ -526,6 +538,7 @@ class Series(MediaMixin, TVBase):
 
 class SeriesList(MediaListMixin, db.Model):
     _group = ListType.SERIES or MediaType.SERIES
+    _type = 'List'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -591,6 +604,7 @@ class Anime(MediaMixin, TVBase):
 
 class AnimeList(MediaListMixin, db.Model):
     _group = ListType.ANIME or MediaType.ANIME
+    _type = 'List'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -672,6 +686,7 @@ class Movies(MediaMixin, db.Model):
 
 class MoviesList(MediaListMixin, db.Model):
     _group = ListType.MOVIES or MediaType.MOVIES
+    _type = 'List'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -732,8 +747,9 @@ class Games(MediaMixin, db.Model):
     list_info = db.relationship('GamesList', backref='games', lazy='dynamic')
 
 
-class GamesList(db.Model):
+class GamesList(MediaListMixin, db.Model):
     _group = ListType.GAMES or MediaType.GAMES
+    _type = 'List'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -744,6 +760,16 @@ class GamesList(db.Model):
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
     comment = db.Column(db.Text)
+
+    @classmethod
+    def get_media_total_eps(cls, user_id):
+        query = db.session.query(func.count(cls.media_id)).filter(cls.user_id == user_id).all()
+        eps_watched = query[0][0]
+
+        if eps_watched is None:
+            eps_watched = 0
+
+        return eps_watched
 
 
 class GamesGenre(db.Model):
@@ -763,7 +789,7 @@ class GamesPlatforms(db.Model):
 
 
 class GamesCompanies(db.Model):
-    _group = ListType.GAMES or MediaType.GAMES>'
+    _group = ListType.GAMES or MediaType.GAMES
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
@@ -846,9 +872,9 @@ class Ranks(db.Model):
 
         for i in range(1, len(list_all_ranks)):
             rank = cls(level=int(list_all_ranks[i][0]),
-                         image_id=list_all_ranks[i][1],
-                         name=list_all_ranks[i][2],
-                         type=list_all_ranks[i][3])
+                       image_id=list_all_ranks[i][1],
+                       name=list_all_ranks[i][2],
+                       type=list_all_ranks[i][3])
             db.session.add(rank)
         db.session.commit()
 
@@ -889,7 +915,7 @@ class Frames(db.Model):
 
         for i in range(1, len(list_all_frames)):
             frame = cls(level=int(list_all_frames[i][0]),
-                           image_id=list_all_frames[i][1])
+                        image_id=list_all_frames[i][1])
             db.session.add(frame)
         db.session.commit()
 

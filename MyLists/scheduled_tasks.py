@@ -374,8 +374,7 @@ def new_releasing_series():
                                                         SeriesList.status != Status.DROPPED)).all()
 
     for info in series_in_ptw:
-        series = Notifications.query.filter_by(user_id=info[1].user_id, media_type='serieslist',
-                                               media_id=info[0].id) \
+        series = Notifications.query.filter_by(user_id=info[1].user_id, media_type='serieslist', media_id=info[0].id) \
             .order_by(desc(Notifications.timestamp)).first()
 
         if series:

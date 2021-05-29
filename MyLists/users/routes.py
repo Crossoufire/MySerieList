@@ -2,7 +2,7 @@ import json
 from MyLists import app, db
 from flask_login import login_required, current_user
 from flask import Blueprint, request, render_template
-from MyLists.models import User, ListType, Ranks, Frames, Notifications
+from MyLists.models import User, Ranks, Frames, Notifications, UserLastUpdate, RoleType, get_models_type
 
 bp = Blueprint('users', __name__)
 
@@ -13,66 +13,115 @@ def account(user_name):
     # Check if the user can see the <media_list>
     user = current_user.check_autorization(user_name)
 
-    # Recover the user frame info (level, image)
-    user_frame_info = user.get_user_frame()
+    # Update the account view count
+    if current_user.role != RoleType.ADMIN and user.id != current_user.id:
+        user.profile_views += 1
+
+    # Get the user frame info
+    user_frame_info = user.get_frame_info()
+
+    # Get the user last updates
+    user_updates = UserLastUpdate.get_user_updates(user.id)
+
+    # Get all the follows
+    follows = user.get_all_follows()
 
     if request.form.get('all_follows'):
-        all_follows = user.get_all_follows()
         return render_template('account_all_follows.html', title='Follows', user=user, frame=user_frame_info,
-                               all_follows=all_follows)
+                               follows=follows)
     elif request.form.get('all_followers'):
-        all_follows = user.get_all_followers()
+        followers = user.get_all_followers()
         return render_template('account_all_follows.html', title='Followers', user=user, frame=user_frame_info,
-                               all_follows=all_follows, followers=True)
+                               follows=followers, followers=True)
     elif request.form.get('all_history'):
-        media_update = user.get_media_updates(all_=True)
+        media_update = UserLastUpdate.get_user_updates(user.id, all_=True)
         return render_template('account_all_history.html', title='History', user=user, frame=user_frame_info,
                                media_updates=media_update)
 
-    # Recover media data
-    media_data = get_media_data(user)
+    # Get follows last updates
+    follows_updates = UserLastUpdate.get_follows_updates(follows)
 
-    # Recover follows data and last updates
-    follows_list, follows_update_list = user.get_follows_data()
+    # Get the all media info in a dict for each media type
+    list_models = get_models_type('List')
+    media_dict, total_time, total_media, total_media_and_eps, total_score, total_mean_score = {}, 0, 0, 0, 0, 0
+    qte_media_type = len(list_models)
+    for model in list_models:
+        media_count = model.get_media_count_by_status(user.id)
+        media_count_score = model.get_media_count_by_score(user.id)
+        media_levels = model.get_media_levels(user)
+        media_score = model.get_media_score(user.id)
+        media_time = getattr(user, f"time_spent_{model.__name__.replace('List', '').lower()}")
+        media_total_eps = model.get_media_total_eps(user.id)
+        media_favorites = model.get_favorites(user.id)
 
-    # Recover the Favorites
-    favorites = get_favorites(user.id)
+        # Each media_data dict contains all the data for one type of media
+        media_data = {'time_spent_hour': round(media_time/60), 'time_spent_day': round(media_time/1440, 2),
+                      'media_count': media_count, 'media_count_score': media_count_score,
+                      'media_total_eps': media_total_eps, 'media_levels': media_levels, 'media_score': media_score,
+                      'media_favorites': media_favorites}
+
+        # Recover the total time for all media in hours
+        total_time += media_data['time_spent_hour']
+
+        # Recover total number of media
+        total_media += media_data['media_count']['total']
+
+        # Recover total number of media
+        total_media_and_eps += media_data['media_total_eps']
+
+        # Recover the total score of all media
+        total_score += media_data['media_score']['scored_media']
+
+        # Recover the total mean score of all media
+        try:
+            total_mean_score += media_data['media_score']['mean_score']
+        except:
+            qte_media_type -= 1
+
+        media_dict[f"{model.__name__.replace('List', '').lower()}"] = media_data
+
+    # Add global media info to the <media_dict>
+    media_dict['total_spent_hour'] = total_time
+    media_dict['total_media'] = total_media
+    media_dict['total_media_and_eps'] = total_media_and_eps
+    media_dict['total_score'] = total_score
+    try:
+        media_dict['total_mean_score'] = round(total_mean_score/qte_media_type, 2)
+    except:
+        media_dict['total_mean_score'] = '-'
 
     # Commit the changes
     db.session.commit()
 
     return render_template('account.html', title=user.username+"'s account", user=user, frame=user_frame_info,
-                           favorites=favorites, media_data=media_data, follows_list=follows_list,
-                           follows_update_list=follows_update_list)
+                           user_updates=user_updates, follows=follows, follows_updates=follows_updates,
+                           media_data=media_dict)
 
 
 @bp.route("/hall_of_fame", methods=['GET', 'POST'])
 @login_required
 def hall_of_fame():
-    users = current_user.followed.all()
-    users.append(current_user)
+    all_users = current_user.followed.all()
+    all_users.append(current_user)
+    models_type = get_models_type('List')
 
     all_users_data = []
-    for user in users:
-        series_level = user.get_media_levels(ListType.SERIES)
-        anime_level = user.get_media_levels(ListType.ANIME)
-        movies_level = user.get_media_levels(ListType.MOVIES)
-        games_level = user.get_media_levels(ListType.GAMES)
-        knowledge_frame = user.get_knowledge_frame()
+    for user in all_users:
+        user_data = {}
+        frame = user.get_frame_info()
 
-        user_data = {"id": user.id,
-                     "username": user.username,
-                     "profile_picture": user.image_file,
-                     "series_data": series_level,
-                     "anime_data": anime_level,
-                     "movies_data": movies_level,
-                     "games_data": games_level,
-                     'knowledge_frame': knowledge_frame,
-                     'current_user': False,
-                     'add_games': user.add_games}
+        user_data["id"] = user.id
+        user_data["username"] = user.username
+        user_data["profile_picture"] = user.image_file
+        user_data["knowledge_frame"] = frame
+        user_data["add_games"] = user.add_games
 
+        user_data["current_user"] = False
         if user.id == current_user.id:
             user_data["current_user"] = True
+
+        for model in models_type:
+            user_data[f"{model.__name__.replace('List', '').lower()}_data"] = model.get_media_levels(user)
 
         all_users_data.append(user_data)
 

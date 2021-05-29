@@ -14,7 +14,7 @@ from flask import Blueprint, url_for, request, abort, render_template, flash, js
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MediaType, get_next_airing, check_media, User, \
-    get_media_query, Games, GamesList, get_more_stats, get_games_stats, UserLastUpdate
+    get_media_query, Games, GamesList, get_more_stats, get_games_stats, UserLastUpdate, get_models_group
 
 bp = Blueprint('main', __name__)
 
@@ -1059,7 +1059,7 @@ def lock_media():
         json_data = request.get_json()
         media_id = json_data['element_id']
         media_list = json_data['element_type']
-        lock_status = json_data['lock_status']
+        lock_status = bool(json_data['lock_status'])
     except:
         return '', 400
 
@@ -1073,18 +1073,8 @@ def lock_media():
     except ValueError:
         return '', 400
 
-    # Check if <lock_status> is boolean
-    if type(lock_status) is not bool:
-        return '', 400
-
-    if list_type == ListType.SERIES:
-        media = Series.query.filter_by(id=media_id).first()
-    elif list_type == ListType.ANIME:
-        media = Anime.query.filter_by(id=media_id).first()
-    elif list_type == ListType.MOVIES:
-        media = Movies.query.filter_by(id=media_id).first()
-    elif list_type == ListType.GAMES:
-        media = Games.query.filter_by(id=media_id).first()
+    models = get_models_group(list_type)
+    media = models[0].query.filter_by(id=media_id).first()
 
     if not media:
         return '', 400
