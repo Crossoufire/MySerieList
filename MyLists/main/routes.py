@@ -1,8 +1,5 @@
 import json
 import pytz
-import sqlalchemy
-from sqlalchemy import func, and_, extract
-
 from MyLists import db, app
 from datetime import datetime
 from MyLists.API_data import ApiData
@@ -10,8 +7,8 @@ from MyLists.main.add_db import AddtoDB
 from flask_login import login_required, current_user
 from MyLists.main.forms import EditMediaData, MediaComment, SearchForm
 from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails
-from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
+from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect, session
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MediaType, get_next_airing, check_media, User, \
     get_media_query, Games, GamesList, get_more_stats, get_games_stats, UserLastUpdate, get_models_group
@@ -71,35 +68,33 @@ def mymedialist(media_list, user_name, category=None, genre='All', sorting=None,
             media_data = get_more_stats(user, list_type)
 
     return render_template(html_template, title="{}'s {}".format(user_name, media_list), user=user, username=user_name,
-                           user_id=str(user.id), media_list=media_list, search_form=search_form, search_q=q,
+                           user_id=user.id, media_list=media_list, search_form=search_form, search_q=q,
                            category=category, genre=genre, sorting=sorting, page=page_val, data=media_data)
 
 
-@bp.route("/comment/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
+@bp.route("/comment/<media_type>/<media_id>", methods=['GET', 'POST'])
 @login_required
 def write_comment(media_type, media_id):
     # Check if <media_type> is valid
     try:
         media_type = MediaType(media_type)
+        models = get_models_group(media_type)
     except ValueError:
         abort(400)
 
-    if media_type == MediaType.SERIES:
-        list_type = ListType.SERIES
-    elif media_type == MediaType.ANIME:
-        list_type = ListType.ANIME
-    elif media_type == MediaType.MOVIES:
-        list_type = ListType.MOVIES
-    elif media_type == MediaType.GAMES:
-        list_type = ListType.GAMES
-
-    media = check_media(media_id, list_type)
+    # Check if the <media> is in the current user's list
+    media = db.session.query(models[0], models[1])\
+        .join(models[0], models[0].id == models[1].media_id)\
+        .filter(models[0].id == media_id, models[1].user_id == current_user.id).first()
     if not media:
-        abort(404)
+        return '', 400
 
     form = MediaComment()
+
     if request.method == 'GET':
         form.comment.data = media[1].comment
+        session['back_url'] = request.referrer or '/'
+
     if form.validate_on_submit():
         comment = form.comment.data
         media[1].comment = comment
@@ -112,19 +107,18 @@ def write_comment(media_type, media_id):
         else:
             flash('Comment successfully added/modified.', 'success')
 
-        if request.args.get('from') == 'media':
-            return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media_id))
-        return redirect(url_for('main.mymedialist', media_list=list_type.value, user_name=current_user.username))
+        return redirect(session['back_url'])
 
     return render_template('medialist_comment.html', title='Add comment', form=form, media_name=media[0].name)
 
 
-@bp.route('/media_sheet/<string:media_type>/<int:media_id>', methods=['GET', 'POST'])
+@bp.route('/media_sheet/<media_type>/<media_id>', methods=['GET', 'POST'])
 @login_required
 def media_sheet(media_type, media_id):
     # Check if <media_type> is valid
     try:
         media_type = MediaType(media_type)
+        models = get_models_group(media_type)
     except ValueError:
         abort(400)
 
@@ -137,66 +131,54 @@ def media_sheet(media_type, media_id):
     elif media_type == MediaType.GAMES:
         list_type = ListType.GAMES
 
-    # Check if <media_id> came from an API and if in local Db
-    api_id = request.args.get('search')
-    if api_id and list_type == ListType.GAMES:
-        search = {'igdb_id': media_id}
-    elif api_id and list_type != ListType.GAMES:
-        search = {'themoviedb_id': media_id}
-    else:
-        search = {'id': media_id}
+    # Check if <media_id> came from an API
+    from_api = request.args.get('search')
 
-    html_template = 'media_sheet_tv.html'
-    if list_type == ListType.SERIES:
-        media = Series.query.filter_by(**search).first()
-    elif list_type == ListType.ANIME:
-        media = Anime.query.filter_by(**search).first()
-    elif list_type == ListType.MOVIES:
-        media = Movies.query.filter_by(**search).first()
-        html_template = 'media_sheet_movies.html'
-    elif list_type == ListType.GAMES:
-        media = Games.query.filter_by(**search).first()
-        html_template = 'media_sheet_games.html'
+    # Check if <media> is in local DB
+    media = models[0].media_sheet_check(media_id, from_api=from_api)
 
-    # If <media> does not exist and <api_id> is provived: Add the <media> to Db, else abort.
+    # If <media> does not exist and <api_id> is provived: Add the <media> to DB, else abort.
     if not media:
-        if api_id:
+        if from_api:
             try:
-                media_api_data = ApiData().get_details_and_credits_data(media_id, list_type)
+                api_data = models[0].get_details_and_credits_data(media_id)
             except Exception as e:
+                flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
                 app.logger.error('[ERROR] - Impossible to get the details and credits from API ({}) ID [{}]: {}'
                                  .format(media_type.value, media_id, e))
-                flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
                 return redirect(request.referrer)
             try:
-                media_details = MediaDetails(media_api_data, list_type).get_media_details()
+                media_details = models[0].get_media_details(api_data)
             except Exception as e:
+                flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
                 app.logger.error('[ERROR] - Occured trying to parse the API data to dict ({}) ID [{}]: {}'
                                  .format(media_type.value, media_id, e))
-                flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
                 return redirect(request.referrer)
             try:
                 media = AddtoDB(media_details, list_type).add_media_to_db()
                 db.session.commit()
             except Exception as e:
+                flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
                 app.logger.error('[ERROR] - Occured trying to add media ({}) ID [{}] to DB: {}'
                                  .format(media_type.value, media_id, e))
-                flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
                 return redirect(request.referrer)
         else:
             abort(404)
 
-    # If <media> and <api_id> provived: redirect to get a nice URL.
-    if media and api_id:
+    # If <media> and <api_id> provived: redirect to get URL with media.id instead of media.api_id
+    if media and from_api:
         return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media.id))
 
     media_info = MediaDict(media, list_type).create_list_dict()
     title = media_info['display_name']
 
+    # Get the HTML template
+    html_template = models[0].media_sheet_template()
+
     return render_template(html_template, title=title, data=media_info, media_list=list_type.value)
 
 
-@bp.route("/media_sheet_form/<string:media_type>/<int:media_id>", methods=['GET', 'POST'])
+@bp.route("/media_sheet_form/<media_type>/<media_id>", methods=['GET', 'POST'])
 @login_required
 def media_sheet_form(media_type, media_id):
     if current_user.role == RoleType.USER:
@@ -894,20 +876,10 @@ def add_favorite():
     except ValueError:
         return '', 400
 
-    # Check if <favorite> is a boolean
-    if type(favorite) is not bool:
-        return '', 400
+    models = get_models_group(list_type)
 
     # Check if the <media_id> is in the current user's list
-    if list_type == ListType.SERIES:
-        media = SeriesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
-    elif list_type == ListType.ANIME:
-        media = AnimeList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
-    elif list_type == ListType.MOVIES:
-        media = MoviesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
-    elif list_type == ListType.GAMES:
-        media = GamesList.query.filter_by(user_id=current_user.id, media_id=media_id).first()
-
+    media = models[1].query.filter_by(user_id=current_user.id, media_id=media_id).first()
     if not media:
         return '', 400
 

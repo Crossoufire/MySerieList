@@ -201,7 +201,7 @@ class MediaDict:
         self.media_info["budget"] = self.data.budget
         self.media_info["revenue"] = self.data.revenue
         self.media_info["tagline"] = self.data.tagline
-        self.media_info["tmdb_id"] = self.data.themoviedb_id
+        self.media_info["tmdb_id"] = self.data.api_id
         self.media_info['release_date'] = 'Unknown'
         self.media_info["status"] = Status.COMPLETED.value
 
@@ -245,7 +245,7 @@ class MediaListObj:
             self.media = "Games"
 
         if list_type != ListType.GAMES:
-            self.tmdb_id = media_data[0].themoviedb_id
+            self.tmdb_id = media_data[0].api_id
             self.rewatched = media_data[1].rewatched
 
         self.id = media_data[0].id
@@ -490,7 +490,7 @@ class MediaDetails:
                               'vote_count': self.media_data.get('vote_count', 0) or 0,
                               'synopsis': self.media_data.get('overview', 'Not defined.') or 'Not defined.',
                               'popularity': self.media_data.get('popularity', 0) or 0,
-                              'themoviedb_id': self.media_data.get('id'),
+                              'api_id': self.media_data.get('id'),
                               'image_cover': self.get_media_cover(),
                               'last_update': datetime.utcnow()}
 

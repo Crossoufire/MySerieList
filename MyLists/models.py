@@ -7,6 +7,8 @@ import iso639
 import json
 import pytz
 import random
+
+import requests
 import rq
 from flask import abort, url_for
 from flask_login import UserMixin, current_user
@@ -23,8 +25,15 @@ def load_user(user_id):
 
 
 def get_models_group(list_type):
-    return [cls for cls in db.Model._decl_class_registry.values() if isinstance(cls, type)
-            and issubclass(cls, db.Model) and cls._group == list_type]
+    _ = []
+    for cls in db.Model._decl_class_registry.values():
+        if isinstance(cls, type) and issubclass(cls, db.Model):
+            try:
+                if list_type in cls._group:
+                    _.append(cls)
+            except:
+                pass
+    return _
 
 
 def get_models_type(model_type):
@@ -95,7 +104,7 @@ followers = db.Table('followers',
 
 
 class User(UserMixin, db.Model):
-    _group = 'User'
+    _group = ['User']
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)
@@ -236,7 +245,7 @@ class User(UserMixin, db.Model):
 
 
 class UserLastUpdate(db.Model):
-    _group = 'User'
+    _group = ['User']
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -322,11 +331,8 @@ class UserLastUpdate(db.Model):
         return user_updates
 
 
-# --- OTHER -------------------------------------------------------------------------------------------------------
-
-
 class RedisTasks(db.Model):
-    _group = 'User'
+    _group = ['User']
 
     id = db.Column(db.String(50), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -348,7 +354,7 @@ class RedisTasks(db.Model):
 
 
 class Notifications(db.Model):
-    _group = 'User'
+    _group = ['User']
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -358,9 +364,10 @@ class Notifications(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 
-class MediaMixin(object):
-    _group = None
+# --- OTHER -------------------------------------------------------------------------------------------------------
 
+
+class MediaMixin(object):
     def get_same_genres(self, genres_list):
         media = eval(self.__class__.__name__)
         media_genre = eval(self.__class__.__name__+'Genre')
@@ -385,10 +392,16 @@ class MediaMixin(object):
         in_user_list = self.list_info.filter_by(user_id=current_user.id).first()
         return in_user_list
 
+    @classmethod
+    def media_sheet_check(cls, media_id, from_api):
+        search = {'id': media_id}
+        if from_api:
+            search = {'api_id': media_id}
+
+        return cls.query.filter_by(**search).first()
+
 
 class MediaListMixin(object):
-    _group = None
-
     @classmethod
     def get_media_count_by_status(cls, user_id):
         media_count = db.session.query(cls.status, func.count(cls.status))\
@@ -494,7 +507,6 @@ class MediaListMixin(object):
 
 class TVBase(db.Model):
     __abstract__ = True
-    _group = None
 
     name = db.Column(db.String(50), nullable=False)
     original_name = db.Column(db.String(50), nullable=False)
@@ -516,16 +528,20 @@ class TVBase(db.Model):
     synopsis = db.Column(db.Text)
     popularity = db.Column(db.Float)
     image_cover = db.Column(db.String(100), nullable=False)
-    themoviedb_id = db.Column(db.Integer, nullable=False)
+    api_id = db.Column(db.Integer, nullable=False)
     last_update = db.Column(db.DateTime, nullable=False)
     lock_status = db.Column(db.Boolean, default=0)
+
+    @staticmethod
+    def media_sheet_template():
+        return 'media_sheet_tv.html'
 
 
 # --- SERIES ------------------------------------------------------------------------------------------------------
 
 
 class Series(MediaMixin, TVBase):
-    _group = ListType.SERIES or MediaType.SERIES
+    _group = (ListType.SERIES, MediaType.SERIES)
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -537,7 +553,7 @@ class Series(MediaMixin, TVBase):
 
 
 class SeriesList(MediaListMixin, db.Model):
-    _group = ListType.SERIES or MediaType.SERIES
+    _group = (ListType.SERIES, MediaType.SERIES)
     _type = 'List'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -554,7 +570,7 @@ class SeriesList(MediaListMixin, db.Model):
 
 
 class SeriesGenre(db.Model):
-    _group = ListType.SERIES or MediaType.SERIES
+    _group = (ListType.SERIES, MediaType.SERIES)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -563,7 +579,7 @@ class SeriesGenre(db.Model):
 
 
 class SeriesEpisodesPerSeason(db.Model):
-    _group = ListType.SERIES or MediaType.SERIES
+    _group = (ListType.SERIES, MediaType.SERIES)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -572,7 +588,7 @@ class SeriesEpisodesPerSeason(db.Model):
 
 
 class SeriesNetwork(db.Model):
-    _group = ListType.SERIES or MediaType.SERIES
+    _group = (ListType.SERIES, MediaType.SERIES)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -580,7 +596,7 @@ class SeriesNetwork(db.Model):
 
 
 class SeriesActors(db.Model):
-    _group = ListType.SERIES or MediaType.SERIES
+    _group = (ListType.SERIES, MediaType.SERIES)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=False)
@@ -591,7 +607,7 @@ class SeriesActors(db.Model):
 
 
 class Anime(MediaMixin, TVBase):
-    _group = ListType.ANIME or MediaType.ANIME
+    _group = (ListType.ANIME, MediaType.ANIME)
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -603,7 +619,7 @@ class Anime(MediaMixin, TVBase):
 
 
 class AnimeList(MediaListMixin, db.Model):
-    _group = ListType.ANIME or MediaType.ANIME
+    _group = (ListType.ANIME, MediaType.ANIME)
     _type = 'List'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -620,7 +636,7 @@ class AnimeList(MediaListMixin, db.Model):
 
 
 class AnimeGenre(db.Model):
-    _group = ListType.ANIME or MediaType.ANIME
+    _group = (ListType.ANIME, MediaType.ANIME)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
@@ -629,7 +645,7 @@ class AnimeGenre(db.Model):
 
 
 class AnimeEpisodesPerSeason(db.Model):
-    _group = ListType.ANIME or MediaType.ANIME
+    _group = (ListType.ANIME, MediaType.ANIME)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
@@ -638,7 +654,7 @@ class AnimeEpisodesPerSeason(db.Model):
 
 
 class AnimeNetwork(db.Model):
-    _group = ListType.ANIME or MediaType.ANIME
+    _group = (ListType.ANIME, MediaType.ANIME)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
@@ -646,7 +662,7 @@ class AnimeNetwork(db.Model):
 
 
 class AnimeActors(db.Model):
-    _group = ListType.ANIME or MediaType.ANIME
+    _group = (ListType.ANIME, MediaType.ANIME)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable=False)
@@ -657,7 +673,7 @@ class AnimeActors(db.Model):
 
 
 class Movies(MediaMixin, db.Model):
-    _group = ListType.MOVIES or MediaType.MOVIES
+    _group = (ListType.MOVIES, MediaType.MOVIES)
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -676,16 +692,20 @@ class Movies(MediaMixin, db.Model):
     revenue = db.Column(db.Float)
     tagline = db.Column(db.String(30))
     image_cover = db.Column(db.String(100), nullable=False)
-    themoviedb_id = db.Column(db.Integer, nullable=False)
+    api_id = db.Column(db.Integer, nullable=False)
     lock_status = db.Column(db.Boolean, default=0)
 
     genres = db.relationship('MoviesGenre', backref='movies', lazy=True)
     actors = db.relationship('MoviesActors', backref='movies', lazy=True)
     list_info = db.relationship('MoviesList', backref='movies', lazy='dynamic')
 
+    @staticmethod
+    def media_sheet_template():
+        return 'media_sheet_movies.html'
+
 
 class MoviesList(MediaListMixin, db.Model):
-    _group = ListType.MOVIES or MediaType.MOVIES
+    _group = (ListType.MOVIES, MediaType.MOVIES)
     _type = 'List'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -700,7 +720,7 @@ class MoviesList(MediaListMixin, db.Model):
 
 
 class MoviesGenre(db.Model):
-    _group = ListType.MOVIES or MediaType.MOVIES
+    _group = (ListType.MOVIES, MediaType.MOVIES)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
@@ -709,7 +729,7 @@ class MoviesGenre(db.Model):
 
 
 class MoviesActors(db.Model):
-    _group = ListType.MOVIES or MediaType.MOVIES
+    _group = (ListType.MOVIES, MediaType.MOVIES)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
@@ -720,7 +740,7 @@ class MoviesActors(db.Model):
 
 
 class Games(MediaMixin, db.Model):
-    _group = ListType.GAMES or MediaType.GAMES
+    _group = (ListType.GAMES, MediaType.GAMES)
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -738,7 +758,7 @@ class Games(MediaMixin, db.Model):
     hltb_main_time = db.Column(db.String(20))
     hltb_main_and_extra_time = db.Column(db.String(20))
     hltb_total_complete_time = db.Column(db.String(20))
-    igdb_id = db.Column(db.Integer, nullable=False)
+    api_id = db.Column(db.Integer, nullable=False)
     lock_status = db.Column(db.Boolean, default=1)
 
     genres = db.relationship('GamesGenre', backref='games', lazy=True)
@@ -746,9 +766,13 @@ class Games(MediaMixin, db.Model):
     companies = db.relationship('GamesCompanies', backref='games', lazy=True)
     list_info = db.relationship('GamesList', backref='games', lazy='dynamic')
 
+    @staticmethod
+    def media_sheet_template():
+        return 'media_sheet_games.html'
+
 
 class GamesList(MediaListMixin, db.Model):
-    _group = ListType.GAMES or MediaType.GAMES
+    _group = (ListType.GAMES, MediaType.GAMES)
     _type = 'List'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -773,7 +797,7 @@ class GamesList(MediaListMixin, db.Model):
 
 
 class GamesGenre(db.Model):
-    _group = ListType.GAMES or MediaType.GAMES
+    _group = (ListType.GAMES, MediaType.GAMES)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
@@ -781,7 +805,7 @@ class GamesGenre(db.Model):
 
 
 class GamesPlatforms(db.Model):
-    _group = ListType.GAMES or MediaType.GAMES
+    _group = (ListType.GAMES, MediaType.GAMES)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
@@ -789,7 +813,7 @@ class GamesPlatforms(db.Model):
 
 
 class GamesCompanies(db.Model):
-    _group = ListType.GAMES or MediaType.GAMES
+    _group = (ListType.GAMES, MediaType.GAMES)
 
     id = db.Column(db.Integer, primary_key=True)
     media_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
@@ -802,7 +826,7 @@ class GamesCompanies(db.Model):
 
 
 class Badges(db.Model):
-    _group = None
+    _group = ['Other']
 
     id = db.Column(db.Integer, primary_key=True)
     threshold = db.Column(db.Integer, nullable=False)
@@ -854,7 +878,7 @@ class Badges(db.Model):
 
 
 class Ranks(db.Model):
-    _group = None
+    _group = ['Other']
 
     id = db.Column(db.Integer, primary_key=True)
     level = db.Column(db.Integer, nullable=False)
@@ -899,7 +923,7 @@ class Ranks(db.Model):
 
 
 class Frames(db.Model):
-    _group = None
+    _group = ['Other']
 
     id = db.Column(db.Integer, primary_key=True)
     level = db.Column(db.Integer, nullable=False)
@@ -937,7 +961,7 @@ class Frames(db.Model):
 
 
 class MyListsStats(db.Model):
-    _group = 'Stats'
+    _group = ['Stats']
 
     id = db.Column(db.Integer, primary_key=True)
     nb_users = db.Column(db.Integer)
@@ -1243,7 +1267,7 @@ def compute_media_time_spent():
             setattr(q[0], f"time_spent_{list_type.value.replace('list', '')}", q[3])
 
 
-# Check if media exists
+# Check if <media> exists
 def check_media(media_id, list_type, add=False):
     media = eval(list_type.value.capitalize().replace('list', ''))
     media_list = eval(list_type.value.capitalize().replace('l', 'L'))
@@ -1508,7 +1532,7 @@ def get_games_stats(user):
 #     query = db.session.query(Series, SeriesGenre).outerjoin(SeriesGenre, SeriesGenre.media_id == Series.id).all()
 #     for q in query:
 #         if q[1] is None:
-#             info = get_orphan_genres_and_actors(q[0].themoviedb_id, ListType.SERIES, media_id=q[0].id)
+#             info = get_orphan_genres_and_actors(q[0].api_id, ListType.SERIES, media_id=q[0].id)
 #             if info is True:
 #                 app.logger.info(f'Orphan series corrected with ID [{q[0].id}]: {q[0].name}')
 #             else:
@@ -1517,7 +1541,7 @@ def get_games_stats(user):
 #     query = db.session.query(Anime, AnimeGenre).outerjoin(AnimeGenre, AnimeGenre.media_id == Anime.id).all()
 #     for q in query:
 #         if q[1] is None:
-#             info = get_orphan_genres_and_actors(q[0].themoviedb_id, ListType.ANIME, media_id=q[0].id)
+#             info = get_orphan_genres_and_actors(q[0].api_id, ListType.ANIME, media_id=q[0].id)
 #             if info is True:
 #                 app.logger.info(f'Orphan anime corrected with ID [{q[0].id}]: {q[0].name}')
 #             else:
@@ -1526,7 +1550,7 @@ def get_games_stats(user):
 #     query = db.session.query(Movies, MoviesGenre).outerjoin(MoviesGenre, MoviesGenre.media_id == Movies.id).all()
 #     for q in query:
 #         if q[1] is None:
-#             info = get_orphan_genres_and_actors(q[0].themoviedb_id, ListType.MOVIES, media_id=q[0].id)
+#             info = get_orphan_genres_and_actors(q[0].api_id, ListType.MOVIES, media_id=q[0].id)
 #             if info is True:
 #                 app.logger.info(f'Orphan movie corrected with ID [{q[0].id}]: {q[0].name}')
 #             else:

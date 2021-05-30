@@ -120,10 +120,10 @@ def get_the_ids(ids_to_add, movies=False):
     else:
         DB = [Series, Anime]
     for media in DB:
-        query = media.query.filter(media.themoviedb_id.in_(ids_to_add)).all()
+        query = media.query.filter(media.api_id.in_(ids_to_add)).all()
         try:
             ids_in_db.append([q.id for q in query])
-            tmp = [q.themoviedb_id for q in query]
+            tmp = [q.api_id for q in query]
         except:
             ids_in_db.append([])
             tmp = []

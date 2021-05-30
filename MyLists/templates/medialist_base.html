@@ -140,7 +140,7 @@
                                     </div>
                                     <div class="col p-0">
                                         <span id="com_{{ item.id }}" style="display: none;">{{ item.comment }}</span>
-                                        {% if user_id == current_user.get_id() %}
+                                        {% if current_user.get_id() == user_id %}
                                             <a class="fa-comment-alt text-light{% if item.comment %} fas commented{% else %}
                                             far{% endif %}" data-toggle='tooltip' title="Comments" {% if item.comment %}
                                             onclick="showComment(card_{{ item.id }}, '{{ item.media }}', '{{ item.id }}',

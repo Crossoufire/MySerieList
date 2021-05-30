@@ -200,11 +200,11 @@ def refresh_element_data(api_id, list_type):
 
     # Update the main details for each media
     if list_type == ListType.SERIES:
-        Series.query.filter_by(themoviedb_id=api_id).update(data['tv_data'])
+        Series.query.filter_by(api_id=api_id).update(data['tv_data'])
     elif list_type == ListType.ANIME:
-        Anime.query.filter_by(themoviedb_id=api_id).update(data['tv_data'])
+        Anime.query.filter_by(api_id=api_id).update(data['tv_data'])
     elif list_type == ListType.MOVIES:
-        Movies.query.filter_by(themoviedb_id=api_id).update(data['movies_data'])
+        Movies.query.filter_by(api_id=api_id).update(data['movies_data'])
 
     # Commit the new changes
     db.session.commit()
@@ -212,11 +212,11 @@ def refresh_element_data(api_id, list_type):
     # Check the episodes/seasons
     if list_type != ListType.MOVIES:
         if list_type == ListType.SERIES:
-            element = Series.query.filter_by(themoviedb_id=api_id).first()
+            element = Series.query.filter_by(api_id=api_id).first()
             old_seas_eps = \
                 [n.episodes for n in SeriesEpisodesPerSeason.query.filter_by(media_id=element.id).all()]
         elif list_type == ListType.ANIME:
-            element = Anime.query.filter_by(themoviedb_id=api_id).first()
+            element = Anime.query.filter_by(api_id=api_id).first()
             old_seas_eps = \
                 [n.episodes for n in AnimeEpisodesPerSeason.query.filter_by(media_id=element.id).all()]
 
@@ -302,9 +302,9 @@ def automatic_media_refresh():
     app.logger.info('[SYSTEM] - Starting automatic media refresh')
 
     # Recover all the data
-    all_series_tmdb_id = [m.themoviedb_id for m in Series.query.filter(Series.lock_status != True)]
-    all_anime_tmdb_id = [m.themoviedb_id for m in Anime.query.filter(Anime.lock_status != True)]
-    all_movies_tmdb_id = [m.themoviedb_id for m in Movies.query.filter(Movies.lock_status != True)]
+    all_series_tmdb_id = [m.api_id for m in Series.query.filter(Series.lock_status != True)]
+    all_anime_tmdb_id = [m.api_id for m in Anime.query.filter(Anime.lock_status != True)]
+    all_movies_tmdb_id = [m.api_id for m in Movies.query.filter(Movies.lock_status != True)]
 
     # Recover from API all the changed <TV_show> ID
     try:
