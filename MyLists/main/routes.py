@@ -6,12 +6,12 @@ from MyLists.API_data import ApiData
 from MyLists.main.add_db import AddtoDB
 from flask_login import login_required, current_user
 from MyLists.main.forms import EditMediaData, MediaComment, SearchForm
-from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete, MediaDetails
+from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect, session
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
     AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MediaType, get_next_airing, check_media, User, \
-    get_media_query, Games, GamesList, get_more_stats, get_games_stats, UserLastUpdate, get_models_group
+    get_media_query, GamesList, get_more_stats, get_games_stats, UserLastUpdate, get_models_group
 
 bp = Blueprint('main', __name__)
 
@@ -90,11 +90,9 @@ def write_comment(media_type, media_id):
         return '', 400
 
     form = MediaComment()
-
     if request.method == 'GET':
         form.comment.data = media[1].comment
         session['back_url'] = request.referrer or '/'
-
     if form.validate_on_submit():
         comment = form.comment.data
         media[1].comment = comment
@@ -122,15 +120,6 @@ def media_sheet(media_type, media_id):
     except ValueError:
         abort(400)
 
-    if media_type == MediaType.SERIES:
-        list_type = ListType.SERIES
-    elif media_type == MediaType.ANIME:
-        list_type = ListType.ANIME
-    elif media_type == MediaType.MOVIES:
-        list_type = ListType.MOVIES
-    elif media_type == MediaType.GAMES:
-        list_type = ListType.GAMES
-
     # Check if <media_id> came from an API
     from_api = request.args.get('search')
 
@@ -140,15 +129,16 @@ def media_sheet(media_type, media_id):
     # If <media> does not exist and <api_id> is provived: Add the <media> to DB, else abort.
     if not media:
         if from_api:
+            API_model = ApiData.get_API_model(media_type)
             try:
-                api_data = models[0].get_details_and_credits_data(media_id)
+                api_info = API_model().get_details_and_credits_data(media_id)
             except Exception as e:
                 flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
                 app.logger.error('[ERROR] - Impossible to get the details and credits from API ({}) ID [{}]: {}'
                                  .format(media_type.value, media_id, e))
                 return redirect(request.referrer)
             try:
-                media_details = models[0].get_media_details(api_data)
+                media_details = API_model().from_API_to_dict(api_info)
             except Exception as e:
                 flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
                 app.logger.error('[ERROR] - Occured trying to parse the API data to dict ({}) ID [{}]: {}'

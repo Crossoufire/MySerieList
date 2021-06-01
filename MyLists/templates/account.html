@@ -723,6 +723,7 @@
                 <ul class="list-unstyled">
                     <li class="m-b-20">
                         <h4><i class="fas fa-user-check"></i>&nbsp;&nbsp; Follows
+                            {% set follows = user.followed.all() %}
                             <form id='all_follows' style="display: inline;" method="POST"
                                   action={{ url_for('users.account', user_name=user.username) }}>
                                 <input class="d-none" name="all_follows" value="True">

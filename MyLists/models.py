@@ -137,6 +137,8 @@ class User(UserMixin, db.Model):
     movies_list = db.relationship('MoviesList', backref='user', lazy=True)
     games_list = db.relationship('GamesList', backref='user', lazy=True)
     redis_tasks = db.relationship('RedisTasks', backref='user', lazy='dynamic')
+    last_updates = db.relationship('UserLastUpdate', backref='user', order_by="desc(UserLastUpdate.date)",
+                                   lazy="dynamic")
     followed = db.relationship('User', secondary=followers, primaryjoin=(followers.c.follower_id == id),
                                secondaryjoin=(followers.c.followed_id == id),
                                backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
@@ -177,22 +179,6 @@ class User(UserMixin, db.Model):
     def is_following(self, user):
         return self.followed.filter(followers.c.followed_id == user.id).count() > 0
 
-    def get_all_follows(self):
-        if current_user.id != self.id:
-            follows = self.followed.all()
-        else:
-            follows = current_user.followed.all()
-
-        return follows
-
-    def get_all_followers(self):
-        if current_user.id != self.id:
-            followers = self.followers.all()
-        else:
-            followers = current_user.followers.all()
-
-        return followers
-
     def count_notifications(self):
         last_notif_time = self.last_notif_read_time or datetime(1900, 1, 1)
         return Notifications.query.filter_by(user_id=self.id) \
@@ -230,37 +216,26 @@ class User(UserMixin, db.Model):
                 "frame_id": frame_id,
                 "frame_level": frame_level}
 
-    @staticmethod
-    def verify_token(token):
-        s = Serializer(app.config['SECRET_KEY'])
-        try:
-            user_id = s.loads(token)["user_id"]
-        except:
-            return None
-        user = User.query.get(user_id)
-        if not user:
-            return None
+    def get_last_updates(self, all_=False):
+        if all_:
+            last_updates = self.last_updates.filter_by(user_id=self.id).all()
         else:
-            return user
+            last_updates = self.last_updates.filter_by(user_id=self.id).limit(7)
+        user_updates = self._shape_to_dict_updates(last_updates)
 
+        return user_updates
 
-class UserLastUpdate(db.Model):
-    _group = ['User']
+    def get_follows_updates(self):
+        follows_update = UserLastUpdate.query\
+            .filter(UserLastUpdate.user_id.in_([u.id for u in self.followed.all()])).limit(11)
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    media_name = db.Column(db.String(50), nullable=False)
-    media_type = db.Column(db.Enum(ListType), nullable=False)
-    media_id = db.Column(db.Integer)
-    old_status = db.Column(db.Enum(Status))
-    new_status = db.Column(db.Enum(Status))
-    old_season = db.Column(db.Integer)
-    new_season = db.Column(db.Integer)
-    old_episode = db.Column(db.Integer)
-    new_episode = db.Column(db.Integer)
-    date = db.Column(db.DateTime, nullable=False)
+        follows_update_list = []
+        for follow in follows_update:
+            tmp = {'username': follow.user.username}
+            tmp.update(self._shape_to_dict_updates([follow])[0])
+            follows_update_list.append(tmp)
 
-    user = db.relationship('User', backref='UserLastUpdate', lazy=False)
+        return follows_update_list
 
     @staticmethod
     def _shape_to_dict_updates(last_update):
@@ -307,28 +282,37 @@ class UserLastUpdate(db.Model):
 
         return update
 
-    @classmethod
-    def get_follows_updates(cls, follows):
-        follows_update = db.session.query(cls).filter(cls.user_id.in_([u.id for u in follows]))\
-            .order_by(cls.date.desc()).limit(11)
-
-        follows_update_list = []
-        for follow in follows_update:
-            follows = {'username': follow.user.username}
-            follows.update(cls._shape_to_dict_updates([follow])[0])
-            follows_update_list.append(follows)
-
-        return follows_update_list
-
-    @classmethod
-    def get_user_updates(cls, user_id, all_=False):
-        if all_:
-            last_updates = cls.query.filter_by(user_id=user_id).order_by(cls.date.desc()).all()
+    @staticmethod
+    def verify_token(token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token)["user_id"]
+        except:
+            return None
+        user = User.query.get(user_id)
+        if not user:
+            return None
         else:
-            last_updates = cls.query.filter_by(user_id=user_id).order_by(cls.date.desc()).limit(7)
-        user_updates = cls._shape_to_dict_updates(last_updates)
+            return user
 
-        return user_updates
+
+class UserLastUpdate(db.Model):
+    _group = ['User']
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    media_name = db.Column(db.String(50), nullable=False)
+    media_type = db.Column(db.Enum(ListType), nullable=False)
+    media_id = db.Column(db.Integer)
+    old_status = db.Column(db.Enum(Status))
+    new_status = db.Column(db.Enum(Status))
+    old_season = db.Column(db.Integer)
+    new_season = db.Column(db.Integer)
+    old_episode = db.Column(db.Integer)
+    new_episode = db.Column(db.Integer)
+    date = db.Column(db.DateTime, nullable=False)
+
+    user = db.relationship('User', backref='UserLastUpdate', lazy=False)
 
 
 class RedisTasks(db.Model):
@@ -497,7 +481,7 @@ class MediaListMixin(object):
     def get_favorites(cls, user_id):
         media = eval(cls.__name__.replace('List', ''))
         fav_media = cls.query.filter_by(favorite=True, user_id=user_id).all()
-        favorites = db.session.query(media).filter(media.id.in_([m.media_id for m in fav_media])).all()
+        favorites = media.query.filter(media.id.in_([m.media_id for m in fav_media])).all()
 
         # Randomize the favorites displayed
         random.shuffle(favorites)

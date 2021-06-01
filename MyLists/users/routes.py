@@ -13,33 +13,31 @@ def account(user_name):
     # Check if the user can see the <media_list>
     user = current_user.check_autorization(user_name)
 
+    # Get the user frame info
+    user_frame_info = user.get_frame_info()
+
+    if request.form.get('all_follows'):
+        follows = user.followed.all()
+        return render_template('account_all_follows.html', title='Follows', user=user,
+                               frame=user_frame_info, follows=follows)
+    elif request.form.get('all_followers'):
+        followers = user.followers.all()
+        return render_template('account_all_follows.html', title='Followers', user=user,
+                               frame=user_frame_info, followers=True, follows=followers)
+    elif request.form.get('all_history'):
+        media_updates = user.get_last_updates(all_=True)
+        return render_template('account_all_history.html', title='History', user=user,
+                               frame=user_frame_info, media_updates=media_updates)
+
     # Update the account view count
     if current_user.role != RoleType.ADMIN and user.id != current_user.id:
         user.profile_views += 1
 
-    # Get the user frame info
-    user_frame_info = user.get_frame_info()
-
     # Get the user last updates
-    user_updates = UserLastUpdate.get_user_updates(user.id)
-
-    # Get all the follows
-    follows = user.get_all_follows()
-
-    if request.form.get('all_follows'):
-        return render_template('account_all_follows.html', title='Follows', user=user, frame=user_frame_info,
-                               follows=follows)
-    elif request.form.get('all_followers'):
-        followers = user.get_all_followers()
-        return render_template('account_all_follows.html', title='Followers', user=user, frame=user_frame_info,
-                               follows=followers, followers=True)
-    elif request.form.get('all_history'):
-        media_update = UserLastUpdate.get_user_updates(user.id, all_=True)
-        return render_template('account_all_history.html', title='History', user=user, frame=user_frame_info,
-                               media_updates=media_update)
+    user_updates = user.get_last_updates(all_=False)
 
     # Get follows last updates
-    follows_updates = UserLastUpdate.get_follows_updates(follows)
+    follows_updates = user.get_follows_updates()
 
     # Get the all media info in a dict for each media type
     list_models = get_models_type('List')
@@ -94,8 +92,7 @@ def account(user_name):
     db.session.commit()
 
     return render_template('account.html', title=user.username+"'s account", user=user, frame=user_frame_info,
-                           user_updates=user_updates, follows=follows, follows_updates=follows_updates,
-                           media_data=media_dict)
+                           user_updates=user_updates, follows_updates=follows_updates, media_data=media_dict)
 
 
 @bp.route("/hall_of_fame", methods=['GET', 'POST'])
