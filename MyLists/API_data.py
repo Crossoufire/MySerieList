@@ -3,14 +3,16 @@ import secrets
 import requests
 from PIL import Image
 from flask import abort
-from MyLists import app
 from pathlib import Path
 from urllib import request
+from MyLists import app, db
 from datetime import datetime
 from howlongtobeatpy import HowLongToBeat
 from ratelimit import sleep_and_retry, limits
-from MyLists.models import ListType, MediaType
 from urllib.request import urlretrieve, Request
+from MyLists.models import ListType, MediaType, Series, Anime, SeriesGenre, AnimeGenre, AnimeActors, SeriesActors, \
+    Movies, SeriesNetwork, AnimeNetwork, SeriesEpisodesPerSeason, AnimeEpisodesPerSeason, MoviesGenre, MoviesActors, \
+    GamesCompanies, GamesPlatforms, Games, GamesGenre
 
 
 # --- GENERAL ---------------------------------------------------------------------------------------------------
@@ -22,35 +24,49 @@ def status_code(status_code):
 
 
 class ApiData(object):
+    _duration = 0
+    local_covers_path = None
+
+    def __init__(self, API_id=None):
+        self.api_key = None
+        self.client_igdb = None
+        self.poster_base_url = None
+        self.media_details = {}
+        self.API_data = None
+        self.API_id = API_id
+        self.all_data = {}
+        self.media = None
+
     @classmethod
     def get_API_model(cls, list_type):
         for model in cls.__subclasses__():
-            if list_type in model._group:
+            if list_type in model.group:
                 return model
 
+    def save_media_to_db(self):
+        self.get_details_and_credits_data()
+        self.from_API_to_dict()
+        self.add_data_to_db()
 
-class TMDBMixin(object):
-    local_covers_path = None
+        return self.media
 
-    def __init__(self):
+
+class TMDBMixin(ApiData):
+    group = []
+
+    def __init__(self, API_id=None):
+        super().__init__(API_id)
         self.api_key = app.config['THEMOVIEDB_API_KEY']
         self.poster_base_url = 'https://image.tmdb.org/t/p/w300'
-        self.media_details = {}
-        self.API_data = None
+        self.API_id = API_id
 
-    def TMDb_search(self, media_name, page=1):
+    def search(self, media_name, page=1):
         response = requests.get("https://api.themoviedb.org/3/search/multi?api_key={0}&query={1}&page={2}"
                                 .format(self.api_key, media_name, page), timeout=15)
 
         status_code(response.status_code)
 
         return json.loads(response.text)
-
-    def save_api_cover(self, media_cover_path, media_cover_name):
-        urlretrieve(f"{self.poster_base_url}{media_cover_path}", f"{self.local_covers_path}/{media_cover_name}")
-        img = Image.open(f"{self.local_covers_path}/{media_cover_name}")
-        img = img.resize((300, 450), Image.ANTIALIAS)
-        img.save(f"{self.local_covers_path}/{media_cover_name}", quality=90)
 
     def get_media_cover(self):
         media_cover_name = 'default.jpg'
@@ -87,17 +103,22 @@ class TMDBMixin(object):
 
         return actors_list
 
+    def save_api_cover(self, media_cover_path, media_cover_name):
+        urlretrieve(f"{self.poster_base_url}{media_cover_path}", f"{self.local_covers_path}/{media_cover_name}")
+        img = Image.open(f"{self.local_covers_path}/{media_cover_name}")
+        img = img.resize((300, 450), Image.ANTIALIAS)
+        img.save(f"{self.local_covers_path}/{media_cover_name}", quality=90)
+
 
 class ApiTV(TMDBMixin):
-    _duration = 0
+    group = []
 
-    def get_details_and_credits_data(self, API_id):
+    def get_details_and_credits_data(self):
         response = requests.get("https://api.themoviedb.org/3/tv/{}?api_key={}&append_to_response=credits"
-                                .format(API_id, self.api_key), timeout=15)
+                                .format(self.API_id, self.api_key), timeout=15)
 
         status_code(response.status_code)
-
-        return json.loads(response.text)
+        self.API_data = json.loads(response.text)
 
     def get_changed_data(self):
         response = requests.get("https://api.themoviedb.org/3/tv/changes?api_key={0}"
@@ -107,53 +128,49 @@ class ApiTV(TMDBMixin):
 
         return json.loads(response.text)
 
-    def get_anime_genres(self):
-        return []
-
-    def from_API_to_dict(self, API_data):
-        self.API_data = API_data
-        self.media_details = {'name': API_data.get('name', 'Unknown') or 'Unknown',
-                              'original_name': API_data.get('original_name', 'Unknown') or 'Unknown',
-                              'first_air_date': API_data.get('first_air_date', 'Unknown') or 'Unknown',
-                              'last_air_date': API_data.get('last_air_date', 'Unknown') or 'Unknown',
-                              'homepage': API_data.get('homepage', 'Unknown') or 'Unknown',
-                              'in_production': API_data.get('in_production', False) or False,
-                              'total_seasons': API_data.get('number_of_seasons', 1) or 1,
-                              'total_episodes': API_data.get('number_of_episodes', 1) or 1,
-                              'status': API_data.get('status', 'Unknown') or 'Unknown',
-                              'vote_average': API_data.get('vote_average', 0) or 0,
-                              'vote_count': API_data.get('vote_count', 0) or 0,
-                              'synopsis': API_data.get('overview', 'Not defined.') or 'Not defined.',
-                              'popularity': API_data.get('popularity', 0) or 0,
-                              'api_id': API_data.get('id'),
+    def from_API_to_dict(self):
+        self.media_details = {'name': self.API_data.get('name', 'Unknown') or 'Unknown',
+                              'original_name': self.API_data.get('original_name', 'Unknown') or 'Unknown',
+                              'first_air_date': self.API_data.get('first_air_date', 'Unknown') or 'Unknown',
+                              'last_air_date': self.API_data.get('last_air_date', 'Unknown') or 'Unknown',
+                              'homepage': self.API_data.get('homepage', 'Unknown') or 'Unknown',
+                              'in_production': self.API_data.get('in_production', False) or False,
+                              'total_seasons': self.API_data.get('number_of_seasons', 1) or 1,
+                              'total_episodes': self.API_data.get('number_of_episodes', 1) or 1,
+                              'status': self.API_data.get('status', 'Unknown') or 'Unknown',
+                              'vote_average': self.API_data.get('vote_average', 0) or 0,
+                              'vote_count': self.API_data.get('vote_count', 0) or 0,
+                              'synopsis': self.API_data.get('overview', 'Not defined.') or 'Not defined.',
+                              'popularity': self.API_data.get('popularity', 0) or 0,
+                              'api_id': self.API_data.get('id'),
                               'next_episode_to_air': None,
                               'season_to_air': None,
                               'episode_to_air': None,
                               'last_update': datetime.utcnow(),
                               'image_cover': self.get_media_cover()}
 
-        next_episode_to_air = API_data.get("next_episode_to_air") or None
+        next_episode_to_air = self.API_data.get("next_episode_to_air") or None
         if next_episode_to_air:
             self.media_details['next_episode_to_air'] = next_episode_to_air['air_date']
             self.media_details['season_to_air'] = next_episode_to_air['season_number']
             self.media_details['episode_to_air'] = next_episode_to_air['episode_number']
 
-        duration = API_data.get("episode_run_time") or None
+        duration = self.API_data.get("episode_run_time") or None
         self.media_details['duration'] = self._duration
         if duration and float(duration) != 0:
             self.media_details['duration'] = duration[0]
 
-        origin_country = API_data.get("origin_country") or None
+        origin_country = self.API_data.get("origin_country") or None
         self.media_details['origin_country'] = 'Unknown'
         if origin_country:
             self.media_details['origin_country'] = origin_country[0]
 
-        created_by = API_data.get("created_by") or None
+        created_by = self.API_data.get("created_by") or None
         self.media_details['created_by'] = 'Unknown'
         if created_by:
             self.media_details['created_by'] = ", ".join(creator['name'] for creator in created_by)
 
-        seasons, seasons_list = API_data.get('seasons') or None, []
+        seasons, seasons_list = self.API_data.get('seasons') or None, []
         if seasons:
             for i in range(0, len(seasons)):
                 if seasons[i]['season_number'] <= 0:
@@ -162,7 +179,7 @@ class ApiTV(TMDBMixin):
         else:
             seasons_list.append({'season': 1, 'episodes': 1})
 
-        networks, networks_list = API_data.get('networks') or None, []
+        networks, networks_list = self.API_data.get('networks') or None, []
         if networks:
             for network in networks[:4]:
                 networks_list.append({'network': network["name"]})
@@ -173,16 +190,20 @@ class ApiTV(TMDBMixin):
         actors_list = self.get_actors()
         anime_genres_list = self.get_anime_genres()
 
-        return {'media_data': self.media_details, 'seasons_data': seasons_list, 'genres_data': genres_list,
-                'anime_genres_data': anime_genres_list, 'actors_data': actors_list, 'networks_data': networks_list}
+        self.all_data = {'media_data': self.media_details, 'seasons_data': seasons_list, 'genres_data': genres_list,
+                         'anime_genres_data': anime_genres_list, 'actors_data': actors_list,
+                         'networks_data': networks_list}
+
+    def get_anime_genres(self):
+        return []
 
 
 # --- CALL CLASSES -----------------------------------------------------------------------------------------------
 
 
-class ApiSeries(ApiData, ApiTV):
+class ApiSeries(ApiTV):
     _duration = 45
-    _group = [ListType.SERIES, MediaType.SERIES]
+    group = [ListType.SERIES, MediaType.SERIES]
     local_covers_path = Path(app.root_path, "static/covers/series_covers/")
 
     def get_trending(self):
@@ -193,18 +214,28 @@ class ApiSeries(ApiData, ApiTV):
 
         return json.loads(response.text)
 
+    def add_data_to_db(self):
+        self.media = Series(**self.media_details['media_data'])
+        db.session.add()
+        db.session.commit()
 
-class ApiAnime(ApiData, ApiTV):
+        for genre in [{**item, 'media_id': self.media.id} for item in self.all_data['genres_data']]:
+            db.session.add(SeriesGenre(**genre))
+
+        for actor in [{**item, 'media_id': self.media.id} for item in self.all_data['actors_data']]:
+            db.session.add(SeriesActors(**actor))
+
+        for network in [{**item, 'media_id': self.media.id} for item in self.all_data['networks_data']]:
+            db.session.add(SeriesNetwork(**network))
+
+        for season in [{**item, 'media_id': self.media.id} for item in self.all_data['seasons_data']]:
+            db.session.add(SeriesEpisodesPerSeason(**season))
+
+
+class ApiAnime(ApiTV):
     _duration = 24
-    _group = [ListType.ANIME, MediaType.ANIME]
+    group = [ListType.ANIME, MediaType.ANIME]
     local_covers_path = Path(app.root_path, "static/covers/anime_covers/")
-
-    @staticmethod
-    def get_trending():
-        response = requests.get("https://api.jikan.moe/v3/top/anime/1/airing", timeout=10)
-        status_code(response.status_code)
-
-        return json.loads(response.text)
 
     @staticmethod
     @sleep_and_retry
@@ -235,6 +266,12 @@ class ApiAnime(ApiData, ApiTV):
 
         return json.loads(response.text)
 
+    def get_trending(self):
+        response = requests.get("https://api.jikan.moe/v3/top/anime/1/airing", timeout=10)
+        status_code(response.status_code)
+
+        return json.loads(response.text)
+
     def get_anime_genres(self):
         anime_genres_list = []
         try:
@@ -250,14 +287,35 @@ class ApiAnime(ApiData, ApiTV):
 
         return anime_genres_list
 
+    def add_data_to_db(self):
+        self.media = Anime(**self.media_details['media_data'])
+        db.session.add()
+        db.session.commit()
 
-class ApiMovies(ApiData, TMDBMixin):
-    _group = [ListType.MOVIES, MediaType.MOVIES]
+        if len(self.all_data['anime_genres_data']) > 0:
+            for genre in [{**item, 'media_id': self.media.id} for item in self.all_data['anime_genres_data']]:
+                db.session.add(AnimeGenre(**genre))
+        else:
+            for genre in [{**item, 'media_id': self.media.id} for item in self.all_data['genres_data']]:
+                db.session.add(AnimeGenre(**genre))
+
+        for actor in [{**item, 'media_id': self.media.id} for item in self.all_data['actors_data']]:
+            db.session.add(AnimeActors(**actor))
+
+        for network in [{**item, 'media_id': self.media.id} for item in self.all_data['networks_data']]:
+            db.session.add(AnimeNetwork(**network))
+
+        for season in [{**item, 'media_id': self.media.id} for item in self.all_data['seasons_data']]:
+            db.session.add(AnimeEpisodesPerSeason(**season))
+
+
+class ApiMovies(TMDBMixin):
+    group = [ListType.MOVIES, MediaType.MOVIES]
     local_covers_path = Path(app.root_path, "static/covers/movies_covers")
 
-    def get_details_and_credits_data(self, API_id):
+    def get_details_and_credits_data(self):
         response = requests.get("https://api.themoviedb.org/3/movie/{}?api_key={}&append_to_response=credits"
-                                .format(API_id, self.api_key), timeout=15)
+                                .format(self.API_id, self.api_key), timeout=15)
 
         status_code(response.status_code)
 
@@ -279,27 +337,26 @@ class ApiMovies(ApiData, TMDBMixin):
 
         return json.loads(response.text)
 
-    def from_API_to_dict(self, API_data):
-        self.API_data = API_data
-        self.media_details = {'name': API_data.get('title', 'Unknown') or 'Unknown',
-                              'original_name': API_data.get('original_title', 'Unknown') or 'Unknown',
-                              'release_date': API_data.get('release_date', 'Unknown') or 'Unknown',
-                              'homepage': API_data.get('homepage', 'Unknown') or 'Unknown',
-                              'released': API_data.get('status', 'Unknown') or '"Unknown',
-                              'vote_average': API_data.get('vote_average', 0) or 0,
-                              'vote_count': API_data.get('vote_count', 0) or 0,
-                              'synopsis': API_data.get('overview', 'Not defined.') or 'Not defined.',
-                              'popularity': API_data.get('popularity', 0) or 0,
-                              'budget': API_data.get('budget', 0) or 0,
-                              'revenue': API_data.get('revenue', 0) or 0,
-                              'tagline': API_data.get('tagline', '-') or '-',
-                              'duration': API_data.get('runtime', 0) or 0,
-                              'original_language': API_data.get('original_language', 'Unknown') or 'Unknown',
-                              'themoviedb_id': API_data.get('id'),
+    def from_API_to_dict(self):
+        self.media_details = {'name': self.API_data.get('title', 'Unknown') or 'Unknown',
+                              'original_name': self.API_data.get('original_title', 'Unknown') or 'Unknown',
+                              'release_date': self.API_data.get('release_date', 'Unknown') or 'Unknown',
+                              'homepage': self.API_data.get('homepage', 'Unknown') or 'Unknown',
+                              'released': self.API_data.get('status', 'Unknown') or '"Unknown',
+                              'vote_average': self.API_data.get('vote_average', 0) or 0,
+                              'vote_count': self.API_data.get('vote_count', 0) or 0,
+                              'synopsis': self.API_data.get('overview', 'Not defined.') or 'Not defined.',
+                              'popularity': self.API_data.get('popularity', 0) or 0,
+                              'budget': self.API_data.get('budget', 0) or 0,
+                              'revenue': self.API_data.get('revenue', 0) or 0,
+                              'tagline': self.API_data.get('tagline', '-') or '-',
+                              'duration': self.API_data.get('runtime', 0) or 0,
+                              'original_language': self.API_data.get('original_language', 'Unknown') or 'Unknown',
+                              'themoviedb_id': self.API_data.get('id'),
                               'director_name': 'Unknown',
                               'image_cover': self.get_media_cover()}
 
-        the_crew = API_data.get('credits', {'crew': None}).get('crew') or None
+        the_crew = self.API_data.get('credits', {'crew': None}).get('crew') or None
         if the_crew:
             for element in the_crew:
                 if element['job'] == 'Director':
@@ -309,20 +366,30 @@ class ApiMovies(ApiData, TMDBMixin):
         genres_list = self.get_genres()
         actors_list = self.get_actors()
 
-        return {'media_data': self.media_details, 'seasons_data': [], 'genres_data': genres_list, 'networks_data': [],
-                'anime_genres_data': [], 'actors_data': actors_list}
+        self.all_data = {'media_data': self.media_details, 'genres_data': genres_list, 'actors_data': actors_list}
+
+    def add_data_to_db(self):
+        self.media = Movies(**self.media_details['media_data'])
+        db.session.add(self.media)
+        db.session.commit()
+
+        for genre in [{**item, 'media_id': self.media.id} for item in self.all_data['genres_data']]:
+            db.session.add(MoviesGenre(**genre))
+
+        for actor in [{**item, 'media_id': self.media.id} for item in self.all_data['actors_data']]:
+            db.session.add(MoviesActors(**actor))
 
 
 class ApiGames(ApiData):
-    _group = [ListType.GAMES, MediaType.GAMES]
+    group = [ListType.GAMES, MediaType.GAMES]
     local_covers_path = Path(app.root_path, "static/covers/games_covers/")
 
-    def __init__(self):
+    def __init__(self, API_id=None):
+        super().__init__(API_id)
         self.api_key = app.config['IGDB_API_KEY']
         self.client_igdb = app.config['CLIENT_IGDB']
         self.poster_base_url = 'https://images.igdb.com/igdb/image/upload/t_1080p/'
-        self.media_details = {}
-        self.API_data = None
+        self.API_id = API_id
 
     @staticmethod
     def HLTB_time(game_name):
@@ -334,7 +401,19 @@ class ApiGames(ApiData):
         else:
             return {'main': None, 'extra': None, 'completionist': None}
 
-    def get_details_and_credits_data(self, API_id):
+    @sleep_and_retry
+    @limits(calls=4, period=1)
+    def search(self, game_name):
+        headers = {'Client-ID': f"{app.config['CLIENT_IGDB']}",
+                   'Authorization': 'Bearer ' + self.api_key}
+        body = 'fields id, name, cover.image_id, first_release_date, storyline; search "{}";'.format(game_name)
+        response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers, timeout=15)
+
+        status_code(response.status_code)
+
+        return json.loads(response.text)
+
+    def get_details_and_credits_data(self):
         headers = {'Client-ID': f"{self.client_igdb}",
                    'Authorization': 'Bearer ' + self.api_key}
         body = 'fields name, cover.image_id, collection.name, game_engines.name, game_modes.name, ' \
@@ -342,19 +421,7 @@ class ApiGames(ApiData):
                'first_release_date, involved_companies.company.name, involved_companies.developer, ' \
                'involved_companies.publisher, storyline, summary, themes.name, url, external_games.uid, ' \
                'external_games.category; where id={};' \
-            .format(API_id)
-        response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers, timeout=15)
-
-        status_code(response.status_code)
-
-        return json.loads(response.text)
-
-    @sleep_and_retry
-    @limits(calls=4, period=1)
-    def IGDB_search(self, game_name):
-        headers = {'Client-ID': f"{app.config['CLIENT_IGDB']}",
-                   'Authorization': 'Bearer ' + self.api_key}
-        body = 'fields id, name, cover.image_id, first_release_date, storyline; search "{}";'.format(game_name)
+            .format(self.API_id)
         response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers, timeout=15)
 
         status_code(response.status_code)
@@ -393,21 +460,20 @@ class ApiGames(ApiData):
 
         return media_cover_name
 
-    def from_API_to_dict(self, API_data):
-        API_data = API_data[0]
-        self.API_data = API_data
-        self.media_details = {'name': API_data.get('name', 'Unknown') or 'Unknown',
-                              'release_date': API_data.get('first_release_date', 'Unknown') or 'Unknown',
-                              'IGDB_url': API_data.get('url', 'Unknown') or 'Unknown',
-                              'vote_average': API_data.get('total_rating', 0) or 0,
-                              'vote_count': API_data.get('total_rating_count', 0) or 0,
-                              'summary': API_data.get('summary', 'No summary found.') or 'No summary found.',
-                              'storyline': API_data.get('storyline', 'No storyline found.') or 'No storyline found.',
-                              'collection_name': API_data.get('collection', {'name': 'Unknown'})['name'] or 'Unknown',
-                              'game_engine': API_data.get('game_engines', [{'name': 'Unknown'}])[0]['name'] or 'Unknown',
-                              'player_perspective': API_data.get('player_perspectives', [{'name': 'Unknown'}])[0]['name'] or 'Unknown',
-                              'game_modes': ','.join([x['name'] for x in API_data.get('game_modes', [{'name': 'Unknown'}])]),
-                              'igdb_id': API_data.get('id'),
+    def from_API_to_dict(self):
+        self.API_data = self.API_data[0]
+        self.media_details = {'name': self.API_data.get('name', 'Unknown') or 'Unknown',
+                              'release_date': self.API_data.get('first_release_date', 'Unknown') or 'Unknown',
+                              'IGDB_url': self.API_data.get('url', 'Unknown') or 'Unknown',
+                              'vote_average': self.API_data.get('total_rating', 0) or 0,
+                              'vote_count': self.API_data.get('total_rating_count', 0) or 0,
+                              'summary': self.API_data.get('summary', 'No summary found.') or 'No summary found.',
+                              'storyline': self.API_data.get('storyline', 'No storyline found.') or 'No storyline found.',
+                              'collection_name': self.API_data.get('collection', {'name': 'Unknown'})['name'] or 'Unknown',
+                              'game_engine': self.API_data.get('game_engines', [{'name': 'Unknown'}])[0]['name'] or 'Unknown',
+                              'player_perspective': self.API_data.get('player_perspectives', [{'name': 'Unknown'}])[0]['name'] or 'Unknown',
+                              'game_modes': ','.join([x['name'] for x in self.API_data.get('game_modes', [{'name': 'Unknown'}])]),
+                              'igdb_id': self.API_data.get('id'),
                               'image_cover': self.get_media_cover()}
 
         hltb_time = self.HLTB_time(self.media_details['name'])
@@ -416,14 +482,14 @@ class ApiGames(ApiData):
         self.media_details['hltb_main_and_extra_time'] = hltb_time['extra']
         self.media_details['hltb_total_complete_time'] = hltb_time['completionist']
 
-        platforms, platforms_list = API_data.get('platforms') or None, []
+        platforms, platforms_list = self.API_data.get('platforms') or None, []
         if platforms:
             for platform in platforms:
                 platforms_list.append({'name': platform["name"]})
         else:
             platforms_list.append({'name': 'Unknown'})
 
-        companies, companies_list = API_data.get('involved_companies') or None, []
+        companies, companies_list = self.API_data.get('involved_companies') or None, []
         if companies:
             for company in companies:
                 companies_list.append({'name': company["company"]["name"], 'publisher': company["publisher"],
@@ -431,12 +497,12 @@ class ApiGames(ApiData):
         else:
             companies_list.append({'name': 'Unknown', 'publisher': False, 'developer': False})
 
-        genres, genres_list = API_data.get('genres') or None, []
+        genres, genres_list = self.API_data.get('genres') or None, []
         if genres:
             for i in range(0, len(genres)):
                 genres_list.append({'genre': genres[i]['name']})
 
-        themes, themes_list = API_data.get('themes') or None, []
+        themes, themes_list = self.API_data.get('themes') or None, []
         if themes:
             for i in range(0, len(themes)):
                 themes_list.append({'genre': themes[i]['name']})
@@ -445,5 +511,28 @@ class ApiGames(ApiData):
         if len(fusion_list) == 0:
             fusion_list.append({'genre': 'Unknown', 'genre_id': 0})
 
-        return {'games_data': self.media_details, 'companies_data': companies_list, 'genres_data': fusion_list,
-                'platforms_data': platforms_list, 'hltb_time': hltb_time}
+        self.all_data = {'media_data': self.media_details, 'companies_data': companies_list, 'genres_data': fusion_list,
+                         'platforms_data': platforms_list, 'hltb_time': hltb_time}
+
+    def add_data_to_db(self):
+        self.media = Games(**self.media_details['media_data'])
+        db.session.add(self.media)
+        db.session.commit()
+
+        for genre in self.all_data['genres_data']:
+            if genre['genre'] == '4X (explore, expand, exploit, and exterminate)':
+                genre['genre'] = '4X'
+            elif genre['genre'] == "Hack and slash/Beat 'em up":
+                genre['genre'] = 'Hack and Slash'
+            elif genre['genre'] == "Card & Board Game":
+                genre['genre'] = 'Card Game'
+            elif genre['genre'] == "Quiz/Trivia":
+                genre['genre'] = 'Quiz'
+            genre.update({'media_id': self.media.id})
+            db.session.add(GamesGenre(**genre))
+
+        for company in [{**item, 'media_id': self.media.id} for item in self.all_data['companies_data']]:
+            db.session.add(GamesCompanies(**company))
+
+        for platform in [{**item, 'media_id': self.media.id} for item in self.all_data['platforms_data']]:
+            db.session.add(GamesPlatforms(**platform))

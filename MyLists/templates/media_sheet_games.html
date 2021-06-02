@@ -1,27 +1,28 @@
 {% extends 'media_sheet_base.html' %}
 
 
-{% block medialist_info %}
-    <div class="row m-l-15 m-r-15">
-        <div class="col-4"><b>Status:</b></div>
-        <div class="col-8">
-            <label for="category-dropdown"></label>
-            <select id="category-dropdown" class="text-light text-center cat-drop"
-              onchange="changeCategoryGames('{{ data['id'] }}', this)">
-                <option {% if data['status'] == 'Completed' %} selected="selected" {% endif %}>Completed</option>
-                <option {% if data['status'] == 'Endless' %} selected="selected" {% endif %}>Endless</option>
-                <option {% if data['status'] == 'Multiplayer' %} selected="selected" {% endif %}>Multiplayer</option>
-            </select>
-            <i id="cat-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
-            &nbsp;<i id="cat-check" class="fas fa-check" style="display: none;"></i>
-        </div>
-    </div>
+{% block hr_color %}
+    hr {margin-top: 5px; border-top: 1px solid #196219;}
+{% endblock hr_color %}
+
+
+{% block cat_select %}
+    <select id="category-dropdown" class="text-light text-center cat-drop" onchange="changeCategoryGames(
+    '{{ data['id'] }}', this)">
+        <option {% if data['status'] == 'Completed' %} selected="selected" {% endif %}>Completed</option>
+        <option {% if data['status'] == 'Endless' %} selected="selected" {% endif %}>Endless</option>
+        <option {% if data['status'] == 'Multiplayer' %} selected="selected" {% endif %}>Multiplayer</option>
+    </select>
+{% endblock cat_select %}
+
+
+{% block add_more %}
     <div class="row m-l-15 m-r-15">
         <div class="col-4"><b>Played:</b></div>
         <div class="col-8">
             <label for="time-dropdown"></label>
-            <select id="time-dropdown" class="text-light text-center cat-drop"
-             onchange="updatePlaytime('{{ data['id'] }}', this)">
+            <select id="time-dropdown" class="text-light text-center cat-drop" onchange="updatePlaytime(
+            '{{ data['id'] }}', this)">
                 {% set play_drop = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 125, 150, 175,
                 200, 225, 250, 275, 300, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000, 1500, 2000, 2500, 3000,
                 4000, 5000, 6000, 7000, 8000, 9000, 10000] %}
@@ -36,25 +37,11 @@
             &nbsp;<i id="time-check" class="fas fa-check" style="display: none;"></i>
         </div>
     </div>
-    <div class="m-l-25 m-r-35 m-t-8 m-b-8" style="border: 1px solid grey;"></div>
-    <div id="score-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="Score /10">
-        <div class="col-4"><b>Score:</b></div>
-        <div class="col-8">
-            <label for="score-dropdown"></label>
-            <select id="score-dropdown" class="text-light text-center cat-drop"
-             onchange="updateScore('{{ data['id'] }}', this, '{{ media_list }}')">
-                <option {% if data['score'] == None or data['score'] == -1 %} selected="selected"
-                {% endif %}value="---">&nbsp;---&nbsp;</option>
-                {% for i in range(0, 21) %}
-                    <option {% if (i-(i/2)) == data['score'] %} selected="selected" {% endif %}
-                    value="{{ (i-(i/2)) }}">&nbsp;{{ (i-(i/2)) }}&nbsp;</option>
-                {% endfor %}
-            </select>
-            <i id="score-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
-            &nbsp;<i id="score-check" class="fas fa-check" style="display: none;"></i>
-        </div>
-    </div>
-{% endblock medialist_info %}
+{% endblock add_more %}
+
+
+{% block add_redo %}
+{% endblock add_redo %}
 
 
 {% block information %}

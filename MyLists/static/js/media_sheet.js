@@ -68,7 +68,7 @@ function removeFromUser(element_id, media_type) {
 
 
 // --- Set media to favorite ----------------------------------------------------------------------------
-function addFavorite(element_id, media_type) {
+function addFavorite(element_id, list_type) {
     let favorite;
     favorite = !!$('#favorite').hasClass('far');
     $('#fav-title').addClass('disabled');
@@ -77,7 +77,7 @@ function addFavorite(element_id, media_type) {
         type: "POST",
         url: "/add_favorite",
         contentType: "application/json",
-        data: JSON.stringify({ element_id: element_id, element_type: media_type, favorite: favorite }),
+        data: JSON.stringify({ element_id: element_id, element_type: list_type, favorite: favorite }),
         dataType: "json",
         success: function() {
             $('#fav-title').removeClass('disabled');
@@ -97,7 +97,7 @@ function addFavorite(element_id, media_type) {
 
 
 // --- Change the TV category ---------------------------------------------------------------------------
-function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
+function changeCategoryTV(element_id, cat_selector, media_list, seas_data) {
     let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
@@ -158,9 +158,9 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
 
 // --- Change the Movie category ------------------------------------------------------------------------
 function changeCategoryMovies(element_id, cat_selector) {
+    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
-    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
 
     if (new_cat === 'Completed') {
         $('#rewatch-row').show('slow');
@@ -192,10 +192,9 @@ function changeCategoryMovies(element_id, cat_selector) {
 
 // --- Change the Game category -------------------------------------------------------------------------
 function changeCategoryGames(element_id, cat_selector) {
+    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
-
-    let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
 
     $.ajax ({
         type: "POST",

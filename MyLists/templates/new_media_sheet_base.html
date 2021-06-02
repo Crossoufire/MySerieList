@@ -13,26 +13,54 @@
             <div class="col-lg-4 col-md-5 col-sm-12">
                 <div class="media-title-mobile">
                     <h3><b>{{ data['display_name'] }}</b></h3>
-                    {% if data['other_name'] %}
-                        <h5 class="text-grey"><i>{{ data['other_name'] }}</i></h5>
-                    {% endif %}
+                    {% if data['other_name'] %} <h5 class="text-grey"><i>{{ data['other_name'] }}</i></h5> {% endif %}
                     <hr>
                 </div>
                 <div class="text-center">
                     <img class="media-cover" src="{{ url_for('static', filename='covers/'+data['cover']) }}" alt=""/>
                 </div>
                 <div class="m-b-15 m-t-15">
-                    <div id="your-medialist-data" class="p-2" {% if not data['in_user_list'] %}
-                     style="display: none;"{% endif %}>
+                    <div id="your-medialist-data" class="p-2" {% if not data['in_user_list'] %}style="display: none;"{% endif %}>
                         <h4 id="fav-title" class="m-l-15 m-r-15">
                             <i class="fas fa-list"></i>&nbsp;&nbsp; <b>List info</b>
                             <i id="favorite" class="fa-heart m-t-3{% if data['favorite'] %} fas favorited {% else %}
-                             far no-fav{% endif %}" onclick="addFavorite('{{ data['id'] }}','{{ list_type }}')"
+                             far no-fav{% endif %}" onclick="addFavorite('{{ data['id'] }}','{{ media_list }}')"
                              data-toggle="tooltip" title="Favorite"></i>
                         </h4>
                         <hr class="m-l-15 m-r-15 m-b-8">
-                        {% block medialist_info scoped %}
-                        {% endblock medialist_info %}
+                        <div class="row m-l-15 m-r-15">
+                            <div class="col-4"><b>Status:</b></div>
+                            <div class="col-8">
+                                <label for="category-dropdown"></label>
+                                {% block cat_select scoped %}
+                                {% endblock cat_select %}
+                                <i id="cat-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+                                &nbsp;<i id="cat-check" class="fas fa-check" style="display: none;"></i>
+                            </div>
+                        </div>
+                        {% block add_more scoped %}
+                        {% endblock add_more %}
+                        <div class="m-l-25 m-r-35 m-t-8 m-b-8" style="border: 1px solid grey;"></div>
+                        <div id="score-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="Score /10">
+                            <div class="col-4"><b>Score:</b></div>
+                            <div class="col-8">
+                                <label for="score-dropdown"></label>
+                                <select id="score-dropdown" class="text-light text-center cat-drop" onchange="updateScore(
+                                 '{{ data['id'] }}', this, '{{ media_list }}')">
+                                    <option {% if data['score'] == None or data['score'] == -1 %} selected="selected"
+                                    {% endif %}value="---">&nbsp;---&nbsp;</option>
+                                    {% for i in range(0, 21) %}
+                                        <option {% if (i-(i/2)) == data['score'] %} selected="selected" {% endif %} value="{{ (i-(i/2)) }}">
+                                            &nbsp;{{ (i-(i/2)) }}&nbsp;
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <i id="score-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
+                                &nbsp;<i id="score-check" class="fas fa-check" style="display: none;"></i>
+                            </div>
+                        </div>
+                        {% block add_redo scoped %}
+                        {% endblock add_redo %}
                         <h4 id="comment-title" class="m-l-15 m-r-15 m-t-15">
                             <i class="fas fa-pen-alt m-t-10"></i>&nbsp; <b>Comment</b>
                             <a class="far fa-edit m-t-10" data-toggle="tooltip" title="Add/Edit Comment"
@@ -41,15 +69,11 @@
                         </h4>
                         <hr class="m-l-15 m-r-15 m-b-8">
                         <p class="comment-style m-l-20 m-r-20">
-                            {% if data['comment'] %}
-                                {{ data['comment'] }}
-                            {% else %}
-                                <i>Nothing to display.</i>
-                            {% endif %}
+                            {% if data['comment'] %} {{ data['comment'] }} {% else %} <i>Nothing to display.</i> {% endif %}
                         </p>
                         <div class="text-center m-t-15">
                             <button class="btn btn-smaller btn-danger" onclick="removeFromUser('{{ data['id'] }}',
-                             '{{ media_list }}')">
+                            '{{ media_list }}')">
                                 <i class="fas fa-ban"></i>&nbsp; Remove from list
                             </button>
                             <i id="loading-remove-list" class="fas fa-spinner fast-spin" style="display: none;"></i>

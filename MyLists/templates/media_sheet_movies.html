@@ -1,39 +1,25 @@
 {% extends 'media_sheet_base.html' %}
 
 
-{% block medialist_info %}
-    <div class="row m-l-15 m-r-15">
-        <div class="col-4"><b>Status:</b></div>
-        <div class="col-8">
-            <label for="category-dropdown"></label>
-            <select id="category-dropdown" class="text-light text-center cat-drop" onchange="changeCategoryMovies(
-             '{{ data['id'] }}', this)">
-                <option {% if data['status'] == 'Completed' %}selected="selected"{% endif %}>Completed</option>
-                <option {% if data['status'] == 'Plan to Watch' %}selected="selected"{% endif %}>Plan to Watch</option>
-            </select>
-            <i id="cat-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
-            &nbsp;<i id="cat-check" class="fas fa-check" style="display: none;"></i>
-        </div>
-    </div>
-    <div class="m-l-25 m-r-35 m-t-8 m-b-8" style="border: 1px solid grey;"></div>
-    <div id="score-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="Score /10">
-        <div class="col-4"><b>Score:</b></div>
-        <div class="col-8">
-            <label for="score-dropdown"></label>
-            <select id="score-dropdown" class="text-light text-center cat-drop" onchange="updateScore(
-             '{{ data['id'] }}', this, '{{ media_list }}')">
-                <option {% if data['score'] == None or data['score'] == -1 %} selected="selected"
-                {% endif %}value="---">&nbsp;---&nbsp;</option>
-                {% for i in range(0, 21) %}
-                    <option {% if (i-(i/2)) == data['score'] %} selected="selected" {% endif %} value="{{ (i-(i/2)) }}">
-                        &nbsp;{{ (i-(i/2)) }}&nbsp;
-                    </option>
-                {% endfor %}
-            </select>
-            <i id="score-loading" class="fas fa-spinner fast-spin" style="display: none;"></i>
-            &nbsp;<i id="score-check" class="fas fa-check" style="display: none;"></i>
-        </div>
-    </div>
+{% block hr_color %}
+    hr {margin-top: 5px; border-top: 1px solid #8c7821;}
+{% endblock hr_color %}
+
+
+{% block cat_select %}
+    <select id="category-dropdown" class="text-light text-center cat-drop" onchange="changeCategoryMovies(
+    '{{ data['id'] }}', this)">
+        <option {% if data['status'] == 'Completed' %}selected="selected"{% endif %}>Completed</option>
+        <option {% if data['status'] == 'Plan to Watch' %}selected="selected"{% endif %}>Plan to Watch</option>
+    </select>
+{% endblock cat_select %}
+
+
+{% block add_more %}
+{% endblock add_more %}
+
+
+{% block add_redo %}
     <div id="rewatch-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="How many time you rewatched this media.
      Do not count the inital completion." {% if data['status'] == 'Completed'%}{% else %}style="display: none;"{% endif %}>
         <div class="col-4"><b>Rewatched:</b></div>
@@ -51,7 +37,7 @@
             &nbsp;<i id="rewatched-check" class="fas fa-check" style="display: none;"></i>
         </div>
     </div>
-{% endblock medialist_info %}
+{% endblock add_redo %}
 
 
 {% block information %}

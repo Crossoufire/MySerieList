@@ -123,29 +123,15 @@ def media_sheet(media_type, media_id):
     # Check if <media_id> came from an API
     from_api = request.args.get('search')
 
-    # Check if <media> is in local DB
+    # Check <media> in local DB
     media = models[0].media_sheet_check(media_id, from_api=from_api)
 
-    # If <media> does not exist and <api_id> is provived: Add the <media> to DB, else abort.
+    # If <media> None and <api_id> True: Add <media> to DB, else abort.
     if not media:
         if from_api:
             API_model = ApiData.get_API_model(media_type)
             try:
-                api_info = API_model().get_details_and_credits_data(media_id)
-            except Exception as e:
-                flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
-                app.logger.error('[ERROR] - Impossible to get the details and credits from API ({}) ID [{}]: {}'
-                                 .format(media_type.value, media_id, e))
-                return redirect(request.referrer)
-            try:
-                media_details = API_model().from_API_to_dict(api_info)
-            except Exception as e:
-                flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
-                app.logger.error('[ERROR] - Occured trying to parse the API data to dict ({}) ID [{}]: {}'
-                                 .format(media_type.value, media_id, e))
-                return redirect(request.referrer)
-            try:
-                media = AddtoDB(media_details, list_type).add_media_to_db()
+                media = API_model(API_id=media_id).save_media_to_db()
                 db.session.commit()
             except Exception as e:
                 flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
@@ -155,7 +141,7 @@ def media_sheet(media_type, media_id):
         else:
             abort(404)
 
-    # If <media> and <api_id> provived: redirect to get URL with media.id instead of media.api_id
+    # If <media> and <api_id>: redirect for URL with media.id instead of media.api_id
     if media and from_api:
         return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media.id))
 
@@ -863,10 +849,9 @@ def add_favorite():
     # Check if the <media_list> exist and is valid
     try:
         list_type = ListType(media_list)
+        models = get_models_group(list_type)
     except ValueError:
         return '', 400
-
-    models = get_models_group(list_type)
 
     # Check if the <media_id> is in the current user's list
     media = models[1].query.filter_by(user_id=current_user.id, media_id=media_id).first()
