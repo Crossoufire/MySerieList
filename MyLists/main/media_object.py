@@ -1,9 +1,6 @@
-import secrets
 import pykakasi
-from MyLists import app
 from flask import url_for
 from datetime import datetime
-from MyLists.API_data import ApiData
 from MyLists.models import ListType, Status
 
 

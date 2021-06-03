@@ -145,13 +145,14 @@ def media_sheet(media_type, media_id):
     if media and from_api:
         return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media.id))
 
-    media_info = MediaDict(media, list_type).create_list_dict()
-    title = media_info['display_name']
-
     # Get the HTML template
     html_template = models[0].media_sheet_template()
 
-    return render_template(html_template, title=title, data=media_info, media_list=list_type.value)
+    # Get the list info of the user on this media
+    user_list_info = media.in_user_list()
+
+    return render_template(html_template, title=media.name, media=media, list_info=user_list_info,
+                           media_list=models[0]._group[0].value)
 
 
 @bp.route("/media_sheet_form/<media_type>/<media_id>", methods=['GET', 'POST'])

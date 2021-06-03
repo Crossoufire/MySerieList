@@ -5,6 +5,8 @@ from pathlib import Path
 
 import iso639
 import json
+
+import pykakasi
 import pytz
 import random
 
@@ -352,7 +354,11 @@ class Notifications(db.Model):
 
 
 class MediaMixin(object):
-    def get_same_genres(self, genres_list):
+    def get_same_genres(self):
+        genres_list = [r.genre for r in self.genres]
+        if len(genres_list) > 2:
+            genres_list = genres_list[:2]
+
         media = eval(self.__class__.__name__)
         media_genre = eval(self.__class__.__name__+'Genre')
 
@@ -516,10 +522,6 @@ class TVBase(db.Model):
     last_update = db.Column(db.DateTime, nullable=False)
     lock_status = db.Column(db.Boolean, default=0)
 
-    @staticmethod
-    def media_sheet_template():
-        return 'media_sheet_tv.html'
-
 
 # --- SERIES ------------------------------------------------------------------------------------------------------
 
@@ -534,6 +536,17 @@ class Series(MediaMixin, TVBase):
     eps_per_season = db.relationship('SeriesEpisodesPerSeason', backref='series', lazy=False)
     networks = db.relationship('SeriesNetwork', backref='series', lazy=True)
     list_info = db.relationship('SeriesList', backref='series', lazy="dynamic")
+
+    def get_media_cover(self):
+        return url_for('static', filename='covers/series_covers/'+self.image_cover)
+
+    @staticmethod
+    def media_sheet_template():
+        return 'media_sheet_series.html'
+
+    @staticmethod
+    def get_latin_name():
+        pass
 
 
 class SeriesList(MediaListMixin, db.Model):
@@ -600,6 +613,10 @@ class Anime(MediaMixin, TVBase):
     eps_per_season = db.relationship('AnimeEpisodesPerSeason', backref='anime', lazy=False)
     list_info = db.relationship('AnimeList', backref='anime', lazy='dynamic')
     networks = db.relationship('AnimeNetwork', backref='anime', lazy=True)
+
+    @staticmethod
+    def media_sheet_template():
+        return 'media_sheet_anime.html'
 
 
 class AnimeList(MediaListMixin, db.Model):

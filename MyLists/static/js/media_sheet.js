@@ -69,8 +69,7 @@ function removeFromUser(element_id, media_type) {
 
 // --- Set media to favorite ----------------------------------------------------------------------------
 function addFavorite(element_id, list_type) {
-    let favorite;
-    favorite = !!$('#favorite').hasClass('far');
+    let favorite = !!$('#favorite').hasClass('far');
     $('#fav-title').addClass('disabled');
 
     $.ajax ({

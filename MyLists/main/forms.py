@@ -3,8 +3,6 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, DataRequired
 from wtforms import StringField, SubmitField, TextAreaField, IntegerField
 
-from MyLists.models import ListType
-
 
 class EditMediaData(FlaskForm):
     cover = FileField('Media cover', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])

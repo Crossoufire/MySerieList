@@ -44,15 +44,15 @@ function removeCat() {
 }
 
 
-// --- Add media to favorite -------------------------------------------------------------------------------
-function addFavorite(fav_div, element_id, media_type) {
+// --- Set media to favorite ----------------------------------------------------------------------------
+function addFavorite(fav_div, element_id, list_type) {
     let favorite = !!$(fav_div).hasClass('far');
 
     $.ajax ({
         type: "POST",
         url: "/add_favorite",
         contentType: "application/json",
-        data: JSON.stringify({ element_id: element_id, element_type: media_type, favorite: favorite }),
+        data: JSON.stringify({ element_id: element_id, element_type: list_type, favorite: favorite }),
         dataType: "json",
         success: function() {
             if (favorite === true) {
@@ -62,7 +62,7 @@ function addFavorite(fav_div, element_id, media_type) {
             }
         },
         error: function() {
-            error_ajax_message('Error trying to add the media to your favorite. Please try again later.')
+            error_ajax_message('Error updating your favorite status. Please try again later.');
         }
     });
 }
