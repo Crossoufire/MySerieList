@@ -8,9 +8,9 @@
 
 {% block cat_select %}
     <select id="category-dropdown" class="text-light text-center cat-drop" onchange="changeCategoryMovies(
-    '{{ data['id'] }}', this)">
-        <option {% if data['status'] == 'Completed' %}selected="selected"{% endif %}>Completed</option>
-        <option {% if data['status'] == 'Plan to Watch' %}selected="selected"{% endif %}>Plan to Watch</option>
+    '{{ media.id }}', this)">
+        <option {% if list_info.status.value == 'Completed' %}selected="selected"{% endif %}>Completed</option>
+        <option {% if list_info.status.value == 'Plan to Watch' %}selected="selected"{% endif %}>Plan to Watch</option>
     </select>
 {% endblock cat_select %}
 
@@ -21,14 +21,14 @@
 
 {% block add_redo %}
     <div id="rewatch-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="How many time you rewatched this media.
-     Do not count the inital completion." {% if data['status'] == 'Completed'%}{% else %}style="display: none;"{% endif %}>
+     Do not count the inital completion." {% if list_info.status.value == 'Completed'%}{% else %}style="display: none;"{% endif %}>
         <div class="col-4"><b>Rewatched:</b></div>
         <div class="col-8">
             <label for="rewatched-dropdown"></label>
             <select id="rewatched-dropdown" class="text-light text-center cat-drop" onchange="updateRewatched(
-             '{{ data['id'] }}', this, '{{ media_list }}')">
+             '{{ media.id }}', this, '{{ media_list }}')">
                 {% for i in range(0, 11) %}
-                    <option {% if i == data['rewatched'] %}selected="selected"{% endif %} value="{{ i }}">
+                    <option {% if i == list_info.rewatched %}selected="selected"{% endif %} value="{{ i }}">
                         &nbsp;{{ i }}&nbsp;
                     </option>
                 {% endfor %}
@@ -45,32 +45,32 @@
         <ul class="list-unstyled">
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-star"></i><b>&nbsp; TMDb Score</b></h5>
-                <i class="fas fa-ticket-alt fa-3x media-ticket" value="{{ data['vote_average'] }}"></i>
-                <div class="movie-vote-average">{{ data['vote_average'] }}</div>
-                <div class="movie-vote-count">({{ data['vote_count']|int }} votes)</div>
+                <i class="fas fa-ticket-alt fa-3x media-ticket" value="{{ media.vote_average }}"></i>
+                <div class="movie-vote-average">{{ media.vote_average }}</div>
+                <div class="movie-vote-count">({{ media.vote_count|int }} votes)</div>
             </li>
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-video"></i><b>&nbsp; Directed by</b></h5>
-                <div>{{ data['director'] }}</div>
+                <div>{{ media.director }}</div>
             </li>
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-calendar-check"></i><b>&nbsp; Release date</b></h5>
-                <div>{{ data['release_date'] }}</div>
+                <div>{{ media.release_date }}</div>
             </li>
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Runtime</b></h5>
-                <div>{{ data['duration']//60 }} h {{ '%02d'|format(data['duration']%60) }} min</div>
+                <div>{{ media.duration//60 }} h {{ '%02d'|format(media.duration%60) }} min</div>
             </li>
             <li>
                 <h5 class="mb-1 text-media"><i class="fas fa-flag"></i><b>&nbsp; Original language</b></h5>
-                {% if data['original_language'] == 'en' %}
+                {% if media.original_language == 'en' %}
                     <span class="flag-icon flag-icon-us"></span>&nbsp;
-                {% elif data['original_language'] == 'ja' %}
+                {% elif media.original_language == 'ja' %}
                     <span class="flag-icon flag-icon-jp"></span>&nbsp;
                 {% else %}
-                    <span class="flag-icon flag-icon-{{ data['original_language'] }}"></span>
+                    <span class="flag-icon flag-icon-{{ media.original_language }}"></span>
                 {% endif %}
-                &nbsp;<span>{{ data['original_language']|capitalize }}</span>
+                &nbsp;<span>{{ media.original_language|capitalize }}</span>
             </li>
         </ul>
     </div>
@@ -78,24 +78,24 @@
         <ul class="list-unstyled">
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-theater-masks"></i><b>&nbsp; Genres</b></h5>
-                <div>{{ data['genres'] }}</div>
+                <div>{{ media.get_genres() }}</div>
             </li>
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-user"></i><b>&nbsp; Actors</b></h5>
                 {% if data['actors'] == 'Unknown' %}
                     <div><i>No actors found</i></div>
                 {% else %}
-                    <div>{{ data['actors'] }}</div>
+                    <div>{{ media.get_actors() }}</div>
                 {% endif %}
             </li>
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-tag"></i><b>&nbsp; Tagline</b></h5>
-                <div>{{ data['tagline'] }}</div>
+                <div>{{ media.tagline }}</div>
             </li>
             <li>
                 <h5 class="mb-1 text-media"><i class="fas fa-home"></i><b>&nbsp; Homepage</b></h5>
-                {% if data['homepage'] != 'Unknown' %}
-                    <a style="word-break: break-all;" href="{{ data['homepage'] }}">{{ data['homepage'] }}</a>
+                {% if media.homepage != 'Unknown' %}
+                    <a style="word-break: break-all;" href="{{ media.homepage }}">{{ media.homepage }}</a>
                 {% else %}
                     <i>No homepage available</i>
                 {% endif %}
@@ -115,7 +115,7 @@
                 </div>
                 <div class="col-7">
                     {% if data['budget'] != 0 %}
-                        {{ "{:,.0f}".format(data['budget']).replace(',', ' ') }} $
+                        {{ "{:,.0f}".format(media.budget).replace(',', ' ') }} $
                     {% else %}
                         <i>No data available</i>
                     {% endif %}
@@ -128,8 +128,8 @@
                    <i class="fas fa-coins"></i>&nbsp; Revenue
                 </div>
                 <div class="col-7">
-                   {% if data['revenue'] != 0 %}
-                        {{ "{:,.0f}".format(data['revenue']).replace(',', ' ') }} $
+                   {% if media.revenue != 0 %}
+                        {{ "{:,.0f}".format(media.revenue).replace(',', ' ') }} $
                     {% else %}
                         <i>No data available</i>
                     {% endif %}

@@ -321,8 +321,6 @@ class UserLastUpdate(db.Model):
     new_episode = db.Column(db.Integer)
     date = db.Column(db.DateTime, nullable=False)
 
-    user = db.relationship('User', backref='UserLastUpdate', lazy=False)
-
 
 class RedisTasks(db.Model):
     _group = ['User']
@@ -387,16 +385,23 @@ class MediaMixin(object):
 
     def in_user_list(self):
         in_user_list = self.list_info.filter_by(user_id=current_user.id).first()
-        if not in_user_list:
-            in_user_list = {'last_episode_watched': 1, "current_season": 1, "score": '---', "favorite": False,
-                            "status": Status.WATCHING.value, "rewatched": 0, "comment": None}
-            in_user_list = dotdict(in_user_list)
-        else:
-            in_user_list = in_user_list[0]
+        # if not in_user_list:
+        #     in_user_list = {'last_episode_watched': 1, 'current_season': 1, 'score': '---', 'favorite': False,
+        #                     'status': Status.WATCHING.value, 'rewatched': 0, 'comment': None}
+        #     in_user_list = dotdict(in_user_list)
         return in_user_list
 
     def get_latin_name(self):
         pass
+
+    def get_networks(self):
+        return ", ".join([d.network for d in self.networks])
+
+    def get_genres(self):
+        return ", ".join([d.genre for d in self.genres])
+
+    def get_actors(self):
+        return ", ".join([d.name for d in self.actors])
 
     @classmethod
     def media_sheet_check(cls, media_id, from_api):
@@ -633,6 +638,9 @@ class Anime(MediaMixin, TVBase):
     def media_sheet_template():
         return 'media_sheet_anime.html'
 
+    def get_media_cover(self):
+        return url_for('static', filename='covers/anime_covers/'+self.image_cover)
+
 
 class AnimeList(MediaListMixin, db.Model):
     _group = (ListType.ANIME, MediaType.ANIME)
@@ -719,6 +727,9 @@ class Movies(MediaMixin, db.Model):
     def media_sheet_template():
         return 'media_sheet_movies.html'
 
+    def get_media_cover(self):
+        return url_for('static', filename='covers/movies_covers/'+self.image_cover)
+
 
 class MoviesList(MediaListMixin, db.Model):
     _group = (ListType.MOVIES, MediaType.MOVIES)
@@ -785,6 +796,9 @@ class Games(MediaMixin, db.Model):
     @staticmethod
     def media_sheet_template():
         return 'media_sheet_games.html'
+
+    def get_media_cover(self):
+        return url_for('static', filename='covers/games_covers/'+self.image_cover)
 
 
 class GamesList(MediaListMixin, db.Model):

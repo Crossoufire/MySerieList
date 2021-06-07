@@ -2,11 +2,10 @@ import json
 import pytz
 from MyLists import db, app
 from datetime import datetime
-from MyLists.API_data import ApiData
-from MyLists.main.add_db import AddtoDB
+from MyLists.API_data import ApiData, TMDBMixin, ApiGames
 from flask_login import login_required, current_user
 from MyLists.main.forms import EditMediaData, MediaComment, SearchForm
-from MyLists.main.media_object import MediaDict, change_air_format, Autocomplete
+from MyLists.main.media_object import change_air_format, Autocomplete
 from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect, session
 from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
@@ -149,9 +148,9 @@ def media_sheet(media_type, media_id):
     html_template = models[0].media_sheet_template()
 
     # Get the list info of the user on this media
-    user_list_info = media.in_user_list()
+    list_info = media.in_user_list()
 
-    return render_template(html_template, title=media.name, media=media, list_info=user_list_info,
+    return render_template(html_template, title=media.name, media=media, list_info=list_info,
                            media_list=models[0]._group[0].value)
 
 
@@ -1046,7 +1045,7 @@ def autocomplete():
 
     # Get the media results
     try:
-        media_data = ApiData().TMDb_search(search)
+        media_data = TMDBMixin().search(search)
     except Exception as e:
         media_data = {}
         app.logger.error('[ERROR] - Requesting the TMDB API: {}'.format(e))
@@ -1062,9 +1061,8 @@ def autocomplete():
 
     games_results = []
     if current_user.add_games:
-        # Get the games results
         try:
-            games_data = ApiData().IGDB_search(search)
+            games_data = ApiGames().search(search)
         except Exception as e:
             games_data = {}
             app.logger.error('[ERROR] - Requesting the IGDB API: {}'.format(e))

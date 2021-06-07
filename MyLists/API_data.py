@@ -39,7 +39,10 @@ class ApiData(object):
 
     @classmethod
     def get_API_model(cls, list_type):
-        for model in cls.__subclasses__():
+        def all_subclasses(cls):
+            return set(cls.__subclasses__()).union([s for c in cls.__subclasses__() for s in all_subclasses(c)])
+        all_ = all_subclasses(cls)
+        for model in all_:
             if list_type in model.group:
                 return model
 
@@ -318,8 +321,7 @@ class ApiMovies(TMDBMixin):
                                 .format(self.API_id, self.api_key), timeout=15)
 
         status_code(response.status_code)
-
-        return json.loads(response.text)
+        self.API_data = json.loads(response.text)
 
     def get_changed_data(self):
         response = requests.get("https://api.themoviedb.org/3/movie/changes?api_key={0}"
@@ -352,7 +354,7 @@ class ApiMovies(TMDBMixin):
                               'tagline': self.API_data.get('tagline', '-') or '-',
                               'duration': self.API_data.get('runtime', 0) or 0,
                               'original_language': self.API_data.get('original_language', 'Unknown') or 'Unknown',
-                              'themoviedb_id': self.API_data.get('id'),
+                              'api_id': self.API_data.get('id'),
                               'director_name': 'Unknown',
                               'image_cover': self.get_media_cover()}
 
@@ -369,7 +371,7 @@ class ApiMovies(TMDBMixin):
         self.all_data = {'media_data': self.media_details, 'genres_data': genres_list, 'actors_data': actors_list}
 
     def add_data_to_db(self):
-        self.media = Movies(**self.media_details['media_data'])
+        self.media = Movies(**self.all_data['media_data'])
         db.session.add(self.media)
         db.session.commit()
 
@@ -425,8 +427,7 @@ class ApiGames(ApiData):
         response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers, timeout=15)
 
         status_code(response.status_code)
-
-        return json.loads(response.text)
+        self.API_data = json.loads(response.text)
 
     def save_api_cover(self, media_cover_path, media_cover_name):
         url_address = f"{self.poster_base_url}{media_cover_path}.jpg"

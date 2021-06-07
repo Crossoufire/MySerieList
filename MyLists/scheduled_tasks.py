@@ -6,7 +6,6 @@ from MyLists import app, db
 from sqlalchemy import and_, desc
 from MyLists.API_data import ApiData
 from datetime import datetime, timedelta
-from MyLists.main.media_object import MediaDetails
 from MyLists.models import Series, SeriesList, SeriesActors, SeriesGenre, SeriesNetwork, SeriesEpisodesPerSeason, \
     UserLastUpdate, Notifications, ListType, Anime, AnimeList, AnimeActors, AnimeGenre, AnimeNetwork, Status, Movies, \
     AnimeEpisodesPerSeason, MoviesList, MoviesActors, MoviesGenre, GlobalStats, MyListsStats, User, RoleType, Games, \

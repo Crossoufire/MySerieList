@@ -96,7 +96,7 @@ function addFavorite(element_id, list_type) {
 
 
 // --- Change the TV category ---------------------------------------------------------------------------
-function changeCategoryTV(element_id, cat_selector, media_list, seas_data) {
+function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
     let new_cat = cat_selector.options[cat_selector.selectedIndex].value;
     $('#cat-loading').show();
     $('#your-medialist-data').addClass('disabled');
@@ -241,7 +241,7 @@ function updateSeason(element_id, value, seas_data, media_list) {
             for (let i = 2; i <= season_data[0][selected_season]; i++) {
                 let opt = document.createElement("option");
                 opt.className = "";
-                opt.innerHTML = '&nbsp;'+i+'&nbsp;';
+                opt.innerHTML = i;
                 document.getElementById('episode-dropdown').appendChild(opt);
             }
         },
