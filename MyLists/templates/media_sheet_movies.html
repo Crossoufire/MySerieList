@@ -138,3 +138,38 @@
         </li>
     </ul>
 {% endblock more_info %}
+
+
+{% block follows_info %}
+    {% for follow in media.in_follows_lists() %}
+        <div class="col col-lg-4 col-md-4 col-sm-6 col-12 m-b-35">
+            <a href="{{ url_for('users.account', user_name=follow[0].username) }}">
+                <div class="follow-div text-light">
+                    <div class="text-light">
+                        <img class="follow-img" src="{{ url_for('static', filename='profile_pics/'
+                        +follow[0].image_file) }}" alt=""/>
+                        <h5 style="display: inline-block;"><b>&nbsp;&nbsp;{{ follow[0].username }}</b></h5>
+                        <i class="fa-sm fa-heart m-l-10{% if follow[1].favorite %} fas f-favorited{% else %}
+                        far f-no-fav{% endif %}"></i>
+                    </div>
+                    <hr class="m-b-8" style="border-color: gray;">
+                    <i class="fas fa-sm fa-star"></i>
+                    <b>{% if follow[1].score == -1 or follow[1].score == None %}&nbsp;Score:&nbsp; ---
+                    {% else %}&nbsp;Score:&nbsp; {{ follow[1].score }}{% endif %}</b>
+                    <div class="follow-status" value="{{ follow[1].status.value }}">
+                        <i class="fas fa-list"></i>
+                        <b>&nbsp;Status:&nbsp;{{ follow[1].status.value }}</b>
+                    </div>
+                    {% if follow[1].status.value == 'Completed' %}
+                        <i class="fas fas-sm fa-redo"></i>
+                        <b>&nbsp;Rewatched:&nbsp; {{ follow[1].rewatched }}</b>
+                    {% endif %}
+                    {% if follow[1].comment %}
+                        <div class="m-t-10"><b>Comment:</b></div>
+                        <p class="text-justify commentary"><i>{{ follow[1].comment }}</i></p>
+                    {% endif %}
+                </div>
+            </a>
+        </div>
+    {% endfor %}
+{% endblock follows_info %}

@@ -50,6 +50,13 @@ def get_models_type(model_type):
     return _
 
 
+class dotdict(dict):
+    """ dictionary attributes accessed with dot.notation """
+    __getattr__ = dict.get
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
+
+
 class ListType(Enum):
     SERIES = 'serieslist'
     ANIME = 'animelist'
@@ -380,7 +387,16 @@ class MediaMixin(object):
 
     def in_user_list(self):
         in_user_list = self.list_info.filter_by(user_id=current_user.id).first()
+        if not in_user_list:
+            in_user_list = {'last_episode_watched': 1, "current_season": 1, "score": '---', "favorite": False,
+                            "status": Status.WATCHING.value, "rewatched": 0, "comment": None}
+            in_user_list = dotdict(in_user_list)
+        else:
+            in_user_list = in_user_list[0]
         return in_user_list
+
+    def get_latin_name(self):
+        pass
 
     @classmethod
     def media_sheet_check(cls, media_id, from_api):
@@ -522,6 +538,9 @@ class TVBase(db.Model):
     last_update = db.Column(db.DateTime, nullable=False)
     lock_status = db.Column(db.Boolean, default=0)
 
+    def get_eps_per_season(self):
+        return [r.episodes for r in self.eps_per_season]
+
 
 # --- SERIES ------------------------------------------------------------------------------------------------------
 
@@ -543,10 +562,6 @@ class Series(MediaMixin, TVBase):
     @staticmethod
     def media_sheet_template():
         return 'media_sheet_series.html'
-
-    @staticmethod
-    def get_latin_name():
-        pass
 
 
 class SeriesList(MediaListMixin, db.Model):

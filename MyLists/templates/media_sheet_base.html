@@ -18,7 +18,7 @@
                     <img class="media-cover" src={{ media.get_media_cover() }} alt=""/>
                 </div>
                 <div class="m-b-15 m-t-15">
-                    <div id="your-medialist-data" class="p-2" {% if not media.in_user_list() %}style="display: none;"{% endif %}>
+                    <div id="your-medialist-data" class="p-2" {% if not user_list_info %}style="display: none;"{% endif %}>
                         <h4 id="fav-title" class="m-l-15 m-r-15">
                             <i class="fas fa-list"></i>&nbsp;&nbsp; <b>List info</b>
                             <i id="favorite" class="fa-heart m-t-3{% if media.favorite %} fas favorited {% else %}
@@ -134,23 +134,19 @@
                 {% if data['lock_status'] %}
                     <div class="custom-control custom-switch">
                         <input id="lock-button" class="custom-control-input" type="checkbox" onchange="lock_media(
-                         '{{ data['id'] }}', '{{ media_list }}')" checked>
-                        <label id="lock-button-label" class="custom-control-label" for="lock-button">
-                            Media is Locked
-                        </label>
+                         '{{ media.id }}', '{{ media_list }}')" checked>
+                        <label id="lock-button-label" class="custom-control-label" for="lock-button">Media is Locked</label>
                     </div>
                     <a id="edit-button" class="btn btn-sm btn-warning text-dark" href="{{ url_for('main.media_sheet_form',
-                     media_type=data['media_type'], media_id=data['id']) }}">Edit media</a>
+                     media_type=media._group[1].value, media_id=media.id) }}">Edit media</a>
                 {% else %}
                     <div class="custom-control custom-switch">
                         <input id="lock-button" class="custom-control-input" type="checkbox" onchange="lock_media(
-                         '{{ data['id'] }}', '{{ media_list }}')">
-                        <label id="lock-button-label" class="custom-control-label" for="lock-button">
-                            Media is Unlocked
-                        </label>
+                         '{{ media.id }}', '{{ media_list }}')">
+                        <label id="lock-button-label" class="custom-control-label" for="lock-button">Media is Unlocked</label>
                     </div>
                     <a id="edit-button" class="btn btn-sm btn-warning text-dark" href="{{ url_for('main.media_sheet_form',
-                     media_type=data['media_type'], media_id=data['id']) }}" style="display: none;">Edit media</a>
+                     media_type=media._group[1].value, media_id=media.id) }}" style="display: none;">Edit media</a>
                 {% endif %}
             </div>
         {% endif %}

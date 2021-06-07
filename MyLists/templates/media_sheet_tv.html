@@ -3,13 +3,13 @@
 
 {% block cat_select %}
     <select id="category-dropdown" class="text-light text-center cat-drop" onchange="changeCategoryTV(
-    '{{ data['id'] }}', this, '{{ data['eps_per_season'] }}', '{{ media_list }}')">
-        <option {% if data['status'] == 'Watching' %} selected="selected" {% endif %}>Watching</option>
-        <option {% if data['status'] == 'Completed' %} selected="selected" {% endif %}>Completed</option>
-        <option {% if data['status'] == 'On Hold' %} selected="selected" {% endif %}>On Hold</option>
-        <option {% if data['status'] == 'Random' %} selected="selected" {% endif %}>Random</option>
-        <option {% if data['status'] == 'Dropped' %} selected="selected" {% endif %}>Dropped</option>
-        <option {% if data['status'] == 'Plan to Watch' %} selected="selected"{% endif %}>Plan to Watch</option>
+    '{{ media.id }}', this, '{{ media.get_eps_per_season() }}', '{{ media_list }}')">
+        <option {% if user_list_info.status == 'Watching' %} selected="selected" {% endif %}>Watching</option>
+        <option {% if user_list_info.status == 'Completed' %} selected="selected" {% endif %}>Completed</option>
+        <option {% if user_list_info.status == 'On Hold' %} selected="selected" {% endif %}>On Hold</option>
+        <option {% if user_list_info.status == 'Random' %} selected="selected" {% endif %}>Random</option>
+        <option {% if user_list_info.status == 'Dropped' %} selected="selected" {% endif %}>Dropped</option>
+        <option {% if user_list_info.status == 'Plan to Watch' %} selected="selected"{% endif %}>Plan to Watch</option>
     </select>
 {% endblock cat_select %}
 
@@ -182,8 +182,8 @@
             <a href="{{ url_for('users.account', user_name=follow[0].username) }}">
                 <div class="follow-div text-light">
                     <div class="text-light">
-                        <img class="follow-img" src="{{ url_for('static',
-                        filename='profile_pics/'+follow[0].image_file) }}" alt=""/>
+                        <img class="follow-img" src="{{ url_for('static', filename='profile_pics/'
+                        +follow[0].image_file) }}" alt=""/>
                         <h5 style="display: inline-block;"><b>&nbsp;&nbsp;{{ follow[0].username }}</b></h5>
                         <i class="fa-sm fa-heart m-l-10{% if follow[1].favorite %} fas f-favorited{% else %}
                         far f-no-fav{% endif %}"></i>
@@ -196,22 +196,14 @@
                         <i class="fas fa-list"></i>
                         <b>&nbsp;Status:&nbsp;{{ follow[1].status.value }}</b>
                     </div>
-                    {% if media_list != 'movieslist' and media_list != 'gameslist' %}
-                        {% if follow[1].status.value == 'Completed' or follow[1].status.value == 'Random'
-                        or follow[1].status.value == 'Plan to Watch' %}
-                        {% else %}
-                            <i class="fas fa-sm fa-play"></i>
-                            <b>&nbsp;Season {{ follow[1].current_season }} - Episode
-                                {{ follow[1].last_episode_watched }}</b>
-                        {% endif %}
+                    {% set check_status = ['Completed', 'Random', 'Plan to Watch'] %}
+                    {% if follow[1].status.value not in check_status %}
+                        <i class="fas fa-sm fa-play"></i>
+                        <b>&nbsp;Season {{ follow[1].current_season }} - Episode {{ follow[1].last_episode_watched }}</b>
                     {% endif %}
-                    {% if follow[1].status.value == 'Completed' and media_list != 'gameslist' %}
+                    {% if follow[1].status.value == 'Completed' %}
                         <i class="fas fas-sm fa-redo"></i>
-                        <b>&nbsp;Re-watched:&nbsp; {{ follow[1].rewatched }}</b>
-                    {% endif %}
-                    {% if media_list == 'gameslist' %}
-                        <i class="fas fas-sm fa-hourglass"></i>
-                        <b>&nbsp;Playtime:&nbsp; {{ (follow[1].playtime/60)|int }} hours</b>
+                        <b>&nbsp;Rewatched:&nbsp; {{ follow[1].rewatched }}</b>
                     {% endif %}
                     {% if follow[1].comment %}
                         <div class="m-t-10"><b>Comment:</b></div>
