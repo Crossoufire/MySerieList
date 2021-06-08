@@ -1,19 +1,18 @@
-import json
-import pytz
-from sqlalchemy import and_
-from wtforms.ext.sqlalchemy.orm import model_form
-
+from PIL import Image
 from MyLists import db, app
 from datetime import datetime
-from MyLists.API_data import ApiData, TMDBMixin, ApiGames
+import os, json, secrets, pytz
+from flask_wtf import FlaskForm
+from wtforms_alchemy import model_form_factory
+from flask_wtf.file import FileAllowed, FileField
 from flask_login import login_required, current_user
-from MyLists.main.forms import EditMediaData, MediaComment, SearchForm
+from MyLists.main.forms import MediaComment, SearchForm
+from MyLists.API_data import ApiData, TMDBMixin, ApiGames
 from MyLists.main.media_object import change_air_format, Autocomplete
-from MyLists.main.functions import set_last_update, compute_time_spent, check_cat_type, save_new_cover
+from MyLists.main.functions import compute_time_spent, check_cat_type
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect, session
-from MyLists.models import Movies, MoviesActors, Series, SeriesList, SeriesNetwork, Anime, AnimeActors, AnimeNetwork, \
-    AnimeList, ListType, SeriesActors, MoviesList, Status, RoleType, MediaType, get_next_airing, check_media, User, \
-    get_media_query, GamesList, get_more_stats, get_games_stats, UserLastUpdate, get_models_group
+from MyLists.models import SeriesList, AnimeList, ListType, MoviesList, Status, RoleType, MediaType, get_next_airing, \
+    check_media, User, get_media_query, GamesList, get_more_stats, get_games_stats, UserLastUpdate, get_models_group
 
 bp = Blueprint('main', __name__)
 
@@ -158,149 +157,48 @@ def media_sheet(media_type, media_id):
                            media_list=models[0]._group[0].value)
 
 
-""" A CHECK LE <MODEL_FORM> DE WTFORMS """
 @bp.route("/media_sheet_form/<media_type>/<media_id>", methods=['GET', 'POST'])
 @login_required
 def media_sheet_form(media_type, media_id):
     if current_user.role == RoleType.USER:
         abort(403)
 
-    # Check if <media_type> is valid
     try:
         media_type = MediaType(media_type)
         models = get_models_group(media_type)
     except ValueError:
         abort(404)
 
-    form = EditMediaData()
+    ModelForm = model_form_factory(FlaskForm)
 
-    TestForm = model_form(models[0])
-    print(TestForm)
+    class Form(ModelForm):
+        class Meta:
+            model = models[0]
+        image_cover = FileField('image_cover', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
 
-    # media = models[0].query.filter_by(id=media_id).first()
-    # if not media:
-    #     abort(404)
+    media = models[0].query.filter_by(id=media_id).first()
+    form = Form(obj=media)
 
-    # if request.method == 'GET':
-    #     form.original_name.data = media.original_name
-    #     form.name.data = media.name
-    #     form.homepage.data = media.homepage
-    #     form.synopsis.data = media.synopsis
-    #     # form.genres.data = ', '.join([r.genre for r in media.genres])
-    #     form.actors.data = ', '.join([r.name for r in media.actors])
-    #     if list_type != ListType.MOVIES:
-    #         form.created_by.data = media.created_by
-    #         form.first_air_date.data = media.first_air_date
-    #         form.last_air_date.data = media.last_air_date
-    #         form.production_status.data = media.status
-    #         form.duration.data = media.duration
-    #         form.origin_country.data = media.origin_country
-    #         form.networks.data = ', '.join([r.network for r in media.networks])
-    #     elif list_type == ListType.MOVIES:
-    #         form.directed_by.data = media.director_name
-    #         form.release_date.data = media.release_date
-    #         form.duration.data = media.duration
-    #         form.original_language.data = media.original_language
-    #         form.tagline.data = media.tagline
-    #         form.budget.data = media.budget
-    #         form.revenue.data = media.revenue
-    # if form.validate_on_submit():
-    #     if form.cover.data:
-    #         media.image_cover = save_new_cover(form.cover.data, media_type)
-    #     media.original_name = form.original_name.data
-    #     media.name = form.name.data
-    #     media.homepage = form.homepage.data
-    #     media.synopsis = form.synopsis.data
-    #     if list_type != ListType.MOVIES:
-    #         media.created_by = form.created_by.data
-    #         media.first_air_date = form.first_air_date.data
-    #         media.last_air_date = form.last_air_date.data
-    #         media.status = form.production_status.data
-    #         media.duration = form.duration.data
-    #         media.origin_country = form.origin_country.data
-    #     elif list_type == ListType.MOVIES:
-    #         media.director_name = form.directed_by.data
-    #         media.release_date = form.release_date.data
-    #         media.duration = form.duration.data
-    #         media.original_language = form.original_language.data
-    #         media.tagline = form.tagline.data
-    #         media.budget = form.budget.data
-    #         media.revenue = form.revenue.data
-    #
-    #     db.session.commit()
-    #
-    #     if list_type == ListType.SERIES or list_type == ListType.ANIME:
-    #         if [r.name for r in media.actors] == form.actors.data.split(', '):
-    #             pass
-    #         else:
-    #             for actor in [r.name for r in media.actors]:
-    #                 if list_type == ListType.SERIES:
-    #                     SeriesActors.query.filter_by(media_id=media_id, name=actor).delete()
-    #                 elif list_type == ListType.ANIME:
-    #                     AnimeActors.query.filter_by(media_id=media_id, name=actor).delete()
-    #                 elif list_type == ListType.MOVIES:
-    #                     MoviesActors.query.filter_by(media_id=media_id, name=actor).delete()
-    #             db.session.commit()
-    #             for actor in form.actors.data.split(', '):
-    #                 if list_type == ListType.SERIES:
-    #                     add_actor = SeriesActors(media_id=media_id,
-    #                                              name=actor)
-    #                 elif list_type == ListType.ANIME:
-    #                     add_actor = AnimeActors(media_id=media_id,
-    #                                             name=actor)
-    #                 elif list_type == ListType.MOVIES:
-    #                     add_actor = MoviesActors(media_id=media_id,
-    #                                              name=actor)
-    #                 db.session.add(add_actor)
-    #             db.session.commit()
-    #
-    #         # Genres
-    #         # if [r.genre for r in element.genres] == form.genres.data.split(', '):
-    #         #     pass
-    #         # else:
-    #         #     for genre in [r.genre for r in element.genres]:
-    #         #         if list_type == ListType.SERIES:
-    #         #             SeriesGenre.query.filter_by(media_id=media_id, genre=genre).delete()
-    #         #         elif list_type == ListType.ANIME:
-    #         #             AnimeGenre.query.filter_by(media_id=media_id, genre=genre).delete()
-    #         #         elif list_type == ListType.MOVIES:
-    #         #             MoviesGenre.query.filter_by(media_id=media_id, genre=genre).delete()
-    #         #     db.session.commit()
-    #         #     for genre in form.genres.data.split(', '):
-    #         #         if list_type == ListType.SERIES:
-    #         #             add_genre = SeriesGenre(media_id=media_id,
-    #         #                                     genre=genre)
-    #         #         elif list_type == ListType.ANIME:
-    #         #             add_genre = AnimeGenre(media_id=media_id,
-    #         #                                    genre=genre)
-    #         #         elif list_type == ListType.MOVIES:
-    #         #             add_genre = MoviesGenre(media_id=media_id,
-    #         #                                     genre=genre)
-    #         #         db.session.add(add_genre)
-    #         #     db.session.commit()
-    #
-    #         # Networks
-    #     elif list_type != ListType.MOVIES:
-    #         if [r.network for r in media.networks] == form.networks.data.split(', '):
-    #             pass
-    #         else:
-    #             for network in [r.network for r in media.networks]:
-    #                 if list_type == ListType.SERIES:
-    #                     SeriesNetwork.query.filter_by(media_id=media_id, network=network).delete()
-    #                 elif list_type == ListType.ANIME:
-    #                     AnimeNetwork.query.filter_by(media_id=media_id, network=network).delete()
-    #             db.session.commit()
-    #             for network in form.networks.data.split(', '):
-    #                 if list_type == ListType.SERIES:
-    #                     add_network = SeriesNetwork(media_id=media_id,
-    #                                                 network=network)
-    #                 elif list_type == ListType.ANIME:
-    #                     add_network = AnimeNetwork(media_id=media_id,
-    #                                                network=network)
-    #                 db.session.add(add_network)
-    #             db.session.commit()
-    #
-    #     return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media_id))
+    if form.is_submitted():
+        if form.image_cover.data != media.image_cover:
+            _, f_ext = os.path.splitext(form.image_cover.data.filename)
+            picture_fn = secrets.token_hex(8) + f_ext
+            picture_path = os.path.join(app.root_path, f'static/covers/{models[0].__name__.lower()}_covers', picture_fn)
+
+            try:
+                i = Image.open(form.image_cover.data)
+                i = i.resize((300, 450), Image.ANTIALIAS)
+                i.save(picture_path, quality=90)
+            except Exception as e:
+                app.logger.error('[SYSTEM] Error occured updating media cover: {}'.format(e))
+                flash(str(e), 'warning')
+                picture_fn = media.image_cover
+
+            form.image_cover.data = picture_fn
+        form.populate_obj(media)
+        db.session.add(media)
+        db.session.commit()
+        return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media_id))
 
     return render_template('media_sheet_form.html', title='Media Form', form=form, media_type=media_type.value)
 

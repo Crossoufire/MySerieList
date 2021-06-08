@@ -130,7 +130,7 @@
             </div>
         </div>
 
-        {% if current_user.role.value != 'user' and media_list != 'gameslist' %}
+        {% if current_user.role.value != 'user' %}
             <div class="m-b-30 text-right">
                 {% if media.lock_status %}
                     <div class="custom-control custom-switch">

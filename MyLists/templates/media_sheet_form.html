@@ -9,7 +9,6 @@
             border: transparent;
             padding: 8px;
         }
-
         .form {
             margin-left: auto;
             margin-right: auto;
@@ -22,80 +21,17 @@
 {% block content %}
     <h4 class="m-t-30 text-center"><i class="fas fa-sliders-h"></i>&nbsp; Edit Media Data</h4>
     <hr class="m-t-0 m-b-25" style="border-color: darkslateblue;">
-
-    {% if media_type == 'Series' or media_type == 'Anime' %}
-        <form method="POST" action="" enctype="multipart/form-data" class="form m-b-50">
-            {{ form.hidden_tag() }}
-            <div class="row">
-                <div class="col-3 p-2 m-t-8">{{ form.cover.label }}:</div>
-                <div class="col-9 p-2">{{ form.cover(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.original_name.label }}:</div>
-                <div class="col-9 p-2">{{ form.original_name(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.name.label }}:</div>
-                <div class="col-9 p-2">{{ form.name(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.created_by.label }}:</div>
-                <div class="col-9 p-2">{{ form.created_by(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.first_air_date.label }}:</div>
-                <div class="col-9 p-2">{{ form.first_air_date(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.last_air_date.label }}:</div>
-                <div class="col-9 p-2">{{ form.last_air_date(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.production_status.label }}:</div>
-                <div class="col-9 p-2">{{ form.production_status(size=70) }}</div>
-                {#                <div class="col-3 p-2 m-t-8">{{ form.genres.label }}:</div>#}
-                {#                <div class="col-9 p-2">{{ form.genres(size=70) }}</div>#}
-                <div class="col-3 p-2 m-t-8">{{ form.actors.label }}:</div>
-                <div class="col-9 p-2">{{ form.actors(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.duration.label }}:</div>
-                <div class="col-9 p-2">{{ form.duration(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.origin_country.label }}:</div>
-                <div class="col-9 p-2">{{ form.origin_country(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.networks.label }}:</div>
-                <div class="col-9 p-2">{{ form.networks(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.homepage.label }}:</div>
-                <div class="col-9 p-2">{{ form.homepage(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.synopsis.label }}:</div>
-                <div class="col-9 p-2">{{ form.synopsis(class="text-justify text-light", rows="5", cols="72",
+    <form class="form m-b-50" action="" method="POST" enctype="multipart/form-data">
+        {{ form.csrf_token }}
+        <div class="row">
+            {% for field in form %}
+                <div class="col-3 p-2 m-t-8">{{ field.label() }}</div>
+                <div class="col-9 p-2">{{ field(class="text-justify text-light", rows="5", cols="72",
                 style="background: #21263b; border: transparent;") }}</div>
-                <div class="col-12 m-t-10 text-center">{{ form.submit(class="btn btn-outline-info") }}</div>
-            </div>
-        </form>
-    {% elif media_type == 'Movies' %}
-        <form method="POST" action="" enctype="multipart/form-data" class="form m-b-50">
-            {{ form.hidden_tag() }}
-            <div class="row">
-                <div class="col-3 p-2 m-t-8">{{ form.cover.label }}:</div>
-                <div class="col-9 p-2">{{ form.cover(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.original_name.label }}:</div>
-                <div class="col-9 p-2">{{ form.original_name(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.name.label }}:</div>
-                <div class="col-9 p-2">{{ form.name(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.directed_by.label }}:</div>
-                <div class="col-9 p-2">{{ form.directed_by(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.release_date.label }}:</div>
-                <div class="col-9 p-2">{{ form.release_date(size=70) }}</div>
-                {#                <div class="col-3 p-2 m-t-8">{{ form.genres.label }}:</div>#}
-                {#                <div class="col-9 p-2">{{ form.genres(size=70) }}</div>#}
-                <div class="col-3 p-2 m-t-8">{{ form.actors.label }}:</div>
-                <div class="col-9 p-2">{{ form.actors(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.duration.label }}:</div>
-                <div class="col-9 p-2">{{ form.duration(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.original_language.label }}:</div>
-                <div class="col-9 p-2">{{ form.original_language(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.tagline.label }}:</div>
-                <div class="col-9 p-2">{{ form.tagline(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.homepage.label }}:</div>
-                <div class="col-9 p-2">{{ form.homepage(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.budget.label }}:</div>
-                <div class="col-9 p-2">{{ form.budget(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.revenue.label }}:</div>
-                <div class="col-9 p-2">{{ form.revenue(size=70) }}</div>
-                <div class="col-3 p-2 m-t-8">{{ form.synopsis.label }}:</div>
-                <div class="col-9 p-2">{{ form.synopsis(class="text-justify text-light", rows="5", cols="72",
-                style="background: #21263b; border: transparent;") }}</div>
-                <div class="col-12 m-t-10 text-center">{{ form.submit(class="btn btn-outline-info") }}</div>
-            </div>
-        </form>
-    {% endif %}
+            {% endfor %}
+            <button class="btn btn-primary m-t-10" type="submit">Update</button>
+        </div>
+    </form>
 {% endblock content %}
 
 

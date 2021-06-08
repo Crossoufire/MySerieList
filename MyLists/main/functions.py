@@ -1,6 +1,8 @@
 import os
 import secrets
 from PIL import Image
+from flask import flash
+
 from MyLists import db, app
 from datetime import datetime
 from flask_login import current_user
@@ -34,29 +36,6 @@ def check_cat_type(list_type, status):
             return games_status_dict[status]
         except KeyError:
             return None
-
-
-def save_new_cover(cover_file, media_type):
-    if media_type == MediaType.SERIES:
-        cover_path = 'static/covers/series_covers/'
-    elif media_type == MediaType.ANIME:
-        cover_path = 'static/covers/anime_covers/'
-    elif media_type == MediaType.MOVIES:
-        cover_path = 'static/covers/movies_covers/'
-
-    _, f_ext = os.path.splitext(cover_file.filename)
-    picture_fn = secrets.token_hex(8) + f_ext
-    picture_path = os.path.join(app.root_path, cover_path, picture_fn)
-
-    try:
-        i = Image.open(cover_file)
-        i = i.resize((300, 450), Image.ANTIALIAS)
-        i.save(picture_path, quality=90)
-    except Exception as e:
-        app.logger.error('[SYSTEM] Error occured updating media cover: {}'.format(e))
-        return "default.jpg"
-
-    return picture_fn
 
 
 def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0, movie_status=None, movie_delete=False,
