@@ -9,8 +9,8 @@
 {% block cat_select %}
     <select id="category-dropdown" class="text-light text-center cat-drop" onchange="changeCategoryMovies(
     '{{ media.id }}', this)">
-        <option {% if list_info.status.value == 'Completed' %}selected="selected"{% endif %}>Completed</option>
-        <option {% if list_info.status.value == 'Plan to Watch' %}selected="selected"{% endif %}>Plan to Watch</option>
+        <option {% if list_info.status == 'Completed' %}selected="selected"{% endif %}>Completed</option>
+        <option {% if list_info.status == 'Plan to Watch' %}selected="selected"{% endif %}>Plan to Watch</option>
     </select>
 {% endblock cat_select %}
 
@@ -21,7 +21,7 @@
 
 {% block add_redo %}
     <div id="rewatch-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="How many time you rewatched this media.
-     Do not count the inital completion." {% if list_info.status.value == 'Completed'%}{% else %}style="display: none;"{% endif %}>
+     Do not count the inital completion." {% if list_info.status == 'Completed'%}{% else %}style="display: none;"{% endif %}>
         <div class="col-4"><b>Rewatched:</b></div>
         <div class="col-8">
             <label for="rewatched-dropdown"></label>

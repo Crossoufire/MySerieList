@@ -1,22 +1,24 @@
 {% extends "media_sheet_base.html" %}
 
+
 {% set eps_per_season = media.get_eps_per_season() %}
+
 
 {% block cat_select %}
     <select id="category-dropdown" class="text-light text-center cat-drop" onchange="changeCategoryTV(
     '{{ media.id }}', this, '{{ eps_per_season }}', '{{ media_list }}')">
-        <option {% if list_info.status.value == 'Watching' %} selected="selected" {% endif %}>Watching</option>
-        <option {% if list_info.status.value == 'Completed' %} selected="selected" {% endif %}>Completed</option>
-        <option {% if list_info.status.value == 'On Hold' %} selected="selected" {% endif %}>On Hold</option>
-        <option {% if list_info.status.value == 'Random' %} selected="selected" {% endif %}>Random</option>
-        <option {% if list_info.status.value == 'Dropped' %} selected="selected" {% endif %}>Dropped</option>
-        <option {% if list_info.status.value == 'Plan to Watch' %} selected="selected"{% endif %}>Plan to Watch</option>
+        <option {% if list_info.status == 'Watching' %} selected="selected" {% endif %}>Watching</option>
+        <option {% if list_info.status == 'Completed' %} selected="selected" {% endif %}>Completed</option>
+        <option {% if list_info.status == 'On Hold' %} selected="selected" {% endif %}>On Hold</option>
+        <option {% if list_info.status == 'Random' %} selected="selected" {% endif %}>Random</option>
+        <option {% if list_info.status == 'Dropped' %} selected="selected" {% endif %}>Dropped</option>
+        <option {% if list_info.status == 'Plan to Watch' %} selected="selected"{% endif %}>Plan to Watch</option>
     </select>
 {% endblock cat_select %}
 
 
 {% block add_more %}
-    <div id="season-row" class="row m-l-15 m-r-15" {% if list_info.status.value == 'Plan to Watch' or list_info.status.value
+    <div id="season-row" class="row m-l-15 m-r-15" {% if list_info.status == 'Plan to Watch' or list_info.status
      == 'Random' %} style="display: none;" {% endif %}>
         <div class="col-4"><b>Season:</b></div>
         <div class="col-8">
@@ -32,14 +34,14 @@
             &nbsp;<i id="season-check" class="fas fa-check" style="display: none;"></i>
         </div>
     </div>
-    <div id="episode-row" class="row m-l-15 m-r-15" {% if list_info.status.value == 'Plan to Watch' or list_info.status.value
+    <div id="episode-row" class="row m-l-15 m-r-15" {% if list_info.status == 'Plan to Watch' or list_info.status
      == 'Random' %} style="display: none;" {% endif %}>
         <div class="col-4"><b>Episode:</b></div>
         <div class="col-8">
             <label for="episode-dropdown"></label>
             <select id="episode-dropdown" class="text-light text-center cat-drop" onchange="updateEpisode(
              '{{ media.id }}', this, '{{ media_list }}')">
-                {% if list_info.status.value == 'Plan to Watch' or list_info.status.value == 'Random' %}
+                {% if list_info.status == 'Plan to Watch' or list_info.status == 'Random' %}
                     {% for i in range(0, eps_per_season[list_info.current_season - 1]) %}
                         <option {% if i + 1 == 1 %} selected="selected" {% endif %} value="{{ i }}">{{ i + 1 }}</option>
                     {% endfor %}
@@ -59,7 +61,7 @@
 
 {% block add_redo %}
     <div id="rewatch-row" class="row m-l-15 m-r-15" data-toggle="tooltip" title="How many time you rewatched this media.
-     Do not count the inital completion." {% if list_info.status.value == 'Completed' %}{% else %}style="display: none;"{% endif %}>
+     Do not count the inital completion." {% if list_info.status == 'Completed' %}{% else %}style="display: none;"{% endif %}>
         <div class="col-4"><b>Rewatched:</b></div>
         <div class="col-8">
             <label for="rewatched-dropdown"></label>
@@ -134,7 +136,8 @@
             </li>
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-clock"></i><b>&nbsp; Completion</b></h5>
-                <div>{{ (media.duration * media.total_episodes)//60 }} h {{ '%02d'|format((media.duration * media.total_episodes)%60) }} min</div>
+                <div>{{ (media.duration * media.total_episodes)//60 }} h {{ '%02d'|format((media.duration * media.total_episodes)%60) }} min
+                </div>
             </li>
             <li class="m-b-15">
                 <h5 class="mb-1 text-media"><i class="fas fa-flag"></i><b>&nbsp; Origin country</b></h5>

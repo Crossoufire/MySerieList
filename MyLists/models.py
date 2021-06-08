@@ -9,7 +9,6 @@ import json
 import pykakasi
 import pytz
 import random
-
 import requests
 import rq
 from flask import abort, url_for
@@ -104,12 +103,12 @@ class RoleType(Enum):
     USER = "user"
 
 
+# --- USERS -------------------------------------------------------------------------------------------------------
+
+
 followers = db.Table('followers',
                      db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
                      db.Column('followed_id', db.Integer, db.ForeignKey('user.id')))
-
-
-# --- USERS -------------------------------------------------------------------------------------------------------
 
 
 class User(UserMixin, db.Model):
@@ -321,6 +320,31 @@ class UserLastUpdate(db.Model):
     new_episode = db.Column(db.Integer)
     date = db.Column(db.DateTime, nullable=False)
 
+    @classmethod
+    def set_last_update(cls, media, media_type, old_status=None, new_status=None, old_season=None,
+                        new_season=None, old_episode=None, new_episode=None, user_id=None):
+
+        # Use for the list import function (redis and rq backgound process), can't import the <current_user> context
+        if current_user:
+            user_id = current_user.id
+
+        check = cls.query.filter_by(user_id=user_id, media_type=media_type, media_id=media.id) \
+            .order_by(cls.date.desc()).first()
+
+        diff = 10000
+        if check:
+            diff = (datetime.utcnow()-check.date).total_seconds()
+
+        update = cls(user_id=user_id, media_name=media.name, media_id=media.id, media_type=media_type,
+                     old_status=old_status, new_status=new_status, old_season=old_season, new_season=new_season,
+                     old_episode=old_episode, new_episode=new_episode, date=datetime.utcnow())
+
+        if diff > 600:
+            db.session.add(update)
+        else:
+            db.session.delete(check)
+            db.session.add(update)
+
 
 class RedisTasks(db.Model):
     _group = ['User']
@@ -383,14 +407,6 @@ class MediaMixin(object):
             .filter(followers.c.follower_id == current_user.id, media_list.media_id == self.id).all()
         return in_follows_lists
 
-    def in_user_list(self):
-        in_user_list = self.list_info.filter_by(user_id=current_user.id).first()
-        # if not in_user_list:
-        #     in_user_list = {'last_episode_watched': 1, 'current_season': 1, 'score': '---', 'favorite': False,
-        #                     'status': Status.WATCHING.value, 'rewatched': 0, 'comment': None}
-        #     in_user_list = dotdict(in_user_list)
-        return in_user_list
-
     def get_latin_name(self):
         pass
 
@@ -410,6 +426,16 @@ class MediaMixin(object):
             search = {'api_id': media_id}
 
         return cls.query.filter_by(**search).first()
+
+    @classmethod
+    def check_media(cls, media_id):
+        media_list = eval(cls.__name__+'List')
+
+        query = db.session.query(cls, media_list) \
+            .join(cls, cls.id == media_list.media_id) \
+            .filter(cls.id == media_id, media_list.user_id == current_user.id).first()
+
+        return query
 
 
 class MediaListMixin(object):
@@ -546,12 +572,24 @@ class TVBase(db.Model):
     def get_eps_per_season(self):
         return [r.episodes for r in self.eps_per_season]
 
+    def get_user_list_info(self):
+        tmp = self.list_info.filter_by(user_id=current_user.id).first()
+        data = {'in_list': False, 'last_episode_watched': 1, 'current_season': 1, 'score': '---',
+                'favorite': False, 'status': Status.WATCHING.value, 'rewatched': 0, 'comment': None}
+        if tmp:
+            data = {'in_list': True, 'last_episode_watched': tmp.last_episode_watched,
+                    'current_season': tmp.current_season, 'score': tmp.score, 'favorite': tmp.favorite,
+                    'status': tmp.status.value, 'rewatched': tmp.rewatched, 'comment': tmp.comment}
+        data = dotdict(data)
+        return data
+
 
 # --- SERIES ------------------------------------------------------------------------------------------------------
 
 
 class Series(MediaMixin, TVBase):
     _group = (ListType.SERIES, MediaType.SERIES)
+    _type = 'Media'
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -567,6 +605,18 @@ class Series(MediaMixin, TVBase):
     @staticmethod
     def media_sheet_template():
         return 'media_sheet_series.html'
+
+    @classmethod
+    def compute_time_spent(cls, media=None, old_watched=0, new_watched=0,  new_rewatch=0, old_rewatch=0, user_id=None):
+        # Use for the list import function (redis and rq backgound process), can't import the <current_user> context
+        if current_user:
+            user = current_user
+        else:
+            user = User.query.filter(User.id == user_id).first()
+
+        old_time = user.time_spent_series
+        user.time_spent_series = old_time + ((new_watched-old_watched) * media.duration) + \
+                                 (media.total_episodes * media.duration * (new_rewatch - old_rewatch))
 
 
 class SeriesList(MediaListMixin, db.Model):
@@ -625,6 +675,7 @@ class SeriesActors(db.Model):
 
 class Anime(MediaMixin, TVBase):
     _group = (ListType.ANIME, MediaType.ANIME)
+    _type = 'Media'
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -640,6 +691,18 @@ class Anime(MediaMixin, TVBase):
 
     def get_media_cover(self):
         return url_for('static', filename='covers/anime_covers/'+self.image_cover)
+
+    @classmethod
+    def compute_time_spent(cls, media=None, old_watched=0, new_watched=0, new_rewatch=0, old_rewatch=0, user_id=None):
+        # Use for the list import function (redis and rq backgound process), can't import the current_user context
+        if current_user:
+            user = current_user
+        else:
+            user = User.query.filter(User.id == user_id).first()
+
+        old_time = user.time_spent_anime
+        user.time_spent_anime = old_time + ((new_watched - old_watched) * media.duration) + (
+                media.total_episodes * media.duration * (new_rewatch - old_rewatch))
 
 
 class AnimeList(MediaListMixin, db.Model):
@@ -698,6 +761,7 @@ class AnimeActors(db.Model):
 
 class Movies(MediaMixin, db.Model):
     _group = (ListType.MOVIES, MediaType.MOVIES)
+    _type = 'Media'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -729,6 +793,39 @@ class Movies(MediaMixin, db.Model):
 
     def get_media_cover(self):
         return url_for('static', filename='covers/movies_covers/'+self.image_cover)
+
+    def get_user_list_info(self):
+        tmp = self.list_info.filter_by(user_id=current_user.id).first()
+        data = {'in_list': False, 'score': '---', 'favorite': False, 'status': Status.COMPLETED.value,
+                'rewatched': 0, 'comment': None}
+        if tmp:
+            data = {'in_list': True, 'score': tmp.score, 'favorite': tmp.favorite, 'status': tmp.status.value,
+                    'rewatched': tmp.rewatched, 'comment': tmp.comment}
+        data = dotdict(data)
+        return data
+
+    @classmethod
+    def compute_time_spent(cls, media=None, movie_status=None, movie_delete=False, movie_add=False, new_rewatch=0,
+                           old_rewatch=0, movie_duration=0, user_id=None):
+
+        # Use for the list import function (redis and rq backgound process), can't import the current_user context
+        if current_user:
+            user = current_user
+        else:
+            user = User.query.filter(User.id == user_id).first()
+
+        old_time = user.time_spent_movies
+        if movie_delete:
+            if movie_status == Status.COMPLETED:
+                user.time_spent_movies = old_time - media.duration + media.duration * (new_rewatch - old_rewatch)
+        elif movie_add:
+            if movie_status == Status.COMPLETED:
+                user.time_spent_movies = old_time + media.duration
+        else:
+            if movie_status == Status.COMPLETED:
+                user.time_spent_movies = old_time + movie_duration + media.duration * (new_rewatch - old_rewatch)
+            else:
+                user.time_spent_movies = old_time - movie_duration + media.duration * (new_rewatch - old_rewatch)
 
 
 class MoviesList(MediaListMixin, db.Model):
@@ -797,8 +894,46 @@ class Games(MediaMixin, db.Model):
     def media_sheet_template():
         return 'media_sheet_games.html'
 
+    def get_user_list_info(self):
+        tmp = self.list_info.filter_by(user_id=current_user.id).first()
+        data = {'in_list': False, 'score': '---', 'favorite': False, 'status': Status.COMPLETED.value,
+                'playtime': 0, 'comment': None}
+        if tmp:
+            data = {'in_list': True, 'score': tmp.score, 'favorite': tmp.favorite, 'status': tmp.status.value,
+                    'playtime': tmp.playtime, 'comment': tmp.comment}
+        data = dotdict(data)
+        return data
+
     def get_media_cover(self):
         return url_for('static', filename='covers/games_covers/'+self.image_cover)
+
+    def get_developers(self):
+        data = []
+        for company in self.companies:
+            if company.developer is True:
+                data.append(company.name)
+        return ", ".join(data)
+
+    def get_platforms(self):
+        return ", ".join([r.name for r in self.platforms])
+
+    def get_publishers(self):
+        data = []
+        for company in self.companies:
+            if company.publisher is True:
+                data.append(company.name)
+        return ", ".join(data)
+
+    @classmethod
+    def compute_time_spent(cls, old_gametime=0, new_gametime=0, user_id=None):
+        # Use for the list import function (redis and rq backgound process), can't import the current_user context
+        if current_user:
+            user = current_user
+        else:
+            user = User.query.filter(User.id == user_id).first()
+
+        old_time = current_user.time_spent_games
+        user.time_spent_games = old_time + new_gametime - old_gametime
 
 
 class GamesList(MediaListMixin, db.Model):
@@ -1256,25 +1391,6 @@ def get_media_count(user_id, list_type):
     return common_ids, common_elements
 
 
-# Recover the next airing media for the user
-def get_next_airing(list_type):
-    media = eval(list_type.value.capitalize().replace('list', ''))
-    media_list = eval(list_type.value.capitalize().replace('l', 'L'))
-
-    if list_type != ListType.MOVIES:
-        media_data = media.next_episode_to_air
-    else:
-        media_data = Movies.release_date
-
-    query = db.session.query(media, media_list) \
-        .join(media, media.id == media_list.media_id) \
-        .filter(media_data > datetime.utcnow(), media_list.user_id == current_user.id,
-                and_(media_list.status != Status.RANDOM, media_list.status != Status.DROPPED)) \
-        .order_by(media_data.asc()).all()
-
-    return query
-
-
 # Recover the total time by medialist for all users
 def compute_media_time_spent():
     for list_type in ListType:
@@ -1295,6 +1411,25 @@ def compute_media_time_spent():
 
         for q in query:
             setattr(q[0], f"time_spent_{list_type.value.replace('list', '')}", q[3])
+
+
+# Recover the next airing media for the user
+def get_next_airing(list_type):
+    media = eval(list_type.value.capitalize().replace('list', ''))
+    media_list = eval(list_type.value.capitalize().replace('l', 'L'))
+
+    if list_type != ListType.MOVIES:
+        media_data = media.next_episode_to_air
+    else:
+        media_data = Movies.release_date
+
+    query = db.session.query(media, media_list) \
+        .join(media, media.id == media_list.media_id) \
+        .filter(media_data > datetime.utcnow(), media_list.user_id == current_user.id,
+                and_(media_list.status != Status.RANDOM, media_list.status != Status.DROPPED)) \
+        .order_by(media_data.asc()).all()
+
+    return query
 
 
 # Check if <media> exists

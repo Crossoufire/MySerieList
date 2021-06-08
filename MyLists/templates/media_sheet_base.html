@@ -18,7 +18,7 @@
                     <img class="media-cover" src={{ media.get_media_cover() }} alt=""/>
                 </div>
                 <div class="m-b-15 m-t-15">
-                    <div id="your-medialist-data" class="p-2" {% if not list_info %}style="display: none;"{% endif %}>
+                    <div id="your-medialist-data" class="p-2" {% if not list_info.in_list %}style="display: none;"{% endif %}>
                         <h4 id="fav-title" class="m-l-15 m-r-15">
                             <i class="fas fa-list"></i>&nbsp;&nbsp; <b>List info</b>
                             <i id="favorite" class="fa-heart m-t-3{% if list_info.favorite %} fas favorited {% else %}
@@ -79,7 +79,7 @@
                         </div>
                     </div>
                     <div class="text-center">
-                        <button id="add-to-list" class="btn btn-smaller btn-info"{% if list_info %}
+                        <button id="add-to-list" class="btn btn-smaller btn-info"{% if list_info.in_list %}
                          style="display: none;" {% endif %} onclick="addToUser('{{ media.id }}', '{{ media_list }}')">
                             <i class="fas fa-plus"></i>&nbsp; Add to your list</button>
                         <i id="loading-add-list" class="fas fa-spinner fast-spin" style="display: none;"></i>

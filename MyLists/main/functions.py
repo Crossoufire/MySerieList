@@ -59,31 +59,6 @@ def save_new_cover(cover_file, media_type):
     return picture_fn
 
 
-def set_last_update(media, media_type, old_status=None, new_status=None, old_season=None, new_season=None,
-                    old_episode=None, new_episode=None, user_id=None):
-
-    # Use for the list import function (redis and rq backgound process), can't import the current_user context
-    if current_user:
-        user_id = current_user.id
-
-    check = UserLastUpdate.query.filter_by(user_id=user_id, media_type=media_type, media_id=media.id) \
-        .order_by(UserLastUpdate.date.desc()).first()
-
-    diff = 10000
-    if check:
-        diff = (datetime.utcnow() - check.date).total_seconds()
-
-    update = UserLastUpdate(user_id=user_id, media_name=media.name, media_id=media.id, media_type=media_type,
-                            old_status=old_status, new_status=new_status, old_season=old_season, new_season=new_season,
-                            old_episode=old_episode, new_episode=new_episode, date=datetime.utcnow())
-
-    if diff > 600:
-        db.session.add(update)
-    else:
-        db.session.delete(check)
-        db.session.add(update)
-
-
 def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0, movie_status=None, movie_delete=False,
                        movie_add=False, new_rewatch=0, old_rewatch=0, movie_duration=0, old_gametime=0, new_gametime=0,
                        user_id=None):
