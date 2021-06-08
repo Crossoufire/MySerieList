@@ -12,7 +12,8 @@ from MyLists.main.media_object import change_air_format, Autocomplete
 from MyLists.main.functions import compute_time_spent, check_cat_type
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect, session
 from MyLists.models import SeriesList, AnimeList, ListType, MoviesList, Status, RoleType, MediaType, get_next_airing, \
-    check_media, User, get_media_query, GamesList, get_more_stats, get_games_stats, UserLastUpdate, get_models_group
+    check_media, User, get_media_query, GamesList, get_more_stats, get_games_stats, UserLastUpdate, get_models_group, \
+    get_models_type
 
 bp = Blueprint('main', __name__)
 
@@ -184,7 +185,6 @@ def media_sheet_form(media_type, media_id):
             _, f_ext = os.path.splitext(form.image_cover.data.filename)
             picture_fn = secrets.token_hex(8) + f_ext
             picture_path = os.path.join(app.root_path, f'static/covers/{models[0].__name__.lower()}_covers', picture_fn)
-
             try:
                 i = Image.open(form.image_cover.data)
                 i = i.resize((300, 450), Image.ANTIALIAS)
@@ -193,7 +193,6 @@ def media_sheet_form(media_type, media_id):
                 app.logger.error('[SYSTEM] Error occured updating media cover: {}'.format(e))
                 flash(str(e), 'warning')
                 picture_fn = media.image_cover
-
             form.image_cover.data = picture_fn
         form.populate_obj(media)
         db.session.add(media)
@@ -207,6 +206,11 @@ def media_sheet_form(media_type, media_id):
 @bp.route("/your_next_airing", methods=['GET', 'POST'])
 @login_required
 def your_next_airing():
+    # models = get_models_type('Media')
+    # data = []
+    # for model in models:
+    #     data.append(model.get_next_airing())
+
     next_series_airing = get_next_airing(ListType.SERIES)
     next_anime_airing = get_next_airing(ListType.ANIME)
     next_movies_airing = get_next_airing(ListType.MOVIES)

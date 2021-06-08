@@ -583,6 +583,17 @@ class TVBase(db.Model):
         data = dotdict(data)
         return data
 
+    @classmethod
+    def get_next_airing(cls):
+        media_list = eval(cls.__name__ + 'List')
+        query = db.session.query(cls, media_list) \
+            .join(cls, cls.id == media_list.media_id) \
+            .filter(cls.next_episode_to_air > datetime.utcnow(), media_list.user_id == current_user.id,
+                    and_(media_list.status != Status.RANDOM, media_list.status != Status.DROPPED)) \
+            .order_by(cls.next_episode_to_air.asc()).all()
+
+        return query
+
 
 # --- SERIES ------------------------------------------------------------------------------------------------------
 
@@ -827,6 +838,16 @@ class Movies(MediaMixin, db.Model):
             else:
                 user.time_spent_movies = old_time - movie_duration + media.duration * (new_rewatch - old_rewatch)
 
+    @classmethod
+    def get_next_airing(cls):
+        media_list = eval(cls.__name__ + 'List')
+        query = db.session.query(cls, media_list) \
+            .join(cls, cls.id == media_list.media_id) \
+            .filter(cls.release_date > datetime.utcnow(), media_list.user_id == current_user.id) \
+            .order_by(cls.release_date.asc()).all()
+
+        return query
+
 
 class MoviesList(MediaListMixin, db.Model):
     _group = (ListType.MOVIES, MediaType.MOVIES)
@@ -865,6 +886,7 @@ class MoviesActors(db.Model):
 
 class Games(MediaMixin, db.Model):
     _group = (ListType.GAMES, MediaType.GAMES)
+    _type = 'Media'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -893,6 +915,16 @@ class Games(MediaMixin, db.Model):
     @staticmethod
     def media_sheet_template():
         return 'media_sheet_games.html'
+
+    @classmethod
+    def get_next_airing(cls):
+        media_list = eval(cls.__name__ + 'List')
+        query = db.session.query(cls, media_list) \
+            .join(cls, cls.id == media_list.media_id) \
+            .filter(cls.release_date > datetime.utcnow(), media_list.user_id == current_user.id) \
+            .order_by(cls.release_date.asc()).all()
+
+        return query
 
     def get_user_list_info(self):
         tmp = self.list_info.filter_by(user_id=current_user.id).first()
