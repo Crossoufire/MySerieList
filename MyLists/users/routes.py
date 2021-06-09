@@ -2,7 +2,8 @@ import json
 from MyLists import app, db
 from flask_login import login_required, current_user
 from flask import Blueprint, request, render_template
-from MyLists.models import User, Ranks, Frames, Notifications, UserLastUpdate, RoleType, get_models_type
+from MyLists.models import User, Ranks, Frames, Notifications, UserLastUpdate, RoleType, get_models_type, SeriesList, \
+    Series
 
 bp = Blueprint('users', __name__)
 

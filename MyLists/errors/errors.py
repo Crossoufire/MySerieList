@@ -43,5 +43,5 @@ def error413(e):
 
 @bp.app_errorhandler(500)
 def error500(e):
-    image_error =  get_error_image()
+    image_error = get_error_image()
     return render_template('error.html', title='Error 500', error_code=500, image_error=image_error), 500

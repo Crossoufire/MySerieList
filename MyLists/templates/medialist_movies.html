@@ -1,30 +1,8 @@
 {% extends 'medialist_base.html' %}
 
 
-{% block return_icon %}
-    <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip" title="Serieslist"
-       href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=username) }}"></a>
-    <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip" title="Animelist"
-       href="{{ url_for('main.mymedialist', media_list='animelist', user_name=username) }}"></a>
-    {% if user.add_games %}
-        <a class="fas fa-lg fa-gamepad m-r-10 return-icon text-games" data-toggle="tooltip" title="Gameslist"
-        href="{{ url_for('main.mymedialist', media_list='gameslist', user_name=username) }}"></a>
-    {% endif %}
-{% endblock return_icon %}
-
-
 {% block categories %}
     {% set categories = ['All', 'Completed', 'Plan to Watch', 'Favorite'] %}
-    {% for cat in categories %}
-        <a class="cat-btn{% if category == cat %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
-         media_list=media_list, user_name=username, category=cat, genre=genre, sorting=sorting, page_val=1) }}">
-            <b>{{ cat|upper }}</b>
-        </a>
-    {% endfor %}
-    <a class="cat-btn{% if category == 'Stats' %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
-     media_list=media_list, user_name=username, category='Stats') }}">
-        <b>STATS</b>
-    </a>
 {% endblock categories %}
 
 
@@ -32,31 +10,17 @@
     {% set all_genres = ["All", "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama",
     "Family", "Fantasy", "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "TV Movie", "Thriller",
     "War", "Western"] %}
-    {% for ge in all_genres %}
-        <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
-         user_name=username, category=category, genre=ge, sorting=sorting,
-         page_val=1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
-            <div>{{ ge }}</div>
-        </a>
-    {% endfor %}
 {% endblock add_genres %}
 
 
 {% block add_sort scoped %}
     {% set all_sort = ['Title A-Z', 'Title Z-A', 'Score +', 'Score -', 'Score TMDB +',
     'Score TMDB -', 'Rewatch', 'Comments', 'Release date +','Release date -'] %}
-    {% for so in all_sort %}
-        <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
-         user_name=username, category=category, genre=genre, sorting=so,
-         page_val=1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
-            <div>{{ so }}</div>
-        </a>
-    {% endfor %}
 {% endblock add_sort %}
 
 
 {% block data %}
-    {{ item.genres }}-{{ media_list }}-{{ item.id }}
+    {{ media_list }}-{{ item.id }}
 {% endblock data %}
 
 
