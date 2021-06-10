@@ -82,7 +82,7 @@ function changeCategory(new_category, card_id) {
 
     $.ajax ({
         type: "POST",
-        url: "/change_element_category",
+        url: "/update_category",
         contentType: "application/json",
         data: JSON.stringify({status: new_category, element_id: element_id, element_type: media_list }),
         dataType: "json",
@@ -110,7 +110,7 @@ function updateEpisode(element_id, episode, media_list) {
 
     $.ajax ({
         type: "POST",
-        url: "/update_element_episode",
+        url: "/update_episode",
         contentType: "application/json",
         data: JSON.stringify({episode: selected_episode, element_id: element_id, element_type: media_list }),
         dataType: "json",
@@ -138,7 +138,7 @@ function updateSeason(element_id, value) {
 
     $.ajax ({
         type: "POST",
-        url: "/update_element_season",
+        url: "/update_season",
         contentType: "application/json",
         data: JSON.stringify({season: selected_season, element_id: element_id, element_type: media_list }),
         dataType: "json",

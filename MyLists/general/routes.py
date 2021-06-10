@@ -1,10 +1,10 @@
 from flask import Blueprint
 from datetime import datetime
 from MyLists import db, bcrypt, app
-from MyLists.API_data import ApiData
 from flask_login import login_required, current_user
 from MyLists.general.trending_data import TrendingData
 from flask import render_template, flash, request, abort
+from MyLists.API_data import ApiSeries, ApiAnime, ApiMovies
 from MyLists.models import User, RoleType, MyListsStats, Frames, Badges, Ranks, compute_media_time_spent
 
 bp = Blueprint('general', __name__)
@@ -69,21 +69,21 @@ def mylists_stats():
 @login_required
 def current_trends():
     try:
-        series_info = ApiData().get_trending_tv()
+        series_info = ApiSeries().get_trending()
     except Exception as e:
         series_info = {'results': []}
         app.logger.error('[ERROR] - Getting the Series trending info: {}.'.format(e))
         flash('The current TV trends from TMDb are not available right now.', 'warning')
 
     try:
-        anime_info = ApiData().get_trending_anime()
+        anime_info = ApiAnime().get_trending()
     except Exception as e:
         anime_info = {'top': []}
         app.logger.error('[ERROR] - Getting the anime trending info: {}.'.format(e))
         flash('The current anime trends from Jikan are not available right now.', 'warning')
 
     try:
-        movies_info = ApiData().get_trending_movies()
+        movies_info = ApiMovies().get_trending()
     except Exception as e:
         movies_info = {'results': []}
         app.logger.error('[ERROR] - Getting the movies trending info: {}.'.format(e))

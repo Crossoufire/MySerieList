@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from MyLists import app, db
 from sqlalchemy import and_, desc
-from MyLists.API_data import ApiData
+from MyLists.API_data import ApiData, ApiTV, ApiMovies
 from datetime import datetime, timedelta
 from MyLists.models import Series, SeriesList, SeriesActors, SeriesGenre, SeriesNetwork, SeriesEpisodesPerSeason, \
     UserLastUpdate, Notifications, ListType, Anime, AnimeList, AnimeActors, AnimeGenre, AnimeNetwork, Status, Movies, \
@@ -18,79 +18,71 @@ def remove_non_list_media():
 
     # Series remover
     series = db.session.query(Series, SeriesList).outerjoin(SeriesList, SeriesList.media_id == Series.id).all()
-    count = 0
-    to_delete = []
-    for tv_series in series:
-        if not tv_series[1]:
-            to_delete.append(tv_series[0].id)
-    for deletion in to_delete:
-        Series.query.filter_by(id=deletion).delete()
-        SeriesActors.query.filter_by(media_id=deletion).delete()
-        SeriesGenre.query.filter_by(media_id=deletion).delete()
-        SeriesNetwork.query.filter_by(media_id=deletion).delete()
-        SeriesEpisodesPerSeason.query.filter_by(media_id=deletion).delete()
-        UserLastUpdate.query.filter_by(media_type=ListType.SERIES, media_id=deletion).delete()
-        Notifications.query.filter_by(media_type='serieslist', media_id=deletion).delete()
+    to_delete, count = [], 0
+    for media in series:
+        if not media[1]:
+            to_delete.append(media[0].id)
+    for del_id in to_delete:
+        Series.query.filter_by(id=del_id).delete()
+        SeriesActors.query.filter_by(media_id=del_id).delete()
+        SeriesGenre.query.filter_by(media_id=del_id).delete()
+        SeriesNetwork.query.filter_by(media_id=del_id).delete()
+        SeriesEpisodesPerSeason.query.filter_by(media_id=del_id).delete()
+        UserLastUpdate.query.filter_by(media_type=ListType.SERIES, media_id=del_id).delete()
+        Notifications.query.filter_by(media_type='serieslist', media_id=del_id).delete()
         count += 1
-
-        app.logger.info('Removed series with ID: [{}]'.format(deletion))
+        app.logger.info('Removed series with ID: [{}]'.format(del_id))
     app.logger.info('Total series removed: {}'.format(count))
 
     # Anime remover
     anime = db.session.query(Anime, AnimeList).outerjoin(AnimeList, AnimeList.media_id == Anime.id).all()
-    count = 0
-    to_delete = []
-    for tv_anime in anime:
-        if not tv_anime[1]:
-            to_delete.append(tv_anime[0].id)
-    for deletion in to_delete:
-        Anime.query.filter_by(id=deletion).delete()
-        AnimeActors.query.filter_by(media_id=deletion).delete()
-        AnimeGenre.query.filter_by(media_id=deletion).delete()
-        AnimeNetwork.query.filter_by(media_id=deletion).delete()
-        AnimeEpisodesPerSeason.query.filter_by(media_id=deletion).delete()
-        UserLastUpdate.query.filter_by(media_type=ListType.ANIME, media_id=deletion).delete()
-        Notifications.query.filter_by(media_type='animelist', media_id=deletion).delete()
+    to_delete, count = [], 0
+    for media in anime:
+        if not media[1]:
+            to_delete.append(media[0].id)
+    for del_id in to_delete:
+        Anime.query.filter_by(id=del_id).delete()
+        AnimeActors.query.filter_by(media_id=del_id).delete()
+        AnimeGenre.query.filter_by(media_id=del_id).delete()
+        AnimeNetwork.query.filter_by(media_id=del_id).delete()
+        AnimeEpisodesPerSeason.query.filter_by(media_id=del_id).delete()
+        UserLastUpdate.query.filter_by(media_type=ListType.ANIME, media_id=del_id).delete()
+        Notifications.query.filter_by(media_type='animelist', media_id=del_id).delete()
         count += 1
-
-        app.logger.info('Removed anime with ID: [{}]'.format(deletion))
+        app.logger.info('Removed anime with ID: [{}]'.format(del_id))
     app.logger.info('Total anime removed: {}'.format(count))
 
     # Movies remover
     movies = db.session.query(Movies, MoviesList).outerjoin(MoviesList, MoviesList.media_id == Movies.id).all()
-    count = 0
-    to_delete = []
-    for movie in movies:
-        if not movie[1]:
-            to_delete.append(movie[0].id)
-    for deletion in to_delete:
-        Movies.query.filter_by(id=deletion).delete()
-        MoviesActors.query.filter_by(media_id=deletion).delete()
-        MoviesGenre.query.filter_by(media_id=deletion).delete()
-        UserLastUpdate.query.filter_by(media_type=ListType.MOVIES, media_id=deletion).delete()
-        Notifications.query.filter_by(media_type='movieslist', media_id=deletion).delete()
+    to_delete, count = [], 0
+    for media in movies:
+        if not media[1]:
+            to_delete.append(media[0].id)
+    for del_id in to_delete:
+        Movies.query.filter_by(id=del_id).delete()
+        MoviesActors.query.filter_by(media_id=del_id).delete()
+        MoviesGenre.query.filter_by(media_id=del_id).delete()
+        UserLastUpdate.query.filter_by(media_type=ListType.MOVIES, media_id=del_id).delete()
+        Notifications.query.filter_by(media_type='movieslist', media_id=del_id).delete()
         count += 1
-
-        app.logger.info('Removed movie with ID: [{}]'.format(deletion))
+        app.logger.info('Removed movie with ID: [{}]'.format(del_id))
     app.logger.info('Total movies removed: {}'.format(count))
 
     # Games remover
     games = db.session.query(Games, GamesList).outerjoin(GamesList, GamesList.media_id == Games.id).all()
-    count = 0
-    to_delete = []
-    for game in games:
-        if not game[1]:
-            to_delete.append(game[0].id)
-    for deletion in to_delete:
-        Games.query.filter_by(id=deletion).delete()
-        GamesPlatforms.query.filter_by(media_id=deletion).delete()
-        GamesCompanies.query.filter_by(media_id=deletion).delete()
-        GamesGenre.query.filter_by(media_id=deletion).delete()
-        UserLastUpdate.query.filter_by(media_type=ListType.GAMES, media_id=deletion).delete()
-        Notifications.query.filter_by(media_type='gameslist', media_id=deletion).delete()
+    to_delete, count = [], 0
+    for media in games:
+        if not media[1]:
+            to_delete.append(media[0].id)
+    for del_id in to_delete:
+        Games.query.filter_by(id=del_id).delete()
+        GamesPlatforms.query.filter_by(media_id=del_id).delete()
+        GamesCompanies.query.filter_by(media_id=del_id).delete()
+        GamesGenre.query.filter_by(media_id=del_id).delete()
+        UserLastUpdate.query.filter_by(media_type=ListType.GAMES, media_id=del_id).delete()
+        Notifications.query.filter_by(media_type='gameslist', media_id=del_id).delete()
         count += 1
-
-        app.logger.info('Removed game with ID: [{}]'.format(deletion))
+        app.logger.info('Removed game with ID: [{}]'.format(del_id))
     app.logger.info('Total games removed: {}'.format(count))
 
     db.session.commit()
@@ -107,8 +99,8 @@ def remove_old_covers():
     path_series_covers = Path(app.root_path, 'static/covers/series_covers/')
 
     images_in_db = []
-    for tv_show in series:
-        images_in_db.append(tv_show.image_cover)
+    for media in series:
+        images_in_db.append(media.image_cover)
 
     images_saved = []
     for file in os.listdir(path_series_covers):
@@ -117,7 +109,7 @@ def remove_old_covers():
     count = 0
     for image in images_saved:
         if image not in images_in_db and image != 'default.jpg':
-            os.remove('{0}/{1}'.format(path_series_covers, image))
+            os.remove(f'{path_series_covers}/{image}')
             app.logger.info('Removed old series cover with name: {}'.format(image))
             count += 1
     app.logger.info('Total old series covers deleted: {}'.format(count))
@@ -127,8 +119,8 @@ def remove_old_covers():
     path_anime_covers = Path(app.root_path, 'static/covers/anime_covers/')
 
     images_in_db = []
-    for tv_show in anime:
-        images_in_db.append(tv_show.image_cover)
+    for media in anime:
+        images_in_db.append(media.image_cover)
 
     images_saved = []
     for file in os.listdir(path_anime_covers):
@@ -137,7 +129,7 @@ def remove_old_covers():
     count = 0
     for image in images_saved:
         if image not in images_in_db and image != 'default.jpg':
-            os.remove('{0}/{1}'.format(path_anime_covers, image))
+            os.remove(f'{path_anime_covers}/{image}')
             app.logger.info('Removed old anime cover with name: {}'.format(image))
             count += 1
     app.logger.info('Total old anime covers deleted: {}'.format(count))
@@ -157,7 +149,7 @@ def remove_old_covers():
     count = 0
     for image in images_saved:
         if image not in images_in_db and image != 'default.jpg':
-            os.remove('{0}/{1}'.format(path_movies_covers, image))
+            os.remove(f'{path_movies_covers}/{image}')
             app.logger.info('Removed old movie cover with name: {}'.format(image))
             count += 1
     app.logger.info('Total old movies covers deleted: {}'.format(count))
@@ -177,7 +169,7 @@ def remove_old_covers():
     count = 0
     for image in images_saved:
         if image not in images_in_db and image != 'default.jpg':
-            os.remove('{0}/{1}'.format(path_games_covers, image))
+            os.remove(f'{path_games_covers}/{image}')
             app.logger.info('Removed old game cover with name: {}'.format(image))
             count += 1
     app.logger.info('Total old game covers deleted: {}'.format(count))
@@ -187,23 +179,16 @@ def remove_old_covers():
 
 
 def refresh_element_data(api_id, list_type):
-    media_data = ApiData().get_details_and_credits_data(api_id, list_type)
-    if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        data = MediaDetails(media_data, list_type, updating=True).get_media_details()
-        if not data['tv_data']:
-            return None
-    elif list_type == ListType.MOVIES:
-        data = MediaDetails(media_data, list_type, updating=True).get_media_details()
-        if not data['movies_data']:
-            return None
+    ApiModel = ApiData.get_API_model(list_type)
+    data = ApiModel(API_id=api_id).update_media_data()
 
     # Update the main details for each media
     if list_type == ListType.SERIES:
-        Series.query.filter_by(api_id=api_id).update(data['tv_data'])
+        Series.query.filter_by(api_id=api_id).update(data['media_data'])
     elif list_type == ListType.ANIME:
-        Anime.query.filter_by(api_id=api_id).update(data['tv_data'])
+        Anime.query.filter_by(api_id=api_id).update(data['media_data'])
     elif list_type == ListType.MOVIES:
-        Movies.query.filter_by(api_id=api_id).update(data['movies_data'])
+        Movies.query.filter_by(api_id=api_id).update(data['media_data'])
 
     # Commit the new changes
     db.session.commit()
@@ -307,14 +292,14 @@ def automatic_media_refresh():
 
     # Recover from API all the changed <TV_show> ID
     try:
-        all_id_tv_changes = ApiData().get_changed_data(list_type=ListType.SERIES)
+        all_id_tv_changes = ApiTV().get_changed_data()
     except Exception as e:
         app.logger.error('[ERROR] - Requesting the changed data from TMDB API: {}'.format(e))
         return
 
     # Recover from API all the changed <Movies> ID
     try:
-        all_id_movies_changes = ApiData().get_changed_data(list_type=ListType.MOVIES)
+        all_id_movies_changes = ApiMovies().get_changed_data()
     except Exception as e:
         app.logger.error('[ERROR] - Requesting the changed data from TMDB API: {}'.format(e))
         return

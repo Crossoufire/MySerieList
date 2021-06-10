@@ -9,35 +9,6 @@ from flask_login import current_user
 from MyLists.models import MediaType, ListType, Status, UserLastUpdate, User
 
 
-def check_cat_type(list_type, status):
-    if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        tv_status_dict = {'Watching': Status.WATCHING,
-                          'Completed': Status.COMPLETED,
-                          'On Hold': Status.ON_HOLD,
-                          'Random': Status.RANDOM,
-                          'Dropped': Status.DROPPED,
-                          'Plan to Watch': Status.PLAN_TO_WATCH}
-        try:
-            return tv_status_dict[status]
-        except KeyError:
-            return None
-    elif list_type == ListType.MOVIES:
-        movie_status_dict = {'Completed': Status.COMPLETED,
-                             'Plan to Watch': Status.PLAN_TO_WATCH}
-        try:
-            return movie_status_dict[status]
-        except KeyError:
-            return None
-    elif list_type == ListType.GAMES:
-        games_status_dict = {'Completed': Status.COMPLETED,
-                             'Endless': Status.ENDLESS,
-                             'Multiplayer': Status.MULTIPLAYER}
-        try:
-            return games_status_dict[status]
-        except KeyError:
-            return None
-
-
 def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0, movie_status=None, movie_delete=False,
                        movie_add=False, new_rewatch=0, old_rewatch=0, movie_duration=0, old_gametime=0, new_gametime=0,
                        user_id=None):

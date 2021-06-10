@@ -53,6 +53,12 @@ class ApiData(object):
 
         return self.media
 
+    def update_media_data(self):
+        self.get_details_and_credits_data()
+        self.from_API_to_dict(updating=True)
+
+        return self.all_data
+
 
 class TMDBMixin(ApiData):
     group = []
@@ -131,7 +137,7 @@ class ApiTV(TMDBMixin):
 
         return json.loads(response.text)
 
-    def from_API_to_dict(self):
+    def from_API_to_dict(self, updating=False):
         self.media_details = {'name': self.API_data.get('name', 'Unknown') or 'Unknown',
                               'original_name': self.API_data.get('original_name', 'Unknown') or 'Unknown',
                               'first_air_date': self.API_data.get('first_air_date', 'Unknown') or 'Unknown',
@@ -189,9 +195,11 @@ class ApiTV(TMDBMixin):
         else:
             networks_list.append({'network': 'Unknown'})
 
-        genres_list = self.get_genres()
-        actors_list = self.get_actors()
-        anime_genres_list = self.get_anime_genres()
+        genres_list, actors_list, anime_genres_list = [], [], []
+        if not updating:
+            genres_list = self.get_genres()
+            actors_list = self.get_actors()
+            anime_genres_list = self.get_anime_genres()
 
         self.all_data = {'media_data': self.media_details, 'seasons_data': seasons_list, 'genres_data': genres_list,
                          'anime_genres_data': anime_genres_list, 'actors_data': actors_list,
@@ -339,7 +347,7 @@ class ApiMovies(TMDBMixin):
 
         return json.loads(response.text)
 
-    def from_API_to_dict(self):
+    def from_API_to_dict(self, updating=False):
         self.media_details = {'name': self.API_data.get('title', 'Unknown') or 'Unknown',
                               'original_name': self.API_data.get('original_title', 'Unknown') or 'Unknown',
                               'release_date': self.API_data.get('release_date', 'Unknown') or 'Unknown',
@@ -365,8 +373,10 @@ class ApiMovies(TMDBMixin):
                     self.media_details['director_name'] = element['name']
                     break
 
-        genres_list = self.get_genres()
-        actors_list = self.get_actors()
+        genres_list, actors_list = [], []
+        if not updating:
+            genres_list = self.get_genres()
+            actors_list = self.get_actors()
 
         self.all_data = {'media_data': self.media_details, 'genres_data': genres_list, 'actors_data': actors_list}
 

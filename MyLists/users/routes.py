@@ -2,8 +2,7 @@ import json
 from MyLists import app, db
 from flask_login import login_required, current_user
 from flask import Blueprint, request, render_template
-from MyLists.models import User, Ranks, Frames, Notifications, UserLastUpdate, RoleType, get_models_type, SeriesList, \
-    Series
+from MyLists.models import User, Ranks, Frames, Notifications, RoleType, get_models_type
 
 bp = Blueprint('users', __name__)
 
@@ -34,10 +33,10 @@ def account(user_name):
     if current_user.role != RoleType.ADMIN and user.id != current_user.id:
         user.profile_views += 1
 
-    # Get the user last updates
+    # Get the user's last updates
     user_updates = user.get_last_updates(all_=False)
 
-    # Get follows last updates
+    # Get follows' last updates
     follows_updates = user.get_follows_updates()
 
     # Get the all media info in a dict for each media type
@@ -47,9 +46,8 @@ def account(user_name):
     for model in list_models:
         media_count = model.get_media_count_by_status(user.id)
         media_count_score = model.get_media_count_by_score(user.id)
-        media_levels = model.get_media_levels(user)
+        media_levels, media_time = model.get_media_levels(user)
         media_score = model.get_media_score(user.id)
-        media_time = getattr(user, f"time_spent_{model.__name__.replace('List', '').lower()}")
         media_total_eps = model.get_media_total_eps(user.id)
         media_favorites = model.get_favorites(user.id)
 

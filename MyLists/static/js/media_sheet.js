@@ -111,7 +111,7 @@ function changeCategoryTV(element_id, cat_selector, seas_data, media_list) {
 
     $.ajax ({
         type: "POST",
-        url: "/change_element_category",
+        url: "/update_category",
         contentType: "application/json",
         data: JSON.stringify({status: new_cat, element_id: element_id, element_type: media_list }),
         dataType: "json",
@@ -171,7 +171,7 @@ function changeCategoryMovies(element_id, cat_selector) {
 
     $.ajax ({
         type: "POST",
-        url: "/change_element_category",
+        url: "/update_category",
         contentType: "application/json",
         data: JSON.stringify({status: new_cat, element_id: element_id, element_type: 'movieslist' }),
         dataType: "json",
@@ -197,7 +197,7 @@ function changeCategoryGames(element_id, cat_selector) {
 
     $.ajax ({
         type: "POST",
-        url: "/change_element_category",
+        url: "/update_category",
         contentType: "application/json",
         data: JSON.stringify({status: new_cat, element_id: element_id, element_type: 'gameslist' }),
         dataType: "json",
@@ -224,7 +224,7 @@ function updateSeason(element_id, value, seas_data, media_list) {
 
     $.ajax ({
         type: "POST",
-        url: "/update_element_season",
+        url: "/update_season",
         contentType: "application/json",
         data: JSON.stringify({season: selected_season, element_id: element_id, element_type: media_list }),
         dataType: "json",
@@ -262,7 +262,7 @@ function updateEpisode(element_id, episode, media_list) {
 
     $.ajax ({
         type: "POST",
-        url: "/update_element_episode",
+        url: "/update_episode",
         contentType: "application/json",
         data: JSON.stringify({episode: episode.selectedIndex, element_id: element_id, element_type: media_list }),
         dataType: "json",

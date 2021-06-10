@@ -366,9 +366,9 @@
                                     {% for favorite in media_data['series']['media_favorites'] %}
                                         {% if loop.index < 11 %}
                                             <a href="{{ url_for('main.media_sheet', media_type='Series',
-                                            media_id=favorite.id) }}">
-                                                <img class="favorite-img" title="{{ favorite.name }}" data-toggle="tooltip"
-                                                src="/static/covers/series_covers/{{ favorite.image_cover }}"/>
+                                             media_id=favorite.media_id) }}">
+                                                <img class="favorite-img" title="{{ favorite.media.name }}" data-toggle="tooltip"
+                                                src="/static/covers/series_covers/{{ favorite.media.image_cover }}"/>
                                             </a>
                                         {% endif %}
                                     {% endfor %}
@@ -520,10 +520,10 @@
                                     {% for favorite in  media_data['anime']['media_favorites'] %}
                                         {% if loop.index < 11 %}
                                             <a href="{{ url_for('main.media_sheet', media_type='Anime',
-                                            media_id=favorite.id) }}">
+                                            media_id=favorite.media_id) }}">
                                                 <img class="favorite-img" data-toggle="tooltip"
-                                                     title="{{ favorite.name }}"
-                                                     src="/static/covers/anime_covers/{{ favorite.image_cover }}"/>
+                                                     title="{{ favorite.media.name }}"
+                                                     src="/static/covers/anime_covers/{{ favorite.media.image_cover }}"/>
                                             </a>
                                         {% endif %}
                                     {% endfor %}
@@ -608,9 +608,9 @@
                                 <div class="col">
                                     {% for favorite in media_data['movies']['media_favorites'] %}
                                         {% if loop.index < 11 %}
-                                            <a href="{{ url_for('main.media_sheet', media_type='Movies', media_id=favorite.id) }}">
-                                                <img class="favorite-img" data-toggle="tooltip" title="{{ favorite.name }}"
-                                                src="/static/covers/movies_covers/{{ favorite.image_cover }}"/>
+                                            <a href="{{ url_for('main.media_sheet', media_type='Movies', media_id=favorite.media_id) }}">
+                                                <img class="favorite-img" data-toggle="tooltip" title="{{ favorite.media.name }}"
+                                                src="/static/covers/movies_covers/{{ favorite.media.image_cover }}"/>
                                             </a>
                                         {% endif %}
                                     {% endfor %}
@@ -705,9 +705,9 @@
                                 <div class="col">
                                     {% for favorite in media_data['games']['media_favorites'] %}
                                         {% if loop.index < 11 %}
-                                            <a href="{{ url_for('main.media_sheet', media_type='Games', media_id=favorite.id) }}">
-                                                <img class="favorite-img" data-toggle="tooltip" title="{{ favorite.name }}"
-                                                src="/static/covers/games_covers/{{ favorite.image_cover }}"/>
+                                            <a href="{{ url_for('main.media_sheet', media_type='Games', media_id=favorite.media_id) }}">
+                                                <img class="favorite-img" data-toggle="tooltip" title="{{ favorite.media.name }}"
+                                                src="/static/covers/games_covers/{{ favorite.media.image_cover }}"/>
                                             </a>
                                         {% endif %}
                                     {% endfor %}

@@ -12,6 +12,7 @@ from flask_login import UserMixin, current_user
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import func, desc, text, and_, or_
 from sqlalchemy.orm import aliased
+from sqlalchemy_filters import apply_filters
 
 from MyLists import app, db, login_manager
 
@@ -59,6 +60,13 @@ class ListType(Enum):
     GAMES = 'gameslist'
 
 
+class MediaType(Enum):
+    SERIES = "Series"
+    ANIME = "Anime"
+    MOVIES = 'Movies'
+    GAMES = 'Games'
+
+
 class Status(Enum):
     ALL = 'All'
     WATCHING = 'Watching'
@@ -73,13 +81,6 @@ class Status(Enum):
     SEARCH = 'Search'
     FAVORITE = 'Favorite'
     STATS = 'Stats'
-
-
-class MediaType(Enum):
-    SERIES = "Series"
-    ANIME = "Anime"
-    MOVIES = 'Movies'
-    GAMES = 'Games'
 
 
 class HomePage(Enum):
@@ -421,8 +422,7 @@ class MediaListMixin(object):
             .filter_by(user_id=user_id).group_by(cls.status).all()
 
         total = sum(x[1] for x in media_count)
-        data = {'total': total,
-                'nodata': False}
+        data = {'total': total, 'nodata': False}
         if total == 0:
             data['nodata'] = True
 
@@ -462,9 +462,9 @@ class MediaListMixin(object):
     @classmethod
     def get_media_levels(cls, user):
         # Get user.time_spent_<media> from the User table
-        total_time_min = getattr(user, f"time_spent_{cls.__name__.replace('List', '').lower()}")
+        time_min = getattr(user, f"time_spent_{cls.__name__.replace('List', '').lower()}")
 
-        element_level_tmp = "{:.2f}".format(round((((400+80*total_time_min)**(1/2))-20)/40, 2))
+        element_level_tmp = "{:.2f}".format(round((((400+80*time_min)**(1/2))-20)/40, 2))
         element_level = int(element_level_tmp.split('.')[0])
         element_percentage = int(element_level_tmp.split('.')[1])
 
@@ -476,7 +476,7 @@ class MediaListMixin(object):
             grade_title = query_rank.name
 
         return {"level": element_level, "level_percent": element_percentage, "grade_id": grade_id,
-                "grade_title": grade_title}
+                "grade_title": grade_title}, time_min
 
     @classmethod
     def get_media_score(cls, user_id):
@@ -508,14 +508,30 @@ class MediaListMixin(object):
 
     @classmethod
     def get_favorites(cls, user_id):
-        media = eval(cls.__name__.replace('List', ''))
-        fav_media = cls.query.filter_by(favorite=True, user_id=user_id).all()
-        favorites = media.query.filter(media.id.in_([m.media_id for m in fav_media])).all()
-
-        # Randomize the favorites displayed
+        favorites = cls.query.filter_by(user_id=user_id, favorite=True).all()
         random.shuffle(favorites)
 
         return favorites
+
+    def category_changes(self, new_status):
+        old_watched = self.eps_watched
+        if new_status == Status.COMPLETED:
+            self.current_season = len(self.media.eps_per_season)
+            self.last_episode_watched = self.media.eps_per_season[-1].episodes
+            self.eps_watched = self.media.total_episodes
+            new_watched = self.media.total_episodes
+        elif new_status == Status.RANDOM or new_status == Status.PLAN_TO_WATCH:
+            self.current_season = 1
+            self.last_episode_watched = 0
+            self.eps_watched = 0
+            new_watched = 0
+        else:
+            new_watched = old_watched
+
+        old_rewatch = self.rewatched
+        self.rewatched = 0
+
+        return old_rewatch, old_watched, new_watched
 
 
 class TVBase(db.Model):
@@ -589,6 +605,24 @@ class Series(MediaMixin, TVBase):
     def get_media_cover(self):
         return url_for('static', filename='covers/series_covers/'+self.image_cover)
 
+    def add_media(self, new_status):
+        new_watched = 1
+        new_season = 1
+        new_episode = 1
+        if new_status == Status.COMPLETED:
+            new_season = len(self.eps_per_season)
+            new_episode = self.eps_per_season[-1].episodes
+            new_watched = self.total_episodes
+        elif new_status == Status.RANDOM or new_status == Status.PLAN_TO_WATCH:
+            new_episode = 0
+            new_watched = 0
+
+        user_list = SeriesList(user_id=current_user.id, media_id=self.id, current_season=new_season,
+                               last_episode_watched=new_episode, status=new_status, eps_watched=new_watched)
+
+        db.session.add(user_list)
+        return new_watched
+
     @staticmethod
     def media_sheet_template():
         return 'media_sheet_series.html'
@@ -626,93 +660,6 @@ class SeriesList(MediaListMixin, db.Model):
 
     def update_total_watched(self, new_rewatch):
         self.eps_watched = self.media.total_episodes + (new_rewatch * self.media.total_episodes)
-
-    @classmethod
-    def get_media_query_new(cls, user_id, category, genre, sorting, page, q):
-        # Create the sorting dict
-        sorting_dict = {'Title A-Z': Series.name.asc(),
-                        'Title Z-A': Series.name.desc(),
-                        'Release date +': Series.first_air_date.desc(),
-                        'Release date -': Series.first_air_date.asc(),
-                        'Score TMDB +': Series.vote_average.desc(),
-                        'Score TMDB -': Series.vote_average.asc(),
-                        'Rewatch': SeriesList.rewatched.desc(),
-                        'Score +': SeriesList.score.desc(),
-                        'Score -': SeriesList.score.asc(),
-                        'Comments': SeriesList.comment.desc()}
-
-        # Check the sorting value
-        try:
-            sorting = sorting_dict[sorting]
-        except KeyError:
-            abort(400)
-
-        # Check the category
-        try:
-            category = Status(category)
-            cat_value = category.value
-        except ValueError:
-            return abort(400)
-
-        # Check the genre
-        genre_filter = SeriesGenre.genre.like(genre)
-        if genre == 'All':
-            genre_filter = text('')
-
-        # # Check the <filter_val> value - NOT USED FOR NOW
-        # filter_val = False
-        # com_ids = [-1]
-        # if filter_val:
-        #     v1, v2 = aliased(media_list), aliased(media_list)
-        #     get_common = db.session.query(v1, v2) \
-        #         .join(v2, and_(v2.user_id == user_id, v2.media_id == v1.media_id)) \
-        #         .filter(v1.user_id == current_user.id).all()
-        #     com_ids = [r[0].media_id for r in get_common]
-
-        query = db.session.query(media, media_list, media_genre, media_more) \
-            .outerjoin(media, media.id == media_list.media_id) \
-            .outerjoin(media_genre, media_genre.media_id == media_list.media_id) \
-            .outerjoin(media_more, media_more.media_id == media_list.media_id) \
-            .filter(media_list.user_id == user_id, media_list.media_id.notin_(com_ids), genre_filter)
-
-        query = cls.query.filter_by(user_id=current_user.id, )
-
-        if category != Status.FAVORITE and category != Status.SEARCH and category != Status.ALL:
-            query = query.filter(media_list.status == category)
-        elif category == Status.FAVORITE:
-            query = query.filter(media_list.favorite)
-        elif category == Status.SEARCH:
-            if list_type == ListType.SERIES or list_type == ListType.ANIME:
-                query = query.filter(or_(media.name.like('%' + q + '%'), media_more.name.like('%' + q + '%'),
-                                         media.original_name.like('%' + q + '%')))
-            elif list_type == ListType.MOVIES:
-                query = query.filter(or_(media.name.like('%' + q + '%'), media_more.name.like('%' + q + '%'),
-                                         media.director_name.like('%' + q + '%'),
-                                         media.original_name.like('%' + q + '%')))
-            elif list_type == ListType.GAMES:
-                query = query.filter(or_(media.name.like('%' + q + '%'),
-                                         media_more.name.like('%' + q + '%')))
-
-        # Run the query
-        results = query.group_by(media.id).order_by(sorting).paginate(int(page), 48, error_out=True)
-
-        # Get <common_media> and <common_elements> between the users
-        common_media, common_elements = get_media_count(user_id, list_type)
-
-        # Recover the media data into a dict
-        items_data_list = []
-        for item in results.items:
-            from MyLists.main.media_object import MediaListObj
-            add_data = MediaListObj(item, common_media, list_type)
-            items_data_list.append(add_data)
-
-        data = {'actual_page': results.page,
-                'total_pages': results.pages,
-                'total_media': results.total,
-                'common_elements': common_elements,
-                'items_list': items_data_list}
-
-        return cat_value, data
 
     @staticmethod
     def default_sorting():
@@ -776,12 +723,26 @@ class Anime(MediaMixin, TVBase):
     networks = db.relationship('AnimeNetwork', backref='anime', lazy=True)
     list_info = db.relationship('AnimeList', back_populates='media', lazy='dynamic')
 
-    @staticmethod
-    def media_sheet_template():
-        return 'media_sheet_anime.html'
-
     def get_media_cover(self):
         return url_for('static', filename='covers/anime_covers/'+self.image_cover)
+
+    def add_media(self, new_status):
+        new_watched = 1
+        new_season = 1
+        new_episode = 1
+        if new_status == Status.COMPLETED:
+            new_season = len(self.eps_per_season)
+            new_episode = self.eps_per_season[-1].episodes
+            new_watched = self.total_episodes
+        elif new_status == Status.RANDOM or new_status == Status.PLAN_TO_WATCH:
+            new_episode = 0
+            new_watched = 0
+
+        user_list = AnimeList(user_id=current_user.id, media_id=self.id, current_season=new_season,
+                               last_episode_watched=new_episode, status=new_status, eps_watched=new_watched)
+
+        db.session.add(user_list)
+        return new_watched
 
     @classmethod
     def compute_time_spent(cls, media=None, old_watched=0, new_watched=0, new_rewatch=0, old_rewatch=0, user_id=None):
@@ -794,6 +755,10 @@ class Anime(MediaMixin, TVBase):
         old_time = user.time_spent_anime
         user.time_spent_anime = old_time + ((new_watched - old_watched) * media.duration) + (
                 media.total_episodes * media.duration * (new_rewatch - old_rewatch))
+
+    @staticmethod
+    def media_sheet_template():
+        return 'media_sheet_anime.html'
 
 
 class AnimeList(MediaListMixin, db.Model):
@@ -895,9 +860,14 @@ class Movies(MediaMixin, db.Model):
     actors = db.relationship('MoviesActors', backref='movies', lazy=True)
     list_info = db.relationship('MoviesList', back_populates='media', lazy='dynamic')
 
-    @staticmethod
-    def media_sheet_template():
-        return 'media_sheet_movies.html'
+    def add_media(self, new_status):
+        if new_status != Status.COMPLETED:
+            new_watched = 0
+
+        user_list = MoviesList(user_id=current_user.id, media_id=self.id, status=new_status, eps_watched=new_watched)
+        db.session.add(user_list)
+
+        return None
 
     def get_media_cover(self):
         return url_for('static', filename='covers/movies_covers/'+self.image_cover)
@@ -935,15 +905,9 @@ class Movies(MediaMixin, db.Model):
             else:
                 user.time_spent_movies = old_time - movie_duration + media.duration * (new_rewatch - old_rewatch)
 
-    @classmethod
-    def get_next_airing(cls):
-        media_list = eval(cls.__name__ + 'List')
-        query = db.session.query(cls, media_list) \
-            .join(cls, cls.id == media_list.media_id) \
-            .filter(cls.release_date > datetime.utcnow(), media_list.user_id == current_user.id) \
-            .order_by(cls.release_date.asc()).all()
-
-        return query
+    @staticmethod
+    def media_sheet_template():
+        return 'media_sheet_movies.html'
 
 
 class MoviesList(MediaListMixin, db.Model):
@@ -964,6 +928,17 @@ class MoviesList(MediaListMixin, db.Model):
 
     def update_total_watched(self, new_rewatch):
         self.eps_watched = 1 + new_rewatch
+
+    def category_changes(self, new_status):
+        if new_status == Status.COMPLETED:
+            self.eps_watched = 1
+        else:
+            self.eps_watched = 0
+
+        old_rewatch = self.rewatched
+        self.rewatched = 0
+
+        return old_rewatch, None, None
 
     @staticmethod
     def default_sorting():
@@ -1026,19 +1001,11 @@ class Games(MediaMixin, db.Model):
     companies = db.relationship('GamesCompanies', backref='games', lazy=True)
     list_info = db.relationship('GamesList', back_populates='media', lazy='dynamic')
 
-    @staticmethod
-    def media_sheet_template():
-        return 'media_sheet_games.html'
-
-    @classmethod
-    def get_next_airing(cls):
-        media_list = eval(cls.__name__ + 'List')
-        query = db.session.query(cls, media_list) \
-            .join(cls, cls.id == media_list.media_id) \
-            .filter(cls.release_date > datetime.utcnow(), media_list.user_id == current_user.id) \
-            .order_by(cls.release_date.asc()).all()
-
-        return query
+    def add_media(self, new_status):
+        user_list = GamesList(user_id=current_user.id, media_id=self.id, status=new_status,
+                              completion=False, playtime=0)
+        db.session.add(user_list)
+        return None
 
     def get_user_list_info(self):
         tmp = self.list_info.filter_by(user_id=current_user.id).first()
@@ -1071,6 +1038,16 @@ class Games(MediaMixin, db.Model):
         return ", ".join(data)
 
     @classmethod
+    def get_next_airing(cls):
+        media_list = eval(cls.__name__ + 'List')
+        query = db.session.query(cls, media_list) \
+            .join(cls, cls.id == media_list.media_id) \
+            .filter(cls.release_date > datetime.utcnow(), media_list.user_id == current_user.id) \
+            .order_by(cls.release_date.asc()).all()
+
+        return query
+
+    @classmethod
     def compute_time_spent(cls, old_playtime=0, new_playtime=0, user_id=None):
         # Use for the list import function (redis and rq backgound process), can't import the current_user context
         if current_user:
@@ -1080,6 +1057,10 @@ class Games(MediaMixin, db.Model):
 
         old_time = current_user.time_spent_games
         user.time_spent_games = old_time + new_playtime - old_playtime
+
+    @staticmethod
+    def media_sheet_template():
+        return 'media_sheet_games.html'
 
 
 class GamesList(MediaListMixin, db.Model):
@@ -1097,6 +1078,9 @@ class GamesList(MediaListMixin, db.Model):
     comment = db.Column(db.Text)
 
     media = db.relationship("Games", back_populates='list_info', lazy=False)
+
+    def category_changes(self, new_status):
+        return None, None, None
 
     @classmethod
     def get_media_total_eps(cls, user_id):

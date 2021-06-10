@@ -56,7 +56,7 @@ function changeCategory(new_category, card_id) {
 
     $.ajax ({
         type: "POST",
-        url: "/change_element_category",
+        url: "/update_category",
         contentType: "application/json",
         data: JSON.stringify({status: new_category, element_id: element_id, element_type: media_list}),
         dataType: "json",
