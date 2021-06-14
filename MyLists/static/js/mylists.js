@@ -38,7 +38,7 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
             this.widget().menu('option', 'items', '> :not(.ui-autocomplete-category)');
         },
         _renderMenu: function (ul, items) {
-            var search;
+            var search, med_select;
             var that = this;
             var categories = [];
 
@@ -52,8 +52,10 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
 
             if (items[0].nb_results !== 0) {
                 search = $('#autocomplete').val();
+                med_select = $('#select-media').val();
                 $('<li class="text-center p-t-5 p-b-5" style="background: #22748d;">' +
-                     '<a class="text-light" href="/search_media?search='+search+'&page=1">More results</a>' +
+                     '<a class="text-light" href="/search_media?search='+search+'&page=1?media-select='+med_select+'">' +
+                        'More results</a>' +
                   '</li>').appendTo(ul);
             }
         },

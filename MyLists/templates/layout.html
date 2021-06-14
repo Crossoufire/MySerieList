@@ -10,7 +10,7 @@
         gtag('js', new Date());
         gtag('config', 'UA-146580264-1');
     </script>
-
++
     <!--- <meta> tag to defines metadata about our HTML document --------------------------------------->
     <meta charset="UTF-8">
     <meta name="author" content="Cross">
@@ -98,11 +98,19 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="nav-collapse">
-                    <form class="form-inline nav-form" action="{{ url_for('main.search_media') }}">
+                    <form id="auto-form" class="form-inline nav-form" name="aform" action="{{ url_for('main.search_media') }}">
                         <label for="autocomplete"></label>
                         <input id="autocomplete" class="form-control search-ipad-mobile" name="search"
-                               placeholder="Search media or users...">
+                         placeholder="Search media or users...">
                     </form>
+                    <label for="select-media"></label>
+                    <select id="select-media" name="media-select" form="auto-form">
+                        <option value="TMDB">Series, Anime & Movies</option>
+                        {% if current_user.add_games %}
+                            <option value="IGDB">Games</option>
+                        {% endif %}
+                        <option value="users">Users</option>
+                    </select>
                     <ul class="navbar-nav mr-auto nav-ul-1">
                         <li class="nav-item nav-li-1">
                             <a class="nav-link" href="{{ url_for('general.mylists_stats') }}">
@@ -235,6 +243,13 @@
 {% endblock %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/mylists.js') }}"></script>
 <script>
+    function validateForm() {
+        let x = document.forms["aform"]["search"].value;
+            if (x === "") {
+                return false;
+            }
+        }
+
     {% if current_user.is_authenticated %}
         {% with task = current_user.get_task_in_progress('import_list') %}
             {% if task %}
