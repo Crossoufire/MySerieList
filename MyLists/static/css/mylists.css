@@ -105,6 +105,24 @@ hr {
     text-align: center;
 }
 
+.auto-select {
+    position: absolute;
+    margin-left: 215px;
+	cursor: pointer;
+    background: transparent;
+    border: none;
+    color: lightgrey;
+    width: 90px;
+}
+
+.auto-select:focus {
+    border: none;
+}
+
+.auto-opt {
+    background-color: #2a2b2d;
+}
+
 @media (max-width: 991px) {
     .nav-form {
         margin-left: auto;

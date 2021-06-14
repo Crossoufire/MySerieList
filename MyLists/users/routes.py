@@ -7,10 +7,9 @@ from MyLists.models import User, Ranks, Frames, Notifications, RoleType, get_mod
 bp = Blueprint('users', __name__)
 
 
-@bp.route('/account', methods=['GET', 'POST'])
 @bp.route('/account/<user_name>', methods=['GET', 'POST'])
 @login_required
-def account(user_name=current_user.username):
+def account(user_name):
     # Check if the user can see the <media_list>
     user = current_user.check_autorization(user_name)
 

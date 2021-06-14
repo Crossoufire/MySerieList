@@ -416,6 +416,8 @@ class ApiGames(ApiData):
     @sleep_and_retry
     @limits(calls=4, period=1)
     def search(self, game_name):
+        print(app.config['CLIENT_IGDB'])
+        print(self.api_key)
         headers = {'Client-ID': f"{app.config['CLIENT_IGDB']}",
                    'Authorization': 'Bearer ' + self.api_key}
         body = 'fields id, name, cover.image_id, first_release_date, storyline; search "{}";'.format(game_name)

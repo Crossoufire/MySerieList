@@ -10,7 +10,7 @@
         gtag('js', new Date());
         gtag('config', 'UA-146580264-1');
     </script>
-+
+
     <!--- <meta> tag to defines metadata about our HTML document --------------------------------------->
     <meta charset="UTF-8">
     <meta name="author" content="Cross">
@@ -101,15 +101,15 @@
                     <form id="auto-form" class="form-inline nav-form" name="aform" action="{{ url_for('main.search_media') }}">
                         <label for="autocomplete"></label>
                         <input id="autocomplete" class="form-control search-ipad-mobile" name="search"
-                         placeholder="Search media or users...">
+                         placeholder="Search...">
+                        <label for="select-media"></label>
                     </form>
-                    <label for="select-media"></label>
-                    <select id="select-media" name="media-select" form="auto-form">
-                        <option value="TMDB">Series, Anime & Movies</option>
+                    <select id="select-media" class="auto-select" name="media_select">
+                        <option class="auto-opt" value="TMDB">Media</option>
                         {% if current_user.add_games %}
-                            <option value="IGDB">Games</option>
+                            <option class="auto-opt" value="IGDB">Games</option>
                         {% endif %}
-                        <option value="users">Users</option>
+                        <option class="auto-opt" value="users">Users</option>
                     </select>
                     <ul class="navbar-nav mr-auto nav-ul-1">
                         <li class="nav-item nav-li-1">

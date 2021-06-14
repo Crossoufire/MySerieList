@@ -1,19 +1,22 @@
 
 // --- Autocomplete ----------------------------------------------------------------------------------
 $(function() {
+    let media_select = document.getElementById('select-media');
     $('#autocomplete').catcomplete({
         delay: 250,
         minLength: 2,
-        source: function (request, response){
+        source: function (request, response) {
+            console.log(request.term);
             $.getJSON("/autocomplete",
                 {
                     q: request.term,
+                    media_select: media_select.options[media_select.selectedIndex].value,
                 },
                 function (data) {
                     response(data.search_results);
                 });
         },
-        select: function (event, ui){
+        select: function (event, ui) {
             let form = document.createElement('form');
             form.method = 'POST';
             if (ui.item.type === 'Series') {
@@ -54,7 +57,7 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
                 search = $('#autocomplete').val();
                 med_select = $('#select-media').val();
                 $('<li class="text-center p-t-5 p-b-5" style="background: #22748d;">' +
-                     '<a class="text-light" href="/search_media?search='+search+'&page=1?media-select='+med_select+'">' +
+                     '<a class="text-light" href="/search_media?search='+search+'&media_select='+med_select+'&page=1">' +
                         'More results</a>' +
                   '</li>').appendTo(ul);
             }

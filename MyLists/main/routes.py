@@ -221,7 +221,7 @@ def your_next_airing():
 @login_required
 def search_media():
     search = request.args.get('search')
-    media_select = request.args.get('media-select')
+    media_select = request.args.get('media_select')
     page = request.args.get('page', 1)
 
     if media_select == "TMDB":
@@ -317,7 +317,7 @@ def search_media():
         return request.referrer or '/'
 
     return render_template("media_search.html", title="Search", all_results=media_results, search=search,
-                           page=int(page), total_results="")
+                           page=int(page), total_results=20)
 
 
 @bp.route('/graph_test', methods=['GET', 'POST'])
@@ -871,7 +871,9 @@ def lock_media():
 @login_required
 def autocomplete():
     search = request.args.get('q')
-    media_select = request.args.get('media-select')
+    media_select = request.args.get('media_select')
+
+    print(search, media_select)
 
     media_results = []
     if media_select == 'TMDB':
