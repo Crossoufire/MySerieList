@@ -13,12 +13,12 @@ $(document).ready(function () {
         data: {
             datasets: [{
                 data: time_data,
-                backgroundColor: ['#216e7d', '#945141', '#8c7821'],
+                backgroundColor: ['#216e7d', '#945141', '#8c7821', '#196219'],
                 borderColor: '#212529',
                 borderWidth: 1,
                 label: 'by_media'
             }],
-            labels: ['Series', 'Anime', 'Movies']
+            labels: ['Series', 'Anime', 'Movies', 'Games']
         },
         options: {
             events: false,

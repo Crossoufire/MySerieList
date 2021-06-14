@@ -512,7 +512,7 @@ def update_Mylists_stats():
     stats = GlobalStats()
 
     def create_dict(data):
-        series_list, anime_list, movies_list = [], [], []
+        series_list, anime_list, movies_list, games_list = [], [], [], []
         for i in range(5):
             try:
                 series_list.append({"info": data[0][i][0], "quantity": data[0][i][2]})
@@ -526,14 +526,19 @@ def update_Mylists_stats():
                 movies_list.append({"info": data[2][i][0], "quantity": data[2][i][2]})
             except:
                 movies_list.append({"info": "-", "quantity": "-"})
+            try:
+                games_list.append({"info": data[3][i][0], "quantity": data[3][i][2]})
+            except:
+                games_list.append({"info": "-", "quantity": "-"})
 
-        return {"series": series_list, "anime": anime_list, "movies": movies_list}
+        return {"series": series_list, "anime": anime_list, "movies": movies_list, "games": games_list}
 
     times_spent = stats.get_total_time_spent()
-    total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0}
+    total_time = {"total": 0, "series": 0, "anime": 0, "movies": 0, "games": 0}
     if times_spent[0]:
         total_time = {"total": sum(times_spent[0]), "series": int(times_spent[0][0]/60),
-                      "anime": int(times_spent[0][1]/60), "movies": int(times_spent[0][2]/60)}
+                      "anime": int(times_spent[0][1]/60), "movies": int(times_spent[0][2]/60),
+                      "games": int(times_spent[0][3]/60)}
 
     top_media = stats.get_top_media()
     most_present_media = create_dict(top_media)
@@ -561,7 +566,8 @@ def update_Mylists_stats():
     nb_series = Series.query.all()
     nb_anime = Anime.query.all()
     nb_movies = Movies.query.all()
-    nb_media = {"series": len(nb_series), "anime": len(nb_anime), "movies": len(nb_movies)}
+    nb_games = Games.query.all()
+    nb_media = {"series": len(nb_series), "anime": len(nb_anime), "movies": len(nb_movies), "games": len(nb_games)}
 
     stats = MyListsStats(nb_users=len(nb_users), nb_media=json.dumps(nb_media),
                          total_time=json.dumps(total_time), top_media=json.dumps(most_present_media),

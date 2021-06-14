@@ -95,10 +95,9 @@ $.widget('custom.catcomplete', $.ui.autocomplete, {
 
 // --- Follow status ---------------------------------------------------------------------------------
 function follow_status(button, follow_id) {
-    let status;
     let $follow_button = $(button);
-
-    status = $follow_button.prop('value') !== '1';
+    let status = $follow_button.attr('value') !== '1';
+    console.log(status);
     $follow_button.addClass('disabled');
     $('#load_'+follow_id).show();
 
@@ -110,14 +109,16 @@ function follow_status(button, follow_id) {
         dataType: "json",
         success: function() {
             if (status === false) {
-                $follow_button.text('Follow');
-                $follow_button.prop('value', '0');
-                $follow_button.addClass('btn-primary').removeClass('btn-dark btn-smaller');
+                $follow_button.attr('data-original-title', 'Follow').tooltip('update').tooltip('show');
+                $follow_button.attr('value', '0');
+                $follow_button.attr('style', 'color: cadetblue;');
+                $follow_button.removeClass('fa-user-minus').addClass('fa-user-plus');
                 $follow_button.removeClass('disabled');
             } else {
-                $follow_button.text('Unfollow');
-                $follow_button.prop('value', '1');
-                $follow_button.removeClass('btn-primary').addClass('btn-dark btn-smaller');
+                $follow_button.attr('data-original-title', 'Unfollow').tooltip('update').tooltip('show');
+                $follow_button.attr('value', '1');
+                $follow_button.attr('style', 'color: indianred;');
+                $follow_button.removeClass('fa-user-plus').addClass('fa-user-minus');
                 $follow_button.removeClass('disabled');
             }
         },

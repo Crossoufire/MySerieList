@@ -32,15 +32,11 @@
             <h2 class="profile-name add-shadow"><b>{{ user.username }}</b>
                 {% if current_user.get_id() != user.id  %}
                     {% if current_user.is_following(user) %}
-                        <button id="follow_{{ user.id }}" class="btn btn-sm btn-dark follow-btn" value="1"
-                                onclick="follow_status(this, '{{ user.id }}')">
-                            Unfollow
-                        </button>
+                        <a class=" m-l-10 fas fa-xs fa-user-minus" data-toggle="tooltip" title="Unfollow"
+                           style="color: indianred;" value='1' onclick="follow_status(this, '{{ user.id }}')"></a>
                     {% else %}
-                        <button id="follow_{{ user.id }}" class="btn btn-sm btn-primary follow-btn" value="0"
-                                onclick="follow_status(this, '{{ user.id }}')">
-                            Follow
-                        </button>
+                        <a class=" m-l-10 fas fa-xs fa-user-plus" data-toggle="tooltip" title="Follow"
+                           style="color: cadetblue;" value='0' onclick="follow_status(this, '{{ user.id }}')"></a>
                     {% endif %}
                     <i id="load_{{ user.id }}" class="fas fa-spinner fast-spin" style="display: none;"></i>
                 {% endif %}
@@ -55,10 +51,27 @@
             </div>
         </div>
         <div class="header-profile-data-mobile text-center">
-            <h4 class="p-0 m-0 add-shadow"><b>{{ user.username }}&nbsp;</b></h4>
+            <h4 class="p-0 m-0 add-shadow"><b>{{ user.username }}</b>
+                <div style="display: inline;">
+                    {% if current_user.get_id() != user.id  %}
+                        {% if current_user.is_following(user) %}
+                            <a class=" m-l-10 fas fa-xs fa-user-minus" data-toggle="tooltip" title="Unfollow"
+                               style="color: indianred;" value='1' onclick="follow_status(this, '{{ user.id }}')"></a>
+                        {% else %}
+                            <a class=" m-l-10 fas fa-xs fa-user-plus" data-toggle="tooltip" title="Follow"
+                               style="color: cadetblue;" value='0' onclick="follow_status(this, '{{ user.id }}')"></a>
+                        {% endif %}
+                        <i id="load_{{ user.id }}" class="fas fa-spinner fast-spin" style="display: none;"></i>
+                    {% endif %}
+                </div>
+            </h4>
             <div class="header-join-follow add-shadow">
                 <b>Joined: {{ user.registered_on.strftime('%d %b %Y') }}</b><br>
-                <b>Followers: {{ user.followers.count() }}</b>
+                <form id='all_followers' style="display: inline;" method="POST" action={{ url_for('users.account',
+                 user_name=user.username) }}>
+                    <input class="d-none" name="all_followers" value="True">
+                    <a onclick="$('#all_followers').submit()"><b>Followers: {{ user.followers.count() }}</b></a>
+                </form>
             </div>
         </div>
     </div>

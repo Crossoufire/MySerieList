@@ -6,6 +6,7 @@ from MyLists.general.trending_data import TrendingData
 from flask import render_template, flash, request, abort
 from MyLists.API_data import ApiSeries, ApiAnime, ApiMovies
 from MyLists.models import User, RoleType, MyListsStats, Frames, Badges, Ranks, compute_media_time_spent
+from MyLists.scheduled_tasks import update_Mylists_stats
 
 bp = Blueprint('general', __name__)
 
@@ -60,6 +61,7 @@ def admin():
 @bp.route("/mylists_stats", methods=['GET'])
 @login_required
 def mylists_stats():
+    # update_Mylists_stats()
     all_stats = MyListsStats.get_all_stats()
 
     return render_template("mylists_stats.html", title='MyLists stats', all_stats=all_stats)

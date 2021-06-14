@@ -1290,7 +1290,8 @@ class MyListsStats(db.Model):
     def get_all_stats(cls):
         all_stats = cls.query.order_by(cls.timestamp.desc()).first()
 
-        return {'nb_users': all_stats.nb_users, 'nb_media': json.loads(all_stats.nb_media),
+        return {'nb_users': all_stats.nb_users,
+                'nb_media': json.loads(all_stats.nb_media),
                 'total_time': json.loads(all_stats.total_time),
                 'top_media': json.loads(all_stats.top_media),
                 'top_genres': json.loads(all_stats.top_genres),

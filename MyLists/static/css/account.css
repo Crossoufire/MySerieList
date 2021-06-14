@@ -152,6 +152,7 @@ a {
         display: none;
     }
     .header-profile-data-mobile {
+        width: 100%;
         display: block;
         position: absolute;
         left: 50%;
@@ -326,7 +327,7 @@ a {
 }
 
 .favorite-img {
-    height: 88px;
+    height: 75px;
     width: auto;
 }
 
