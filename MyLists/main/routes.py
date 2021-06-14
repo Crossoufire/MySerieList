@@ -193,7 +193,6 @@ def media_sheet_form(media_type, media_id):
     return render_template('media_sheet_form.html', title='Media Form', form=form, media_type=media_type)
 
 
-""" A REFACTORER """
 @bp.route("/your_next_airing", methods=['GET', 'POST'])
 @login_required
 def your_next_airing():
@@ -218,75 +217,69 @@ def your_next_airing():
                            airing_movies=next_movies_airing, movies_dates=movies_dates)
 
 
-""" A REFACTORER """
 @bp.route('/search_media', methods=['GET', 'POST'])
 @login_required
 def search_media():
     search = request.args.get('search')
+    media_select = request.args.get('media-select')
     page = request.args.get('page', 1)
 
-    if not search or len(search) == 0:
-        return redirect(request.referrer)
-
-    # Get the series, anime and movies results
-    try:
-        data_search = ApiData().TMDb_search(search, page=page)
-    except Exception as e:
-        data_search = {}
-        app.logger.error('[SYSTEM] - Error requesting the TMDb API: {}'.format(e))
-        flash('Sorry, an error occured, the TMDb API is unreachable for now.', 'warning')
-
-    if data_search.get("total_results", 0) == 0:
-        flash('Sorry, no results found for your query.', 'warning')
-        return redirect(request.referrer)
-
-    # Recover 1 page of results (20 max, series, anime, movies) without peoples
-    media_results = []
-    for result in data_search["results"]:
-        if result.get('known_for_department'):
-            continue
-
-        media_data = {'name': result.get('original_title') or result.get('original_name'),
-                      'overview': result.get('overview'),
-                      'first_air_date': result.get('first_air_date') or result.get('release_date'),
-                      'api_id': result['id']}
-
-        # Modify the first_air_date / release_date format
-        if media_data['first_air_date'] == '':
-            media_data['first_air_date'] = 'Unknown'
-
-        # Recover the poster_path or take a default image
-        if result["poster_path"]:
-            media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
-        else:
-            media_data["poster_path"] = url_for('static', filename="covers/anime_covers/default.jpg")
-
-        # Put data in different lists in function of media type
-        if result['media_type'] == 'tv':
-            media_data['url'] = f"https://www.themoviedb.org/tv/{result['id']}"
-            media_data['media'] = 'Series'
-            if result['origin_country'] == 'JP' or result['original_language'] == 'ja' \
-                    and 16 in result['genre_ids']:
-                media_data['media_type'] = ListType.ANIME.value
-                media_data['name'] = result['name']
-                media_data['media'] = 'Anime'
-                media_results.append(media_data)
-            else:
-                media_data['media_type'] = ListType.SERIES.value
-                media_results.append(media_data)
-        elif result['media_type'] == 'movie':
-            media_data['media'] = 'Movies'
-            media_data['media_type'] = ListType.MOVIES.value
-            media_data['url'] = f"https://www.themoviedb.org/movie/{result['id']}"
-            if result['original_language'] == 'ja' and 16 in result['genre_ids']:
-                media_data['name'] = result['title']
-            media_results.append(media_data)
-
-    games_results = []
-    if current_user.add_games:
-        # Get the games results
+    if media_select == "TMDB":
         try:
-            games_data = ApiData().IGDB_search(search)
+            data_search = TMDBMixin().search(search, page=page)
+        except Exception as e:
+            data_search = {}
+            app.logger.error('[SYSTEM] - Error requesting the TMDb API: {}'.format(e))
+            flash('Sorry, an error occured, the TMDb API is unreachable for now.', 'warning')
+
+        if data_search.get("total_results", 0) == 0:
+            flash('Sorry, no results found for your query.', 'warning')
+            return redirect(request.referrer)
+
+        # Recover 1 page of results, 20 max, removes the peoples
+        media_results = []
+        for result in data_search["results"]:
+            if result.get('known_for_department'):
+                continue
+
+            media_data = {'name': result.get('original_title') or result.get('original_name'),
+                          'overview': result.get('overview'),
+                          'first_air_date': result.get('first_air_date') or result.get('release_date'),
+                          'api_id': result['id']}
+
+            # Modify the first_air_date / release_date format
+            if media_data['first_air_date'] == "":
+                media_data['first_air_date'] = "Unknown"
+
+            # Recover the poster_path or take a default image
+            media_data["poster_path"] = url_for('static', filename="covers/series_covers/default.jpg")
+            if result["poster_path"]:
+                media_data["poster_path"] = "{}{}".format("http://image.tmdb.org/t/p/w300", result["poster_path"])
+
+            # Put data in different lists in function of media type
+            if result['media_type'] == 'tv':
+                media_data['url'] = f"https://www.themoviedb.org/tv/{result['id']}"
+                media_data['media'] = 'Series'
+                if result['origin_country'] == 'JP' or result['original_language'] == 'ja' \
+                        and 16 in result['genre_ids']:
+                    media_data['media_type'] = ListType.ANIME.value
+                    media_data['name'] = result['name']
+                    media_data['media'] = 'Anime'
+                    media_results.append(media_data)
+                else:
+                    media_data['media_type'] = ListType.SERIES.value
+                    media_results.append(media_data)
+            elif result['media_type'] == 'movie':
+                media_data['media'] = 'Movies'
+                media_data['media_type'] = ListType.MOVIES.value
+                media_data['url'] = f"https://www.themoviedb.org/movie/{result['id']}"
+                if result['original_language'] == 'ja' and 16 in result['genre_ids']:
+                    media_data['name'] = result['title']
+                media_results.append(media_data)
+    elif media_select == "IGDB":
+        media_results = []
+        try:
+            games_data = ApiGames().search(search)
         except Exception as e:
             games_data = {}
             app.logger.error('[ERROR] - Requesting the IGDB API: {}'.format(e))
@@ -309,13 +302,22 @@ def search_media():
                 # Put data in different lists in function of media type
                 media_data['media'] = 'Games'
                 media_data['media_type'] = ListType.GAMES.value
-
-                games_results.append(media_data)
-
-    media_results += games_results
+                media_results.append(media_data)
+    elif media_select == "users":
+        users_search = User.query.filter(User.username.like('%' + search + '%')).all()
+        media_results = []
+        for data in users_search:
+            user_data = {'display_name': data.username,
+                         'image_cover': '/static/profile_pics/' + data.image_file,
+                         'date': datetime.strftime(data.registered_on, '%d %b %Y'),
+                         'category': 'Users',
+                         'type': 'User'}
+            media_results.append(user_data)
+    else:
+        return request.referrer or '/'
 
     return render_template("media_search.html", title="Search", all_results=media_results, search=search,
-                           page=int(page), total_results=data_search['total_results'])
+                           page=int(page), total_results="")
 
 
 @bp.route('/graph_test', methods=['GET', 'POST'])
@@ -869,28 +871,24 @@ def lock_media():
 @login_required
 def autocomplete():
     search = request.args.get('q')
-
-    # Get the users results
-    users = User.query.filter(User.username.like('%'+search+'%')).all()
-
-    # Get the media results
-    try:
-        media_data = TMDBMixin().search(search)
-    except Exception as e:
-        media_data = {}
-        app.logger.error('[ERROR] - Requesting the TMDB API: {}'.format(e))
+    media_select = request.args.get('media-select')
 
     media_results = []
-    if media_data.get('total_results', 0) or 0 > 0:
-        for i, result in enumerate(media_data["results"]):
-            if i >= media_data["total_results"] or i > 19 or len(media_results) >= 7:
-                break
-            if result.get('known_for_department'):
-                continue
-            media_results.append(Autocomplete(result).get_autocomplete_dict())
+    if media_select == 'TMDB':
+        try:
+            media_data = TMDBMixin().search(search)
+        except Exception as e:
+            media_data = {}
+            app.logger.error('[ERROR] - Requesting the TMDB API: {}'.format(e))
 
-    games_results = []
-    if current_user.add_games:
+        if media_data.get('total_results', 0) or 0 > 0:
+            for i, result in enumerate(media_data["results"]):
+                if i >= media_data["total_results"] or i > 19 or len(media_results) >= 7:
+                    break
+                if result.get('known_for_department'):
+                    continue
+                media_results.append(Autocomplete(result).get_autocomplete_dict())
+    elif media_select == 'IGDB':
         try:
             games_data = ApiGames().search(search)
         except Exception as e:
@@ -899,18 +897,23 @@ def autocomplete():
 
         if len(games_data) > 0:
             for result in games_data:
-                if len(games_results) >= 5:
+                if len(media_results) >= 5:
                     break
-                games_results.append(Autocomplete(result).get_games_autocomplete_dict())
+                media_results.append(Autocomplete(result).get_games_autocomplete_dict())
+    elif media_select == 'users':
+        users = User.query.filter(User.username.like('%' + search + '%')).all()
+        for user in users:
+            media_results.append(Autocomplete(user).get_user_dict())
+    else:
+        return request.referrer or '/'
 
-    # Create the <total_results> list
-    total_results = media_results + users + games_results
-    if len(total_results) == 0:
+    if len(media_results) == 0:
         return jsonify(search_results=[{'nb_results': 0, 'category': None}]), 200
 
-    total_results = sorted(total_results, key=lambda i: i['category'])
+    # Sort the <total_results> list
+    media_results = sorted(media_results, key=lambda i: i['category'])
 
-    return jsonify(search_results=total_results), 200
+    return jsonify(search_results=media_results), 200
 
 
 @bp.route('/read_notifications', methods=['GET'])

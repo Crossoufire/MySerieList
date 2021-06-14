@@ -24,14 +24,18 @@
                 <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mobile-margin mobile-center">
                     <a class="fas fa-lg fa-user m-r-10 return-icon text-grey" data-toggle="tooltip" title="{{ user.username }}"
                      href="{{ url_for('users.account', user_name=user.username) }}"></a>
-                    <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime" data-toggle="tooltip" title="Animelist"
+                    <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime {% if media_list == 'animelist' %}
+                     disabled {% endif %}" data-toggle="tooltip" title="Animelist"
                      href="{{ url_for('main.mymedialist', media_list='animelist', user_name=user.username) }}"></a>
-                    <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series" data-toggle="tooltip" title="Serieslist"
+                    <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series {% if media_list == 'serieslist' %}
+                     disabled {% endif %}" data-toggle="tooltip" title="Serieslist"
                      href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=user.username) }}"></a>
-                    <a class="fas fa-lg fa-film m-r-10 return-icon text-movies" data-toggle="tooltip" title="Movieslist"
+                    <a class="fas fa-lg fa-film m-r-10 return-icon text-movies {% if media_list == 'movieslist' %}
+                     disabled {% endif %}" data-toggle="tooltip" title="Movieslist"
                      href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=user.username) }}"></a>
                     {% if user.add_games %}
-                        <a class="fas fa-lg fa-gamepad m-r-10 return-icon text-games" data-toggle="tooltip" title="Gameslist"
+                        <a class="fas fa-lg fa-gamepad m-r-10 return-icon text-games {% if media_list == 'gameslist' %}
+                         disabled {% endif %}" data-toggle="tooltip" title="Gameslist"
                          href="{{ url_for('main.mymedialist', media_list='gameslist', user_name=user.username) }}"></a>
                     {% endif %}
 
@@ -55,8 +59,9 @@
         </section>
         <section class="media-list-categories">
             <div class="categories-css p-1">
+                {% block categories scoped %} {% endblock categories %}
                 {% for cat in categories %}
-                    <a class="cat-btn{% if category == cat %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
+                    <a class="cat-btn{% if cat == category %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
                      media_list=media_list, user_name=user.username, category=cat, genre=genre, sorting=sorting, page_val=1) }}">
                         <b>{{ cat|upper }}</b>
                     </a>
@@ -88,6 +93,7 @@
                 <li class="nav-item dropdown li-genre-sort text-grey">
                     <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Genre {{ genre|upper }}</b></a>
                     <div class="dropdown-menu genre-drop">
+                        {% block add_genres scoped %} {% endblock add_genres %}
                         {% for ge in all_genres %}
                             <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
                              user_name=user.username, category=category, genre=ge, sorting=sorting, page_val=1) }}
@@ -100,6 +106,7 @@
                 <li class="nav-item dropdown li-genre-sort text-grey">
                     <a class="nav-link dropdown-toggle" data-toggle="dropdown"><b>Sort {{ sorting|upper }}</b></a>
                     <div class="dropdown-menu sort-drop">
+                        {% block add_sort scoped %} {% endblock add_sort %}
                         {% for so in all_sort %}
                             <a class="dropdown-item text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
                              user_name=user.username, category=category, genre=genre, sorting=so, page_val=1) }}
@@ -135,7 +142,7 @@
                                     <div class="bottom-card-cat{% if media_list =='movieslist' %}-movie {% endif %}">
                                         {{ item.category }}</div>
                                 {% endif %}
-                                {% if user_id == current_user.get_id() %}
+                                {% if current_user.get_id() == user_id %}
                                     <a class="card-btn-top-left fas fa-bars text-light"
                                        onclick="chargeButtons(card_{{ item.id }})"></a>
                                     <a class="card-btn-toop-right fas fa-trash text-light"
@@ -159,7 +166,7 @@
                                         </a>
                                     </div>
                                     <div class="col p-0">
-                                        <a id="score_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
+                                        <a id="score_{{ item.id }}" class="{% if current_user.get_id() != user_id %}
                                            disabled {% endif %}" data-toggle="tooltip" title="Score /10"
                                            onclick="scoreDrop(this, {{ item.id }}, '{{ media_list }}')">
                                             {{ item.score }}

@@ -2,6 +2,7 @@ from collections import OrderedDict
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
+import pandas as pd
 import iso639
 import json
 import pytz
@@ -12,8 +13,6 @@ from flask_login import UserMixin, current_user
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import func, desc, text, and_, or_
 from sqlalchemy.orm import aliased
-from sqlalchemy_filters import apply_filters
-
 from MyLists import app, db, login_manager
 
 
@@ -1719,9 +1718,7 @@ def get_games_stats(user):
     media_comp = GamesCompanies
     media_plat = GamesPlatforms
 
-    media_data = db.session.query(media, media_list) \
-        .join(media_list, media_list.media_id == media.id) \
-        .filter(media_list.user_id == user.id)
+    media_data = media.query.filter_by(id=user.id).statement
 
     top_companies = db.session.query(media_comp.name, media_list, func.count(media_comp.name).label('count')) \
         .join(media_comp, media_comp.media_id == media_list.media_id) \
@@ -1740,7 +1737,7 @@ def get_games_stats(user):
 
     media_periods = OrderedDict({"'90s-": 0, "'91-95s": 0, "'96-00s": 0, "'01-05s": 0, "'06-10s": 0, "'11-15s": 0,
                                  "'16-20s+": 0})
-    media_hltb_main = OrderedDict({'<10h': 0, '10h-19h': 0, '20h-29h': 0, '30h-49h': 0, '50h-79h': 0, '80h+': 0})
+    media_hltb_main = OrderedDict({'<10h': 0, '10h-20h': 0, '21h-35h': 0, '36h-50h': 0, '51h-80h': 0, '81h+': 0})
     for element in media_data:
         # --- Period stats ----------------------------------------------------------------------------
         try:
@@ -1748,6 +1745,20 @@ def get_games_stats(user):
             airing_year = int(airing_year.split('-')[2])
         except:
             airing_year = 0
+
+        df = pd.read_sql(sql=media_data, con=db.session.bind)
+
+        print(df.head())
+
+        df['release_date'] = df['release_date'].astype(int)
+        df["release_date"].apply(lambda x: datetime.utcfromtimestamp(x).strftime('%d-%b-%Y'))
+
+        print(df.head())
+
+        df = df.set_index('Year')
+        df = df.resample('5AS').sum()
+
+        print(df.head())
 
         if airing_year <= 1990:
             media_periods["'90s-"] += 1
@@ -1778,15 +1789,15 @@ def get_games_stats(user):
         if hltb_main < 600:
             media_hltb_main['<10h'] += 1
         elif 600 <= hltb_main < 1200:
-            media_hltb_main['10h-19h'] += 1
+            media_hltb_main['10h-20h'] += 1
         elif 1200 <= hltb_main < 1800:
-            media_hltb_main['20h-29h'] += 1
+            media_hltb_main['21h-35h'] += 1
         elif 1800 <= hltb_main < 3000:
-            media_hltb_main['30h-49h'] += 1
+            media_hltb_main['36h-50h'] += 1
         elif 3000 <= hltb_main < 4800:
-            media_hltb_main['50h-79h'] += 1
+            media_hltb_main['51h-80h'] += 1
         elif hltb_main >= 4800:
-            media_hltb_main['80h+'] += 1
+            media_hltb_main['81h+'] += 1
 
     data = {'genres': top_genres, 'platforms': top_platforms, 'companies': top_companies, 'periods': media_periods,
             'hltb_main': media_hltb_main}
