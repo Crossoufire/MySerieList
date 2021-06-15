@@ -10,24 +10,25 @@
     <div class="m-t-30 ml-auto mr-auto m-b-50">
         {% for data in all_data %}
             {% if data[0].__class__.__name__ != "Undefined" %}
-                <h3 class="mt-1 mb-0 p-t-30"><b>NEXT {{ data[0][0].__class__.__name__.upper() }}</b></h3>
+                <h3 class="mt-1 mb-0 p-t-30"><b>NEXT {{ data[0][0][0].__class__.__name__.upper() }}</b></h3>
                 <hr class="mt-2 mb-4">
                 <div class="row">
                     {% for media in data %}
                         <div class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
                             <div class="card bg-transparent">
                                 <div class="view overlay">
-                                    <img class="card-img-top" src="{{ media[0].get_media_cover() }}" style="height: auto;" alt=""/>
+                                    <img class="card-img-top" src="{{ media[0][0].get_media_cover() }}"
+                                     style="height: auto;" alt=""/>
                                     <a class="mask flex-center rgba-black-strong"
-                                       href="/media_sheet/{{ data[0][0].__class__.__name__ }}/{{ media[0].id }}">
-                                        <span class="font-mask text-center text-light">{{ media[0].name }}</span>
+                                       href="/media_sheet/{{ data[0][0].__class__.__name__ }}/{{ media[0][0].id }}">
+                                        <span class="font-mask text-center text-light">{{ media[0][0].name }}</span>
                                     </a>
                                 </div>
-                                {% if media[0].season_to_air %}
+                                {% if media[0][0].season_to_air %}
                                     <div class="absolute-data text-center">
-                                        S{{ '{:02d}'.format(media[0].season_to_air) }}
+                                        S{{ '{:02d}'.format(media[0][0].season_to_air) }}
                                         &nbsp; - &nbsp;
-                                        E{{ '{:02d}'.format(media[0].episode_to_air) }}
+                                        E{{ '{:02d}'.format(media[0][0].episode_to_air) }}
                                     </div>
                                 {% endif %}
                                 <div class="absolute-data-2 text-center">{{ media[1] }}</div>

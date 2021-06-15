@@ -25,17 +25,17 @@
                     <a class="fas fa-lg fa-user m-r-10 return-icon text-grey" data-toggle="tooltip" title="{{ user.username }}"
                      href="{{ url_for('users.account', user_name=user.username) }}"></a>
                     <a class="fas fa-lg fa-torii-gate m-r-10 return-icon text-anime {% if media_list == 'animelist' %}
-                     disabled {% endif %}" data-toggle="tooltip" title="Animelist"
-                     href="{{ url_for('main.mymedialist', media_list='animelist', user_name=user.username) }}"></a>
+                     disabled" style="background: #150e0e; {% endif %}" data-toggle="tooltip" title="Animelist"
+                       href="{{ url_for('main.mymedialist', media_list='animelist', user_name=user.username) }}"></a>
                     <a class="fas fa-lg fa-tv m-r-10 return-icon-tv text-series {% if media_list == 'serieslist' %}
-                     disabled {% endif %}" data-toggle="tooltip" title="Serieslist"
+                     disabled" style="background: #150e0e; {% endif %}" data-toggle="tooltip" title="Serieslist"
                      href="{{ url_for('main.mymedialist', media_list='serieslist', user_name=user.username) }}"></a>
                     <a class="fas fa-lg fa-film m-r-10 return-icon text-movies {% if media_list == 'movieslist' %}
-                     disabled {% endif %}" data-toggle="tooltip" title="Movieslist"
+                     disabled" style="background: #150e0e; {% endif %}" data-toggle="tooltip" title="Movieslist"
                      href="{{ url_for('main.mymedialist', media_list='movieslist', user_name=user.username) }}"></a>
                     {% if user.add_games %}
                         <a class="fas fa-lg fa-gamepad m-r-10 return-icon text-games {% if media_list == 'gameslist' %}
-                         disabled {% endif %}" data-toggle="tooltip" title="Gameslist"
+                         disabled" style="background: #150e0e; {% endif %}" data-toggle="tooltip" title="Gameslist"
                          href="{{ url_for('main.mymedialist', media_list='gameslist', user_name=user.username) }}"></a>
                     {% endif %}
 
@@ -59,7 +59,7 @@
         </section>
         <section class="media-list-categories">
             <div class="categories-css p-1">
-                {% block categories scoped %} {% endblock categories %}
+                {% block categories scoped %}{% endblock categories %}
                 {% for cat in categories %}
                     <a class="cat-btn{% if cat == category %} btn-selected{% endif %}" href="{{ url_for('main.mymedialist',
                      media_list=media_list, user_name=user.username, category=cat, genre=genre, sorting=sorting, page_val=1) }}">

@@ -1,25 +1,19 @@
 {% extends 'medialist_base.html' %}
 
 
-{% block categories %}
-    {% set categories = ['All', 'Completed', 'Endless', 'Multiplayer', 'Favorite', 'Stats'] %}
-{% endblock categories %}
+{% set categories = ['All', 'Completed', 'Endless', 'Multiplayer', 'Favorite', 'Stats'] %}
 
 
-{% block add_genres %}
-    {% set all_genres = ["All", "4X", "Action",  "Adventure", "Arcade", "Business", "Card Game", "Comedy", "Drama",
-    "Educational", "Erotic", "Fantasy", "Fighting","Hack and Slash", "Historical", "Horror", "Indie", "Kids", "MOBA",
-    "Music", "Mystery", "Non-fiction", "Open world", "Party", "Pinball", "Platform", "Point-and-click", "Puzzle",
-    "Quiz", "Racing", "Real Time Strategy (RTS)", "Role-playing (RPG)", "Romance", "Sandbox", "Science fiction",
-    "Shooter", "Simulator", "Sport", "Stealth", "Strategy", "Survival", "Tactical", "Thriller",
-    "Turn-based strategy (TBS)", "Visual Novel", "Warfare"] %}
-{% endblock add_genres %}
+{% set all_genres = ["All", "4X", "Action",  "Adventure", "Arcade", "Business", "Card Game", "Comedy", "Drama",
+"Educational", "Erotic", "Fantasy", "Fighting","Hack and Slash", "Historical", "Horror", "Indie", "Kids", "MOBA",
+"Music", "Mystery", "Non-fiction", "Open world", "Party", "Pinball", "Platform", "Point-and-click", "Puzzle",
+"Quiz", "Racing", "Real Time Strategy (RTS)", "Role-playing (RPG)", "Romance", "Sandbox", "Science fiction",
+"Shooter", "Simulator", "Sport", "Stealth", "Strategy", "Survival", "Tactical", "Thriller",
+"Turn-based strategy (TBS)", "Visual Novel", "Warfare"] %}
 
 
-{% block add_sort %}
-    {% set all_sort = ['Playtime +', 'Playtime -', 'Title A-Z', 'Title Z-A', 'Score +', 'Score -', 'Score IGDB +',
-    'Score IGDB -', 'Comments','Release date +','Release date -'] %}
-{% endblock add_sort %}
+{% set all_sort = ['Playtime +', 'Playtime -', 'Title A-Z', 'Title Z-A', 'Score +', 'Score -', 'Score IGDB +',
+'Score IGDB -', 'Comments','Release date +','Release date -'] %}
 
 
 {% block data %}
