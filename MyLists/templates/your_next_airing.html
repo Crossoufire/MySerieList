@@ -8,94 +8,42 @@
 
 {% block content %}
     <div class="m-t-30 ml-auto mr-auto m-b-50">
-        <h3 class="mt-1 mb-0 p-t-30"><b>NEXT SERIES TO AIR</b></h3>
-        <hr class="mt-2 mb-4 top-series">
-        <div class="row">
-            {% for series in airing_series %}
-                <div class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
-                    <div class="card bg-transparent">
-                        <div class="view overlay">
-                            <img class="card-img-top" src="/static/covers/series_covers/{{ series[0].image_cover }}"
-                                 style="height: auto;" alt=""/>
-                            <a class="mask flex-center rgba-black-strong" href="/media_sheet/Series/{{ series[0].id }}">
-                                <span class="font-mask text-center text-light">{{ series[0].name }}</span>
-                            </a>
+        {% for data in all_data %}
+            {% if data[0].__class__.__name__ != "Undefined" %}
+                <h3 class="mt-1 mb-0 p-t-30"><b>NEXT {{ data[0][0].__class__.__name__.upper() }}</b></h3>
+                <hr class="mt-2 mb-4">
+                <div class="row">
+                    {% for media in data %}
+                        <div class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+                            <div class="card bg-transparent">
+                                <div class="view overlay">
+                                    <img class="card-img-top" src="{{ media[0].get_media_cover() }}" style="height: auto;" alt=""/>
+                                    <a class="mask flex-center rgba-black-strong"
+                                       href="/media_sheet/{{ data[0][0].__class__.__name__ }}/{{ media[0].id }}">
+                                        <span class="font-mask text-center text-light">{{ media[0].name }}</span>
+                                    </a>
+                                </div>
+                                {% if media[0].season_to_air %}
+                                    <div class="absolute-data text-center">
+                                        S{{ '{:02d}'.format(media[0].season_to_air) }}
+                                        &nbsp; - &nbsp;
+                                        E{{ '{:02d}'.format(media[0].episode_to_air) }}
+                                    </div>
+                                {% endif %}
+                                <div class="absolute-data-2 text-center">{{ media[1] }}</div>
+                            </div>
                         </div>
-                        <div class="absolute-data text-center bg-series">
-                            S{{ '{:02d}'.format(series[0].season_to_air) }}
-                            &nbsp; - &nbsp;
-                            E{{ '{:02d}'.format(series[0].episode_to_air) }}
-                        </div>
-                        <div class="absolute-data-2 text-center bg-series">
-                           {{ series_dates[loop.index0] }}
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
-        </div>
-        {% if not airing_series %}
-            <div class="text-center m-b-40"><i><b>No next airing found in your series list.</b></i></div>
-        {% endif %}
-
-        <h3 class="mt-1 mb-0 p-t-20"><b>NEXT ANIME TO AIR</b></h3>
-        <hr class="mt-2 mb-4 top-anime">
-        <div class="row">
-            {% for series in airing_anime %}
-                <div class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
-                    <div class="card bg-transparent">
-                        <div class="view overlay">
-                            <img class="card-img-top" src="/static/covers/anime_covers/{{ series[0].image_cover }}"
-                                 height="300" width="200" style="height: auto;" alt=""/>
-                            <a class="mask flex-center rgba-black-strong" href="/media_sheet/Anime/{{ series[0].id }}">
-                                <span class="font-mask text-center text-light">{{ series[0].name }}</span>
-                            </a>
-                        </div>
-                        <div class="absolute-data text-center bg-anime">
-                            S{{ '{:02d}'.format(series[0].season_to_air) }}
-                            &nbsp; - &nbsp;
-                            E{{ '{:02d}'.format(series[0].episode_to_air) }}
-                        </div>
-                        <div class="absolute-data-2 text-center bg-anime">
-                            {{ anime_dates[loop.index0] }}
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-        {% if not airing_anime %}
-            <div class="text-center m-b-40"><i><b>No next airing found in your anime list.</b></i></div>
-        {% endif %}
-
-        <h3 class="mt-1 mb-0 p-t-20"><b>NEXT MOVIES TO AIR</b></h3>
-        <hr class="mt-2 mb-4 top-movies">
-        <div class="row">
-            {% for series in airing_movies %}
-                <div class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
-                    <div class="card bg-transparent">
-                        <div class="view overlay">
-                            <img class="card-img-top" src="/static/covers/movies_covers/{{ series[0].image_cover }}"
-                                 height="300" width="200" style="height: auto;" alt=""/>
-                            <a class="mask flex-center rgba-black-strong" href="/media_sheet/Movies/{{ series[0].id }}">
-                                <span class="font-mask text-center text-light">{{ series[0].name }}</span>
-                            </a>
-                        </div>
-                        <div class="absolute-data-2 text-center bg-movies">
-                            {{ movies_dates[loop.index0] }}
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-        {% if not airing_movies %}
-            <div class="text-center m-b-50"><i><b>No next airing found in your movies list.</b></i></div>
-        {% endif %}
-    </div>
+            {% endif %}
+        {% endfor %}
+     </div>
 {% endblock content %}
 
 
 {% block script %}
     <script>
-        // --- Create Row gutters ----------------------------------------------
+        // --- Create Row gutters ---------------
         $(document).ready(function() {
             let $row = $('.row');
             function a() {

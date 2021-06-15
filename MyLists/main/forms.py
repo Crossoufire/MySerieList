@@ -1,11 +1,11 @@
 from flask import request
 from flask_wtf import FlaskForm
 from flask_wtf.file import DataRequired
+# from wtforms_alchemy import model_form_factory
 from wtforms import StringField, SubmitField, TextAreaField
-from wtforms_alchemy import model_form_factory
 
 
-ModelForm = model_form_factory(FlaskForm)
+# ModelForm = model_form_factory(FlaskForm)
 
 
 class MediaComment(FlaskForm):

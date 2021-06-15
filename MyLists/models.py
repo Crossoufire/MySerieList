@@ -3,11 +3,11 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 import pandas as pd
-import iso639
+# import iso639
 import json
 import pytz
 import random
-import rq
+# import rq
 from flask import abort, url_for
 from flask_login import UserMixin, current_user
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -43,6 +43,24 @@ def get_models_type(model_type):
             except:
                 pass
     return _
+
+
+def change_air_format(date, media_sheet=False, games=False):
+    if media_sheet and not games:
+        try:
+            return datetime.strptime(date, '%Y-%m-%d').strftime("%b %Y")
+        except:
+            return 'Unknown'
+    elif not media_sheet and not games:
+        try:
+            return datetime.strptime(date, '%Y-%m-%d').strftime("%d %b %Y")
+        except:
+            return 'Unknown'
+    elif games:
+        try:
+            return datetime.utcfromtimestamp(int(date)).strftime('%d %b %Y')
+        except:
+            return 'Unknown'
 
 
 class dotdict(dict):
@@ -572,18 +590,23 @@ class TVBase(db.Model):
                     'current_season': tmp.current_season, 'score': tmp.score, 'favorite': tmp.favorite,
                     'status': tmp.status.value, 'rewatched': tmp.rewatched, 'comment': tmp.comment}
         data = dotdict(data)
+
         return data
 
     @classmethod
     def get_next_airing(cls):
         media_list = eval(cls.__name__ + 'List')
-        query = db.session.query(cls, media_list) \
-            .join(cls, cls.id == media_list.media_id) \
+
+        query = db.session.query(cls) \
             .filter(cls.next_episode_to_air > datetime.utcnow(), media_list.user_id == current_user.id,
                     and_(media_list.status != Status.RANDOM, media_list.status != Status.DROPPED)) \
             .order_by(cls.next_episode_to_air.asc()).all()
 
-        return query
+        formated_dates = []
+        for data in query:
+            formated_dates.append(change_air_format(data.next_episode_to_air))
+
+        return list(map(list, zip(query, formated_dates)))
 
 
 # --- SERIES ------------------------------------------------------------------------------------------------------
@@ -882,6 +905,21 @@ class Movies(MediaMixin, db.Model):
         return data
 
     @classmethod
+    def get_next_airing(cls):
+        media_list = eval(cls.__name__ + 'List')
+
+        query = db.session.query(cls) \
+            .filter(cls.release_date > datetime.utcnow(), media_list.user_id == current_user.id,
+                    and_(media_list.status != Status.RANDOM, media_list.status != Status.DROPPED)) \
+            .order_by(cls.release_date.asc()).all()
+
+        formated_dates = []
+        for data in query:
+            formated_dates.append(change_air_format(data.release_date))
+
+        return list(map(list, zip(query, formated_dates)))
+
+    @classmethod
     def compute_time_spent(cls, media=None, movie_status=None, movie_delete=False, movie_add=False, new_rewatch=0,
                            old_rewatch=0, movie_duration=0, user_id=None):
 
@@ -1039,12 +1077,17 @@ class Games(MediaMixin, db.Model):
     @classmethod
     def get_next_airing(cls):
         media_list = eval(cls.__name__ + 'List')
-        query = db.session.query(cls, media_list) \
-            .join(cls, cls.id == media_list.media_id) \
-            .filter(cls.release_date > datetime.utcnow(), media_list.user_id == current_user.id) \
+
+        query = db.session.query(cls) \
+            .filter(cls.release_date > datetime.utcnow(), media_list.user_id == current_user.id,
+                    and_(media_list.status != Status.RANDOM, media_list.status != Status.DROPPED)) \
             .order_by(cls.release_date.asc()).all()
 
-        return query
+        formated_dates = []
+        for data in query:
+            formated_dates.append(change_air_format(data.release_date))
+
+        return list(map(list, zip(query, formated_dates)))
 
     @classmethod
     def compute_time_spent(cls, old_playtime=0, new_playtime=0, user_id=None):
@@ -1572,26 +1615,6 @@ def get_next_airing(list_type):
         .filter(media_data > datetime.utcnow(), media_list.user_id == current_user.id,
                 and_(media_list.status != Status.RANDOM, media_list.status != Status.DROPPED)) \
         .order_by(media_data.asc()).all()
-
-    return query
-
-
-# Check if <media> exists
-def check_media(media_id, list_type, add=False):
-    media = eval(list_type.value.capitalize().replace('list', ''))
-    media_list = eval(list_type.value.capitalize().replace('l', 'L'))
-
-    if add:
-        query = db.session.query(media).filter(media.id == media_id).first()
-        if query:
-            test = db.session.query(media_list)\
-                .filter(media_list.media_id == media_id, media_list.user_id == current_user.id).first()
-            if test:
-                query = None
-    else:
-        query = db.session.query(media, media_list) \
-            .join(media, media.id == media_list.media_id) \
-            .filter(media.id == media_id, media_list.user_id == current_user.id).first()
 
     return query
 

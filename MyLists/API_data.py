@@ -7,7 +7,7 @@ from pathlib import Path
 from urllib import request
 from MyLists import app, db
 from datetime import datetime
-from howlongtobeatpy import HowLongToBeat
+# from howlongtobeatpy import HowLongToBeat
 from ratelimit import sleep_and_retry, limits
 from urllib.request import urlretrieve, Request
 from MyLists.models import ListType, MediaType, Series, Anime, SeriesGenre, AnimeGenre, AnimeActors, SeriesActors, \
@@ -166,7 +166,7 @@ class ApiTV(TMDBMixin):
 
         duration = self.API_data.get("episode_run_time") or None
         self.media_details['duration'] = self._duration
-        if duration and float(duration) != 0:
+        if duration and float(duration[0]) != 0:
             self.media_details['duration'] = duration[0]
 
         origin_country = self.API_data.get("origin_country") or None
@@ -226,8 +226,8 @@ class ApiSeries(ApiTV):
         return json.loads(response.text)
 
     def add_data_to_db(self):
-        self.media = Series(**self.media_details['media_data'])
-        db.session.add()
+        self.media = Series(**self.all_data['media_data'])
+        db.session.add(self.media)
         db.session.commit()
 
         for genre in [{**item, 'media_id': self.media.id} for item in self.all_data['genres_data']]:
@@ -299,8 +299,8 @@ class ApiAnime(ApiTV):
         return anime_genres_list
 
     def add_data_to_db(self):
-        self.media = Anime(**self.media_details['media_data'])
-        db.session.add()
+        self.media = Anime(**self.all_data['media_data'])
+        db.session.add(self.media)
         db.session.commit()
 
         if len(self.all_data['anime_genres_data']) > 0:
@@ -528,7 +528,7 @@ class ApiGames(ApiData):
                          'platforms_data': platforms_list, 'hltb_time': hltb_time}
 
     def add_data_to_db(self):
-        self.media = Games(**self.media_details['media_data'])
+        self.media = Games(**self.all_data['media_data'])
         db.session.add(self.media)
         db.session.commit()
 

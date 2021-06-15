@@ -6,11 +6,11 @@ from flask_wtf.file import FileAllowed, FileField
 from flask_login import login_required, current_user
 from MyLists.main.functions import compute_time_spent
 from MyLists.API_data import ApiData, TMDBMixin, ApiGames
-from MyLists.main.forms import MediaComment, SearchForm, ModelForm
+from MyLists.main.forms import MediaComment, SearchForm # ModelForm
 from MyLists.main.media_object import change_air_format, Autocomplete
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect, session
-from MyLists.models import ListType, Status, RoleType, MediaType, get_next_airing, User, get_media_query, \
-    get_more_stats, get_games_stats, UserLastUpdate, get_models_group
+from MyLists.models import ListType, Status, RoleType, MediaType, User, get_media_query, get_more_stats, \
+    get_games_stats, UserLastUpdate, get_models_group, get_models_type
 
 bp = Blueprint('main', __name__)
 
@@ -108,9 +108,19 @@ def write_comment(media_type, media_id):
 def media_sheet(media_type, media_id):
     # Check if <media_type> is valid
     try:
-        models = get_models_group(MediaType(media_type))
+        media_type = MediaType(media_type)
+        models = get_models_group(media_type)
     except ValueError:
         abort(400)
+
+    if media_type == MediaType.SERIES:
+        list_type = ListType.SERIES
+    elif media_type == MediaType.ANIME:
+        list_type = ListType.ANIME
+    elif media_type == MediaType.MOVIES:
+        list_type = ListType.MOVIES
+    elif media_type == MediaType.GAMES:
+        list_type = ListType.GAMES
 
     # Check if <media_id> came from an API
     from_api = request.args.get('search')
@@ -131,7 +141,7 @@ def media_sheet(media_type, media_id):
             except Exception as e:
                 flash('Sorry, a problem occured trying to load the media info. Please try again later.', 'warning')
                 app.logger.error('[ERROR] - Occured trying to add media ({}) ID [{}] to DB: {}'
-                                 .format(media_type, media_id, e))
+                                 .format(list_type.value, media_id, e))
                 location = request.referrer or '/'
                 return redirect(location)
         else:
@@ -139,7 +149,7 @@ def media_sheet(media_type, media_id):
 
     # If <media> and <api_id>: redirect for URL with media.id instead of media.api_id
     if media and from_api:
-        return redirect(url_for('main.media_sheet', media_type=media_type, media_id=media.id))
+        return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media.id))
 
     # Get the HTML template
     html_template = models[0].media_sheet_template()
@@ -147,7 +157,8 @@ def media_sheet(media_type, media_id):
     # Get the list info of the user on this media
     list_info = media.get_user_list_info()
 
-    return render_template(html_template, title=media.name, media=media, list_info=list_info, media_list=media_type)
+    return render_template(html_template, title=media.name, media=media, list_info=list_info,
+                           media_list=list_type.value)
 
 
 @bp.route("/media_sheet_form/<media_type>/<media_id>", methods=['GET', 'POST'])
@@ -196,25 +207,13 @@ def media_sheet_form(media_type, media_id):
 @bp.route("/your_next_airing", methods=['GET', 'POST'])
 @login_required
 def your_next_airing():
-    next_series_airing = get_next_airing(ListType.SERIES)
-    next_anime_airing = get_next_airing(ListType.ANIME)
-    next_movies_airing = get_next_airing(ListType.MOVIES)
+    models = get_models_type('Media')
 
-    series_dates = []
-    for series in next_series_airing:
-        series_dates.append(change_air_format(series[0].next_episode_to_air))
+    all_data = []
+    for model in models:
+        all_data.append(model.get_next_airing())
 
-    anime_dates = []
-    for anime in next_anime_airing:
-        anime_dates.append(change_air_format(anime[0].next_episode_to_air))
-
-    movies_dates = []
-    for movies in next_movies_airing:
-        movies_dates.append(change_air_format(movies[0].release_date))
-
-    return render_template('your_next_airing.html', title='Your next airing', airing_series=next_series_airing,
-                           series_dates=series_dates, airing_anime=next_anime_airing, anime_dates=anime_dates,
-                           airing_movies=next_movies_airing, movies_dates=movies_dates)
+    return render_template('your_next_airing.html', title='Your next airing', all_data=all_data)
 
 
 @bp.route('/search_media', methods=['GET', 'POST'])
@@ -481,23 +480,23 @@ def update_episode():
         return '', 400
 
     # Check if the media exists
-    media = models[0].check_media(media_id)
+    media = models[1].query.filter(user_id=current_user.id, media_id=media_id).first()
     if not media:
         return '', 400
 
     # Check if the episode number is between 1 and <last_episode>
-    if 1 > new_episode > media[0].eps_per_season[media[1].current_season - 1].episodes:
+    if 1 > new_episode > media.media.eps_per_season[media.current_season - 1].episodes:
         return '', 400
 
     # Get the old data
-    old_season = media[1].current_season
-    old_episode = media[1].last_episode_watched
-    old_watched = media[1].eps_watched
+    old_season = media.current_season
+    old_episode = media.last_episode_watched
+    old_watched = media.eps_watched
 
     # Set the new data
-    new_watched = sum([x.episodes for x in media[0].eps_per_season[:old_season-1]]) + new_episode
-    media[1].last_episode_watched = new_episode
-    media[1].eps_watched = new_watched + (media[1].rewatched * media[0].total_episodes)
+    new_watched = sum([x.episodes for x in media.media.eps_per_season[:old_season-1]]) + new_episode
+    media.last_episode_watched = new_episode
+    media.eps_watched = new_watched + (media.rewatched * media.media.total_episodes)
     app.logger.info('[User {}] {} [ID {}] episode updated from {} to {}'
                     .format(current_user.id, list_type, media_id, old_episode, new_episode))
 
@@ -505,11 +504,11 @@ def update_episode():
     db.session.commit()
 
     # Set the last updates
-    UserLastUpdate.set_last_update(media=media[0], media_type=list_type, old_season=old_season,
+    UserLastUpdate.set_last_update(media=media.media, media_type=list_type, old_season=old_season,
                                    new_season=old_season, old_episode=old_episode, new_episode=new_episode)
 
     # Compute the new time spent
-    models[0].compute_time_spent(media=media[0], old_watched=old_watched, new_watched=new_watched)
+    models[0].compute_time_spent(media=media.media, old_watched=old_watched, new_watched=new_watched)
 
     # Commit the final changes
     db.session.commit()
@@ -872,8 +871,6 @@ def lock_media():
 def autocomplete():
     search = request.args.get('q')
     media_select = request.args.get('media_select')
-
-    print(search, media_select)
 
     media_results = []
     if media_select == 'TMDB':
