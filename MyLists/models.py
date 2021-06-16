@@ -4,6 +4,7 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 import pandas as pd
+import numpy as np
 # import iso639
 import json
 import pytz
@@ -15,8 +16,6 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import func, desc, text, and_, or_
 from sqlalchemy.orm import aliased
 from MyLists import app, db, login_manager
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_columns', None)
 
 
 @login_manager.user_loader
@@ -1743,91 +1742,67 @@ def get_more_stats(user, list_type):
 
 # Get user's games stats
 def get_games_stats(user):
-    media = Games
-    media_list = GamesList
-    media_genres = GamesGenre
-    media_comp = GamesCompanies
-    media_plat = GamesPlatforms
+    media_data = GamesList.query.filter_by(user_id=user.id).statement
 
-    media_data = media_list.query.filter_by(user_id=3).statement
+    top_companies = db.session.query(GamesCompanies.name, GamesList, func.count(GamesCompanies.name).label('count')) \
+        .join(GamesCompanies, GamesCompanies.media_id == GamesList.media_id) \
+        .filter(GamesList.user_id == user.id, GamesCompanies.name != 'Unknown') \
+        .group_by(GamesCompanies.name).order_by(text('count desc')).limit(10).all()
 
-    top_companies = db.session.query(media_comp.name, media_list, func.count(media_comp.name).label('count')) \
-        .join(media_comp, media_comp.media_id == media_list.media_id) \
-        .filter(media_list.user_id == user.id, media_comp.name != 'Unknown') \
-        .group_by(media_comp.name).order_by(text('count desc')).limit(10).all()
+    top_platforms = db.session.query(GamesPlatforms.name, GamesList, func.count(GamesPlatforms.name).label('count')) \
+        .join(GamesPlatforms, GamesPlatforms.media_id == GamesList.media_id) \
+        .filter(GamesList.user_id == user.id, GamesPlatforms.name != 'Unknown') \
+        .group_by(GamesPlatforms.name).order_by(text('count desc')).limit(10).all()
 
-    top_platforms = db.session.query(media_plat.name, media_list, func.count(media_plat.name).label('count')) \
-        .join(media_plat, media_plat.media_id == media_list.media_id) \
-        .filter(media_list.user_id == user.id, media_plat.name != 'Unknown') \
-        .group_by(media_plat.name).order_by(text('count desc')).limit(10).all()
+    top_genres = db.session.query(GamesGenre.genre, GamesList, func.count(GamesGenre.genre).label('count')) \
+        .join(GamesGenre, GamesGenre.media_id == GamesList.media_id) \
+        .filter(GamesList.user_id == user.id, GamesGenre.genre != 'Unknown') \
+        .group_by(GamesGenre.genre).order_by(text('count desc')).limit(10).all()
 
-    top_genres = db.session.query(media_genres.genre, media_list, func.count(media_genres.genre).label('count')) \
-        .join(media_genres, media_genres.media_id == media_list.media_id) \
-        .filter(media_list.user_id == user.id, media_genres.genre != 'Unknown') \
-        .group_by(media_genres.genre).order_by(text('count desc')).limit(10).all()
+    df1 = pd.read_sql(sql=media_data, con=db.session.bind)
 
-    media_periods = OrderedDict({"'90s-": 0, "'91-95s": 0, "'96-00s": 0, "'01-05s": 0, "'06-10s": 0, "'11-15s": 0,
-                                 "'16-20s+": 0})
-    media_hltb_main = OrderedDict({'<10h': 0, '10h-20h': 0, '21h-35h': 0, '36h-50h': 0, '51h-80h': 0, '81h+': 0})
-
-    start = time.time()
-    df = pd.read_sql(sql=media_data, con=db.session.bind)
+    # --- Games count by release dates ----------------------------------------------------
+    df = df1.copy()
     df['count'] = 1
     df = df[df.release_date != "Unknown"]
     df['release_date'] = df['release_date'].astype(int)
     df = df.set_index(['release_date'])
     df.index = pd.to_datetime(df.index, unit='s')
     df = df.resample('5AS').sum()
-    print(df)
-    end = time.time()
-    print(end - start)
+    games_count_by_release = list(zip(df['release_date'].values, df['count'].values))
+    print(games_count_by_release)
 
+    # --- Games by playtime interval ------------------------------------------------------
+    df1 = df1.set_index(['playtime'])
+    tata = np.array([600, 1200, 1800, 3000, 4800])
+    idx = pd.cut(df1.index, bins=np.append([0], tata), include_lowest=True, right=False)
+    df1 = df1.groupby(idx, as_index=False).agg(','.join)
+    print(df1)
+
+    media_hltb_main = OrderedDict({'<10h': 0, '10h-20h': 0, '21h-35h': 0, '36h-50h': 0, '51h-80h': 0, '81h+': 0})
     for element in media_data:
-        # --- Period stats ----------------------------------------------------------------------------
         try:
-            airing_year = datetime.utcfromtimestamp(int(element.media.release_date)).strftime('%d-%b-%Y')
-            airing_year = int(airing_year.split('-')[2])
+            hltb_main = element[0].hltb_main_time
+            if '½' in hltb_main:
+                hltb_main = hltb_main.replace('½', '')
+                hltb_main = float(hltb_main)*60 + 30
+            else:
+                hltb_main = float(hltb_main)*60
         except:
             continue
 
-        if airing_year <= 1990:
-            media_periods["'90s-"] += 1
-        elif 1990 < airing_year < 1996:
-            media_periods["'91-95s"] += 1
-        elif 1995 < airing_year < 2001:
-            media_periods["'96-00s"] += 1
-        elif 2000 < airing_year < 2006:
-            media_periods["'01-05s"] += 1
-        elif 2005 < airing_year < 2011:
-            media_periods["'06-10s"] += 1
-        elif 2010 < airing_year < 2016:
-            media_periods["'11-15s"] += 1
-        elif airing_year >= 2016:
-            media_periods["'16-20s+"] += 1
-
-        # # --- Eps / runtime stats ---------------------------------------------------------------------
-        # try:
-        #     hltb_main = element[0].hltb_main_time
-        #     if '½' in hltb_main:
-        #         hltb_main = hltb_main.replace('½', '')
-        #         hltb_main = float(hltb_main)*60 + 30
-        #     else:
-        #         hltb_main = float(hltb_main)*60
-        # except:
-        #     hltb_main = 0
-        #
-        # if hltb_main < 600:
-        #     media_hltb_main['<10h'] += 1
-        # elif 600 <= hltb_main < 1200:
-        #     media_hltb_main['10h-20h'] += 1
-        # elif 1200 <= hltb_main < 1800:
-        #     media_hltb_main['21h-35h'] += 1
-        # elif 1800 <= hltb_main < 3000:
-        #     media_hltb_main['36h-50h'] += 1
-        # elif 3000 <= hltb_main < 4800:
-        #     media_hltb_main['51h-80h'] += 1
-        # elif hltb_main >= 4800:
-        #     media_hltb_main['81h+'] += 1
+        if hltb_main < 600:
+            media_hltb_main['<10h'] += 1
+        elif 600 <= hltb_main < 1200:
+            media_hltb_main['10h-20h'] += 1
+        elif 1200 <= hltb_main < 1800:
+            media_hltb_main['21h-35h'] += 1
+        elif 1800 <= hltb_main < 3000:
+            media_hltb_main['36h-50h'] += 1
+        elif 3000 <= hltb_main < 4800:
+            media_hltb_main['51h-80h'] += 1
+        elif hltb_main >= 4800:
+            media_hltb_main['81h+'] += 1
 
     data = {'genres': top_genres, 'platforms': top_platforms, 'companies': top_companies, 'periods': media_periods,
             'hltb_main': media_hltb_main}
