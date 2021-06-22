@@ -128,72 +128,72 @@
         {% else %}
             <div class="row m-b-40">
                 {% for item in data['items_list'] %}
-                    <div id="card_{{ item.id }}" values="{% block data scoped %}{% endblock data %}"
-                    cat="{{ item.category }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
+                    <div id="card_{{ item.media.id }}" values="{% block data scoped %}{% endblock data %}"
+                    cat="{{ item.status.value }}" class="card-container col-xl-2 col-lg-2 col-md-3 col-sm-3 col-4">
                         <div class="card bg-transparent">
                             <div class="view overlay">
-                                <img class="card-img-top" height="300" width="200" src="{{ item.cover }}" alt=""
-                                style="height: auto;"/>
+                                <img class="card-img-top" src="{{ item.media.get_media_cover() }}" alt="" height="300"
+                                width="200" style="height: auto;"/>
                                 <a class="mask flex-center rgba-black-strong" href="{{ url_for('main.media_sheet',
-                                media_type=item.media, media_id=item.id) }}">
-                                    <span class="font-mask text-center text-light">{{ item.display_name }}</span>
+                                media_type=item.media.__class__.__name__, media_id=item.media.id) }}">
+                                    <span class="font-mask text-center text-light">{{ item.media.name }}</span>
                                 </a>
                                 {% if category == 'Search' or category == 'All' %}
                                     <div class="bottom-card-cat{% if media_list =='movieslist' %}-movie {% endif %}">
-                                        {{ item.category }}</div>
+                                        {{ item.status.value }}</div>
                                 {% endif %}
-                                {% if current_user.get_id() == user_id %}
+                                {% if current_user.get_id() == user.id %}
                                     <a class="card-btn-top-left fas fa-bars text-light"
-                                       onclick="chargeButtons(card_{{ item.id }})"></a>
+                                       onclick="chargeButtons(card_{{ item.media.id }})"></a>
                                     <a class="card-btn-toop-right fas fa-trash text-light"
-                                       onclick="deleteElement(card_{{ item.id }}, '{{ media_list }}')"></a>
+                                       onclick="deleteElement(card_{{ item.media.id }}, '{{ media_list }}')"></a>
                                 {% else %}
-                                    {% if item.common %}
-                                        <div class="card-ribbon"></div>
-                                    {% else %}
-                                        <a class="card-btn-top-left fas fa-plus text-light"
-                                           onclick="ChargeButtonsOther(card_{{ item.id }})"></a>
-                                    {% endif %}
+{#                                    {% if item.common %}#}
+{#                                        <div class="card-ribbon"></div>#}
+{#                                    {% else %}#}
+{#                                        <a class="card-btn-top-left fas fa-plus text-light"#}
+{#                                           onclick="ChargeButtonsOther(card_{{ item.id }})"></a>#}
+{#                                    {% endif %}#}
                                 {% endif %}
                             </div>
                             <div class="bottom-card-info{% if media_list =='movieslist' %}-movie {% endif %}">
                                 <div class="row no-gutters" style="opacity: 0.7;">
                                     <div class="col p-0">
                                         <a class="fa-heart {% if item.favorite %} fas favorited {% else %}
-                                        far {% endif %} {% if user_id != current_user.get_id() %}
+                                        far {% endif %} {% if current_user.get_id() != user.id %}
                                         disabled {% endif %}" data-toggle='tooltip' title="Favorite"
-                                           onclick="addFavorite(this,'{{ item.id }}','{{ media_list }}')">
+                                           onclick="addFavorite(this,'{{ item.media.id }}','{{ media_list }}')">
                                         </a>
                                     </div>
                                     <div class="col p-0">
-                                        <a id="score_{{ item.id }}" class="{% if current_user.get_id() != user_id %}
+                                        <a id="score_{{ item.media.id }}" class="{% if current_user.get_id() != user.id %}
                                            disabled {% endif %}" data-toggle="tooltip" title="Score /10"
-                                           onclick="scoreDrop(this, {{ item.id }}, '{{ media_list }}')">
-                                            {{ item.score }}
+                                           onclick="scoreDrop(this, {{ item.media.id }}, '{{ media_list }}')">
+                                            {{ item.score or '---' }}
                                         </a>
                                     </div>
                                     <div class="col p-0">
-                                        <span id="com_{{ item.id }}" style="display: none;">{{ item.comment }}</span>
-                                        {% if current_user.get_id() == user_id %}
+                                        <span id="com_{{ item.media.id }}" style="display: none;">{{ item.comment }}</span>
+                                        {% if current_user.get_id() == user.id %}
                                             <a class="fa-comment-alt text-light{% if item.comment %} fas commented{% else %}
                                             far{% endif %}" data-toggle='tooltip' title="Comments" {% if item.comment %}
-                                            onclick="showComment(card_{{ item.id }}, '{{ item.media }}', '{{ item.id }}',
-                                            true)"{% else %} href="{{ url_for('main.write_comment', media_type=item.media,
-                                            media_id=item.id) }}"{% endif %}></a>
+                                            onclick="showComment(card_{{ item.media.id }}, '{{ item.media.__class__.__name__ }}',
+                                            '{{ item.media.id }}', true)"{% else %} href="{{ url_for('main.write_comment',
+                                            media_type=item.media.__class__.__name__, media_id=item.media.id) }}"{% endif %}></a>
                                         {% else %}
                                             <a class="fa-comment-alt text-light {% if item.comment %}fas commented {% else %}
                                             far disabled{% endif %}" data-toggle="tooltip" title="Comments"
-                                            {% if item.comment %} onclick="showComment(card_{{ item.id }}, '{{ item.media }}',
-                                            '{{ item.id }}', false)"{% endif %}></a>
+                                            {% if item.comment %} onclick="showComment(card_{{ item.media.id }}, '{{ item.media.__class__.__name__ }}',
+                                            '{{ item.media.id }}', false)"{% endif %}></a>
                                         {% endif %}
                                     </div>
                                     {% if media_list != 'gameslist' %}
-                                        <div class="col" {% if item.category == 'Completed' %}style="display: block;"
+                                        <div class="col" {% if item.status.value == 'Completed' %}style="display: block;"
                                          {% else %} style="display: none;"{% endif %}>
-                                            <a id="rew_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
+                                            <a id="rew_{{ item.media.id }}" class="{% if current_user.get_id() != user.id %}
                                              disabled {% endif %}" data-toggle="tooltip" title="How many time you rewatched this
                                              media. Do not count the inital completion." onclick="rewatchDrop(this,
-                                             {{ item.id }}, '{{ media_list }}')">
+                                             {{ item.media.id }}, '{{ media_list }}')">
                                                 {{ item.rewatched }}
                                             </a>
                                         </div>
@@ -203,11 +203,11 @@
                             {% block seas_eps_drop scoped %}
                             {% endblock seas_eps_drop %}
                             {% if media_list == 'gameslist' %}
-                                <div class="seas-eps-drop-container {% if user_id != current_user.get_id() %}
+                                <div class="seas-eps-drop-container {% if current_user.get_id() != user.id %}
                                  disabled {% endif %}">
-                                    <a id="play_{{ item.id }}" class="{% if user_id != current_user.get_id() %}
+                                    <a id="play_{{ item.media.id }}" class="{% if current_user.get_id() != user.id %}
                                      disabled {% endif %}" data-toggle="tooltip" title="Update playtime"
-                                     onclick="playtimeDrop(this, {{ item.id }})">
+                                     onclick="playtimeDrop(this, {{ item.media.id }})">
                                         {{ (item.playtime/60)|int }} hours
                                     </a>
                                 </div>
@@ -224,7 +224,7 @@
                 {% for i in range(data['total_pages']) %}
                     <li class="page-item {% if i + 1 == data['actual_page'] %}active {% endif %}">
                         <a class="page-link text-light" href="{{ url_for('main.mymedialist', media_list=media_list,
-                         user_name=username, category=category, genre=genre, sorting=sorting,
+                         user_name=user.username, category=category, genre=genre, sorting=sorting,
                          page_val=i + 1) }}{% if category == 'Search' %}?q={{ search_q }}{% endif %}">
                             {{ '{:02d}'.format(i + 1) }}
                         </a>

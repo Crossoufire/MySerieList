@@ -106,17 +106,18 @@ hr {
 }
 
 .auto-select {
+    border: none;
     position: absolute;
-    margin-left: 215px;
+    margin-left: 227px;
 	cursor: pointer;
     background: transparent;
-    border: none;
     color: lightgrey;
-    width: 90px;
+    width: 80px;
 }
 
 .auto-select:focus {
-    border: none;
+    outline: 0;
+    box-shadow: none;
 }
 
 .auto-opt {

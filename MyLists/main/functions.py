@@ -1,12 +1,5 @@
-import os
-import secrets
-from PIL import Image
-from flask import flash
-
-from MyLists import db, app
-from datetime import datetime
 from flask_login import current_user
-from MyLists.models import MediaType, ListType, Status, UserLastUpdate, User
+from MyLists.models import ListType, Status, User
 
 
 def compute_time_spent(media=None, list_type=None, old_watched=0, new_watched=0, movie_status=None, movie_delete=False,

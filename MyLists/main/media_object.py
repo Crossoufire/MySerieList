@@ -1,7 +1,7 @@
 import pykakasi
 from flask import url_for
 from datetime import datetime
-from MyLists.models import ListType, Status
+from MyLists.models import ListType
 
 
 def latin_alphabet(original_name):
@@ -96,74 +96,3 @@ class MediaListObj:
             self.current_season = media_data[1].current_season
         elif list_type == ListType.GAMES:
             self.playtime = media_data[1].playtime
-
-
-# Parsing the <API_data> to dict to display the autocomplete
-class Autocomplete:
-    def __init__(self, result):
-        self.tmdb_cover_link = "http://image.tmdb.org/t/p/w300"
-        self.igdb_cover_link = "https://images.igdb.com/igdb/image/upload/t_1080p/"
-        self.result = result
-        self.info = {}
-
-    def get_autocomplete_dict(self):
-        self.info['tmdb_id'] = self.result.get('id')
-
-        self.info['image_cover'] = url_for('static', filename="covers/series_covers/default.jpg")
-        if self.result.get('poster_path'):
-            self.info['image_cover'] = "{}{}".format(self.tmdb_cover_link, self.result.get('poster_path'))
-
-        if self.result.get('media_type') == 'tv':
-            self.get_tv_dict()
-        elif self.result.get('media_type') == 'movie':
-            self.get_movies_dict()
-
-        return self.info
-
-    def get_games_autocomplete_dict(self):
-        self.info['igdb_id'] = self.result.get('id')
-        self.info['display_name'] = self.result.get('name')
-        self.info['category'] = 'Games'
-        self.info['type'] = 'Game'
-
-        self.info['image_cover'] = url_for('static', filename="covers/series_covers/default.jpg")
-        if self.result.get('cover'):
-            self.info['image_cover'] = "{}{}.jpg".format(self.igdb_cover_link, self.result['cover']['image_id'])
-
-        self.info['date'] = change_air_format(self.result.get('first_release_date'), games=True)
-
-        return self.info
-
-    def get_user_dict(self):
-        self.info = {'display_name': self.result.username,
-                     'image_cover': '/static/profile_pics/' + self.result.image_file,
-                     'date': datetime.strftime(self.result.registered_on, '%d %b %Y'),
-                     'category': 'Users',
-                     'type': 'User'}
-
-        return self.info
-
-    def get_tv_dict(self):
-        self.info['category'] = 'Series/Anime'
-
-        return_latin = latin_alphabet(self.result.get('original_name'))
-        self.info['display_name'] = self.result.get('name')
-        if return_latin is True:
-            self.info['display_name'] = self.result.get('original_name')
-
-        self.info['date'] = change_air_format(self.result.get('first_air_date'))
-        self.info['type'] = 'Series'
-        if self.result.get('origin_country') == 'JP' or self.result.get('original_language') == 'ja' \
-                and 16 in self.result.get('genre_ids'):
-            self.info['type'] = 'Anime'
-
-    def get_movies_dict(self):
-        self.info['category'] = 'Movies'
-
-        return_latin = latin_alphabet(self.result.get('original_title'))
-        self.info['display_name'] = self.result.get('title')
-        if return_latin is True:
-            self.info['display_name'] = self.result.get('original_title')
-
-        self.info['date'] = change_air_format(self.result.get('release_date'))
-        self.info['type'] = 'Movie'

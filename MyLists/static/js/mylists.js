@@ -19,15 +19,9 @@ $(function() {
         select: function (event, ui) {
             let form = document.createElement('form');
             form.method = 'POST';
-            if (ui.item.type === 'Series') {
-                form.action = '/media_sheet/Series/' + ui.item.tmdb_id + '?search=True';
-            } else if (ui.item.type === 'Anime') {
-                form.action = '/media_sheet/Anime/' + ui.item.tmdb_id + '?search=True';
-            } else if (ui.item.type === 'Movie') {
-                form.action = '/media_sheet/Movies/' + ui.item.tmdb_id + '?search=True';
-            } else if (ui.item.type === 'Game') {
-                form.action = '/media_sheet/Games/' + ui.item.igdb_id + '?search=True';
-            } else if (ui.item.type === 'User') {
+            if (ui.item.type !== 'User') {
+                form.action = '/media_sheet/'+ui.item.type+'/' + ui.item.api_id + '?search=True';
+            } else {
                 form.action = '/account/' + ui.item.display_name;
             }
             document.body.appendChild(form);

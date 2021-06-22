@@ -211,7 +211,7 @@ def refresh_element_data(api_id, list_type):
                 users_list = SeriesList.query.filter_by(media_id=element.id).all()
 
                 for user in users_list:
-                    episodes_watched = user.eps_watched
+                    episodes_watched = user.total
 
                     count = 0
                     for i in range(0, len(data['seasons_data'])):
@@ -246,7 +246,7 @@ def refresh_element_data(api_id, list_type):
                 users_list = AnimeList.query.filter_by(media_id=element.id).all()
 
                 for user in users_list:
-                    episodes_watched = user.eps_watched
+                    episodes_watched = user.total
 
                     count = 0
                     for i in range(0, len(data['seasons_data'])):

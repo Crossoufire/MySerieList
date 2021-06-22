@@ -3,23 +3,22 @@
 
 {% set categories = ['All', 'Watching', 'Completed', 'On Hold', 'Random', 'Dropped', 'Plan to Watch', 'Favorite'] %}
 
-
 {% set all_sort = ['Title A-Z', 'Title Z-A', 'Score +', 'Score -', 'Score TMDB +', 'Score TMDB -', 'Rewatch',
 'Comments', 'Release date +','Release date -'] %}
 
 
 {% block data %}
-    {{ item.eps_per_season }}-{{ media_list }}-{{ item.id }}
+    {{ item.media.eps_per_season }}-{{ media_list }}-{{ item.media.id }}
 {% endblock data %}
 
 
 {% block seas_eps_drop %}
-    <div class="seas-eps-drop-container" {% if category == 'plan-to-watch'
-    or category == 'random' %} style="display: none;"{% endif %}>
+    <div class="seas-eps-drop-container" {% if category == 'Plan to Watch'
+    or category == 'Random' %} style="display: none;"{% endif %}>
         <select id="S_{{ item.id }}" class="seas-eps-drop
-         {% if user_id != current_user.get_id() %} disabled{% endif %}"
-                onchange="updateSeason('{{ item.id }}', this)">
-            {% for i in range(item.eps_per_season|length) %}
+         {% if current_user.get_id() != user.id %} disabled{% endif %}"
+                onchange="updateSeason('{{ item.media.id }}', this)">
+            {% for i in range(item.media.eps_per_season|length) %}
                 <option class="seas-eps-drop-options" {% if i + 1 == item.current_season %}
                         selected="selected"{% endif %}>
                     {{ "S{:02}".format(i + 1) }}
@@ -29,19 +28,19 @@
 
         <span style="border-right: 2px solid gray;"></span>
 
-        <select id="E_{{ item.id }}" class="text-light text-center p-0 seas-eps-drop
-         {% if user_id != current_user.get_id() %} disabled{% endif %}"
-                onchange="updateEpisode('{{ item.id }}', this, '{{ media_list }}')">
-            {% if category == 'plan-to-watch' or category == 'random' %}
-                {% for i in range(0, item.eps_per_season[item.current_season - 1]) %}
+        <select id="E_{{ item.media.id }}" class="text-light text-center p-0 seas-eps-drop
+         {% if current_user.get_id() != user.id %} disabled{% endif %}"
+                onchange="updateEpisode('{{ item.media.id }}', this, '{{ media_list }}')">
+            {% if category == 'Plan to Watch' or category == 'Random' %}
+                {% for i in range(0, item.media.eps_per_season[item.current_season - 1].episodes) %}
                     <option class="seas-eps-drop-options" {% if i + 1 == 1 %} selected="selected" {% endif %}>
                         {{ "E{:02}".format(i + 1) }}
                     </option>
                 {% endfor %}
             {% else %}
-                {% for i in range(item.eps_per_season[item.current_season - 1]) %}
-                    <option class="seas-eps-drop-options"
-                    {% if i + 1 == item.last_episode_watched %} selected="selected" {% endif %}>
+                {% for i in range(item.media.eps_per_season[item.current_season - 1].episodes) %}
+                    <option class="seas-eps-drop-options" {% if i + 1 == item.last_episode_watched %}
+                    selected="selected" {% endif %}>
                         {{ "E{:02}".format(i + 1) }}
                     </option>
                 {% endfor %}

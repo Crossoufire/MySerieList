@@ -1,21 +1,21 @@
+import time
+
 from PIL import Image
 from MyLists import db, app
 from datetime import datetime
 import os, json, secrets, pytz
 from flask_wtf.file import FileAllowed, FileField
 from flask_login import login_required, current_user
-from MyLists.main.functions import compute_time_spent
+from MyLists.main.media_object import change_air_format
 from MyLists.API_data import ApiData, TMDBMixin, ApiGames
-from MyLists.main.forms import MediaComment, SearchForm # ModelForm
-from MyLists.main.media_object import change_air_format, Autocomplete
+from MyLists.main.forms import MediaComment, SearchForm, ModelForm
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect, session
 from MyLists.models import ListType, Status, RoleType, MediaType, User, get_media_query, get_more_stats, \
-    get_games_stats, UserLastUpdate, get_models_group, get_models_type
+    get_games_stats, UserLastUpdate, get_models_group, get_models_type, get_media_query_test
 
 bp = Blueprint('main', __name__)
 
 
-""" A REFACTORER """
 @bp.route("/<media_list>/<user_name>/", methods=['GET', 'POST'])
 @bp.route("/<media_list>/<user_name>/<category>/", methods=['GET', 'POST'])
 @bp.route("/<media_list>/<user_name>/<category>/genre/<genre>/by/<sorting>/page/<page_val>", methods=['GET', 'POST'])
@@ -53,7 +53,8 @@ def mymedialist(media_list, user_name, category=None, genre='All', sorting=None,
 
     # Get the corresponding data depending on the selected category
     if category != 'Stats':
-        category, media_data = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
+        # category, media_data = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
+        category, media_data = get_media_query_test(user.id, list_type, category, genre, sorting, page_val, q)
     else:
         if list_type == ListType.GAMES:
             media_data = get_games_stats(user)
@@ -91,7 +92,7 @@ def write_comment(media_type, media_id):
         media.comment = comment
 
         db.session.commit()
-        app.logger.info('[{}] added a comment on {} with ID [{}]'.format(current_user.id, media_type, media_id))
+        app.logger.info(f"[{current_user.id}] added a comment on {media_type} with ID [{media_id}]")
 
         if not comment or comment == '':
             flash('Your comment has been removed/is empty.', 'warning')
@@ -185,14 +186,14 @@ def media_sheet_form(media_type, media_id):
         if form.image_cover.data != media.image_cover:
             _, f_ext = os.path.splitext(form.image_cover.data.filename)
             picture_fn = secrets.token_hex(8) + f_ext
-            picture_path = os.path.join(app.root_path, f'static/covers/{media_type.lower()}_covers', picture_fn)
+            picture_path = os.path.join(app.root_path, f"static/covers/{media_type.lower()}_covers", picture_fn)
             try:
                 i = Image.open(form.image_cover.data)
                 i = i.convert('RGB')
                 i = i.resize((300, 450), Image.ANTIALIAS)
                 i.save(picture_path, quality=90)
             except Exception as e:
-                app.logger.error('[SYSTEM] Error occured updating media cover: {}'.format(e))
+                app.logger.error(f"[SYSTEM] Error occured updating media cover: {e}")
                 flash(str(e), 'warning')
                 picture_fn = media.image_cover
             form.image_cover.data = picture_fn
@@ -228,7 +229,7 @@ def search_media():
             data_search = TMDBMixin().search(search, page=page)
         except Exception as e:
             data_search = {}
-            app.logger.error('[SYSTEM] - Error requesting the TMDb API: {}'.format(e))
+            app.logger.error(f"[SYSTEM] - Error requesting the TMDb API: {e}")
             flash('Sorry, an error occured, the TMDb API is unreachable for now.', 'warning')
 
         if data_search.get("total_results", 0) == 0:
@@ -281,7 +282,7 @@ def search_media():
             games_data = ApiGames().search(search)
         except Exception as e:
             games_data = {}
-            app.logger.error('[ERROR] - Requesting the IGDB API: {}'.format(e))
+            app.logger.error(f"[ERROR] - Requesting the IGDB API: {e}")
             flash('Sorry, an error occured, the IGDB API is unreachable for now.', 'warning')
 
         # Recover the games results
@@ -435,27 +436,23 @@ def update_season():
     # Get the old data
     old_season = media.current_season
     old_episode = media.last_episode_watched
-    old_watched = media.eps_watched
 
     # Set the new data
     new_watched = sum([x.episodes for x in media.media.eps_per_season[:new_season-1]]) + 1
     media.current_season = new_season
     media.last_episode_watched = 1
-    media.eps_watched = new_watched + (media.rewatched * media.media.total_episodes)
-    app.logger.info('[User {}] - [Media {}] - [ID {}] season updated from {} to {}'
-                    .format(current_user.id, media_list, media_id, old_season, new_season))
-
-    # commit the first changes
-    db.session.commit()
+    new_total = new_watched + (media.rewatched * media.media.total_episodes)
+    media.total = new_total
+    app.logger.info(f"[User {current_user.id}] - [{media_list}] - [ID {media_id}] season updated to {new_season}")
 
     # Set the last updates
-    UserLastUpdate.set_last_update(media=media[0], media_type=list_type, old_season=old_season,
+    UserLastUpdate.set_last_update(media=media.media, media_type=list_type, old_season=old_season,
                                    new_season=new_season, new_episode=1, old_episode=old_episode)
 
-    # Compute the new time spent
-    models[0].compute_time_spent(media=media[0], old_watched=old_watched, new_watched=new_watched)
+    # Compute new time spent
+    models[0].compute_time_spent(media=media, new_data=new_total)
 
-    # Commit the final changes
+    # Commit the changes
     db.session.commit()
 
     return '', 204
@@ -491,32 +488,27 @@ def update_episode():
     # Get the old data
     old_season = media.current_season
     old_episode = media.last_episode_watched
-    old_watched = media.eps_watched
 
     # Set the new data
     new_watched = sum([x.episodes for x in media.media.eps_per_season[:old_season-1]]) + new_episode
     media.last_episode_watched = new_episode
-    media.eps_watched = new_watched + (media.rewatched * media.media.total_episodes)
-    app.logger.info('[User {}] {} [ID {}] episode updated from {} to {}'
-                    .format(current_user.id, list_type, media_id, old_episode, new_episode))
-
-    # Commit the first changes
-    db.session.commit()
+    new_total = new_watched + (media.rewatched * media.media.total_episodes)
+    media.total = new_total
+    app.logger.info(f"[User {current_user.id}] {list_type} [ID {media_id}] episode updated to {new_episode}")
 
     # Set the last updates
     UserLastUpdate.set_last_update(media=media.media, media_type=list_type, old_season=old_season,
                                    new_season=old_season, old_episode=old_episode, new_episode=new_episode)
 
-    # Compute the new time spent
-    models[0].compute_time_spent(media=media.media, old_watched=old_watched, new_watched=new_watched)
+    # Compute new time spent
+    models[0].compute_time_spent(media=media, new_data=new_total)
 
-    # Commit the final changes
+    # Commit the changes
     db.session.commit()
 
     return '', 204
 
 
-""" A REFACTORER """
 @bp.route('/update_category', methods=['POST'])
 @login_required
 def update_category():
@@ -540,31 +532,24 @@ def update_category():
     if not new_status:
         return '', 400
 
-    # Recover the media
+    # Get the media
     media = models[1].query.filter_by(user_id=current_user.id, media_id=media_id).first()
     if not media:
         return '', 400
 
-    old_status = media.status
-    media.status = new_status
-
-    old_rewatch, old_watched, new_watched = media.category_changes(new_status)
+    # Change the status and get data to compute last updates and time spent
+    new_total = media.category_changes(new_status)
 
     # Set the last updates
-    UserLastUpdate.set_last_update(media=media.media, media_type=list_type, old_status=old_status,
+    UserLastUpdate.set_last_update(media=media.media, media_type=list_type, old_status=media.status,
                                    new_status=new_status)
 
     # Compute the new time spent
-    if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        compute_time_spent(media=media.media, list_type=list_type, old_watched=old_watched, new_watched=new_watched,
-                           old_rewatch=old_rewatch)
-    elif list_type == ListType.MOVIES:
-        compute_time_spent(media=media.media, list_type=list_type, movie_status=media.status, old_rewatch=old_rewatch,
-                           movie_duration=media.media.duration)
+    models[0].compute_time_spent(media=media, new_data=new_total)
 
+    # Commit the session
     db.session.commit()
-    app.logger.info("[User {}] {}'s category [ID {}] changed from {} to {}."
-                    .format(current_user.id, media_id, list_type, old_status, new_status))
+    app.logger.info(f"[User {current_user.id}] {list_type}'s category [ID {media_id}] changed to {new_status}")
 
     return '', 204
 
@@ -598,13 +583,9 @@ def update_score():
     if not media:
         return '', 400
 
-    # Get the old data
-    old_score = media.score
-
     # Set the new data
     media.score = new_score
-    app.logger.info('[{}] Series ID {} score updated from {} to {}'
-                    .format(current_user.id, media_id, old_score, new_score))
+    app.logger.info(f"[{current_user.id}] Series ID {media_id} score updated to {new_score}")
 
     # Commit the changes
     db.session.commit()
@@ -634,22 +615,16 @@ def update_playtime():
     if not media:
         return '', 400
 
-    # Get the old data
-    old_playtime = media.playtime
-
-    # Set the new data
-    media.playtime = new_playtime
-    app.logger.info('[{}] Games ID {} playtime updated from {} to {}'.format(current_user.id, media_id, old_playtime,
-                                                                             new_playtime))
-
     # Set the last updates
-    UserLastUpdate.set_last_update(media=media.media, media_type=list_type, old_playtime=old_playtime,
+    UserLastUpdate.set_last_update(media=media.media, media_type=list_type, old_playtime=media.playtime,
                                    new_playtime=new_playtime)
 
-    models[0].compute_time_spent(old_playtime=old_playtime, new_playtime=new_playtime)
+    # Compute the new time spent
+    models[0].compute_time_spent(media=media, new_data=new_playtime)
 
     # Commit the changes
     db.session.commit()
+    app.logger.info(f"[{current_user.id}] Games ID {media_id} playtime updated to {new_playtime}")
 
     return '', 204
 
@@ -680,21 +655,15 @@ def update_rewatch():
     if not media or media.status != Status.COMPLETED:
         return '', 400
 
-    # Get the old data
-    old_rewatch = media.rewatched
+    # Update rewatch and total data watched
+    new_total = media.update_total_watched(new_rewatch)
 
-    # Set the new data
-    media.rewatched = new_rewatch
-    app.logger.info('[{}] Media ID {} rewatched {}x times'.format(current_user.id, media_id, new_rewatch))
-
-    # Update total data watched
-    media.update_total_watched(new_rewatch)
+    # Compute the new time spent
+    models[0].compute_time_spent(media=media, new_data=new_total)
 
     # Commit the changes
     db.session.commit()
-
-    # Compute the new time spent
-    models[0].compute_time_spent(media=media, old_rewatch=old_rewatch, new_rewatch=new_rewatch)
+    app.logger.info('[{}] Media ID {} rewatched {}x times'.format(current_user.id, media_id, new_rewatch))
 
     return '', 204
 
@@ -729,7 +698,6 @@ def add_favorite():
     return '', 204
 
 
-""" A REFACTORER """
 @bp.route('/add_element', methods=['POST'])
 @login_required
 def add_element():
@@ -768,17 +736,13 @@ def add_element():
 
     # Commit the changes
     db.session.commit()
-    app.logger.info('[User {}] {} Added [ID {}] in the category: {}'
-                    .format(current_user.id, list_type.value.replace('list', ''), media_id, new_status.value))
+    app.logger.info(f"[User {current_user.id}] {list_type} Added [ID {media_id}] in the category: {new_status}")
 
     # Set the last update
     UserLastUpdate.set_last_update(media=media, media_type=list_type, new_status=new_status)
 
     # Compute the new time spent
-    if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        compute_time_spent(media=media, new_watched=new_watched, list_type=list_type)
-    elif list_type == ListType.MOVIES:
-        compute_time_spent(media=media, list_type=list_type, movie_status=new_status, movie_add=True)
+    models[0].compute_time_spent(media=media, new_data=new_watched, add_=True)
 
     # Commit the last updates and the new time spent changes
     db.session.commit()
@@ -786,7 +750,6 @@ def add_element():
     return '', 204
 
 
-""" A REFACTORER """
 @bp.route('/delete_element', methods=['POST'])
 @login_required
 def delete_element():
@@ -797,36 +760,25 @@ def delete_element():
     except:
         return '', 400
 
-    # Check if the <media_list> exist and is valid
+    # Check if <list_type> exist and is valid
     try:
-        list_type = ListType(media_list)
-        models = get_models_group(list_type)
-    except ValueError:
-        return '', 400
+        models = get_models_group(ListType(media_list))
+    except:
+        try:
+            models = get_models_group(MediaType(media_list))
+        except:
+            return '', 400
 
     media = models[1].query.filter_by(user_id=current_user.id, media_id=media_id).first()
     if not media:
         return '', 400
 
-    # Get the old data
-    if list_type != ListType.GAMES:
-        old_rewatch = media.rewatched
-
-    # Compute the new time spent
-    if list_type == ListType.SERIES or list_type == ListType.ANIME:
-        old_watched = media.eps_watched
-        models[0].compute_time_spent(media=media.media, old_watched=old_watched, list_type=list_type,
-                                     old_rewatch=old_rewatch)
-    elif list_type == ListType.MOVIES:
-        models[0].compute_time_spent(media=media.media, list_type=list_type, movie_status=media.status,
-                                     movie_delete=True, old_rewatch=old_rewatch)
-    elif list_type == ListType.GAMES:
-        models[0].compute_time_spent(media=media.media, list_type=list_type, old_playtime=media.playtime)
+    models[0].compute_time_spent(media=media, new_data=0)
 
     # Delete the media from the user's list
     db.session.delete(media)
     db.session.commit()
-    app.logger.info('[User {}] {} [ID {}] successfully removed.'.format(current_user.id, list_type, media_id))
+    app.logger.info(f"[User {current_user.id}] {media_list} [ID {media_id}] successfully removed.")
 
     return '', 204
 
@@ -861,48 +813,35 @@ def lock_media():
 
     media.lock_status = lock_status
     db.session.commit()
+    app.logger.info(f"{media_list} [ID {media_id}] successfully locked.")
 
     return '', 204
 
 
-""" A REFACTORER """
 @bp.route('/autocomplete', methods=['GET'])
 @login_required
 def autocomplete():
     search = request.args.get('q')
     media_select = request.args.get('media_select')
 
-    media_results = []
     if media_select == 'TMDB':
         try:
-            media_data = TMDBMixin().search(search)
+            Api_data = TMDBMixin()
+            Api_data.search(search)
+            media_results = Api_data.get_autocomplete_list()
         except Exception as e:
-            media_data = {}
-            app.logger.error('[ERROR] - Requesting the TMDB API: {}'.format(e))
-
-        if media_data.get('total_results', 0) or 0 > 0:
-            for i, result in enumerate(media_data["results"]):
-                if i >= media_data["total_results"] or i > 19 or len(media_results) >= 7:
-                    break
-                if result.get('known_for_department'):
-                    continue
-                media_results.append(Autocomplete(result).get_autocomplete_dict())
+            media_results = []
+            app.logger.error(f"[ERROR] - Requesting the TMDB API: {e}")
     elif media_select == 'IGDB':
         try:
-            games_data = ApiGames().search(search)
+            Api_data = ApiGames()
+            Api_data.search(search)
+            media_results = Api_data.get_autocomplete_list()
         except Exception as e:
-            games_data = {}
-            app.logger.error('[ERROR] - Requesting the IGDB API: {}'.format(e))
-
-        if len(games_data) > 0:
-            for result in games_data:
-                if len(media_results) >= 5:
-                    break
-                media_results.append(Autocomplete(result).get_games_autocomplete_dict())
+            media_results = []
+            app.logger.error(f"[ERROR] - Requesting the IGDB API: {e}")
     elif media_select == 'users':
-        users = User.query.filter(User.username.like('%' + search + '%')).all()
-        for user in users:
-            media_results.append(Autocomplete(user).get_user_dict())
+        media_results = User.get_autocomplete_list(search)
     else:
         return request.referrer or '/'
 

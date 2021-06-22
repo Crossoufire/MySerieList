@@ -70,19 +70,19 @@ def add_id_to_user(user_id, ids_to_add, list_type):
                                    current_season=len(media.eps_per_season),
                                    last_episode_watched=media.eps_per_season[-1].episodes,
                                    status=Status.COMPLETED,
-                                   eps_watched=media.total_episodes)
+                                   total=media.total_episodes)
         elif list_type == ListType.ANIME:
             user_list = AnimeList(user_id=user_id,
                                   media_id=media.id,
                                   current_season=len(media.eps_per_season),
                                   last_episode_watched=media.eps_per_season[-1].episodes,
                                   status=Status.COMPLETED,
-                                  eps_watched=media.total_episodes)
+                                  total=media.total_episodes)
         elif list_type == ListType.MOVIES:
             user_list = MoviesList(user_id=user_id,
                                    media_id=media.id,
                                    status=Status.COMPLETED,
-                                   eps_watched=1)
+                                   total=1)
 
         db.session.add(user_list)
         app.logger.info('[User {}] {} Added [ID {}] in the category: Completed'

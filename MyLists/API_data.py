@@ -1,13 +1,14 @@
 import json
 import secrets
+import pykakasi
 import requests
 from PIL import Image
-from flask import abort
 from pathlib import Path
 from urllib import request
 from MyLists import app, db
 from datetime import datetime
-# from howlongtobeatpy import HowLongToBeat
+from flask import abort, url_for
+from howlongtobeatpy import HowLongToBeat
 from ratelimit import sleep_and_retry, limits
 from urllib.request import urlretrieve, Request
 from MyLists.models import ListType, MediaType, Series, Anime, SeriesGenre, AnimeGenre, AnimeActors, SeriesActors, \
@@ -21,6 +22,46 @@ from MyLists.models import ListType, MediaType, Series, Anime, SeriesGenre, Anim
 def status_code(status_code):
     if status_code != 200:
         abort(status_code)
+
+
+def latin_alphabet(original_name):
+    try:
+        original_name.encode('iso-8859-1')
+        return True
+    except UnicodeEncodeError:
+        try:
+            kks = pykakasi.kakasi()
+            kks.setMode("H", "a")
+            kks.setMode("K", "a")
+            kks.setMode("J", "a")
+            kks.setMode("s", True)
+            try:
+                conv = kks.getConverter().do(original_name).split('.')
+            except:
+                conv = kks.getConverter().do(original_name).split()
+            cap_parts = [p.capitalize() for p in conv]
+            cap_message = " ".join(cap_parts)
+            return cap_message
+        except:
+            return False
+
+
+def change_air_format(date, media_sheet=False, games=False):
+    if media_sheet and not games:
+        try:
+            return datetime.strptime(date, '%Y-%m-%d').strftime("%b %Y")
+        except:
+            return 'Unknown'
+    elif not media_sheet and not games:
+        try:
+            return datetime.strptime(date, '%Y-%m-%d').strftime("%d %b %Y")
+        except:
+            return 'Unknown'
+    elif games:
+        try:
+            return datetime.utcfromtimestamp(int(date)).strftime('%d %b %Y')
+        except:
+            return 'Unknown'
 
 
 class ApiData(object):
@@ -74,8 +115,7 @@ class TMDBMixin(ApiData):
                                 .format(self.api_key, media_name, page), timeout=15)
 
         status_code(response.status_code)
-
-        return json.loads(response.text)
+        self.API_data = json.loads(response.text)
 
     def get_media_cover(self):
         media_cover_name = 'default.jpg'
@@ -117,6 +157,50 @@ class TMDBMixin(ApiData):
         img = Image.open(f"{self.local_covers_path}/{media_cover_name}")
         img = img.resize((300, 450), Image.ANTIALIAS)
         img.save(f"{self.local_covers_path}/{media_cover_name}", quality=90)
+
+    def get_autocomplete_list(self):
+        media_results = []
+        if self.API_data.get('total_results', 0) or 0 > 0:
+            for i, result in enumerate(self.API_data["results"]):
+                media_details = {}
+                if i >= self.API_data["total_results"] or i > 19 or len(media_results) >= 7:
+                    break
+                if result.get('known_for_department'):
+                    continue
+
+                media_details['api_id'] = result.get('id')
+                media_details['image_cover']: url_for('static', filename="covers/series_covers/default.jpg")
+
+                if result.get('poster_path'):
+                    media_details['image_cover'] = f"{self.poster_base_url}{result.get('poster_path')}"
+
+                if result.get('media_type') == 'tv':
+                    media_details['category'] = 'Series/Anime'
+
+                    return_latin = latin_alphabet(result.get('original_name'))
+                    media_details['display_name'] = result.get('name')
+                    if return_latin is True:
+                        media_details['display_name'] = result.get('original_name')
+
+                    media_details['date'] = change_air_format(result.get('first_air_date'))
+                    media_details['type'] = 'Series'
+                    if result.get('origin_country') == 'JP' or result.get('original_language') == 'ja' \
+                            and 16 in result.get('genre_ids'):
+                        media_details['type'] = 'Anime'
+                elif result.get('media_type') == 'movie':
+                    media_details['category'] = 'Movies'
+
+                    return_latin = latin_alphabet(result.get('original_title'))
+                    media_details['display_name'] = result.get('title')
+                    if return_latin is True:
+                        media_details['display_name'] = result.get('original_title')
+
+                    media_details['date'] = change_air_format(result.get('release_date'))
+                    media_details['type'] = 'Movies'
+
+                media_results.append(media_details)
+
+        return media_results
 
 
 class ApiTV(TMDBMixin):
@@ -416,16 +500,13 @@ class ApiGames(ApiData):
     @sleep_and_retry
     @limits(calls=4, period=1)
     def search(self, game_name):
-        print(app.config['CLIENT_IGDB'])
-        print(self.api_key)
         headers = {'Client-ID': f"{app.config['CLIENT_IGDB']}",
                    'Authorization': 'Bearer ' + self.api_key}
         body = 'fields id, name, cover.image_id, first_release_date, storyline; search "{}";'.format(game_name)
         response = requests.post('https://api.igdb.com/v4/games', data=body, headers=headers, timeout=15)
 
         status_code(response.status_code)
-
-        return json.loads(response.text)
+        self.API_data = json.loads(response.text)
 
     def get_details_and_credits_data(self):
         headers = {'Client-ID': f"{self.client_igdb}",
@@ -440,6 +521,7 @@ class ApiGames(ApiData):
 
         status_code(response.status_code)
         self.API_data = json.loads(response.text)
+        self.API_data = self.API_data[0]
 
     def save_api_cover(self, media_cover_path, media_cover_name):
         url_address = f"{self.poster_base_url}{media_cover_path}.jpg"
@@ -474,7 +556,6 @@ class ApiGames(ApiData):
         return media_cover_name
 
     def from_API_to_dict(self):
-        self.API_data = self.API_data[0]
         self.media_details = {'name': self.API_data.get('name', 'Unknown') or 'Unknown',
                               'release_date': self.API_data.get('first_release_date', 'Unknown') or 'Unknown',
                               'IGDB_url': self.API_data.get('url', 'Unknown') or 'Unknown',
@@ -549,3 +630,25 @@ class ApiGames(ApiData):
 
         for platform in [{**item, 'media_id': self.media.id} for item in self.all_data['platforms_data']]:
             db.session.add(GamesPlatforms(**platform))
+
+    def get_autocomplete_list(self):
+        media_results = []
+        if len(self.API_data) > 0:
+            for result in self.API_data:
+                media_details = {}
+                if len(media_results) >= 5:
+                    break
+
+                media_details['api_id'] = result.get('id')
+                media_details['display_name'] = result.get('name')
+                media_details['category'] = 'Games'
+                media_details['type'] = 'Games'
+                media_details['image_cover'] = url_for('static', filename="covers/series_covers/default.jpg")
+                if result.get('cover'):
+                    media_details['image_cover'] = f"{self.poster_base_url}{result['cover']['image_id']}.jpg"
+
+                media_details['date'] = change_air_format(result.get('first_release_date'), games=True)
+
+                media_results.append(media_details)
+
+        return media_results

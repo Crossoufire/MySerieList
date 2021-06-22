@@ -101,7 +101,7 @@
                     <form id="auto-form" class="form-inline nav-form" name="aform" action="{{ url_for('main.search_media') }}">
                         <label for="autocomplete"></label>
                         <input id="autocomplete" class="form-control search-ipad-mobile" name="search"
-                         placeholder="Search...">
+                         placeholder="Search media or users">
                         <label for="select-media"></label>
                     </form>
                     <select id="select-media" class="auto-select" name="media_select">
@@ -243,12 +243,9 @@
 {% endblock %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/mylists.js') }}"></script>
 <script>
-    function validateForm() {
-        let x = document.forms["aform"]["search"].value;
-            if (x === "") {
-                return false;
-            }
-        }
+    $('#select-media').change(function () {
+        $('#autocomplete').val('')
+    });
 
     {% if current_user.is_authenticated %}
         {% with task = current_user.get_task_in_progress('import_list') %}

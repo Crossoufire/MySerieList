@@ -1,15 +1,15 @@
-import time
+import operator
 from collections import OrderedDict
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 import pandas as pd
 import numpy as np
-# import iso639
+import iso639
 import json
 import pytz
 import random
-# import rq
+import rq
 from flask import abort, url_for
 from flask_login import UserMixin, current_user
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -251,6 +251,18 @@ class User(UserMixin, db.Model):
             follows_update_list.append(tmp)
 
         return follows_update_list
+
+    @classmethod
+    def get_autocomplete_list(cls, search):
+        users = cls.query.filter(cls.username.like('%' + search + '%'), cls.role != RoleType.ADMIN).all()
+        users_list = []
+        for user in users:
+            users_list.append({'display_name': user.username,
+                               'image_cover': '/static/profile_pics/' + user.image_file,
+                               'date': datetime.strftime(user.registered_on, '%d %b %Y'),
+                               'category': 'Users',
+                               'type': 'User'})
+        return users_list
 
     @staticmethod
     def _shape_to_dict_updates(last_update):
@@ -517,7 +529,7 @@ class MediaListMixin(object):
 
     @classmethod
     def get_media_total_eps(cls, user_id):
-        query = db.session.query(func.sum(cls.eps_watched)).filter(cls.user_id == user_id).all()
+        query = db.session.query(func.sum(cls.total)).filter(cls.user_id == user_id).all()
         eps_watched = query[0][0]
 
         if eps_watched is None:
@@ -533,24 +545,25 @@ class MediaListMixin(object):
         return favorites
 
     def category_changes(self, new_status):
-        old_watched = self.eps_watched
+        #  Set the new status
+        self.status = new_status
+
+        new_total = self.total
         if new_status == Status.COMPLETED:
             self.current_season = len(self.media.eps_per_season)
             self.last_episode_watched = self.media.eps_per_season[-1].episodes
-            self.eps_watched = self.media.total_episodes
-            new_watched = self.media.total_episodes
+            self.total = self.media.total_episodes
+            new_total = self.media.total_episodes
         elif new_status == Status.RANDOM or new_status == Status.PLAN_TO_WATCH:
             self.current_season = 1
             self.last_episode_watched = 0
-            self.eps_watched = 0
-            new_watched = 0
-        else:
-            new_watched = old_watched
+            self.total = 0
+            new_total = 0
 
-        old_rewatch = self.rewatched
+        #  Reset the rewatched
         self.rewatched = 0
 
-        return old_rewatch, old_watched, new_watched
+        return new_total
 
 
 class TVBase(db.Model):
@@ -643,7 +656,7 @@ class Series(MediaMixin, TVBase):
             new_watched = 0
 
         user_list = SeriesList(user_id=current_user.id, media_id=self.id, current_season=new_season,
-                               last_episode_watched=new_episode, status=new_status, eps_watched=new_watched)
+                               last_episode_watched=new_episode, status=new_status, total=new_watched)
 
         db.session.add(user_list)
         return new_watched
@@ -653,7 +666,7 @@ class Series(MediaMixin, TVBase):
         return 'media_sheet_series.html'
 
     @classmethod
-    def compute_time_spent(cls, media=None, old_watched=0, new_watched=0,  new_rewatch=0, old_rewatch=0, user_id=None):
+    def compute_time_spent(cls, media, new_data=0, add_=False, user_id=None):
         # Use for the list import function (redis and rq backgound process), can't import the <current_user> context
         if current_user:
             user = current_user
@@ -661,8 +674,10 @@ class Series(MediaMixin, TVBase):
             user = User.query.filter(User.id == user_id).first()
 
         old_time = user.time_spent_series
-        user.time_spent_series = old_time + ((new_watched-old_watched) * media.duration) +\
-                                 (media.total_episodes * media.duration * (new_rewatch - old_rewatch))
+        if add_:
+            user.time_spent_series = old_time + (new_data * media.media.duration)
+        else:
+            user.time_spent_series = old_time + ((new_data - media.total) * media.media.duration)
 
 
 class SeriesList(MediaListMixin, db.Model):
@@ -678,13 +693,16 @@ class SeriesList(MediaListMixin, db.Model):
     rewatched = db.Column(db.Integer, nullable=False, default=0)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
-    eps_watched = db.Column(db.Integer)
+    total = db.Column(db.Integer)
     comment = db.Column(db.Text)
 
     media = db.relationship("Series", back_populates='list_info', lazy=False)
 
     def update_total_watched(self, new_rewatch):
-        self.eps_watched = self.media.total_episodes + (new_rewatch * self.media.total_episodes)
+        self.rewatched = new_rewatch
+        new_total = self.media.total_episodes + (new_rewatch * self.media.total_episodes)
+        self.total = new_total
+        return new_total
 
     @staticmethod
     def default_sorting():
@@ -764,22 +782,24 @@ class Anime(MediaMixin, TVBase):
             new_watched = 0
 
         user_list = AnimeList(user_id=current_user.id, media_id=self.id, current_season=new_season,
-                               last_episode_watched=new_episode, status=new_status, eps_watched=new_watched)
+                              last_episode_watched=new_episode, status=new_status, total=new_watched)
 
         db.session.add(user_list)
         return new_watched
 
     @classmethod
-    def compute_time_spent(cls, media=None, old_watched=0, new_watched=0, new_rewatch=0, old_rewatch=0, user_id=None):
-        # Use for the list import function (redis and rq backgound process), can't import the current_user context
+    def compute_time_spent(cls, media, new_data=0, add_=False, user_id=None):
+        # Use for the list import function (redis and rq backgound process), can't import the <current_user> context
         if current_user:
             user = current_user
         else:
             user = User.query.filter(User.id == user_id).first()
 
         old_time = user.time_spent_anime
-        user.time_spent_anime = old_time + ((new_watched - old_watched) * media.duration) + (
-                media.total_episodes * media.duration * (new_rewatch - old_rewatch))
+        if add_:
+            user.time_spent_anime = old_time + (new_data * media.media.duration)
+        else:
+            user.time_spent_anime = old_time + ((new_data - media.total) * media.media.duration)
 
     @staticmethod
     def media_sheet_template():
@@ -799,13 +819,16 @@ class AnimeList(MediaListMixin, db.Model):
     rewatched = db.Column(db.Integer, nullable=False, default=0)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
-    eps_watched = db.Column(db.Integer)
+    total = db.Column(db.Integer)
     comment = db.Column(db.Text)
 
     media = db.relationship("Anime", back_populates='list_info', lazy=False)
 
     def update_total_watched(self, new_rewatch):
-        self.eps_watched = self.media.total_episodes + (new_rewatch * self.media.total_episodes)
+        self.rewatched = new_rewatch
+        new_total = self.media.total_episodes + (new_rewatch * self.media.total_episodes)
+        self.total = new_total
+        return new_total
 
     @staticmethod
     def default_sorting():
@@ -889,7 +912,7 @@ class Movies(MediaMixin, db.Model):
         if new_status != Status.COMPLETED:
             new_watched = 0
 
-        user_list = MoviesList(user_id=current_user.id, media_id=self.id, status=new_status, eps_watched=new_watched)
+        user_list = MoviesList(user_id=current_user.id, media_id=self.id, status=new_status, total=new_watched)
         db.session.add(user_list)
 
         return None
@@ -926,27 +949,18 @@ class Movies(MediaMixin, db.Model):
         return list(map(list, zip(query, formated_dates)))
 
     @classmethod
-    def compute_time_spent(cls, media=None, movie_status=None, movie_delete=False, movie_add=False, new_rewatch=0,
-                           old_rewatch=0, movie_duration=0, user_id=None):
-
-        # Use for the list import function (redis and rq backgound process), can't import the current_user context
+    def compute_time_spent(cls, media, new_data=0, add_=False, user_id=None):
+        # Use for the list import function (redis and rq backgound process), can't import the <current_user> context
         if current_user:
             user = current_user
         else:
             user = User.query.filter(User.id == user_id).first()
 
         old_time = user.time_spent_movies
-        if movie_delete:
-            if movie_status == Status.COMPLETED:
-                user.time_spent_movies = old_time - media.duration + media.duration * (new_rewatch - old_rewatch)
-        elif movie_add:
-            if movie_status == Status.COMPLETED:
-                user.time_spent_movies = old_time + media.duration
+        if add_:
+            user.time_spent_movies = old_time + (new_data * media.media.duration)
         else:
-            if movie_status == Status.COMPLETED:
-                user.time_spent_movies = old_time + movie_duration + media.duration * (new_rewatch - old_rewatch)
-            else:
-                user.time_spent_movies = old_time - movie_duration + media.duration * (new_rewatch - old_rewatch)
+            user.time_spent_movies = old_time + ((new_data - media.total) * media.media.duration)
 
     @staticmethod
     def media_sheet_template():
@@ -962,7 +976,7 @@ class MoviesList(MediaListMixin, db.Model):
     media_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     status = db.Column(db.Enum(Status), nullable=False)
     rewatched = db.Column(db.Integer, nullable=False, default=0)
-    eps_watched = db.Column(db.Integer)
+    total = db.Column(db.Integer)
     favorite = db.Column(db.Boolean)
     score = db.Column(db.Float)
     comment = db.Column(db.Text)
@@ -970,18 +984,23 @@ class MoviesList(MediaListMixin, db.Model):
     media = db.relationship("Movies", back_populates='list_info', lazy=False)
 
     def update_total_watched(self, new_rewatch):
-        self.eps_watched = 1 + new_rewatch
+        self.rewatched = new_rewatch
+        new_total = 1 + new_rewatch
+        self.total = new_total
+        return new_total
 
     def category_changes(self, new_status):
         if new_status == Status.COMPLETED:
-            self.eps_watched = 1
+            self.total = 1
+            new_total = 1
         else:
-            self.eps_watched = 0
+            self.total = 0
+            new_total = 0
 
-        old_rewatch = self.rewatched
+        # Set rewatched value
         self.rewatched = 0
 
-        return old_rewatch, None, None
+        return new_total
 
     @staticmethod
     def default_sorting():
@@ -1097,15 +1116,15 @@ class Games(MediaMixin, db.Model):
         return list(map(list, zip(query, formated_dates)))
 
     @classmethod
-    def compute_time_spent(cls, old_playtime=0, new_playtime=0, user_id=None):
-        # Use for the list import function (redis and rq backgound process), can't import the current_user context
+    def compute_time_spent(cls, media, new_data=0, add_=False, user_id=None):
+        # Use for the list import function (redis and rq backgound process), can't import the <current_user> context
         if current_user:
             user = current_user
         else:
             user = User.query.filter(User.id == user_id).first()
 
-        old_time = current_user.time_spent_games
-        user.time_spent_games = old_time + new_playtime - old_playtime
+        old_time = user.time_spent_games
+        user.time_spent_games = old_time + (new_data - media.playtime)
 
     @staticmethod
     def media_sheet_template():
@@ -1129,7 +1148,7 @@ class GamesList(MediaListMixin, db.Model):
     media = db.relationship("Games", back_populates='list_info', lazy=False)
 
     def category_changes(self, new_status):
-        return None, None, None
+        return self.playtime
 
     @classmethod
     def get_media_total_eps(cls, user_id):
@@ -1436,7 +1455,7 @@ class GlobalStats:
         queries = []
         for list_type in self.truncated_list_type:
             self.get_query_data(list_type)
-            queries.append(db.session.query(func.sum(self.media_list.eps_watched),
+            queries.append(db.session.query(func.sum(self.media_list.total),
                                             func.sum(self.media_list.current_season)).all())
         return queries
 
@@ -1560,6 +1579,57 @@ def get_media_query(user_id, list_type, category, genre, sorting, page, q):
     return cat_value, data
 
 
+def get_media_query_test(user_id, list_type, category, genre, sorting, page, q):
+    models = get_models_group(list_type)
+    sorting_dict = {'Title A-Z': 'media.name',
+                    'Title Z-A': 'media.name',
+                    'Score +': 'score',
+                    'Score -': 'score',
+                    'Comments': 'comment',
+                    'Release date +': 'media.first_air_date',
+                    'Release date -': 'media.first_air_date',
+                    'Rewatch': 'rewatched',
+                    'Score TMDB +': 'media.vote_average',
+                    'Score TMDB -': 'media.vote_average'}
+
+    if category == 'Favorite':
+        category = True
+    elif category != 'All':
+        category = Status(category)
+
+    # Check the sorting value
+    try:
+        reverse = False
+        if '+' in sorting:
+            reverse = True
+        sorting = sorting_dict[sorting]
+    except KeyError:
+        abort(400)
+
+    results = models[1].query.filter_by(user_id=user_id).all()
+
+    toto = []
+    for media in results:
+        if media.status == category or media.favorite == category or category == 'All':
+            if genre in [x.genre for x in media.media.genres] or genre == 'All':
+                toto.append(media)
+
+    toto.sort(key=lambda x: operator.attrgetter(sorting)(x), reverse=reverse)
+
+    to_show = [toto[x: x+48] for x in range(0, len(toto), 48)]
+
+    # Get <common_media> and <common_elements> between the users
+    common_media, common_elements = get_media_count(user_id, list_type)
+
+    data = {'actual_page': page,
+            'total_pages': len(to_show),
+            'total_media': len(toto),
+            'common_elements': common_elements,
+            'items_list': to_show[int(page)-1]}
+
+    return category.value, data
+
+
 # Count the number of media in a list type for a user
 def get_media_count(user_id, list_type):
     # If user_id == current_user.id the common media does not need to be calculated.
@@ -1592,8 +1662,8 @@ def compute_media_time_spent():
         media_list = eval(list_type.value.capitalize().replace('l', 'L'))
 
         if media_list != GamesList:
-            query = db.session.query(User, media.duration, media_list.eps_watched,
-                                     func.sum(media.duration * media_list.eps_watched)) \
+            query = db.session.query(User, media.duration, media_list.total,
+                                     func.sum(media.duration * media_list.total)) \
                 .join(media, media.id == media_list.media_id) \
                 .join(User, User.id == media_list.user_id) \
                 .group_by(media_list.user_id).all()
@@ -1702,7 +1772,7 @@ def get_more_stats(user, list_type):
 
         # --- Eps / runtime stats ---------------------------------------------------------------------
         if list_type == ListType.SERIES or list_type == ListType.ANIME:
-            nb_watched = element[1].eps_watched
+            nb_watched = element[1].total
             if element[1].rewatched > 0:
                 nb_watched = element[0].total_episodes
 
@@ -1769,40 +1839,15 @@ def get_games_stats(user):
     df = df.set_index(['release_date'])
     df.index = pd.to_datetime(df.index, unit='s')
     df = df.resample('5AS').sum()
-    games_count_by_release = list(zip(df['release_date'].values, df['count'].values))
-    print(games_count_by_release)
+    games_count_by_release = list(zip(df.index, df['count'].values))
 
     # --- Games by playtime interval ------------------------------------------------------
     df1 = df1.set_index(['playtime'])
-    tata = np.array([600, 1200, 1800, 3000, 4800])
+    df1['count'] = 1
+    tata = np.array([600, 1200, 1800, 3000, 4800, np.inf])
     idx = pd.cut(df1.index, bins=np.append([0], tata), include_lowest=True, right=False)
-    df1 = df1.groupby(idx, as_index=False).agg(','.join)
+    df1 = df1.groupby(idx, as_index=False).sum()
     print(df1)
-
-    media_hltb_main = OrderedDict({'<10h': 0, '10h-20h': 0, '21h-35h': 0, '36h-50h': 0, '51h-80h': 0, '81h+': 0})
-    for element in media_data:
-        try:
-            hltb_main = element[0].hltb_main_time
-            if '½' in hltb_main:
-                hltb_main = hltb_main.replace('½', '')
-                hltb_main = float(hltb_main)*60 + 30
-            else:
-                hltb_main = float(hltb_main)*60
-        except:
-            continue
-
-        if hltb_main < 600:
-            media_hltb_main['<10h'] += 1
-        elif 600 <= hltb_main < 1200:
-            media_hltb_main['10h-20h'] += 1
-        elif 1200 <= hltb_main < 1800:
-            media_hltb_main['21h-35h'] += 1
-        elif 1800 <= hltb_main < 3000:
-            media_hltb_main['36h-50h'] += 1
-        elif 3000 <= hltb_main < 4800:
-            media_hltb_main['51h-80h'] += 1
-        elif hltb_main >= 4800:
-            media_hltb_main['81h+'] += 1
 
     data = {'genres': top_genres, 'platforms': top_platforms, 'companies': top_companies, 'periods': media_periods,
             'hltb_main': media_hltb_main}
