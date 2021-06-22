@@ -1,5 +1,3 @@
-import time
-
 from PIL import Image
 from MyLists import db, app
 from datetime import datetime
@@ -11,7 +9,7 @@ from MyLists.API_data import ApiData, TMDBMixin, ApiGames
 from MyLists.main.forms import MediaComment, SearchForm, ModelForm
 from flask import Blueprint, url_for, request, abort, render_template, flash, jsonify, redirect, session
 from MyLists.models import ListType, Status, RoleType, MediaType, User, get_media_query, get_more_stats, \
-    get_games_stats, UserLastUpdate, get_models_group, get_models_type, get_media_query_test
+    get_games_stats, UserLastUpdate, get_models_group, get_models_type
 
 bp = Blueprint('main', __name__)
 
@@ -53,8 +51,7 @@ def mymedialist(media_list, user_name, category=None, genre='All', sorting=None,
 
     # Get the corresponding data depending on the selected category
     if category != 'Stats':
-        # category, media_data = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
-        category, media_data = get_media_query_test(user.id, list_type, category, genre, sorting, page_val, q)
+        category, media_data = get_media_query(user.id, list_type, category, genre, sorting, page_val, q)
     else:
         if list_type == ListType.GAMES:
             media_data = get_games_stats(user)
@@ -153,13 +150,12 @@ def media_sheet(media_type, media_id):
         return redirect(url_for('main.media_sheet', media_type=media_type.value, media_id=media.id))
 
     # Get the HTML template
-    html_template = models[0].media_sheet_template()
+    template = models[0].media_sheet_template()
 
     # Get the list info of the user on this media
     list_info = media.get_user_list_info()
 
-    return render_template(html_template, title=media.name, media=media, list_info=list_info,
-                           media_list=list_type.value)
+    return render_template(template, title=media.name, media=media, list_info=list_info, media_list=list_type.value)
 
 
 @bp.route("/media_sheet_form/<media_type>/<media_id>", methods=['GET', 'POST'])
@@ -202,7 +198,7 @@ def media_sheet_form(media_type, media_id):
         db.session.commit()
         return redirect(url_for('main.media_sheet', media_type=media_type, media_id=media_id))
 
-    return render_template('media_sheet_form.html', title='Media Form', form=form, media_type=media_type)
+    return render_template('media_sheet_form.html', title='Media Form', form=form)
 
 
 @bp.route("/your_next_airing", methods=['GET', 'POST'])

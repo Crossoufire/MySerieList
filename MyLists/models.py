@@ -1558,76 +1558,20 @@ def get_media_query(user_id, list_type, category, genre, sorting, page, q):
                                      media_more.name.like('%' + q + '%')))
 
     # Run the query
-    results = query.group_by(media.id).order_by(sorting).paginate(int(page), 48, error_out=True)
+    paginate_result = query.group_by(media.id).order_by(sorting).paginate(int(page), 48, error_out=True)
+    results_ids = [x[0].id for x in paginate_result.items]
+    results = media_list.query.filter(media_list.user_id == user_id, media_list.media_id.in_(results_ids)).all()
 
     # Get <common_media> and <common_elements> between the users
     common_media, common_elements = get_media_count(user_id, list_type)
 
-    # Recover the media data into a dict
-    items_data_list = []
-    for item in results.items:
-        from MyLists.main.media_object import MediaListObj
-        add_data = MediaListObj(item, common_media, list_type)
-        items_data_list.append(add_data)
-
-    data = {'actual_page': results.page,
-            'total_pages': results.pages,
-            'total_media': results.total,
+    data = {'actual_page': paginate_result.page,
+            'total_pages': paginate_result.pages,
+            'total_media': paginate_result.total,
             'common_elements': common_elements,
-            'items_list': items_data_list}
+            'items_list': results}
 
     return cat_value, data
-
-
-def get_media_query_test(user_id, list_type, category, genre, sorting, page, q):
-    models = get_models_group(list_type)
-    sorting_dict = {'Title A-Z': 'media.name',
-                    'Title Z-A': 'media.name',
-                    'Score +': 'score',
-                    'Score -': 'score',
-                    'Comments': 'comment',
-                    'Release date +': 'media.first_air_date',
-                    'Release date -': 'media.first_air_date',
-                    'Rewatch': 'rewatched',
-                    'Score TMDB +': 'media.vote_average',
-                    'Score TMDB -': 'media.vote_average'}
-
-    if category == 'Favorite':
-        category = True
-    elif category != 'All':
-        category = Status(category)
-
-    # Check the sorting value
-    try:
-        reverse = False
-        if '+' in sorting:
-            reverse = True
-        sorting = sorting_dict[sorting]
-    except KeyError:
-        abort(400)
-
-    results = models[1].query.filter_by(user_id=user_id).all()
-
-    toto = []
-    for media in results:
-        if media.status == category or media.favorite == category or category == 'All':
-            if genre in [x.genre for x in media.media.genres] or genre == 'All':
-                toto.append(media)
-
-    toto.sort(key=lambda x: operator.attrgetter(sorting)(x), reverse=reverse)
-
-    to_show = [toto[x: x+48] for x in range(0, len(toto), 48)]
-
-    # Get <common_media> and <common_elements> between the users
-    common_media, common_elements = get_media_count(user_id, list_type)
-
-    data = {'actual_page': page,
-            'total_pages': len(to_show),
-            'total_media': len(toto),
-            'common_elements': common_elements,
-            'items_list': to_show[int(page)-1]}
-
-    return category.value, data
 
 
 # Count the number of media in a list type for a user
